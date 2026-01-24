@@ -51,8 +51,7 @@ export default function AdminCardsPage() {
                 <TableHead>Name</TableHead>
                 <TableHead>Type</TableHead>
                 <TableHead>Set</TableHead>
-                <TableHead>Rarity</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead>Rarity</TableHead>=
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -62,11 +61,6 @@ export default function AdminCardsPage() {
                   <TableCell>{card.type}</TableCell>
                   <TableCell>{card.setName || card.setCode}</TableCell>
                   <TableCell>{card.rarity}</TableCell>
-                  <TableCell>
-                    <Badge variant={card.isReleased ? "default" : "secondary"}>
-                      {card.isReleased ? "Released" : "Unreleased"}
-                    </Badge>
-                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>

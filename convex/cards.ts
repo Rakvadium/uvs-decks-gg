@@ -93,9 +93,6 @@ export const listReleased = query({
   handler: async (ctx) => {
     const cards = await ctx.db
       .query("cards")
-      .withIndex("by_released_and_variant", (q) =>
-        q.eq("isReleased", true).eq("isVariant", false)
-      )
       .collect();
 
     return cards.filter((card) => card.isFrontFace !== false);
@@ -116,9 +113,6 @@ export const listReleasedPaginated = query({
     const limit = args.limit ?? 500;
     const result = await ctx.db
       .query("cards")
-      .withIndex("by_released_and_variant", (q) =>
-        q.eq("isReleased", true).eq("isVariant", false)
-      )
       .paginate({ numItems: limit, cursor: args.cursor ?? null });
 
     return {
@@ -314,7 +308,6 @@ export const listPaginated = query({
 
     const result = await ctx.db
       .query("cards")
-      .withIndex("by_normalizedName")
       .paginate(paginationOpts);
 
     let page = result.page.filter((card) => card.isFrontFace !== false && card.isVariant !== true);
@@ -369,9 +362,6 @@ export const getRarities = query({
   handler: async (ctx) => {
     const cards = await ctx.db
       .query("cards")
-      .withIndex("by_released_and_variant", (q) =>
-        q.eq("isReleased", true).eq("isVariant", false)
-      )
       .collect();
 
     const rarities = new Set<string>();
@@ -390,9 +380,6 @@ export const getTypes = query({
   handler: async (ctx) => {
     const cards = await ctx.db
       .query("cards")
-      .withIndex("by_released_and_variant", (q) =>
-        q.eq("isReleased", true).eq("isVariant", false)
-      )
       .collect();
 
     const types = new Set<string>();
@@ -411,9 +398,6 @@ export const getSets = query({
   handler: async (ctx) => {
     const cards = await ctx.db
       .query("cards")
-      .withIndex("by_released_and_variant", (q) =>
-        q.eq("isReleased", true).eq("isVariant", false)
-      )
       .collect();
 
     const sets = new Set<string>();
@@ -495,9 +479,6 @@ export const listCharacters = query({
 
     const allCards = await ctx.db
       .query("cards")
-      .withIndex("by_released_and_variant", (q) =>
-        q.eq("isReleased", true).eq("isVariant", false)
-      )
       .collect();
 
     return allCards.filter((card) => card.type === cardType && card.isFrontFace !== false);

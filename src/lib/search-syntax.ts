@@ -355,7 +355,7 @@ export const UNIVERSUS_SYNTAX_DEFINITIONS: SyntaxDefinition[] = [
     description: "Filter by keyword",
     examples: ["keyword:powerful", "kw:breaker", "k:stun"],
     operators: [":", "=", "!="],
-    matcher: createArrayMatcher((card) => card.keywords),
+    matcher: createArrayMatcher((card) => card.keywords ? card.keywords.split("|") : undefined),
   },
   {
     key: "symbol",
@@ -363,7 +363,7 @@ export const UNIVERSUS_SYNTAX_DEFINITIONS: SyntaxDefinition[] = [
     description: "Filter by symbol",
     examples: ["symbol:fire", "sym:earth", "symbol:void"],
     operators: [":", "=", "!="],
-    matcher: createArrayMatcher((card) => card.symbols),
+    matcher: createArrayMatcher((card) => card.symbols ? card.symbols.split("|") : undefined),
   },
   {
     key: "zone",

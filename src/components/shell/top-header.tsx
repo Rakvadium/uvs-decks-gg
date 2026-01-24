@@ -29,6 +29,7 @@ import {
   DropdownMenuSubContent,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuthActions } from "@convex-dev/auth/react";

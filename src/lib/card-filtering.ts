@@ -56,7 +56,7 @@ export function filterCardsBySet(cards: Card[], setCodes?: string[]): Card[] {
 export function filterCardsByKeywords(cards: Card[], keywords?: string[]): Card[] {
     if (!keywords || keywords.length === 0) return cards;
     return cards.filter((card) => {
-        const cardKeywords = card.keywords ?? [];
+        const cardKeywords = card.keywords ? card.keywords.split("|") : [];
         return keywords.some(kw => cardKeywords.includes(kw));
     });
 }

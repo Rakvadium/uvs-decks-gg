@@ -197,7 +197,7 @@ export const validateDeck = query({
         const card = cardMap.get(cardIdStr);
         if (!card) continue;
 
-        const cardIdentities = card.symbols ?? [];
+        const cardIdentities = card.symbols ? card.symbols.split("|") : [];
         const hasMatchingIdentity = cardIdentities.includes(deck.selectedIdentity) || 
           cardIdentities.includes("Infinity");
 
