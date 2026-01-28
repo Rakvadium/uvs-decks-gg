@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo, useRef, useEffect, useCallback } from "react";
-import { Loader2, RefreshCw, Database, Cloud } from "lucide-react";
+import { Loader2, Database, Cloud } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -124,10 +124,70 @@ function CacheStatusBadge({
   );
 }
 
-export function GalleryView() {
-  const [search, setSearch] = useState("");
+interface InfiniteCardGridProps {
+  cards: CachedCard[];
+}
+
+function InfiniteCardGrid({ cards }: InfiniteCardGridProps) {
   const [visibleCount, setVisibleCount] = useState(CARDS_PER_PAGE);
   const loadMoreRef = useRef<HTMLDivElement>(null);
+  
+  const visibleCards = useMemo(() => {
+    return cards.slice(0, visibleCount);
+  }, [cards, visibleCount]);
+  
+  const hasMore = visibleCount < cards.length;
+  
+  const handleLoadMore = useCallback(() => {
+    if (hasMore) {
+      setVisibleCount((prev) => Math.min(prev + CARDS_PER_PAGE, cards.length));
+    }
+  }, [hasMore, cards.length]);
+  
+  useEffect(() => {
+    if (!loadMoreRef.current) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore) {
+          handleLoadMore();
+        }
+      },
+      { rootMargin: "200px" }
+    );
+
+    observer.observe(loadMoreRef.current);
+    return () => observer.disconnect();
+  }, [hasMore, handleLoadMore]);
+  
+  return (
+    <>
+      <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+        {visibleCards.map((card) => (
+          <CardGridItem key={card._id} card={card} />
+        ))}
+      </div>
+
+      {hasMore && (
+        <div ref={loadMoreRef} className="flex justify-center py-8">
+          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+        </div>
+      )}
+
+      {visibleCards.length === 0 && (
+        <div className="flex flex-col items-center justify-center py-12 text-center">
+          <p className="text-lg font-medium">No cards found</p>
+          <p className="text-muted-foreground">
+            Try adjusting your search or filters
+          </p>
+        </div>
+      )}
+    </>
+  );
+}
+
+export function GalleryView() {
+  const [search, setSearch] = useState("");
   
   const { uiState } = useUIState();
   const {
@@ -139,7 +199,6 @@ export function GalleryView() {
     serverVersion,
     isSyncing,
     refreshCache,
-    uniqueValues,
   } = useCardData();
 
   const filters = useMemo(() => ({
@@ -158,35 +217,10 @@ export function GalleryView() {
     return sortCards(filtered, sortOptions);
   }, [cards, filters, sortOptions]);
 
-  const visibleCards = useMemo(() => {
-    return filteredCards.slice(0, visibleCount);
-  }, [filteredCards, visibleCount]);
-
-  const handleLoadMore = useCallback(() => {
-    if (visibleCount < filteredCards.length) {
-      setVisibleCount((prev) => Math.min(prev + CARDS_PER_PAGE, filteredCards.length));
-    }
-  }, [visibleCount, filteredCards.length]);
-
-  useEffect(() => {
-    if (!loadMoreRef.current) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          handleLoadMore();
-        }
-      },
-      { rootMargin: "200px" }
-    );
-
-    observer.observe(loadMoreRef.current);
-    return () => observer.disconnect();
-  }, [handleLoadMore]);
-
-  useEffect(() => {
-    setVisibleCount(CARDS_PER_PAGE);
-  }, [search, filters]);
+  const filterKey = useMemo(
+    () => JSON.stringify({ search, filters: uiState.galleryFilters }),
+    [search, uiState.galleryFilters]
+  );
 
   if (isLoading && cards.length === 0) {
     return (
@@ -228,26 +262,7 @@ export function GalleryView() {
         />
       </div>
 
-      <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-        {visibleCards.map((card) => (
-          <CardGridItem key={card._id} card={card} />
-        ))}
-      </div>
-
-      {visibleCount < filteredCards.length && (
-        <div ref={loadMoreRef} className="flex justify-center py-8">
-          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-        </div>
-      )}
-
-      {visibleCards.length === 0 && !isLoading && (
-        <div className="flex flex-col items-center justify-center py-12 text-center">
-          <p className="text-lg font-medium">No cards found</p>
-          <p className="text-muted-foreground">
-            Try adjusting your search or filters
-          </p>
-        </div>
-      )}
+      <InfiniteCardGrid key={filterKey} cards={filteredCards} />
 
       <LoadingProgress progress={loadProgress} isLoadingMore={isLoadingMore} />
     </div>

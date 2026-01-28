@@ -1,8 +1,8 @@
 import { query, mutation, action, internalMutation } from "./_generated/server";
 import { paginationOptsValidator } from "convex/server";
 import { v } from "convex/values";
-import { cardValidator, cardDataVersionValidator } from "./validators";
-import { api, internal } from "./_generated/api";
+import { cardValidator } from "./validators";
+import { api } from "./_generated/api";
 
 export const list = query({
   args: {

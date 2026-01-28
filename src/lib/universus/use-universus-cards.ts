@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useQuery, useConvex } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import {
-  CachedCard,
   getCachedCards,
   setCachedCards,
   getCacheMetadata,
@@ -14,7 +13,10 @@ import {
   CardIndex,
   getUniqueValues,
 } from "./card-store";
+import type { CachedCard } from "./card-store";
 import type { CardFilters } from "@/providers/UIStateProvider";
+
+export type { CachedCard } from "./card-store";
 
 export type SortDirection = "asc" | "desc";
 
@@ -96,7 +98,12 @@ export function useUniversusCards(): UseUniversusCardsResult {
       let isFirstChunk = true;
       
       while (!isDone) {
-        const result = await convex.query(api.cards.listAllCardsChunked, {
+        const result: {
+          cards: CachedCard[];
+          nextCursor: string | null;
+          isDone: boolean;
+          totalEstimate: number;
+        } = await convex.query(api.cards.listAllCardsChunked, {
           cursor,
           chunkSize: BACKGROUND_CHUNK_SIZE,
         });
