@@ -71,6 +71,44 @@ export function useUniversusCards(): UseUniversusCardsResult {
   const serverVersion = versionData?.version ?? null;
   const serverCardCount = versionData?.cardCount ?? 0;
 
+  const fallbackToDirectQuery = useCallback(async () => {
+    if (syncInProgress.current) return;
+    syncInProgress.current = true;
+    setIsSyncing(true);
+    setError(null);
+    
+    try {
+      const allCards: CachedCard[] = await convex.query(api.cards.listReleased, {});
+      
+      setCards(allCards);
+      setIsLoading(false);
+      
+      await setCachedCards(allCards);
+      await setCacheMetadata({
+        version: 1,
+        updatedAt: Date.now(),
+        cardCount: allCards.length,
+        lastSyncAt: Date.now(),
+      });
+      
+      setCachedVersion(1);
+      const cardIndex = buildCardIndex(allCards);
+      setIndex(cardIndex);
+      setUniqueValues(getUniqueValues(allCards));
+      setLoadProgress(100);
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err);
+        console.error("Failed to load cards:", err);
+      }
+    } finally {
+      setIsLoading(false);
+      setIsLoadingMore(false);
+      setIsSyncing(false);
+      syncInProgress.current = false;
+    }
+  }, [convex]);
+
   const loadFromCache = useCallback(async (): Promise<boolean> => {
     try {
       const [cachedCards, metadata] = await Promise.all([
@@ -139,29 +177,29 @@ export function useUniversusCards(): UseUniversusCardsResult {
       
       await setCachedCards(allCards);
       await setCacheMetadata({
-        version: serverVersion!,
+        version: serverVersion ?? 1,
         updatedAt: Date.now(),
         cardCount: allCards.length,
         lastSyncAt: Date.now(),
       });
       
-      setCachedVersion(serverVersion);
+      setCachedVersion(serverVersion ?? 1);
       const cardIndex = buildCardIndex(allCards);
       setIndex(cardIndex);
       setUniqueValues(getUniqueValues(allCards));
       setLoadProgress(100);
     } catch (err) {
-      if (err instanceof Error) {
-        setError(err);
-        console.error("Failed to sync cards:", err);
-      }
+      console.error("Chunked loading failed, falling back to direct query:", err);
+      syncInProgress.current = false;
+      await fallbackToDirectQuery();
+      return;
     } finally {
       setIsLoading(false);
       setIsLoadingMore(false);
       setIsSyncing(false);
       syncInProgress.current = false;
     }
-  }, [convex, serverVersion]);
+  }, [convex, serverVersion, fallbackToDirectQuery]);
 
   const refreshCache = useCallback(async () => {
     await clearCardCache();
@@ -192,18 +230,24 @@ export function useUniversusCards(): UseUniversusCardsResult {
 
   useEffect(() => {
     if (!isHydrated) return;
-    if (serverVersion === null) return;
     
     const checkAndSync = async () => {
       const metadata = await getCacheMetadata();
       
-      if (!metadata || metadata.version !== serverVersion) {
-        await fetchAllCardsProgressively();
+      if (serverVersion !== null) {
+        if (!metadata || metadata.version !== serverVersion) {
+          await fetchAllCardsProgressively();
+        }
+      } else if (versionData === undefined) {
+      } else {
+        if (!metadata) {
+          await fallbackToDirectQuery();
+        }
       }
     };
     
     checkAndSync();
-  }, [isHydrated, serverVersion, fetchAllCardsProgressively]);
+  }, [isHydrated, serverVersion, versionData, fetchAllCardsProgressively, fallbackToDirectQuery]);
 
   return {
     cards,
