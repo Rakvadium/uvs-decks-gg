@@ -5,6 +5,12 @@ import { v } from "convex/values";
 export default defineSchema({
   ...authTables,
 
+  cardDataVersion: defineTable({
+    version: v.number(),
+    updatedAt: v.number(),
+    cardCount: v.number(),
+  }),
+
   users: defineTable({
     username: v.optional(v.string()),
     email: v.optional(v.string()),

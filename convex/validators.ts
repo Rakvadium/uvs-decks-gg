@@ -226,3 +226,11 @@ export const ingestionJobValidator = v.object({
   startedAt: v.number(),
   completedAt: v.optional(v.number()),
 });
+
+export const cardDataVersionValidator = v.object({
+  _id: v.id("cardDataVersion"),
+  _creationTime: v.number(),
+  version: v.number(),
+  updatedAt: v.number(),
+  cardCount: v.number(),
+});
