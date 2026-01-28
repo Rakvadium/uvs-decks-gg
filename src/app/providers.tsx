@@ -8,6 +8,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "sonner";
 import { QueryProvider } from "@/providers/QueryProvider";
 import { AuthDialogProvider } from "@/components/auth/auth-dialog";
+import { CardDataProvider } from "@/lib/universus";
 
 const convex = new ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
@@ -22,7 +23,9 @@ export function Providers({ children }: { children: ReactNode }) {
           disableTransitionOnChange
         >
           <AuthDialogProvider>
-            <TooltipProvider delayDuration={0}>{children}</TooltipProvider>
+            <CardDataProvider>
+              <TooltipProvider delayDuration={0}>{children}</TooltipProvider>
+            </CardDataProvider>
           </AuthDialogProvider>
           <Toaster />
         </ThemeProvider>

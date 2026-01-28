@@ -1,4 +1,4 @@
-import { query, mutation, action } from "./_generated/server";
+import { query, mutation, action, internalMutation } from "./_generated/server";
 import { paginationOptsValidator } from "convex/server";
 import { v } from "convex/values";
 import { cardValidator } from "./validators";
@@ -482,6 +482,149 @@ export const listCharacters = query({
       .collect();
 
     return allCards.filter((card) => card.type === cardType && card.isFrontFace !== false);
+  },
+});
+
+export const getCardDataVersion = query({
+  args: {},
+  returns: v.union(
+    v.object({
+      version: v.number(),
+      updatedAt: v.number(),
+      cardCount: v.number(),
+    }),
+    v.null()
+  ),
+  handler: async (ctx) => {
+    const versionDoc = await ctx.db.query("cardDataVersion").first();
+    if (!versionDoc) return null;
+    return {
+      version: versionDoc.version,
+      updatedAt: versionDoc.updatedAt,
+      cardCount: versionDoc.cardCount,
+    };
+  },
+});
+
+export const listAllCardsChunked = query({
+  args: {
+    cursor: v.union(v.string(), v.null()),
+    chunkSize: v.optional(v.number()),
+  },
+  returns: v.object({
+    cards: v.array(cardValidator),
+    nextCursor: v.union(v.string(), v.null()),
+    isDone: v.boolean(),
+    totalEstimate: v.number(),
+  }),
+  handler: async (ctx, args) => {
+    const chunkSize = args.chunkSize ?? 500;
+    
+    const result = await ctx.db
+      .query("cards")
+      .paginate({ numItems: chunkSize, cursor: args.cursor ?? null });
+    
+    const filteredCards = result.page.filter(
+      (card) => card.isFrontFace !== false && card.isVariant !== true
+    );
+    
+    const versionDoc = await ctx.db.query("cardDataVersion").first();
+    const totalEstimate = versionDoc?.cardCount ?? 0;
+    
+    return {
+      cards: filteredCards,
+      nextCursor: result.isDone ? null : result.continueCursor,
+      isDone: result.isDone,
+      totalEstimate,
+    };
+  },
+});
+
+export const getInitialCards = query({
+  args: {
+    limit: v.optional(v.number()),
+  },
+  returns: v.object({
+    cards: v.array(cardValidator),
+    hasMore: v.boolean(),
+    version: v.union(v.number(), v.null()),
+    totalEstimate: v.number(),
+  }),
+  handler: async (ctx, args) => {
+    const limit = args.limit ?? 100;
+    
+    const result = await ctx.db
+      .query("cards")
+      .paginate({ numItems: limit, cursor: null });
+    
+    const filteredCards = result.page.filter(
+      (card) => card.isFrontFace !== false && card.isVariant !== true
+    );
+    
+    const versionDoc = await ctx.db.query("cardDataVersion").first();
+    
+    return {
+      cards: filteredCards,
+      hasMore: !result.isDone,
+      version: versionDoc?.version ?? null,
+      totalEstimate: versionDoc?.cardCount ?? 0,
+    };
+  },
+});
+
+export const updateCardDataVersion = internalMutation({
+  args: {},
+  returns: v.number(),
+  handler: async (ctx) => {
+    const cards = await ctx.db.query("cards").collect();
+    const cardCount = cards.filter(
+      (card) => card.isFrontFace !== false && card.isVariant !== true
+    ).length;
+    
+    const existingVersion = await ctx.db.query("cardDataVersion").first();
+    const now = Date.now();
+    
+    if (existingVersion) {
+      const newVersion = existingVersion.version + 1;
+      await ctx.db.patch(existingVersion._id, {
+        version: newVersion,
+        updatedAt: now,
+        cardCount,
+      });
+      return newVersion;
+    } else {
+      await ctx.db.insert("cardDataVersion", {
+        version: 1,
+        updatedAt: now,
+        cardCount,
+      });
+      return 1;
+    }
+  },
+});
+
+export const initializeCardDataVersion = mutation({
+  args: {},
+  returns: v.number(),
+  handler: async (ctx) => {
+    const cards = await ctx.db.query("cards").collect();
+    const cardCount = cards.filter(
+      (card) => card.isFrontFace !== false && card.isVariant !== true
+    ).length;
+    
+    const existingVersion = await ctx.db.query("cardDataVersion").first();
+    const now = Date.now();
+    
+    if (existingVersion) {
+      return existingVersion.version;
+    } else {
+      await ctx.db.insert("cardDataVersion", {
+        version: 1,
+        updatedAt: now,
+        cardCount,
+      });
+      return 1;
+    }
   },
 });
 
