@@ -41,8 +41,6 @@ export interface UseUniversusCardsResult {
   isHydrated: boolean;
 }
 
-const BACKGROUND_CHUNK_SIZE = 500;
-
 const emptySubscribe = () => () => {};
 const getClientSnapshot = () => true;
 const getServerSnapshot = () => false;
@@ -67,47 +65,7 @@ export function useUniversusCards(): UseUniversusCardsResult {
   const convex = useConvex();
   const isHydrated = useIsClient();
 
-  const versionData = useQuery(api.cards.getCardDataVersion);
-  const serverVersion = versionData?.version ?? null;
-  const serverCardCount = versionData?.cardCount ?? 0;
-
-  const fallbackToDirectQuery = useCallback(async () => {
-    if (syncInProgress.current) return;
-    syncInProgress.current = true;
-    setIsSyncing(true);
-    setError(null);
-    
-    try {
-      const allCards: CachedCard[] = await convex.query(api.cards.listReleased, {});
-      
-      setCards(allCards);
-      setIsLoading(false);
-      
-      await setCachedCards(allCards);
-      await setCacheMetadata({
-        version: 1,
-        updatedAt: Date.now(),
-        cardCount: allCards.length,
-        lastSyncAt: Date.now(),
-      });
-      
-      setCachedVersion(1);
-      const cardIndex = buildCardIndex(allCards);
-      setIndex(cardIndex);
-      setUniqueValues(getUniqueValues(allCards));
-      setLoadProgress(100);
-    } catch (err) {
-      if (err instanceof Error) {
-        setError(err);
-        console.error("Failed to load cards:", err);
-      }
-    } finally {
-      setIsLoading(false);
-      setIsLoadingMore(false);
-      setIsSyncing(false);
-      syncInProgress.current = false;
-    }
-  }, [convex]);
+  const releasedCards = useQuery(api.cards.listReleased);
 
   const loadFromCache = useCallback(async (): Promise<boolean> => {
     try {
@@ -133,73 +91,39 @@ export function useUniversusCards(): UseUniversusCardsResult {
     }
   }, []);
 
-  const fetchAllCardsProgressively = useCallback(async () => {
+  const syncFromConvex = useCallback(async (serverCards: CachedCard[]) => {
     if (syncInProgress.current) return;
     syncInProgress.current = true;
     setIsSyncing(true);
-    setError(null);
     
     try {
-      let cursor: string | null = null;
-      let allCards: CachedCard[] = [];
-      let isDone = false;
-      let isFirstChunk = true;
+      const newVersion = Date.now();
       
-      while (!isDone) {
-        const result: {
-          cards: CachedCard[];
-          nextCursor: string | null;
-          isDone: boolean;
-          totalEstimate: number;
-        } = await convex.query(api.cards.listAllCardsChunked, {
-          cursor,
-          chunkSize: BACKGROUND_CHUNK_SIZE,
-        });
-        
-        allCards = [...allCards, ...result.cards];
-        cursor = result.nextCursor;
-        isDone = result.isDone;
-        
-        const progress = result.totalEstimate > 0 
-          ? Math.min(99, Math.round((allCards.length / result.totalEstimate) * 100))
-          : 50;
-        setLoadProgress(progress);
-        
-        if (isFirstChunk && result.cards.length > 0) {
-          setCards(allCards);
-          setIsLoading(false);
-          setIsLoadingMore(true);
-          isFirstChunk = false;
-        } else {
-          setCards(allCards);
-        }
-      }
-      
-      await setCachedCards(allCards);
+      await setCachedCards(serverCards);
       await setCacheMetadata({
-        version: serverVersion ?? 1,
-        updatedAt: Date.now(),
-        cardCount: allCards.length,
-        lastSyncAt: Date.now(),
+        version: newVersion,
+        updatedAt: newVersion,
+        cardCount: serverCards.length,
+        lastSyncAt: newVersion,
       });
       
-      setCachedVersion(serverVersion ?? 1);
-      const cardIndex = buildCardIndex(allCards);
+      setCards(serverCards);
+      setCachedVersion(newVersion);
+      const cardIndex = buildCardIndex(serverCards);
       setIndex(cardIndex);
-      setUniqueValues(getUniqueValues(allCards));
+      setUniqueValues(getUniqueValues(serverCards));
       setLoadProgress(100);
-    } catch (err) {
-      console.error("Chunked loading failed, falling back to direct query:", err);
-      syncInProgress.current = false;
-      await fallbackToDirectQuery();
-      return;
-    } finally {
       setIsLoading(false);
-      setIsLoadingMore(false);
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err);
+        console.error("Failed to sync cards:", err);
+      }
+    } finally {
       setIsSyncing(false);
       syncInProgress.current = false;
     }
-  }, [convex, serverVersion, fallbackToDirectQuery]);
+  }, []);
 
   const refreshCache = useCallback(async () => {
     await clearCardCache();
@@ -210,8 +134,11 @@ export function useUniversusCards(): UseUniversusCardsResult {
     setLoadProgress(0);
     setIsLoading(true);
     syncInProgress.current = false;
-    await fetchAllCardsProgressively();
-  }, [fetchAllCardsProgressively]);
+    
+    if (releasedCards) {
+      await syncFromConvex(releasedCards);
+    }
+  }, [releasedCards, syncFromConvex]);
 
   useEffect(() => {
     if (!isHydrated) return;
@@ -230,33 +157,30 @@ export function useUniversusCards(): UseUniversusCardsResult {
 
   useEffect(() => {
     if (!isHydrated) return;
+    if (releasedCards === undefined) return;
     
-    const checkAndSync = async () => {
+    const updateFromServer = async () => {
       const metadata = await getCacheMetadata();
       
-      if (serverVersion !== null) {
-        if (!metadata || metadata.version !== serverVersion) {
-          await fetchAllCardsProgressively();
-        }
-      } else if (versionData === undefined) {
-      } else {
-        if (!metadata) {
-          await fallbackToDirectQuery();
-        }
+      if (!metadata || releasedCards.length !== metadata.cardCount) {
+        await syncFromConvex(releasedCards);
+      } else if (cards.length === 0 && releasedCards.length > 0) {
+        setCards(releasedCards);
+        setIsLoading(false);
       }
     };
     
-    checkAndSync();
-  }, [isHydrated, serverVersion, versionData, fetchAllCardsProgressively, fallbackToDirectQuery]);
+    updateFromServer();
+  }, [isHydrated, releasedCards, syncFromConvex, cards.length]);
 
   return {
     cards,
-    isLoading,
+    isLoading: isLoading && cards.length === 0,
     isLoadingMore,
     loadProgress,
-    totalCards: serverCardCount,
+    totalCards: releasedCards?.length ?? cards.length,
     cachedVersion,
-    serverVersion,
+    serverVersion: null,
     isSyncing,
     error,
     index,
