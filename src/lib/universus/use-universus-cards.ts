@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useSyncExternalStore } from "react";
 import { useQuery, useConvex } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import {
@@ -38,9 +38,18 @@ export interface UseUniversusCardsResult {
   index: CardIndex | null;
   uniqueValues: ReturnType<typeof getUniqueValues> | null;
   refreshCache: () => Promise<void>;
+  isHydrated: boolean;
 }
 
 const BACKGROUND_CHUNK_SIZE = 500;
+
+const emptySubscribe = () => () => {};
+const getClientSnapshot = () => true;
+const getServerSnapshot = () => false;
+
+function useIsClient() {
+  return useSyncExternalStore(emptySubscribe, getClientSnapshot, getServerSnapshot);
+}
 
 export function useUniversusCards(): UseUniversusCardsResult {
   const [cards, setCards] = useState<CachedCard[]>([]);
@@ -56,6 +65,7 @@ export function useUniversusCards(): UseUniversusCardsResult {
   const syncInProgress = useRef(false);
   const initialLoadDone = useRef(false);
   const convex = useConvex();
+  const isHydrated = useIsClient();
 
   const versionData = useQuery(api.cards.getCardDataVersion);
   const serverVersion = versionData?.version ?? null;
@@ -166,6 +176,7 @@ export function useUniversusCards(): UseUniversusCardsResult {
   }, [fetchAllCardsProgressively]);
 
   useEffect(() => {
+    if (!isHydrated) return;
     if (initialLoadDone.current) return;
     initialLoadDone.current = true;
     
@@ -177,9 +188,10 @@ export function useUniversusCards(): UseUniversusCardsResult {
     };
     
     initializeCards();
-  }, [loadFromCache]);
+  }, [isHydrated, loadFromCache]);
 
   useEffect(() => {
+    if (!isHydrated) return;
     if (serverVersion === null) return;
     
     const checkAndSync = async () => {
@@ -191,7 +203,7 @@ export function useUniversusCards(): UseUniversusCardsResult {
     };
     
     checkAndSync();
-  }, [serverVersion, fetchAllCardsProgressively]);
+  }, [isHydrated, serverVersion, fetchAllCardsProgressively]);
 
   return {
     cards,
@@ -206,6 +218,7 @@ export function useUniversusCards(): UseUniversusCardsResult {
     index,
     uniqueValues,
     refreshCache,
+    isHydrated,
   };
 }
 

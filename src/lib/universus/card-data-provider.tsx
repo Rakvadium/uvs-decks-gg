@@ -5,6 +5,7 @@ import {
   useContext,
   useMemo,
   ReactNode,
+  useSyncExternalStore,
 } from "react";
 import {
   useUniversusCards,
@@ -24,13 +25,41 @@ interface CardDataContextValue extends UseUniversusCardsResult {
   getFilteredAndSortedCards: (filters: CardFilters, sortOptions: CardSortOptions) => CachedCard[];
 }
 
-const CardDataContext = createContext<CardDataContextValue | null>(null);
+const defaultContextValue: CardDataContextValue = {
+  cards: [],
+  isLoading: true,
+  isLoadingMore: false,
+  loadProgress: 0,
+  totalCards: 0,
+  cachedVersion: null,
+  serverVersion: null,
+  isSyncing: false,
+  error: null,
+  index: null,
+  uniqueValues: null,
+  isHydrated: false,
+  refreshCache: async () => {},
+  getFilteredCards: () => [],
+  getSortedCards: (cards) => cards,
+  getPaginatedCards: () => ({ cards: [], totalPages: 0, hasMore: false }),
+  getFilteredAndSortedCards: () => [],
+};
+
+const CardDataContext = createContext<CardDataContextValue>(defaultContextValue);
 
 interface CardDataProviderProps {
   children: ReactNode;
 }
 
-export function CardDataProvider({ children }: CardDataProviderProps) {
+const emptySubscribe = () => () => {};
+const getClientSnapshot = () => true;
+const getServerSnapshot = () => false;
+
+function useIsClient() {
+  return useSyncExternalStore(emptySubscribe, getClientSnapshot, getServerSnapshot);
+}
+
+function CardDataProviderInner({ children }: CardDataProviderProps) {
   const cardData = useUniversusCards();
 
   const value = useMemo((): CardDataContextValue => {
@@ -67,12 +96,22 @@ export function CardDataProvider({ children }: CardDataProviderProps) {
   );
 }
 
-export function useCardData() {
-  const context = useContext(CardDataContext);
-  if (!context) {
-    throw new Error("useCardData must be used within a CardDataProvider");
+export function CardDataProvider({ children }: CardDataProviderProps) {
+  const isClient = useIsClient();
+
+  if (!isClient) {
+    return (
+      <CardDataContext.Provider value={defaultContextValue}>
+        {children}
+      </CardDataContext.Provider>
+    );
   }
-  return context;
+
+  return <CardDataProviderInner>{children}</CardDataProviderInner>;
+}
+
+export function useCardData() {
+  return useContext(CardDataContext);
 }
 
 export function useFilteredCards(filters: CardFilters): CachedCard[] {

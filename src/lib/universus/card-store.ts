@@ -1,4 +1,3 @@
-import { get, set, del, createStore } from "idb-keyval";
 import type { Doc } from "../../../convex/_generated/dataModel";
 
 export type CachedCard = Doc<"cards">;
@@ -15,14 +14,27 @@ const STORE_NAME = "cards";
 const METADATA_KEY = "cache-metadata";
 const CARDS_KEY = "cards-data";
 
-const cardStore = typeof window !== "undefined" 
-  ? createStore(DB_NAME, STORE_NAME)
-  : null;
+let cardStorePromise: Promise<ReturnType<typeof import("idb-keyval").createStore>> | null = null;
+
+async function getCardStore() {
+  if (typeof window === "undefined") return null;
+  
+  if (!cardStorePromise) {
+    cardStorePromise = import("idb-keyval").then(({ createStore }) => {
+      return createStore(DB_NAME, STORE_NAME);
+    });
+  }
+  
+  return cardStorePromise;
+}
 
 export async function getCacheMetadata(): Promise<CardCacheMetadata | null> {
-  if (!cardStore) return null;
+  const store = await getCardStore();
+  if (!store) return null;
+  
   try {
-    const metadata = await get<CardCacheMetadata>(METADATA_KEY, cardStore);
+    const { get } = await import("idb-keyval");
+    const metadata = await get<CardCacheMetadata>(METADATA_KEY, store);
     return metadata ?? null;
   } catch {
     return null;
@@ -30,18 +42,24 @@ export async function getCacheMetadata(): Promise<CardCacheMetadata | null> {
 }
 
 export async function setCacheMetadata(metadata: CardCacheMetadata): Promise<void> {
-  if (!cardStore) return;
+  const store = await getCardStore();
+  if (!store) return;
+  
   try {
-    await set(METADATA_KEY, metadata, cardStore);
+    const { set } = await import("idb-keyval");
+    await set(METADATA_KEY, metadata, store);
   } catch (error) {
     console.error("Failed to save cache metadata:", error);
   }
 }
 
 export async function getCachedCards(): Promise<CachedCard[]> {
-  if (!cardStore) return [];
+  const store = await getCardStore();
+  if (!store) return [];
+  
   try {
-    const cards = await get<CachedCard[]>(CARDS_KEY, cardStore);
+    const { get } = await import("idb-keyval");
+    const cards = await get<CachedCard[]>(CARDS_KEY, store);
     return cards ?? [];
   } catch {
     return [];
@@ -49,22 +67,28 @@ export async function getCachedCards(): Promise<CachedCard[]> {
 }
 
 export async function setCachedCards(cards: CachedCard[]): Promise<void> {
-  if (!cardStore) return;
+  const store = await getCardStore();
+  if (!store) return;
+  
   try {
-    await set(CARDS_KEY, cards, cardStore);
+    const { set } = await import("idb-keyval");
+    await set(CARDS_KEY, cards, store);
   } catch (error) {
     console.error("Failed to save cards to cache:", error);
   }
 }
 
 export async function appendCachedCards(newCards: CachedCard[]): Promise<CachedCard[]> {
-  if (!cardStore) return newCards;
+  const store = await getCardStore();
+  if (!store) return newCards;
+  
   try {
+    const { set } = await import("idb-keyval");
     const existingCards = await getCachedCards();
     const existingIds = new Set(existingCards.map(c => c._id));
     const uniqueNewCards = newCards.filter(c => !existingIds.has(c._id));
     const allCards = [...existingCards, ...uniqueNewCards];
-    await set(CARDS_KEY, allCards, cardStore);
+    await set(CARDS_KEY, allCards, store);
     return allCards;
   } catch (error) {
     console.error("Failed to append cards to cache:", error);
@@ -73,10 +97,13 @@ export async function appendCachedCards(newCards: CachedCard[]): Promise<CachedC
 }
 
 export async function clearCardCache(): Promise<void> {
-  if (!cardStore) return;
+  const store = await getCardStore();
+  if (!store) return;
+  
   try {
-    await del(METADATA_KEY, cardStore);
-    await del(CARDS_KEY, cardStore);
+    const { del } = await import("idb-keyval");
+    await del(METADATA_KEY, store);
+    await del(CARDS_KEY, store);
   } catch (error) {
     console.error("Failed to clear card cache:", error);
   }
