@@ -441,89 +441,244 @@ Attack mode is designed as an **animated overlay** that enhances the life tracke
 - **Satisfying animations** with tactile feedback (thud, shake, pulse)
 - **Quick abort option** to cancel without changes
 
-### 4.2 Attack Mode Visual Layout
+### 4.2 Physical Setup Context
 
-When attack mode activates, elements animate from the center of the screen, collapsing into a circular pattern with a satisfying "thud" haptic/visual effect.
+The phone is placed **flat on the table** between two players who sit across from each other:
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                                                             │
-│  ┌─────────────────────┐           ┌─────────────────────┐  │
-│  │                     │           │                     │  │
-│  │    [RIVAL HEALTH]   │           │    [YOUR HEALTH]    │  │
-│  │         ५          │           │         20          │  │
-│  │      +      -       │           │      -      +       │  │
-│  │    (still active)   │           │    (still active)   │  │
-│  │                     │           │                     │  │
-│  └─────────────────────┘           └─────────────────────┘  │
-│                                                             │
-│                    ╔═══════════════════╗                    │
-│                    ║                   ║                    │
-│                    ║    [🎯 THROW]     ║  ← Toggle above    │
-│                    ║                   ║                    │
-│        ┌───────────╬═══════════════════╬───────────┐        │
-│        │           ║                   ║           │        │
-│        │   ┌───┐   ║   ┌───────────┐   ║   ┌───┐   │        │
-│        │   │ 5 │   ║   │   HIGH    │   ║   │11 │   │        │
-│        │   └───┘   ║   │  ═══════  │   ║   └───┘   │        │
-│        │  SPEED    ║   │    MID    │   ║  DAMAGE   │        │
-│        │   [-][+]  ║   │  ═══════  │   ║   [-][+]  │        │
-│        │           ║   │    LOW    │   ║           │        │
-│        │           ║   └───────────┘   ║           │        │
-│        │           ║                   ║           │        │
-│        └───────────╬═══════════════════╬───────────┘        │
-│                    ║                   ║                    │
-│                    ║  ┌─────────────┐  ║                    │
-│                    ║  │ 🛡️  ½  💥 │  ║  ← Block buttons   │
-│                    ║  │FULL PRT  NO │  ║                    │
-│                    ║  └─────────────┘  ║                    │
-│                    ║                   ║                    │
-│                    ║     [✕ ABORT]     ║  ← Cancel button   │
-│                    ║                   ║                    │
-│                    ╚═══════════════════╝                    │
-│                                                             │
-│         (Entire attack panel rotated 90° sideways           │
-│          so both players can read it easily)                │
-│                                                             │
-└─────────────────────────────────────────────────────────────┘
+        ┌─────────────────┐
+        │                 │
+        │   RIVAL SITS    │
+        │     HERE        │
+        │       ↓         │
+        └─────────────────┘
+                │
+    ┌───────────┴───────────┐
+    │                       │
+    │   ┌───────────────┐   │
+    │   │    PHONE      │   │
+    │   │  (flat on     │   │
+    │   │    table)     │   │
+    │   └───────────────┘   │
+    │                       │
+    └───────────┬───────────┘
+                │
+        ┌─────────────────┐
+        │       ↑         │
+        │   PLAYER SITS   │
+        │      HERE       │
+        │                 │
+        └─────────────────┘
 ```
 
-### 4.3 Attack Panel Components
+This means:
+- **Rival's health** (top of screen, upside down) appears right-side-up to the rival
+- **Player's health** (bottom of screen, normal) appears right-side-up to the player
+- **Attack sequence** (middle, sideways) can be read by both players from their positions
 
-The attack panel is displayed **sideways** (rotated 90°) in the center of the screen so both players can read it from their seated positions.
+### 4.3 Normal Life Tracker View (Portrait)
+
+```
+┌─────────────────────────────────────┐
+│                                     │
+│    ┌─────────────────────────────┐  │
+│    │                             │  │
+│    │   [Character]         ⚙️   │  │  ← Upside down
+│    │                             │  │    (readable by
+│    │          ५                 │  │     rival across
+│    │        HEALTH               │  │     the table)
+│    │                             │  │
+│    │       +        -            │  │
+│    │                             │  │
+│    │   [Sub Counters...]         │  │
+│    │                             │  │
+│    └─────────────────────────────┘  │
+│              RIVAL PANEL            │
+│           (rotated 180°)            │
+│                                     │
+├─────────────────────────────────────┤
+│                                     │
+│   [Reset] [⚔️ Attack] [📜 History]  │  ← Center controls
+│                                     │
+├─────────────────────────────────────┤
+│                                     │
+│             YOUR PANEL              │
+│           (normal orientation)      │
+│    ┌─────────────────────────────┐  │
+│    │                             │  │
+│    │   [Sub Counters...]         │  │
+│    │                             │  │
+│    │       -        +            │  │
+│    │                             │  │
+│    │          20                 │  │
+│    │        HEALTH               │  │
+│    │                             │  │
+│    │   [Character]         ⚙️   │  │  ← Right side up
+│    │                             │  │    (readable by
+│    └─────────────────────────────┘  │     player)
+│                                     │
+└─────────────────────────────────────┘
+```
+
+### 4.4 Attack Mode Layout
+
+When attack mode activates:
+1. **Center controls disappear** (Reset, Attack, History buttons)
+2. **Rival panel slides UP** slightly to make room
+3. **Player panel slides DOWN** slightly to make room
+4. **Attack sequence animates into the center** with a "thud" effect
+5. **Attack elements are rotated 90°** (sideways) so both players can read them
+
+```
+┌─────────────────────────────────────┐
+│    ┌─────────────────────────────┐  │
+│    │          ५                 │  │  ← Rival health
+│    │   [Character]    +    -     │  │    (still upside down,
+│    └─────────────────────────────┘  │     still interactive)
+│              ↑ slides up ↑          │
+│                                     │
+│┌───────────────────────────────────┐│
+││ ╔═══════════════════════════════╗ ││
+││ ║                               ║ ││
+││ ║  ┌──────┐ ┌────────┐ ┌──────┐ ║ ││
+││ ║  │ SPD  │ │  ZONE  │ │ DMG  │ ║ ││
+││ ║  │  5   │ │ ▢HIGH  │ │  11  │ ║ ││
+││ ║  │[-][+]│ │ ▣MID   │ │[-][+]│ ║ ││  ← ATTACK PANEL
+││ ║  └──────┘ │ ▢LOW   │ └──────┘ ║ ││    (rotated 90°
+││ ║           └────────┘          ║ ││     sideways)
+││ ║                               ║ ││
+││ ║  [THROW]  🛡️FULL ½PRT 💥NO   ║ ││
+││ ║                               ║ ││
+││ ║          [✕ ABORT]            ║ ││
+││ ╚═══════════════════════════════╝ ││
+│└───────────────────────────────────┘│
+│                                     │
+│              ↓ slides down ↓        │
+│    ┌─────────────────────────────┐  │
+│    │          20                 │  │  ← Player health
+│    │   [Character]    -    +     │  │    (still right-side up,
+│    └─────────────────────────────┘  │     still interactive)
+└─────────────────────────────────────┘
+```
+
+### 4.5 Attack Panel Detail (Rotated 90° View)
+
+When you look at the phone from the SIDE (as both players would), the attack panel reads normally:
+
+```
+     ┌─────────────────────────────────────────────────────┐
+     │                                                     │
+     │   ┌───────────┐                     ┌───────────┐   │
+     │   │   SPEED   │                     │   DAMAGE  │   │
+     │   │           │                     │           │   │
+     │   │     5     │    ┌───────────┐    │    11     │   │
+     │   │           │    │   HIGH    │    │           │   │
+     │   │  [−] [+]  │    │ ━━━━━━━━━ │    │  [−] [+]  │   │
+     │   │           │    │  ▶ MID ◀  │    │           │   │
+     │   └───────────┘    │ ━━━━━━━━━ │    └───────────┘   │
+     │                    │   LOW     │                    │
+     │   ┌───────────┐    └───────────┘    ┌───────────┐   │
+     │   │           │                     │           │   │
+     │   │  [THROW]  │                     │  [ABORT]  │   │
+     │   │    OFF    │                     │     ✕     │   │
+     │   │           │                     │           │   │
+     │   └───────────┘                     └───────────┘   │
+     │                                                     │
+     │   ┌─────────────────────────────────────────────┐   │
+     │   │                                             │   │
+     │   │    🛡️ FULL      ½ PARTIAL      💥 NO       │   │
+     │   │    (0 dmg)       (6 dmg)       (11 dmg)    │   │
+     │   │                                             │   │
+     │   └─────────────────────────────────────────────┘   │
+     │                                                     │
+     └─────────────────────────────────────────────────────┘
+     
+     ↑ This is what both players see when looking at the
+       phone from either side of the table
+```
+
+### 4.6 Attack Panel Components
+
+The attack panel is displayed **rotated 90°** (sideways/landscape within portrait) in the center of the screen. This allows both players sitting on opposite sides of the table to read the attack information from their positions.
 
 ```typescript
 interface AttackPanelLayout {
-  leftStat: {
+  rotation: 90;
+  position: "center";
+  
+  speedSection: {
+    position: "left";
     label: "SPEED";
     value: number;
-    adjustable: true;
+    controls: ["-", "+"];
   };
-  centerZone: {
+  
+  zoneSection: {
+    position: "center";
     zones: ["HIGH", "MID", "LOW"];
     selected: "high" | "mid" | "low" | null;
+    layout: "vertical-stack";
   };
-  rightStat: {
+  
+  damageSection: {
+    position: "right";
     label: "DAMAGE";
     value: number;
-    adjustable: true;
+    controls: ["-", "+"];
   };
+  
   throwToggle: {
-    position: "above";
+    position: "left-of-zones";
+    label: "THROW";
     enabled: boolean;
   };
-  blockButtons: {
-    position: "below";
-    options: ["full", "partial", "none"];
-  };
+  
   abortButton: {
-    position: "bottom";
+    position: "right-of-zones";
     label: "ABORT";
+    icon: "✕";
+  };
+  
+  blockButtons: {
+    position: "bottom-row";
+    options: [
+      { type: "full", icon: "🛡️", label: "FULL" },
+      { type: "partial", icon: "½", label: "PARTIAL" },
+      { type: "none", icon: "💥", label: "NO" },
+    ];
+    showDamagePreview: true;
   };
 }
 ```
 
-### 4.4 Attack State
+### 4.7 Health Panel Behavior During Attack
+
+The health panels remain fully functional during the attack sequence:
+
+```typescript
+interface HealthPanelDuringAttack {
+  rival: {
+    position: "top";
+    rotation: 180;
+    slidesUp: true;
+    slideDistance: 50;
+    interactive: true;
+    showsCharacter: true;
+    showsSubCounters: false;
+  };
+  player: {
+    position: "bottom";
+    rotation: 0;
+    slidesDown: true;
+    slideDistance: 50;
+    interactive: true;
+    showsCharacter: true;
+    showsSubCounters: false;
+  };
+}
+```
+
+### 4.8 Attack State
 
 ```typescript
 interface AttackState {
@@ -542,7 +697,7 @@ interface AttackState {
 }
 ```
 
-### 4.5 Animation Sequences
+### 4.9 Animation Sequences
 
 #### Entry Animation ("Thud" Effect)
 ```typescript
@@ -603,7 +758,7 @@ const blockAnimations = {
 };
 ```
 
-### 4.6 Damage Calculation
+### 4.10 Damage Calculation
 
 ```typescript
 function calculateDamage(
@@ -651,7 +806,7 @@ function getBlockResultPreview(attack: AttackState): BlockPreview[] {
 }
 ```
 
-### 4.7 Health Adjustment During Attack
+### 4.11 Health Adjustment During Attack
 
 Both players can still adjust health during the attack sequence:
 
@@ -692,26 +847,37 @@ function AttackModeHealth({
 }
 ```
 
-### 4.8 Attack Resolution Flow
+### 4.12 Attack Resolution Flow
 
 1. **Player taps Attack Mode button** in center controls
-2. **Entry animation plays**: Elements burst from center, collapse into circle pattern with "thud"
-3. **Attack panel appears sideways**: Readable by both players
-4. **Player configures attack**:
+2. **Center controls fade out** (Reset, Attack, History buttons disappear)
+3. **Health panels slide apart**:
+   - Rival panel slides UP ~50px
+   - Player panel slides DOWN ~50px
+   - Sub-counters temporarily hidden to save space
+4. **Attack panel animates in**:
+   - Elements burst from center with "thud" haptic
+   - Panel is rotated 90° (sideways) for dual-player readability
+5. **Player configures attack**:
    - Selects zone (High/Mid/Low)
    - Adjusts speed/damage with +/- buttons
    - Optionally enables Throw toggle
-5. **During attack sequence**:
-   - Both health totals remain visible and adjustable
-   - Manual health changes (for card effects) still work normally
-6. **Resolution** (one of three options):
-   - **FULL**: Deflect animation on defender, damage = 0 (or half if Throw)
-   - **PARTIAL**: Graze animation, half damage applied
-   - **NO BLOCK**: Devastate animation, full damage applied
-7. **Exit animation**: Attack panel fades/shrinks away
-8. **History record created** for the attack
+6. **During attack sequence**:
+   - Both health totals remain visible at top/bottom
+   - Health still adjustable (for healing/damage card effects)
+   - Block buttons show damage preview in real-time
+7. **Resolution** (one of three options):
+   - **FULL**: Deflect animation on defender health, damage = 0 (or half if Throw)
+   - **PARTIAL**: Graze animation on defender health, half damage applied
+   - **NO BLOCK**: Devastate animation on defender health, full damage applied
+8. **Exit sequence**:
+   - Attack panel shrinks/fades away
+   - Health panels slide back to original positions
+   - Sub-counters reappear
+   - Center controls fade back in
+9. **History record created** for the attack
 
-### 4.9 Abort Functionality
+### 4.13 Abort Functionality
 
 The abort button cancels the attack sequence without applying any damage:
 
@@ -727,7 +893,7 @@ function handleAbort(attackState: AttackState, originalHealth: HealthState) {
 }
 ```
 
-### 4.10 Attack Mode Component Structure
+### 4.14 Attack Mode Component Structure
 
 ```
 components/attack-mode/
