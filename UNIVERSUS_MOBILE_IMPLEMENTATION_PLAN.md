@@ -86,11 +86,20 @@ universus-mobile/
 │   │   ├── HistoryDrawer.tsx         # Health change history
 │   │   └── index.ts
 │   ├── attack-mode/
-│   │   ├── AttackPanel.tsx           # Main attack tracking UI
+│   │   ├── AttackModeOverlay.tsx     # Main overlay container
+│   │   ├── AttackPanel.tsx           # Central rotated attack panel
+│   │   ├── AttackStatCircle.tsx      # Speed/Damage circular displays
 │   │   ├── ZoneSelector.tsx          # High/Mid/Low zone picker
-│   │   ├── StatAdjuster.tsx          # Speed/Damage modifiers
-│   │   ├── ThrowToggle.tsx           # Throw attack indicator
-│   │   ├── BlockButtons.tsx          # Full/Partial/No block
+│   │   ├── ThrowToggle.tsx           # Throw attack toggle
+│   │   ├── BlockButtonGroup.tsx      # Full/Partial/No block buttons
+│   │   ├── AbortButton.tsx           # Cancel attack button
+│   │   ├── AttackHealthDisplay.tsx   # Health display during attack
+│   │   ├── animations/
+│   │   │   ├── entryAnimation.ts     # Thud entry sequence
+│   │   │   ├── blockAnimations.ts    # Resolution animations
+│   │   │   ├── shakeAnimation.ts     # Damage shake effect
+│   │   │   ├── pulseAnimation.ts     # Block success pulse
+│   │   │   └── particleEffects.ts    # Impact particles
 │   │   └── index.ts
 │   ├── stats/
 │   │   ├── WinLossChart.tsx          # Visual win/loss display
@@ -422,64 +431,179 @@ interface SubCounter {
 
 ## Phase 4: Attack Mode
 
-### 4.1 Attack Mode Overlay
+### 4.1 Attack Mode Design Philosophy
 
-When attack mode is activated, an overlay appears showing attack tracking:
+Attack mode is designed as an **animated overlay** that enhances the life tracker rather than replacing it. The key principles are:
+
+- **Both players can always see their health totals**
+- **Health can still be manually adjusted** during attack sequence (for healing/damage effects)
+- **Sideways orientation** makes it easy for both seated players to read
+- **Satisfying animations** with tactile feedback (thud, shake, pulse)
+- **Quick abort option** to cancel without changes
+
+### 4.2 Attack Mode Visual Layout
+
+When attack mode activates, elements animate from the center of the screen, collapsing into a circular pattern with a satisfying "thud" haptic/visual effect.
 
 ```
-┌─────────────────────────────────────┐
-│  ← Back              Attack Mode    │
-├─────────────────────────────────────┤
-│                                     │
-│           ZONE                      │
-│   ┌─────┬─────┬─────┐               │
-│   │ HIGH│ MID │ LOW │               │
-│   └─────┴─────┴─────┘               │
-│                                     │
-│    Speed: [  5  ]  [-] [+]          │
-│                                     │
-│    Damage: [ 11 ]  [-] [+]          │
-│                                     │
-│    ┌─────────────────────────────┐  │
-│    │      [ THROW ]              │  │
-│    └─────────────────────────────┘  │
-│                                     │
-├─────────────────────────────────────┤
-│                                     │
-│  ┌───────────────────────────────┐  │
-│  │         FULL BLOCK            │  │
-│  │        (0 damage)             │  │
-│  └───────────────────────────────┘  │
-│                                     │
-│  ┌───────────────────────────────┐  │
-│  │       PARTIAL BLOCK           │  │
-│  │        (6 damage)             │  │
-│  └───────────────────────────────┘  │
-│                                     │
-│  ┌───────────────────────────────┐  │
-│  │         NO BLOCK              │  │
-│  │        (11 damage)            │  │
-│  └───────────────────────────────┘  │
-│                                     │
-│          [Current HP: 20 → ??]      │
-└─────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│                                                             │
+│  ┌─────────────────────┐           ┌─────────────────────┐  │
+│  │                     │           │                     │  │
+│  │    [RIVAL HEALTH]   │           │    [YOUR HEALTH]    │  │
+│  │         ५          │           │         20          │  │
+│  │      +      -       │           │      -      +       │  │
+│  │    (still active)   │           │    (still active)   │  │
+│  │                     │           │                     │  │
+│  └─────────────────────┘           └─────────────────────┘  │
+│                                                             │
+│                    ╔═══════════════════╗                    │
+│                    ║                   ║                    │
+│                    ║    [🎯 THROW]     ║  ← Toggle above    │
+│                    ║                   ║                    │
+│        ┌───────────╬═══════════════════╬───────────┐        │
+│        │           ║                   ║           │        │
+│        │   ┌───┐   ║   ┌───────────┐   ║   ┌───┐   │        │
+│        │   │ 5 │   ║   │   HIGH    │   ║   │11 │   │        │
+│        │   └───┘   ║   │  ═══════  │   ║   └───┘   │        │
+│        │  SPEED    ║   │    MID    │   ║  DAMAGE   │        │
+│        │   [-][+]  ║   │  ═══════  │   ║   [-][+]  │        │
+│        │           ║   │    LOW    │   ║           │        │
+│        │           ║   └───────────┘   ║           │        │
+│        │           ║                   ║           │        │
+│        └───────────╬═══════════════════╬───────────┘        │
+│                    ║                   ║                    │
+│                    ║  ┌─────────────┐  ║                    │
+│                    ║  │ 🛡️  ½  💥 │  ║  ← Block buttons   │
+│                    ║  │FULL PRT  NO │  ║                    │
+│                    ║  └─────────────┘  ║                    │
+│                    ║                   ║                    │
+│                    ║     [✕ ABORT]     ║  ← Cancel button   │
+│                    ║                   ║                    │
+│                    ╚═══════════════════╝                    │
+│                                                             │
+│         (Entire attack panel rotated 90° sideways           │
+│          so both players can read it easily)                │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
 ```
 
-### 4.2 Attack State
+### 4.3 Attack Panel Components
+
+The attack panel is displayed **sideways** (rotated 90°) in the center of the screen so both players can read it from their seated positions.
+
+```typescript
+interface AttackPanelLayout {
+  leftStat: {
+    label: "SPEED";
+    value: number;
+    adjustable: true;
+  };
+  centerZone: {
+    zones: ["HIGH", "MID", "LOW"];
+    selected: "high" | "mid" | "low" | null;
+  };
+  rightStat: {
+    label: "DAMAGE";
+    value: number;
+    adjustable: true;
+  };
+  throwToggle: {
+    position: "above";
+    enabled: boolean;
+  };
+  blockButtons: {
+    position: "below";
+    options: ["full", "partial", "none"];
+  };
+  abortButton: {
+    position: "bottom";
+    label: "ABORT";
+  };
+}
+```
+
+### 4.4 Attack State
 
 ```typescript
 interface AttackState {
   isActive: boolean;
+  phase: "entering" | "active" | "resolving" | "exiting";
   zone: "high" | "mid" | "low" | null;
   speed: number;
   damage: number;
   isThrow: boolean;
   attacker: "player" | "rival";
   defender: "player" | "rival";
+  healthBeforeAttack: {
+    player: number;
+    rival: number;
+  };
 }
 ```
 
-### 4.3 Damage Calculation
+### 4.5 Animation Sequences
+
+#### Entry Animation ("Thud" Effect)
+```typescript
+const attackEntryAnimation = {
+  duration: 400,
+  sequence: [
+    { type: "scale", from: 0, to: 1.1, duration: 200, easing: "easeOut" },
+    { type: "scale", from: 1.1, to: 1.0, duration: 100, easing: "easeIn" },
+    { type: "haptic", style: "heavy" },
+    { type: "overlay", opacity: 0.3 },
+  ],
+  elements: [
+    { id: "speedCircle", delay: 0 },
+    { id: "zonePanel", delay: 50 },
+    { id: "damageCircle", delay: 100 },
+    { id: "throwToggle", delay: 150 },
+    { id: "blockButtons", delay: 200 },
+  ],
+};
+```
+
+#### Block Resolution Animations
+
+```typescript
+const blockAnimations = {
+  none: {
+    name: "Devastate",
+    description: "Severe shake + red flash on defender health",
+    sequence: [
+      { type: "flash", color: "#ef4444", intensity: 0.8, duration: 100 },
+      { type: "shake", intensity: 20, duration: 400 },
+      { type: "haptic", style: "heavy", count: 3 },
+      { type: "numberRoll", from: currentHealth, to: newHealth, duration: 600 },
+      { type: "particles", style: "impact", color: "#ef4444" },
+    ],
+  },
+  partial: {
+    name: "Graze",
+    description: "Medium shake + orange flash on defender health",
+    sequence: [
+      { type: "flash", color: "#f97316", intensity: 0.5, duration: 80 },
+      { type: "shake", intensity: 10, duration: 250 },
+      { type: "haptic", style: "medium", count: 2 },
+      { type: "numberRoll", from: currentHealth, to: newHealth, duration: 400 },
+      { type: "particles", style: "sparks", color: "#f97316" },
+    ],
+  },
+  full: {
+    name: "Deflect",
+    description: "Sturdy pulse + shield glow on defender health",
+    sequence: [
+      { type: "pulse", color: "#22c55e", scale: 1.05, duration: 150 },
+      { type: "glow", color: "#22c55e", intensity: 0.6, duration: 300 },
+      { type: "haptic", style: "light" },
+      { type: "icon", name: "shield", animation: "bounce" },
+    ],
+  },
+};
+```
+
+### 4.6 Damage Calculation
 
 ```typescript
 function calculateDamage(
@@ -499,18 +623,130 @@ function calculateDamage(
       return baseDamage;
   }
 }
+
+function getBlockResultPreview(attack: AttackState): BlockPreview[] {
+  return [
+    {
+      type: "full",
+      label: "FULL",
+      icon: "🛡️",
+      damage: attack.isThrow ? Math.ceil(attack.damage / 2) : 0,
+      description: attack.isThrow ? "Throw deals partial" : "No damage",
+    },
+    {
+      type: "partial",
+      label: "PARTIAL",
+      icon: "½",
+      damage: Math.ceil(attack.damage / 2),
+      description: `${Math.ceil(attack.damage / 2)} damage`,
+    },
+    {
+      type: "none",
+      label: "NO BLOCK",
+      icon: "💥",
+      damage: attack.damage,
+      description: `${attack.damage} damage`,
+    },
+  ];
+}
 ```
 
-### 4.4 Attack Resolution Flow
+### 4.7 Health Adjustment During Attack
 
-1. Player enters attack mode
-2. Selects attack zone (High/Mid/Low)
-3. Adjusts speed and damage modifiers
-4. Optionally toggles Throw
-5. Taps block result button
-6. Damage applied to defender's health
-7. Attack mode exits
-8. History record created
+Both players can still adjust health during the attack sequence:
+
+```typescript
+interface AttackModeHealthProps {
+  health: number;
+  maxHealth: number;
+  isDefender: boolean;
+  pendingDamage?: number;
+  onHealthChange: (delta: number) => void;
+}
+
+function AttackModeHealth({
+  health,
+  maxHealth,
+  isDefender,
+  pendingDamage,
+  onHealthChange,
+}: AttackModeHealthProps) {
+  return (
+    <View style={styles.healthContainer}>
+      <Text style={styles.healthValue}>{health}</Text>
+      {isDefender && pendingDamage !== undefined && (
+        <Text style={styles.pendingDamage}>
+          → {Math.max(0, health - pendingDamage)}
+        </Text>
+      )}
+      <View style={styles.adjustButtons}>
+        <Pressable onPress={() => onHealthChange(-1)}>
+          <Text>-</Text>
+        </Pressable>
+        <Pressable onPress={() => onHealthChange(1)}>
+          <Text>+</Text>
+        </Pressable>
+      </View>
+    </View>
+  );
+}
+```
+
+### 4.8 Attack Resolution Flow
+
+1. **Player taps Attack Mode button** in center controls
+2. **Entry animation plays**: Elements burst from center, collapse into circle pattern with "thud"
+3. **Attack panel appears sideways**: Readable by both players
+4. **Player configures attack**:
+   - Selects zone (High/Mid/Low)
+   - Adjusts speed/damage with +/- buttons
+   - Optionally enables Throw toggle
+5. **During attack sequence**:
+   - Both health totals remain visible and adjustable
+   - Manual health changes (for card effects) still work normally
+6. **Resolution** (one of three options):
+   - **FULL**: Deflect animation on defender, damage = 0 (or half if Throw)
+   - **PARTIAL**: Graze animation, half damage applied
+   - **NO BLOCK**: Devastate animation, full damage applied
+7. **Exit animation**: Attack panel fades/shrinks away
+8. **History record created** for the attack
+
+### 4.9 Abort Functionality
+
+The abort button cancels the attack sequence without applying any damage:
+
+```typescript
+function handleAbort(attackState: AttackState, originalHealth: HealthState) {
+  Animated.timing(panelOpacity, {
+    toValue: 0,
+    duration: 200,
+    useNativeDriver: true,
+  }).start(() => {
+    setAttackState({ ...attackState, isActive: false });
+  });
+}
+```
+
+### 4.10 Attack Mode Component Structure
+
+```
+components/attack-mode/
+├── AttackModeOverlay.tsx       # Main overlay container
+├── AttackPanel.tsx             # Central rotated panel
+├── AttackStatCircle.tsx        # Speed/Damage circular displays
+├── ZoneSelector.tsx            # High/Mid/Low zone picker
+├── ThrowToggle.tsx             # Throw attack toggle
+├── BlockButtonGroup.tsx        # Full/Partial/No block buttons
+├── AbortButton.tsx             # Cancel attack button
+├── AttackHealthDisplay.tsx     # Health display during attack
+├── animations/
+│   ├── entryAnimation.ts       # Thud entry sequence
+│   ├── blockAnimations.ts      # Resolution animations
+│   ├── shakeAnimation.ts       # Damage shake effect
+│   ├── pulseAnimation.ts       # Block success pulse
+│   └── particleEffects.ts      # Impact particles
+└── index.ts
+```
 
 ---
 
@@ -1012,6 +1248,21 @@ export const getMatchHistory = query({
 ### State Management with Zustand
 
 ```typescript
+interface AttackState {
+  isActive: boolean;
+  phase: "entering" | "active" | "resolving" | "exiting";
+  zone: "high" | "mid" | "low" | null;
+  speed: number;
+  damage: number;
+  isThrow: boolean;
+  attacker: "player" | "rival";
+  defender: "player" | "rival";
+  healthBeforeAttack: {
+    player: number;
+    rival: number;
+  };
+}
+
 interface GameStore {
   playerHealth: number;
   rivalHealth: number;
@@ -1031,18 +1282,38 @@ interface GameStore {
   setPlayerHealth: (health: number) => void;
   setRivalHealth: (health: number) => void;
   adjustHealth: (playerId: "player" | "rival", delta: number) => void;
+  adjustHealthDuringAttack: (playerId: "player" | "rival", delta: number) => void;
   setCharacter: (playerId: "player" | "rival", character: Character) => void;
   setThemeColor: (playerId: "player" | "rival", color: string) => void;
   addSubCounter: (playerId: "player" | "rival", counter: SubCounter) => void;
   updateSubCounter: (playerId: "player" | "rival", id: string, delta: number) => void;
   removeSubCounter: (playerId: "player" | "rival", id: string) => void;
+  
   enterAttackMode: (attacker: "player" | "rival") => void;
-  exitAttackMode: () => void;
-  updateAttack: (updates: Partial<AttackState>) => void;
+  setAttackPhase: (phase: AttackState["phase"]) => void;
+  setAttackZone: (zone: "high" | "mid" | "low") => void;
+  adjustAttackSpeed: (delta: number) => void;
+  adjustAttackDamage: (delta: number) => void;
+  toggleThrow: () => void;
   resolveAttack: (blockResult: "full" | "partial" | "none") => void;
+  abortAttack: () => void;
+  exitAttackMode: () => void;
+  
   resetGame: (result?: "win" | "loss" | "draw") => void;
   undoLastChange: () => void;
 }
+
+const initialAttackState: AttackState = {
+  isActive: false,
+  phase: "entering",
+  zone: null,
+  speed: 0,
+  damage: 0,
+  isThrow: false,
+  attacker: "player",
+  defender: "rival",
+  healthBeforeAttack: { player: 0, rival: 0 },
+};
 ```
 
 ---
@@ -1063,33 +1334,45 @@ interface GameStore {
 - [ ] Build center controls
 
 ### Week 5-6: Attack Mode
-- [ ] Design attack mode overlay
-- [ ] Implement zone selection
-- [ ] Add stat modifiers
-- [ ] Build block resolution
-- [ ] Integrate with health tracking
+- [ ] Build AttackModeOverlay container
+- [ ] Create entry animation with "thud" effect
+- [ ] Implement rotated AttackPanel layout
+- [ ] Build AttackStatCircle components (speed/damage)
+- [ ] Implement ZoneSelector with zone highlighting
+- [ ] Add ThrowToggle component
+- [ ] Create BlockButtonGroup with preview damage
+- [ ] Implement AbortButton with cancel flow
+- [ ] Build AttackHealthDisplay (adjustable during attack)
 
-### Week 7-8: History & Persistence
+### Week 7: Attack Mode Animations
+- [ ] Create shake animation for damage
+- [ ] Build pulse animation for blocks
+- [ ] Implement particle effects (impact sparks)
+- [ ] Add haptic feedback integration
+- [ ] Build number roll animation for health changes
+- [ ] Polish exit animations
+
+### Week 8-9: History & Persistence
 - [ ] Implement debounced history recording
 - [ ] Build history drawer UI
 - [ ] Add undo functionality
 - [ ] Set up game session creation
 - [ ] Implement reset flow
 
-### Week 9-10: Statistics & Subscription
+### Week 10-11: Statistics & Subscription
 - [ ] Create match record system
 - [ ] Build statistics views
 - [ ] Integrate Stripe subscriptions
 - [ ] Add premium feature gating
 
-### Week 11-12: Offline & Polish
+### Week 12-13: Offline & Polish
 - [ ] Implement offline queue
 - [ ] Add network sync handling
 - [ ] Polish animations
 - [ ] Performance optimization
 - [ ] Testing & bug fixes
 
-### Week 13+ (Stretch): Rival Sync
+### Week 14+ (Stretch): Rival Sync
 - [ ] QR code generation
 - [ ] Deep linking setup
 - [ ] Real-time sync implementation
@@ -1104,11 +1387,20 @@ interface GameStore {
 - Health validation logic
 - Debounce behavior
 - Offline queue operations
+- Attack state transitions
+- Block result previews (with/without Throw)
 
 ### Integration Tests
 - Convex mutations/queries
 - Authentication flow
 - Subscription verification
+- Attack mode entry/exit with health persistence
+
+### Animation Tests
+- Entry animation timing
+- Block resolution animations
+- Health adjustment during attack
+- Abort flow restores original state
 
 ### E2E Tests
 - Complete game session flow
