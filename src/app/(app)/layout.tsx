@@ -23,6 +23,7 @@ import { Upload, Layers, CreditCard, Settings } from "lucide-react";
 import Link from "next/link";
 import { TcgDndProvider } from "@/lib/dnd";
 import { GalleryFiltersProvider } from "@/providers/GalleryFiltersProvider";
+import { DecksProvider } from "@/providers/DecksProvider";
 
 const LEFT_SIDEBAR_KEY = "uvs-decks-left-sidebar-collapsed";
 
@@ -181,6 +182,10 @@ function ShellLayoutInner({ children }: { children: ReactNode }) {
 
   if (pageType === "gallery") {
     return <GalleryFiltersProvider>{content}</GalleryFiltersProvider>;
+  }
+
+  if (pageType === "decks") {
+    return <DecksProvider>{content}</DecksProvider>;
   }
 
   return content;

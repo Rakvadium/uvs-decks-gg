@@ -18,6 +18,7 @@ import {
   Settings,
   LogOut,
   LogIn,
+  Hexagon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -83,7 +84,7 @@ export function LeftSidebar({ collapsed, onToggle }: LeftSidebarProps) {
 
   const sidebarContent = (
     <>
-      <div className={cn("px-2 pt-2 pb-2", collapsed && "flex justify-center")}>
+      <div className={cn("px-2 pt-4 pb-2", collapsed && "flex justify-center")}>
         {collapsed ? (
           <Tooltip>
             <TooltipTrigger asChild>
@@ -91,18 +92,20 @@ export function LeftSidebar({ collapsed, onToggle }: LeftSidebarProps) {
                 variant="ghost"
                 size="icon"
                 onClick={onToggle}
-                className="h-9 w-full"
+                className="h-9 w-full text-sidebar-foreground/60 hover:text-primary hover:bg-primary/10"
               >
                 <ChevronRight className="h-4 w-4" />
               </Button>
             </TooltipTrigger>
-            <TooltipContent side="right">Expand sidebar</TooltipContent>
+            <TooltipContent side="right" className="font-mono uppercase tracking-wider text-xs">
+              Expand
+            </TooltipContent>
           </Tooltip>
         ) : (
           <Button
             variant="ghost"
             onClick={onToggle}
-            className="w-full justify-start gap-3 px-3 text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
+            className="w-full justify-start gap-3 px-3 text-sidebar-foreground/60 hover:bg-primary/10 hover:text-primary font-mono uppercase tracking-wider text-xs"
           >
             <ChevronLeft className="h-4 w-4" />
             <span>Collapse</span>
@@ -110,8 +113,12 @@ export function LeftSidebar({ collapsed, onToggle }: LeftSidebarProps) {
         )}
       </div>
 
-      <nav className="flex flex-1 flex-col gap-2 p-2">
-        {!isOnAdminPage && navItems.map((item) => {
+      <div className="px-3 py-2">
+        <div className="h-px bg-gradient-to-r from-transparent via-sidebar-border to-transparent" />
+      </div>
+
+      <nav className="flex flex-1 flex-col gap-1 p-2">
+        {!isOnAdminPage && navItems.map((item, index) => {
           const href = `/${item.path}`;
           const isActive = pathname.includes(`/${item.path}`);
           const Icon = item.icon;
@@ -119,21 +126,35 @@ export function LeftSidebar({ collapsed, onToggle }: LeftSidebarProps) {
           const navLink = (
             <Link key={item.path} href={href}>
               <motion.div
-                whileHover={prefersReducedMotion ? undefined : { x: collapsed ? 0 : 2 }}
+                initial={false}
+                whileHover={prefersReducedMotion ? undefined : { x: collapsed ? 0 : 4 }}
                 whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}
                 className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                  "relative flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-all duration-200",
                   collapsed && "justify-center px-2",
                   isActive
-                    ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                    : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
+                    ? "bg-primary/15 text-primary shadow-[0_0_10px_-5px_var(--primary)] border border-primary/30"
+                    : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground border border-transparent hover:border-sidebar-border/50"
                 )}
+                style={{
+                  animationDelay: `${index * 50}ms`,
+                }}
               >
-                <Icon className="h-4 w-4 shrink-0" />
+                <Icon className={cn(
+                  "h-4 w-4 shrink-0 transition-all duration-200",
+                  isActive && "drop-shadow-[0_0_4px_var(--primary)]"
+                )} />
                 {!collapsed && (
-                  <span className="whitespace-nowrap">
+                  <span className="whitespace-nowrap font-mono uppercase tracking-wider text-xs">
                     {item.label}
                   </span>
+                )}
+                {isActive && (
+                  <motion.div
+                    layoutId="activeNav"
+                    className="absolute inset-0 rounded-md border border-primary/20"
+                    transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                  />
                 )}
               </motion.div>
             </Link>
@@ -143,7 +164,9 @@ export function LeftSidebar({ collapsed, onToggle }: LeftSidebarProps) {
             return (
               <Tooltip key={item.path}>
                 <TooltipTrigger asChild>{navLink}</TooltipTrigger>
-                <TooltipContent side="right">{item.label}</TooltipContent>
+                <TooltipContent side="right" className="font-mono uppercase tracking-wider text-xs">
+                  {item.label}
+                </TooltipContent>
               </Tooltip>
             );
           }
@@ -153,12 +176,12 @@ export function LeftSidebar({ collapsed, onToggle }: LeftSidebarProps) {
 
         {isOnAdminPage && (
           <div className={cn(
-            "flex items-center gap-2 px-3 py-2 text-sm font-semibold text-sidebar-foreground",
+            "flex items-center gap-2 px-3 py-2.5 text-sm font-semibold",
             collapsed && "justify-center px-2"
           )}>
-            <Shield className="h-4 w-4 shrink-0 text-primary" />
+            <Shield className="h-4 w-4 shrink-0 text-primary drop-shadow-[0_0_8px_var(--primary)]" />
             {!collapsed && (
-              <span className="whitespace-nowrap">
+              <span className="whitespace-nowrap font-display uppercase tracking-widest text-xs text-primary">
                 Admin Panel
               </span>
             )}
@@ -168,23 +191,31 @@ export function LeftSidebar({ collapsed, onToggle }: LeftSidebarProps) {
         <div className="flex-1" />
       </nav>
 
-      <div className={cn("border-t border-sidebar-border p-2", collapsed && "flex flex-col items-center")}>
+      <div className="px-3 py-2">
+        <div className="h-px bg-gradient-to-r from-transparent via-sidebar-border to-transparent" />
+      </div>
+
+      <div className={cn("p-2", collapsed && "flex flex-col items-center")}>
         {!isLoading && !isAuthenticated ? (
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
-                variant="ghost"
+                variant="outline"
                 onClick={openAuthDialog}
                 className={cn(
-                  "w-full text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-foreground",
+                  "w-full border-primary/30 hover:border-primary/60 hover:bg-primary/10 hover:text-primary",
                   collapsed ? "h-10 w-10 p-0" : "h-12 justify-start gap-3 px-3"
                 )}
               >
                 <LogIn className="h-4 w-4 shrink-0" />
-                {!collapsed && <span className="text-sm font-medium">Sign In</span>}
+                {!collapsed && <span className="font-mono uppercase tracking-wider text-xs">Sign In</span>}
               </Button>
             </TooltipTrigger>
-            {collapsed && <TooltipContent side="right">Sign In</TooltipContent>}
+            {collapsed && (
+              <TooltipContent side="right" className="font-mono uppercase tracking-wider text-xs">
+                Sign In
+              </TooltipContent>
+            )}
           </Tooltip>
         ) : (
           <DropdownMenu>
@@ -192,77 +223,81 @@ export function LeftSidebar({ collapsed, onToggle }: LeftSidebarProps) {
               <Button
                 variant="ghost"
                 className={cn(
-                  "w-full text-sidebar-foreground data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground",
-                  collapsed ? "h-10 w-10 p-0" : "h-12 justify-start gap-3 px-3"
+                  "w-full text-sidebar-foreground hover:bg-primary/10 hover:text-primary data-[state=open]:bg-primary/15 data-[state=open]:text-primary border border-transparent hover:border-primary/30 data-[state=open]:border-primary/30",
+                  collapsed ? "h-10 w-10 p-0" : "h-14 justify-start gap-3 px-3"
                 )}
               >
-                <Avatar className="h-8 w-8 shrink-0">
+                <Avatar className="h-8 w-8 shrink-0 border border-primary/30 shadow-[0_0_10px_-3px_var(--primary)]">
                   {user?.image && <AvatarImage src={user.image} alt={user.username || "User"} />}
-                  <AvatarFallback className="bg-primary text-primary-foreground text-sm font-medium">
+                  <AvatarFallback className="bg-primary/20 text-primary text-sm font-mono font-bold">
                     {user?.username?.charAt(0).toUpperCase() || "?"}
                   </AvatarFallback>
                 </Avatar>
                 {!collapsed && (
-                  <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-medium">{user?.username || "User"}</span>
-                    <span className="truncate text-xs text-sidebar-foreground/70">{user?.email || "Not signed in"}</span>
+                  <div className="grid flex-1 text-left leading-tight">
+                    <span className="truncate font-medium font-mono uppercase tracking-wide text-xs">{user?.username || "User"}</span>
+                    <span className="truncate text-xs text-sidebar-foreground/50 font-mono">{user?.email || "Not signed in"}</span>
                   </div>
                 )}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent
-              className="w-56 rounded-lg"
+              className="w-56 rounded-lg border-primary/20 bg-popover/95 backdrop-blur-lg"
               align="start"
               side={collapsed ? "right" : "top"}
               sideOffset={4}
             >
-              <DropdownMenuItem onClick={toggleTheme}>
+              <DropdownMenuItem onClick={toggleTheme} className="font-mono uppercase tracking-wider text-xs hover:bg-primary/10 hover:text-primary">
                 {isDark ? (
                   <Sun className="mr-2 h-4 w-4" />
                 ) : (
                   <Moon className="mr-2 h-4 w-4" />
                 )}
-                {isDark ? "Light mode" : "Dark mode"}
+                {isDark ? "Light Mode" : "Dark Mode"}
               </DropdownMenuItem>
               <DropdownMenuSub>
-                <DropdownMenuSubTrigger>
+                <DropdownMenuSubTrigger className="font-mono uppercase tracking-wider text-xs hover:bg-primary/10 hover:text-primary">
                   <Palette className="mr-2 h-4 w-4" />
                   Theme
                 </DropdownMenuSubTrigger>
                 <DropdownMenuSubContent>
                   <DropdownMenuRadioGroup value={colorScheme} onValueChange={(value) => setColorScheme(value as typeof colorScheme)}>
                     {COLOR_SCHEMES.map((scheme) => (
-                      <DropdownMenuRadioItem key={scheme.value} value={scheme.value}>
+                      <DropdownMenuRadioItem 
+                        key={scheme.value} 
+                        value={scheme.value}
+                        className="font-mono uppercase tracking-wider text-xs hover:bg-primary/10 hover:text-primary"
+                      >
                         {scheme.label}
                       </DropdownMenuRadioItem>
                     ))}
                   </DropdownMenuRadioGroup>
                 </DropdownMenuSubContent>
               </DropdownMenuSub>
-              <DropdownMenuItem onClick={() => router.push("/settings")}>
+              <DropdownMenuItem onClick={() => router.push("/settings")} className="font-mono uppercase tracking-wider text-xs hover:bg-primary/10 hover:text-primary">
                 <Settings className="mr-2 h-4 w-4" />
                 Settings
               </DropdownMenuItem>
               {isAdmin && (
                 <>
-                  <DropdownMenuSeparator />
+                  <DropdownMenuSeparator className="bg-border/50" />
                   {isOnAdminPage ? (
-                    <DropdownMenuItem onClick={() => router.push("/")}>
+                    <DropdownMenuItem onClick={() => router.push("/")} className="font-mono uppercase tracking-wider text-xs hover:bg-primary/10 hover:text-primary">
                       <Home className="mr-2 h-4 w-4" />
                       Back to App
                     </DropdownMenuItem>
                   ) : (
-                    <DropdownMenuItem onClick={() => router.push("/admin")}>
+                    <DropdownMenuItem onClick={() => router.push("/admin")} className="font-mono uppercase tracking-wider text-xs hover:bg-primary/10 hover:text-primary">
                       <Shield className="mr-2 h-4 w-4" />
                       Admin Panel
                     </DropdownMenuItem>
                   )}
                 </>
               )}
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleSignOut}>
+              <DropdownMenuSeparator className="bg-border/50" />
+              <DropdownMenuItem onClick={handleSignOut} className="font-mono uppercase tracking-wider text-xs hover:bg-destructive/10 hover:text-destructive">
                 <LogOut className="mr-2 h-4 w-4" />
-                Sign out
+                Sign Out
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -280,9 +315,12 @@ export function LeftSidebar({ collapsed, onToggle }: LeftSidebarProps) {
           animate={{ width: 64, opacity: 1 }}
           exit={{ width: 0, opacity: 0 }}
           transition={{ duration: prefersReducedMotion ? 0 : 0.2, ease: "easeInOut" }}
-          className="flex h-full flex-col overflow-hidden bg-sidebar"
+          className="relative flex h-full flex-col overflow-hidden bg-sidebar border-r border-sidebar-border/50"
         >
-          {sidebarContent}
+          <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-secondary/5 pointer-events-none" />
+          <div className="relative z-10 flex h-full flex-col">
+            {sidebarContent}
+          </div>
         </motion.aside>
       ) : (
         <motion.aside
@@ -291,9 +329,12 @@ export function LeftSidebar({ collapsed, onToggle }: LeftSidebarProps) {
           animate={{ width: 256, opacity: 1 }}
           exit={{ width: 0, opacity: 0 }}
           transition={{ duration: prefersReducedMotion ? 0 : 0.2, ease: "easeInOut" }}
-          className="flex h-full flex-col overflow-hidden bg-sidebar"
+          className="relative flex h-full flex-col overflow-hidden bg-sidebar border-r border-sidebar-border/50"
         >
-          {sidebarContent}
+          <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-secondary/5 pointer-events-none" />
+          <div className="relative z-10 flex h-full flex-col">
+            {sidebarContent}
+          </div>
         </motion.aside>
       )}
     </AnimatePresence>

@@ -9,6 +9,7 @@ import { Toaster } from "sonner";
 import { QueryProvider } from "@/providers/QueryProvider";
 import { AuthDialogProvider } from "@/components/auth/auth-dialog";
 import { CardDataProvider } from "@/lib/universus";
+import { ColorSchemeProvider } from "@/providers/ColorSchemeProvider";
 
 const convex = new ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
@@ -18,16 +19,18 @@ export function Providers({ children }: { children: ReactNode }) {
       <QueryProvider>
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
+          defaultTheme="dark"
           enableSystem
           disableTransitionOnChange
         >
-          <AuthDialogProvider>
-            <CardDataProvider>
-              <TooltipProvider delayDuration={0}>{children}</TooltipProvider>
-            </CardDataProvider>
-          </AuthDialogProvider>
-          <Toaster />
+          <ColorSchemeProvider>
+            <AuthDialogProvider>
+              <CardDataProvider>
+                <TooltipProvider delayDuration={0}>{children}</TooltipProvider>
+              </CardDataProvider>
+            </AuthDialogProvider>
+            <Toaster />
+          </ColorSchemeProvider>
         </ThemeProvider>
       </QueryProvider>
     </ConvexAuthNextjsProvider>
