@@ -181,3 +181,7 @@ export function useGalleryFilters(): GalleryFiltersContextValue {
   }
   return context;
 }
+
+export function useGalleryFiltersOptional(): GalleryFiltersContextValue | null {
+  return useContext(GalleryFiltersContext);
+}

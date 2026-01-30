@@ -23,7 +23,7 @@ import { Slider } from "@/components/ui/slider";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { SymbolIcon, SymbolBadge } from "@/components/universus/symbol-icon";
-import { useGalleryFilters } from "@/providers/GalleryFiltersProvider";
+import { useGalleryFiltersOptional } from "@/providers/GalleryFiltersProvider";
 
 interface FilterOption {
   value: string;
@@ -295,7 +295,9 @@ function SymbolSelectFilter({ symbols, selected, onChange }: SymbolSelectFilterP
 }
 
 function FilterPanel() {
-  const { state, actions, meta } = useGalleryFilters();
+  const context = useGalleryFiltersOptional();
+  if (!context) return null;
+  const { state, actions, meta } = context;
   const filters = state.filters;
   const uniqueValues = meta.uniqueValues;
   const hasActiveFilters = meta.activeFilterCount > 0;
@@ -518,8 +520,11 @@ function FilterPanel() {
 }
 
 export function GalleryHeader() {
-  const { state, actions, meta } = useGalleryFilters();
+  const context = useGalleryFiltersOptional();
   const [isFilterPanelOpen, setIsFilterPanelOpen] = useState(false);
+  
+  if (!context) return null;
+  const { state, actions, meta } = context;
 
   const typeOptions = useMemo(
     () =>
