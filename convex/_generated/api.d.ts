@@ -20,6 +20,8 @@ import type * as flags from "../flags.js";
 import type * as formats from "../formats.js";
 import type * as http from "../http.js";
 import type * as migrations_migrateDeckSchema from "../migrations/migrateDeckSchema.js";
+import type * as migrations_migrateSetLegality from "../migrations/migrateSetLegality.js";
+import type * as r2 from "../r2.js";
 import type * as sessions from "../sessions.js";
 import type * as sets from "../sets.js";
 import type * as social from "../social.js";
@@ -47,6 +49,8 @@ declare const fullApi: ApiFromModules<{
   formats: typeof formats;
   http: typeof http;
   "migrations/migrateDeckSchema": typeof migrations_migrateDeckSchema;
+  "migrations/migrateSetLegality": typeof migrations_migrateSetLegality;
+  r2: typeof r2;
   sessions: typeof sessions;
   sets: typeof sets;
   social: typeof social;

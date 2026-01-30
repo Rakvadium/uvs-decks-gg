@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef, useSyncExternalStore } from "react";
-import { useQuery, useConvex } from "convex/react";
+import { useConvex, useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import {
   getCachedCards,
@@ -33,6 +33,7 @@ export interface UseUniversusCardsResult {
   totalCards: number;
   cachedVersion: number | null;
   serverVersion: number | null;
+  isCheckingVersion: boolean;
   isSyncing: boolean;
   error: Error | null;
   index: CardIndex | null;
@@ -64,51 +65,75 @@ export function useUniversusCards(): UseUniversusCardsResult {
   const initialLoadDone = useRef(false);
   const convex = useConvex();
   const isHydrated = useIsClient();
+  
+  const serverVersionData = useQuery(api.cards.getCardDataVersion, {});
+  const serverVersion = serverVersionData?.version ?? null;
+  const isCheckingVersion = serverVersionData === undefined;
 
-  const releasedCards = useQuery(api.cards.listReleased);
-
-  const loadFromCache = useCallback(async (): Promise<boolean> => {
+  const loadFromCache = useCallback(async (): Promise<{ hasCache: boolean; version: number | null }> => {
     try {
       const [cachedCards, metadata] = await Promise.all([
         getCachedCards(),
         getCacheMetadata(),
       ]);
       
-      if (cachedCards.length > 0) {
+      if (cachedCards.length > 0 && metadata) {
         setCards(cachedCards);
-        setCachedVersion(metadata?.version ?? null);
+        setCachedVersion(metadata.version);
         const cardIndex = buildCardIndex(cachedCards);
         setIndex(cardIndex);
         setUniqueValues(getUniqueValues(cachedCards));
         setLoadProgress(100);
         setIsLoading(false);
-        return true;
+        return { hasCache: true, version: metadata.version };
       }
-      return false;
+      return { hasCache: false, version: null };
     } catch (err) {
       console.error("Failed to load from cache:", err);
-      return false;
+      return { hasCache: false, version: null };
     }
   }, []);
 
-  const syncFromConvex = useCallback(async (serverCards: CachedCard[]) => {
+  const fetchFromConvex = useCallback(async (): Promise<CachedCard[]> => {
+    const allCards: CachedCard[] = [];
+    let cursor: string | null = null;
+    let isDone = false;
+
+    while (!isDone) {
+      const result = await convex.query(api.cards.listReleasedPaginated, {
+        cursor,
+        limit: 1000,
+      });
+
+      allCards.push(...result.cards);
+      cursor = result.cursor;
+      isDone = result.isDone;
+      
+      const progress = Math.min(95, Math.round((allCards.length / 3000) * 100));
+      setLoadProgress(progress);
+    }
+
+    return allCards;
+  }, [convex]);
+
+  const syncFromConvex = useCallback(async (serverCards: CachedCard[], version: number) => {
     if (syncInProgress.current) return;
     syncInProgress.current = true;
     setIsSyncing(true);
     
     try {
-      const newVersion = Date.now();
+      const now = Date.now();
       
       await setCachedCards(serverCards);
       await setCacheMetadata({
-        version: newVersion,
-        updatedAt: newVersion,
+        version,
+        updatedAt: now,
         cardCount: serverCards.length,
-        lastSyncAt: newVersion,
+        lastSyncAt: now,
       });
       
       setCards(serverCards);
-      setCachedVersion(newVersion);
+      setCachedVersion(version);
       const cardIndex = buildCardIndex(serverCards);
       setIndex(cardIndex);
       setUniqueValues(getUniqueValues(serverCards));
@@ -126,6 +151,8 @@ export function useUniversusCards(): UseUniversusCardsResult {
   }, []);
 
   const refreshCache = useCallback(async () => {
+    if (serverVersion === null) return;
+    
     await clearCardCache();
     setCachedVersion(null);
     setCards([]);
@@ -135,10 +162,9 @@ export function useUniversusCards(): UseUniversusCardsResult {
     setIsLoading(true);
     syncInProgress.current = false;
     
-    if (releasedCards) {
-      await syncFromConvex(releasedCards);
-    }
-  }, [releasedCards, syncFromConvex]);
+    const freshCards = await fetchFromConvex();
+    await syncFromConvex(freshCards, serverVersion);
+  }, [fetchFromConvex, syncFromConvex, serverVersion]);
 
   useEffect(() => {
     if (!isHydrated) return;
@@ -146,7 +172,8 @@ export function useUniversusCards(): UseUniversusCardsResult {
     initialLoadDone.current = true;
     
     const initializeCards = async () => {
-      const hasCache = await loadFromCache();
+      const { hasCache, version: localVersion } = await loadFromCache();
+      
       if (!hasCache) {
         setIsLoading(true);
       }
@@ -157,30 +184,50 @@ export function useUniversusCards(): UseUniversusCardsResult {
 
   useEffect(() => {
     if (!isHydrated) return;
-    if (releasedCards === undefined) return;
+    if (isCheckingVersion) return;
+    if (syncInProgress.current) return;
     
-    const updateFromServer = async () => {
-      const metadata = await getCacheMetadata();
+    const checkAndSync = async () => {
+      if (serverVersion === null) {
+        if (cards.length === 0) {
+          setIsLoading(true);
+          setIsLoadingMore(true);
+          const freshCards = await fetchFromConvex();
+          await syncFromConvex(freshCards, 1);
+          setIsLoadingMore(false);
+        }
+        return;
+      }
       
-      if (!metadata || releasedCards.length !== metadata.cardCount) {
-        await syncFromConvex(releasedCards);
-      } else if (cards.length === 0 && releasedCards.length > 0) {
-        setCards(releasedCards);
-        setIsLoading(false);
+      if (cachedVersion === null) {
+        setIsLoading(true);
+        setIsLoadingMore(true);
+        const freshCards = await fetchFromConvex();
+        await syncFromConvex(freshCards, serverVersion);
+        setIsLoadingMore(false);
+        return;
+      }
+      
+      if (cachedVersion !== serverVersion) {
+        console.log(`Cache outdated: local v${cachedVersion} vs server v${serverVersion}`);
+        setIsSyncing(true);
+        const freshCards = await fetchFromConvex();
+        await syncFromConvex(freshCards, serverVersion);
       }
     };
     
-    updateFromServer();
-  }, [isHydrated, releasedCards, syncFromConvex, cards.length]);
+    checkAndSync();
+  }, [isHydrated, isCheckingVersion, serverVersion, cachedVersion, cards.length, fetchFromConvex, syncFromConvex]);
 
   return {
     cards,
     isLoading: isLoading && cards.length === 0,
     isLoadingMore,
     loadProgress,
-    totalCards: releasedCards?.length ?? cards.length,
+    totalCards: cards.length,
     cachedVersion,
-    serverVersion: null,
+    serverVersion,
+    isCheckingVersion,
     isSyncing,
     error,
     index,
@@ -194,7 +241,7 @@ export function filterCards(
   cards: CachedCard[],
   filters: CardFilters
 ): CachedCard[] {
-  let result = cards;
+  let result = cards.filter((card) => card.isFrontFace !== false && card.isVariant !== true);
 
   if (filters.search && filters.search.trim()) {
     const searchLower = filters.search.toLowerCase();
@@ -297,11 +344,28 @@ export function filterCards(
   return result;
 }
 
+function defaultCardSort(a: CachedCard, b: CachedCard): number {
+  const setNumA = a.setNumber ?? 0;
+  const setNumB = b.setNumber ?? 0;
+  if (setNumA !== setNumB) {
+    return setNumB - setNumA;
+  }
+  
+  const collectorA = parseInt(a.collectorNumber ?? "0", 10);
+  const collectorB = parseInt(b.collectorNumber ?? "0", 10);
+  return collectorA - collectorB;
+}
+
 export function sortCards(
   cards: CachedCard[],
   options: CardSortOptions
 ): CachedCard[] {
   const { field, direction } = options;
+  
+  if (field === "default") {
+    return [...cards].sort(defaultCardSort);
+  }
+  
   const multiplier = direction === "desc" ? -1 : 1;
 
   return [...cards].sort((a, b) => {
@@ -340,7 +404,7 @@ export function sortCards(
         comparison = (a.damage ?? 0) - (b.damage ?? 0);
         break;
       default:
-        comparison = a.name.localeCompare(b.name);
+        return defaultCardSort(a, b);
     }
 
     return comparison * multiplier;

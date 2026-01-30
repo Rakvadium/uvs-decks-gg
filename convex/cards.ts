@@ -4,6 +4,8 @@ import { v } from "convex/values";
 import { cardValidator } from "./validators";
 import { api } from "./_generated/api";
 
+const PUBLIC_R2_BASE_URL = "https://pub-53d81abf7a7f442a90c9383c1e7bdc60.r2.dev";
+
 export const list = query({
   args: {
     search: v.optional(v.string()),
@@ -115,8 +117,16 @@ export const listReleasedPaginated = query({
       .query("cards")
       .paginate({ numItems: limit, cursor: args.cursor ?? null });
 
+    const cardsWithUrls = result.page.map((card) => {
+      if (card.imageUrl && !card.imageUrl.startsWith("http")) {
+        const publicUrl = `${PUBLIC_R2_BASE_URL}/cards/${card.imageUrl}`;
+        return { ...card, imageUrl: publicUrl };
+      }
+      return card;
+    });
+
     return {
-      cards: result.page.filter((card) => card.isFrontFace !== false),
+      cards: cardsWithUrls,
       cursor: result.continueCursor,
       isDone: result.isDone,
     };

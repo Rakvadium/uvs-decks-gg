@@ -204,7 +204,9 @@ interface UIStateProviderProps {
 }
 
 export function UIStateProvider({ children }: UIStateProviderProps) {
-  const [uiState, setUIState] = useState<UIState>({});
+  const [uiState, setUIState] = useState<UIState>(() =>
+    typeof window === "undefined" ? {} : loadPersistedUIState()
+  );
   const [isHydrated, setIsHydrated] = useState(false);
   const serverSyncedRef = useRef(false);
 
@@ -212,8 +214,6 @@ export function UIStateProvider({ children }: UIStateProviderProps) {
   const setActiveDeckMutation = useMutation(api.sessions.setActiveDeck);
 
   useEffect(() => {
-    const persisted = loadPersistedUIState();
-    setUIState(persisted);
     setIsHydrated(true);
     serverSyncedRef.current = false;
   }, []);
@@ -238,71 +238,47 @@ export function UIStateProvider({ children }: UIStateProviderProps) {
     setUIState((prev) => ({ ...prev, ...updates }));
   }, []);
 
-  const setGalleryFilters = useCallback(
-    (filters: CardFilters) => {
-      updateUIState({ galleryFilters: filters });
-    },
-    [updateUIState]
-  );
+  const setGalleryFilters = useCallback((filters: CardFilters) => {
+    setUIState((prev) => ({ ...prev, galleryFilters: filters }));
+  }, []);
 
   const setActiveDeckId = useCallback(
     (deckId: string | undefined) => {
-      updateUIState({ activeDeckId: deckId });
+      setUIState((prev) => ({ ...prev, activeDeckId: deckId }));
       setActiveDeckMutation({
         deckId: deckId ? (deckId as Id<"decks">) : undefined,
       });
     },
-    [updateUIState, setActiveDeckMutation]
+    [setActiveDeckMutation]
   );
 
-  const setGalleryViewMode = useCallback(
-    (mode: GalleryViewMode) => {
-      updateUIState({ galleryViewMode: mode });
-    },
-    [updateUIState]
-  );
+  const setGalleryViewMode = useCallback((mode: GalleryViewMode) => {
+    setUIState((prev) => ({ ...prev, galleryViewMode: mode }));
+  }, []);
 
-  const setGalleryCardsPerRow = useCallback(
-    (count: number | undefined) => {
-      updateUIState({ galleryCardsPerRow: count });
-    },
-    [updateUIState]
-  );
+  const setGalleryCardsPerRow = useCallback((count: number | undefined) => {
+    setUIState((prev) => ({ ...prev, galleryCardsPerRow: count }));
+  }, []);
 
-  const setRightSidebarAction = useCallback(
-    (actionId: string | undefined) => {
-      updateUIState({ rightSidebarAction: actionId });
-    },
-    [updateUIState]
-  );
+  const setRightSidebarAction = useCallback((actionId: string | undefined) => {
+    setUIState((prev) => ({ ...prev, rightSidebarAction: actionId }));
+  }, []);
 
-  const setGalleryFormat = useCallback(
-    (format: string | undefined) => {
-      updateUIState({ galleryFormat: format });
-    },
-    [updateUIState]
-  );
+  const setGalleryFormat = useCallback((format: string | undefined) => {
+    setUIState((prev) => ({ ...prev, galleryFormat: format }));
+  }, []);
 
-  const setGallerySets = useCallback(
-    (setCodes: string[] | undefined) => {
-      updateUIState({ gallerySets: setCodes });
-    },
-    [updateUIState]
-  );
+  const setGallerySets = useCallback((setCodes: string[] | undefined) => {
+    setUIState((prev) => ({ ...prev, gallerySets: setCodes }));
+  }, []);
 
-  const setGallerySortField = useCallback(
-    (field: string | undefined) => {
-      updateUIState({ gallerySortField: field });
-    },
-    [updateUIState]
-  );
+  const setGallerySortField = useCallback((field: string | undefined) => {
+    setUIState((prev) => ({ ...prev, gallerySortField: field }));
+  }, []);
 
-  const setGallerySortDirection = useCallback(
-    (direction: "asc" | "desc" | undefined) => {
-      updateUIState({ gallerySortDirection: direction });
-    },
-    [updateUIState]
-  );
+  const setGallerySortDirection = useCallback((direction: "asc" | "desc" | undefined) => {
+    setUIState((prev) => ({ ...prev, gallerySortDirection: direction }));
+  }, []);
 
   const value = useMemo(
     () => ({

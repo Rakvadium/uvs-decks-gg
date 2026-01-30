@@ -40,6 +40,7 @@ import { useConvexAuth, useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { useTheme, useColorScheme, COLOR_SCHEMES } from "@/lib/theme";
 import { useAuthDialog } from "@/components/auth/auth-dialog";
+import { usePrefersReducedMotion } from "@/lib/reduced-motion";
 
 interface NavItem {
   path: string;
@@ -69,6 +70,7 @@ export function LeftSidebar({ collapsed, onToggle }: LeftSidebarProps) {
   const { isDark, toggleTheme } = useTheme();
   const { colorScheme, setColorScheme } = useColorScheme();
   const { openAuthDialog } = useAuthDialog();
+  const prefersReducedMotion = usePrefersReducedMotion();
   const user = useQuery(api.user.currentUser, isAuthenticated ? {} : "skip");
   const isAdmin = user?.role === "Admin";
 
@@ -117,8 +119,8 @@ export function LeftSidebar({ collapsed, onToggle }: LeftSidebarProps) {
           const navLink = (
             <Link key={item.path} href={href}>
               <motion.div
-                whileHover={{ x: collapsed ? 0 : 2 }}
-                whileTap={{ scale: 0.98 }}
+                whileHover={prefersReducedMotion ? undefined : { x: collapsed ? 0 : 2 }}
+                whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}
                 className={cn(
                   "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                   collapsed && "justify-center px-2",
@@ -277,7 +279,7 @@ export function LeftSidebar({ collapsed, onToggle }: LeftSidebarProps) {
           initial={{ width: 0, opacity: 0 }}
           animate={{ width: 64, opacity: 1 }}
           exit={{ width: 0, opacity: 0 }}
-          transition={{ duration: 0.2, ease: "easeInOut" }}
+          transition={{ duration: prefersReducedMotion ? 0 : 0.2, ease: "easeInOut" }}
           className="flex h-full flex-col overflow-hidden bg-sidebar"
         >
           {sidebarContent}
@@ -288,7 +290,7 @@ export function LeftSidebar({ collapsed, onToggle }: LeftSidebarProps) {
           initial={{ width: 0, opacity: 0 }}
           animate={{ width: 256, opacity: 1 }}
           exit={{ width: 0, opacity: 0 }}
-          transition={{ duration: 0.2, ease: "easeInOut" }}
+          transition={{ duration: prefersReducedMotion ? 0 : 0.2, ease: "easeInOut" }}
           className="flex h-full flex-col overflow-hidden bg-sidebar"
         >
           {sidebarContent}

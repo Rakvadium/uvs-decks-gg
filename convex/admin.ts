@@ -12,38 +12,47 @@ import { cardValidator, cardInputValidator, subFormatValidator, ingestionJobVali
 import { requireAdmin } from "./utils/validation";
 
 export const releaseCards = mutation({
-  args: {
-    cardIds: v.optional(v.array(v.id("cards"))),
-  },
+  args: {},
   returns: v.object({
-    releasedCount: v.number(),
+    version: v.number(),
+    cardCount: v.number(),
+    previousVersion: v.union(v.number(), v.null()),
   }),
-  handler: async (ctx, args) => {
+  handler: async (ctx) => {
     await requireAdmin(ctx);
 
+    const cards = await ctx.db.query("cards").collect();
+    const cardCount = cards.filter(
+      (card) => card.isFrontFace !== false && card.isVariant !== true
+    ).length;
+
     const now = Date.now();
+    const existingVersion = await ctx.db.query("cardDataVersion").first();
 
-    let cardsToRelease;
-    if (args.cardIds) {
-      cardsToRelease = await Promise.all(
-        args.cardIds.map(id => ctx.db.get(id))
-      );
+    if (existingVersion) {
+      const newVersion = existingVersion.version + 1;
+      await ctx.db.patch(existingVersion._id, {
+        version: newVersion,
+        updatedAt: now,
+        cardCount,
+      });
+      return {
+        version: newVersion,
+        cardCount,
+        previousVersion: existingVersion.version,
+      };
     } else {
-      cardsToRelease = await ctx.db
-        .query("cards")
-        .collect();
+      await ctx.db.insert("cardDataVersion", {
+        version: 1,
+        updatedAt: now,
+        cardCount,
+      });
+      return {
+        version: 1,
+        cardCount,
+        previousVersion: null,
+      };
     }
-
-    let releasedCount = 0;
-    for (const card of cardsToRelease) {
-      if (card) {
-        await ctx.db.patch(card._id, {
-        });
-        releasedCount++;
-      }
-    }
-
-    return { releasedCount };
   },
 });
 
@@ -67,7 +76,7 @@ export const createSet = mutation({
     cardCount: v.optional(v.number()),
     iconUrl: v.optional(v.string()),
     setNumber: v.optional(v.number()),
-    legality: v.optional(v.any()),
+    legality: v.optional(v.string()),
     isRotating: v.optional(v.boolean()),
     isFuture: v.optional(v.boolean()),
   },
@@ -95,7 +104,7 @@ export const updateSet = mutation({
     cardCount: v.optional(v.number()),
     iconUrl: v.optional(v.string()),
     setNumber: v.optional(v.number()),
-    legality: v.optional(v.any()),
+    legality: v.optional(v.string()),
     isRotating: v.optional(v.boolean()),
     isFuture: v.optional(v.boolean()),
   },
@@ -237,6 +246,74 @@ export const deleteFormat = mutation({
     await requireAdmin(ctx);
     await ctx.db.delete(args.formatId);
     return null;
+  },
+});
+
+export const seedFormats = mutation({
+  args: {},
+  returns: v.object({
+    created: v.number(),
+    skipped: v.number(),
+  }),
+  handler: async (ctx) => {
+    const defaultFormats = [
+      {
+        key: "standard",
+        name: "Standard",
+        description: "The primary competitive format featuring the most recent sets.",
+        isDefault: true,
+        minDeckSize: 60,
+        maxDeckSize: undefined,
+        sideboardRule: "optional",
+        defaultCopyLimit: 4,
+        requiresStartingCharacter: true,
+        requiresIdentity: false,
+      },
+      {
+        key: "heroic",
+        name: "Heroic",
+        description: "An extended format including older sets.",
+        isDefault: false,
+        minDeckSize: 60,
+        maxDeckSize: undefined,
+        sideboardRule: "optional",
+        defaultCopyLimit: 4,
+        requiresStartingCharacter: true,
+        requiresIdentity: false,
+      },
+      {
+        key: "retro",
+        name: "Retro",
+        description: "A legacy format including all sets from the game's history.",
+        isDefault: false,
+        minDeckSize: 60,
+        maxDeckSize: undefined,
+        sideboardRule: "optional",
+        defaultCopyLimit: 4,
+        requiresStartingCharacter: true,
+        requiresIdentity: false,
+      },
+    ];
+
+    let created = 0;
+    let skipped = 0;
+
+    for (const format of defaultFormats) {
+      const existing = await ctx.db
+        .query("formats")
+        .withIndex("by_key", (q) => q.eq("key", format.key))
+        .unique();
+
+      if (existing) {
+        skipped++;
+        continue;
+      }
+
+      await ctx.db.insert("formats", format);
+      created++;
+    }
+
+    return { created, skipped };
   },
 });
 
@@ -835,7 +912,7 @@ export const upsertSet = mutation({
     code: v.string(),
     name: v.string(),
     setNumber: v.optional(v.number()),
-    legality: v.optional(v.any()),
+    legality: v.optional(v.string()),
     isRotating: v.optional(v.boolean()),
     isFuture: v.optional(v.boolean()),
     spotlightIP: v.optional(v.string()),
@@ -985,6 +1062,52 @@ export const upsertCardsBatch = mutation({
   },
 });
 
+export const linkCardFaces = mutation({
+  args: {
+    adminApiKey: v.string(),
+    links: v.array(v.object({
+      frontOracleId: v.string(),
+      backOracleId: v.string(),
+    })),
+  },
+  returns: v.object({
+    linked: v.number(),
+    failed: v.number(),
+  }),
+  handler: async (ctx, args) => {
+    validateAdminApiKey(args.adminApiKey);
+    let linked = 0;
+    let failed = 0;
+
+    for (const link of args.links) {
+      try {
+        const frontCard = await ctx.db
+          .query("cards")
+          .withIndex("by_oracleId", (q) => q.eq("oracleId", link.frontOracleId))
+          .first();
+
+        const backCard = await ctx.db
+          .query("cards")
+          .withIndex("by_oracleId", (q) => q.eq("oracleId", link.backOracleId))
+          .first();
+
+        if (!frontCard || !backCard) {
+          failed++;
+          continue;
+        }
+
+        await ctx.db.patch(frontCard._id, { backCardId: backCard._id });
+        await ctx.db.patch(backCard._id, { frontCardId: frontCard._id });
+        linked++;
+      } catch {
+        failed++;
+      }
+    }
+
+    return { linked, failed };
+  },
+});
+
 export const deleteSetsBatch = internalMutation({
   args: {
     limit: v.number(),
@@ -1024,5 +1147,27 @@ export const clearAllSets = action({
     }
 
     return { deletedCount: totalDeleted };
+  },
+});
+
+export const getCardDataVersion = query({
+  args: {},
+  returns: v.union(
+    v.object({
+      version: v.number(),
+      updatedAt: v.number(),
+      cardCount: v.number(),
+    }),
+    v.null()
+  ),
+  handler: async (ctx) => {
+    await requireAdmin(ctx);
+    const versionDoc = await ctx.db.query("cardDataVersion").first();
+    if (!versionDoc) return null;
+    return {
+      version: versionDoc.version,
+      updatedAt: versionDoc.updatedAt,
+      cardCount: versionDoc.cardCount,
+    };
   },
 });

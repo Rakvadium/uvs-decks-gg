@@ -3,13 +3,12 @@
 import { useMobileShell } from "./mobile-shell-context"
 import { Button } from "@/components/ui/button"
 import { PanelRightOpen } from "lucide-react"
+import { useShellSlot } from "./shell-slot-provider"
 
-interface MobileActionsTriggerProps {
-  hasActions: boolean
-}
-
-export function MobileActionsTrigger({ hasActions }: MobileActionsTriggerProps) {
+export function MobileActionsTrigger() {
   const { setActionsSheetOpen } = useMobileShell()
+  const { state } = useShellSlot()
+  const hasActions = (state.slots.get("right-sidebar")?.length ?? 0) > 0
 
   if (!hasActions) {
     return null

@@ -1,12 +1,15 @@
 "use client";
 
-import { ReactNode, useState, useEffect } from "react";
+import { ReactNode, useState, useEffect, useMemo } from "react";
 import { AuthGuard } from "@/components/auth-guard";
-import { UIStateProvider } from "@/providers";
+import { UIStateProvider, ActiveDeckProvider } from "@/providers";
 import {
   LeftSidebar,
   TopHeader,
   RightSidebar,
+  ShellSlotProvider,
+  useShellSlot,
+  useRegisterSlot,
   MobileShellProvider,
   MobileHeader,
   MobileTopBar,
@@ -18,22 +21,12 @@ import {
 import { usePathname, useParams } from "next/navigation";
 import { Upload, Layers, CreditCard, Settings } from "lucide-react";
 import Link from "next/link";
-import { AdminTopBarProvider } from "@/components/admin/admin-top-bar-context";
 import { TcgDndProvider } from "@/lib/dnd";
+import { GalleryFiltersProvider } from "@/providers/GalleryFiltersProvider";
 
 const LEFT_SIDEBAR_KEY = "uvs-decks-left-sidebar-collapsed";
 
 export type PageType = "gallery" | "decks" | "deckDetails" | "collection" | "community" | "home" | "admin" | "settings";
-
-export interface SidebarAction {
-  id: string;
-  label: string;
-  icon: ReactNode;
-  content: ReactNode;
-  header?: ReactNode;
-  footer?: ReactNode;
-  isDefault?: boolean;
-}
 
 function getPageType(pathname: string): PageType | null {
   if (pathname.startsWith("/admin")) return "admin";
@@ -93,22 +86,25 @@ function AdminSidebarContent() {
   );
 }
 
-function getAdminSidebarActions(): SidebarAction[] {
-  return [
-    {
-      id: "admin-nav",
-      label: "Admin Navigation",
-      icon: <Settings className="h-4 w-4" />,
-      content: <AdminSidebarContent />,
-    },
-  ];
+function AdminSidebarSlot() {
+  return <AdminSidebarContent />;
 }
 
-function ShellLayout({ children }: { children: ReactNode }) {
+function AdminSidebarSlotRegistration() {
+  const slotOptions = useMemo(
+    () => ({ label: "Admin Navigation", icon: Settings }),
+    []
+  );
+  useRegisterSlot("right-sidebar", "admin-nav", AdminSidebarSlot, slotOptions);
+  return null;
+}
+
+function ShellLayoutInner({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const params = useParams();
   const [leftSidebarCollapsed, setLeftSidebarCollapsed] = useState(false);
   const [isHydrated, setIsHydrated] = useState(false);
+  const { state } = useShellSlot();
 
   const pageType = getPageType(pathname);
   const deckId = params?.deckId as string | undefined;
@@ -121,20 +117,7 @@ function ShellLayout({ children }: { children: ReactNode }) {
     setIsHydrated(true);
   }, []);
 
-  const getSidebarActions = (): SidebarAction[] => {
-    if (pageType === "admin") {
-      return getAdminSidebarActions();
-    }
-
-    if (pageType === "settings") {
-      return [];
-    }
-
-    return [];
-  };
-
-  const actions = getSidebarActions();
-  const hasRightSidebar = actions.length > 0;
+  const hasRightSidebar = (state.slots.get("right-sidebar")?.length ?? 0) > 0;
 
   const toggleLeftSidebar = () => {
     setLeftSidebarCollapsed((prev) => {
@@ -146,13 +129,12 @@ function ShellLayout({ children }: { children: ReactNode }) {
 
   const desktopLayout = (
     <div className="hidden md:flex h-screen w-full flex-col overflow-hidden">
-      <TopHeader pageType={pageType} deckId={deckId} />
+      <TopHeader />
       <div className="flex flex-1 overflow-hidden bg-sidebar">
-        {/* Temporarily disabled left sidebar - navigation moved to header */}
-        {/* <LeftSidebar
+        <LeftSidebar
           collapsed={isHydrated ? leftSidebarCollapsed : false}
           onToggle={toggleLeftSidebar}
-        /> */}
+        />
         <div className="flex flex-1 overflow-hidden">
           <div className="relative flex flex-1 flex-col min-w-0">
             <div className="pointer-events-none absolute -top-3 left-0 z-10 h-3 w-3">
@@ -167,7 +149,7 @@ function ShellLayout({ children }: { children: ReactNode }) {
               {children}
             </main>
           </div>
-          {hasRightSidebar && <RightSidebar actions={actions} />}
+          {hasRightSidebar && <RightSidebar />}
         </div>
       </div>
     </div>
@@ -180,36 +162,47 @@ function ShellLayout({ children }: { children: ReactNode }) {
         <main className="min-h-0 flex-1 overflow-y-auto">
           {children}
         </main>
-        <MobileActionsTrigger hasActions={hasRightSidebar} />
+        <MobileActionsTrigger />
         <MobileTopBar pageType={pageType} deckId={deckId} />
         <MobileBottomNav />
         <MobileProfileSheet />
-        <MobileActionsSheet actions={actions} />
+        <MobileActionsSheet />
       </div>
     </MobileShellProvider>
   );
 
   const content = (
     <>
+      {pageType === "admin" ? <AdminSidebarSlotRegistration /> : null}
       {desktopLayout}
       {mobileLayout}
     </>
   );
 
-  if (pageType === "admin") {
-    return <AdminTopBarProvider>{content}</AdminTopBarProvider>;
+  if (pageType === "gallery") {
+    return <GalleryFiltersProvider>{content}</GalleryFiltersProvider>;
   }
 
   return content;
+}
+
+function ShellLayout({ children }: { children: ReactNode }) {
+  return (
+    <ShellLayoutInner>{children}</ShellLayoutInner>
+  );
 }
 
 export default function AppLayout({ children }: { children: ReactNode }) {
   return (
     <AuthGuard>
       <UIStateProvider>
-        <TcgDndProvider>
-          <ShellLayout>{children}</ShellLayout>
-        </TcgDndProvider>
+        <ActiveDeckProvider>
+          <TcgDndProvider>
+            <ShellSlotProvider>
+              <ShellLayout>{children}</ShellLayout>
+            </ShellSlotProvider>
+          </TcgDndProvider>
+        </ActiveDeckProvider>
       </UIStateProvider>
     </AuthGuard>
   );

@@ -1,6 +1,12 @@
 export { LeftSidebar } from "./left-sidebar";
 export { TopHeader } from "./top-header";
 export { RightSidebar } from "./right-sidebar";
+export {
+  ShellSlotProvider,
+  useShellSlot,
+  useRegisterSlot,
+  SlotRenderer,
+} from "./shell-slot-provider";
 export { ThemeInjector } from "./theme-injector";
 export { MobileShellProvider, useMobileShell } from "./mobile-shell-context";
 export { MobileHeader } from "./mobile-header";

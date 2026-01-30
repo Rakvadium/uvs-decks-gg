@@ -29,7 +29,7 @@ export default defineSchema({
     releasedAt: v.optional(v.number()),
     cardCount: v.optional(v.number()),
     iconUrl: v.optional(v.string()),
-    legality: v.optional(v.record(v.string(), v.boolean())),
+    legality: v.optional(v.string()),
     isRotating: v.optional(v.boolean()),
     isFuture: v.optional(v.boolean()),
     spotlightIP: v.optional(v.string()),

@@ -1,59 +1,15 @@
 "use client";
 
 import { useState, useMemo, useRef, useEffect, useCallback } from "react";
-import { Loader2, Database, Cloud } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { IMAGE_BASE_URL } from "@/config/universus";
-import { useCardData, filterCards, sortCards, CachedCard } from "@/lib/universus";
-import { useUIState } from "@/providers/UIStateProvider";
+import { Loader2, UserIcon } from "lucide-react";
+import { useCardData, CachedCard } from "@/lib/universus";
+import { useActiveDeck } from "@/providers/ActiveDeckProvider";
+import { CardGridItem } from "@/components/universus";
+import { GalleryTopBarFilters } from "./gallery-header";
+import { useRegisterSlot } from "@/components/shell/shell-slot-provider";
+import { useGalleryFilters } from "@/providers/GalleryFiltersProvider";
 
 const CARDS_PER_PAGE = 50;
-
-interface CardGridItemProps {
-  card: CachedCard;
-}
-
-function CardGridItem({ card }: CardGridItemProps) {
-  return (
-    <Card className="overflow-hidden group cursor-pointer hover:ring-2 ring-primary transition-all">
-      <div className="aspect-[2.5/3.5] relative bg-muted">
-        {card.imageUrl ? (
-          <img
-            src={card.imageUrl.startsWith("http") ? card.imageUrl : `${IMAGE_BASE_URL}/${card.imageUrl}`}
-            alt={card.name}
-            className="w-full h-full object-cover"
-            loading="lazy"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <span className="text-xs text-muted-foreground">No Image</span>
-          </div>
-        )}
-      </div>
-      <CardContent className="p-3">
-        <p className="font-medium text-sm truncate" title={card.name}>
-          {card.name}
-        </p>
-        <div className="flex items-center gap-2 mt-1">
-          <Badge variant="outline" className="text-xs">
-            {card.type}
-          </Badge>
-          {card.rarity && (
-            <span className="text-xs text-muted-foreground">{card.rarity}</span>
-          )}
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
 
 function LoadingProgress({ progress, isLoadingMore }: { progress: number; isLoadingMore: boolean }) {
   if (!isLoadingMore || progress >= 100) return null;
@@ -65,7 +21,7 @@ function LoadingProgress({ progress, isLoadingMore }: { progress: number; isLoad
         <span className="text-xs text-muted-foreground">Loading cards...</span>
         <div className="w-32 h-1.5 bg-muted rounded-full overflow-hidden">
           <div 
-            className="h-full bg-primary transition-all duration-300"
+            className="h-full bg-primary transition-[width] duration-300"
             style={{ width: `${progress}%` }}
           />
         </div>
@@ -75,54 +31,6 @@ function LoadingProgress({ progress, isLoadingMore }: { progress: number; isLoad
   );
 }
 
-function CacheStatusBadge({ 
-  cachedVersion, 
-  serverVersion, 
-  isSyncing,
-  cardCount,
-  onRefresh 
-}: { 
-  cachedVersion: number | null;
-  serverVersion: number | null;
-  isSyncing: boolean;
-  cardCount: number;
-  onRefresh: () => void;
-}) {
-  const isUpToDate = cachedVersion !== null && cachedVersion === serverVersion;
-  
-  return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="h-8 gap-2"
-          onClick={onRefresh}
-          disabled={isSyncing}
-        >
-          {isSyncing ? (
-            <Loader2 className="h-3.5 w-3.5 animate-spin" />
-          ) : isUpToDate ? (
-            <Database className="h-3.5 w-3.5 text-green-500" />
-          ) : (
-            <Cloud className="h-3.5 w-3.5 text-yellow-500" />
-          )}
-          <span className="text-xs">
-            {cardCount.toLocaleString()} cached
-          </span>
-        </Button>
-      </TooltipTrigger>
-      <TooltipContent>
-        <div className="text-xs">
-          <p>Cache Version: {cachedVersion ?? "None"}</p>
-          <p>Server Version: {serverVersion ?? "Loading..."}</p>
-          <p>{isSyncing ? "Syncing..." : isUpToDate ? "Up to date" : "Update available"}</p>
-          <p className="mt-1 text-muted-foreground">Click to refresh</p>
-        </div>
-      </TooltipContent>
-    </Tooltip>
-  );
-}
 
 interface InfiniteCardGridProps {
   cards: CachedCard[];
@@ -131,6 +39,15 @@ interface InfiniteCardGridProps {
 function InfiniteCardGrid({ cards }: InfiniteCardGridProps) {
   const [visibleCount, setVisibleCount] = useState(CARDS_PER_PAGE);
   const loadMoreRef = useRef<HTMLDivElement>(null);
+  const { cards: allCards } = useCardData();
+  
+  const cardIdMap = useMemo(() => {
+    const map = new Map<string, CachedCard>();
+    for (const card of allCards) {
+      map.set(card._id, card);
+    }
+    return map;
+  }, [allCards]);
   
   const visibleCards = useMemo(() => {
     return cards.slice(0, visibleCount);
@@ -162,10 +79,17 @@ function InfiniteCardGrid({ cards }: InfiniteCardGridProps) {
   
   return (
     <>
-      <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-        {visibleCards.map((card) => (
-          <CardGridItem key={card._id} card={card} />
-        ))}
+      <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8">
+        {visibleCards.map((card) => {
+          const backCard = card.backCardId ? cardIdMap.get(card.backCardId) : undefined;
+          return (
+            <CardGridItem
+              key={card._id}
+              card={card}
+              backCard={backCard}
+            />
+          );
+        })}
       </div>
 
       {hasMore && (
@@ -186,85 +110,58 @@ function InfiniteCardGrid({ cards }: InfiniteCardGridProps) {
   );
 }
 
+function ActiveDeckSidebar() {
+  const { activeDeck, isLoading } = useActiveDeck();
+
+  if (isLoading) {
+    return <div className="p-4 text-sm text-muted-foreground">Loading deck</div>;
+  }
+
+  if (!activeDeck) {
+    return <div className="p-4 text-sm text-muted-foreground">No active deck selected</div>;
+  }
+
+  return (
+    <div className="h-full overflow-y-auto p-4">
+      <div className="space-y-2">
+        <h3 className="text-base font-semibold">{activeDeck.name}</h3>
+        <div className="text-sm text-muted-foreground">Cards in deck: {Object.keys(activeDeck.mainQuantities).length}</div>
+      </div>
+    </div>
+  );
+}
+
 export function GalleryView() {
-  const [search, setSearch] = useState("");
-  
-  const { uiState } = useUIState();
-  const {
-    cards,
-    isLoading,
-    isLoadingMore,
-    loadProgress,
-    cachedVersion,
-    serverVersion,
-    isSyncing,
-    refreshCache,
-  } = useCardData();
-
-  const filters = useMemo(() => ({
-    search,
-    searchMode: "name" as const,
-    ...uiState.galleryFilters,
-  }), [search, uiState.galleryFilters]);
-
-  const sortOptions = useMemo(() => ({
-    field: uiState.gallerySortField ?? "name",
-    direction: uiState.gallerySortDirection ?? "asc" as const,
-  }), [uiState.gallerySortField, uiState.gallerySortDirection]);
-
-  const filteredCards = useMemo(() => {
-    const filtered = filterCards(cards, filters);
-    return sortCards(filtered, sortOptions);
-  }, [cards, filters, sortOptions]);
-
-  const filterKey = useMemo(
-    () => JSON.stringify({ search, filters: uiState.galleryFilters }),
-    [search, uiState.galleryFilters]
+  const { state, meta } = useGalleryFilters();
+  const activeDeckSlotOptions = useMemo(
+    () => ({ label: "Active Deck", icon: UserIcon }),
+    []
   );
 
-  if (isLoading && cards.length === 0) {
+  useRegisterSlot("top-bar", "gallery-filters", GalleryTopBarFilters);
+  useRegisterSlot("right-sidebar", "active-deck", ActiveDeckSidebar, activeDeckSlotOptions);
+
+  const filterKey = useMemo(
+    () => JSON.stringify({ search: state.search, searchMode: state.searchMode, filters: state.filters }),
+    [state.search, state.searchMode, state.filters]
+  );
+
+  if (meta.isLoading && meta.totalCards === 0) {
     return (
       <div className="flex h-full flex-col items-center justify-center gap-4">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-        <p className="text-muted-foreground">Loading card data...</p>
+        <p className="text-muted-foreground">Loading card data…</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-4">
-          <div>
-            <h1 className="text-2xl font-bold">Card Gallery</h1>
-            <p className="text-muted-foreground">
-              {filteredCards.length.toLocaleString()} cards
-              {filteredCards.length !== cards.length && (
-                <span className="text-muted-foreground/60">
-                  {" "}of {cards.length.toLocaleString()}
-                </span>
-              )}
-            </p>
-          </div>
-          <CacheStatusBadge
-            cachedVersion={cachedVersion}
-            serverVersion={serverVersion}
-            isSyncing={isSyncing}
-            cardCount={cards.length}
-            onRefresh={refreshCache}
-          />
-        </div>
-        <Input
-          placeholder="Search cards..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="max-w-sm"
-        />
+    <div className="flex flex-col h-full">
+      <div className="flex-1 overflow-y-auto p-4">
+        <InfiniteCardGrid key={filterKey} cards={meta.filteredCards} />
       </div>
 
-      <InfiniteCardGrid key={filterKey} cards={filteredCards} />
-
-      <LoadingProgress progress={loadProgress} isLoadingMore={isLoadingMore} />
+      <LoadingProgress progress={meta.loadProgress} isLoadingMore={meta.isLoadingMore} />
     </div>
   );
 }

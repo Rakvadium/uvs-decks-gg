@@ -1,0 +1,14 @@
+## 2026-01-30
+- Phase 0: Added `ShellSlotProvider` registry in `src/components/shell/shell-slot-provider.tsx` to centralize top-bar and right-sidebar slot management and improve slot stability.
+- Phase 1: Added `GalleryFiltersProvider` in `src/providers/GalleryFiltersProvider.tsx` and exported it from `src/providers/index.ts` to consolidate gallery filter state, actions, and derived metadata.
+- Phase 2: Refactored gallery views and filters in `src/components/gallery/gallery-view.tsx` and `src/components/gallery/gallery-header.tsx` to consume `GalleryFiltersProvider` and register top-bar slots declaratively.
+- Phase 3: Removed card grid prop drilling by wiring `CardGridItem` to `useActiveDeck` and simplifying `InfiniteCardGrid` in `src/components/universus/card-grid-item.tsx` and `src/components/gallery/gallery-view.tsx`.
+- Phase 4: Migrated shell layout and header/sidebar components to slot registry usage in `src/components/shell/top-header.tsx`, `src/components/shell/right-sidebar.tsx`, `src/components/shell/mobile-actions-*`, `src/app/(app)/layout.tsx`, and `src/components/admin/admin-page-header.tsx` to eliminate action prop threading.
+- Phase 5: Improved gallery accessibility in `src/components/gallery/gallery-header.tsx` and `src/components/universus/card-grid-item.tsx` with keyboard support, labels, and input attributes for interactive elements.
+- Phase 6: Added reduced motion support via `src/lib/reduced-motion.ts` and applied it in `src/components/universus/card-grid-item.tsx`, `src/components/shell/left-sidebar.tsx`, and `src/components/gallery/gallery-view.tsx` to soften animations and limit transitions.
+- Phase 7: Updated gallery loading and search placeholders in `src/components/gallery/gallery-view.tsx` and `src/components/gallery/gallery-header.tsx` to use ellipsis characters.
+- Phase 8: Applied functional state updates and lazy UI state initialization in `src/providers/UIStateProvider.tsx` to reduce re-renders and avoid redundant hydration work.
+- Phase 9: Updated provider composition in `src/app/(app)/layout.tsx` and `src/app/(app)/gallery/page.tsx` to scope gallery filters and use shell slot context at the app layout level.
+- Phase 10: Removed deprecated shell and top bar contexts from `src/components/gallery/gallery-top-bar-context.tsx`, `src/components/admin/admin-top-bar-context.tsx`, and `src/components/shell/right-sidebar-context.tsx` after migration to slot registry.
+- Fix: Wrapped gallery shell content with `GalleryFiltersProvider` in `src/app/(app)/layout.tsx` and removed the page-level wrapper in `src/app/(app)/gallery/page.tsx` so top-bar slots render under the provider.
+- Fix: Stabilized `ShellSlotProvider` actions in `src/components/shell/shell-slot-provider.tsx` to prevent repeated slot registration loops.

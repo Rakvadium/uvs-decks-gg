@@ -95,7 +95,7 @@ export const deckSectionValidator = v.union(
   v.literal("reference")
 );
 
-export const legalityValidator = v.record(v.string(), v.boolean());
+export const legalityValidator = v.optional(v.string());
 
 export const galleryFiltersValidator = v.object({
   search: v.optional(v.string()),
@@ -170,7 +170,7 @@ export const setDocValidator = v.object({
   releasedAt: v.optional(v.number()),
   cardCount: v.optional(v.number()),
   iconUrl: v.optional(v.string()),
-  legality: v.optional(legalityValidator),
+  legality: v.optional(v.string()),
   isRotating: v.optional(v.boolean()),
   isFuture: v.optional(v.boolean()),
   spotlightIP: v.optional(v.string()),

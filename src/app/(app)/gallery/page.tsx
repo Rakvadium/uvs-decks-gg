@@ -1,10 +1,10 @@
 "use client";
 
-import { GalleryView } from "@/components/gallery";
+import { GalleryView } from "@/components/gallery/gallery-view";
 
 export default function GalleryPage() {
   return (
-    <div className="flex h-full flex-col overflow-y-auto p-6">
+    <div className="h-full overflow-hidden">
       <GalleryView />
     </div>
   );

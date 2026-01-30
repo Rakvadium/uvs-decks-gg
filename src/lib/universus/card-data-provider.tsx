@@ -16,9 +16,18 @@ import {
   CardSortOptions,
   CachedCard,
 } from "./use-universus-cards";
+import { useSets, CachedSet, parseSetLegality } from "./use-sets";
+import { useFormats, CachedFormat } from "./use-formats";
 import type { CardFilters } from "@/providers/UIStateProvider";
 
 interface CardDataContextValue extends UseUniversusCardsResult {
+  sets: CachedSet[];
+  setsLoading: boolean;
+  formats: CachedFormat[];
+  formatsLoading: boolean;
+  getSetByCode: (code: string) => CachedSet | undefined;
+  getFormatByKey: (key: string) => CachedFormat | undefined;
+  isSetLegalInFormat: (setCode: string, formatKey: string) => boolean;
   getFilteredCards: (filters: CardFilters) => CachedCard[];
   getSortedCards: (cards: CachedCard[], options: CardSortOptions) => CachedCard[];
   getPaginatedCards: (cards: CachedCard[], page: number, pageSize: number) => ReturnType<typeof paginateCards>;
@@ -27,18 +36,26 @@ interface CardDataContextValue extends UseUniversusCardsResult {
 
 const defaultContextValue: CardDataContextValue = {
   cards: [],
+  sets: [],
+  setsLoading: true,
+  formats: [],
+  formatsLoading: true,
   isLoading: true,
   isLoadingMore: false,
   loadProgress: 0,
   totalCards: 0,
   cachedVersion: null,
   serverVersion: null,
+  isCheckingVersion: true,
   isSyncing: false,
   error: null,
   index: null,
   uniqueValues: null,
   isHydrated: false,
   refreshCache: async () => {},
+  getSetByCode: () => undefined,
+  getFormatByKey: () => undefined,
+  isSetLegalInFormat: () => true,
   getFilteredCards: () => [],
   getSortedCards: (cards) => cards,
   getPaginatedCards: () => ({ cards: [], totalPages: 0, hasMore: false }),
@@ -61,10 +78,31 @@ function useIsClient() {
 
 function CardDataProviderInner({ children }: CardDataProviderProps) {
   const cardData = useUniversusCards();
+  const setsData = useSets({ serverVersion: cardData.serverVersion });
+  const formatsData = useFormats();
 
   const value = useMemo((): CardDataContextValue => {
+    const isSetLegalInFormat = (setCode: string, formatKey: string): boolean => {
+      const set = setsData.getSetByCode(setCode);
+      if (!set) return true;
+      
+      const legalFormats = parseSetLegality(set.legality);
+      if (legalFormats.length === 0) return true;
+      
+      return legalFormats.includes(formatKey);
+    };
+
     const getFilteredCards = (filters: CardFilters) => {
-      return filterCards(cardData.cards, filters);
+      let cards = filterCards(cardData.cards, filters);
+      
+      if (filters.format) {
+        cards = cards.filter((card) => {
+          if (!card.setCode) return true;
+          return isSetLegalInFormat(card.setCode, filters.format!);
+        });
+      }
+      
+      return cards;
     };
 
     const getSortedCards = (cards: CachedCard[], options: CardSortOptions) => {
@@ -76,18 +114,25 @@ function CardDataProviderInner({ children }: CardDataProviderProps) {
     };
 
     const getFilteredAndSortedCards = (filters: CardFilters, sortOptions: CardSortOptions) => {
-      const filtered = filterCards(cardData.cards, filters);
+      const filtered = getFilteredCards(filters);
       return sortCards(filtered, sortOptions);
     };
 
     return {
       ...cardData,
+      sets: setsData.sets,
+      setsLoading: setsData.isLoading,
+      formats: formatsData.formats,
+      formatsLoading: formatsData.isLoading,
+      getSetByCode: setsData.getSetByCode,
+      getFormatByKey: formatsData.getFormatByKey,
+      isSetLegalInFormat,
       getFilteredCards,
       getSortedCards,
       getPaginatedCards,
       getFilteredAndSortedCards,
     };
-  }, [cardData]);
+  }, [cardData, setsData, formatsData]);
 
   return (
     <CardDataContext.Provider value={value}>
