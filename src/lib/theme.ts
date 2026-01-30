@@ -3,7 +3,7 @@
 import { useTheme as useNextTheme } from "next-themes";
 import { useCallback, useEffect, useState } from "react";
 
-export type ColorScheme = "default" | "calm-storm" | "cyberpunk" | "bubblegum" | "caffeine" | "darkmatter";
+export type ColorScheme = "default" | "calm-storm" | "cyberpunk" | "bubblegum" | "caffeine" | "darkmatter" | "holoterminal";
 
 export const COLOR_SCHEMES: { value: ColorScheme; label: string }[] = [
   { value: "default", label: "Default" },
@@ -12,6 +12,7 @@ export const COLOR_SCHEMES: { value: ColorScheme; label: string }[] = [
   { value: "bubblegum", label: "Bubblegum" },
   { value: "caffeine", label: "Caffeine" },
   { value: "darkmatter", label: "Darkmatter" },
+  { value: "holoterminal", label: "Holoterminal" },
 ];
 
 const COLOR_SCHEME_STORAGE_KEY = "color-scheme";
@@ -24,6 +25,7 @@ function getStoredColorScheme(): ColorScheme {
   if (stored === "bubblegum") return "bubblegum";
   if (stored === "caffeine") return "caffeine";
   if (stored === "darkmatter") return "darkmatter";
+  if (stored === "holoterminal") return "holoterminal";
   return "default";
 }
 
