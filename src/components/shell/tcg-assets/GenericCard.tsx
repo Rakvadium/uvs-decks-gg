@@ -4,7 +4,7 @@ import { RotateCcw, Plus, Minus, Eye } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { AspectRatio } from "@/components/ui/aspect-ratio"
 import { Button } from "@/components/ui/button"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 
@@ -217,67 +217,61 @@ function GenericCard({
 
           {/* Deck Management Buttons */}
           <div className="absolute bottom-2 left-2 right-2 z-10 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    size="sm"
-                    variant="secondary"
-                    className="bg-white/20 backdrop-blur-sm border-white/30 text-white hover:bg-white/30 flex-1"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onRemoveFromDeck?.(cardData.id);
-                    }}
-                    disabled={deckCount === 0}
-                  >
-                    <Minus className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Remove from deck</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  className="bg-white/20 backdrop-blur-sm border-white/30 text-white hover:bg-white/30 flex-1"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onRemoveFromDeck?.(cardData.id);
+                  }}
+                  disabled={deckCount === 0}
+                >
+                  <Minus className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Remove from deck</p>
+              </TooltipContent>
+            </Tooltip>
 
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    size="sm"
-                    variant="secondary"
-                    className="bg-white/20 backdrop-blur-sm border-white/30 text-white hover:bg-white/30 flex-1"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onAddToDeck?.(cardData.id);
-                    }}
-                  >
-                    <Plus className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Add to deck</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  className="bg-white/20 backdrop-blur-sm border-white/30 text-white hover:bg-white/30 flex-1"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onAddToDeck?.(cardData.id);
+                  }}
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Add to deck</p>
+              </TooltipContent>
+            </Tooltip>
           </div>
 
           {/* Flip Button */}
           {showFlipButton && (
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <CardFlipButton
-                    onClick={(e) => {
-                      e?.stopPropagation();
-                      onFlip?.();
-                    }}
-                  />
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>View Back</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <CardFlipButton
+                  onClick={(e) => {
+                    e?.stopPropagation();
+                    onFlip?.();
+                  }}
+                />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>View Back</p>
+              </TooltipContent>
+            </Tooltip>
           )}
         </AspectRatio>
       </div>

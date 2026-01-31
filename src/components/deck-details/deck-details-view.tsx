@@ -210,6 +210,10 @@ export function DeckDetailsView({ deckId }: DeckDetailsViewProps) {
   const prefersReducedMotion = usePrefersReducedMotion();
   const { cards: allCards } = useCardData();
   const { activeDeckId, setActiveDeck } = useActiveDeck();
+  const gallerySlotOptions = useMemo(() => ({ label: "Gallery", icon: LayoutGrid }), []);
+  const statsSlotOptions = useMemo(() => ({ label: "Stats", icon: BarChart3 }), []);
+  const simulatorSlotOptions = useMemo(() => ({ label: "Simulator", icon: Shuffle }), []);
+  const importExportSlotOptions = useMemo(() => ({ label: "Import/Export", icon: Download }), []);
   
   const deck = useQuery(api.decks.getById, { deckId: deckId as Id<"decks"> });
   const formats = useQuery(api.formats.list, {});
@@ -225,10 +229,10 @@ export function DeckDetailsView({ deckId }: DeckDetailsViewProps) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
-  useRegisterSlot("right-sidebar", "deck-gallery", GallerySidebar, { label: "Gallery", icon: LayoutGrid });
-  useRegisterSlot("right-sidebar", "deck-stats", StatsSidebar, { label: "Stats", icon: BarChart3 });
-  useRegisterSlot("right-sidebar", "deck-simulator", HandSimulatorSidebar, { label: "Simulator", icon: Shuffle });
-  useRegisterSlot("right-sidebar", "deck-import-export", ImportExportSidebar, { label: "Import/Export", icon: Download });
+  useRegisterSlot("right-sidebar", "deck-gallery", GallerySidebar, gallerySlotOptions);
+  useRegisterSlot("right-sidebar", "deck-stats", StatsSidebar, statsSlotOptions);
+  useRegisterSlot("right-sidebar", "deck-simulator", HandSimulatorSidebar, simulatorSlotOptions);
+  useRegisterSlot("right-sidebar", "deck-import-export", ImportExportSidebar, importExportSlotOptions);
 
   const mainCards = useMemo(() => {
     if (!deck) return [];

@@ -90,6 +90,9 @@ export function RightSidebar() {
             const Icon = slot.icon;
             const label = slot.label ?? slot.id;
             const isActive = activeActionId === slot.id;
+            const handleClick = () => {
+              actions.setActiveSidebarAction(isActive ? null : slot.id);
+            };
             return (
               <Tooltip key={slot.id}>
                 <TooltipTrigger asChild>
@@ -102,9 +105,7 @@ export function RightSidebar() {
                         ? "bg-primary/15 text-primary border-primary/30 shadow-[0_0_15px_-5px_var(--primary)]" 
                         : "hover:bg-primary/10 hover:text-primary hover:border-primary/20"
                     )}
-                    onClick={() => actions.setActiveSidebarAction(
-                      isActive ? null : slot.id
-                    )}
+                    onClick={handleClick}
                   >
                     {Icon ? (
                       <Icon className={cn(
