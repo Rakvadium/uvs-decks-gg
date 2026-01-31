@@ -22,13 +22,24 @@ export function MobileActionsTrigger() {
     return null
   }
 
-  const bottomPosition = pageType === "gallery" ? "bottom-[9.5rem]" : "bottom-32"
+  if (pageType === "gallery") {
+    return (
+      <Button
+        variant="ghost"
+        size="icon"
+        className="fixed bottom-[8.75rem] right-4 z-40 h-10 w-10 rounded-full shadow-md border border-border/50 bg-background/95 backdrop-blur-lg"
+        onClick={() => setActionsSheetOpen(true)}
+      >
+        <PanelRightOpen className="h-5 w-5" />
+      </Button>
+    )
+  }
 
   return (
     <Button
       variant="ghost"
       size="icon"
-      className={`fixed ${bottomPosition} right-3 z-40 h-10 w-10 rounded-full shadow-md border border-border/50 bg-background/95 backdrop-blur-lg`}
+      className="fixed bottom-32 right-3 z-40 h-10 w-10 rounded-full shadow-md border border-border/50 bg-background/95 backdrop-blur-lg"
       onClick={() => setActionsSheetOpen(true)}
     >
       <PanelRightOpen className="h-5 w-5" />

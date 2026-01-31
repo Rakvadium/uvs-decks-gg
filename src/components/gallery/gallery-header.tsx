@@ -70,8 +70,8 @@ function StatInput({ label, filterKey, value, onChange }: StatInputProps) {
   };
 
   return (
-    <div className="flex items-center gap-3">
-      <span className="text-[11px] font-mono text-muted-foreground w-16 shrink-0">{label}</span>
+    <div className="flex items-center gap-1.5 md:gap-3">
+      <span className="text-[11px] font-mono text-muted-foreground w-14 md:w-16 shrink-0">{label}</span>
       <div className={cn(
         "relative flex items-center h-7 flex-1 rounded-md border bg-background/50 overflow-hidden transition-all",
         hasValue 
@@ -137,14 +137,14 @@ function FilterDialog({ open, onOpenChange }: FilterDialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent size="lg" className="p-0 overflow-hidden max-h-[85vh]" showCloseButton={true}>
+      <DialogContent size="lg" className="p-0 overflow-hidden max-h-[85vh] md:pb-0" showCloseButton={true}>
         <DialogTitle className="sr-only">Filter Cards</DialogTitle>
         
-        <div className="relative">
+        <div className="relative flex flex-col h-full pb-20 md:pb-0">
           <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5 pointer-events-none" />
           <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
           
-          <div className="relative z-10 p-6 border-b border-border/30">
+          <div className="relative z-10 p-6 border-b border-border/30 shrink-0">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/20 border border-primary/40 shadow-[0_0_12px_-3px_var(--primary)]">
@@ -171,7 +171,7 @@ function FilterDialog({ open, onOpenChange }: FilterDialogProps) {
             </div>
           </div>
 
-          <div className="relative z-10 overflow-y-auto max-h-[calc(85vh-120px)] p-6">
+          <div className="relative z-10 flex-1 overflow-y-auto p-6 min-h-0">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-4">
                 <div className="p-3 rounded-lg border border-border/50 bg-card/30 backdrop-blur-sm space-y-3">
@@ -283,10 +283,10 @@ function FilterDialog({ open, onOpenChange }: FilterDialogProps) {
                         </Label>
                       </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       <div className="space-y-2">
                         <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70">Standard</span>
-                        <div className="grid grid-cols-6 gap-1.5">
+                        <div className="grid grid-cols-4 md:grid-cols-6 gap-2 md:gap-1.5">
                           {uniqueValues?.symbols
                             .filter((s) => !s.startsWith("attuned:") && s !== "infinity")
                             .map((symbol) => (
@@ -309,7 +309,7 @@ function FilterDialog({ open, onOpenChange }: FilterDialogProps) {
                       </div>
                       <div className="space-y-2">
                         <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70">Attuned</span>
-                        <div className="grid grid-cols-6 gap-1.5">
+                        <div className="grid grid-cols-4 md:grid-cols-6 gap-2 md:gap-1.5">
                           {uniqueValues?.symbols
                             .filter((s) => s.startsWith("attuned:"))
                             .map((symbol) => (
@@ -458,8 +458,8 @@ function FilterDialog({ open, onOpenChange }: FilterDialogProps) {
                       <div className="space-y-2">
                         <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70">Block</span>
                         <div className="space-y-1.5">
-                          <div className="flex items-center gap-3">
-                            <span className="text-[11px] font-mono text-muted-foreground w-16 shrink-0">Zone</span>
+                          <div className="flex items-center gap-1.5 md:gap-3">
+                            <span className="text-[11px] font-mono text-muted-foreground w-14 md:w-16 shrink-0">Zone</span>
                             <div className="flex h-7 flex-1 items-center rounded-md border border-border/50 bg-background/50 overflow-hidden">
                               {["High", "Mid", "Low"].map((zone, idx) => (
                                 <button
@@ -498,8 +498,8 @@ function FilterDialog({ open, onOpenChange }: FilterDialogProps) {
                       <div className="space-y-2">
                         <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70">Attack</span>
                         <div className="space-y-1.5">
-                          <div className="flex items-center gap-3">
-                            <span className="text-[11px] font-mono text-muted-foreground w-16 shrink-0">Zone</span>
+                          <div className="flex items-center gap-1.5 md:gap-3">
+                            <span className="text-[11px] font-mono text-muted-foreground w-14 md:w-16 shrink-0">Zone</span>
                             <div className="flex h-7 flex-1 items-center rounded-md border border-border/50 bg-background/50 overflow-hidden">
                               {["High", "Mid", "Low"].map((zone, idx) => (
                                 <button
@@ -570,22 +570,22 @@ function FilterDialog({ open, onOpenChange }: FilterDialogProps) {
               </div>
             </div>
           </div>
-
-          <div className="relative z-10 p-4 border-t border-border/30 bg-background/80 backdrop-blur-sm">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-xs font-mono text-muted-foreground">
-                <Sparkles className="h-3.5 w-3.5 text-primary" />
-                <span className="uppercase tracking-widest">
-                  {hasActiveFilters ? `${meta.activeFilterCount} filters active` : "No filters active"}
-                </span>
-              </div>
-              <Button 
-                onClick={() => onOpenChange(false)}
-                className="gap-2"
-              >
-                <span className="font-mono uppercase tracking-wider text-xs">Apply Filters</span>
-              </Button>
+        </div>
+        
+        <div className="md:relative md:z-10 md:p-4 md:border-t md:border-border/30 md:bg-background/80 md:backdrop-blur-sm fixed bottom-0 left-0 right-0 z-20 bg-card/95 backdrop-blur-lg p-4 border-t border-border/30">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 text-xs font-mono text-muted-foreground">
+              <Sparkles className="h-3.5 w-3.5 text-primary" />
+              <span className="uppercase tracking-widest">
+                {hasActiveFilters ? `${meta.activeFilterCount} filters active` : "No filters active"}
+              </span>
             </div>
+            <Button 
+              onClick={() => onOpenChange(false)}
+              className="gap-2"
+            >
+              <span className="font-mono uppercase tracking-wider text-xs">Apply Filters</span>
+            </Button>
           </div>
         </div>
       </DialogContent>
