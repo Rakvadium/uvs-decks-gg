@@ -7,6 +7,8 @@ import {
   Dialog,
   DialogContent,
   DialogTitle,
+  DialogFooter,
+  DialogClose,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -273,9 +275,9 @@ export function CardDetailsDialog({ card, backCard, open, onOpenChange }: CardDe
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent size="lg" className="p-0 overflow-hidden max-h-[90vh]" showCloseButton={true}>
+      <DialogContent size="lg" className="p-0 overflow-hidden max-h-[90vh] md:pb-6" showCloseButton={true}>
         <DialogTitle className="sr-only">{displayCard.name} - Card Details</DialogTitle>
-        <div className="flex flex-col lg:flex-row h-full">
+        <div className="flex flex-col lg:flex-row h-full pb-16 md:pb-0">
           <div className="relative lg:w-[320px] shrink-0 bg-gradient-to-br from-background via-card to-background p-6 flex items-center justify-center">
             <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5" />
             <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
@@ -517,6 +519,13 @@ export function CardDetailsDialog({ card, backCard, open, onOpenChange }: CardDe
             </div>
           </div>
         </div>
+        <DialogFooter className="md:hidden">
+          <DialogClose asChild>
+            <Button variant="outline" className="w-full">
+              Close
+            </Button>
+          </DialogClose>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

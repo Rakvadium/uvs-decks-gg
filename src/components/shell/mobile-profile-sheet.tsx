@@ -76,8 +76,8 @@ export function MobileProfileSheet() {
 
   return (
     <Sheet open={isProfileSheetOpen} onOpenChange={setProfileSheetOpen}>
-      <SheetContent side="right" className="w-full max-w-sm p-0" showCloseButton={false}>
-        <SheetHeader className="p-4 pb-2">
+      <SheetContent side="right" className="w-full max-w-sm p-0 flex flex-col" showCloseButton={false}>
+        <SheetHeader className="p-4 pb-2 shrink-0">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Avatar className="h-12 w-12">
@@ -106,7 +106,7 @@ export function MobileProfileSheet() {
           </div>
         </SheetHeader>
 
-        <div className="flex flex-1 flex-col overflow-y-auto">
+        <div className="flex-1 overflow-y-auto min-h-0">
           <Separator />
           
           <div className="p-4">
@@ -190,10 +190,12 @@ export function MobileProfileSheet() {
             </div>
           </div>
 
+          {!isAdmin && <div className="pb-24" />}
+
           {isAdmin && (
             <>
               <Separator />
-              <div className="p-4">
+              <div className="p-4 pb-24">
                 <p className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
                   Admin
                 </p>
@@ -219,34 +221,44 @@ export function MobileProfileSheet() {
               </div>
             </>
           )}
+        </div>
 
-          <div className="mt-auto">
-            <Separator />
-            <div className="p-4">
-              {!isLoading && !isAuthenticated ? (
-                <Button
-                  variant="default"
-                  className="w-full gap-2"
-                  onClick={() => {
-                    openAuthDialog()
-                    setProfileSheetOpen(false)
-                  }}
-                >
-                  <LogIn className="h-4 w-4" />
-                  Sign In
-                </Button>
-              ) : (
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start gap-3 text-destructive hover:bg-destructive/10 hover:text-destructive"
-                  onClick={handleSignOut}
-                >
-                  <LogOut className="h-5 w-5" />
-                  Sign out
-                </Button>
-              )}
+        <div className="shrink-0 bg-background border-t p-4 flex flex-col gap-3">
+          {!isLoading && !isAuthenticated && (
+            <div className="flex items-center gap-3">
+              <Avatar className="h-10 w-10">
+                <AvatarFallback className="bg-primary/20 text-primary text-sm font-mono font-bold">
+                  ?
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium">Guest</p>
+                <p className="text-xs text-muted-foreground">Not signed in</p>
+              </div>
             </div>
-          </div>
+          )}
+          {!isLoading && !isAuthenticated ? (
+            <Button
+              variant="default"
+              className="w-full gap-2"
+              onClick={() => {
+                openAuthDialog()
+                setProfileSheetOpen(false)
+              }}
+            >
+              <LogIn className="h-4 w-4" />
+              Sign In
+            </Button>
+          ) : isAuthenticated && (
+            <Button
+              variant="ghost"
+              className="w-full justify-start gap-3 text-destructive hover:bg-destructive/10 hover:text-destructive"
+              onClick={handleSignOut}
+            >
+              <LogOut className="h-5 w-5" />
+              Sign out
+            </Button>
+          )}
         </div>
       </SheetContent>
     </Sheet>
