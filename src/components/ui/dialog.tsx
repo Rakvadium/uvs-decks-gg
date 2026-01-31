@@ -74,12 +74,12 @@ function DialogContent({
       <DialogPrimitive.Content
         data-slot="dialog-content"
         className={cn(
-          "fixed z-50 shadow-2xl duration-200 overflow-x-hidden overflow-y-auto",
+          "fixed z-50 shadow-2xl duration-200 overflow-x-hidden",
           "bg-card/95 backdrop-blur-lg border-primary/20",
           "data-[state=open]:animate-in data-[state=closed]:animate-out",
           "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
-          "inset-0 h-[100dvh] w-full rounded-none border-0 p-4 pt-14",
-          "md:inset-auto md:top-[50%] md:left-[50%] md:h-auto md:max-h-[85vh] md:translate-x-[-50%] md:translate-y-[-50%] md:rounded-lg md:border md:p-6",
+          "inset-0 h-[100dvh] w-full rounded-none border-0 flex flex-col",
+          "md:inset-auto md:top-[50%] md:left-[50%] md:h-auto md:max-h-[85vh] md:translate-x-[-50%] md:translate-y-[-50%] md:rounded-lg md:border md:overflow-y-auto",
           "md:data-[state=closed]:zoom-out-95 md:data-[state=open]:zoom-in-95",
           "md:shadow-[0_0_50px_-10px_var(--primary)]",
           dialogSizeStyles[size],
@@ -89,13 +89,13 @@ function DialogContent({
       >
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5 pointer-events-none rounded-lg" />
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
-        <div className="relative z-10">
+        <div className="relative z-10 flex-1 overflow-y-auto">
           {children}
         </div>
         {showCloseButton && (
           <DialogPrimitive.Close
             data-slot="dialog-close"
-            className="absolute top-4 right-4 z-20 h-8 w-8 rounded-md flex items-center justify-center opacity-70 transition-all hover:opacity-100 hover:bg-primary/10 hover:text-primary focus:ring-2 focus:ring-primary/30 focus:outline-hidden disabled:pointer-events-none border border-transparent hover:border-primary/30"
+            className="hidden md:flex absolute top-4 right-4 z-20 h-8 w-8 rounded-md items-center justify-center opacity-70 transition-all hover:opacity-100 hover:bg-primary/10 hover:text-primary focus:ring-2 focus:ring-primary/30 focus:outline-hidden disabled:pointer-events-none border border-transparent hover:border-primary/30"
           >
             <XIcon className="h-4 w-4" />
             <span className="sr-only">Close</span>
@@ -138,6 +138,8 @@ function DialogFooter({ className, ...props }: React.ComponentProps<"div">) {
       data-slot="dialog-footer"
       className={cn(
         "flex flex-col-reverse gap-2 pt-4 sm:flex-row sm:justify-end border-t border-border/30",
+        "md:relative md:z-10",
+        "fixed bottom-0 left-0 right-0 z-20 bg-card/95 backdrop-blur-lg p-4 border-t border-border/30 md:border-0 md:p-0 md:pt-4",
         className
       )}
       {...props}

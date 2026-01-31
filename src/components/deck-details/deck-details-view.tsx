@@ -274,7 +274,7 @@ export function DeckDetailsView({ deckId }: DeckDetailsViewProps) {
   const currentCards = activeSection === "main" ? mainCards : activeSection === "side" ? sideCards : referenceCards;
   const currentQuantities = deck ? (activeSection === "main" ? deck.mainQuantities : activeSection === "side" ? deck.sideQuantities : deck.referenceQuantities) : {};
 
-  const isActiveDeck = deck && activeDeckId === deck._id;
+  const isActiveDeck = !!(deck && activeDeckId === deck._id);
 
   const startEditing = useCallback(() => {
     if (deck) {
@@ -298,7 +298,6 @@ export function DeckDetailsView({ deckId }: DeckDetailsViewProps) {
         deckId: deck._id,
         name: editName.trim() || deck.name,
         description: editDescription.trim() || undefined,
-        format: editFormat || undefined,
         isPublic: editIsPublic,
       });
       setIsEditing(false);

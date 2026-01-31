@@ -101,7 +101,7 @@ export function useUniversusCards(): UseUniversusCardsResult {
     let isDone = false;
 
     while (!isDone) {
-      const result = await convex.query(api.cards.listReleasedPaginated, {
+      const result: { cards: Array<any>; cursor: string | null; isDone: boolean } = await convex.query(api.cards.listReleasedPaginated, {
         cursor,
         limit: 1000,
       });

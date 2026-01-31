@@ -289,7 +289,7 @@ export function GalleryView() {
       </div>
 
       <div className="relative z-10 flex-1 overflow-y-auto">
-        <div className="p-4 md:p-6 space-y-4">
+        <div className="p-4 md:p-6 space-y-4 pb-[8rem] md:pb-4">
           <GalleryStats 
             totalCards={meta.totalCards} 
             filteredCount={meta.filteredCount} 
