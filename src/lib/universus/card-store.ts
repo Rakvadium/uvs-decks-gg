@@ -2,6 +2,51 @@ import type { Doc } from "../../../convex/_generated/dataModel";
 
 export type CachedCard = Doc<"cards">;
 
+export const KEYWORD_LIST = [
+  "Ally",
+  "Breaker",
+  "Charge",
+  "Combo",
+  "Deflect",
+  "Desperation",
+  "Diplomacy",
+  "EX",
+  "Echo",
+  "Elusive",
+  "Flash",
+  "Frenzy",
+  "Fury",
+  "Gauge",
+  "Item",
+  "Kick",
+  "Multiple",
+  "Only",
+  "Pizza",
+  "Powerful",
+  "Punch",
+  "Ranged",
+  "Reversal",
+  "Safe",
+  "Scheme",
+  "Shift",
+  "Slam",
+  "Spell",
+  "Stance",
+  "Stun",
+  "Taunt",
+  "Tech",
+  "Tension",
+  "Terrain",
+  "Throw",
+  "Titan",
+  "Unique",
+  "Vestige",
+  "Weapon",
+  "XP",
+] as const;
+
+export type Keyword = (typeof KEYWORD_LIST)[number];
+
 export interface CardCacheMetadata {
   version: number;
   updatedAt: number;
@@ -198,35 +243,53 @@ export function getUniqueValues(cards: CachedCard[]): {
   rarities: string[];
   setCodes: string[];
   setNames: string[];
+  setNumbers: number[];
   keywords: string[];
   symbols: string[];
 } {
   const types = new Set<string>();
   const rarities = new Set<string>();
-  const setCodes = new Set<string>();
-  const setNames = new Set<string>();
-  const keywords = new Set<string>();
+  const setData = new Map<string, { name: string; number: number }>();
   const symbols = new Set<string>();
 
   for (const card of cards) {
     if (card.type) types.add(card.type);
     if (card.rarity) rarities.add(card.rarity);
-    if (card.setCode) setCodes.add(card.setCode);
-    if (card.setName) setNames.add(card.setName);
-    if (card.keywords) {
-      card.keywords.split("|").forEach(kw => keywords.add(kw.trim()));
+    if (card.setCode && card.setName) {
+      if (!setData.has(card.setCode)) {
+        setData.set(card.setCode, { 
+          name: card.setName, 
+          number: card.setNumber ?? 0 
+        });
+      }
     }
     if (card.symbols) {
       card.symbols.split("|").forEach(s => symbols.add(s.trim()));
     }
   }
 
+  const sortedSets = Array.from(setData.entries())
+    .sort((a, b) => (b[1].number ?? 0) - (a[1].number ?? 0));
+
   return {
-    types: Array.from(types).sort(),
+    types: Array.from(types).filter(t => t !== "Special").sort(),
     rarities: Array.from(rarities).sort(),
-    setCodes: Array.from(setCodes).sort(),
-    setNames: Array.from(setNames).sort(),
-    keywords: Array.from(keywords).sort(),
+    setCodes: sortedSets.map(([code]) => code),
+    setNames: sortedSets.map(([, data]) => data.name),
+    setNumbers: sortedSets.map(([, data]) => data.number),
+    keywords: [...KEYWORD_LIST],
     symbols: Array.from(symbols).sort(),
   };
 }
+
+export function cardHasKeyword(card: CachedCard, keyword: string): boolean {
+  if (!card.keywords) return false;
+  const cardKeywords = card.keywords.split("|").map(kw => kw.trim());
+  return cardKeywords.some(kw => kw === keyword || kw.startsWith(`${keyword}:`));
+}
+
+export function cardHasSymbol(card: CachedCard, symbol: string): boolean {
+  if (!card.symbols) return false;
+  const cardSymbols = card.symbols.split("|").map(s => s.trim());
+  return cardSymbols.some(s => s.toLowerCase() === symbol.toLowerCase());
+} 

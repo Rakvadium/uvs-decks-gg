@@ -12,9 +12,10 @@ import {
   buildCardIndex,
   CardIndex,
   getUniqueValues,
+  cardHasKeyword,
 } from "./card-store";
 import type { CachedCard } from "./card-store";
-import type { CardFilters } from "@/providers/UIStateProvider";
+import type { CardFilters, StatFilterValue, StatOperator } from "@/providers/UIStateProvider";
 
 export type { CachedCard } from "./card-store";
 
@@ -237,6 +238,29 @@ export function useUniversusCards(): UseUniversusCardsResult {
   };
 }
 
+function matchesStatFilter(cardValue: number | undefined, filter: StatFilterValue | undefined): boolean {
+  if (!filter) return true;
+  if (cardValue === undefined) return false;
+  
+  const { operator, value } = filter;
+  switch (operator) {
+    case "eq":
+      return cardValue === value;
+    case "neq":
+      return cardValue !== value;
+    case "gt":
+      return cardValue > value;
+    case "lt":
+      return cardValue < value;
+    case "gte":
+      return cardValue >= value;
+    case "lte":
+      return cardValue <= value;
+    default:
+      return true;
+  }
+}
+
 export function filterCards(
   cards: CachedCard[],
   filters: CardFilters
@@ -278,9 +302,14 @@ export function filterCards(
   if (filters.symbols && filters.symbols.length > 0) {
     result = result.filter((card) => {
       if (!card.symbols) return false;
-      const cardSymbols = card.symbols.split("|").map(s => s.trim().toLowerCase());
+      let cardSymbols = card.symbols.split("|").map(s => s.trim().toLowerCase());
       if (filters.symbolMatchAll) {
-        return filters.symbols!.every(s => cardSymbols.includes(s.toLowerCase()));
+        return filters.symbols!.every(s => cardSymbols.includes(s.toLowerCase()));  
+      }
+      const isAttuned = cardSymbols.some(s => s.toLowerCase().startsWith("attuned"));
+      const isAttunedFilter = filters.symbols?.some(s => s.toLowerCase().startsWith("attuned"));
+      if (isAttuned && !isAttunedFilter) {
+        cardSymbols = cardSymbols.map(s => s.replace("attuned:", "").toLowerCase());
       }
       return filters.symbols!.some(s => cardSymbols.includes(s.toLowerCase()));
     });
@@ -289,11 +318,10 @@ export function filterCards(
   if (filters.keywords && filters.keywords.length > 0) {
     result = result.filter((card) => {
       if (!card.keywords) return false;
-      const cardKeywords = card.keywords.split("|").map(k => k.trim().toLowerCase());
       if (filters.keywordMatchAll) {
-        return filters.keywords!.every(k => cardKeywords.includes(k.toLowerCase()));
+        return filters.keywords!.every(k => cardHasKeyword(card, k));
       }
-      return filters.keywords!.some(k => cardKeywords.includes(k.toLowerCase()));
+      return filters.keywords!.some(k => cardHasKeyword(card, k));
     });
   }
 
@@ -334,11 +362,43 @@ export function filterCards(
   }
 
   if (filters.attackZone && filters.attackZone.length > 0) {
-    result = result.filter((card) => card.attackZone && filters.attackZone!.includes(card.attackZone));
+    result = result.filter((card) => card.attackZone && filters.attackZone?.map(z => z.toLowerCase())!.includes(card.attackZone!.toLowerCase()));
   }
 
   if (filters.blockZone && filters.blockZone.length > 0) {
-    result = result.filter((card) => card.blockZone && filters.blockZone!.includes(card.blockZone));
+    result = result.filter((card) => card.blockZone && filters.blockZone?.map(z => z.toLowerCase())!.includes(card.blockZone!.toLowerCase()));
+  }
+
+  if (filters.difficulty) {
+    result = result.filter((card) => matchesStatFilter(card.difficulty, filters.difficulty));
+  }
+
+  if (filters.control) {
+    result = result.filter((card) => matchesStatFilter(card.control, filters.control));
+  }
+
+  if (filters.speed) {
+    result = result.filter((card) => matchesStatFilter(card.speed, filters.speed));
+  }
+
+  if (filters.damage) {
+    result = result.filter((card) => matchesStatFilter(card.damage, filters.damage));
+  }
+
+  if (filters.blockModifier) {
+    result = result.filter((card) => matchesStatFilter(card.blockModifier, filters.blockModifier));
+  }
+
+  if (filters.health) {
+    result = result.filter((card) => matchesStatFilter(card.health, filters.health));
+  }
+
+  if (filters.handSize) {
+    result = result.filter((card) => matchesStatFilter(card.handSize, filters.handSize));
+  }
+
+  if (filters.stamina) {
+    result = result.filter((card) => matchesStatFilter(card.stamina, filters.stamina));
   }
 
   return result;

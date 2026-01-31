@@ -134,8 +134,8 @@ export function CardGridItem({
             "[transform-style:preserve-3d]",
             prefersReducedMotion ? "transition-none" : "transition-[transform] duration-500",
             isFlipped && "[transform:rotateY(180deg)]",
-            "shadow-[0_0_10px_-3px_var(--primary)/30]",
-            isHovered && "shadow-[0_0_25px_-3px_var(--primary)]"
+            "shadow-[0_0_6px_-2px_var(--primary)/20]",
+            isHovered && "shadow-[0_0_15px_-3px_var(--primary)/60]"
           )}
         >
           <CardFace

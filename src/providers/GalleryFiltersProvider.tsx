@@ -12,12 +12,15 @@ import { useCardData, sortCards, CachedCard } from "@/lib/universus";
 import { useUIState, type CardFilters } from "@/providers/UIStateProvider";
 
 type SearchMode = "name" | "text" | "all";
+type ViewMode = "card" | "list" | "details";
 
 interface GalleryFiltersState {
   search: string;
   searchMode: SearchMode;
   filters: CardFilters;
   effectiveFormat: string;
+  viewMode: ViewMode;
+  cardsPerRow: number;
 }
 
 interface GalleryFiltersActions {
@@ -25,6 +28,8 @@ interface GalleryFiltersActions {
   setSearchMode: (mode: SearchMode) => void;
   updateFilter: <K extends keyof CardFilters>(key: K, value: CardFilters[K]) => void;
   clearAllFilters: () => void;
+  setViewMode: (mode: ViewMode) => void;
+  setCardsPerRow: (count: number) => void;
 }
 
 interface GalleryFiltersMeta {
@@ -59,7 +64,9 @@ export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
     getFilteredCards,
   } = useCardData();
   const [search, setSearch] = useState("");
-  const [searchMode, setSearchMode] = useState<SearchMode>("name");
+  const [searchMode, setSearchMode] = useState<SearchMode>("all");
+  const [viewMode, setViewMode] = useState<ViewMode>("card");
+  const [cardsPerRow, setCardsPerRow] = useState(6);
 
   const galleryFilters = uiState.galleryFilters ?? {};
   const defaultFormat = formats.find((format) => format.isDefault)?.key ?? "standard";
@@ -78,7 +85,7 @@ export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
   const sortOptions = useMemo(
     () => ({
       field: uiState.gallerySortField ?? "default",
-      direction: (uiState.gallerySortDirection ?? "asc") as const,
+      direction: (uiState.gallerySortDirection ?? "asc") as "asc" | "desc",
     }),
     [uiState.gallerySortField, uiState.gallerySortDirection]
   );
@@ -130,12 +137,16 @@ export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
         searchMode,
         filters,
         effectiveFormat,
+        viewMode,
+        cardsPerRow,
       },
       actions: {
         setSearch,
         setSearchMode,
         updateFilter,
         clearAllFilters,
+        setViewMode,
+        setCardsPerRow,
       },
       meta: {
         totalCards: cards.length,
@@ -154,6 +165,8 @@ export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
       searchMode,
       filters,
       effectiveFormat,
+      viewMode,
+      cardsPerRow,
       updateFilter,
       clearAllFilters,
       cards.length,

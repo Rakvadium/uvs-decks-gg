@@ -129,13 +129,13 @@ function ShellLayoutInner({ children }: { children: ReactNode }) {
   };
 
   const desktopLayout = (
-    <div className="hidden md:flex h-screen w-full flex-col overflow-hidden">
-      <TopHeader />
-      <div className="flex flex-1 overflow-hidden bg-sidebar">
-        <LeftSidebar
-          collapsed={isHydrated ? leftSidebarCollapsed : false}
-          onToggle={toggleLeftSidebar}
-        />
+    <div className="hidden md:flex h-screen w-full overflow-hidden">
+      <LeftSidebar
+        collapsed={isHydrated ? leftSidebarCollapsed : false}
+        onToggle={toggleLeftSidebar}
+      />
+      <div className="flex flex-1 flex-col overflow-hidden bg-sidebar">
+        <TopHeader />
         <div className="flex flex-1 overflow-hidden">
           <div className="relative flex flex-1 flex-col min-w-0">
             <div className="pointer-events-none absolute -top-3 left-0 z-10 h-3 w-3">
@@ -150,9 +150,9 @@ function ShellLayoutInner({ children }: { children: ReactNode }) {
               {children}
             </main>
           </div>
-          {hasRightSidebar && <RightSidebar />}
         </div>
       </div>
+      {hasRightSidebar && <RightSidebar />}
     </div>
   );
 

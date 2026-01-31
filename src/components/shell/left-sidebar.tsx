@@ -84,7 +84,30 @@ export function LeftSidebar({ collapsed, onToggle }: LeftSidebarProps) {
 
   const sidebarContent = (
     <>
-      <div className={cn("px-2 pt-4 pb-2", collapsed && "flex justify-center")}>
+      <div className={cn("px-3 pt-4 pb-2", collapsed ? "flex justify-center" : "")}>
+        <Link href="/home" className="group flex items-center gap-3">
+          <div className="relative flex h-10 w-10 shrink-0 items-center justify-center">
+            <div className="absolute inset-0 rounded-lg bg-primary/20 border border-primary/40 shadow-[0_0_8px_-2px_var(--primary)] group-hover:shadow-[0_0_12px_-2px_var(--primary)] transition-shadow duration-300" />
+            <Hexagon className="relative h-5 w-5 text-primary drop-shadow-[0_0_3px_var(--primary)]" />
+          </div>
+          {!collapsed && (
+            <div className="flex flex-col">
+              <span className="whitespace-nowrap text-lg font-display font-bold tracking-widest text-foreground uppercase">
+                UVS<span className="text-primary">DECKS</span>
+              </span>
+              <span className="text-[10px] font-mono text-muted-foreground tracking-[0.3em] uppercase -mt-1">
+                .GG
+              </span>
+            </div>
+          )}
+        </Link>
+      </div>
+
+      <div className="px-3 py-2">
+        <div className="h-px bg-gradient-to-r from-transparent via-sidebar-border to-transparent" />
+      </div>
+
+      <div className={cn("px-2 pb-2", collapsed && "flex justify-center")}>
         {collapsed ? (
           <Tooltip>
             <TooltipTrigger asChild>

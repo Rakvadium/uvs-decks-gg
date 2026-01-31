@@ -1,521 +1,595 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Search, SlidersHorizontal, X, ChevronDown } from "lucide-react";
+import { Search, SlidersHorizontal, X, Filter, Sparkles, LayoutGrid, List, FileText } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import { Separator } from "@/components/ui/separator";
+import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
-import { SymbolIcon, SymbolBadge } from "@/components/universus/symbol-icon";
+import { SymbolBadge } from "@/components/universus/symbol-icon";
 import { useGalleryFiltersOptional } from "@/providers/GalleryFiltersProvider";
+import type { StatOperator, StatFilterValue, CardFilters } from "@/providers/UIStateProvider";
 
-interface FilterOption {
-  value: string;
+type StatFilterKey = "difficulty" | "control" | "speed" | "damage" | "blockModifier" | "handSize" | "health" | "stamina";
+
+const OPERATOR_OPTIONS: { value: StatOperator; label: string }[] = [
+  { value: "eq", label: "=" },
+  { value: "neq", label: "≠" },
+  { value: "gt", label: ">" },
+  { value: "lt", label: "<" },
+  { value: "gte", label: "≥" },
+  { value: "lte", label: "≤" },
+];
+
+interface StatInputProps {
   label: string;
+  filterKey: StatFilterKey;
+  value: StatFilterValue | undefined;
+  onChange: (key: StatFilterKey, value: StatFilterValue | undefined) => void;
 }
 
-interface MultiSelectFilterProps {
-  label: string;
-  options: FilterOption[];
-  selected: string[];
-  onChange: (selected: string[]) => void;
-  maxDisplay?: number;
-}
+function StatInput({ label, filterKey, value, onChange }: StatInputProps) {
+  const hasValue = value?.value !== undefined;
 
-function MultiSelectFilter({
-  label,
-  options,
-  selected,
-  onChange,
-  maxDisplay = 2,
-}: MultiSelectFilterProps) {
-  const [open, setOpen] = useState(false);
-
-  const displayText = useMemo(() => {
-    if (selected.length === 0) return label;
-    if (selected.length <= maxDisplay) {
-      return selected.join(", ");
-    }
-    return `${selected.slice(0, maxDisplay).join(", ")} +${selected.length - maxDisplay}`;
-  }, [selected, label, maxDisplay]);
-
-  const handleToggle = (value: string) => {
-    if (selected.includes(value)) {
-      onChange(selected.filter((v) => v !== value));
+  const handleOperatorChange = (op: string) => {
+    if (value?.value !== undefined) {
+      onChange(filterKey, { operator: op as StatOperator, value: value.value });
     } else {
-      onChange([...selected, value]);
+      onChange(filterKey, { operator: op as StatOperator, value: 0 });
     }
   };
 
-  const handleClear = (e: React.MouseEvent | React.KeyboardEvent) => {
-    e.stopPropagation();
-    onChange([]);
-  };
-
-  return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          size="sm"
-          className={cn(
-            "h-8 gap-1 text-xs",
-            selected.length > 0 && "border-primary"
-          )}
-        >
-          <span className="max-w-[120px] truncate">{displayText}</span>
-          {selected.length > 0 ? (
-            <X
-              className="h-3 w-3 shrink-0"
-              role="button"
-              tabIndex={0}
-              aria-label="Clear filter"
-              onClick={handleClear}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault();
-                  handleClear(e);
-                }
-              }}
-            />
-          ) : (
-            <ChevronDown className="h-3 w-3 shrink-0" />
-          )}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-56 p-2" align="start">
-        <div className="max-h-64 overflow-y-auto space-y-1">
-          {options.map((option) => (
-            <div
-              key={option.value}
-              className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-muted cursor-pointer"
-              onClick={() => handleToggle(option.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault();
-                  handleToggle(option.value);
-                }
-              }}
-              role="option"
-              tabIndex={0}
-              aria-selected={selected.includes(option.value)}
-            >
-              <Checkbox
-                checked={selected.includes(option.value)}
-                onCheckedChange={() => handleToggle(option.value)}
-              />
-              <span className="text-sm">{option.label}</span>
-            </div>
-          ))}
-        </div>
-      </PopoverContent>
-    </Popover>
-  );
-}
-
-interface RangeFilterProps {
-  label: string;
-  min: number;
-  max: number;
-  value: [number | undefined, number | undefined];
-  onChange: (value: [number | undefined, number | undefined]) => void;
-}
-
-function RangeFilter({ label, min, max, value, onChange }: RangeFilterProps) {
-  const [open, setOpen] = useState(false);
-  const currentMin = value[0] ?? min;
-  const currentMax = value[1] ?? max;
-  const hasValue = value[0] !== undefined || value[1] !== undefined;
-
-  const displayText = useMemo(() => {
-    if (!hasValue) return label;
-    if (currentMin === currentMax) return `${label}: ${currentMin}`;
-    return `${label}: ${currentMin}-${currentMax}`;
-  }, [label, hasValue, currentMin, currentMax]);
-
-  const handleClear = (e: React.MouseEvent | React.KeyboardEvent) => {
-    e.stopPropagation();
-    onChange([undefined, undefined]);
-  };
-
-  return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          size="sm"
-          className={cn("h-8 gap-1 text-xs", hasValue && "border-primary")}
-        >
-          <span>{displayText}</span>
-          {hasValue ? (
-            <X
-              className="h-3 w-3 shrink-0"
-              role="button"
-              tabIndex={0}
-              aria-label="Clear filter"
-              onClick={handleClear}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault();
-                  handleClear(e);
-                }
-              }}
-            />
-          ) : (
-            <ChevronDown className="h-3 w-3 shrink-0" />
-          )}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-64 p-4" align="start">
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-medium">{label}</span>
-            <span className="text-sm text-muted-foreground">
-              {currentMin} - {currentMax}
-            </span>
-          </div>
-          <Slider
-            min={min}
-            max={max}
-            step={1}
-            value={[currentMin, currentMax]}
-            onValueChange={([newMin, newMax]) => {
-              onChange([
-                newMin === min ? undefined : newMin,
-                newMax === max ? undefined : newMax,
-              ]);
-            }}
-          />
-          <div className="flex justify-between text-xs text-muted-foreground">
-            <span>{min}</span>
-            <span>{max}</span>
-          </div>
-        </div>
-      </PopoverContent>
-    </Popover>
-  );
-}
-
-interface SymbolSelectFilterProps {
-  symbols: string[];
-  selected: string[];
-  onChange: (selected: string[]) => void;
-}
-
-function SymbolSelectFilter({ symbols, selected, onChange }: SymbolSelectFilterProps) {
-  const [open, setOpen] = useState(false);
-
-  const handleToggle = (symbol: string) => {
-    if (selected.includes(symbol)) {
-      onChange(selected.filter((s) => s !== symbol));
+  const handleValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const numValue = e.target.value === "" ? undefined : parseInt(e.target.value, 10);
+    if (numValue === undefined || isNaN(numValue)) {
+      onChange(filterKey, undefined);
     } else {
-      onChange([...selected, symbol]);
+      onChange(filterKey, { operator: value?.operator ?? "eq", value: numValue });
     }
   };
 
-  const handleClear = (e: React.MouseEvent | React.KeyboardEvent) => {
-    e.stopPropagation();
-    onChange([]);
-  };
-
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          size="sm"
-          className={cn(
-            "h-8 gap-1 text-xs",
-            selected.length > 0 && "border-primary"
-          )}
+    <div className="flex items-center gap-3">
+      <span className="text-[11px] font-mono text-muted-foreground w-16 shrink-0">{label}</span>
+      <div className={cn(
+        "relative flex items-center h-7 flex-1 rounded-md border bg-background/50 overflow-hidden transition-all",
+        hasValue 
+          ? "border-primary/40 shadow-[0_0_8px_-3px_var(--primary)]" 
+          : "border-border/50"
+      )}>
+        <Select
+          value={value?.operator ?? "eq"}
+          onValueChange={handleOperatorChange}
         >
-          {selected.length === 0 ? (
-            <>
-              <span>Symbols</span>
-              <ChevronDown className="h-3 w-3 shrink-0" />
-            </>
-          ) : (
-            <>
-              <span className="flex items-center gap-0.5">
-                {selected.slice(0, 3).map((s) => (
-                  <SymbolIcon key={s} symbol={s} size="xs" />
-                ))}
-                {selected.length > 3 && (
-                  <span className="text-[10px] ml-0.5">+{selected.length - 3}</span>
-                )}
-              </span>
-              <X
-                className="h-3 w-3 shrink-0"
-                role="button"
-                tabIndex={0}
-                aria-label="Clear filter"
-                onClick={handleClear}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    handleClear(e);
-                  }
-                }}
-              />
-            </>
-          )}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-auto p-3" align="start">
-        <div className="grid grid-cols-6 gap-1.5">
-          {symbols.map((symbol) => (
-            <SymbolBadge
-              key={symbol}
-              symbol={symbol}
-              selected={selected.includes(symbol)}
-              onClick={() => handleToggle(symbol)}
-              size="md"
-            />
-          ))}
-        </div>
-      </PopoverContent>
-    </Popover>
+          <SelectTrigger 
+            size="sm"
+            className="h-full w-10 px-0 text-[11px] font-mono border-0 bg-muted/60 rounded-none shadow-none focus-visible:ring-0 focus-visible:shadow-none justify-center"
+          >
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {OPERATOR_OPTIONS.map((op) => (
+              <SelectItem key={op.value} value={op.value} className="text-xs font-mono">
+                {op.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <input
+          type="number"
+          className="h-full flex-1 px-2 text-[11px] font-mono bg-transparent border-0 outline-none focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none placeholder:text-muted-foreground/50"
+          value={value?.value ?? ""}
+          onChange={handleValueChange}
+          placeholder=""
+        />
+      </div>
+    </div>
   );
 }
 
-function FilterPanel() {
+interface FilterDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+function FilterDialog({ open, onOpenChange }: FilterDialogProps) {
   const context = useGalleryFiltersOptional();
+  const [setSearch, setSetSearch] = useState("");
+  
   if (!context) return null;
   const { state, actions, meta } = context;
   const filters = state.filters;
   const uniqueValues = meta.uniqueValues;
   const hasActiveFilters = meta.activeFilterCount > 0;
 
+  const filteredSets = useMemo(() => {
+    if (!uniqueValues?.setNames) return [];
+    const sets = uniqueValues.setNames.map((name, idx) => ({
+      name,
+      code: uniqueValues.setCodes[idx],
+      number: uniqueValues.setNumbers?.[idx] ?? 0,
+    }));
+    if (!setSearch.trim()) return sets;
+    const search = setSearch.toLowerCase();
+    return sets.filter((s) => s.name.toLowerCase().includes(search) || s.code.toLowerCase().includes(search));
+  }, [uniqueValues?.setNames, uniqueValues?.setCodes, uniqueValues?.setNumbers, setSearch]);
+
   return (
-    <div className="space-y-6 p-4">
-      <div className="flex items-center justify-between">
-        <h3 className="font-semibold">Filters</h3>
-        {hasActiveFilters && (
-          <Button variant="ghost" size="sm" onClick={actions.clearAllFilters}>
-            Clear all
-          </Button>
-        )}
-      </div>
-
-      <div className="space-y-4">
-        <div className="space-y-2">
-          <Label>Type</Label>
-          <div className="flex flex-wrap gap-1.5">
-            {uniqueValues?.types.map((type) => (
-              <Badge
-                key={type}
-                variant={filters.type?.includes(type) ? "default" : "outline"}
-                className="cursor-pointer"
-                onClick={() => {
-                  const current = filters.type ?? [];
-                  if (current.includes(type)) {
-                    actions.updateFilter(
-                      "type",
-                      current.filter((t) => t !== type)
-                    );
-                  } else {
-                    actions.updateFilter("type", [...current, type]);
-                  }
-                }}
-              >
-                {type}
-              </Badge>
-            ))}
-          </div>
-        </div>
-
-        <Separator />
-
-        <div className="space-y-2">
-          <Label>Rarity</Label>
-          <div className="flex flex-wrap gap-1.5">
-            {uniqueValues?.rarities.map((rarity) => (
-              <Badge
-                key={rarity}
-                variant={filters.rarity?.includes(rarity) ? "default" : "outline"}
-                className="cursor-pointer"
-                onClick={() => {
-                  const current = filters.rarity ?? [];
-                  if (current.includes(rarity)) {
-                    actions.updateFilter(
-                      "rarity",
-                      current.filter((r) => r !== rarity)
-                    );
-                  } else {
-                    actions.updateFilter("rarity", [...current, rarity]);
-                  }
-                }}
-              >
-                {rarity}
-              </Badge>
-            ))}
-          </div>
-        </div>
-
-        <Separator />
-
-        <div className="space-y-2">
-          <Label>Set</Label>
-          <div className="max-h-48 overflow-y-auto space-y-1">
-            {uniqueValues?.setNames.map((setName) => (
-              <div
-                key={setName}
-                className="flex items-center gap-2 py-1"
-              >
-                <Checkbox
-                  checked={filters.set?.includes(
-                    uniqueValues.setCodes[uniqueValues.setNames.indexOf(setName)]
-                  )}
-                  onCheckedChange={(checked) => {
-                    const setCode =
-                      uniqueValues.setCodes[uniqueValues.setNames.indexOf(setName)];
-                    const current = filters.set ?? [];
-                    if (checked) {
-                      actions.updateFilter("set", [...current, setCode]);
-                    } else {
-                      actions.updateFilter(
-                        "set",
-                        current.filter((s) => s !== setCode)
-                      );
-                    }
-                  }}
-                />
-                <span className="text-sm">{setName}</span>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent size="lg" className="p-0 overflow-hidden max-h-[85vh]" showCloseButton={true}>
+        <DialogTitle className="sr-only">Filter Cards</DialogTitle>
+        
+        <div className="relative">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5 pointer-events-none" />
+          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+          
+          <div className="relative z-10 p-6 border-b border-border/30">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/20 border border-primary/40 shadow-[0_0_12px_-3px_var(--primary)]">
+                  <Filter className="h-5 w-5 text-primary drop-shadow-[0_0_4px_var(--primary)]" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-display font-bold uppercase tracking-wide">Filter Cards</h2>
+                  <p className="text-xs font-mono text-muted-foreground uppercase tracking-widest">
+                    {meta.filteredCount.toLocaleString()} of {meta.totalCards.toLocaleString()} cards
+                  </p>
+                </div>
               </div>
-            ))}
-          </div>
-        </div>
-
-        <Separator />
-
-        <div className="space-y-2">
-          <Label>Symbols</Label>
-          <div className="grid grid-cols-6 gap-1.5">
-            {uniqueValues?.symbols.map((symbol) => (
-              <SymbolBadge
-                key={symbol}
-                symbol={symbol}
-                selected={filters.symbols?.includes(symbol)}
-                onClick={() => {
-                  const current = filters.symbols ?? [];
-                  if (current.includes(symbol)) {
-                    actions.updateFilter(
-                      "symbols",
-                      current.filter((s) => s !== symbol)
-                    );
-                  } else {
-                    actions.updateFilter("symbols", [...current, symbol]);
-                  }
-                }}
-                size="md"
-              />
-            ))}
-          </div>
-          {(filters.symbols?.length ?? 0) > 1 && (
-            <div className="flex items-center gap-2 pt-1">
-              <Checkbox
-                checked={filters.symbolMatchAll ?? false}
-                onCheckedChange={(checked) =>
-                  actions.updateFilter("symbolMatchAll", checked ? true : undefined)
-                }
-              />
-              <span className="text-xs text-muted-foreground">
-                Match all symbols
-              </span>
-            </div>
-          )}
-        </div>
-
-        <Separator />
-
-        <div className="space-y-2">
-          <Label>Keywords</Label>
-          <div className="max-h-48 overflow-y-auto flex flex-wrap gap-1.5">
-            {uniqueValues?.keywords.map((keyword) => (
-              <Badge
-                key={keyword}
-                variant={filters.keywords?.includes(keyword) ? "default" : "outline"}
-                className="cursor-pointer text-xs"
-                onClick={() => {
-                  const current = filters.keywords ?? [];
-                  if (current.includes(keyword)) {
-                    actions.updateFilter(
-                      "keywords",
-                      current.filter((k) => k !== keyword)
-                    );
-                  } else {
-                    actions.updateFilter("keywords", [...current, keyword]);
-                  }
-                }}
-              >
-                {keyword}
-              </Badge>
-            ))}
-          </div>
-        </div>
-
-        <Separator />
-
-        <div className="space-y-4">
-          <Label>Stats</Label>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <span className="text-sm text-muted-foreground">Difficulty</span>
-              <Slider
-                min={0}
-                max={6}
-                step={1}
-                value={[
-                  filters.difficultyMin ?? 0,
-                  filters.difficultyMax ?? 6,
-                ]}
-                onValueChange={([min, max]) => {
-                  actions.updateFilter("difficultyMin", min === 0 ? undefined : min);
-                  actions.updateFilter("difficultyMax", max === 6 ? undefined : max);
-                }}
-              />
-              <div className="flex justify-between text-xs text-muted-foreground">
-                <span>{filters.difficultyMin ?? 0}</span>
-                <span>{filters.difficultyMax ?? 6}</span>
-              </div>
-            </div>
-            <div className="space-y-2">
-              <span className="text-sm text-muted-foreground">Control</span>
-              <Slider
-                min={0}
-                max={6}
-                step={1}
-                value={[filters.controlMin ?? 0, filters.controlMax ?? 6]}
-                onValueChange={([min, max]) => {
-                  actions.updateFilter("controlMin", min === 0 ? undefined : min);
-                  actions.updateFilter("controlMax", max === 6 ? undefined : max);
-                }}
-              />
-              <div className="flex justify-between text-xs text-muted-foreground">
-                <span>{filters.controlMin ?? 0}</span>
-                <span>{filters.controlMax ?? 6}</span>
-              </div>
+              {hasActiveFilters && (
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={actions.clearAllFilters}
+                  className="gap-2 border-destructive/30 text-destructive hover:bg-destructive/10 hover:border-destructive"
+                >
+                  <X className="h-3.5 w-3.5" />
+                  <span className="font-mono uppercase tracking-wider text-xs">Clear All</span>
+                </Button>
+              )}
             </div>
           </div>
+
+          <div className="relative z-10 overflow-y-auto max-h-[calc(85vh-120px)] p-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-4">
+                <div className="p-3 rounded-lg border border-border/50 bg-card/30 backdrop-blur-sm space-y-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground shrink-0 w-12">Format</span>
+                    <div className="flex flex-wrap gap-1">
+                      {meta.formats.map((format) => (
+                        <Badge
+                          key={format.key}
+                          variant={filters.format === format.key ? "default" : "outline"}
+                          className={cn(
+                            "cursor-pointer transition-all text-[10px] px-2 py-0.5",
+                            filters.format === format.key && "shadow-[0_0_10px_-3px_var(--primary)]"
+                          )}
+                          onClick={() => {
+                            if (filters.format === format.key) {
+                              actions.updateFilter("format", undefined);
+                            } else {
+                              actions.updateFilter("format", format.key);
+                            }
+                          }}
+                        >
+                          {format.name}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground shrink-0 w-12 pt-0.5">Type</span>
+                    <div className="flex flex-wrap gap-1">
+                      {uniqueValues?.types.map((type) => (
+                        <Badge
+                          key={type}
+                          variant={filters.type?.includes(type) ? "default" : "outline"}
+                          className={cn(
+                            "cursor-pointer transition-all text-[10px] px-2 py-0.5",
+                            filters.type?.includes(type) && "shadow-[0_0_10px_-3px_var(--primary)]"
+                          )}
+                          onClick={() => {
+                            const current = filters.type ?? [];
+                            if (current.includes(type)) {
+                              actions.updateFilter("type", current.filter((t) => t !== type));
+                            } else {
+                              actions.updateFilter("type", [...current, type]);
+                            }
+                          }}
+                        >
+                          {type}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground shrink-0 w-12 pt-0.5">Rarity</span>
+                    <div className="flex flex-wrap gap-1">
+                      {uniqueValues?.rarities.map((rarity) => (
+                        <Badge
+                          key={rarity}
+                          variant={filters.rarity?.includes(rarity) ? "default" : "outline"}
+                          className={cn(
+                            "cursor-pointer transition-all text-[10px] px-2 py-0.5",
+                            filters.rarity?.includes(rarity) && "shadow-[0_0_10px_-3px_var(--primary)]"
+                          )}
+                          onClick={() => {
+                            const current = filters.rarity ?? [];
+                            if (current.includes(rarity)) {
+                              actions.updateFilter("rarity", current.filter((r) => r !== rarity));
+                            } else {
+                              actions.updateFilter("rarity", [...current, rarity]);
+                            }
+                          }}
+                        >
+                          {rarity}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Symbols</span>
+                  <div className="p-3 rounded-lg border border-border/50 bg-card/30 backdrop-blur-sm space-y-3">
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="flex items-center gap-2">
+                        <Switch
+                          checked={filters.symbols?.includes("infinity") ?? false}
+                          onCheckedChange={(checked) => {
+                            const current = filters.symbols ?? [];
+                            if (checked) {
+                              actions.updateFilter("symbols", [...current, "infinity"]);
+                            } else {
+                              actions.updateFilter("symbols", current.filter((s) => s !== "infinity"));
+                            }
+                          }}
+                        />
+                        <Label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground cursor-pointer">
+                          Infinity
+                        </Label>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Switch
+                          checked={filters.symbolMatchAll ?? false}
+                          onCheckedChange={(checked) =>
+                            actions.updateFilter("symbolMatchAll", checked ? true : undefined)
+                          }
+                        />
+                        <Label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground cursor-pointer">
+                          Match All
+                        </Label>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-2">
+                        <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70">Standard</span>
+                        <div className="grid grid-cols-6 gap-1.5">
+                          {uniqueValues?.symbols
+                            .filter((s) => !s.startsWith("attuned:") && s !== "infinity")
+                            .map((symbol) => (
+                              <SymbolBadge
+                                key={symbol}
+                                symbol={symbol}
+                                selected={filters.symbols?.includes(symbol)}
+                                onClick={() => {
+                                  const current = filters.symbols ?? [];
+                                  if (current.includes(symbol)) {
+                                    actions.updateFilter("symbols", current.filter((s) => s !== symbol));
+                                  } else {
+                                    actions.updateFilter("symbols", [...current, symbol]);
+                                  }
+                                }}
+                                size="sm"
+                              />
+                            ))}
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70">Attuned</span>
+                        <div className="grid grid-cols-6 gap-1.5">
+                          {uniqueValues?.symbols
+                            .filter((s) => s.startsWith("attuned:"))
+                            .map((symbol) => (
+                              <SymbolBadge
+                                key={symbol}
+                                symbol={symbol}
+                                selected={filters.symbols?.includes(symbol)}
+                                onClick={() => {
+                                  const current = filters.symbols ?? [];
+                                  if (current.includes(symbol)) {
+                                    actions.updateFilter("symbols", current.filter((s) => s !== symbol));
+                                  } else {
+                                    actions.updateFilter("symbols", [...current, symbol]);
+                                  }
+                                }}
+                                size="sm"
+                              />
+                            ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Set</span>
+                  <div className="p-3 rounded-lg border border-border/50 bg-card/30 backdrop-blur-sm space-y-2">
+                    <div className="relative">
+                      <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+                      <Input
+                        placeholder="Search sets..."
+                        value={setSearch}
+                        onChange={(e) => setSetSearch(e.target.value)}
+                        className="h-7 pl-8 text-xs bg-background/50"
+                      />
+                      {setSearch && (
+                        <button
+                          type="button"
+                          className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                          onClick={() => setSetSearch("")}
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      )}
+                    </div>
+                    <div className="max-h-[140px] overflow-y-auto grid grid-cols-2 gap-1">
+                      {filteredSets.map((set) => {
+                        const isSelected = filters.set?.includes(set.code);
+                        return (
+                          <div
+                            key={set.name}
+                            className={cn(
+                              "flex items-center gap-1.5 px-2 py-1 rounded-md cursor-pointer transition-all border",
+                              isSelected 
+                                ? "bg-primary/15 border-primary/30 shadow-[0_0_10px_-5px_var(--primary)]" 
+                                : "border-transparent hover:bg-muted/50"
+                            )}
+                            onClick={() => {
+                              const current = filters.set ?? [];
+                              if (isSelected) {
+                                actions.updateFilter("set", current.filter((s) => s !== set.code));
+                              } else {
+                                actions.updateFilter("set", [...current, set.code]);
+                              }
+                            }}
+                          >
+                            <Checkbox checked={isSelected} className="pointer-events-none h-3 w-3" />
+                            <span className="text-[11px] truncate">{set.name}</span>
+                          </div>
+                        );
+                      })}
+                      {filteredSets.length === 0 && (
+                        <div className="col-span-full text-center text-xs text-muted-foreground py-2">
+                          No sets match
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Keywords</span>
+                    <div className="flex items-center gap-1.5">
+                      <Switch
+                        checked={filters.keywordMatchAll ?? false}
+                        onCheckedChange={(checked) =>
+                          actions.updateFilter("keywordMatchAll", checked ? true : undefined)
+                        }
+                      />
+                      <Label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground cursor-pointer">
+                        Match All
+                      </Label>
+                    </div>
+                  </div>
+                  <div className="p-3 rounded-lg border border-border/50 bg-card/30 backdrop-blur-sm">
+                    <div className="grid grid-cols-5 gap-1">
+                      {uniqueValues?.keywords.map((keyword) => (
+                        <Badge
+                          key={keyword}
+                          variant={filters.keywords?.includes(keyword) ? "default" : "outline"}
+                          className={cn(
+                            "cursor-pointer text-[10px] px-1 py-0.5 transition-all w-full justify-center truncate",
+                            filters.keywords?.includes(keyword) && "shadow-[0_0_8px_-3px_var(--primary)]"
+                          )}
+                          onClick={() => {
+                            const current = filters.keywords ?? [];
+                            if (current.includes(keyword)) {
+                              actions.updateFilter("keywords", current.filter((k) => k !== keyword));
+                            } else {
+                              actions.updateFilter("keywords", [...current, keyword]);
+                            }
+                          }}
+                        >
+                          {keyword}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Stats</span>
+                  <div className="p-3 rounded-lg border border-border/50 bg-card/30 backdrop-blur-sm space-y-3">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70">Card</span>
+                        <div className="space-y-1.5">
+                          <StatInput
+                            label="Difficulty"
+                            filterKey="difficulty"
+                            value={filters.difficulty}
+                            onChange={(key, val) => actions.updateFilter(key, val)}
+                          />
+                          <StatInput
+                            label="Control"
+                            filterKey="control"
+                            value={filters.control}
+                            onChange={(key, val) => actions.updateFilter(key, val)}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70">Block</span>
+                        <div className="space-y-1.5">
+                          <div className="flex items-center gap-3">
+                            <span className="text-[11px] font-mono text-muted-foreground w-16 shrink-0">Zone</span>
+                            <div className="flex h-7 flex-1 items-center rounded-md border border-border/50 bg-background/50 overflow-hidden">
+                              {["High", "Mid", "Low"].map((zone, idx) => (
+                                <button
+                                  key={zone}
+                                  type="button"
+                                  className={cn(
+                                    "h-full flex-1 text-[10px] font-mono transition-all",
+                                    idx !== 0 && "border-l border-border/50",
+                                    filters.blockZone?.includes(zone) 
+                                      ? "bg-primary/20 text-primary shadow-[inset_0_0_8px_-3px_var(--primary)]" 
+                                      : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                                  )}
+                                  onClick={() => {
+                                    const current = filters.blockZone ?? [];
+                                    if (current.includes(zone)) {
+                                      actions.updateFilter("blockZone", current.filter((z) => z !== zone));
+                                    } else {
+                                      actions.updateFilter("blockZone", [...current, zone]);
+                                    }
+                                  }}
+                                >
+                                  {zone}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                          <StatInput
+                            label="Modifier"
+                            filterKey="blockModifier"
+                            value={filters.blockModifier}
+                            onChange={(key, val) => actions.updateFilter(key, val)}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70">Attack</span>
+                        <div className="space-y-1.5">
+                          <div className="flex items-center gap-3">
+                            <span className="text-[11px] font-mono text-muted-foreground w-16 shrink-0">Zone</span>
+                            <div className="flex h-7 flex-1 items-center rounded-md border border-border/50 bg-background/50 overflow-hidden">
+                              {["High", "Mid", "Low"].map((zone, idx) => (
+                                <button
+                                  key={zone}
+                                  type="button"
+                                  className={cn(
+                                    "h-full flex-1 text-[10px] font-mono transition-all",
+                                    idx !== 0 && "border-l border-border/50",
+                                    filters.attackZone?.includes(zone) 
+                                      ? "bg-primary/20 text-primary shadow-[inset_0_0_8px_-3px_var(--primary)]" 
+                                      : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                                  )}
+                                  onClick={() => {
+                                    const current = filters.attackZone ?? [];
+                                    if (current.includes(zone)) {
+                                      actions.updateFilter("attackZone", current.filter((z) => z !== zone));
+                                    } else {
+                                      actions.updateFilter("attackZone", [...current, zone]);
+                                    }
+                                  }}
+                                >
+                                  {zone}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                          <StatInput
+                            label="Speed"
+                            filterKey="speed"
+                            value={filters.speed}
+                            onChange={(key, val) => actions.updateFilter(key, val)}
+                          />
+                          <StatInput
+                            label="Damage"
+                            filterKey="damage"
+                            value={filters.damage}
+                            onChange={(key, val) => actions.updateFilter(key, val)}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70">General</span>
+                        <div className="space-y-1.5">
+                          <StatInput
+                            label="Health"
+                            filterKey="health"
+                            value={filters.health}
+                            onChange={(key, val) => actions.updateFilter(key, val)}
+                          />
+                          <StatInput
+                            label="Hand Size"
+                            filterKey="handSize"
+                            value={filters.handSize}
+                            onChange={(key, val) => actions.updateFilter(key, val)}
+                          />
+                          <StatInput
+                            label="Stamina"
+                            filterKey="stamina"
+                            value={filters.stamina}
+                            onChange={(key, val) => actions.updateFilter(key, val)}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="relative z-10 p-4 border-t border-border/30 bg-background/80 backdrop-blur-sm">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-xs font-mono text-muted-foreground">
+                <Sparkles className="h-3.5 w-3.5 text-primary" />
+                <span className="uppercase tracking-widest">
+                  {hasActiveFilters ? `${meta.activeFilterCount} filters active` : "No filters active"}
+                </span>
+              </div>
+              <Button 
+                onClick={() => onOpenChange(false)}
+                className="gap-2"
+              >
+                <span className="font-mono uppercase tracking-wider text-xs">Apply Filters</span>
+              </Button>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -547,227 +621,146 @@ export function GalleryHeader() {
     [meta.uniqueValues]
   );
 
-  return (
-    <div className="flex items-center gap-2 w-full">
-      <div className="relative w-72 shrink-0 flex items-center">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
-          <Input
-            placeholder={
-              state.searchMode === "name" 
-                ? "Search by name…" 
-                : state.searchMode === "text"
-                ? "Search card text…"
-                : "Search all fields…"
-            }
-            value={state.search}
-            onChange={(e) => actions.setSearch(e.target.value)}
-            className="h-8 pl-8 pr-[5.5rem] text-sm"
-            name="gallery-search"
-            spellCheck={false}
-          />
-          <div className="absolute right-1 top-1/2 -translate-y-1/2">
-            <div className="flex items-center bg-muted rounded-md p-0.5">
-              <button
-                type="button"
-                onClick={() => actions.setSearchMode("name")}
-                className={cn(
-                  "px-1.5 py-0.5 text-[10px] font-medium rounded transition-colors",
-                  state.searchMode === "name"
-                    ? "bg-background text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
-                )}
-                aria-label="Search by name"
-              >
-                Name
-              </button>
-              <button
-                type="button"
-                onClick={() => actions.setSearchMode("text")}
-                className={cn(
-                  "px-1.5 py-0.5 text-[10px] font-medium rounded transition-colors",
-                  state.searchMode === "text"
-                    ? "bg-background text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
-                )}
-                aria-label="Search by text"
-              >
-                Text
-              </button>
-              <button
-                type="button"
-                onClick={() => actions.setSearchMode("all")}
-                className={cn(
-                  "px-1.5 py-0.5 text-[10px] font-medium rounded transition-colors",
-                  state.searchMode === "all"
-                    ? "bg-background text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
-                )}
-                aria-label="Search all fields"
-              >
-                All
-              </button>
-            </div>
-          </div>
-        </div>
+  const viewModeIcons = {
+    card: LayoutGrid,
+    list: List,
+    details: FileText,
+  };
+  const CurrentViewIcon = viewModeIcons[state.viewMode];
 
-        <div className="flex items-center gap-1 text-xs text-muted-foreground whitespace-nowrap">
-          <span className="font-medium text-foreground">
-            {meta.filteredCount.toLocaleString()}
-          </span>
-          {meta.filteredCount !== meta.totalCards && (
-            <>
-              <span>of</span>
-              <span>{meta.totalCards.toLocaleString()}</span>
-            </>
-          )}
-          <span>cards</span>
-        </div>
-
-        <Separator orientation="vertical" className="h-5 mx-1" />
-
-        <div className="flex items-center gap-1.5 flex-wrap">
-          {meta.formats.length > 0 && (
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="sm"
+  const viewSelector = (
+    <Popover>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          className="flex items-center justify-center h-6 w-6 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+          aria-label="Change view mode"
+        >
+          <CurrentViewIcon className="h-3.5 w-3.5" />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent className="w-48 p-3" align="end">
+        <div className="space-y-3">
+          <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground">View Mode</span>
+          <div className="flex gap-1">
+            {(["card", "list", "details"] as const).map((mode) => {
+              const Icon = viewModeIcons[mode];
+              return (
+                <button
+                  key={mode}
+                  type="button"
+                  onClick={() => actions.setViewMode(mode)}
                   className={cn(
-                    "h-8 gap-1 text-xs",
-                    state.filters.format && "border-primary"
+                    "flex-1 flex flex-col items-center gap-1 p-2 rounded-md transition-all",
+                    state.viewMode === mode
+                      ? "bg-primary/15 text-primary border border-primary/30"
+                      : "hover:bg-muted border border-transparent"
                   )}
                 >
-                  <span>{state.filters.format ? meta.formats.find(f => f.key === state.filters.format)?.name ?? state.filters.format : "Format"}</span>
-                  {state.filters.format ? (
-                    <X
-                      className="h-3 w-3 shrink-0"
-                      role="button"
-                      tabIndex={0}
-                      aria-label="Clear filter"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        actions.updateFilter("format", undefined);
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" || e.key === " ") {
-                          e.preventDefault();
-                          actions.updateFilter("format", undefined);
-                        }
-                      }}
-                    />
-                  ) : (
-                    <ChevronDown className="h-3 w-3 shrink-0" />
-                  )}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-48 p-2" align="start">
-                <div className="space-y-1">
-                  {meta.formats.map((format) => (
-                    <button
-                      key={format.key}
-                      type="button"
-                      className={cn(
-                        "flex items-center gap-2 px-2 py-1.5 rounded text-left",
-                        state.filters.format === format.key
-                          ? "bg-primary/10 text-primary"
-                          : "hover:bg-muted"
-                      )}
-                      onClick={() => {
-                        actions.updateFilter("format", format.key);
-                      }}
-                    >
-                      <span className="text-sm">{format.name}</span>
-                    </button>
-                  ))}
-                </div>
-              </PopoverContent>
-            </Popover>
-          )}
-
-          <MultiSelectFilter
-            label="Type"
-            options={typeOptions}
-            selected={state.filters.type ?? []}
-            onChange={(selected) => actions.updateFilter("type", selected)}
-          />
-
-          <MultiSelectFilter
-            label="Set"
-            options={setOptions}
-            selected={state.filters.set ?? []}
-            onChange={(selected) => actions.updateFilter("set", selected)}
-          />
-
-          <SymbolSelectFilter
-            symbols={meta.uniqueValues?.symbols ?? []}
-            selected={state.filters.symbols ?? []}
-            onChange={(selected) => actions.updateFilter("symbols", selected)}
-          />
-
-          <MultiSelectFilter
-            label="Keywords"
-            options={keywordOptions}
-            selected={state.filters.keywords ?? []}
-            onChange={(selected) => actions.updateFilter("keywords", selected)}
-            maxDisplay={1}
-          />
-
-          <RangeFilter
-            label="Control"
-            min={0}
-            max={6}
-            value={[state.filters.controlMin, state.filters.controlMax]}
-            onChange={([min, max]) => {
-              actions.updateFilter("controlMin", min);
-              actions.updateFilter("controlMax", max);
-            }}
-          />
-
-          <RangeFilter
-            label="Difficulty"
-            min={0}
-            max={6}
-            value={[state.filters.difficultyMin, state.filters.difficultyMax]}
-            onChange={([min, max]) => {
-              actions.updateFilter("difficultyMin", min);
-              actions.updateFilter("difficultyMax", max);
-            }}
-          />
-
-          {meta.activeFilterCount > 0 && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-8 px-2 text-xs text-muted-foreground"
-              onClick={actions.clearAllFilters}
-            >
-              Clear
-            </Button>
+                  <Icon className="h-4 w-4" />
+                  <span className="text-[10px] font-mono uppercase">{mode}</span>
+                </button>
+              );
+            })}
+          </div>
+          {state.viewMode === "card" && (
+            <div className="space-y-2 pt-2 border-t border-border/30">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-mono text-muted-foreground">Cards per row</span>
+                <span className="text-xs font-mono text-primary">{state.cardsPerRow}</span>
+              </div>
+              <Slider
+                min={3}
+                max={10}
+                step={1}
+                value={[state.cardsPerRow]}
+                onValueChange={([value]) => actions.setCardsPerRow(value)}
+              />
+            </div>
           )}
         </div>
+      </PopoverContent>
+    </Popover>
+  );
 
-        <div className="ml-auto">
-          <Sheet open={isFilterPanelOpen} onOpenChange={setIsFilterPanelOpen}>
-            <SheetTrigger asChild>
-              <Button variant="outline" size="sm" className="h-8 gap-1.5">
-                <SlidersHorizontal className="h-3.5 w-3.5" />
-                <span className="hidden sm:inline text-xs">Filters</span>
-                {meta.activeFilterCount > 0 && (
-                  <Badge variant="secondary" className="h-4 px-1 text-[10px]">
-                    {meta.activeFilterCount}
-                  </Badge>
-                )}
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
-              <SheetHeader>
-                <SheetTitle>Filter Cards</SheetTitle>
-              </SheetHeader>
-              <FilterPanel />
-            </SheetContent>
-          </Sheet>
+  const filterPanelButton = (
+    <>
+      <button
+        type="button"
+        className="relative flex items-center justify-center h-6 w-6 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+        aria-label="Open filter panel"
+        onClick={() => setIsFilterPanelOpen(true)}
+      >
+        <SlidersHorizontal className="h-3.5 w-3.5" />
+        {meta.activeFilterCount > 0 && (
+          <Badge variant="secondary" className="absolute -top-1 -right-1 h-3.5 min-w-3.5 px-0.5 text-[9px] flex items-center justify-center">
+            {meta.activeFilterCount}
+          </Badge>
+        )}
+      </button>
+      <FilterDialog open={isFilterPanelOpen} onOpenChange={setIsFilterPanelOpen} />
+    </>
+  );
+
+  return (
+    <div className="flex items-center justify-center w-full">
+      <div className="relative w-full max-w-xl flex items-center">
+        <div className="absolute left-1.5 top-1/2 -translate-y-1/2 flex items-center gap-1 z-10">
+          <Search className="h-4 w-4 text-primary/70 ml-1" />
+          <Select
+            value={state.searchMode}
+            onValueChange={(value) => actions.setSearchMode(value as "name" | "text" | "all")}
+          >
+            <SelectTrigger 
+              size="sm" 
+              className="h-6 px-2 py-0 text-[10px] border-0 bg-muted/80 shadow-none focus-visible:ring-0 focus-visible:shadow-none min-w-[3.5rem]"
+            >
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All</SelectItem>
+              <SelectItem value="name">Name</SelectItem>
+              <SelectItem value="text">Text</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <Input
+          placeholder={
+            state.searchMode === "name" 
+              ? "Search by name…" 
+              : state.searchMode === "text"
+              ? "Search card text…"
+              : "Search all fields…"
+          }
+          value={state.search}
+          onChange={(e) => actions.setSearch(e.target.value)}
+          className="h-9 pl-[6.5rem] pr-20 text-sm border-primary/40 bg-background/50 shadow-[0_0_10px_-3px_var(--primary)] focus-visible:border-primary focus-visible:shadow-[0_0_15px_-3px_var(--primary)]"
+          name="gallery-search"
+          spellCheck={false}
+        />
+        <div className="absolute right-[1px] top-[1px] bottom-[1px] flex items-stretch">
+          <div className="flex items-center justify-center px-1.5">
+            {viewSelector}
+          </div>
+          <div className="flex items-center justify-center px-1.5">
+            {filterPanelButton}
+          </div>
+          {meta.activeFilterCount > 0 && (
+            <>
+              <div className="w-px self-stretch bg-primary/50" />
+              <button
+                type="button"
+                onClick={actions.clearAllFilters}
+                className="flex items-center justify-center px-2.5 bg-destructive/10 hover:bg-destructive/20 text-destructive transition-colors rounded-r-md"
+                aria-label="Clear all filters"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            </>
+          )}
         </div>
       </div>
+    </div>
   );
 }
 

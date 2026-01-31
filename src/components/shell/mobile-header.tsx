@@ -21,10 +21,6 @@ export function MobileHeader() {
         </div>
       </Link>
 
-      <div className="relative z-10 flex items-center gap-2 text-[10px] font-mono text-muted-foreground/60">
-        <div className="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_6px_#22c55e] animate-pulse" />
-        <span className="uppercase tracking-widest hidden sm:inline">Online</span>
-      </div>
     </header>
   )
 }
