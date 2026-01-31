@@ -146,28 +146,38 @@ function FilterDialog({ open, onOpenChange }: FilterDialogProps) {
           
           <div className="relative z-10 p-6 border-b border-border/30 shrink-0">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 flex-1 min-w-0">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/20 border border-primary/40 shadow-[0_0_12px_-3px_var(--primary)]">
                   <Filter className="h-5 w-5 text-primary drop-shadow-[0_0_4px_var(--primary)]" />
                 </div>
-                <div>
+                <div className="min-w-0">
                   <h2 className="text-xl font-display font-bold uppercase tracking-wide">Filter Cards</h2>
                   <p className="text-xs font-mono text-muted-foreground uppercase tracking-widest">
                     {meta.filteredCount.toLocaleString()} of {meta.totalCards.toLocaleString()} cards
                   </p>
                 </div>
               </div>
-              {hasActiveFilters && (
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={actions.clearAllFilters}
-                  className="gap-2 border-destructive/30 text-destructive hover:bg-destructive/10 hover:border-destructive"
+              <div className="flex items-center gap-2 shrink-0">
+                {hasActiveFilters && (
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={actions.clearAllFilters}
+                    className="hidden md:flex gap-2 border-destructive/30 text-destructive hover:bg-destructive/10 hover:border-destructive"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                    <span className="font-mono uppercase tracking-wider text-xs">Clear All</span>
+                  </Button>
+                )}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => onOpenChange(false)}
+                  className="md:hidden h-8 w-8 shrink-0"
                 >
-                  <X className="h-3.5 w-3.5" />
-                  <span className="font-mono uppercase tracking-wider text-xs">Clear All</span>
+                  <X className="h-4 w-4" />
                 </Button>
-              )}
+              </div>
             </div>
           </div>
 
