@@ -16,20 +16,24 @@ type Deck = Doc<"decks">;
 
 interface ActiveDeckContextValue {
   activeDeck: Deck | null | undefined;
+  activeDeckId: string | null | undefined;
   isLoading: boolean;
   hasActiveDeck: boolean;
   getCardCount: (cardId: string) => number;
   addCard: (cardId: string) => void;
   removeCard: (cardId: string) => void;
+  setActiveDeck: (deckId: string | null) => void;
 }
 
 const ActiveDeckContext = createContext<ActiveDeckContextValue>({
   activeDeck: null,
+  activeDeckId: null,
   isLoading: false,
   hasActiveDeck: false,
   getCardCount: () => 0,
   addCard: () => {},
   removeCard: () => {},
+  setActiveDeck: () => {},
 });
 
 interface ActiveDeckProviderProps {
@@ -37,7 +41,7 @@ interface ActiveDeckProviderProps {
 }
 
 export function ActiveDeckProvider({ children }: ActiveDeckProviderProps) {
-  const { uiState } = useUIState();
+  const { uiState, setActiveDeckId: setActiveDeckIdInUI } = useUIState();
   const activeDeckId = uiState.activeDeckId;
 
   const activeDeck = useQuery(
@@ -50,6 +54,13 @@ export function ActiveDeckProvider({ children }: ActiveDeckProviderProps) {
 
   const isLoading = activeDeckId !== undefined && activeDeck === undefined;
   const hasActiveDeck = !!activeDeck;
+
+  const setActiveDeck = useCallback(
+    (deckId: string | null) => {
+      setActiveDeckIdInUI(deckId ?? undefined);
+    },
+    [setActiveDeckIdInUI]
+  );
 
   const getCardCount = useCallback(
     (cardId: string): number => {
@@ -88,13 +99,15 @@ export function ActiveDeckProvider({ children }: ActiveDeckProviderProps) {
   const value = useMemo(
     (): ActiveDeckContextValue => ({
       activeDeck,
+      activeDeckId,
       isLoading,
       hasActiveDeck,
       getCardCount,
       addCard,
       removeCard,
+      setActiveDeck,
     }),
-    [activeDeck, isLoading, hasActiveDeck, getCardCount, addCard, removeCard]
+    [activeDeck, activeDeckId, isLoading, hasActiveDeck, getCardCount, addCard, removeCard, setActiveDeck]
   );
 
   return (
