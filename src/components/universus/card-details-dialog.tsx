@@ -275,7 +275,7 @@ export function CardDetailsDialog({ card, backCard, open, onOpenChange }: CardDe
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent size="lg" className="p-0 overflow-hidden max-h-[90vh] md:pb-6" showCloseButton={true}>
+      <DialogContent size="lg" className="p-0 overflow-hidden max-h-[90vh] md:pb-6" showCloseButton={false}>
         <DialogTitle className="sr-only">{displayCard.name} - Card Details</DialogTitle>
         <div className="flex flex-col lg:flex-row pb-16 md:pb-0">
           <div className="relative lg:w-[320px] shrink-0 bg-gradient-to-br from-background via-card to-background p-6 flex items-center justify-center lg:sticky lg:top-0 lg:self-start">
@@ -521,9 +521,13 @@ export function CardDetailsDialog({ card, backCard, open, onOpenChange }: CardDe
         </div>
         <DialogFooter className="md:hidden">
           <DialogClose asChild>
-            <Button variant="outline" className="w-full">
-              Close
-            </Button>
+            <div className="flex items-center justify-end w-full">
+              <Button
+                  className="gap-2 ml-auto"
+              >
+                <span className="font-mono uppercase tracking-wider text-xs">Close</span>
+              </Button>
+            </div>
           </DialogClose>
         </DialogFooter>
       </DialogContent>

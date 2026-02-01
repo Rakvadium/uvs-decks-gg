@@ -158,7 +158,7 @@ export function CardGridItem({
             className={cn(
               "absolute inset-0 pointer-events-none transition-opacity duration-300 rounded-lg",
               "bg-gradient-to-t from-background/80 via-transparent to-transparent",
-              isHovered ? "opacity-100" : "opacity-0"
+              isHovered ? "opacity-25" : "opacity-0"
             )}
           />
 

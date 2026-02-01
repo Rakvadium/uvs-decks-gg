@@ -6,8 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
-  Dialog,
-  DialogContent,
+  Dialog, DialogClose,
+  DialogContent, DialogFooter,
   DialogTitle,
 } from "@/components/ui/dialog";
 import {
@@ -137,7 +137,7 @@ function FilterDialog({ open, onOpenChange }: FilterDialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent size="lg" className="p-0 overflow-hidden max-h-[85vh] md:pb-0" showCloseButton={true}>
+      <DialogContent size="lg" className="p-0 overflow-hidden max-h-[85vh] md:pb-0" showCloseButton={false}>
         <DialogTitle className="sr-only">Filter Cards</DialogTitle>
         
         <div className="relative flex flex-col h-full pb-20 md:pb-0">
@@ -159,9 +159,9 @@ function FilterDialog({ open, onOpenChange }: FilterDialogProps) {
               </div>
               <div className="flex items-center gap-2 shrink-0">
                 {hasActiveFilters && (
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
+                  <Button
+                    variant="outline"
+                    size="sm"
                     onClick={actions.clearAllFilters}
                     className="hidden md:flex gap-2 border-destructive/30 text-destructive hover:bg-destructive/10 hover:border-destructive"
                   >
@@ -169,14 +169,6 @@ function FilterDialog({ open, onOpenChange }: FilterDialogProps) {
                     <span className="font-mono uppercase tracking-wider text-xs">Clear All</span>
                   </Button>
                 )}
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => onOpenChange(false)}
-                  className="md:hidden h-8 w-8 shrink-0"
-                >
-                  <X className="h-4 w-4" />
-                </Button>
               </div>
             </div>
           </div>
@@ -581,23 +573,17 @@ function FilterDialog({ open, onOpenChange }: FilterDialogProps) {
             </div>
           </div>
         </div>
-        
-        <div className="md:relative md:z-10 md:p-4 md:border-t md:border-border/30 md:bg-background/80 md:backdrop-blur-sm fixed bottom-0 left-0 right-0 z-20 bg-card/95 backdrop-blur-lg p-4 border-t border-border/30">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-xs font-mono text-muted-foreground">
-              <Sparkles className="h-3.5 w-3.5 text-primary" />
-              <span className="uppercase tracking-widest">
-                {hasActiveFilters ? `${meta.activeFilterCount} filters active` : "No filters active"}
-              </span>
+        <DialogFooter className="md:hidden">
+          <DialogClose asChild>
+            <div className="flex items-center justify-end w-full">
+              <Button
+                  className="gap-2 ml-auto"
+              >
+                <span className="font-mono uppercase tracking-wider text-xs">Close</span>
+              </Button>
             </div>
-            <Button 
-              onClick={() => onOpenChange(false)}
-              className="gap-2"
-            >
-              <span className="font-mono uppercase tracking-wider text-xs">Apply Filters</span>
-            </Button>
-          </div>
-        </div>
+          </DialogClose>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
@@ -723,7 +709,7 @@ export function GalleryHeader() {
           >
             <SelectTrigger 
               size="sm" 
-              className="h-6 px-2 py-0 text-[10px] border-0 bg-muted/80 shadow-none focus-visible:ring-0 focus-visible:shadow-none min-w-[3.5rem]"
+              className="h-6 px-2 mx-1 rounded-none py-0 text-[10px] border-x-1 border-y-0 border-primary/40 shadow-none focus-visible:ring-0 focus-visible:shadow-none min-w-[3.5rem]"
             >
               <SelectValue />
             </SelectTrigger>
@@ -756,17 +742,14 @@ export function GalleryHeader() {
             {filterPanelButton}
           </div>
           {meta.activeFilterCount > 0 && (
-            <>
-              <div className="w-px self-stretch bg-primary/50" />
               <button
                 type="button"
                 onClick={actions.clearAllFilters}
-                className="flex items-center justify-center px-2.5 bg-destructive/10 hover:bg-destructive/20 text-destructive transition-colors rounded-r-md"
+                className="flex items-center justify-center px-2.5 bg-primary/10 hover:bg-primary/20 text-primary transition-colors rounded-r-md"
                 aria-label="Clear all filters"
               >
                 <X className="h-3.5 w-3.5" />
               </button>
-            </>
           )}
         </div>
       </div>

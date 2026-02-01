@@ -27,7 +27,7 @@ export function MobileActionsTrigger() {
       <Button
         variant="ghost"
         size="icon"
-        className="fixed bottom-[9.25rem] right-0 z-40 h-10 w-10 rounded-l-full rounded-r-none shadow-md border border-border/50 bg-background/95 backdrop-blur-lg"
+        className="fixed bottom-[7.5rem] right-0 z-40 h-10 w-10 rounded-l-lg rounded-r-none rounded-bl-none shadow-md border-l border-t border-primary border-b-0 border-r-0 bg-background/95 backdrop-blur-lg"
         onClick={() => setActionsSheetOpen(true)}
       >
         <PanelRightOpen className="h-5 w-5" />
