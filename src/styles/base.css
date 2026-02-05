@@ -1,5 +1,13 @@
 @custom-variant dark (&:is(.dark *));
 
+:root {
+  --font-geist-sans: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", sans-serif;
+  --font-geist-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo,
+    Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --font-display: "Orbitron", var(--font-geist-sans);
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -208,6 +216,11 @@
   .pulse-glow {
     animation: pulse-glow 2s ease-in-out infinite;
   }
+
+  .drag-float {
+    animation: drag-float 1.6s ease-in-out infinite;
+    transform-origin: center;
+  }
   
   @keyframes pulse-glow {
     0%, 100% {
@@ -220,6 +233,15 @@
                   0 0 30px var(--primary),
                   0 0 45px var(--primary);
       opacity: 0.9;
+    }
+  }
+
+  @keyframes drag-float {
+    0%, 100% {
+      transform: translateY(0) rotate(-2deg);
+    }
+    50% {
+      transform: translateY(-6px) rotate(2deg);
     }
   }
   

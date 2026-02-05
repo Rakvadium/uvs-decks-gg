@@ -132,6 +132,9 @@ export function useTcgDraggable({
         window.removeEventListener("mouseup", handleEnd);
         window.removeEventListener("touchend", handleEnd);
         window.removeEventListener("touchcancel", handleEnd);
+        window.removeEventListener("dragend", handleEnd);
+        window.removeEventListener("drop", handleEnd);
+        window.removeEventListener("blur", handleEnd);
       };
 
       window.addEventListener("mousemove", handleMove, { passive: false });
@@ -139,6 +142,9 @@ export function useTcgDraggable({
       window.addEventListener("mouseup", handleEnd);
       window.addEventListener("touchend", handleEnd);
       window.addEventListener("touchcancel", handleEnd);
+      window.addEventListener("dragend", handleEnd);
+      window.addEventListener("drop", handleEnd);
+      window.addEventListener("blur", handleEnd);
     },
     [isDisabled, skipDragSelector, dragStartDistance, card, sourceId, startDrag, endDrag]
   );

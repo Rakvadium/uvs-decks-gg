@@ -10,9 +10,19 @@ import {
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { Id, Doc } from "../../../convex/_generated/dataModel";
+import { useCardData } from "@/lib/universus";
+import { canAddCardToSection, canMoveCardToSection } from "./card-eligibility";
 
 type Deck = Doc<"decks">;
 type DeckSection = "main" | "side" | "reference";
+type DeckUpdate = {
+  name?: string;
+  description?: string;
+  isPublic?: boolean;
+  imageCardId?: Id<"cards"> | null;
+  startingCharacterId?: Id<"cards"> | null;
+  selectedIdentity?: string | null;
+};
 
 interface SiloedDeckContextValue {
   deck: Deck | null;
@@ -25,7 +35,7 @@ interface SiloedDeckContextValue {
   addCard: (cardId: Id<"cards">, section?: DeckSection) => Promise<void>;
   removeCard: (cardId: Id<"cards">, section: DeckSection) => Promise<void>;
   moveCard: (cardId: Id<"cards">, fromSection: DeckSection, toSection: DeckSection, quantity?: number) => Promise<void>;
-  updateDeck: (updates: { name?: string; description?: string; isPublic?: boolean }) => Promise<void>;
+  updateDeck: (updates: DeckUpdate) => Promise<void>;
   getCardSection: (cardId: Id<"cards">) => DeckSection | null;
   getTotalCardCount: () => number;
   getSectionCardCount: (section: DeckSection) => number;
@@ -43,6 +53,7 @@ export function SiloedDeckProvider({ children, deckId }: SiloedDeckProviderProps
     api.decks.getById,
     { deckId: deckId as Id<"decks"> }
   );
+  const { cards } = useCardData();
 
   const addCardMutation = useMutation(api.decks.addCard);
   const removeCardMutation = useMutation(api.decks.removeCard);
@@ -70,15 +81,58 @@ export function SiloedDeckProvider({ children, deckId }: SiloedDeckProviderProps
     return counts;
   }, [mainCounts, sideCounts, referenceCounts]);
 
+  const cardMap = useMemo(() => {
+    const map = new Map<string, Doc<"cards">>();
+    for (const card of cards) {
+      map.set(card._id, card as Doc<"cards">);
+    }
+    return map;
+  }, [cards]);
+
+  const sectionCounts = useMemo(
+    () => ({ mainCounts, sideCounts, referenceCounts }),
+    [mainCounts, sideCounts, referenceCounts]
+  );
+
+  const canAddToSection = useCallback(
+    (cardId: Id<"cards">, section: DeckSection, quantity?: number) => {
+      const card = cardMap.get(cardId.toString());
+      return canAddCardToSection({
+        card,
+        cardId: cardId.toString(),
+        section,
+        counts: sectionCounts,
+        quantity,
+      });
+    },
+    [cardMap, sectionCounts]
+  );
+
+  const canMoveToSection = useCallback(
+    (cardId: Id<"cards">, fromSection: DeckSection, toSection: DeckSection, quantity?: number) => {
+      const card = cardMap.get(cardId.toString());
+      return canMoveCardToSection({
+        card,
+        cardId: cardId.toString(),
+        fromSection,
+        toSection,
+        counts: sectionCounts,
+        quantity,
+      });
+    },
+    [cardMap, sectionCounts]
+  );
+
   const addCard = useCallback(
     async (cardId: Id<"cards">, section: DeckSection = "main") => {
+      if (!canAddToSection(cardId, section)) return;
       await addCardMutation({
         deckId: deckId as Id<"decks">,
         cardId,
         section,
       });
     },
-    [deckId, addCardMutation]
+    [deckId, addCardMutation, canAddToSection]
   );
 
   const removeCard = useCallback(
@@ -94,6 +148,7 @@ export function SiloedDeckProvider({ children, deckId }: SiloedDeckProviderProps
 
   const moveCard = useCallback(
     async (cardId: Id<"cards">, fromSection: DeckSection, toSection: DeckSection, quantity?: number) => {
+      if (!canMoveToSection(cardId, fromSection, toSection, quantity)) return;
       await moveCardMutation({
         deckId: deckId as Id<"decks">,
         cardId,
@@ -102,11 +157,11 @@ export function SiloedDeckProvider({ children, deckId }: SiloedDeckProviderProps
         quantity,
       });
     },
-    [deckId, moveCardMutation]
+    [deckId, moveCardMutation, canMoveToSection]
   );
 
   const updateDeck = useCallback(
-    async (updates: { name?: string; description?: string; isPublic?: boolean }) => {
+    async (updates: DeckUpdate) => {
       await updateDeckMutation({
         deckId: deckId as Id<"decks">,
         ...updates,
@@ -192,4 +247,8 @@ export function useSiloedDeck() {
     throw new Error("useSiloedDeck must be used within a SiloedDeckProvider");
   }
   return context;
+}
+
+export function useSiloedDeckOptional() {
+  return useContext(SiloedDeckContext);
 }

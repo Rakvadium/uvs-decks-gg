@@ -76,6 +76,8 @@ export interface UIState {
   galleryFilters?: CardFilters;
   galleryViewMode?: GalleryViewMode;
   galleryCardsPerRow?: number;
+  galleryCardsPerRowOpen?: number;
+  galleryCardsPerRowClosed?: number;
   rightSidebarAction?: string;
   galleryFormat?: string;
   gallerySets?: string[];
@@ -88,7 +90,7 @@ interface UIStateContextValue {
   updateUIState: (updates: Partial<UIState>) => void;
   setGalleryFilters: (filters: CardFilters) => void;
   setGalleryViewMode: (mode: GalleryViewMode) => void;
-  setGalleryCardsPerRow: (count: number | undefined) => void;
+  setGalleryCardsPerRow: (count: number | undefined, isSidebarOpen?: boolean) => void;
   setActiveDeckId: (deckId: string | undefined) => void;
   setRightSidebarAction: (actionId: string | undefined) => void;
   setGalleryFormat: (format: string | undefined) => void;
@@ -116,6 +118,14 @@ function loadPersistedUIState(): UIState {
     const galleryViewMode = (localStorage.getItem(getStorageKey("galleryViewMode")) as GalleryViewMode) ?? undefined;
     const galleryCardsPerRowRaw = localStorage.getItem(getStorageKey("galleryCardsPerRow"));
     const galleryCardsPerRow = galleryCardsPerRowRaw ? parseInt(galleryCardsPerRowRaw, 10) : undefined;
+    const galleryCardsPerRowOpenRaw = localStorage.getItem(getStorageKey("galleryCardsPerRowOpen"));
+    const galleryCardsPerRowClosedRaw = localStorage.getItem(getStorageKey("galleryCardsPerRowClosed"));
+    const galleryCardsPerRowOpen = galleryCardsPerRowOpenRaw
+      ? parseInt(galleryCardsPerRowOpenRaw, 10)
+      : galleryCardsPerRow;
+    const galleryCardsPerRowClosed = galleryCardsPerRowClosedRaw
+      ? parseInt(galleryCardsPerRowClosedRaw, 10)
+      : galleryCardsPerRow;
     const rightSidebarAction = localStorage.getItem(getStorageKey("rightSidebarAction")) ?? undefined;
     const galleryFormat = localStorage.getItem(getStorageKey("galleryFormat")) ?? undefined;
     const gallerySetsRaw = localStorage.getItem(getStorageKey("gallerySets"));
@@ -128,6 +138,8 @@ function loadPersistedUIState(): UIState {
       galleryFilters,
       galleryViewMode,
       galleryCardsPerRow,
+      galleryCardsPerRowOpen,
+      galleryCardsPerRowClosed,
       rightSidebarAction,
       galleryFormat,
       gallerySets,
@@ -160,10 +172,16 @@ function persistUIState(state: UIState) {
       localStorage.removeItem(getStorageKey("galleryViewMode"));
     }
 
-    if (state.galleryCardsPerRow) {
-      localStorage.setItem(getStorageKey("galleryCardsPerRow"), state.galleryCardsPerRow.toString());
+    if (state.galleryCardsPerRowOpen) {
+      localStorage.setItem(getStorageKey("galleryCardsPerRowOpen"), state.galleryCardsPerRowOpen.toString());
     } else {
-      localStorage.removeItem(getStorageKey("galleryCardsPerRow"));
+      localStorage.removeItem(getStorageKey("galleryCardsPerRowOpen"));
+    }
+
+    if (state.galleryCardsPerRowClosed) {
+      localStorage.setItem(getStorageKey("galleryCardsPerRowClosed"), state.galleryCardsPerRowClosed.toString());
+    } else {
+      localStorage.removeItem(getStorageKey("galleryCardsPerRowClosed"));
     }
 
     if (state.rightSidebarAction) {
@@ -256,8 +274,14 @@ export function UIStateProvider({ children }: UIStateProviderProps) {
     setUIState((prev) => ({ ...prev, galleryViewMode: mode }));
   }, []);
 
-  const setGalleryCardsPerRow = useCallback((count: number | undefined) => {
-    setUIState((prev) => ({ ...prev, galleryCardsPerRow: count }));
+  const setGalleryCardsPerRow = useCallback((count: number | undefined, isSidebarOpen?: boolean) => {
+    setUIState((prev) => ({
+      ...prev,
+      galleryCardsPerRow: count,
+      ...(isSidebarOpen
+        ? { galleryCardsPerRowOpen: count }
+        : { galleryCardsPerRowClosed: count }),
+    }));
   }, []);
 
   const setRightSidebarAction = useCallback((actionId: string | undefined) => {

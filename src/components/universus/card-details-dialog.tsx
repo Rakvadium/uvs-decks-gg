@@ -30,7 +30,7 @@ import { CachedCard } from "@/lib/universus";
 import { UNIVERSUS_KEYWORD_ABILITIES } from "@/config/universus";
 import { SymbolIcon } from "./symbol-icon";
 import { cn } from "@/lib/utils";
-import { useActiveDeck } from "@/providers/ActiveDeckProvider";
+import { canAddCardToSection, getCardCopyLimit, getCardSectionCounts, useDeckEditor } from "@/lib/deck";
 import { usePrefersReducedMotion } from "@/lib/reduced-motion";
 import {
   Tooltip,
@@ -245,33 +245,22 @@ function ZoneIndicator({ zone, label }: { zone: string | undefined; label: strin
 export function CardDetailsDialog({ card, backCard, open, onOpenChange }: CardDetailsDialogProps) {
   const [isFlipped, setIsFlipped] = useState(false);
   const prefersReducedMotion = usePrefersReducedMotion();
-  const { hasActiveDeck, getCardCount, addCard, removeCard } = useActiveDeck();
-  
-  if (!card) return null;
-  
-  const displayCard = isFlipped && backCard ? backCard : card;
-  const deckCount = getCardCount(card._id);
+  const { hasDeck, addCard, removeCard, mainCounts, sideCounts, referenceCounts } = useDeckEditor();
+
+  const displayCard = card && isFlipped && backCard ? backCard : card;
   const hasBack = !!backCard;
-  
-  const symbols = useMemo(() => {
-    if (!displayCard.symbols) return [];
-    const rawSymbols = displayCard.symbols
-      .split(/[,|]/)
-      .map(s => s.trim().toLowerCase())
-      .filter(Boolean);
-    return [...new Set(rawSymbols)];
-  }, [displayCard.symbols]);
-  
-  const keywords = useMemo(() => {
-    if (!displayCard.keywords) return [];
-    return displayCard.keywords
-      .split(/[,|]/)
-      .map(k => k.trim())
-      .filter(Boolean);
-  }, [displayCard.keywords]);
-  
-  const showRarity = displayCard.rarity && 
-    displayCard.rarity.toLowerCase() !== displayCard.type?.toLowerCase();
+  const sectionCounts = useMemo(
+    () => ({ mainCounts, sideCounts, referenceCounts }),
+    [mainCounts, sideCounts, referenceCounts]
+  );
+  const cardId = card?._id ?? "";
+  const counts = useMemo(
+    () => (card ? getCardSectionCounts(cardId, sectionCounts) : { main: 0, side: 0, reference: 0, mainSide: 0, total: 0 }),
+    [card, cardId, sectionCounts]
+  );
+  const copyLimit = useMemo(() => getCardCopyLimit(card), [card]);
+
+  if (!card || !displayCard) return null;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -294,7 +283,7 @@ export function CardDetailsDialog({ card, backCard, open, onOpenChange }: CardDe
                     animate={prefersReducedMotion ? {} : { rotateY: 0, opacity: 1 }}
                     exit={prefersReducedMotion ? {} : { rotateY: 90, opacity: 0 }}
                     transition={{ duration: 0.3 }}
-                    className="absolute inset-0 rounded-xl overflow-hidden shadow-[0_0_40px_-10px_var(--primary)]"
+                    className="absolute inset-0 rounded-xl overflow-hidden shadow-[0_0_22px_-12px_var(--primary)]"
                   >
                     {displayCard.imageUrl ? (
                       <Image
@@ -336,188 +325,76 @@ export function CardDetailsDialog({ card, backCard, open, onOpenChange }: CardDe
                     </span>
                   </Button>
                 )}
-                
-                {hasActiveDeck && (
-                  <div className="flex items-center gap-1">
-                    <Button
-                      variant="outline"
-                      size="icon-sm"
-                      onClick={() => removeCard(card._id)}
-                      disabled={deckCount === 0}
-                      className="border-destructive/30 hover:border-destructive hover:bg-destructive/10"
-                    >
-                      <Minus className="h-4 w-4 text-destructive" />
-                    </Button>
-                    <span className="w-8 text-center font-mono font-bold text-primary">
-                      {deckCount}
-                    </span>
-                    <Button
-                      variant="outline"
-                      size="icon-sm"
-                      onClick={() => addCard(card._id)}
-                      className="border-primary/30 hover:border-primary hover:bg-primary/10"
-                    >
-                      <Plus className="h-4 w-4 text-primary" />
-                    </Button>
-                  </div>
-                )}
               </div>
-            </div>
-          </div>
 
-          <div className="flex-1 overflow-y-auto p-6 space-y-6">
-            <div className="space-y-3">
-              <div className="flex items-start justify-between gap-4">
-                <h2 className="text-2xl font-display font-bold uppercase tracking-wide">
-                  {displayCard.name}
-                </h2>
-                {displayCard.collectorNumber && (
-                  <span className="text-xs font-mono text-muted-foreground shrink-0">
-                    #{displayCard.collectorNumber}
+              {hasDeck && (
+                <div className="mt-4 space-y-2">
+                  <span className="block text-[10px] font-mono uppercase tracking-widest text-muted-foreground text-center">
+                    Deck Sections
                   </span>
-                )}
-              </div>
-              
-              <div className="flex flex-wrap items-center gap-2">
-                {displayCard.type && (
-                  <Badge variant="cyber">{displayCard.type}</Badge>
-                )}
-                {showRarity && (
-                  <Badge variant="outline">{displayCard.rarity}</Badge>
-                )}
-                {displayCard.setName && (
-                  <Badge variant="secondary">{displayCard.setName}</Badge>
-                )}
-                {symbols.length > 0 && (
-                  <>
-                    <div className="h-4 w-px bg-border/50 mx-1" />
-                    <div className="flex items-center gap-1.5">
-                      {symbols.map((symbol) => (
-                        <div
-                          key={symbol}
-                          className="hover:scale-110 transition-transform"
-                          title={symbol.charAt(0).toUpperCase() + symbol.slice(1)}
+                  {([
+                    {
+                      key: "main",
+                      label: "Main",
+                      count: counts.main,
+                      canAdd: canAddCardToSection({ card, cardId: card._id, section: "main", counts: sectionCounts }),
+                    },
+                    {
+                      key: "side",
+                      label: "Side",
+                      count: counts.side,
+                      canAdd: canAddCardToSection({ card, cardId: card._id, section: "side", counts: sectionCounts }),
+                    },
+                    {
+                      key: "reference",
+                      label: "Reference",
+                      count: counts.reference,
+                      canAdd: canAddCardToSection({ card, cardId: card._id, section: "reference", counts: sectionCounts }),
+                    },
+                  ] as const).map((section) => (
+                    <div
+                      key={section.key}
+                      className="flex items-center justify-between gap-2 rounded-md border border-border/40 bg-card/40 px-2.5 py-1.5"
+                    >
+                      <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+                        {section.label}
+                      </span>
+                      <div className="flex items-center gap-1.5">
+                        <Button
+                          variant="outline"
+                          size="icon-sm"
+                          onClick={() => removeCard(card._id, section.key)}
+                          disabled={section.count === 0}
+                          className="border-destructive/30 hover:border-destructive hover:bg-destructive/10"
                         >
-                          <SymbolIcon symbol={symbol} size="md" />
-                        </div>
-                      ))}
-                    </div>
-                  </>
-                )}
-              </div>
-            </div>
-
-            {(displayCard.control !== undefined || displayCard.difficulty !== undefined || displayCard.blockZone || displayCard.blockModifier !== undefined || displayCard.health !== undefined || displayCard.stamina !== undefined || displayCard.handSize !== undefined) && (
-              <div className="space-y-2">
-                <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground">General</span>
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
-                  <StatBlock icon={Gauge} label="Difficulty" value={displayCard.difficulty} color="orange" />
-                  <StatBlock icon={Shield} label="Check" value={displayCard.control} color="primary" />
-                  {(displayCard.blockZone || displayCard.blockModifier !== undefined) && (
-                    <div className="col-span-2 grid grid-cols-2 gap-2">
-                      <ZoneIndicator zone={displayCard.blockZone} label="Block Zone" />
-                      <StatBlock icon={Target} label="Block Mod" value={displayCard.blockModifier} color="secondary" />
-                    </div>
-                  )}
-                  <StatBlock icon={Heart} label="Health" value={displayCard.health} color="destructive" />
-                  {displayCard.stamina && (
-                    <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-secondary/30 bg-secondary/10">
-                      <Gauge className="h-4 w-4 text-secondary" />
-                      <div className="flex flex-col">
-                        <span className="text-lg font-display font-bold text-secondary">{displayCard.stamina}</span>
-                        <span className="text-[10px] font-mono uppercase tracking-widest opacity-70 text-secondary">Vitality</span>
+                          <Minus className="h-4 w-4 text-destructive" />
+                        </Button>
+                        <span className="w-7 text-center font-mono font-bold text-primary text-xs">
+                          {section.count}
+                        </span>
+                        <Button
+                          variant="outline"
+                          size="icon-sm"
+                          onClick={() => addCard(card._id, section.key)}
+                          disabled={!section.canAdd}
+                          className="border-primary/30 hover:border-primary hover:bg-primary/10"
+                        >
+                          <Plus className="h-4 w-4 text-primary" />
+                        </Button>
                       </div>
                     </div>
-                  )}
-                  {displayCard.handSize && (
-                    <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-primary/30 bg-primary/10">
-                      <Copy className="h-4 w-4 text-primary" />
-                      <div className="flex flex-col">
-                        <span className="text-lg font-display font-bold text-primary">{displayCard.handSize}</span>
-                        <span className="text-[10px] font-mono uppercase tracking-widest opacity-70 text-primary">Hand Size</span>
-                      </div>
-                    </div>
+                  ))}
+                  {copyLimit !== Number.POSITIVE_INFINITY && (
+                    <span className="block text-[10px] font-mono uppercase tracking-widest text-muted-foreground text-center">
+                      Limit {copyLimit} in Main/Side
+                    </span>
                   )}
                 </div>
-              </div>
-            )}
-
-            {(displayCard.speed !== undefined || displayCard.attackZone || displayCard.damage !== undefined) && (
-              <div className="space-y-2">
-                <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Attack</span>
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
-                  <StatBlock icon={Zap} label="Speed" value={displayCard.speed} color="accent" />
-                  <ZoneIndicator zone={displayCard.attackZone} label="Zone" />
-                  <StatBlock icon={Swords} label="Damage" value={displayCard.damage} color="accent" />
-                </div>
-              </div>
-            )}
-
-            {keywords.length > 0 && (() => {
-              const keywordAbilities: string[] = [];
-              const otherKeywords: string[] = [];
-              
-              keywords.forEach(kw => {
-                const keywordName = kw.replace(/[:\s]+\d+$/, "").trim();
-                if (KEYWORD_ABILITY_MAP.has(keywordName.toLowerCase())) {
-                  keywordAbilities.push(kw);
-                } else {
-                  otherKeywords.push(kw);
-                }
-              });
-              
-              keywordAbilities.sort((a, b) => a.localeCompare(b));
-              otherKeywords.sort((a, b) => a.localeCompare(b));
-              
-              return (
-                <div className="space-y-2">
-                  <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Keywords</span>
-                  <div className="flex flex-wrap items-center gap-1.5">
-                    {keywordAbilities.map((keyword, i) => (
-                      <KeywordBadge key={`ability-${i}`} keyword={keyword} />
-                    ))}
-                    {keywordAbilities.length > 0 && otherKeywords.length > 0 && (
-                      <span className="text-muted-foreground/50 mx-1 font-mono">/</span>
-                    )}
-                    {otherKeywords.map((keyword, i) => (
-                      <KeywordBadge key={`other-${i}`} keyword={keyword} />
-                    ))}
-                  </div>
-                </div>
-              );
-            })()}
-
-            {displayCard.text && (
-              <div className="space-y-2">
-                <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Card Text</span>
-                <div className="p-4 rounded-lg border border-border/50 bg-card/30 backdrop-blur-sm">
-                  <AbilityText text={displayCard.text} />
-                </div>
-              </div>
-            )}
-
-            {displayCard.copyLimit && (
-              <div className="flex items-center gap-2 text-sm">
-                <Copy className="h-4 w-4 text-muted-foreground" />
-                <span className="font-mono text-muted-foreground">
-                  Limit: <span className="text-foreground font-bold">{displayCard.copyLimit}</span> per deck
-                </span>
-              </div>
-            )}
-
-            <Separator className="bg-border/30" />
-
-            <div className="flex items-center justify-between text-xs font-mono text-muted-foreground">
-              <span className="uppercase tracking-widest">
-                {displayCard.setCode} • {displayCard.rarity}
-              </span>
-              {displayCard.oracleId && (
-                <span className="opacity-50">
-                  Oracle: {displayCard.oracleId.slice(0, 8)}...
-                </span>
               )}
             </div>
           </div>
+
+          <CardDetailsContent card={displayCard} />
         </div>
         <DialogFooter className="md:hidden">
           <DialogClose asChild>
@@ -532,5 +409,183 @@ export function CardDetailsDialog({ card, backCard, open, onOpenChange }: CardDe
         </DialogFooter>
       </DialogContent>
     </Dialog>
+  );
+}
+
+export function CardDetailsContent({ card, className }: { card: CachedCard; className?: string }) {
+  const symbols = useMemo(() => {
+    if (!card.symbols) return [];
+    const rawSymbols = card.symbols
+      .split(/[,|]/)
+      .map(s => s.trim().toLowerCase())
+      .filter(Boolean);
+    return [...new Set(rawSymbols)];
+  }, [card.symbols]);
+  
+  const keywords = useMemo(() => {
+    if (!card.keywords) return [];
+    return card.keywords
+      .split(/[,|]/)
+      .map(k => k.trim())
+      .filter(Boolean);
+  }, [card.keywords]);
+  
+  const showRarity = card.rarity && 
+    card.rarity.toLowerCase() !== card.type?.toLowerCase();
+
+  return (
+    <div className={cn("flex-1 overflow-y-auto p-6 space-y-6", className)}>
+      <div className="space-y-3">
+        <div className="flex items-start justify-between gap-4">
+          <h2 className="text-2xl font-display font-bold uppercase tracking-wide">
+            {card.name}
+          </h2>
+          {card.collectorNumber && (
+            <span className="text-xs font-mono text-muted-foreground shrink-0">
+              #{card.collectorNumber}
+            </span>
+          )}
+        </div>
+        
+        <div className="flex flex-wrap items-center gap-2">
+          {card.type && (
+            <Badge variant="cyber">{card.type}</Badge>
+          )}
+          {showRarity && (
+            <Badge variant="outline">{card.rarity}</Badge>
+          )}
+          {card.setName && (
+            <Badge variant="secondary">{card.setName}</Badge>
+          )}
+          {symbols.length > 0 && (
+            <>
+              <div className="h-4 w-px bg-border/50 mx-1" />
+              <div className="flex items-center gap-1.5">
+                {symbols.map((symbol) => (
+                  <div
+                    key={symbol}
+                    className="hover:scale-110 transition-transform"
+                    title={symbol.charAt(0).toUpperCase() + symbol.slice(1)}
+                  >
+                    <SymbolIcon symbol={symbol} size="md" />
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+
+      {(card.control !== undefined || card.difficulty !== undefined || card.blockZone || card.blockModifier !== undefined || card.health !== undefined || card.stamina !== undefined || card.handSize !== undefined) && (
+        <div className="space-y-2">
+          <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground">General</span>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
+            <StatBlock icon={Gauge} label="Difficulty" value={card.difficulty} color="orange" />
+            <StatBlock icon={Shield} label="Check" value={card.control} color="primary" />
+            {(card.blockZone || card.blockModifier !== undefined) && (
+              <div className="col-span-2 grid grid-cols-2 gap-2">
+                <ZoneIndicator zone={card.blockZone} label="Block Zone" />
+                <StatBlock icon={Target} label="Block Mod" value={card.blockModifier} color="secondary" />
+              </div>
+            )}
+            <StatBlock icon={Heart} label="Health" value={card.health} color="destructive" />
+            {card.stamina && (
+              <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-secondary/30 bg-secondary/10">
+                <Gauge className="h-4 w-4 text-secondary" />
+                <div className="flex flex-col">
+                  <span className="text-lg font-display font-bold text-secondary">{card.stamina}</span>
+                  <span className="text-[10px] font-mono uppercase tracking-widest opacity-70 text-secondary">Vitality</span>
+                </div>
+              </div>
+            )}
+            {card.handSize && (
+              <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-primary/30 bg-primary/10">
+                <Copy className="h-4 w-4 text-primary" />
+                <div className="flex flex-col">
+                  <span className="text-lg font-display font-bold text-primary">{card.handSize}</span>
+                  <span className="text-[10px] font-mono uppercase tracking-widest opacity-70 text-primary">Hand Size</span>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {(card.speed !== undefined || card.attackZone || card.damage !== undefined) && (
+        <div className="space-y-2">
+          <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Attack</span>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
+            <StatBlock icon={Zap} label="Speed" value={card.speed} color="accent" />
+            <ZoneIndicator zone={card.attackZone} label="Zone" />
+            <StatBlock icon={Swords} label="Damage" value={card.damage} color="accent" />
+          </div>
+        </div>
+      )}
+
+      {keywords.length > 0 && (() => {
+        const keywordAbilities: string[] = [];
+        const otherKeywords: string[] = [];
+        
+        keywords.forEach(kw => {
+          const keywordName = kw.replace(/[:\s]+\d+$/, "").trim();
+          if (KEYWORD_ABILITY_MAP.has(keywordName.toLowerCase())) {
+            keywordAbilities.push(kw);
+          } else {
+            otherKeywords.push(kw);
+          }
+        });
+        
+        keywordAbilities.sort((a, b) => a.localeCompare(b));
+        otherKeywords.sort((a, b) => a.localeCompare(b));
+        
+        return (
+          <div className="space-y-2">
+            <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Keywords</span>
+            <div className="flex flex-wrap items-center gap-1.5">
+              {keywordAbilities.map((keyword, i) => (
+                <KeywordBadge key={`ability-${i}`} keyword={keyword} />
+              ))}
+              {keywordAbilities.length > 0 && otherKeywords.length > 0 && (
+                <span className="text-muted-foreground/50 mx-1 font-mono">/</span>
+              )}
+              {otherKeywords.map((keyword, i) => (
+                <KeywordBadge key={`other-${i}`} keyword={keyword} />
+              ))}
+            </div>
+          </div>
+        );
+      })()}
+
+      {card.text && (
+        <div className="space-y-2">
+          <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Card Text</span>
+          <div className="p-4 rounded-lg border border-border/50 bg-card/30 backdrop-blur-sm">
+            <AbilityText text={card.text} />
+          </div>
+        </div>
+      )}
+
+      {card.copyLimit && (
+        <div className="flex items-center gap-2 text-sm">
+          <Copy className="h-4 w-4 text-muted-foreground" />
+          <span className="font-mono text-muted-foreground">
+            Limit: <span className="text-foreground font-bold">{card.copyLimit}</span> in Main/Side
+          </span>
+        </div>
+      )}
+
+      <Separator className="bg-border/30" />
+
+      <div className="flex items-center justify-between text-xs font-mono text-muted-foreground">
+        <span className="uppercase tracking-widest">
+          {card.setCode} • {card.rarity}
+        </span>
+        {card.oracleId && (
+          <span className="opacity-50">
+            Oracle: {card.oracleId.slice(0, 8)}...
+          </span>
+        )}
+      </div>
+    </div>
   );
 }

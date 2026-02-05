@@ -33,15 +33,22 @@ export interface SlotRegistrationOptions {
   footer?: ComponentType;
 }
 
+export const MIN_SIDEBAR_WIDTH = 320;
+export const MAX_SIDEBAR_WIDTH = 480;
+export const DEFAULT_SIDEBAR_WIDTH = 400;
+export const SIDEBAR_WIDTH_KEY = "uvs-decks-right-sidebar-width";
+
 interface ShellSlotState {
   slots: Map<SlotArea, SlotRegistration[]>;
   activeSidebarActionId: string | null;
+  sidebarWidth: number;
 }
 
 interface ShellSlotActions {
   registerSlot: (area: SlotArea, registration: SlotRegistration) => void;
   unregisterSlot: (area: SlotArea, id: string) => void;
   setActiveSidebarAction: (id: string | null) => void;
+  setSidebarWidth: (width: number) => void;
 }
 
 interface ShellSlotContextValue {
@@ -51,11 +58,27 @@ interface ShellSlotContextValue {
 
 const ShellSlotContext = createContext<ShellSlotContextValue | null>(null);
 
+function getInitialSidebarWidth(): number {
+  if (typeof window === "undefined") return DEFAULT_SIDEBAR_WIDTH;
+  const stored = localStorage.getItem(SIDEBAR_WIDTH_KEY);
+  if (stored === null) return DEFAULT_SIDEBAR_WIDTH;
+  const parsed = parseInt(stored, 10);
+  if (isNaN(parsed)) return DEFAULT_SIDEBAR_WIDTH;
+  return Math.max(DEFAULT_SIDEBAR_WIDTH, Math.min(MAX_SIDEBAR_WIDTH, parsed));
+}
+
 export function ShellSlotProvider({ children }: { children: ReactNode }) {
   const [slots, setSlots] = useState<Map<SlotArea, SlotRegistration[]>>(
     () => new Map()
   );
   const [activeSidebarActionId, setActiveSidebarActionIdState] = useState<string | null>(null);
+  const [sidebarWidth, setSidebarWidthState] = useState<number>(DEFAULT_SIDEBAR_WIDTH);
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  useEffect(() => {
+    setSidebarWidthState(getInitialSidebarWidth());
+    setIsHydrated(true);
+  }, []);
 
   const registerSlot = useCallback((area: SlotArea, registration: SlotRegistration) => {
     setSlots((prev) => {
@@ -86,21 +109,30 @@ export function ShellSlotProvider({ children }: { children: ReactNode }) {
     setActiveSidebarActionIdState(id);
   }, []);
 
+  const setSidebarWidth = useCallback((width: number) => {
+    const clampedWidth = Math.max(MIN_SIDEBAR_WIDTH, Math.min(MAX_SIDEBAR_WIDTH, width));
+    setSidebarWidthState(clampedWidth);
+    if (typeof window !== "undefined") {
+      localStorage.setItem(SIDEBAR_WIDTH_KEY, String(clampedWidth));
+    }
+  }, []);
+
   const actions = useMemo(
     (): ShellSlotActions => ({
       registerSlot,
       unregisterSlot,
       setActiveSidebarAction,
+      setSidebarWidth,
     }),
-    [registerSlot, unregisterSlot, setActiveSidebarAction]
+    [registerSlot, unregisterSlot, setActiveSidebarAction, setSidebarWidth]
   );
 
   const value = useMemo(
     (): ShellSlotContextValue => ({
-      state: { slots, activeSidebarActionId },
+      state: { slots, activeSidebarActionId, sidebarWidth: isHydrated ? sidebarWidth : DEFAULT_SIDEBAR_WIDTH },
       actions,
     }),
-    [slots, activeSidebarActionId, actions]
+    [slots, activeSidebarActionId, sidebarWidth, isHydrated, actions]
   );
 
   return (

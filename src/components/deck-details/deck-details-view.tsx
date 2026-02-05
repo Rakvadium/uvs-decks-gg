@@ -23,7 +23,6 @@ import {
   Lock,
   Hexagon,
   User,
-  Settings,
   LayoutGrid,
   BarChart3,
   Shuffle,
@@ -35,7 +34,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import {
   AlertDialog,
@@ -55,11 +53,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { CardDetailsDialog } from "@/components/universus";
 import { cn } from "@/lib/utils";
 import { useActiveDeck } from "@/providers/ActiveDeckProvider";
 import { useRegisterSlot } from "@/components/shell/shell-slot-provider";
 import { usePrefersReducedMotion } from "@/lib/reduced-motion";
-import { useCardData } from "@/lib/universus";
+import { useCardData, type CachedCard } from "@/lib/universus";
+import { formatUniversusCardType } from "@/config/universus";
 
 interface DeckDetailsViewProps {
   deckId: string;
@@ -73,38 +73,113 @@ const SECTION_CONFIG = {
   reference: { label: "Reference", icon: Bookmark, color: "accent" },
 } as const;
 
-function DeckCardItem({ 
-  card, 
-  quantity, 
-  onRemove 
-}: { 
-  card: { _id: string; name: string; type?: string; imageUrl?: string; rarity?: string };
+const CARD_TYPE_ORDER = ["Attack", "Foundation", "Action", "Asset", "Backup", "Character"] as const;
+const CARD_TYPE_LABELS: Record<string, string> = {
+  Attack: "Attacks",
+  Foundation: "Foundations",
+  Action: "Actions",
+  Asset: "Assets",
+  Backup: "Backups",
+  Character: "Characters",
+};
+
+function DeckCardStackItem({
+  card,
+  quantity,
+  backCard,
+}: {
+  card: CachedCard;
   quantity: number;
-  onRemove?: () => void;
+  backCard?: CachedCard | null;
 }) {
+  const prefersReducedMotion = usePrefersReducedMotion();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const stackCount = Math.max(1, quantity);
+  const stackOffset = 6;
+  const stackedLayers = Array.from({ length: Math.max(0, stackCount - 1) }, (_, index) => index + 1);
+
+  const handleOpen = useCallback(() => {
+    setIsDialogOpen(true);
+  }, []);
+
+  const handleKeyDown = useCallback((event: React.KeyboardEvent<HTMLButtonElement>) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      setIsDialogOpen(true);
+    }
+  }, []);
+
   return (
-    <div className="group flex items-center gap-3 px-3 py-2 rounded-lg border border-border/30 bg-card/30 hover:border-primary/30 hover:bg-card/50 transition-all">
-      <div className="relative w-8 h-11 rounded overflow-hidden bg-muted/50 shrink-0">
-        {card.imageUrl ? (
-          <Image src={card.imageUrl} alt={card.name} fill className="object-cover object-top" />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <Hexagon className="h-4 w-4 text-muted-foreground/30" />
+    <>
+      <div className="group flex flex-col gap-2">
+        <div className="relative pr-6 pb-6">
+          <div className="relative aspect-[2.5/3.5] overflow-visible">
+          {stackedLayers.map((layer) => (
+            <div
+              key={layer}
+              aria-hidden="true"
+              className="absolute inset-0 rounded-lg border border-border/80 bg-muted/70 ring-1 ring-white/10 shadow-[0_14px_30px_-18px_rgba(0,0,0,0.7)] pointer-events-none"
+              style={{
+                transform: `translate(${layer * stackOffset}px, ${layer * stackOffset}px)`,
+                opacity: Math.max(0.55, 0.9 - layer * 0.08),
+              }}
+            />
+          ))}
+
+          <button
+            type="button"
+            onClick={handleOpen}
+            onKeyDown={handleKeyDown}
+            className={cn(
+              "absolute inset-0 z-10 rounded-lg overflow-hidden",
+              "shadow-[0_10px_30px_-16px_rgba(0,0,0,0.7)]",
+              "transition-transform duration-300",
+              !prefersReducedMotion && "group-hover:-translate-x-1 group-hover:-translate-y-1"
+            )}
+            aria-label={`Open ${card.name} details`}
+          >
+            {card.imageUrl ? (
+              <Image
+                src={card.imageUrl}
+                alt={card.name}
+                fill
+                sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, (max-width: 1280px) 20vw, 16vw"
+                className="object-cover"
+                loading="lazy"
+                draggable={false}
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center bg-muted/50 border border-border/50">
+                <div className="text-center">
+                  <div className="w-8 h-8 mx-auto mb-2 rounded border border-primary/30 flex items-center justify-center">
+                    <span className="text-primary/50 text-lg">?</span>
+                  </div>
+                  <span className="text-xs text-muted-foreground font-mono uppercase tracking-wider">No Image</span>
+                </div>
+              </div>
+            )}
+          </button>
+
+          <div className="absolute top-2 right-2 z-20">
+            <Badge variant="outline" className="text-[10px] font-mono bg-background/80 backdrop-blur-sm">
+              x{quantity}
+            </Badge>
           </div>
-        )}
+          </div>
+        </div>
+
+        <div className="text-xs font-mono uppercase tracking-wider text-muted-foreground truncate" title={card.name}>
+          {card.name}
+        </div>
       </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium truncate">{card.name}</p>
-        <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
-          {card.type}
-        </p>
-      </div>
-      <div className="flex items-center gap-2">
-        <Badge variant="outline" className="text-xs font-mono">
-          x{quantity}
-        </Badge>
-      </div>
-    </div>
+
+      <CardDetailsDialog
+        card={card}
+        backCard={backCard}
+        open={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+      />
+    </>
   );
 }
 
@@ -234,36 +309,44 @@ export function DeckDetailsView({ deckId }: DeckDetailsViewProps) {
   useRegisterSlot("right-sidebar", "deck-simulator", HandSimulatorSidebar, simulatorSlotOptions);
   useRegisterSlot("right-sidebar", "deck-import-export", ImportExportSidebar, importExportSlotOptions);
 
+  const cardIdMap = useMemo(() => {
+    const map = new Map<string, CachedCard>();
+    for (const card of allCards) {
+      map.set(card._id, card);
+    }
+    return map;
+  }, [allCards]);
+
   const mainCards = useMemo(() => {
     if (!deck) return [];
     return deck.mainCardIds
-      .map(id => allCards.find(c => c._id === id))
-      .filter(Boolean) as typeof allCards;
-  }, [deck, allCards]);
+      .map(id => cardIdMap.get(id))
+      .filter(Boolean) as CachedCard[];
+  }, [deck, cardIdMap]);
 
   const sideCards = useMemo(() => {
     if (!deck) return [];
     return deck.sideCardIds
-      .map(id => allCards.find(c => c._id === id))
-      .filter(Boolean) as typeof allCards;
-  }, [deck, allCards]);
+      .map(id => cardIdMap.get(id))
+      .filter(Boolean) as CachedCard[];
+  }, [deck, cardIdMap]);
 
   const referenceCards = useMemo(() => {
     if (!deck) return [];
     return deck.referenceCardIds
-      .map(id => allCards.find(c => c._id === id))
-      .filter(Boolean) as typeof allCards;
-  }, [deck, allCards]);
+      .map(id => cardIdMap.get(id))
+      .filter(Boolean) as CachedCard[];
+  }, [deck, cardIdMap]);
 
   const startingCharacter = useMemo(() => {
     if (!deck?.startingCharacterId) return null;
-    return allCards.find(c => c._id === deck.startingCharacterId);
-  }, [deck, allCards]);
+    return cardIdMap.get(deck.startingCharacterId) ?? null;
+  }, [deck, cardIdMap]);
 
   const imageCard = useMemo(() => {
     if (!deck?.imageCardId) return null;
-    return allCards.find(c => c._id === deck.imageCardId);
-  }, [deck, allCards]);
+    return cardIdMap.get(deck.imageCardId) ?? null;
+  }, [deck, cardIdMap]);
 
   const counts = useMemo(() => ({
     main: deck ? Object.values(deck.mainQuantities).reduce((sum, qty) => sum + qty, 0) : 0,
@@ -273,6 +356,46 @@ export function DeckDetailsView({ deckId }: DeckDetailsViewProps) {
 
   const currentCards = activeSection === "main" ? mainCards : activeSection === "side" ? sideCards : referenceCards;
   const currentQuantities = deck ? (activeSection === "main" ? deck.mainQuantities : activeSection === "side" ? deck.sideQuantities : deck.referenceQuantities) : {};
+  
+  const visibleCards = useMemo(() => {
+    return currentCards.filter((card) => (currentQuantities[card._id.toString()] ?? 0) > 0);
+  }, [currentCards, currentQuantities]);
+
+  const sortedCards = useMemo(() => {
+    const cardsCopy = [...visibleCards];
+    cardsCopy.sort((a, b) => {
+      const difficultyA = typeof a.difficulty === "number" ? a.difficulty : Number.POSITIVE_INFINITY;
+      const difficultyB = typeof b.difficulty === "number" ? b.difficulty : Number.POSITIVE_INFINITY;
+      if (difficultyA !== difficultyB) return difficultyA - difficultyB;
+      return (a.name ?? "").localeCompare(b.name ?? "", undefined, { sensitivity: "base" });
+    });
+    return cardsCopy;
+  }, [visibleCards]);
+
+  const groupedCards = useMemo(() => {
+    const groups = new Map<string, CachedCard[]>();
+    for (const card of sortedCards) {
+      const normalizedType = formatUniversusCardType(card.type) ?? card.type ?? "Other";
+      const list = groups.get(normalizedType) ?? [];
+      list.push(card);
+      groups.set(normalizedType, list);
+    }
+
+    const orderedTypes = [
+      ...CARD_TYPE_ORDER,
+      ...Array.from(groups.keys())
+        .filter((type) => !CARD_TYPE_ORDER.includes(type as (typeof CARD_TYPE_ORDER)[number]))
+        .sort(),
+    ];
+
+    return orderedTypes
+      .filter((type) => groups.has(type))
+      .map((type) => ({
+        type,
+        label: CARD_TYPE_LABELS[type] ?? type,
+        cards: groups.get(type) ?? [],
+      }));
+  }, [sortedCards]);
 
   const isActiveDeck = !!(deck && activeDeckId === deck._id);
 
@@ -561,7 +684,7 @@ export function DeckDetailsView({ deckId }: DeckDetailsViewProps) {
           })}
         </div>
 
-        {currentCards.length === 0 ? (
+        {visibleCards.length === 0 ? (
           <Card className="border-dashed border-2 border-border/50">
             <CardContent className="flex flex-col items-center justify-center py-12">
               <div className="w-16 h-16 rounded-lg border border-primary/30 flex items-center justify-center mb-4 shadow-[0_0_20px_-5px_var(--primary)]">
@@ -579,17 +702,47 @@ export function DeckDetailsView({ deckId }: DeckDetailsViewProps) {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-3">
-            {currentCards.map((card) => {
-              const quantity = currentQuantities[card._id.toString()] ?? 0;
+          <div className="space-y-8">
+            {groupedCards.map((group) => {
+              const totalCount = group.cards.reduce((sum, card) => {
+                return sum + (currentQuantities[card._id.toString()] ?? 0);
+              }, 0);
+
               return (
-                <motion.div
-                  key={card._id}
-                  initial={prefersReducedMotion ? {} : { opacity: 0, y: 10 }}
-                  animate={prefersReducedMotion ? {} : { opacity: 1, y: 0 }}
-                >
-                  <DeckCardItem card={card} quantity={quantity} />
-                </motion.div>
+                <div key={group.type} className="space-y-3">
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-display font-bold uppercase tracking-[0.2em]">
+                        {group.label}
+                      </span>
+                      <Badge variant="outline" className="text-[10px] font-mono uppercase tracking-wider">
+                        {totalCount}
+                      </Badge>
+                    </div>
+                    <div className="flex-1 h-px bg-border/50" />
+                  </div>
+
+                  <div className="grid gap-6 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+                    {group.cards.map((card, index) => {
+                      const quantity = currentQuantities[card._id.toString()] ?? 0;
+                      const backCard = card.backCardId ? cardIdMap.get(card.backCardId) : undefined;
+
+                      return (
+                        <motion.div
+                          key={card._id}
+                          initial={prefersReducedMotion ? {} : { opacity: 0, y: 12 }}
+                          animate={prefersReducedMotion ? {} : { opacity: 1, y: 0 }}
+                          transition={{
+                            duration: 0.25,
+                            delay: prefersReducedMotion ? 0 : Math.min(index * 0.03, 0.4),
+                          }}
+                        >
+                          <DeckCardStackItem card={card} quantity={quantity} backCard={backCard} />
+                        </motion.div>
+                      );
+                    })}
+                  </div>
+                </div>
               );
             })}
           </div>

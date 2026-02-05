@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useState } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,7 @@ import {
   DialogTitle,
   DialogFooter,
   DialogDescription,
+  DialogBody,
 } from "@/components/ui/dialog";
 import { Card, CardContent } from "@/components/ui/card";
 import { 
@@ -23,6 +24,7 @@ import {
   FolderOpen,
   Globe,
   Lock,
+  PenLine,
 } from "lucide-react";
 import { DeckGridItem } from "./deck-grid-item";
 import Link from "next/link";
@@ -31,7 +33,6 @@ import { cn } from "@/lib/utils";
 import { useRegisterSlot } from "@/components/shell/shell-slot-provider";
 import { Separator } from "@/components/ui/separator";
 import { useDecks, useDecksOptional } from "@/providers/DecksProvider";
-import { useState } from "react";
 
 type DeckTab = "my-decks" | "public" | "tournament";
 
@@ -63,6 +64,18 @@ function DecksTopBar() {
 
   return (
     <div className="flex items-center gap-2 w-full">
+      <div className="relative flex-1 max-w-xs">
+        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+        <Input
+          placeholder="Search decks..."
+          value={state.searchQuery}
+          onChange={(e) => actions.setSearchQuery(e.target.value)}
+          className="h-8 pl-8 text-sm"
+        />
+      </div>
+
+      <Separator orientation="vertical" className="h-5 mx-1" />
+
       <div className="flex gap-1 p-0.5 rounded-md bg-muted/50 border border-border/50">
         {TABS.map((tab) => {
           const Icon = tab.icon;
@@ -95,18 +108,6 @@ function DecksTopBar() {
         })}
       </div>
 
-      <Separator orientation="vertical" className="h-5 mx-1" />
-
-      <div className="relative flex-1 max-w-xs">
-        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
-        <Input
-          placeholder="Search decks..."
-          value={state.searchQuery}
-          onChange={(e) => actions.setSearchQuery(e.target.value)}
-          className="h-8 pl-8 text-sm"
-        />
-      </div>
-
       {isAuthenticated && (
         <div className="ml-auto">
           <Button 
@@ -127,14 +128,23 @@ function DecksTopBar() {
 export function DecksView() {
   const { isAuthenticated, isLoading: authLoading } = useConvexAuth();
   const user = useQuery(api.user.currentUser, isAuthenticated ? {} : "skip");
+  const { state, actions } = useDecks();
+  const deckSearch = state.searchQuery.trim();
+
   const myDecks = useQuery(
     api.decks.listByUser,
-    user ? { userId: user._id } : "skip"
+    user
+      ? {
+          userId: user._id,
+          ...(deckSearch ? { search: deckSearch } : {}),
+        }
+      : "skip"
   );
-  const publicDecks = useQuery(api.decks.listPublic, {});
+  const publicDecks = useQuery(
+    api.decks.listPublic,
+    deckSearch ? { search: deckSearch } : {}
+  );
   const createDeck = useMutation(api.decks.create);
-  
-  const { state, actions } = useDecks();
   const [newDeckName, setNewDeckName] = useState("");
   const [isCreating, setIsCreating] = useState(false);
 
@@ -152,26 +162,12 @@ export function DecksView() {
     }
   };
 
-  const currentDecks = useMemo(() => {
-    let decks: typeof myDecks = [];
-    
-    if (state.activeTab === "my-decks") {
-      decks = myDecks || [];
-    } else if (state.activeTab === "public") {
-      decks = publicDecks || [];
-    } else if (state.activeTab === "tournament") {
-      decks = [];
-    }
-    
-    if (!state.searchQuery.trim()) return decks;
-    
-    const query = state.searchQuery.toLowerCase();
-    return decks.filter(deck => 
-      deck.name.toLowerCase().includes(query) ||
-      deck.description?.toLowerCase().includes(query) ||
-      deck.format?.toLowerCase().includes(query)
-    );
-  }, [state.activeTab, myDecks, publicDecks, state.searchQuery]);
+  const currentDecks =
+    state.activeTab === "my-decks"
+      ? myDecks || []
+      : state.activeTab === "public"
+      ? publicDecks || []
+      : [];
 
   if (authLoading) {
     return (
@@ -223,27 +219,67 @@ export function DecksView() {
       </div>
 
       <Dialog open={state.isCreateDialogOpen} onOpenChange={(open) => open ? actions.openCreateDialog() : actions.closeCreateDialog()}>
-        <DialogContent size="sm">
-          <DialogHeader>
-            <DialogTitle>Create New Deck</DialogTitle>
-            <DialogDescription>Enter a name for your new deck</DialogDescription>
-          </DialogHeader>
-          <Input
-            placeholder="Deck name..."
-            value={newDeckName}
-            onChange={(e) => setNewDeckName(e.target.value)}
-            className="mt-4"
-            onKeyDown={(e) => e.key === "Enter" && handleCreate()}
-          />
-          <DialogFooter className="mt-4">
-            <Button variant="outline" onClick={() => actions.closeCreateDialog()}>
-              Cancel
-            </Button>
-            <Button onClick={handleCreate} disabled={isCreating || !newDeckName.trim()}>
-              {isCreating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Create
-            </Button>
-          </DialogFooter>
+        <DialogContent size="md" className="overflow-hidden">
+          <div className="relative">
+            <div className="pointer-events-none absolute inset-0">
+              <div className="absolute -top-16 left-10 h-24 w-24 rounded-full bg-primary/20 blur-3xl" />
+              <div className="absolute -bottom-16 right-10 h-24 w-24 rounded-full bg-secondary/20 blur-3xl" />
+              <div className="absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
+            </div>
+
+            <div className="relative p-6">
+              <DialogHeader className="border-border/20 pb-4">
+                <div className="flex items-start gap-3">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-lg border border-primary/30 bg-primary/10 shadow-[0_0_20px_-6px_var(--primary)]">
+                    <Layers className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <DialogTitle className="text-xl">Create New Deck</DialogTitle>
+                    <DialogDescription className="text-sm">
+                      Give it a name now; you can always refine it later.
+                    </DialogDescription>
+                  </div>
+                </div>
+              </DialogHeader>
+
+              <DialogBody className="pt-4">
+                <label className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground">
+                  Deck name
+                </label>
+                <div className="relative mt-2">
+                  <PenLine className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/70" />
+                  <Input
+                    placeholder="Deck name..."
+                    value={newDeckName}
+                    onChange={(e) => setNewDeckName(e.target.value)}
+                    className="h-12 pl-10 text-base bg-background/40 border-border/60 focus-visible:ring-primary/25"
+                    onKeyDown={(e) => e.key === "Enter" && handleCreate()}
+                  />
+                </div>
+                <p className="mt-2 text-xs text-muted-foreground/70">
+                  Tip: Use a format or archetype keyword to make it easier to find later.
+                </p>
+              </DialogBody>
+
+              <DialogFooter className="mt-6 gap-3 border-t-0 bg-transparent p-0">
+                <Button
+                  variant="outline"
+                  className="h-11 px-6"
+                  onClick={() => actions.closeCreateDialog()}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  className="h-11 px-6"
+                  onClick={handleCreate}
+                  disabled={isCreating || !newDeckName.trim()}
+                >
+                  {isCreating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Create Deck
+                </Button>
+              </DialogFooter>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
 
@@ -298,7 +334,7 @@ export function DecksView() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-4 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {currentDecks.map((deck) => (
             <DeckGridItem 
               key={deck._id} 

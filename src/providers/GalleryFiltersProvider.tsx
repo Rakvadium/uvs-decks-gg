@@ -9,7 +9,8 @@ import {
   ReactNode,
 } from "react";
 import { useCardData, sortCards, CachedCard } from "@/lib/universus";
-import { useUIState, type CardFilters } from "@/providers/UIStateProvider";
+import { useUIState, type CardFilters, type GalleryViewMode } from "@/providers/UIStateProvider";
+import { useShellSlot } from "@/components/shell/shell-slot-provider";
 
 type SearchMode = "name" | "text" | "all";
 type ViewMode = "card" | "list" | "details";
@@ -53,7 +54,8 @@ interface GalleryFiltersContextValue {
 const GalleryFiltersContext = createContext<GalleryFiltersContextValue | null>(null);
 
 export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
-  const { uiState, setGalleryFilters } = useUIState();
+  const { uiState, setGalleryFilters, setGalleryViewMode, setGalleryCardsPerRow } = useUIState();
+  const { state: shellState } = useShellSlot();
   const {
     cards,
     isLoading,
@@ -65,8 +67,49 @@ export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
   } = useCardData();
   const [search, setSearch] = useState("");
   const [searchMode, setSearchMode] = useState<SearchMode>("all");
-  const [viewMode, setViewMode] = useState<ViewMode>("card");
-  const [cardsPerRow, setCardsPerRow] = useState(6);
+  const isSidebarOpen = useMemo(() => Boolean(shellState.activeSidebarActionId), [shellState.activeSidebarActionId]);
+  const viewMode: ViewMode = useMemo(() => {
+    const storedMode = uiState.galleryViewMode;
+    if (storedMode === "grid") return "card";
+    if (storedMode === "list" || storedMode === "details") return storedMode;
+    return "card";
+  }, [uiState.galleryViewMode]);
+  const cardsPerRow = useMemo(() => {
+    const clampCardsPerRow = (value: number | undefined, fallback: number) => {
+      const raw = typeof value === "number" ? value : fallback;
+      if (Number.isNaN(raw)) return fallback;
+      return Math.min(10, Math.max(3, Math.round(raw)));
+    };
+
+    const legacy = uiState.galleryCardsPerRow;
+    const openDefault = 4;
+    const closedDefault = 6;
+    const openValue = clampCardsPerRow(uiState.galleryCardsPerRowOpen ?? legacy, openDefault);
+    const closedValue = clampCardsPerRow(uiState.galleryCardsPerRowClosed ?? legacy, closedDefault);
+
+    return isSidebarOpen ? openValue : closedValue;
+  }, [
+    uiState.galleryCardsPerRow,
+    uiState.galleryCardsPerRowOpen,
+    uiState.galleryCardsPerRowClosed,
+    isSidebarOpen,
+  ]);
+
+  const handleSetViewMode = useCallback(
+    (mode: ViewMode) => {
+      const mapped: GalleryViewMode = mode === "card" ? "grid" : mode;
+      setGalleryViewMode(mapped);
+    },
+    [setGalleryViewMode]
+  );
+
+  const handleSetCardsPerRow = useCallback(
+    (count: number) => {
+      const next = Math.min(10, Math.max(3, Math.round(count)));
+      setGalleryCardsPerRow(next, isSidebarOpen);
+    },
+    [setGalleryCardsPerRow, isSidebarOpen]
+  );
 
   const galleryFilters = uiState.galleryFilters ?? {};
   const defaultFormat = formats.find((format) => format.isDefault)?.key ?? "standard";
@@ -102,7 +145,7 @@ export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
 
   const activeFilterCount = useMemo(() => {
     let count = 0;
-    if (filters.format) count++;
+    if (galleryFilters.format && galleryFilters.format !== defaultFormat) count++;
     if (filters.type?.length) count++;
     if (filters.rarity?.length) count++;
     if (filters.set?.length) count++;
@@ -145,8 +188,8 @@ export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
         setSearchMode,
         updateFilter,
         clearAllFilters,
-        setViewMode,
-        setCardsPerRow,
+        setViewMode: handleSetViewMode,
+        setCardsPerRow: handleSetCardsPerRow,
       },
       meta: {
         totalCards: cards.length,
@@ -169,6 +212,8 @@ export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
       cardsPerRow,
       updateFilter,
       clearAllFilters,
+      handleSetViewMode,
+      handleSetCardsPerRow,
       cards.length,
       filteredCards,
       uniqueValues,

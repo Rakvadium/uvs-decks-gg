@@ -101,13 +101,13 @@ function DragOverlay() {
 
   return createPortal(
     <div
-      className="pointer-events-none fixed left-0 top-0 z-[9999]"
+      className="pointer-events-none fixed left-0 top-0 z-[9999] transition-transform duration-75 ease-out"
       style={{
         transform: `translate3d(${pos.x - overlayWidth / 2}px, ${pos.y - overlayHeight / 2}px, 0)`,
       }}
     >
       <div
-        className="overflow-hidden rounded-xl border bg-background/70 shadow-2xl"
+        className="drag-float overflow-hidden rounded-xl border bg-background/70 shadow-2xl ring-1 ring-primary/20"
         style={{ width: overlayWidth, height: overlayHeight }}
       >
         {imageUrl ? (

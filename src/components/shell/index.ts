@@ -1,6 +1,7 @@
 export { LeftSidebar } from "./left-sidebar";
 export { TopHeader } from "./top-header";
 export { RightSidebar } from "./right-sidebar";
+export { SidebarFooter } from "./sidebar-footer";
 export {
   ShellSlotProvider,
   useShellSlot,
