@@ -10,7 +10,7 @@ import {
   useMemo,
   useRef,
 } from "react";
-import { useQuery, useMutation } from "convex/react";
+import { useQuery, useMutation, useConvexAuth } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { Id } from "../../convex/_generated/dataModel";
 
@@ -225,26 +225,31 @@ export function UIStateProvider({ children }: UIStateProviderProps) {
   const [uiState, setUIState] = useState<UIState>(() =>
     typeof window === "undefined" ? {} : loadPersistedUIState()
   );
-  const [isHydrated, setIsHydrated] = useState(false);
+  const isHydrated = typeof window !== "undefined";
   const serverSyncedRef = useRef(false);
+  const wasAuthenticatedRef = useRef(false);
+  const { isAuthenticated, isLoading: authLoading } = useConvexAuth();
 
-  const serverActiveDeckId = useQuery(api.sessions.getActiveDeckId);
+  const serverActiveDeckId = useQuery(api.sessions.getActiveDeckId, isAuthenticated ? {} : "skip");
   const setActiveDeckMutation = useMutation(api.sessions.setActiveDeck);
 
   useEffect(() => {
-    setIsHydrated(true);
-    serverSyncedRef.current = false;
-  }, []);
+    if (wasAuthenticatedRef.current !== isAuthenticated) {
+      wasAuthenticatedRef.current = isAuthenticated;
+      serverSyncedRef.current = false;
+    }
+  }, [isAuthenticated]);
 
   useEffect(() => {
-    if (isHydrated && serverActiveDeckId !== undefined && !serverSyncedRef.current) {
+    if (isHydrated && isAuthenticated && !authLoading && serverActiveDeckId !== undefined && !serverSyncedRef.current) {
       serverSyncedRef.current = true;
-      if (serverActiveDeckId) {
-        setUIState((prev) => ({ ...prev, activeDeckId: serverActiveDeckId }));
-        localStorage.setItem(getStorageKey("activeDeckId"), serverActiveDeckId);
-      }
+      queueMicrotask(() => {
+        setUIState((prev) => ({ ...prev, activeDeckId: serverActiveDeckId ?? undefined }));
+        if (serverActiveDeckId) localStorage.setItem(getStorageKey("activeDeckId"), serverActiveDeckId);
+        else localStorage.removeItem(getStorageKey("activeDeckId"));
+      });
     }
-  }, [isHydrated, serverActiveDeckId]);
+  }, [isHydrated, isAuthenticated, authLoading, serverActiveDeckId]);
 
   useEffect(() => {
     if (isHydrated) {
@@ -263,11 +268,13 @@ export function UIStateProvider({ children }: UIStateProviderProps) {
   const setActiveDeckId = useCallback(
     (deckId: string | undefined) => {
       setUIState((prev) => ({ ...prev, activeDeckId: deckId }));
-      setActiveDeckMutation({
-        deckId: deckId ? (deckId as Id<"decks">) : undefined,
-      });
+      if (isAuthenticated) {
+        setActiveDeckMutation({
+          deckId: deckId ? (deckId as Id<"decks">) : undefined,
+        });
+      }
     },
-    [setActiveDeckMutation]
+    [setActiveDeckMutation, isAuthenticated]
   );
 
   const setGalleryViewMode = useCallback((mode: GalleryViewMode) => {

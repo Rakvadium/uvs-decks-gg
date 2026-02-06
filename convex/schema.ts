@@ -141,6 +141,18 @@ export default defineSchema({
   sessions: defineTable({
     userId: v.id("users"),
     activeDeckId: v.optional(v.id("decks")),
+    theme: v.optional(v.union(v.literal("light"), v.literal("dark"), v.literal("system"))),
+    colorScheme: v.optional(
+      v.union(
+        v.literal("default"),
+        v.literal("calm-storm"),
+        v.literal("cyberpunk"),
+        v.literal("bubblegum"),
+        v.literal("caffeine"),
+        v.literal("darkmatter"),
+        v.literal("holoterminal")
+      )
+    ),
     galleryFilters: v.optional(v.any()),
     rightSidebarAction: v.optional(v.string()),
     lastActiveAt: v.number(),

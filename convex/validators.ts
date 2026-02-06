@@ -107,11 +107,29 @@ export const galleryFiltersValidator = v.object({
   symbols: v.optional(v.array(v.string())),
 });
 
+export const themePreferenceValidator = v.optional(
+  v.union(v.literal("light"), v.literal("dark"), v.literal("system"))
+);
+
+export const colorSchemeValidator = v.optional(
+  v.union(
+    v.literal("default"),
+    v.literal("calm-storm"),
+    v.literal("cyberpunk"),
+    v.literal("bubblegum"),
+    v.literal("caffeine"),
+    v.literal("darkmatter"),
+    v.literal("holoterminal")
+  )
+);
+
 export const sessionValidator = v.object({
   _id: v.id("sessions"),
   _creationTime: v.number(),
   userId: v.id("users"),
   activeDeckId: v.optional(v.id("decks")),
+  theme: themePreferenceValidator,
+  colorScheme: colorSchemeValidator,
   galleryFilters: v.optional(galleryFiltersValidator),
   rightSidebarAction: v.optional(v.string()),
   lastActiveAt: v.number(),
