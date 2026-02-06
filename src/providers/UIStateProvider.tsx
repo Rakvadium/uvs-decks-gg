@@ -8,7 +8,6 @@ import {
   ReactNode,
   useEffect,
   useMemo,
-  useRef,
 } from "react";
 import { useQuery, useMutation, useConvexAuth } from "convex/react";
 import { api } from "../../convex/_generated/api";
@@ -226,30 +225,24 @@ export function UIStateProvider({ children }: UIStateProviderProps) {
     typeof window === "undefined" ? {} : loadPersistedUIState()
   );
   const isHydrated = typeof window !== "undefined";
-  const serverSyncedRef = useRef(false);
-  const wasAuthenticatedRef = useRef(false);
   const { isAuthenticated, isLoading: authLoading } = useConvexAuth();
 
   const serverActiveDeckId = useQuery(api.sessions.getActiveDeckId, isAuthenticated ? {} : "skip");
   const setActiveDeckMutation = useMutation(api.sessions.setActiveDeck);
 
   useEffect(() => {
-    if (wasAuthenticatedRef.current !== isAuthenticated) {
-      wasAuthenticatedRef.current = isAuthenticated;
-      serverSyncedRef.current = false;
-    }
-  }, [isAuthenticated]);
-
-  useEffect(() => {
-    if (isHydrated && isAuthenticated && !authLoading && serverActiveDeckId !== undefined && !serverSyncedRef.current) {
-      serverSyncedRef.current = true;
+    if (isHydrated && isAuthenticated && !authLoading && serverActiveDeckId !== undefined) {
+      const nextActiveDeckId = serverActiveDeckId ?? undefined;
+      if (uiState.activeDeckId === nextActiveDeckId) {
+        return;
+      }
       queueMicrotask(() => {
-        setUIState((prev) => ({ ...prev, activeDeckId: serverActiveDeckId ?? undefined }));
+        setUIState((prev) => ({ ...prev, activeDeckId: nextActiveDeckId }));
         if (serverActiveDeckId) localStorage.setItem(getStorageKey("activeDeckId"), serverActiveDeckId);
         else localStorage.removeItem(getStorageKey("activeDeckId"));
       });
     }
-  }, [isHydrated, isAuthenticated, authLoading, serverActiveDeckId]);
+  }, [isHydrated, isAuthenticated, authLoading, serverActiveDeckId, uiState.activeDeckId]);
 
   useEffect(() => {
     if (isHydrated) {

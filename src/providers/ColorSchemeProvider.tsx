@@ -73,12 +73,15 @@ function applyColorScheme(scheme: ColorScheme) {
 
 export function ColorSchemeProvider({ children }: { children: ReactNode }) {
   const [colorScheme, setColorSchemeState] = useState<ColorScheme>(() => getStoredColorScheme());
-  const hasSyncedFromServerRef = useRef(false);
   const lastPersistedRef = useRef<string | null>(null);
+  const applyingServerPrefsRef = useRef(false);
   const { isAuthenticated, isLoading: authLoading } = useConvexAuth();
   const { theme, resolvedTheme, setTheme } = useNextTheme();
   const session = useQuery(api.sessions.getSession, isAuthenticated ? {} : "skip");
   const updateSession = useMutation(api.sessions.updateSession);
+  const isSessionLoaded = session !== undefined;
+  const sessionTheme = session?.theme;
+  const sessionColorScheme = session?.colorScheme;
   const mounted = true;
 
   useEffect(() => {
@@ -92,58 +95,53 @@ export function ColorSchemeProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!isAuthenticated) {
-      hasSyncedFromServerRef.current = false;
+      applyingServerPrefsRef.current = false;
       lastPersistedRef.current = null;
     }
   }, [isAuthenticated]);
 
   useEffect(() => {
-    if (!isAuthenticated || authLoading || session === undefined || hasSyncedFromServerRef.current) {
+    if (!isAuthenticated || authLoading || !isSessionLoaded) {
       return;
     }
 
-    hasSyncedFromServerRef.current = true;
-    const initialTheme = normalizeThemePreference(theme) ?? normalizeThemePreference(resolvedTheme) ?? "dark";
-    lastPersistedRef.current = `${initialTheme}|${colorScheme}`;
-
-    const serverTheme = normalizeThemePreference(session?.theme);
-    const serverColorScheme = normalizeColorScheme(session?.colorScheme);
-
-    if (serverTheme && serverTheme !== theme) {
-      setTheme(serverTheme);
-    }
-
-    let effectiveColorScheme = colorScheme;
-    if (serverColorScheme && serverColorScheme !== colorScheme) {
-      queueMicrotask(() => setColorScheme(serverColorScheme));
-      effectiveColorScheme = serverColorScheme;
-    }
-
+    const serverTheme = normalizeThemePreference(sessionTheme);
+    const serverColorScheme = normalizeColorScheme(sessionColorScheme);
     const localTheme = normalizeThemePreference(theme) ?? normalizeThemePreference(resolvedTheme) ?? "dark";
-    const effectiveTheme = serverTheme ?? localTheme;
 
     if (!serverTheme || !serverColorScheme) {
-      lastPersistedRef.current = `${effectiveTheme}|${effectiveColorScheme}`;
+      const localKey = `${localTheme}|${colorScheme}`;
+      if (lastPersistedRef.current === localKey) {
+        return;
+      }
+      lastPersistedRef.current = localKey;
       void updateSession({
-        theme: effectiveTheme,
-        colorScheme: effectiveColorScheme,
+        theme: localTheme,
+        colorScheme,
       });
       return;
     }
-  }, [
-    isAuthenticated,
-    authLoading,
-    session,
-    theme,
-    resolvedTheme,
-    setTheme,
-    colorScheme,
-    setColorScheme,
-    updateSession,
-  ]);
+
+    const serverKey = `${serverTheme}|${serverColorScheme}`;
+    const localKey = `${localTheme}|${colorScheme}`;
+
+    if (localKey !== serverKey) {
+      applyingServerPrefsRef.current = true;
+      if (theme !== serverTheme) {
+        setTheme(serverTheme);
+      }
+      if (colorScheme !== serverColorScheme) {
+        queueMicrotask(() => setColorScheme(serverColorScheme));
+      }
+      return;
+    }
+
+    applyingServerPrefsRef.current = false;
+    lastPersistedRef.current = serverKey;
+  }, [isAuthenticated, authLoading, isSessionLoaded, sessionTheme, sessionColorScheme, theme, resolvedTheme, colorScheme, setTheme, setColorScheme, updateSession]);
 
   useEffect(() => {
-    if (!isAuthenticated || authLoading || session === undefined || !hasSyncedFromServerRef.current) {
+    if (!isAuthenticated || authLoading || !isSessionLoaded) {
       return;
     }
 
@@ -153,6 +151,16 @@ export function ColorSchemeProvider({ children }: { children: ReactNode }) {
     }
 
     const persistenceKey = `${normalizedTheme}|${colorScheme}`;
+    if (applyingServerPrefsRef.current) {
+      const serverTheme = normalizeThemePreference(sessionTheme);
+      const serverColorScheme = normalizeColorScheme(sessionColorScheme);
+      if (serverTheme && serverColorScheme && persistenceKey === `${serverTheme}|${serverColorScheme}`) {
+        applyingServerPrefsRef.current = false;
+        lastPersistedRef.current = persistenceKey;
+      }
+      return;
+    }
+
     if (lastPersistedRef.current === persistenceKey) {
       return;
     }
@@ -162,7 +170,7 @@ export function ColorSchemeProvider({ children }: { children: ReactNode }) {
       theme: normalizedTheme,
       colorScheme,
     });
-  }, [isAuthenticated, authLoading, session, theme, resolvedTheme, colorScheme, updateSession]);
+  }, [isAuthenticated, authLoading, isSessionLoaded, sessionTheme, sessionColorScheme, theme, resolvedTheme, colorScheme, updateSession]);
 
   return (
     <ColorSchemeContext.Provider value={{ colorScheme, setColorScheme, mounted }}>
