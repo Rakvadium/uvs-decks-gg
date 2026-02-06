@@ -23,8 +23,8 @@ export function ActiveDeckCharacterPicker() {
           type="button"
           aria-label="Choose starting character"
           className={cn(
-            "relative h-20 w-16 overflow-hidden rounded-md border border-border/40 bg-muted/40",
-            "transition-all hover:border-primary/40 hover:shadow-[0_0_12px_-6px_var(--primary)]",
+            "relative h-full min-h-[108px] w-[86px] overflow-hidden rounded-none border-0 border-r border-border/40 bg-muted/40",
+            "transition-all hover:border-r-primary/40 hover:shadow-[0_0_14px_-8px_var(--primary)]",
             !startingCharacter && "opacity-80"
           )}
         >

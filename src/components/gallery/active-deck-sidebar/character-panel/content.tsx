@@ -16,15 +16,17 @@ function ActiveDeckCharacterPanelContent() {
 
   return (
     <>
-      <div className="space-y-3 rounded-lg border border-border/50 bg-card/40 p-3">
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0 flex items-start gap-3">
+      <div className="overflow-hidden rounded-lg border border-border/50 bg-card/40">
+        <div className="flex items-stretch justify-between">
+          <div className="min-w-0 flex flex-1 items-stretch">
             <div className="relative">
               <ActiveDeckCharacterPicker />
               <ActiveDeckCharacterSymbolSelector />
             </div>
 
-            <ActiveDeckCharacterSummary />
+            <div className="min-w-0 flex-1 p-3">
+              <ActiveDeckCharacterSummary />
+            </div>
           </div>
         </div>
       </div>

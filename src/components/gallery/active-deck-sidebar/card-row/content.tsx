@@ -20,8 +20,8 @@ function ActiveDeckCardRowContent() {
   return (
     <div
       className={cn(
-        "group relative flex items-center gap-2 rounded-md border border-transparent px-2 py-1.5 transition",
-        "hover:border-primary/20 hover:bg-primary/5",
+        "group relative flex min-h-9 items-stretch overflow-hidden rounded-sm border border-border/30 bg-card/20 transition",
+        "hover:border-primary/30 hover:bg-primary/6",
         isDragging && "opacity-60"
       )}
       style={{
@@ -42,11 +42,11 @@ function ActiveDeckCardRowContent() {
     >
       <ActiveDeckCardRowThumbnail />
 
-      <div className="min-w-0 flex-1 transition-all duration-200 group-hover:pr-24">
-        <p className="truncate text-xs font-medium">{card.name}</p>
+      <div className="min-w-0 flex flex-1 items-center px-2.5 py-1.5 transition-all duration-200 group-hover:pr-24">
+        <p className="truncate text-xs font-medium leading-tight">{card.name}</p>
       </div>
 
-      <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground transition-opacity duration-150 group-hover:opacity-0">
+      <span className="flex items-center px-2 text-[10px] font-mono uppercase tracking-wider text-muted-foreground transition-opacity duration-150 group-hover:opacity-0">
         x{count}
       </span>
 
