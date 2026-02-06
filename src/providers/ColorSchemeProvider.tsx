@@ -1,8 +1,7 @@
 "use client";
 
-import { createContext, useContext, useCallback, useEffect, useRef, useState, ReactNode } from "react";
+import { createContext, useContext, useCallback, useEffect, ReactNode } from "react";
 import { useConvexAuth, useMutation, useQuery } from "convex/react";
-import { useTheme as useNextTheme } from "next-themes";
 import { api } from "../../convex/_generated/api";
 
 export type ColorScheme = "default" | "calm-storm" | "cyberpunk" | "bubblegum" | "caffeine" | "darkmatter" | "holoterminal";
@@ -28,8 +27,6 @@ const VALID_COLOR_SCHEMES: ColorScheme[] = [
   "default",
 ];
 
-type ThemePreference = "light" | "dark" | "system";
-
 interface ColorSchemeContextValue {
   colorScheme: ColorScheme;
   setColorScheme: (scheme: ColorScheme) => void;
@@ -37,13 +34,6 @@ interface ColorSchemeContextValue {
 }
 
 const ColorSchemeContext = createContext<ColorSchemeContextValue | null>(null);
-
-function normalizeThemePreference(value: string | null | undefined): ThemePreference | null {
-  if (value === "light" || value === "dark" || value === "system") {
-    return value;
-  }
-  return null;
-}
 
 function normalizeColorScheme(value: string | null | undefined): ColorScheme | null {
   if (value && VALID_COLOR_SCHEMES.includes(value as ColorScheme)) {
@@ -62,85 +52,27 @@ function applyColorScheme(scheme: ColorScheme) {
 }
 
 export function ColorSchemeProvider({ children }: { children: ReactNode }) {
-  const [colorScheme, setColorSchemeState] = useState<ColorScheme>(DEFAULT_COLOR_SCHEME);
-  const lastPersistedRef = useRef<string | null>(null);
-  const themeRef = useRef<ThemePreference | null>(null);
-  const colorSchemeRef = useRef<ColorScheme>(DEFAULT_COLOR_SCHEME);
   const { isAuthenticated, isLoading: authLoading } = useConvexAuth();
-  const { theme, resolvedTheme, setTheme } = useNextTheme();
   const session = useQuery(api.sessions.getSession, isAuthenticated ? {} : "skip");
   const updateSession = useMutation(api.sessions.updateSession);
-  const isSessionLoaded = session !== undefined;
-  const sessionTheme = session?.theme;
-  const sessionColorScheme = session?.colorScheme;
+  const colorScheme = normalizeColorScheme(session?.colorScheme) ?? DEFAULT_COLOR_SCHEME;
   const mounted = true;
 
   useEffect(() => {
     applyColorScheme(colorScheme);
   }, [colorScheme]);
 
-  useEffect(() => {
-    colorSchemeRef.current = colorScheme;
-  }, [colorScheme]);
-
-  useEffect(() => {
-    themeRef.current = normalizeThemePreference(theme) ?? normalizeThemePreference(resolvedTheme);
-  }, [theme, resolvedTheme]);
-
   const setColorScheme = useCallback((scheme: ColorScheme) => {
-    setColorSchemeState(scheme);
-  }, []);
-
-  useEffect(() => {
-    if (!isAuthenticated) {
-      lastPersistedRef.current = null;
-    }
-  }, [isAuthenticated]);
-
-  useEffect(() => {
-    if (!isAuthenticated || authLoading || !isSessionLoaded) {
+    if (!isAuthenticated || authLoading) {
       return;
     }
-
-    const serverTheme = normalizeThemePreference(sessionTheme);
-    const serverColorScheme = normalizeColorScheme(sessionColorScheme) ?? DEFAULT_COLOR_SCHEME;
-    if (serverTheme && themeRef.current !== serverTheme) {
-      setTheme(serverTheme);
-    }
-    if (colorSchemeRef.current !== serverColorScheme) {
-      queueMicrotask(() => setColorScheme(serverColorScheme));
-    }
-    lastPersistedRef.current = serverTheme ? `${serverTheme}|${serverColorScheme}` : null;
-  }, [isAuthenticated, authLoading, isSessionLoaded, sessionTheme, sessionColorScheme, setTheme, setColorScheme]);
-
-  useEffect(() => {
-    if (!isAuthenticated || authLoading || !isSessionLoaded) {
+    if (scheme === colorScheme) {
       return;
     }
-
-    const normalizedTheme = normalizeThemePreference(theme) ?? normalizeThemePreference(resolvedTheme);
-    if (!normalizedTheme) {
-      return;
-    }
-
-    const persistenceKey = `${normalizedTheme}|${colorScheme}`;
-    const serverTheme = normalizeThemePreference(sessionTheme);
-    const serverColorScheme = normalizeColorScheme(sessionColorScheme);
-    if (serverTheme && serverColorScheme && persistenceKey === `${serverTheme}|${serverColorScheme}`) {
-      lastPersistedRef.current = persistenceKey;
-      return;
-    }
-
-    if (lastPersistedRef.current === persistenceKey) {
-      return;
-    }
-
-    lastPersistedRef.current = persistenceKey;
     void updateSession({
-      theme: normalizedTheme,
-      colorScheme,
+      colorScheme: scheme,
     });
-  }, [isAuthenticated, authLoading, isSessionLoaded, sessionTheme, sessionColorScheme, theme, resolvedTheme, colorScheme, updateSession]);
+  }, [isAuthenticated, authLoading, colorScheme, updateSession]);
 
   return (
     <ColorSchemeContext.Provider value={{ colorScheme, setColorScheme, mounted }}>
