@@ -1,6 +1,7 @@
 "use client";
 
-import { Library, Layers, LayoutGrid, ArrowRight, Hexagon, Users, Zap, Database, Activity, Terminal, ChevronRight } from "lucide-react";
+import { memo, useEffect, useRef } from "react";
+import { Library, Layers, LayoutGrid, ArrowRight, Hexagon, Users, Zap, Database, Activity, Terminal, ChevronRight, Lock, AlertTriangle } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "convex/react";
@@ -9,14 +10,16 @@ import { useConvexAuth } from "convex/react";
 import { useCardData } from "@/lib/universus";
 import { motion } from "framer-motion";
 import { usePrefersReducedMotion } from "@/lib/reduced-motion";
+import { useAuthDialog } from "@/components/auth/auth-dialog";
 
-function StatCard({ label, value, icon: Icon, delay = 0 }: { label: string; value: string | number; icon: typeof Database; delay?: number }) {
+function StatCard({ label, value, icon: Icon, delay = 0, animate = true }: { label: string; value: string | number; icon: typeof Database; delay?: number; animate?: boolean }) {
   const prefersReducedMotion = usePrefersReducedMotion();
+  const motionEnabled = animate && !prefersReducedMotion;
   
   return (
     <motion.div
-      initial={prefersReducedMotion ? {} : { opacity: 0, y: 20 }}
-      animate={prefersReducedMotion ? {} : { opacity: 1, y: 0 }}
+      initial={motionEnabled ? { opacity: 0, y: 20 } : false}
+      animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay }}
       className="relative group"
     >
@@ -34,15 +37,17 @@ function StatCard({ label, value, icon: Icon, delay = 0 }: { label: string; valu
   );
 }
 
-function NavCard({ href, icon: Icon, title, description, accentColor = "primary", delay = 0 }: { 
+function NavCard({ href, icon: Icon, title, description, accentColor = "primary", delay = 0, animate = true }: { 
   href: string; 
   icon: typeof LayoutGrid; 
   title: string; 
   description: string;
   accentColor?: "primary" | "secondary" | "accent";
   delay?: number;
+  animate?: boolean;
 }) {
   const prefersReducedMotion = usePrefersReducedMotion();
+  const motionEnabled = animate && !prefersReducedMotion;
   const colorClasses = {
     primary: "from-primary/20 to-primary/5 border-primary/30 hover:border-primary/60 hover:shadow-[0_0_30px_-5px_var(--primary)]",
     secondary: "from-secondary/20 to-secondary/5 border-secondary/30 hover:border-secondary/60 hover:shadow-[0_0_30px_-5px_var(--secondary)]",
@@ -56,8 +61,8 @@ function NavCard({ href, icon: Icon, title, description, accentColor = "primary"
   
   return (
     <motion.div
-      initial={prefersReducedMotion ? {} : { opacity: 0, y: 30 }}
-      animate={prefersReducedMotion ? {} : { opacity: 1, y: 0 }}
+      initial={motionEnabled ? { opacity: 0, y: 30 } : false}
+      animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, delay }}
     >
       <Link href={href} className="block group">
@@ -89,13 +94,14 @@ function NavCard({ href, icon: Icon, title, description, accentColor = "primary"
   );
 }
 
-function TerminalLine({ children, prefix = "$", delay = 0 }: { children: React.ReactNode; prefix?: string; delay?: number }) {
+function TerminalLine({ children, prefix = "$", delay = 0, animate = true }: { children: React.ReactNode; prefix?: string; delay?: number; animate?: boolean }) {
   const prefersReducedMotion = usePrefersReducedMotion();
+  const motionEnabled = animate && !prefersReducedMotion;
   
   return (
     <motion.div
-      initial={prefersReducedMotion ? {} : { opacity: 0, x: -10 }}
-      animate={prefersReducedMotion ? {} : { opacity: 1, x: 0 }}
+      initial={motionEnabled ? { opacity: 0, x: -10 } : false}
+      animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.3, delay }}
       className="flex items-center gap-2 font-mono text-sm"
     >
@@ -105,19 +111,43 @@ function TerminalLine({ children, prefix = "$", delay = 0 }: { children: React.R
   );
 }
 
-export default function HomePage() {
-  const { isAuthenticated } = useConvexAuth();
+function HomePage() {
+  const { isAuthenticated, isLoading } = useConvexAuth();
   const user = useQuery(api.user.currentUser, isAuthenticated ? {} : "skip");
   const { cards, isLoading: cardsLoading } = useCardData();
   const decks = useQuery(api.decks.listByUser, user ? { userId: user._id } : "skip");
   const prefersReducedMotion = usePrefersReducedMotion();
+  const { openAuthDialog } = useAuthDialog();
+  const introRef = useRef(true);
+
+  useEffect(() => {
+    introRef.current = false;
+  }, []);
 
   const totalCards = cards.length;
   const totalDecks = decks?.length ?? 0;
-  const username = user?.username ?? "Commander";
+  const username = user?.username ?? "Operator";
+  const introAnimations = !prefersReducedMotion && introRef.current;
+  const authLabel = isLoading ? "Linking Session" : isAuthenticated ? "Session Verified" : "Access Denied";
+  const authDetail = isLoading
+    ? "Establishing encrypted handshake..."
+    : isAuthenticated
+      ? `Access granted · ${username}`
+      : "ERR-401 // Access denied. Insert credentials to sync decks + collection.";
+  const authBadge = isAuthenticated ? "Authenticated" : "Denied";
+  const greetingLead = isAuthenticated ? "Welcome back," : "Guest Access";
+  const showAuthCta = !isLoading && !isAuthenticated;
+  const authTone = isAuthenticated ? "text-primary" : "text-destructive";
+  const showPersonalStats = !isLoading && isAuthenticated;
+  const decksLabel = showPersonalStats ? "Decks in Vault" : "Vault Locked";
+  const decksValue = showPersonalStats ? totalDecks : "—";
+  const decksIcon = showPersonalStats ? Layers : Lock;
+  const collectionLabel = showPersonalStats ? "Collection" : "Collection Locked";
+  const collectionValue = showPersonalStats ? "0" : "—";
+  const collectionIcon = showPersonalStats ? Library : AlertTriangle;
 
   return (
-    <div className="relative flex h-full flex-col overflow-y-auto">
+    <div className="relative flex h-full flex-col overflow-y-auto" style={{ transform: "translateZ(0)" }}>
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
         <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-secondary/5 rounded-full blur-3xl" />
@@ -126,28 +156,31 @@ export default function HomePage() {
 
       <div className="relative z-10 p-6 md:p-8 lg:p-10 space-y-10">
         <motion.div 
-          initial={prefersReducedMotion ? {} : { opacity: 0, y: -20 }}
-          animate={prefersReducedMotion ? {} : { opacity: 1, y: 0 }}
+          initial={introAnimations ? { opacity: 0, y: -20 } : false}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           className="space-y-6"
         >
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <div className="flex h-3 w-3 rounded-full bg-green-500 shadow-[0_0_10px_#22c55e] animate-pulse" />
             <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground">System Online</span>
+            <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground/60">Auth: {authBadge}</span>
           </div>
           
           <div className="space-y-3">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold tracking-tight">
-              <span className="text-foreground">Welcome back,</span>
+              <span className="text-foreground">{greetingLead}</span>
               <br />
-              <span className="text-primary drop-shadow-[0_0_20px_var(--primary)]">{username}</span>
+              <span className="text-primary drop-shadow-[0_0_20px_var(--primary)]">
+                {isAuthenticated ? username : "Guest Operator"}
+              </span>
             </h1>
             <p className="text-lg md:text-xl font-mono text-muted-foreground max-w-2xl">
-              UniVersus Trading Card Game Database Terminal
+              UniVersus TCG Operations Console · Secure deck intelligence and card indexing
             </p>
           </div>
 
-          <div className="flex items-center gap-6 pt-2">
+          <div className="flex flex-wrap items-center gap-4 pt-2">
             <div className="flex items-center gap-2">
               <Activity className="h-4 w-4 text-green-500" />
               <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
@@ -156,19 +189,28 @@ export default function HomePage() {
             </div>
             <div className="h-4 w-px bg-border" />
             <div className="flex items-center gap-2">
-              <Zap className="h-4 w-4 text-primary" />
+              <Zap className={`h-4 w-4 ${authTone}`} />
               <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
-                Ready
+                {authLabel}
               </span>
+            </div>
+            <div className="h-4 w-px bg-border" />
+            <div className="flex flex-wrap items-center gap-3 text-xs font-mono uppercase tracking-widest text-muted-foreground/70">
+              <span>{authDetail}</span>
+              {showAuthCta && (
+                <Button variant="outline" size="sm" onClick={openAuthDialog}>
+                  Authenticate
+                </Button>
+              )}
             </div>
           </div>
         </motion.div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <StatCard label="Cards in DB" value={totalCards.toLocaleString()} icon={Database} delay={0.1} />
-          <StatCard label="Your Decks" value={totalDecks} icon={Layers} delay={0.2} />
-          <StatCard label="Collection" value="0" icon={Library} delay={0.3} />
-          <StatCard label="Community" value="Live" icon={Users} delay={0.4} />
+          <StatCard label="Cards in DB" value={totalCards.toLocaleString()} icon={Database} delay={0.1} animate={introAnimations} />
+          <StatCard label={decksLabel} value={decksValue} icon={decksIcon} delay={0.2} animate={introAnimations} />
+          <StatCard label={collectionLabel} value={collectionValue} icon={collectionIcon} delay={0.3} animate={introAnimations} />
+          <StatCard label="Community" value="Live" icon={Users} delay={0.4} animate={introAnimations} />
         </div>
 
         <div className="grid gap-6 md:grid-cols-3">
@@ -179,6 +221,7 @@ export default function HomePage() {
             description="Browse the complete database of UniVersus cards. Search, filter, and explore."
             accentColor="primary"
             delay={0.2}
+            animate={introAnimations}
           />
           <NavCard
             href="/decks"
@@ -187,6 +230,7 @@ export default function HomePage() {
             description="Create, edit, and optimize your competitive decks with advanced tools."
             accentColor="secondary"
             delay={0.3}
+            animate={introAnimations}
           />
           <NavCard
             href="/collection"
@@ -195,59 +239,90 @@ export default function HomePage() {
             description="Track your physical and digital card collection. Monitor your progress."
             accentColor="accent"
             delay={0.4}
+            animate={introAnimations}
           />
         </div>
 
         <motion.div
-          initial={prefersReducedMotion ? {} : { opacity: 0, y: 20 }}
-          animate={prefersReducedMotion ? {} : { opacity: 1, y: 0 }}
+          initial={introAnimations ? { opacity: 0, y: 20 } : false}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.5 }}
           className="relative overflow-hidden rounded-xl border border-border/50 bg-card/30 backdrop-blur-sm"
         >
           <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
           <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5 pointer-events-none" />
           
-          <div className="relative z-10 p-6 md:p-8">
-            <div className="flex items-center gap-3 mb-6">
+          <div className="relative z-10 p-6 md:p-8 space-y-6">
+            <div className="flex items-center gap-3">
               <Terminal className="h-5 w-5 text-primary" />
-              <h2 className="font-display font-semibold uppercase tracking-widest text-sm">Quick Access Terminal</h2>
+              <h2 className="font-display font-semibold uppercase tracking-widest text-sm">Signal Relay Console</h2>
             </div>
             
-            <div className="space-y-3 mb-8 p-4 rounded-lg bg-background/50 border border-border/30">
-              <TerminalLine delay={0.6}>uvs-system --status</TerminalLine>
-              <TerminalLine prefix=">" delay={0.7}>All systems operational</TerminalLine>
-              <TerminalLine delay={0.8}>uvs-db --count cards</TerminalLine>
-              <TerminalLine prefix=">" delay={0.9}>{totalCards.toLocaleString()} cards indexed and ready</TerminalLine>
-              <TerminalLine delay={1.0}>uvs-user --session</TerminalLine>
-              <TerminalLine prefix=">" delay={1.1}>Welcome, {username}. Your session is active.</TerminalLine>
-            </div>
-            
-            <div className="flex flex-wrap gap-4">
-              <Button variant="neon" asChild>
-                <Link href="/gallery">
-                  <LayoutGrid className="mr-2 h-4 w-4" />
-                  Explore Cards
-                </Link>
-              </Button>
-              <Button variant="outline" asChild>
-                <Link href="/decks">
-                  <Layers className="mr-2 h-4 w-4" />
-                  Create Deck
-                </Link>
-              </Button>
-              <Button variant="ghost" asChild>
-                <Link href="/community">
-                  <Users className="mr-2 h-4 w-4" />
-                  Community
-                </Link>
-              </Button>
+            <div className="grid gap-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
+              <div className="space-y-3 p-4 rounded-lg bg-background/50 border border-border/30">
+                {showPersonalStats ? (
+                  <>
+                    <TerminalLine delay={0.6} animate={introAnimations}>uvs-auth --status</TerminalLine>
+                    <TerminalLine prefix=">" delay={0.7} animate={introAnimations}>{authLabel}</TerminalLine>
+                    <TerminalLine delay={0.8} animate={introAnimations}>uvs-db --sync</TerminalLine>
+                    <TerminalLine prefix=">" delay={0.9} animate={introAnimations}>
+                      {cardsLoading ? "Synchronization in progress" : `${totalCards.toLocaleString()} cards indexed`}
+                    </TerminalLine>
+                    <TerminalLine delay={1.0} animate={introAnimations}>uvs-decks --count</TerminalLine>
+                    <TerminalLine prefix=">" delay={1.1} animate={introAnimations}>
+                      {totalDecks} deck{totalDecks === 1 ? "" : "s"} in vault
+                    </TerminalLine>
+                  </>
+                ) : (
+                  <>
+                    <TerminalLine delay={0.6} animate={introAnimations}>uvs-auth --status</TerminalLine>
+                    <TerminalLine prefix=">" delay={0.7} animate={introAnimations}>ERR-401 ACCESS DENIED</TerminalLine>
+                    <TerminalLine delay={0.8} animate={introAnimations}>hint: uvs-auth --login</TerminalLine>
+                    <TerminalLine prefix=">" delay={0.9} animate={introAnimations}>Credentials required for vault access</TerminalLine>
+                    <TerminalLine delay={1.0} animate={introAnimations}>uvs-collection --scan</TerminalLine>
+                    <TerminalLine prefix=">" delay={1.1} animate={introAnimations}>LOCKED UNTIL AUTH</TerminalLine>
+                  </>
+                )}
+              </div>
+
+              <div className="relative overflow-hidden rounded-lg border border-border/30 bg-background/40 p-4">
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-secondary/10 pointer-events-none" />
+                <div className="relative z-10 space-y-4">
+                  <div className="space-y-1">
+                    <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Community Relay</p>
+                    <h3 className="font-display text-lg uppercase tracking-widest">
+                      {showPersonalStats ? "Live Signal" : "Access Denied"}
+                    </h3>
+                    <p className="text-sm font-mono text-muted-foreground">
+                      {showPersonalStats
+                        ? "Tap into the meta stream. Share builds, scan tech, and track events."
+                        : "This relay is sealed. Authenticate to unlock community intel."}
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap gap-3">
+                    {showPersonalStats ? (
+                      <Button variant="neon" asChild>
+                        <Link href="/community">
+                          <Users className="mr-2 h-4 w-4" />
+                          Open Community
+                        </Link>
+                      </Button>
+                    ) : null}
+                    {showAuthCta && (
+                      <Button variant="outline" onClick={openAuthDialog}>
+                        Authenticate
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </motion.div>
 
         <motion.div
-          initial={prefersReducedMotion ? {} : { opacity: 0 }}
-          animate={prefersReducedMotion ? {} : { opacity: 1 }}
+          initial={introAnimations ? { opacity: 0 } : false}
+          animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.8 }}
           className="flex items-center justify-center gap-4 py-8 text-xs font-mono text-muted-foreground/40"
         >
@@ -259,3 +334,5 @@ export default function HomePage() {
     </div>
   );
 }
+
+export default memo(HomePage);

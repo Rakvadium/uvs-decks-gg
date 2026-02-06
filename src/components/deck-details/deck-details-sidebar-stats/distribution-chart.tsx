@@ -1,0 +1,90 @@
+import { useMemo } from "react";
+import { PIE_CHART_COLORS } from "./constants";
+
+interface DistributionBucket {
+  label: string;
+  value: number;
+}
+
+interface PieDistributionChartProps {
+  title: string;
+  buckets: DistributionBucket[];
+  total: number;
+}
+
+export function PieDistributionChart({ title, buckets, total }: PieDistributionChartProps) {
+  const chartTotal = total > 0 ? total : buckets.reduce((sum, bucket) => sum + bucket.value, 0);
+  const nonZeroBuckets = buckets.filter((bucket) => bucket.value > 0);
+
+  const visibleBuckets = useMemo(() => {
+    if (nonZeroBuckets.length <= 6) return nonZeroBuckets;
+
+    const [first, second, third, fourth, fifth, ...rest] = nonZeroBuckets;
+    const otherValue = rest.reduce((sum, bucket) => sum + bucket.value, 0);
+
+    return [first, second, third, fourth, fifth, { label: "Other", value: otherValue }];
+  }, [nonZeroBuckets]);
+
+  const gradient = useMemo(() => {
+    if (chartTotal <= 0 || visibleBuckets.length === 0) return "transparent";
+
+    let cursor = 0;
+    const stops: string[] = [];
+
+    for (const [index, bucket] of visibleBuckets.entries()) {
+      const slice = (bucket.value / chartTotal) * 100;
+      const start = cursor;
+      cursor += slice;
+      const color = PIE_CHART_COLORS[index % PIE_CHART_COLORS.length];
+
+      stops.push(`${color} ${start.toFixed(3)}% ${cursor.toFixed(3)}%`);
+    }
+
+    return `conic-gradient(${stops.join(", ")})`;
+  }, [chartTotal, visibleBuckets]);
+
+  return (
+    <div className="space-y-2 rounded-lg border border-border/50 bg-card/30 p-3">
+      <div className="flex items-center justify-between">
+        <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">{title}</span>
+        <span className="font-mono text-[10px] text-muted-foreground">{chartTotal}</span>
+      </div>
+
+      {visibleBuckets.length === 0 ? (
+        <p className="text-[11px] text-muted-foreground">No data.</p>
+      ) : (
+        <div className="grid grid-cols-[86px_1fr] items-start gap-3">
+          <div
+            className="relative h-[86px] w-[86px] shrink-0 rounded-full border border-border/40"
+            style={{ background: gradient }}
+          >
+            <div className="absolute inset-[19px] flex items-center justify-center rounded-full border border-border/40 bg-background/90">
+              <span className="font-mono text-[10px] text-primary">{chartTotal}</span>
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            {visibleBuckets.map((bucket, index) => {
+              const ratio = chartTotal > 0 ? (bucket.value / chartTotal) * 100 : 0;
+              const color = PIE_CHART_COLORS[index % PIE_CHART_COLORS.length];
+
+              return (
+                <div key={`${title}-${bucket.label}`} className="flex items-center justify-between gap-2 font-mono text-[10px]">
+                  <div className="flex min-w-0 items-center gap-1.5">
+                    <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: color }} />
+                    <span className="truncate text-muted-foreground">{bucket.label}</span>
+                  </div>
+                  <span className="shrink-0 text-primary">
+                    {bucket.value} ({Math.round(ratio)}%)
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export type { DistributionBucket };

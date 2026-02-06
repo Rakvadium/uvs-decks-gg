@@ -1,0 +1,25 @@
+import { motion } from "framer-motion";
+import type { ReactNode } from "react";
+import { useLeftSidebarContext } from "./context";
+
+interface LeftSidebarFrameProps {
+  children: ReactNode;
+}
+
+export function LeftSidebarFrame({ children }: LeftSidebarFrameProps) {
+  const { collapsed, prefersReducedMotion } = useLeftSidebarContext();
+
+  const width = collapsed ? 64 : 256;
+
+  return (
+    <motion.aside
+      initial={false}
+      animate={{ width }}
+      transition={{ duration: prefersReducedMotion ? 0 : 0.22, ease: [0.22, 1, 0.36, 1] }}
+      className="relative flex h-full flex-col overflow-hidden border-r border-sidebar-border/50 bg-sidebar"
+    >
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-secondary/5" />
+      <div className="relative z-10 flex h-full flex-col">{children}</div>
+    </motion.aside>
+  );
+}

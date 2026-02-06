@@ -2,7 +2,7 @@
 
 import { ReactNode, useState, useEffect, useMemo } from "react";
 import { AuthGuard } from "@/components/auth-guard";
-import { UIStateProvider, ActiveDeckProvider } from "@/providers";
+import { UIStateProvider, ActiveDeckProvider, DeckDetailsProvider } from "@/providers";
 import {
   LeftSidebar,
   TopHeader,
@@ -22,6 +22,7 @@ import { usePathname, useParams } from "next/navigation";
 import { Upload, Layers, CreditCard, Settings } from "lucide-react";
 import Link from "next/link";
 import { TcgDndProvider } from "@/lib/dnd";
+import { SiloedDeckProvider } from "@/lib/deck";
 import { GalleryFiltersProvider } from "@/providers/GalleryFiltersProvider";
 import { DecksProvider } from "@/providers/DecksProvider";
 
@@ -186,6 +187,16 @@ function ShellLayoutInner({ children }: { children: ReactNode }) {
 
   if (pageType === "decks") {
     return <DecksProvider>{content}</DecksProvider>;
+  }
+
+  if (pageType === "deckDetails" && deckId) {
+    return (
+      <GalleryFiltersProvider>
+        <SiloedDeckProvider deckId={deckId}>
+          <DeckDetailsProvider deckId={deckId}>{content}</DeckDetailsProvider>
+        </SiloedDeckProvider>
+      </GalleryFiltersProvider>
+    );
   }
 
   return content;

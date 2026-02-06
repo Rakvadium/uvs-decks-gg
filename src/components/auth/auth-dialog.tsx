@@ -8,6 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import type { AuthDialogFlow } from "./dialog-flow";
 import { SignInFormDialog } from "./sign-in-dialog";
 import { SignUpFormDialog } from "./sign-up-dialog";
 import { ResetPasswordFormDialog } from "./reset-password-dialog";
@@ -63,7 +64,7 @@ export function AuthDialogProvider({ children }: AuthDialogProviderProps) {
 }
 
 function AuthFormWithClose({ onSuccess }: { onSuccess: () => void }) {
-  const [flow, setFlow] = useState<"signIn" | "signUp" | "reset">("signIn");
+  const [flow, setFlow] = useState<AuthDialogFlow>("signIn");
 
   return (
     <>

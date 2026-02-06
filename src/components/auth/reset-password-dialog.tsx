@@ -6,11 +6,12 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { toast } from "sonner";
 import { ArrowLeft, Send } from "lucide-react";
+import type { AuthDialogFlow } from "./dialog-flow";
 
 export function ResetPasswordFormDialog({
   setFlow,
 }: {
-  setFlow: (flow: "signIn" | "signUp" | "reset") => void;
+  setFlow: (flow: AuthDialogFlow) => void;
 }) {
   const { signIn } = useAuthActions();
   const [submitting, setSubmitting] = useState(false);
@@ -88,4 +89,3 @@ export function ResetPasswordFormDialog({
     </>
   );
 }
-

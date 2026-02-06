@@ -1,8 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, useMemo, ReactNode } from "react";
-
-type DeckTab = "my-decks" | "public" | "tournament";
+import { useDeckCatalogData, type DeckTab } from "@/hooks/useDeckCatalogData";
 
 interface DecksState {
   activeTab: DeckTab;
@@ -20,6 +19,7 @@ interface DecksActions {
 interface DecksContextValue {
   state: DecksState;
   actions: DecksActions;
+  catalog: ReturnType<typeof useDeckCatalogData>;
 }
 
 const DecksContext = createContext<DecksContextValue | null>(null);
@@ -28,20 +28,25 @@ export function DecksProvider({ children }: { children: ReactNode }) {
   const [activeTab, setActiveTab] = useState<DeckTab>("my-decks");
   const [searchQuery, setSearchQuery] = useState("");
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const catalog = useDeckCatalogData(searchQuery, activeTab);
 
-  const value = useMemo((): DecksContextValue => ({
-    state: {
-      activeTab,
-      searchQuery,
-      isCreateDialogOpen,
-    },
-    actions: {
-      setActiveTab,
-      setSearchQuery,
-      openCreateDialog: () => setIsCreateDialogOpen(true),
-      closeCreateDialog: () => setIsCreateDialogOpen(false),
-    },
-  }), [activeTab, searchQuery, isCreateDialogOpen]);
+  const value = useMemo(
+    (): DecksContextValue => ({
+      state: {
+        activeTab,
+        searchQuery,
+        isCreateDialogOpen,
+      },
+      actions: {
+        setActiveTab,
+        setSearchQuery,
+        openCreateDialog: () => setIsCreateDialogOpen(true),
+        closeCreateDialog: () => setIsCreateDialogOpen(false),
+      },
+      catalog,
+    }),
+    [activeTab, searchQuery, isCreateDialogOpen, catalog]
+  );
 
   return (
     <DecksContext.Provider value={value}>
