@@ -1,6 +1,7 @@
 "use client";
 
 import { CardDetailsDialog } from "@/components/universus";
+import { useCardNavigation } from "@/components/universus/card-details/navigation-context";
 import { cn } from "@/lib/utils";
 import { CardDeckControlsCompact } from "../card-deck-controls";
 import { CardListItemProvider, useCardListItemContext } from "./context";
@@ -19,6 +20,7 @@ function CardListItemContent() {
     isDragging,
     setIsDialogOpen,
   } = useCardListItemContext();
+  const nav = useCardNavigation();
 
   return (
     <>
@@ -52,7 +54,14 @@ function CardListItemContent() {
         />
       </div>
 
-      <CardDetailsDialog card={card} backCard={backCard} open={isDialogOpen} onOpenChange={setIsDialogOpen} />
+      <CardDetailsDialog
+        card={card}
+        backCard={backCard}
+        open={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+        cards={nav?.cards}
+        getBackCard={nav?.getBackCard}
+      />
     </>
   );
 }

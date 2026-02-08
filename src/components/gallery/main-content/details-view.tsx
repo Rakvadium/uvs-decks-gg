@@ -1,6 +1,8 @@
+import { CardNavigationProvider } from "@/components/universus/card-details/navigation-context";
 import type { CachedCard } from "@/lib/universus";
 import { useInfiniteSlice } from "@/hooks/useInfiniteSlice";
 import { CARDS_PER_PAGE } from "./constants";
+import { useGalleryCardMap } from "./card-map-context";
 import { CardDetailsListItem } from "./card-details-list-item";
 import { LoadMoreIndicator } from "./load-more-indicator";
 import { NoCardsFound } from "./no-cards-found";
@@ -10,13 +12,14 @@ interface GalleryDetailsViewProps {
 }
 
 export function GalleryDetailsView({ cards }: GalleryDetailsViewProps) {
+  const { getBackCard } = useGalleryCardMap();
   const { visibleItems: visibleCards, hasMore, loadMoreRef } = useInfiniteSlice({
     items: cards,
     pageSize: CARDS_PER_PAGE,
   });
 
   return (
-    <>
+    <CardNavigationProvider cards={cards} getBackCard={getBackCard}>
       <div className="space-y-6">
         {visibleCards.map((card) => (
           <div key={card._id} className="w-full">
@@ -27,6 +30,6 @@ export function GalleryDetailsView({ cards }: GalleryDetailsViewProps) {
 
       {hasMore ? <LoadMoreIndicator loadMoreRef={loadMoreRef} /> : null}
       {visibleCards.length === 0 ? <NoCardsFound /> : null}
-    </>
+    </CardNavigationProvider>
   );
 }

@@ -2,14 +2,13 @@ import { useMemo } from "react";
 import { Minus, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { CachedCard } from "@/lib/universus";
-import { canAddCardToDeck, canAddCardToSection, getCardCopyLimit, getCardSectionCounts, useDeckEditor } from "@/lib/deck";
+import { canAddCardToSection, getCardCopyLimit, getCardSectionCounts, useDeckEditor } from "@/lib/deck";
 
 interface DeckSectionControlsProps {
   card: CachedCard;
-  layout?: "vertical" | "horizontal" | "compact";
 }
 
-export function DeckSectionControls({ card, layout = "vertical" }: DeckSectionControlsProps) {
+export function DeckSectionControls({ card }: DeckSectionControlsProps) {
   const { hasDeck, addCard, removeCard, mainCounts, sideCounts, referenceCounts } = useDeckEditor();
 
   const sectionCounts = useMemo(
@@ -26,7 +25,6 @@ export function DeckSectionControls({ card, layout = "vertical" }: DeckSectionCo
   const copyLimit = useMemo(() => getCardCopyLimit(card), [card]);
 
   if (!hasDeck) return null;
-  if (!canAddCardToDeck(card)) return null;
 
   const sections = [
     {
@@ -43,49 +41,11 @@ export function DeckSectionControls({ card, layout = "vertical" }: DeckSectionCo
     },
     {
       key: "reference" as const,
-      label: "Ref",
+      label: "Reference",
       count: counts.reference,
       canAdd: canAddCardToSection({ card, cardId: card._id, section: "reference", counts: sectionCounts }),
     },
   ];
-
-  if (layout === "horizontal") {
-    return (
-      <div className="flex items-center gap-2">
-        {sections.map((section) => (
-          <div
-            key={section.key}
-            className="flex items-center gap-1 rounded-md border border-border/40 bg-card/40 px-2 py-1"
-          >
-            <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-              {section.label}
-            </span>
-            <Button
-              variant="outline"
-              size="icon-sm"
-              onClick={() => removeCard(card._id, section.key)}
-              disabled={section.count === 0}
-              className="h-6 w-6 border-destructive/30 hover:border-destructive hover:bg-destructive/10"
-            >
-              <Minus className="h-3 w-3 text-destructive" />
-            </Button>
-            <span className="w-5 text-center font-mono text-xs font-bold text-primary">
-              {section.count}
-            </span>
-            <Button
-              variant="outline"
-              size="icon-sm"
-              onClick={() => addCard(card._id, section.key)}
-              disabled={!section.canAdd}
-              className="h-6 w-6 border-primary/30 hover:border-primary hover:bg-primary/10"
-            >
-              <Plus className="h-3 w-3 text-primary" />
-            </Button>
-          </div>
-        ))}
-      </div>
-    );
-  }
 
   return (
     <div className="mt-4 space-y-2">

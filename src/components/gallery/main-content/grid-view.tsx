@@ -1,6 +1,7 @@
 import { useMemo, type CSSProperties } from "react";
 import { motion } from "framer-motion";
 import { CardGridItem } from "@/components/universus";
+import { CardNavigationProvider } from "@/components/universus/card-details/navigation-context";
 import { useInfiniteSlice } from "@/hooks/useInfiniteSlice";
 import { usePrefersReducedMotion } from "@/lib/reduced-motion";
 import type { CachedCard } from "@/lib/universus";
@@ -28,7 +29,7 @@ export function GalleryGridView({ cards, cardsPerRow }: GalleryGridViewProps) {
   });
 
   return (
-    <>
+    <CardNavigationProvider cards={cards} getBackCard={getBackCard}>
       <div
         className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-[repeat(var(--cards-per-row),minmax(0,1fr))]"
         style={gridStyle}
@@ -50,6 +51,6 @@ export function GalleryGridView({ cards, cardsPerRow }: GalleryGridViewProps) {
 
       {hasMore ? <LoadMoreIndicator loadMoreRef={loadMoreRef} /> : null}
       {visibleCards.length === 0 ? <NoCardsFound /> : null}
-    </>
+    </CardNavigationProvider>
   );
 }

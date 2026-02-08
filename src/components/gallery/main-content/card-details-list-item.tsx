@@ -3,6 +3,7 @@ import Image from "next/image";
 import { FileText, Hexagon, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CardDetailsContent, CardDetailsDialog } from "@/components/universus";
+import { useCardNavigation } from "@/components/universus/card-details/navigation-context";
 import { usePrefersReducedMotion } from "@/lib/reduced-motion";
 import { useTcgDraggable } from "@/lib/dnd";
 import { cn } from "@/lib/utils";
@@ -19,6 +20,7 @@ export function CardDetailsListItem({ card }: CardDetailsListItemProps) {
   const [isFlipped, setIsFlipped] = useState(false);
   const prefersReducedMotion = usePrefersReducedMotion();
   const { getBackCard } = useGalleryCardMap();
+  const nav = useCardNavigation();
   const backCard = getBackCard(card);
   const hasBack = Boolean(backCard);
   const displayCard = useMemo(() => (isFlipped && backCard ? backCard : card), [isFlipped, backCard, card]);
@@ -91,7 +93,14 @@ export function CardDetailsListItem({ card }: CardDetailsListItemProps) {
         </div>
       </div>
 
-      <CardDetailsDialog card={card} backCard={backCard} open={isDialogOpen} onOpenChange={setIsDialogOpen} />
+      <CardDetailsDialog
+        card={card}
+        backCard={backCard}
+        open={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+        cards={nav?.cards}
+        getBackCard={nav?.getBackCard}
+      />
     </>
   );
 }
