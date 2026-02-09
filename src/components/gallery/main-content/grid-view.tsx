@@ -37,7 +37,7 @@ export function GalleryGridView({ cards, cardsPerRow }: GalleryGridViewProps) {
         {visibleCards.map((card, index) => (
           <motion.div
             key={card._id}
-            initial={prefersReducedMotion ? {} : { opacity: 0, y: 20 }}
+            initial={false}
             animate={prefersReducedMotion ? {} : { opacity: 1, y: 0 }}
             transition={{
               duration: 0.3,

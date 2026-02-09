@@ -4,9 +4,12 @@ import { createContext, useContext, useState, ReactNode, useCallback } from "rea
 import { useRouter, usePathname } from "next/navigation";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
+  DialogFooter,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import type { AuthDialogFlow } from "./dialog-flow";
 import { SignInFormDialog } from "./sign-in-dialog";
@@ -52,11 +55,22 @@ export function AuthDialogProvider({ children }: AuthDialogProviderProps) {
     <AuthDialogContext.Provider value={{ isOpen, openAuthDialog, closeAuthDialog }}>
       {children}
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="max-w-md p-8">
-          <VisuallyHidden>
-            <DialogTitle>Sign In or Create Account</DialogTitle>
-          </VisuallyHidden>
-          <AuthFormWithClose onSuccess={handleSuccess} />
+        <DialogContent className="max-w-md overflow-hidden p-0" showCloseButton={false}>
+          <div className="relative flex h-full min-h-0 flex-col">
+            <VisuallyHidden>
+              <DialogTitle>Sign In or Create Account</DialogTitle>
+            </VisuallyHidden>
+
+            <div className="min-h-0 flex-1 overflow-y-auto px-6 pb-24 pt-6 md:pb-20">
+              <AuthFormWithClose onSuccess={handleSuccess} />
+            </div>
+
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button variant="outline">Close</Button>
+              </DialogClose>
+            </DialogFooter>
+          </div>
         </DialogContent>
       </Dialog>
     </AuthDialogContext.Provider>

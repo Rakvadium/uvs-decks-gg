@@ -22,7 +22,7 @@ export function LoadingProgress({ progress, isLoadingMore }: LoadingProgressProp
         <div className="h-2 w-44 overflow-hidden rounded-full bg-muted/50">
           <motion.div
             className="h-full bg-gradient-to-r from-primary to-secondary"
-            initial={{ width: 0 }}
+            initial={false}
             animate={{ width: `${progress}%` }}
             transition={{ duration: 0.3 }}
             style={{ boxShadow: "0 0 10px var(--primary)" }}

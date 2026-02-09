@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogBody,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -17,15 +18,15 @@ export function DeckCreateDialog() {
 
   return (
     <Dialog open={model.isOpen} onOpenChange={model.handleOpenChange}>
-      <DialogContent size="md" className="overflow-hidden">
-        <div className="relative">
+      <DialogContent size="md" className="overflow-hidden p-0" showCloseButton={false}>
+        <div className="relative flex h-full min-h-0 flex-col">
           <div className="pointer-events-none absolute inset-0">
             <div className="absolute -top-16 left-10 h-24 w-24 rounded-full bg-primary/20 blur-3xl" />
             <div className="absolute -bottom-16 right-10 h-24 w-24 rounded-full bg-secondary/20 blur-3xl" />
             <div className="absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
           </div>
 
-          <div className="relative p-6">
+          <div className="relative min-h-0 flex-1 overflow-y-auto p-6 pb-24 md:pb-20">
             <DialogHeader className="border-border/20 pb-4">
               <div className="flex items-start gap-3">
                 <div className="flex h-11 w-11 items-center justify-center rounded-lg border border-primary/30 bg-primary/10 shadow-[0_0_20px_-6px_var(--primary)]">
@@ -58,17 +59,19 @@ export function DeckCreateDialog() {
                 Tip: Use a format or archetype keyword to make it easier to find later.
               </p>
             </DialogBody>
-
-            <DialogFooter className="mt-6 gap-3 border-t-0 bg-transparent p-0">
-              <Button variant="outline" className="h-11 px-6" onClick={model.closeDialog}>
-                Cancel
-              </Button>
-              <Button className="h-11 px-6" onClick={() => void model.handleCreate()} disabled={!model.canCreate}>
-                {model.isCreating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                Create Deck
-              </Button>
-            </DialogFooter>
           </div>
+
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline" className="h-11 px-6" onClick={model.closeDialog}>
+                Close
+              </Button>
+            </DialogClose>
+            <Button className="h-11 px-6" onClick={() => void model.handleCreate()} disabled={!model.canCreate}>
+              {model.isCreating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+              Create Deck
+            </Button>
+          </DialogFooter>
         </div>
       </DialogContent>
     </Dialog>

@@ -21,15 +21,13 @@ export function SidebarFooter({
   }[align];
 
   if (children) {
-    return <div className={cn("flex w-full items-center gap-2", alignClass, className)}>{children}</div>;
+    return <div className={cn("flex items-center gap-2", alignClass, className)}>{children}</div>;
   }
 
-  const hasMultiple = Boolean(secondaryAction && primaryAction);
-
   return (
-    <div className={cn("flex w-full items-center gap-2", alignClass, className)}>
+    <div className={cn("flex items-center gap-2", alignClass, className)}>
       {secondaryAction ? <FooterActionButton action={secondaryAction} defaultFullWidth={false} /> : null}
-      {primaryAction ? <FooterActionButton action={primaryAction} defaultFullWidth={!hasMultiple} /> : null}
+      {primaryAction ? <FooterActionButton action={primaryAction} defaultFullWidth={false} /> : null}
     </div>
   );
 }

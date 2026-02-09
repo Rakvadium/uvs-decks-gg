@@ -223,10 +223,10 @@ export function CardDetailsV5({
 
           <div className="relative z-10 w-full max-w-[220px]">
             <motion.div className="relative aspect-[2.5/3.5] w-full" style={{ perspective: 1000 }}>
-              <AnimatePresence mode="wait">
+              <AnimatePresence initial={false} mode="wait">
                 <motion.div
                   key={isFlipped ? "back" : "front"}
-                  initial={prefersReducedMotion ? {} : { rotateY: -90, opacity: 0 }}
+                  initial={false}
                   animate={prefersReducedMotion ? {} : { rotateY: 0, opacity: 1 }}
                   exit={prefersReducedMotion ? {} : { rotateY: 90, opacity: 0 }}
                   transition={{ duration: 0.3 }}

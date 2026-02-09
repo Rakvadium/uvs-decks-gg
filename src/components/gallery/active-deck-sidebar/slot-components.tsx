@@ -50,6 +50,7 @@ export function ActiveDeckFooter() {
 
   return (
     <SidebarFooter
+      align="end"
       primaryAction={{
         label: "Open Deck Details",
         href: `/decks/${activeDeck._id}`,

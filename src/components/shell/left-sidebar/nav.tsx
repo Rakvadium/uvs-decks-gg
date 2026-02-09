@@ -23,7 +23,7 @@ export function LeftSidebarNav() {
                   whileHover={prefersReducedMotion ? undefined : { x: collapsed ? 0 : 4 }}
                   whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}
                   className={cn(
-                    "relative flex items-center gap-3 rounded-md border px-3 py-2.5 text-sm font-medium transition-all duration-200",
+                    "render-stable relative flex items-center gap-3 rounded-md border px-3 py-2.5 text-sm font-medium transition-all duration-200",
                     collapsed && "justify-center px-2",
                     isActive
                       ? "border-primary/30 bg-primary/15 text-primary shadow-[0_0_10px_-5px_var(--primary)]"
@@ -44,6 +44,7 @@ export function LeftSidebarNav() {
                   ) : null}
                   {isActive ? (
                     <motion.div
+                      initial={false}
                       layoutId="activeNav"
                       className="absolute inset-0 rounded-md border border-primary/20"
                       transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}

@@ -1,10 +1,10 @@
-import { ChevronLeft, X } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useMobileActionsSheetContext } from "./context";
 
 export function MobileActionsSheetHeader() {
-  const { activeSlot, ActiveHeader, handleBack, closeSheet } = useMobileActionsSheetContext();
+  const { activeSlot, ActiveHeader, handleBack } = useMobileActionsSheetContext();
 
   return (
     <SheetHeader className="flex shrink-0 flex-row items-center justify-between border-b px-4 py-3">
@@ -23,10 +23,6 @@ export function MobileActionsSheetHeader() {
           </SheetTitle>
         )}
       </div>
-
-      <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" onClick={closeSheet}>
-        <X className="h-4 w-4" />
-      </Button>
     </SheetHeader>
   );
 }

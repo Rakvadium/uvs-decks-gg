@@ -35,7 +35,7 @@ export function DeckCardsStackedView() {
                 return (
                   <motion.div
                     key={card._id}
-                    initial={model.prefersReducedMotion ? {} : { opacity: 0, y: 12 }}
+                    initial={false}
                     animate={model.prefersReducedMotion ? {} : { opacity: 1, y: 0 }}
                     transition={{
                       duration: 0.25,

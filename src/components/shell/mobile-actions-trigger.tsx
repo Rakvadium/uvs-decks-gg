@@ -2,47 +2,29 @@
 
 import { useMobileShell } from "./mobile-shell-context"
 import { Button } from "@/components/ui/button"
-import { PanelRightOpen } from "lucide-react"
+import { PanelBottomOpen } from "lucide-react"
 import { useShellSlot } from "./shell-slot-provider"
-import { usePathname } from "next/navigation"
-
-function getPageType(pathname: string) {
-  if (pathname.includes("/gallery")) return "gallery"
-  return null
-}
 
 export function MobileActionsTrigger() {
   const { setActionsSheetOpen } = useMobileShell()
   const { state } = useShellSlot()
-  const pathname = usePathname()
-  const pageType = getPageType(pathname)
   const hasActions = (state.slots.get("right-sidebar")?.length ?? 0) > 0
 
   if (!hasActions) {
     return null
   }
 
-  if (pageType === "gallery") {
-    return (
+  return (
+    <div className="pointer-events-none absolute bottom-full right-3 z-40 mb-2">
       <Button
         variant="ghost"
         size="icon"
-        className="fixed bottom-[8rem] right-0 z-40 h-10 w-10 rounded-l-lg rounded-r-none rounded-bl-none shadow-md border-l border-t border-primary border-b-0 border-r-0 bg-background/95 backdrop-blur-lg"
+        className="pointer-events-auto h-9 w-10 rounded-lg border border-primary/35 bg-background/70 text-primary shadow-[0_0_14px_-8px_var(--primary)] hover:bg-background/85"
         onClick={() => setActionsSheetOpen(true)}
+        aria-label="Open actions panel"
       >
-        <PanelRightOpen className="h-5 w-5" />
+        <PanelBottomOpen className="h-5 w-5" />
       </Button>
-    )
-  }
-
-  return (
-    <Button
-      variant="ghost"
-      size="icon"
-      className="fixed bottom-32 right-3 z-40 h-10 w-10 rounded-full shadow-md border border-border/50 bg-background/95 backdrop-blur-lg"
-      onClick={() => setActionsSheetOpen(true)}
-    >
-      <PanelRightOpen className="h-5 w-5" />
-    </Button>
+    </div>
   )
 }

@@ -6,6 +6,7 @@
     "dev": "next dev -p 8081",
     "build": "next build --webpack",
     "start": "next start -p 8081",
+    "postinstall": "node tools/patch-convex-auth-hosts.mjs",
     "lint": "eslint",
     "import:universus": "bun scripts/import-universus.ts",
     "import:universus:all": "bun scripts/import-universus.ts --all",

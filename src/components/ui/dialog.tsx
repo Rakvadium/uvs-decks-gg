@@ -63,10 +63,12 @@ function DialogContent({
   children,
   showCloseButton = true,
   size = "default",
+  allowOverflow = false,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
   showCloseButton?: boolean
   size?: DialogSize
+  allowOverflow?: boolean
 }) {
   return (
     <DialogPortal data-slot="dialog-portal">
@@ -79,9 +81,10 @@ function DialogContent({
           "data-[state=open]:animate-in data-[state=closed]:animate-out",
           "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
           "inset-0 h-[100dvh] w-full rounded-none border-0 flex flex-col",
-          "md:inset-auto md:top-[50%] md:left-[50%] md:h-auto md:max-h-[85vh] md:translate-x-[-50%] md:translate-y-[-50%] md:rounded-lg md:border md:overflow-y-auto",
+          "md:inset-auto md:top-[50%] md:left-[50%] md:h-auto md:max-h-[85vh] md:translate-x-[-50%] md:translate-y-[-50%] md:rounded-lg md:border",
           "md:data-[state=closed]:zoom-out-95 md:data-[state=open]:zoom-in-95",
           "md:shadow-[0_0_50px_-10px_var(--primary)]",
+          allowOverflow ? "md:overflow-visible" : "md:overflow-y-auto",
           dialogSizeStyles[size],
           className
         )}
@@ -89,7 +92,12 @@ function DialogContent({
       >
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5 pointer-events-none rounded-lg" />
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
-        <div className="relative z-10 flex-1 overflow-y-auto">
+        <div
+          className={cn(
+            "relative z-10 flex-1 overflow-y-auto",
+            allowOverflow && "md:overflow-visible"
+          )}
+        >
           {children}
         </div>
         {showCloseButton && (
@@ -137,9 +145,9 @@ function DialogFooter({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="dialog-footer"
       className={cn(
-        "flex flex-col-reverse gap-2 pt-4 sm:flex-row sm:justify-end border-t border-border/30",
-        "md:relative md:z-10",
-        "fixed bottom-0 left-0 right-0 z-20 bg-card/95 backdrop-blur-lg p-4 border-t border-border/30 md:border-0 md:p-0 md:pt-4",
+        "fixed bottom-0 left-0 right-0 z-20",
+        "flex flex-col-reverse gap-2 border-t border-border/30 bg-card/95 p-4 backdrop-blur-lg",
+        "sm:flex-row sm:justify-end",
         className
       )}
       {...props}

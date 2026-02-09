@@ -20,7 +20,7 @@ interface GalleryFilterDialogProps {
 
 function GalleryFilterDialogLayout() {
   return (
-    <div className="relative flex h-full flex-col pb-20 md:pb-0">
+    <div className="relative flex h-full min-h-0 flex-col pb-24 md:pb-20">
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5" />
       <div className="absolute left-0 right-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
 
@@ -42,7 +42,7 @@ export function GalleryFilterDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         size="lg"
-        className="max-h-[85vh] overflow-hidden p-0 md:pb-0"
+        className="overflow-hidden p-0 md:max-h-[85vh] md:pb-0"
         showCloseButton={false}
       >
         <DialogTitle className="sr-only">Filter Cards</DialogTitle>
@@ -51,13 +51,11 @@ export function GalleryFilterDialog({
           <GalleryFilterDialogLayout />
         </GalleryFilterDialogProvider>
 
-        <DialogFooter className="md:hidden">
+        <DialogFooter>
           <DialogClose asChild>
-            <div className="flex w-full items-center justify-end">
-              <Button className="ml-auto gap-2">
-                <span className="text-xs font-mono uppercase tracking-wider">Close</span>
-              </Button>
-            </div>
+            <Button variant="outline">
+              <span className="text-xs font-mono uppercase tracking-wider">Close</span>
+            </Button>
           </DialogClose>
         </DialogFooter>
       </DialogContent>

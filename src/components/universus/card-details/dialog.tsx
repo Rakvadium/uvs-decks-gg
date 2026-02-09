@@ -1,7 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-import { createPortal } from "react-dom";
+import { useCallback, useEffect, useRef, useState } from "react";
+import dynamic from "next/dynamic";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { CachedCard } from "@/lib/universus";
 import { Button } from "@/components/ui/button";
@@ -9,17 +9,15 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
+  DialogFooter,
   DialogTitle,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { DeckSectionControls } from "./deck-section-controls";
-import { useCardDetailsVariant } from "./use-card-details-variant";
-import { VariantSelector } from "./variant-selector";
-import { CardDetailsV1 } from "./variants/v1";
-import { CardDetailsV2 } from "./variants/v2";
-import { CardDetailsV3 } from "./variants/v3";
-import { CardDetailsV4 } from "./variants/v4";
-import { CardDetailsV5 } from "./variants/v5";
+const CardDetailsV2 = dynamic(
+  () => import("./variants/v2").then((module) => module.CardDetailsV2),
+  { ssr: false }
+);
 
 interface CardDetailsDialogProps {
   card: CachedCard | null;
@@ -29,14 +27,6 @@ interface CardDetailsDialogProps {
   cards?: CachedCard[];
   getBackCard?: (card: CachedCard) => CachedCard | null | undefined;
 }
-
-const VARIANT_COMPONENTS = {
-  v1: CardDetailsV1,
-  v2: CardDetailsV2,
-  v3: CardDetailsV3,
-  v4: CardDetailsV4,
-  v5: CardDetailsV5,
-};
 
 export function CardDetailsDialog({
   card,
@@ -48,21 +38,21 @@ export function CardDetailsDialog({
 }: CardDetailsDialogProps) {
   const [isFlipped, setIsFlipped] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(-1);
-  const { variant } = useCardDetailsVariant();
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
 
   // Sync current index when card changes or dialog opens
   useEffect(() => {
     if (!open || !card || !cards?.length) {
-      setCurrentIndex(-1);
+      queueMicrotask(() => setCurrentIndex(-1));
       return;
     }
     const idx = cards.findIndex((c) => c._id === card._id);
-    setCurrentIndex(idx);
+    queueMicrotask(() => setCurrentIndex(idx));
   }, [open, card, cards]);
 
   // Reset flip when navigating
   useEffect(() => {
-    setIsFlipped(false);
+    queueMicrotask(() => setIsFlipped(false));
   }, [currentIndex]);
 
   const currentCard = cards && currentIndex >= 0 ? cards[currentIndex] : card;
@@ -85,6 +75,34 @@ export function CardDetailsDialog({
     setCurrentIndex((i) => i + 1);
   }, [canGoNext]);
 
+  const handleTouchStart = useCallback((event: React.TouchEvent<HTMLDivElement>) => {
+    const touch = event.touches[0];
+    if (!touch) return;
+    touchStartRef.current = { x: touch.clientX, y: touch.clientY };
+  }, []);
+
+  const handleTouchEnd = useCallback(
+    (event: React.TouchEvent<HTMLDivElement>) => {
+      if (!hasNavigation || !touchStartRef.current) return;
+      const touch = event.changedTouches[0];
+      if (!touch) return;
+
+      const deltaX = touch.clientX - touchStartRef.current.x;
+      const deltaY = touch.clientY - touchStartRef.current.y;
+      touchStartRef.current = null;
+
+      // Treat only deliberate horizontal swipes as navigation.
+      if (Math.abs(deltaX) < 60 || Math.abs(deltaX) <= Math.abs(deltaY) * 1.2) return;
+
+      if (deltaX < 0) {
+        goToNext();
+      } else {
+        goToPrev();
+      }
+    },
+    [goToNext, goToPrev, hasNavigation]
+  );
+
   // Keyboard navigation
   useEffect(() => {
     if (!open || !hasNavigation) return;
@@ -106,83 +124,87 @@ export function CardDetailsDialog({
   if (!currentCard) return null;
 
   const displayCard = isFlipped && currentBackCard ? currentBackCard : currentCard;
-  const VariantComponent = VARIANT_COMPONENTS[variant];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent size="md" className="max-h-[90vh] overflow-hidden p-0 md:pb-0" showCloseButton={false}>
+      <DialogContent
+        size="md"
+        className="overflow-x-hidden p-0 md:max-h-[90vh] md:overflow-visible md:pb-0 md:w-[60vw] md:min-w-[60vw] md:max-w-[60vw]"
+        showCloseButton={false}
+        allowOverflow
+      >
         <DialogTitle className="sr-only">{displayCard.name} - Card Details</DialogTitle>
+        <div
+          className="relative flex h-full min-h-0 touch-pan-y flex-col"
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+        >
+          {hasNavigation && (
+            <div
+              data-card-details-nav="true"
+              className="pointer-events-none absolute inset-y-0 left-0 right-0 z-40 hidden md:block"
+            >
+              <button
+                type="button"
+                onClick={goToPrev}
+                disabled={!canGoPrev}
+                className={cn(
+                  "pointer-events-auto absolute left-0 top-1/2 flex h-10 w-10 -translate-x-[70%] -translate-y-1/2 items-center justify-center rounded-full transition-all md:h-12 md:w-12 z-[60]",
+                  canGoPrev
+                    ? "bg-card/90 text-primary border border-primary/30 hover:bg-primary/20 hover:border-primary/50 shadow-[0_0_15px_-3px_var(--primary)]"
+                    : "bg-card/50 text-muted-foreground/30 border border-border/20 cursor-not-allowed"
+                )}
+                aria-label="Previous card"
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </button>
+              <button
+                type="button"
+                onClick={goToNext}
+                disabled={!canGoNext}
+                className={cn(
+                  "pointer-events-auto absolute right-0 top-1/2 flex h-10 w-10 translate-x-[70%] -translate-y-1/2 items-center justify-center rounded-full transition-all md:h-12 md:w-12 z-[60]",
+                  canGoNext
+                    ? "bg-card/90 text-primary border border-primary/30 hover:bg-primary/20 hover:border-primary/50 shadow-[0_0_15px_-3px_var(--primary)]"
+                    : "bg-card/50 text-muted-foreground/30 border border-border/20 cursor-not-allowed"
+                )}
+                aria-label="Next card"
+              >
+                <ChevronRight className="h-5 w-5" />
+              </button>
+            </div>
+          )}
 
-        <VariantComponent
-          card={currentCard}
-          displayCard={displayCard}
-          backCard={currentBackCard ?? null}
-          hasBack={Boolean(currentBackCard)}
-          isFlipped={isFlipped}
-          onToggleFlip={() => setIsFlipped((v) => !v)}
-        />
-
-        <div className="flex items-center gap-3 border-t border-border/20 px-4 py-2">
-          <DeckSectionControls card={currentCard} layout="horizontal" />
-
-          <div className="ml-auto flex items-center gap-3">
-            <VariantSelector />
-
-            {hasNavigation && (
-              <span className="text-[10px] font-mono text-muted-foreground/50">
-                {currentIndex + 1} / {cards!.length}
-              </span>
-            )}
-
-            <DialogClose asChild className="md:hidden">
-              <Button variant="outline" size="sm">
-                <span className="text-xs font-mono uppercase tracking-wider">Close</span>
-              </Button>
-            </DialogClose>
-
-            <DialogClose asChild className="hidden md:inline-flex">
-              <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
-                <span className="text-xs font-mono uppercase tracking-wider">Close</span>
-              </Button>
-            </DialogClose>
+          <div className="min-h-0 flex-1 overflow-y-auto pb-14 md:overflow-hidden md:pb-12">
+            <CardDetailsV2
+              card={currentCard}
+              displayCard={displayCard}
+              backCard={currentBackCard ?? null}
+              hasBack={Boolean(currentBackCard)}
+              isFlipped={isFlipped}
+              onToggleFlip={() => setIsFlipped((v) => !v)}
+            />
           </div>
+
+          <DialogFooter className="justify-start gap-3">
+            <DeckSectionControls card={currentCard} layout="horizontal" />
+
+            <div className="ml-auto flex items-center gap-3">
+              {hasNavigation && (
+                <span className="text-[10px] font-mono text-muted-foreground/50">
+                  {currentIndex + 1} / {cards!.length}
+                </span>
+              )}
+
+              <DialogClose asChild>
+                <Button variant="outline" size="sm">
+                  <span className="text-xs font-mono uppercase tracking-wider">Close</span>
+                </Button>
+              </DialogClose>
+            </div>
+          </DialogFooter>
         </div>
       </DialogContent>
-
-      {hasNavigation && open && typeof document !== "undefined" &&
-        createPortal(
-          <div className="pointer-events-none fixed inset-0 z-[60] flex items-center justify-between px-4 md:px-8">
-            <button
-              type="button"
-              onClick={goToPrev}
-              disabled={!canGoPrev}
-              className={cn(
-                "pointer-events-auto flex h-10 w-10 items-center justify-center rounded-full transition-all md:h-12 md:w-12 z-[60]",
-                canGoPrev
-                  ? "bg-card/90 text-primary border border-primary/30 hover:bg-primary/20 hover:border-primary/50 shadow-[0_0_15px_-3px_var(--primary)]"
-                  : "bg-card/50 text-muted-foreground/30 border border-border/20 cursor-not-allowed"
-              )}
-              aria-label="Previous card"
-            >
-              <ChevronLeft className="h-5 w-5" />
-            </button>
-            <button
-              type="button"
-              onClick={goToNext}
-              disabled={!canGoNext}
-              className={cn(
-                "pointer-events-auto flex h-10 w-10 items-center justify-center rounded-full transition-all md:h-12 md:w-12 z-[60]",
-                canGoNext
-                  ? "bg-card/90 text-primary border border-primary/30 hover:bg-primary/20 hover:border-primary/50 shadow-[0_0_15px_-3px_var(--primary)]"
-                  : "bg-card/50 text-muted-foreground/30 border border-border/20 cursor-not-allowed"
-              )}
-              aria-label="Next card"
-            >
-              <ChevronRight className="h-5 w-5" />
-            </button>
-          </div>,
-          document.body
-        )}
     </Dialog>
   );
 }

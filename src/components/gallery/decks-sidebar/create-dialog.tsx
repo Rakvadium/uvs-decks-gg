@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogBody,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -24,40 +25,40 @@ export function DeckCreateDialog() {
 
   return (
     <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-      <DialogContent size="sm" className="overflow-hidden">
-        <div className="relative p-6">
-          <DialogHeader>
-            <DialogTitle>Create New Deck</DialogTitle>
-            <DialogDescription>Name it now, refine it later.</DialogDescription>
-          </DialogHeader>
+      <DialogContent size="sm" className="overflow-hidden p-0" showCloseButton={false}>
+        <div className="relative flex h-full min-h-0 flex-col">
+          <div className="min-h-0 flex-1 overflow-y-auto p-6 pb-24 md:pb-20">
+            <DialogHeader>
+              <DialogTitle>Create New Deck</DialogTitle>
+              <DialogDescription>Name it now, refine it later.</DialogDescription>
+            </DialogHeader>
 
-          <DialogBody className="pt-4">
-            <label className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground">
-              Deck name
-            </label>
-            <div className="relative mt-2">
-              <Input
-                placeholder="Deck name..."
-                value={newDeckName}
-                onChange={(event) => setNewDeckName(event.target.value)}
-                className="h-11 text-sm"
-                onKeyDown={(event) => {
-                  if (event.key === "Enter") {
-                    void handleCreate();
-                  }
-                }}
-              />
-            </div>
-          </DialogBody>
+            <DialogBody className="pt-4">
+              <label className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground">
+                Deck name
+              </label>
+              <div className="relative mt-2">
+                <Input
+                  placeholder="Deck name..."
+                  value={newDeckName}
+                  onChange={(event) => setNewDeckName(event.target.value)}
+                  className="h-11 text-sm"
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") {
+                      void handleCreate();
+                    }
+                  }}
+                />
+              </div>
+            </DialogBody>
+          </div>
 
-          <DialogFooter className="mt-4 gap-2 border-t-0 bg-transparent p-0">
-            <Button
-              variant="outline"
-              className="h-10 px-4"
-              onClick={() => setIsCreateOpen(false)}
-            >
-              Cancel
-            </Button>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline" className="h-10 px-4">
+                Close
+              </Button>
+            </DialogClose>
             <Button
               className="h-10 px-4"
               onClick={() => void handleCreate()}

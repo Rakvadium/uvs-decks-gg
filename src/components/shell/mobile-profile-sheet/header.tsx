@@ -1,11 +1,9 @@
-import { ChevronRight } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import { SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useMobileProfileSheetContext } from "./context";
 
 export function MobileProfileSheetHeader() {
-  const { user, closeSheet } = useMobileProfileSheetContext();
+  const { user } = useMobileProfileSheetContext();
 
   return (
     <SheetHeader className="shrink-0 p-4 pb-2">
@@ -22,9 +20,6 @@ export function MobileProfileSheetHeader() {
             <span className="text-sm text-muted-foreground">{user?.email || "Not signed in"}</span>
           </div>
         </div>
-        <Button variant="ghost" size="icon" onClick={closeSheet} className="h-8 w-8">
-          <ChevronRight className="h-4 w-4" />
-        </Button>
       </div>
     </SheetHeader>
   );
