@@ -1,14 +1,29 @@
+import Image from "next/image";
 import Link from "next/link";
-import { Globe, Lock } from "lucide-react";
+import { Globe, Hexagon, Lock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useIsMobile } from "@/hooks/useIsMobile";
 import { useDeckSidebarItemContext } from "./context";
 
 export function DeckSidebarItemHeader() {
-  const { deck, isActive } = useDeckSidebarItemContext();
+  const isMobile = useIsMobile();
+  const { deck, deckImageName, deckImageUrl, isActive } = useDeckSidebarItemContext();
 
   return (
-    <div className="flex items-start justify-between gap-3">
-      <div className="min-w-0 space-y-1">
+    <div className="flex items-start gap-3">
+      {isMobile ? (
+        <div className="relative h-14 w-10 shrink-0 overflow-hidden rounded-md border border-border/50 bg-muted/40">
+          {deckImageUrl ? (
+            <Image src={deckImageUrl} alt={deckImageName} fill className="object-cover object-top" />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center">
+              <Hexagon className="h-4 w-4 text-muted-foreground/50" />
+            </div>
+          )}
+        </div>
+      ) : null}
+
+      <div className="min-w-0 flex-1 space-y-1">
         <div className="min-w-0 flex items-center gap-2">
           <Link
             href={`/decks/${deck._id}`}

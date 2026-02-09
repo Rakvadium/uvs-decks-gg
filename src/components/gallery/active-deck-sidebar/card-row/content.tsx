@@ -13,6 +13,7 @@ function ActiveDeckCardRowContent() {
     dragHandleProps,
     handlePointerEnter,
     handlePointerMove,
+    isMobile,
     isDragging,
     onHoverLeave,
   } = useActiveDeckCardRowContext();
@@ -42,11 +43,21 @@ function ActiveDeckCardRowContent() {
     >
       <ActiveDeckCardRowThumbnail />
 
-      <div className="min-w-0 flex flex-1 items-center px-2.5 py-1.5 transition-all duration-200 group-hover:pr-24">
+      <div
+        className={cn(
+          "min-w-0 flex flex-1 items-center px-2.5 py-1.5 transition-all duration-200",
+          isMobile ? "pr-20" : "group-hover:pr-24"
+        )}
+      >
         <p className="truncate text-xs font-medium leading-tight">{card.name}</p>
       </div>
 
-      <span className="flex items-center px-2 text-[10px] font-mono uppercase tracking-wider text-muted-foreground transition-opacity duration-150 group-hover:opacity-0">
+      <span
+        className={cn(
+          "flex items-center px-2 text-[10px] font-mono uppercase tracking-wider text-muted-foreground transition-opacity duration-150 group-hover:opacity-0",
+          isMobile && "hidden"
+        )}
+      >
         x{count}
       </span>
 

@@ -9,7 +9,7 @@ import { DeckDetailsHeroSymbolSelector } from "./symbol-selector";
 
 function DeckDetailsHeroPanelEmptyState() {
   return (
-    <div className="relative h-48 w-full shrink-0 overflow-hidden rounded-xl border border-border/50 bg-gradient-to-br from-primary/10 via-card to-secondary/10 lg:h-64 lg:w-48" />
+    <div className="relative aspect-[2.5/3.5] w-32 shrink-0 overflow-hidden rounded-xl border border-border/50 bg-gradient-to-br from-primary/10 via-card to-secondary/10 sm:w-40 lg:w-48" />
   );
 }
 
@@ -28,7 +28,7 @@ function DeckDetailsHeroPanelContent() {
 
   return (
     <>
-      <div className="relative h-48 w-full shrink-0 overflow-hidden rounded-xl border border-border/50 bg-gradient-to-br from-primary/10 via-card to-secondary/10 lg:h-64 lg:w-48">
+      <div className="relative aspect-[2.5/3.5] w-32 shrink-0 overflow-hidden rounded-xl border border-border/50 bg-gradient-to-br from-primary/10 via-card to-secondary/10 sm:w-40 lg:w-48">
         <DeckDetailsHeroCharacterImagePicker />
         <DeckDetailsHeroSymbolSelector />
         <DeckDetailsHeroReadyBadge />

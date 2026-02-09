@@ -12,8 +12,8 @@ function DeckGridItemCard() {
   } = useDeckGridItemContext();
 
   return (
-    <Link href={`/decks/${_id}`}>
-      <div className="group relative flex h-[180px] overflow-hidden rounded-xl border border-border/50 bg-card/50 backdrop-blur-sm transition-all duration-300 hover:border-primary/50 hover:shadow-[0_0_30px_-10px_var(--primary)]">
+    <Link href={`/decks/${_id}`} className="block min-w-0">
+      <div className="group relative flex h-[160px] min-w-0 overflow-hidden rounded-xl border border-border/50 bg-card/50 backdrop-blur-sm transition-all duration-300 hover:border-primary/50 hover:shadow-[0_0_30px_-10px_var(--primary)] sm:h-[180px]">
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-primary/5 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 
         <div className="absolute left-0 top-0 h-px w-[100px] bg-gradient-to-r from-primary/50 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />

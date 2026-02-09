@@ -1,10 +1,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { canAddCardToSection, useDeckEditor } from "@/lib/deck";
 import { useTcgDraggable } from "@/lib/dnd";
+import { useIsMobile } from "@/hooks/useIsMobile";
 import { usePrefersReducedMotion } from "@/lib/reduced-motion";
 import type { CardGridItemProps } from "./types";
 
 export function useCardGridItem({ card, backCard }: CardGridItemProps) {
+  const isMobile = useIsMobile();
+  const [usesTouchControls, setUsesTouchControls] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [isFlipped, setIsFlipped] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -43,6 +46,7 @@ export function useCardGridItem({ card, backCard }: CardGridItemProps) {
   const hasBackCardData = Boolean(backCard);
   const displayCard = isFlipped && backCard ? backCard : card;
   const showDeckCount = hasDeck && deckCount > 0;
+  const showInlineControls = isMobile || usesTouchControls;
 
   useEffect(() => {
     if (isDragging) {
@@ -59,6 +63,19 @@ export function useCardGridItem({ card, backCard }: CardGridItemProps) {
 
     return undefined;
   }, [isDragging]);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(hover: none), (pointer: coarse)");
+
+    const handleChange = (event: MediaQueryListEvent | MediaQueryList) => {
+      setUsesTouchControls(event.matches);
+    };
+
+    handleChange(mediaQuery);
+
+    mediaQuery.addEventListener("change", handleChange);
+    return () => mediaQuery.removeEventListener("change", handleChange);
+  }, []);
 
   const handleFlip = useCallback(
     (event: React.MouseEvent) => {
@@ -107,6 +124,7 @@ export function useCardGridItem({ card, backCard }: CardGridItemProps) {
     hasDeck,
     isDialogOpen,
     isDragging,
+    isMobile: showInlineControls,
     isFlipped,
     isHovered,
     prefersReducedMotion,

@@ -8,10 +8,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { cn } from "@/lib/utils";
+import { useIsMobile } from "@/hooks/useIsMobile";
 import { DECK_SECTION_META as SECTION_META } from "@/lib/deck/display-config";
 import { useActiveDeckCardRowContext } from "./context";
 
 export function ActiveDeckCardRowControls() {
+  const isMobile = useIsMobile();
   const {
     addCard,
     canAddToDeck,
@@ -25,11 +28,18 @@ export function ActiveDeckCardRowControls() {
   } = useActiveDeckCardRowContext();
 
   return (
-    <div className="pointer-events-none absolute right-2 top-1/2 flex -translate-y-1/2 items-center gap-1 opacity-0 transition-opacity duration-150 group-hover:pointer-events-auto group-hover:opacity-100">
+    <div
+      className={cn(
+        "absolute right-2 top-1/2 flex -translate-y-1/2 items-center gap-1",
+        isMobile
+          ? "pointer-events-auto opacity-100"
+          : "pointer-events-none opacity-0 transition-opacity duration-150 group-hover:pointer-events-auto group-hover:opacity-100"
+      )}
+    >
       <Button
         variant="ghost"
         size="icon-sm"
-        className="h-7 w-7"
+        className={cn("h-7 w-7", isMobile && "h-6 w-6")}
         onClick={() => removeCard(card._id, sectionKey)}
         disabled={count <= 0}
       >
@@ -43,40 +53,42 @@ export function ActiveDeckCardRowControls() {
       <Button
         variant="ghost"
         size="icon-sm"
-        className="h-7 w-7"
+        className={cn("h-7 w-7", isMobile && "h-6 w-6")}
         onClick={() => addCard(card._id, sectionKey)}
         disabled={!canAddToDeck}
       >
         <Plus className="h-3.5 w-3.5" />
       </Button>
 
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon-sm" className="h-7 w-7" data-no-drag>
-            <MoreVertical className="h-3.5 w-3.5" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuLabel>Move To</DropdownMenuLabel>
-          {moveTargets.map((target) => (
+      {!isMobile ? (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon-sm" className="h-7 w-7" data-no-drag>
+              <MoreVertical className="h-3.5 w-3.5" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel>Move To</DropdownMenuLabel>
+            {moveTargets.map((target) => (
+              <DropdownMenuItem
+                key={`${card._id}-move-${target}`}
+                onClick={() => moveCard(card._id, sectionKey, target)}
+                disabled={!canMoveToSection(target)}
+              >
+                Move To {SECTION_META[target].label}
+              </DropdownMenuItem>
+            ))}
+            <DropdownMenuSeparator />
             <DropdownMenuItem
-              key={`${card._id}-move-${target}`}
-              onClick={() => moveCard(card._id, sectionKey, target)}
-              disabled={!canMoveToSection(target)}
+              onClick={() => removeCard(card._id, sectionKey)}
+              disabled={count <= 0}
+              variant="destructive"
             >
-              Move To {SECTION_META[target].label}
+              Remove One
             </DropdownMenuItem>
-          ))}
-          <DropdownMenuSeparator />
-          <DropdownMenuItem
-            onClick={() => removeCard(card._id, sectionKey)}
-            disabled={count <= 0}
-            variant="destructive"
-          >
-            Remove One
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ) : null}
     </div>
   );
 }

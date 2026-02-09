@@ -7,6 +7,7 @@ import { useRegisterSlot } from "@/components/shell/shell-slot-provider";
 import { DeckDetailsTopBar } from "./deck-details-top-bar";
 import { DeckCardsSection } from "./deck-details-cards-section";
 import { DeckDetailsHeroPanel } from "./deck-details-hero-panel";
+import { DeckDetailsMetaPanel } from "./deck-details-meta-panel";
 import {
   GallerySidebar,
   HandSimulatorSidebar,
@@ -44,17 +45,18 @@ export function DeckDetailsView() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6">
       <div className="relative">
         <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-secondary/5 to-accent/5 rounded-xl blur-xl" />
 
-        <div className="relative flex flex-col lg:flex-row gap-6">
-          <DeckDetailsHeroPanel />
+        <div className="relative flex flex-col gap-4 lg:flex-row lg:gap-6">
+          <div className="flex items-start gap-3 sm:gap-4 lg:w-[22rem] lg:flex-col">
+            <DeckDetailsHeroPanel />
+            <DeckDetailsMetaPanel />
+          </div>
 
           <div className="flex-1">
-            <div className="pl-10 md:pl-0">
-              <DeckCardsSection />
-            </div>
+            <DeckCardsSection />
           </div>
         </div>
       </div>

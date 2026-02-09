@@ -8,7 +8,7 @@ export function ActiveDeckCardRowThumbnail() {
   } = useActiveDeckCardRowContext();
 
   return (
-    <div className="relative h-auto w-8 shrink-0 overflow-hidden border-r border-border/40 bg-muted/50">
+    <div className="relative w-10 shrink-0 self-stretch overflow-hidden border-r border-border/40 bg-muted/50">
       {imageUrl ? (
         <Image src={imageUrl} alt={name} fill className="object-cover object-top" />
       ) : (

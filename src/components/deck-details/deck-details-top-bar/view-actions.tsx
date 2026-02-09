@@ -4,7 +4,11 @@ import { cn } from "@/lib/utils";
 import { useDeckDetailsTopBarContext } from "./context";
 import { DeckDetailsTopBarDeleteAction } from "./delete-action";
 
-export function DeckDetailsTopBarViewActions() {
+interface DeckDetailsTopBarViewActionsProps {
+  compact?: boolean;
+}
+
+export function DeckDetailsTopBarViewActions({ compact = false }: DeckDetailsTopBarViewActionsProps) {
   const { isActiveDeck, setAsActiveDeck, startEditing } = useDeckDetailsTopBarContext();
 
   return (
@@ -14,18 +18,24 @@ export function DeckDetailsTopBarViewActions() {
         size="sm"
         onClick={setAsActiveDeck}
         disabled={isActiveDeck}
-        className="h-8"
+        className={cn("h-8", compact && "gap-1 px-2 text-xs")}
       >
         <Zap className={cn("mr-1 h-4 w-4", isActiveDeck && "text-yellow-400")} />
         {isActiveDeck ? "Active" : "Set Active"}
       </Button>
 
-      <Button variant="outline" size="sm" onClick={startEditing} className="h-8">
-        <Edit3 className="mr-1 h-4 w-4" />
-        Edit
+      <Button
+        variant="outline"
+        size={compact ? "icon" : "sm"}
+        onClick={startEditing}
+        className={cn("h-8", compact && "w-8")}
+        aria-label="Edit deck metadata"
+      >
+        <Edit3 className={cn("h-4 w-4", !compact && "mr-1")} />
+        {!compact ? "Edit" : null}
       </Button>
 
-      <DeckDetailsTopBarDeleteAction />
+      <DeckDetailsTopBarDeleteAction compact={compact} />
     </>
   );
 }

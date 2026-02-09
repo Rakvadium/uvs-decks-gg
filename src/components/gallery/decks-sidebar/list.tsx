@@ -1,9 +1,11 @@
 import { Loader2, Lock, Plus, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useIsMobile } from "@/hooks/useIsMobile";
 import { useDecksSidebarContext } from "./context";
 import { DeckSidebarItem } from "./deck-sidebar-item";
 
 export function DecksSidebarList() {
+  const isMobile = useIsMobile();
   const {
     activeTab,
     currentDecks,
@@ -55,7 +57,7 @@ export function DecksSidebarList() {
               : "No decks yet"}
         </p>
 
-        {!searchQuery.trim() && activeTab === "my-decks" && isAuthenticated ? (
+        {!searchQuery.trim() && activeTab === "my-decks" && isAuthenticated && !isMobile ? (
           <Button
             variant="neon"
             size="sm"

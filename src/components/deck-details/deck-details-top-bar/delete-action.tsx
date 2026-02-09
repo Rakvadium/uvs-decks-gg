@@ -13,7 +13,11 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useDeckDetailsTopBarContext } from "./context";
 
-export function DeckDetailsTopBarDeleteAction() {
+interface DeckDetailsTopBarDeleteActionProps {
+  compact?: boolean;
+}
+
+export function DeckDetailsTopBarDeleteAction({ compact = false }: DeckDetailsTopBarDeleteActionProps) {
   const { deck, isDeleting, deleteDeck } = useDeckDetailsTopBarContext();
 
   if (!deck) return null;
@@ -23,8 +27,9 @@ export function DeckDetailsTopBarDeleteAction() {
       <AlertDialogTrigger asChild>
         <Button
           variant="outline"
-          size="sm"
+          size={compact ? "icon" : "sm"}
           className="h-8 border-destructive/30 text-destructive hover:bg-destructive/10"
+          aria-label="Delete deck"
         >
           <Trash2 className="h-4 w-4" />
         </Button>

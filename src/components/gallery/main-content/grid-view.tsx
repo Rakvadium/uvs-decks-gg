@@ -18,7 +18,8 @@ interface GalleryGridViewProps {
 export function GalleryGridView({ cards, cardsPerRow }: GalleryGridViewProps) {
   const prefersReducedMotion = usePrefersReducedMotion();
   const { getBackCard } = useGalleryCardMap();
-  const clampedCardsPerRow = Math.min(10, Math.max(3, Math.round(cardsPerRow)));
+  const clampedCardsPerRow = Math.min(10, Math.max(1, Math.round(cardsPerRow)));
+  const mobileGridColsClassName = clampedCardsPerRow <= 1 ? "grid-cols-1" : "grid-cols-2";
   const gridStyle = useMemo(
     () => ({ "--cards-per-row": clampedCardsPerRow }) as CSSProperties,
     [clampedCardsPerRow]
@@ -31,7 +32,7 @@ export function GalleryGridView({ cards, cardsPerRow }: GalleryGridViewProps) {
   return (
     <CardNavigationProvider cards={cards} getBackCard={getBackCard}>
       <div
-        className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-[repeat(var(--cards-per-row),minmax(0,1fr))]"
+        className={`grid gap-4 ${mobileGridColsClassName} md:grid-cols-[repeat(var(--cards-per-row),minmax(0,1fr))]`}
         style={gridStyle}
       >
         {visibleCards.map((card, index) => (

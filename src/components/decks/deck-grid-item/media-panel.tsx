@@ -9,7 +9,7 @@ export function DeckGridItemMediaPanel() {
   } = useDeckGridItemContext();
 
   return (
-    <div className="relative w-[120px] shrink-0 overflow-hidden bg-gradient-to-br from-primary/10 via-card to-secondary/10">
+    <div className="relative w-[96px] shrink-0 overflow-hidden bg-gradient-to-br from-primary/10 via-card to-secondary/10 sm:w-[120px]">
       {displayImage ? (
         <>
           <Image
@@ -33,12 +33,12 @@ export function DeckGridItemMediaPanel() {
 
       <div className="absolute bottom-2 left-2">
         {isPublic ? (
-          <div className="rounded border border-primary/40 bg-primary/30 p-1.5 backdrop-blur-sm">
-            <Globe className="h-3 w-3 text-primary" />
+          <div className="rounded border border-primary/40 bg-primary/30 p-1 backdrop-blur-sm sm:p-1.5">
+            <Globe className="h-2.5 w-2.5 text-primary sm:h-3 sm:w-3" />
           </div>
         ) : (
-          <div className="rounded border border-border/50 bg-muted/60 p-1.5 backdrop-blur-sm">
-            <Lock className="h-3 w-3 text-muted-foreground" />
+          <div className="rounded border border-border/50 bg-muted/60 p-1 backdrop-blur-sm sm:p-1.5">
+            <Lock className="h-2.5 w-2.5 text-muted-foreground sm:h-3 sm:w-3" />
           </div>
         )}
       </div>

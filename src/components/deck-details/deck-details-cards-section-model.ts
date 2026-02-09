@@ -2,6 +2,7 @@
 
 import { useCallback, useMemo, useState } from "react";
 import { Id } from "../../../convex/_generated/dataModel";
+import { useIsMobile } from "@/hooks/useIsMobile";
 import { useDeckDetails } from "@/providers/DeckDetailsProvider";
 import { usePrefersReducedMotion } from "@/lib/reduced-motion";
 import { useCardData, type CachedCard } from "@/lib/universus";
@@ -29,16 +30,19 @@ import { SIDEBAR_SIDEBOARD_LIMIT } from "./uvs-import-export";
 const EMPTY_QUANTITIES: Record<string, number> = {};
 
 export function useDeckCardsSectionModel() {
+  const isMobile = useIsMobile();
   const prefersReducedMotion = usePrefersReducedMotion();
   const { cards: allCards } = useCardData();
   const { addCard } = useDeckEditor();
   const { deck, activeSection, setActiveSection } = useDeckDetails();
 
-  const [viewMode, setViewMode] = useState<DeckViewMode>("stacked");
+  const [manualViewMode, setManualViewMode] = useState<DeckViewMode | null>(null);
   const [listSortKey, setListSortKey] = useState<DeckListSortKey>("difficulty");
   const [listSortDirection, setListSortDirection] = useState<ListSortDirection>("asc");
   const [hoveredCard, setHoveredCard] = useState<CachedCard | null>(null);
   const [hoveredRect, setHoveredRect] = useState<DOMRect | null>(null);
+
+  const viewMode = manualViewMode ?? (isMobile ? "list" : "stacked");
 
   const cardIdMap = useCardIdMap(allCards);
 
@@ -197,6 +201,10 @@ export function useDeckCardsSectionModel() {
     if (!selected) return;
     setListSortKey(selected.key);
     setListSortDirection(selected.direction);
+  }, []);
+
+  const setViewMode = useCallback((mode: DeckViewMode) => {
+    setManualViewMode(mode);
   }, []);
 
   const onHoverListCard = useCallback((card: CachedCard, rect: DOMRect) => {
