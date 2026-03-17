@@ -3,12 +3,14 @@
 import {
   createContext,
   useContext,
+  useEffect,
   useMemo,
   useCallback,
   useState,
   ReactNode,
 } from "react";
 import { useCardData, sortCards, CachedCard } from "@/lib/universus";
+import { useIsMobile } from "@/hooks/useIsMobile";
 import { useUIState, type CardFilters, type GalleryViewMode } from "@/providers/UIStateProvider";
 import { useShellSlot } from "@/components/shell/shell-slot-provider";
 
@@ -56,6 +58,7 @@ const GalleryFiltersContext = createContext<GalleryFiltersContextValue | null>(n
 export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
   const { uiState, setGalleryFilters, setGalleryViewMode, setGalleryCardsPerRow } = useUIState();
   const { state: shellState } = useShellSlot();
+  const isMobile = useIsMobile();
   const {
     cards,
     isLoading,
@@ -75,15 +78,17 @@ export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
     return "card";
   }, [uiState.galleryViewMode]);
   const cardsPerRow = useMemo(() => {
+    const minCardsPerRow = isMobile ? 1 : 3;
+    const maxCardsPerRow = isMobile ? 2 : 10;
     const clampCardsPerRow = (value: number | undefined, fallback: number) => {
       const raw = typeof value === "number" ? value : fallback;
       if (Number.isNaN(raw)) return fallback;
-      return Math.min(10, Math.max(3, Math.round(raw)));
+      return Math.min(maxCardsPerRow, Math.max(minCardsPerRow, Math.round(raw)));
     };
 
     const legacy = uiState.galleryCardsPerRow;
-    const openDefault = 4;
-    const closedDefault = 6;
+    const openDefault = isMobile ? 1 : 4;
+    const closedDefault = isMobile ? 2 : 6;
     const openValue = clampCardsPerRow(uiState.galleryCardsPerRowOpen ?? legacy, openDefault);
     const closedValue = clampCardsPerRow(uiState.galleryCardsPerRowClosed ?? legacy, closedDefault);
 
@@ -93,6 +98,7 @@ export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
     uiState.galleryCardsPerRowOpen,
     uiState.galleryCardsPerRowClosed,
     isSidebarOpen,
+    isMobile,
   ]);
 
   const handleSetViewMode = useCallback(
@@ -105,13 +111,21 @@ export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
 
   const handleSetCardsPerRow = useCallback(
     (count: number) => {
-      const next = Math.min(10, Math.max(3, Math.round(count)));
+      const minCardsPerRow = isMobile ? 1 : 3;
+      const maxCardsPerRow = isMobile ? 2 : 10;
+      const next = Math.min(maxCardsPerRow, Math.max(minCardsPerRow, Math.round(count)));
       setGalleryCardsPerRow(next, isSidebarOpen);
     },
-    [setGalleryCardsPerRow, isSidebarOpen]
+    [setGalleryCardsPerRow, isSidebarOpen, isMobile]
   );
 
-  const galleryFilters = uiState.galleryFilters ?? {};
+  useEffect(() => {
+    if (isMobile && viewMode === "details") {
+      handleSetViewMode("list");
+    }
+  }, [isMobile, viewMode, handleSetViewMode]);
+
+  const galleryFilters = useMemo(() => uiState.galleryFilters ?? {}, [uiState.galleryFilters]);
   const defaultFormat = formats.find((format) => format.isDefault)?.key ?? "standard";
   const effectiveFormat = galleryFilters.format ?? defaultFormat;
 
@@ -154,7 +168,7 @@ export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
     if (filters.difficultyMin !== undefined || filters.difficultyMax !== undefined) count++;
     if (filters.controlMin !== undefined || filters.controlMax !== undefined) count++;
     return count;
-  }, [filters]);
+  }, [filters, galleryFilters.format, defaultFormat]);
 
   const updateFilter = useCallback(
     <K extends keyof CardFilters>(key: K, value: CardFilters[K]) => {

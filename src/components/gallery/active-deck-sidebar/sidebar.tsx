@@ -1,6 +1,7 @@
 import { useCallback, useState } from "react";
 import { Hexagon, Loader2 } from "lucide-react";
 import { CardHoverPreviewPortal } from "@/components/deck/shared";
+import { useIsMobile } from "@/hooks/useIsMobile";
 import { usePrefersReducedMotion } from "@/lib/reduced-motion";
 import { type CachedCard } from "@/lib/universus";
 import { useActiveDeck } from "@/providers/ActiveDeckProvider";
@@ -9,23 +10,27 @@ import { ActiveDeckSections } from "./sections";
 
 export function ActiveDeckSidebar() {
   const { activeDeck, isLoading } = useActiveDeck();
+  const isMobile = useIsMobile();
   const prefersReducedMotion = usePrefersReducedMotion();
   const [hoveredCard, setHoveredCard] = useState<CachedCard | null>(null);
   const [hoveredRect, setHoveredRect] = useState<DOMRect | null>(null);
 
   const handleHoverEnter = useCallback((card: CachedCard, rect: DOMRect) => {
+    if (isMobile) return;
     setHoveredCard(card);
     setHoveredRect(rect);
-  }, []);
+  }, [isMobile]);
 
   const handleHoverMove = useCallback((rect: DOMRect) => {
+    if (isMobile) return;
     setHoveredRect(rect);
-  }, []);
+  }, [isMobile]);
 
   const handleHoverLeave = useCallback(() => {
+    if (isMobile) return;
     setHoveredCard(null);
     setHoveredRect(null);
-  }, []);
+  }, [isMobile]);
 
   if (isLoading) {
     return (
@@ -57,8 +62,8 @@ export function ActiveDeckSidebar() {
   return (
     <div className="relative h-full space-y-3 overflow-y-auto p-4">
       <CardHoverPreviewPortal
-        card={hoveredCard}
-        rect={hoveredRect}
+        card={isMobile ? null : hoveredCard}
+        rect={isMobile ? null : hoveredRect}
         prefersReducedMotion={prefersReducedMotion}
         width={220}
       />

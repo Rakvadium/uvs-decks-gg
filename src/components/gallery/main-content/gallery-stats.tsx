@@ -13,7 +13,7 @@ export function GalleryStats({ totalCards, filteredCount, isLoading }: GallerySt
 
   return (
     <motion.div
-      initial={prefersReducedMotion ? {} : { opacity: 0, y: -10 }}
+      initial={false}
       animate={prefersReducedMotion ? {} : { opacity: 1, y: 0 }}
       className="flex items-center gap-4 px-2 py-3"
     >

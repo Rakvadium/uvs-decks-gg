@@ -48,7 +48,7 @@ export function DecksTopBar() {
               )}
             >
               <Icon className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">{tab.label}</span>
+              <span className="hidden sm:inline">{tab.shortLabel}</span>
               {count > 0 ? (
                 <span
                   className={cn(

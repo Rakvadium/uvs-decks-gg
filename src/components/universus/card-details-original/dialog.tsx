@@ -29,10 +29,10 @@ export function CardDetailsDialog({ card, backCard, open, onOpenChange }: CardDe
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent size="lg" className="max-h-[90vh] overflow-hidden p-0 md:pb-6" showCloseButton={false}>
+      <DialogContent size="lg" className="overflow-hidden p-0 md:max-h-[90vh]" showCloseButton={false}>
         <DialogTitle className="sr-only">{displayCard.name} - Card Details</DialogTitle>
 
-        <div className="flex flex-col pb-16 lg:flex-row md:pb-0">
+        <div className="flex h-full min-h-0 flex-col pb-24 md:pb-20 lg:flex-row">
           <CardDetailsImagePanel
             displayCard={displayCard}
             deckCard={card}
@@ -43,13 +43,11 @@ export function CardDetailsDialog({ card, backCard, open, onOpenChange }: CardDe
           <CardDetailsContent card={displayCard} />
         </div>
 
-        <DialogFooter className="md:hidden">
+        <DialogFooter>
           <DialogClose asChild>
-            <div className="flex w-full items-center justify-end">
-              <Button className="ml-auto gap-2">
-                <span className="text-xs font-mono uppercase tracking-wider">Close</span>
-              </Button>
-            </div>
+            <Button variant="outline">
+              <span className="text-xs font-mono uppercase tracking-wider">Close</span>
+            </Button>
           </DialogClose>
         </DialogFooter>
       </DialogContent>

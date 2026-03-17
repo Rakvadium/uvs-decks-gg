@@ -22,6 +22,7 @@ interface GalleryFilterDialogContextValue {
   setSetSearch: (value: string) => void;
   clearSetSearch: () => void;
   filteredSets: SetFilterOption[];
+  setOptions: SetFilterOption[];
   toggleFormat: (formatKey: string) => void;
   toggleStringFilter: (key: StringArrayFilterKey, value: string) => void;
   setStatFilter: (key: StatFilterKey, value: StatFilterValue | undefined) => void;
@@ -45,25 +46,25 @@ export function GalleryFilterDialogProvider({
   const filters = state.filters;
   const uniqueValues = meta.uniqueValues;
   const [setSearch, setSetSearch] = useState("");
-
-  const filteredSets = useMemo(() => {
+  const setOptions = useMemo(() => {
     if (!uniqueValues?.setNames) return [];
 
-    const sets = uniqueValues.setNames.map((name, index) => ({
+    return uniqueValues.setNames.map((name, index) => ({
       name,
       code: uniqueValues.setCodes[index],
       number: uniqueValues.setNumbers?.[index] ?? 0,
     }));
+  }, [uniqueValues]);
+  const filteredSets = useMemo(() => {
+    if (!setSearch.trim()) return setOptions;
 
-    if (!setSearch.trim()) return sets;
-
-    const search = setSearch.toLowerCase();
-    return sets.filter(
-      (set) =>
-        set.name.toLowerCase().includes(search) ||
-        set.code.toLowerCase().includes(search)
+    const query = setSearch.toLowerCase();
+    return setOptions.filter(
+      (setOption) =>
+        setOption.name.toLowerCase().includes(query) ||
+        setOption.code.toLowerCase().includes(query)
     );
-  }, [setSearch, uniqueValues]);
+  }, [setSearch, setOptions]);
 
   const toggleFormat = useCallback(
     (formatKey: string) => {
@@ -114,6 +115,7 @@ export function GalleryFilterDialogProvider({
       setSetSearch,
       clearSetSearch: () => setSetSearch(""),
       filteredSets,
+      setOptions,
       toggleFormat,
       toggleStringFilter,
       setStatFilter,
@@ -126,6 +128,7 @@ export function GalleryFilterDialogProvider({
       filters,
       setSearch,
       filteredSets,
+      setOptions,
       toggleFormat,
       toggleStringFilter,
       setStatFilter,

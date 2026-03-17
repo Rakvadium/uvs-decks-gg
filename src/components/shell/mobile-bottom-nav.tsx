@@ -32,8 +32,8 @@ export function MobileBottomNav() {
   }
 
   return (
-    <nav className="shrink-0 border-t border-primary/20 bg-sidebar/95 backdrop-blur-lg pb-[env(safe-area-inset-bottom)]">
-      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+    <nav className="relative shrink-0 border-t border-primary/20 bg-sidebar/95 backdrop-blur-lg pb-[env(safe-area-inset-bottom)]">
+      <div className="pointer-events-none absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
       <div className="flex h-16 items-center justify-around px-2">
         {navItems.map((item) => {
           const isActive = pathname.includes(`/${item.path}`)

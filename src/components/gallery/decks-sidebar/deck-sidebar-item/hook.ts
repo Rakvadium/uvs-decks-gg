@@ -3,7 +3,7 @@ import { useDecksSidebarContext } from "../context";
 import type { DeckData } from "../types";
 
 export function useDeckSidebarItemModel(deck: DeckData) {
-  const { activeDeckId, setActiveDeck, userId } = useDecksSidebarContext();
+  const { activeDeckId, setActiveDeck, userId, cardIdMap } = useDecksSidebarContext();
 
   const isOwner = userId ? deck.userId === userId : false;
   const isActive = activeDeckId === deck._id;
@@ -14,6 +14,10 @@ export function useDeckSidebarItemModel(deck: DeckData) {
     () => Object.values(deck.referenceQuantities).reduce((sum, qty) => sum + qty, 0),
     [deck.referenceQuantities]
   );
+  const imageCardId = deck.imageCardId ?? deck.startingCharacterId;
+  const imageCard = imageCardId ? cardIdMap.get(imageCardId) ?? null : null;
+  const deckImageUrl = imageCard?.imageUrl ?? null;
+  const deckImageName = imageCard?.name ?? deck.name;
 
   const handleSetActive = useCallback(() => {
     if (!isActive) {
@@ -28,6 +32,8 @@ export function useDeckSidebarItemModel(deck: DeckData) {
     mainCount,
     sideCount,
     referenceCount,
+    deckImageUrl,
+    deckImageName,
     handleSetActive,
   };
 }

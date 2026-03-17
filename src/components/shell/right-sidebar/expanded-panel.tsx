@@ -23,7 +23,7 @@ export function RightSidebarExpandedPanel() {
       animate={{ width }}
       transition={isResizing ? { duration: 0 } : { duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
       className={cn(
-        "relative flex h-full flex-col overflow-hidden bg-background",
+        "render-stable relative flex h-full flex-col overflow-hidden bg-background",
         width > 0 && "border-l border-sidebar-border/50"
       )}
     >

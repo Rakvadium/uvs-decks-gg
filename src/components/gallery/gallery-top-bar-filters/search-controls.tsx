@@ -1,5 +1,6 @@
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { useIsMobile } from "@/hooks/useIsMobile";
 import {
   Select,
   SelectContent,
@@ -11,6 +12,29 @@ import { useGalleryTopBarFiltersContext } from "./context";
 
 export function GallerySearchControls() {
   const { state, actions } = useGalleryTopBarFiltersContext();
+  const isMobile = useIsMobile();
+
+  if (isMobile) {
+    return (
+      <div className="relative">
+        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-primary/70" />
+        <Input
+          placeholder={
+            state.searchMode === "name"
+              ? "Search by name…"
+              : state.searchMode === "text"
+                ? "Search card text…"
+                : "Search all fields…"
+          }
+          value={state.search}
+          onChange={(event) => actions.setSearch(event.target.value)}
+          className="h-9 border-primary/40 bg-background/50 pl-9 text-sm shadow-[0_0_10px_-3px_var(--primary)] focus-visible:border-primary focus-visible:shadow-[0_0_15px_-3px_var(--primary)]"
+          name="gallery-search"
+          spellCheck={false}
+        />
+      </div>
+    );
+  }
 
   return (
     <>

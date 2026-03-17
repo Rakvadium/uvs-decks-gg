@@ -9,8 +9,6 @@ export function HandSimulatorSidebarFooter() {
   return (
     <Button
       variant="outline"
-      size="sm"
-      className="w-full"
       onClick={dispatchSimulatorRedraw}
       disabled={!canDraw}
     >

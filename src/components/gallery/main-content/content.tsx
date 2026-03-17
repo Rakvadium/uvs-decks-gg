@@ -20,7 +20,7 @@ function GalleryMainContentBody() {
 
   return (
     <div className="relative z-10 flex-1 overflow-y-auto">
-      <div className="space-y-4 p-4 pb-[8rem] md:p-6 md:pb-4">
+      <div className="space-y-4 p-4 pb-6 md:p-6 md:pb-4">
         <GalleryStats totalCards={meta.totalCards} filteredCount={meta.filteredCount} isLoading={meta.isLoadingMore} />
 
         {state.viewMode === "card" ? (

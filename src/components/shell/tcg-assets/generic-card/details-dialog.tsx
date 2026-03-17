@@ -1,9 +1,12 @@
 import {
   Dialog,
+  DialogClose,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import { DefaultDetails } from "./default-details";
 import { useGenericCardContext } from "./context";
 import { CardArt } from "./card-art";
@@ -27,33 +30,46 @@ export function GenericCardDetailsDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="md:min-w-[65vw] md:max-h-[90vh]">
-        <DialogHeader>
-          <DialogTitle>{cardData.name}</DialogTitle>
-        </DialogHeader>
+      <DialogContent
+        className="overflow-hidden p-0 md:min-w-[65vw] md:max-h-[90vh]"
+        showCloseButton={false}
+      >
+        <div className="relative flex h-full min-h-0 flex-col">
+          <DialogHeader className="shrink-0 px-6 pb-4 pt-6">
+            <DialogTitle>{cardData.name}</DialogTitle>
+          </DialogHeader>
 
-        <div className="grid grid-cols-1 gap-6 overflow-auto md:grid-cols-2">
-          <div className="flex justify-center">
-            <CardArt className="group w-64" clickable={false} />
+          <div className="min-h-0 flex-1 overflow-y-auto px-6 pb-24 pt-2 md:pb-20">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              <div className="flex justify-center">
+                <CardArt className="group w-64" clickable={false} />
+              </div>
+
+              <div className="space-y-4">
+                {renderDetails ? (
+                  renderDetails({
+                    cardData,
+                    deckCount,
+                    onAddToDeck,
+                    onRemoveFromDeck,
+                  })
+                ) : (
+                  <DefaultDetails
+                    cardData={cardData}
+                    deckCount={deckCount}
+                    onAddToDeck={onAddToDeck}
+                    onRemoveFromDeck={onRemoveFromDeck}
+                  />
+                )}
+              </div>
+            </div>
           </div>
 
-          <div className="space-y-4">
-            {renderDetails ? (
-              renderDetails({
-                cardData,
-                deckCount,
-                onAddToDeck,
-                onRemoveFromDeck,
-              })
-            ) : (
-              <DefaultDetails
-                cardData={cardData}
-                deckCount={deckCount}
-                onAddToDeck={onAddToDeck}
-                onRemoveFromDeck={onRemoveFromDeck}
-              />
-            )}
-          </div>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline">Close</Button>
+            </DialogClose>
+          </DialogFooter>
         </div>
       </DialogContent>
     </Dialog>

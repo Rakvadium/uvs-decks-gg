@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { canAddCardToSection, canMoveCardToSection } from "@/lib/deck";
+import { useIsMobile } from "@/hooks/useIsMobile";
 import {
   DECK_SECTION_KEYS,
   type DeckSection,
@@ -9,6 +10,7 @@ import { useActiveDeckSectionsContext } from "../sections-context";
 import type { ActiveDeckCardRowProps } from "./types";
 
 export function useActiveDeckCardRowModel({ card, count, sectionKey }: ActiveDeckCardRowProps) {
+  const isMobile = useIsMobile();
   const {
     addCard,
     getBackCard,
@@ -74,10 +76,12 @@ export function useActiveDeckCardRowModel({ card, count, sectionKey }: ActiveDec
   };
 
   const handlePointerEnter = (rect: DOMRect) => {
+    if (isMobile) return;
     onHoverEnter(card, rect);
   };
 
   const handlePointerMove = (rect: DOMRect) => {
+    if (isMobile) return;
     onHoverMove(rect);
   };
 
@@ -87,6 +91,7 @@ export function useActiveDeckCardRowModel({ card, count, sectionKey }: ActiveDec
     count,
     sectionKey,
     moveTargets,
+    isMobile,
     isDragging,
     dragHandleProps,
     canAddToDeck,

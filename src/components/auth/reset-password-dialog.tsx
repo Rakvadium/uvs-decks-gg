@@ -7,6 +7,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { ArrowLeft, Send } from "lucide-react";
 import type { AuthDialogFlow } from "./dialog-flow";
+import { clearAuthCookies, isRefreshTokenParseError } from "./auth-recovery";
 
 export function ResetPasswordFormDialog({
   setFlow,
@@ -48,21 +49,32 @@ export function ResetPasswordFormDialog({
       </div>
       <form
         className="flex flex-col"
-        onSubmit={(event) => {
+        onSubmit={async (event) => {
           event.preventDefault();
           setSubmitting(true);
-          const formData = new FormData(event.currentTarget);
+          const form = event.currentTarget;
 
-          signIn("password", formData)
-            .then(() => {
-              setSent(true);
-              toast.success("Reset link sent!");
-            })
-            .catch((error) => {
-              console.error(error);
-              toast.error("Could not send reset link");
-            })
-            .finally(() => setSubmitting(false));
+          try {
+            await signIn("password", new FormData(form));
+            setSent(true);
+            toast.success("Reset link sent!");
+          } catch (error) {
+            if (isRefreshTokenParseError(error)) {
+              try {
+                await clearAuthCookies();
+                await signIn("password", new FormData(form));
+                setSent(true);
+                toast.success("Reset link sent!");
+                return;
+              } catch (retryError) {
+                console.error(retryError);
+              }
+            }
+            console.error(error);
+            toast.error("Could not send reset link");
+          } finally {
+            setSubmitting(false);
+          }
         }}
       >
         <div className="flex items-center justify-between mt-4 py-1">

@@ -6,8 +6,8 @@ import {
   useAvailableGallerySidebarContext,
   useGallerySidebarContext,
 } from "./context";
+import { DeckDetailsGallerySidebarBottomBar } from "./bottom-bar";
 import { DeckDetailsGallerySidebarBody } from "./body";
-import { DeckDetailsGallerySidebarHeader } from "./header";
 import { DeckDetailsGallerySidebarHoverPreview } from "./hover-preview";
 
 function GallerySidebarUnavailable() {
@@ -34,9 +34,9 @@ function DeckDetailsGallerySidebarAvailableContent() {
   return (
     <>
       <DeckDetailsGallerySidebarHoverPreview />
-      <div className="flex h-full flex-col">
-        <DeckDetailsGallerySidebarHeader />
+      <div className="flex h-full min-h-0 flex-col">
         <DeckDetailsGallerySidebarBody />
+        <DeckDetailsGallerySidebarBottomBar />
         <GalleryFilterDialog open={isFilterDialogOpen} onOpenChange={setIsFilterDialogOpen} />
       </div>
     </>

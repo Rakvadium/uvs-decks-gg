@@ -332,6 +332,15 @@
     right: -1px;
     border-width: 0 2px 2px 0;
   }
+
+  .render-stable {
+    contain: paint;
+    isolation: isolate;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
 }
 
 @layer components {

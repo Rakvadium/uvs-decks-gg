@@ -38,7 +38,7 @@ export function CardHoverPreviewPortal({
 
   return createPortal(
     <motion.div
-      initial={prefersReducedMotion ? {} : { opacity: 0, scale: 0.96 }}
+      initial={false}
       animate={prefersReducedMotion ? {} : { opacity: 1, scale: 1 }}
       className={`pointer-events-none fixed ${zIndexClassName}`}
       style={{ left, top, width: previewWidth, height: previewHeight }}

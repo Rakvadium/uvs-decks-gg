@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/popover";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogHeader,
   DialogTitle,
@@ -213,24 +214,30 @@ export function SearchBar({
       {/* Advanced Filters Dialog */}
       {advancedFilters && (
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogContent size="xl" className={dialogClassName}>
-            <DialogHeader>
-              <DialogTitle>{advancedFiltersTitle}</DialogTitle>
-            </DialogHeader>
-            <div className="py-4">
-              {advancedFilters}
+          <DialogContent size="xl" className={cn("overflow-hidden p-0", dialogClassName)} showCloseButton={false}>
+            <div className="relative flex h-full min-h-0 flex-col">
+              <DialogHeader className="shrink-0 px-6 pb-4 pt-6">
+                <DialogTitle>{advancedFiltersTitle}</DialogTitle>
+              </DialogHeader>
+
+              <div className="min-h-0 flex-1 overflow-y-auto px-6 pb-24 pt-2 md:pb-20">
+                {advancedFilters}
+              </div>
+
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button variant="outline">Close</Button>
+                </DialogClose>
+                <Button
+                  onClick={() => {
+                    setIsDialogOpen(false);
+                    onSearch?.(searchValue);
+                  }}
+                >
+                  Apply Filters
+                </Button>
+              </DialogFooter>
             </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
-                Cancel
-              </Button>
-              <Button onClick={() => {
-                setIsDialogOpen(false);
-                onSearch?.(searchValue);
-              }}>
-                Apply Filters
-              </Button>
-            </DialogFooter>
           </DialogContent>
         </Dialog>
       )}

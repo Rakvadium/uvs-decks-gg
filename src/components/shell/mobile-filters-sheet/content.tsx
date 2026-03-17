@@ -1,6 +1,5 @@
 "use client";
 
-import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useMobileFiltersSheetModel } from "./hook";
@@ -24,22 +23,22 @@ export function MobileFiltersSheet({
         <SheetContent side="bottom" className="flex h-[85vh] flex-col p-0" showCloseButton={false}>
           <SheetHeader className="flex shrink-0 flex-row items-center justify-between border-b px-4 py-3">
             <SheetTitle>{title}</SheetTitle>
-            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={model.closeSheet}>
-              <X className="h-4 w-4" />
-            </Button>
           </SheetHeader>
 
           <div className="min-h-0 flex-1 overflow-y-auto p-4">{children}</div>
 
-          <div className="flex shrink-0 items-center gap-2 border-t bg-background p-4">
-            {showClearButton ? (
-              <Button variant="outline" className="flex-1" onClick={model.handleClear}>
-                Clear All
-              </Button>
-            ) : null}
-            <Button className="flex-1" onClick={model.handleApply}>
-              Apply Filters
+          <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-t bg-background p-4">
+            <Button variant="outline" onClick={model.closeSheet}>
+              Close
             </Button>
+            <div className="flex flex-wrap items-center justify-end gap-2">
+              {showClearButton ? (
+                <Button variant="outline" onClick={model.handleClear}>
+                  Clear All
+                </Button>
+              ) : null}
+              <Button onClick={model.handleApply}>Apply Filters</Button>
+            </div>
           </div>
         </SheetContent>
       </Sheet>

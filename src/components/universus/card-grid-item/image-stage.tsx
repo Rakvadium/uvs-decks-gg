@@ -16,10 +16,10 @@ export function CardGridItemImageStage() {
         isHovered && "shadow-[0_0_0_1px_var(--primary)/70,0_0_8px_var(--primary)/90,0_0_16px_var(--primary)/25]"
       )}
     >
-      <AnimatePresence mode="wait">
+      <AnimatePresence initial={false} mode="wait">
         <motion.div
           key={isFlipped ? "back" : "front"}
-          initial={prefersReducedMotion ? {} : { rotateY: -90, opacity: 0 }}
+          initial={false}
           animate={prefersReducedMotion ? {} : { rotateY: 0, opacity: 1 }}
           exit={prefersReducedMotion ? {} : { rotateY: 90, opacity: 0 }}
           transition={{ duration: 0.25 }}

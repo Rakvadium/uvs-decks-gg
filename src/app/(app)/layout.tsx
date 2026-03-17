@@ -1,12 +1,11 @@
 "use client";
 
-import { ReactNode, useState, useEffect, useMemo } from "react";
+import { ReactNode, useState, useMemo } from "react";
+import dynamic from "next/dynamic";
 import { AuthGuard } from "@/components/auth-guard";
 import { UIStateProvider, ActiveDeckProvider, DeckDetailsProvider } from "@/providers";
 import {
-  LeftSidebar,
   TopHeader,
-  RightSidebar,
   ShellSlotProvider,
   useShellSlot,
   useRegisterSlot,
@@ -25,6 +24,15 @@ import { TcgDndProvider } from "@/lib/dnd";
 import { SiloedDeckProvider } from "@/lib/deck";
 import { GalleryFiltersProvider } from "@/providers/GalleryFiltersProvider";
 import { DecksProvider } from "@/providers/DecksProvider";
+
+const LeftSidebar = dynamic(
+  () => import("@/components/shell").then((module) => module.LeftSidebar),
+  { ssr: false }
+);
+const RightSidebar = dynamic(
+  () => import("@/components/shell").then((module) => module.RightSidebar),
+  { ssr: false }
+);
 
 const LEFT_SIDEBAR_KEY = "uvs-decks-left-sidebar-collapsed";
 
@@ -104,20 +112,15 @@ function AdminSidebarSlotRegistration() {
 function ShellLayoutInner({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const params = useParams();
-  const [leftSidebarCollapsed, setLeftSidebarCollapsed] = useState(false);
-  const [isHydrated, setIsHydrated] = useState(false);
+  const [leftSidebarCollapsed, setLeftSidebarCollapsed] = useState(() => {
+    if (typeof window === "undefined") return false;
+    const stored = window.localStorage.getItem(LEFT_SIDEBAR_KEY);
+    return stored === "true";
+  });
   const { state } = useShellSlot();
 
   const pageType = getPageType(pathname);
   const deckId = params?.deckId as string | undefined;
-
-  useEffect(() => {
-    const stored = localStorage.getItem(LEFT_SIDEBAR_KEY);
-    if (stored !== null) {
-      setLeftSidebarCollapsed(stored === "true");
-    }
-    setIsHydrated(true);
-  }, []);
 
   const hasRightSidebar = (state.slots.get("right-sidebar")?.length ?? 0) > 0;
 
@@ -132,7 +135,7 @@ function ShellLayoutInner({ children }: { children: ReactNode }) {
   const desktopLayout = (
     <div className="hidden md:flex h-screen w-full overflow-hidden">
       <LeftSidebar
-        collapsed={isHydrated ? leftSidebarCollapsed : false}
+        collapsed={leftSidebarCollapsed}
         onToggle={toggleLeftSidebar}
       />
       <div className="flex flex-1 flex-col overflow-hidden bg-sidebar">
@@ -164,9 +167,11 @@ function ShellLayoutInner({ children }: { children: ReactNode }) {
         <main className="min-h-0 flex-1 overflow-y-auto">
           {children}
         </main>
-        <MobileActionsTrigger />
-        <MobileTopBar pageType={pageType} deckId={deckId} />
-        <MobileBottomNav />
+        <div className="relative shrink-0">
+          <MobileTopBar pageType={pageType} />
+          <MobileBottomNav />
+          <MobileActionsTrigger />
+        </div>
         <MobileProfileSheet />
         <MobileActionsSheet />
       </div>
