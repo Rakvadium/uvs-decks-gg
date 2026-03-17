@@ -479,7 +479,7 @@ export function DeckDetailsView({ deckId }: DeckDetailsViewProps) {
                       variant={isActiveDeck ? "default" : "outline"} 
                       size="sm"
                       onClick={handleSetActiveDeck}
-                      disabled={isActiveDeck}
+                      disabled={!!isActiveDeck}
                     >
                       <Zap className={cn("h-4 w-4 mr-1", isActiveDeck && "text-yellow-400")} />
                       {isActiveDeck ? "Active" : "Set Active"}

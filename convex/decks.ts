@@ -108,6 +108,7 @@ export const update = mutation({
     deckId: v.id("decks"),
     name: v.optional(v.string()),
     description: v.optional(v.string()),
+    format: v.optional(v.string()),
     isPublic: v.optional(v.boolean()),
     imageCardId: v.optional(v.union(v.id("cards"), v.null())),
     startingCharacterId: v.optional(v.union(v.id("cards"), v.null())),
