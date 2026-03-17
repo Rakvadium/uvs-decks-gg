@@ -1,6 +1,7 @@
 import { CardNavigationProvider } from "@/components/universus/card-details/navigation-context";
 import type { CachedCard } from "@/lib/universus";
 import { useInfiniteSlice } from "@/hooks/useInfiniteSlice";
+import { useIsMobile } from "@/hooks/useIsMobile";
 import { CARDS_PER_PAGE } from "./constants";
 import { useGalleryCardMap } from "./card-map-context";
 import { CardListItem } from "./card-list-item";
@@ -12,10 +13,12 @@ interface GalleryListViewProps {
 }
 
 export function GalleryListView({ cards }: GalleryListViewProps) {
+  const isMobile = useIsMobile();
   const { getBackCard } = useGalleryCardMap();
   const { visibleItems: visibleCards, hasMore, loadMoreRef } = useInfiniteSlice({
     items: cards,
     pageSize: CARDS_PER_PAGE,
+    rootMargin: isMobile ? "0px 0px 480px 0px" : undefined,
   });
 
   return (

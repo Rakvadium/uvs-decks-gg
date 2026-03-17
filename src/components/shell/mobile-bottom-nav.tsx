@@ -32,8 +32,7 @@ export function MobileBottomNav() {
   }
 
   return (
-    <nav className="relative shrink-0 border-t border-primary/20 bg-sidebar/95 backdrop-blur-lg pb-[env(safe-area-inset-bottom)]">
-      <div className="pointer-events-none absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+    <nav className="relative shrink-0 bg-background pb-[env(safe-area-inset-bottom)]">
       <div className="flex h-16 items-center justify-around px-2">
         {navItems.map((item) => {
           const isActive = pathname.includes(`/${item.path}`)
@@ -51,11 +50,11 @@ export function MobileBottomNav() {
               )}
             >
               {isActive && (
-                <div className="absolute inset-x-2 top-0 h-0.5 bg-primary shadow-[0_0_10px_var(--primary)]" />
+                <div className="absolute inset-x-2 top-0 h-0.5 bg-primary shadow-[0_0_2px_var(--primary),0_0_6px_var(--primary)/45]" />
               )}
               <Icon className={cn(
                 "h-5 w-5 transition-all duration-200",
-                isActive && "drop-shadow-[0_0_8px_var(--primary)]"
+                isActive && "drop-shadow-[0_0_4px_var(--primary)]"
               )} />
               <span className={cn(
                 "text-[10px] font-mono uppercase tracking-widest",
@@ -71,7 +70,7 @@ export function MobileBottomNav() {
           onClick={() => setProfileSheetOpen(true)}
           className="relative flex flex-1 flex-col items-center justify-center gap-1.5 py-2 text-muted-foreground hover:text-foreground transition-all duration-200"
         >
-          <Avatar className="h-6 w-6 border border-primary/30 shadow-[0_0_8px_-2px_var(--primary)]">
+          <Avatar className="h-6 w-6 border border-primary/30 shadow-[0_0_2px_var(--primary)/60,0_0_6px_var(--primary)/35]">
             {user?.image && <AvatarImage src={user.image} alt={user.username || "User"} />}
             <AvatarFallback className="bg-primary/20 text-primary text-xs font-mono font-bold">
               {user?.username?.charAt(0).toUpperCase() || "?"}

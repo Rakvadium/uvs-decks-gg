@@ -15,7 +15,6 @@ import {
   MobileBottomNav,
   MobileProfileSheet,
   MobileActionsSheet,
-  MobileActionsTrigger,
 } from "@/components/shell";
 import { usePathname, useParams } from "next/navigation";
 import { Upload, Layers, CreditCard, Settings } from "lucide-react";
@@ -165,15 +164,19 @@ function ShellLayoutInner({ children }: { children: ReactNode }) {
       <div className="flex md:hidden h-[100dvh] w-full flex-col bg-background relative">
         <MobileHeader />
         <main className="min-h-0 flex-1 overflow-y-auto">
-          {children}
+          <div className="min-h-full pb-[calc(env(safe-area-inset-bottom)+11rem)]">
+            {children}
+          </div>
         </main>
-        <div className="relative shrink-0">
-          <MobileTopBar pageType={pageType} />
-          <MobileBottomNav />
-          <MobileActionsTrigger />
+        <div className="pointer-events-none fixed inset-x-0 bottom-0 z-40 bg-transparent ">
+          <div className="relative pointer-events-auto overflow-visible">
+            <MobileActionsSheet>
+              <MobileTopBar pageType={pageType} />
+              <MobileBottomNav />
+            </MobileActionsSheet>
+          </div>
         </div>
         <MobileProfileSheet />
-        <MobileActionsSheet />
       </div>
     </MobileShellProvider>
   );

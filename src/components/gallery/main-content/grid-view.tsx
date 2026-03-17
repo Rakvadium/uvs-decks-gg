@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { CardGridItem } from "@/components/universus";
 import { CardNavigationProvider } from "@/components/universus/card-details/navigation-context";
 import { useInfiniteSlice } from "@/hooks/useInfiniteSlice";
+import { useIsMobile } from "@/hooks/useIsMobile";
 import { usePrefersReducedMotion } from "@/lib/reduced-motion";
 import type { CachedCard } from "@/lib/universus";
 import { CARDS_PER_PAGE } from "./constants";
@@ -16,6 +17,7 @@ interface GalleryGridViewProps {
 }
 
 export function GalleryGridView({ cards, cardsPerRow }: GalleryGridViewProps) {
+  const isMobile = useIsMobile();
   const prefersReducedMotion = usePrefersReducedMotion();
   const { getBackCard } = useGalleryCardMap();
   const clampedCardsPerRow = Math.min(10, Math.max(1, Math.round(cardsPerRow)));
@@ -27,6 +29,7 @@ export function GalleryGridView({ cards, cardsPerRow }: GalleryGridViewProps) {
   const { visibleItems: visibleCards, hasMore, loadMoreRef } = useInfiniteSlice({
     items: cards,
     pageSize: CARDS_PER_PAGE,
+    rootMargin: isMobile ? "0px 0px 480px 0px" : undefined,
   });
 
   return (
