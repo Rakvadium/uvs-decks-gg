@@ -3,7 +3,11 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useDeckDetailsTopBarContext } from "./context";
 
-export function DeckDetailsTopBarViewActions() {
+interface DeckDetailsTopBarViewActionsProps {
+  compact?: boolean;
+}
+
+export function DeckDetailsTopBarViewActions({ compact = false }: DeckDetailsTopBarViewActionsProps) {
   const { isActiveDeck, isOwner, setAsActiveDeck, startEditing } = useDeckDetailsTopBarContext();
 
   if (!isOwner) return null;
@@ -12,18 +16,25 @@ export function DeckDetailsTopBarViewActions() {
     <>
       <Button
         variant={isActiveDeck ? "default" : "outline"}
-        size="sm"
+        size={compact ? "icon" : "sm"}
         onClick={setAsActiveDeck}
         disabled={isActiveDeck}
-        className={cn("h-8", isActiveDeck && "disabled:opacity-100")}
+        className={cn("h-8", compact && "w-8", isActiveDeck && "disabled:opacity-100")}
+        aria-label={isActiveDeck ? "Active deck" : "Set as active deck"}
       >
-        <Zap className={cn("mr-1 h-4 w-4", isActiveDeck && "text-yellow-400")} />
-        {isActiveDeck ? "Active" : "Set Active"}
+        <Zap className={cn("h-4 w-4", !compact && "mr-1", isActiveDeck && "text-yellow-400")} />
+        {!compact ? (isActiveDeck ? "Active" : "Set Active") : null}
       </Button>
 
-      <Button variant="outline" size="sm" onClick={startEditing} className="h-8">
-        <Edit3 className="mr-1 h-4 w-4" />
-        Edit
+      <Button
+        variant="outline"
+        size={compact ? "icon" : "sm"}
+        onClick={startEditing}
+        className={cn("h-8", compact && "w-8")}
+        aria-label="Edit deck"
+      >
+        <Edit3 className={cn("h-4 w-4", !compact && "mr-1")} />
+        {!compact ? "Edit" : null}
       </Button>
     </>
   );
