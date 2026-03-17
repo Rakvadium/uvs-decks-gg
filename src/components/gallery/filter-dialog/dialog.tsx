@@ -5,7 +5,6 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
-  DialogFooter,
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useGalleryFiltersOptional } from "@/providers/GalleryFiltersProvider";
@@ -20,7 +19,7 @@ interface GalleryFilterDialogProps {
 
 function GalleryFilterDialogLayout() {
   return (
-    <div className="relative flex h-full min-h-0 flex-col pb-24 md:pb-20">
+    <div className="relative flex h-full min-h-0 flex-col">
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5" />
       <div className="absolute left-0 right-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
 
@@ -44,20 +43,19 @@ export function GalleryFilterDialog({
         size="lg"
         className="overflow-hidden p-0 md:max-h-[85vh] md:pb-0"
         showCloseButton={false}
+        footer={
+          <DialogClose asChild>
+            <Button variant="outline">
+              <span className="text-xs font-mono uppercase tracking-wider">Close</span>
+            </Button>
+          </DialogClose>
+        }
       >
         <DialogTitle className="sr-only">Filter Cards</DialogTitle>
 
         <GalleryFilterDialogProvider filtersContext={filtersContext}>
           <GalleryFilterDialogLayout />
         </GalleryFilterDialogProvider>
-
-        <DialogFooter>
-          <DialogClose asChild>
-            <Button variant="outline">
-              <span className="text-xs font-mono uppercase tracking-wider">Close</span>
-            </Button>
-          </DialogClose>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

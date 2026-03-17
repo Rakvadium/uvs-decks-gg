@@ -61,13 +61,16 @@ type DialogSize = keyof typeof dialogSizeStyles
 function DialogContent({
   className,
   children,
+  footer,
   showCloseButton = true,
   size = "default",
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
   showCloseButton?: boolean
   size?: DialogSize
+  footer?: React.ReactNode
 }) {
+  const hasFooter = footer != null
   return (
     <DialogPortal data-slot="dialog-portal">
       <DialogOverlay />
@@ -88,9 +91,26 @@ function DialogContent({
       >
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5 pointer-events-none rounded-lg" />
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
-        <div className="relative z-10 flex-1 overflow-y-auto">
+        <div
+          className={cn(
+            "relative z-10 flex-1 min-h-0 overflow-y-auto",
+            hasFooter && "pb-24 md:pb-0"
+          )}
+        >
           {children}
         </div>
+        {hasFooter && (
+          <div
+            data-slot="dialog-footer-slot"
+            className={cn(
+              "flex flex-col-reverse gap-2 pt-4 sm:flex-row sm:justify-end border-t border-border/30",
+              "flex-shrink-0",
+              "fixed bottom-0 left-0 right-0 z-20 bg-card/95 backdrop-blur-lg p-4 pb-[max(1rem,env(safe-area-inset-bottom))] md:static md:bg-transparent md:backdrop-blur-none md:p-0 md:pb-0 md:pt-4 md:z-10 md:border-0"
+            )}
+          >
+            {footer}
+          </div>
+        )}
         {showCloseButton && (
           <DialogPrimitive.Close
             data-slot="dialog-close"

@@ -6,7 +6,6 @@ import {
   DialogClose,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -25,9 +24,30 @@ export function DeckCreateDialog() {
 
   return (
     <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-      <DialogContent size="sm" className="overflow-hidden p-0" showCloseButton={false}>
+      <DialogContent
+        size="sm"
+        className="overflow-hidden p-0"
+        showCloseButton={false}
+        footer={
+          <>
+            <DialogClose asChild>
+              <Button variant="outline" className="h-10 px-4">
+                Close
+              </Button>
+            </DialogClose>
+            <Button
+              className="h-10 px-4"
+              onClick={() => void handleCreate()}
+              disabled={isCreating || !newDeckName.trim()}
+            >
+              {isCreating ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+              Create Deck
+            </Button>
+          </>
+        }
+      >
         <div className="relative flex h-full min-h-0 flex-col">
-          <div className="min-h-0 flex-1 overflow-y-auto p-6 pb-24 md:pb-20">
+          <div className="min-h-0 flex-1 overflow-y-auto p-6">
             <DialogHeader>
               <DialogTitle>Create New Deck</DialogTitle>
               <DialogDescription>Name it now, refine it later.</DialogDescription>
@@ -52,22 +72,6 @@ export function DeckCreateDialog() {
               </div>
             </DialogBody>
           </div>
-
-          <DialogFooter>
-            <DialogClose asChild>
-              <Button variant="outline" className="h-10 px-4">
-                Close
-              </Button>
-            </DialogClose>
-            <Button
-              className="h-10 px-4"
-              onClick={() => void handleCreate()}
-              disabled={isCreating || !newDeckName.trim()}
-            >
-              {isCreating ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-              Create Deck
-            </Button>
-          </DialogFooter>
         </div>
       </DialogContent>
     </Dialog>

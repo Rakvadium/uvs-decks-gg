@@ -101,6 +101,30 @@ export function CardDetailsDialog({
         size="md"
         className="max-h-[90vh] overflow-hidden p-0 md:pb-0"
         showCloseButton={false}
+        footer={
+          <div className="flex items-center gap-3">
+            {showDeckControls && (
+              <DeckSectionControls card={currentCard} layout="horizontal" />
+            )}
+            <div className="ml-auto flex items-center gap-3">
+              {hasNavigation && (
+                <span className="text-[10px] font-mono text-muted-foreground/50">
+                  {currentIndex + 1} / {cards!.length}
+                </span>
+              )}
+              <DialogClose asChild className="md:hidden">
+                <Button variant="outline" size="sm">
+                  <span className="text-xs font-mono uppercase tracking-wider">Close</span>
+                </Button>
+              </DialogClose>
+              <DialogClose asChild className="hidden md:inline-flex">
+                <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+                  <span className="text-xs font-mono uppercase tracking-wider">Close</span>
+                </Button>
+              </DialogClose>
+            </div>
+          </div>
+        }
         onPointerDownOutside={(e) => {
           const target = e.target as HTMLElement;
           if (target.closest("[data-card-dialog-nav]")) {
@@ -118,32 +142,6 @@ export function CardDetailsDialog({
           isFlipped={isFlipped}
           onToggleFlip={() => setIsFlipped((v) => !v)}
         />
-
-        <div className="flex items-center gap-3 border-t border-border/20 px-4 py-2">
-          {showDeckControls && (
-            <DeckSectionControls card={currentCard} layout="horizontal" />
-          )}
-
-          <div className="ml-auto flex items-center gap-3">
-            {hasNavigation && (
-              <span className="text-[10px] font-mono text-muted-foreground/50">
-                {currentIndex + 1} / {cards!.length}
-              </span>
-            )}
-
-            <DialogClose asChild className="md:hidden">
-              <Button variant="outline" size="sm">
-                <span className="text-xs font-mono uppercase tracking-wider">Close</span>
-              </Button>
-            </DialogClose>
-
-            <DialogClose asChild className="hidden md:inline-flex">
-              <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
-                <span className="text-xs font-mono uppercase tracking-wider">Close</span>
-              </Button>
-            </DialogClose>
-          </div>
-        </div>
       </DialogContent>
 
       {hasNavigation && open && typeof document !== "undefined" &&

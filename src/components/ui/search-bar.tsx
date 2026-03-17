@@ -15,7 +15,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 
@@ -214,17 +213,12 @@ export function SearchBar({
       {/* Advanced Filters Dialog */}
       {advancedFilters && (
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogContent size="xl" className={cn("overflow-hidden p-0", dialogClassName)} showCloseButton={false}>
-            <div className="relative flex h-full min-h-0 flex-col">
-              <DialogHeader className="shrink-0 px-6 pb-4 pt-6">
-                <DialogTitle>{advancedFiltersTitle}</DialogTitle>
-              </DialogHeader>
-
-              <div className="min-h-0 flex-1 overflow-y-auto px-6 pb-24 pt-2 md:pb-20">
-                {advancedFilters}
-              </div>
-
-              <DialogFooter>
+          <DialogContent
+            size="xl"
+            className={cn("overflow-hidden p-0", dialogClassName)}
+            showCloseButton={false}
+            footer={
+              <>
                 <DialogClose asChild>
                   <Button variant="outline">Close</Button>
                 </DialogClose>
@@ -236,7 +230,17 @@ export function SearchBar({
                 >
                   Apply Filters
                 </Button>
-              </DialogFooter>
+              </>
+            }
+          >
+            <div className="relative flex h-full min-h-0 flex-col">
+              <DialogHeader className="shrink-0 px-6 pb-4 pt-6">
+                <DialogTitle>{advancedFiltersTitle}</DialogTitle>
+              </DialogHeader>
+
+              <div className="min-h-0 flex-1 overflow-y-auto px-6 pt-2">
+                {advancedFilters}
+              </div>
             </div>
           </DialogContent>
         </Dialog>

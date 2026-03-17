@@ -7,7 +7,6 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
-  DialogFooter,
   DialogTitle,
 } from "@/components/ui/dialog";
 import { CardDetailsContent } from "./content";
@@ -29,10 +28,21 @@ export function CardDetailsDialog({ card, backCard, open, onOpenChange }: CardDe
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent size="lg" className="overflow-hidden p-0 md:max-h-[90vh]" showCloseButton={false}>
+      <DialogContent
+        size="lg"
+        className="overflow-hidden p-0 md:max-h-[90vh]"
+        showCloseButton={false}
+        footer={
+          <DialogClose asChild>
+            <Button variant="outline">
+              <span className="text-xs font-mono uppercase tracking-wider">Close</span>
+            </Button>
+          </DialogClose>
+        }
+      >
         <DialogTitle className="sr-only">{displayCard.name} - Card Details</DialogTitle>
 
-        <div className="flex h-full min-h-0 flex-col pb-24 md:pb-20 lg:flex-row">
+        <div className="flex h-full min-h-0 flex-col lg:flex-row">
           <CardDetailsImagePanel
             displayCard={displayCard}
             deckCard={card}
@@ -42,14 +52,6 @@ export function CardDetailsDialog({ card, backCard, open, onOpenChange }: CardDe
           />
           <CardDetailsContent card={displayCard} />
         </div>
-
-        <DialogFooter>
-          <DialogClose asChild>
-            <Button variant="outline">
-              <span className="text-xs font-mono uppercase tracking-wider">Close</span>
-            </Button>
-          </DialogClose>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
