@@ -1,10 +1,9 @@
 "use client";
 
-import { Ghost, LogIn, UserPlus } from "lucide-react";
+import { LogIn, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { AuthDialogFlow } from "../dialog-flow";
-import { FLAGS } from "@/lib/flags";
 import { useSignInDialogModel } from "./hook";
 
 export function SignInFormDialog({
@@ -14,7 +13,7 @@ export function SignInFormDialog({
   setFlow: (flow: AuthDialogFlow) => void;
   onSuccess: () => void;
 }) {
-  const { submitting, handleSubmit, handleAnonymousSignIn } = useSignInDialogModel(onSuccess);
+  const { submitting, handleSubmit } = useSignInDialogModel(onSuccess);
 
   return (
     <>
@@ -47,15 +46,6 @@ export function SignInFormDialog({
           </Button>
         </div>
       </form>
-
-      {FLAGS.ANONYMOUS_AUTH_ENABLED ? (
-        <div className="mt-6 border-t border-border pt-6">
-          <Button variant="ghost" className="w-full" onClick={handleAnonymousSignIn} disabled={submitting}>
-            <Ghost className="size-4" />
-            Continue as Guest
-          </Button>
-        </div>
-      ) : null}
     </>
   );
 }

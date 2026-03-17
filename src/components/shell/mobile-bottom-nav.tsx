@@ -32,7 +32,7 @@ export function MobileBottomNav() {
   }
 
   return (
-    <nav className="relative shrink-0 bg-background pb-[env(safe-area-inset-bottom)]">
+    <nav className="relative shrink-0 bg-background pt-2 pb-[env(safe-area-inset-bottom)]">
       <div className="flex h-16 items-center justify-around px-2">
         {navItems.map((item) => {
           const isActive = pathname.includes(`/${item.path}`)

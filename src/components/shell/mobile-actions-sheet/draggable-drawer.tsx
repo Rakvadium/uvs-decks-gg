@@ -285,7 +285,7 @@ export function MobileActionsDraggableDrawer({ children }: MobileActionsDraggabl
               <MobileActionsSheetContent />
             </div>
           </div>
-          <div ref={bottomStackRef} className="shrink-0 mt-2">
+          <div ref={bottomStackRef} className="shrink-0 pt-2">
             {children}
           </div>
         </div>

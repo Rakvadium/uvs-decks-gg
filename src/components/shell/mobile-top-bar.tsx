@@ -9,7 +9,7 @@ interface MobileTopBarProps {
   pageType?: PageType | null
 }
 
-const mobileTopBarClassName = "relative shrink-0 bg-background"
+const mobileTopBarClassName = "relative shrink-0 bg-background pt-3"
 
 export function MobileTopBar({ pageType }: MobileTopBarProps) {
   const { state } = useShellSlot()

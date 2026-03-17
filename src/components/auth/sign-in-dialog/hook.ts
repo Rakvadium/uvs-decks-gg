@@ -1,7 +1,6 @@
 import { useCallback, useState, type FormEvent } from "react";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { toast } from "sonner";
-import { FLAGS } from "@/lib/flags";
 import { clearAuthCookies, isRefreshTokenParseError } from "../auth-recovery";
 
 export function useSignInDialogModel(onSuccess: () => void) {
@@ -48,44 +47,8 @@ export function useSignInDialogModel(onSuccess: () => void) {
     [onSuccess, signIn]
   );
 
-  const handleAnonymousSignIn = useCallback(async () => {
-    if (!FLAGS.ANONYMOUS_AUTH_ENABLED) return;
-
-    setSubmitting(true);
-    try {
-      const result = await signIn("anonymous");
-      if (!result.signingIn) {
-        toast.error("Anonymous sign-in could not be completed");
-        return;
-      }
-      toast.success("Signed in anonymously");
-      onSuccess();
-    } catch (error) {
-      if (isRefreshTokenParseError(error)) {
-        try {
-          await clearAuthCookies();
-          const retryResult = await signIn("anonymous");
-          if (!retryResult.signingIn) {
-            toast.error("Anonymous sign-in could not be completed");
-            return;
-          }
-          toast.success("Signed in anonymously");
-          onSuccess();
-          return;
-        } catch (retryError) {
-          console.error(retryError);
-        }
-      }
-      console.error(error);
-      toast.error("Could not sign in anonymously");
-    } finally {
-      setSubmitting(false);
-    }
-  }, [onSuccess, signIn]);
-
   return {
     submitting,
     handleSubmit,
-    handleAnonymousSignIn,
   };
 }

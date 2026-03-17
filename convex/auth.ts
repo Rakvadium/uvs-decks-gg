@@ -1,10 +1,8 @@
-import { Anonymous } from "@convex-dev/auth/providers/Anonymous";
 import { Password } from "@convex-dev/auth/providers/Password";
 import { convexAuth } from "@convex-dev/auth/server";
 import { ConvexError } from "convex/values";
 import { z } from "zod";
 import { ResendOTPPasswordReset } from "./ResendOTPPasswordReset";
-import { FLAGS } from "./flags";
 
 const ProfileSchema = z.object({
   email: z.string().email("Invalid email format"),
@@ -30,10 +28,6 @@ export default Password({
   },
 });
 
-const providers = FLAGS.ANONYMOUS_AUTH_ENABLED
-  ? [Password({ reset: ResendOTPPasswordReset }), Anonymous]
-  : [Password({ reset: ResendOTPPasswordReset })];
-
 export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
-  providers,
+  providers: [Password({ reset: ResendOTPPasswordReset })],
 });
