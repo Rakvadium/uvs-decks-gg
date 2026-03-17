@@ -22,8 +22,11 @@ export function DeckDetailsHeroSymbolSelector() {
           type="button"
           aria-label="Change symbol"
           className={cn(
-            "absolute bottom-2 left-2 z-20 flex h-9 w-9 items-center justify-center rounded-md border border-border/50 bg-background/80",
-            "transition-all hover:border-primary/50 hover:bg-primary/5 hover:shadow-[0_0_12px_-6px_var(--primary)]"
+            "absolute bottom-0 left-0 z-20 flex h-9 w-9 items-center justify-center",
+            "rounded-bl-lg rounded-tr-lg rounded-tl-none rounded-br-none",
+            "bg-background/80 backdrop-blur-sm",
+            "border-r border-t border-border/40",
+            "transition-all hover:bg-primary/10 hover:border-primary/40"
           )}
         >
           <SymbolIcon symbol={selectedSymbol ?? characterSymbols[0]} size="lg" />

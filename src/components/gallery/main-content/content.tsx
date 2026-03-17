@@ -8,6 +8,7 @@ import { GalleryGridView } from "./grid-view";
 import { GalleryInitializationState } from "./initial-loading-state";
 import { GalleryListView } from "./list-view";
 import { GalleryStats } from "./gallery-stats";
+import { CardPreviewDialogTrigger } from "./card-preview-dialog";
 import { LoadingProgress } from "./loading-progress";
 
 function GalleryMainContentBody() {
@@ -21,7 +22,10 @@ function GalleryMainContentBody() {
   return (
     <div className="relative z-10 flex-1 overflow-y-auto">
       <div className="space-y-4 p-4 pb-6 md:p-6 md:pb-4">
-        <GalleryStats totalCards={meta.totalCards} filteredCount={meta.filteredCount} isLoading={meta.isLoadingMore} />
+        <div className="flex items-center justify-between">
+          <GalleryStats totalCards={meta.totalCards} filteredCount={meta.filteredCount} isLoading={meta.isLoadingMore} />
+          <CardPreviewDialogTrigger />
+        </div>
 
         {state.viewMode === "card" ? (
           <GalleryGridView key={filterKey} cards={meta.filteredCards} cardsPerRow={state.cardsPerRow} />

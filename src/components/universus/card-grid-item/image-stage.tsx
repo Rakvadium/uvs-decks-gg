@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { cn } from "@/lib/utils";
+import { CARD_GLOW_REST, CARD_GLOW_HOVER } from "@/components/universus/card-item/glow";
 import { useCardGridItemContext } from "./context";
 import { CardImageDisplay } from "./image-display";
 
@@ -10,11 +10,8 @@ export function CardGridItemImageStage() {
 
   return (
     <div
-      className={cn(
-        "relative h-full w-full overflow-hidden rounded-lg",
-        "shadow-[0_0_0_1px_var(--primary)/30,0_0_5px_var(--primary)/50]",
-        isHovered && "shadow-[0_0_0_1px_var(--primary)/70,0_0_8px_var(--primary)/90,0_0_16px_var(--primary)/25]"
-      )}
+      className="relative h-full w-full overflow-hidden rounded-lg transition-shadow duration-150"
+      style={{ boxShadow: isHovered ? CARD_GLOW_HOVER : CARD_GLOW_REST }}
     >
       <AnimatePresence initial={false} mode="wait">
         <motion.div
@@ -30,21 +27,15 @@ export function CardGridItemImageStage() {
       </AnimatePresence>
 
       <div
-        className={cn(
-          "pointer-events-none absolute inset-0 rounded-lg bg-gradient-to-t from-background/80 via-transparent to-transparent transition-opacity duration-150",
-          isHovered ? "opacity-25" : "opacity-0"
-        )}
+        className="pointer-events-none absolute inset-0 rounded-lg bg-gradient-to-t from-background/80 via-transparent to-transparent transition-opacity duration-150"
+        style={{ opacity: isHovered ? 0.25 : 0 }}
       />
 
       <div
-        className={cn(
-          "pointer-events-none absolute inset-0 rounded-lg",
-          "bg-[linear-gradient(135deg,transparent_40%,var(--primary)/10_50%,transparent_60%)]",
-          "transition-opacity duration-150",
-          isHovered ? "opacity-100" : "opacity-0"
-        )}
+        className="pointer-events-none absolute inset-0 rounded-lg bg-[linear-gradient(135deg,transparent_40%,var(--primary)/10_50%,transparent_60%)] transition-opacity duration-150"
         style={{
           backgroundSize: "200% 200%",
+          opacity: isHovered ? 1 : 0,
           animation: isHovered && !prefersReducedMotion ? "holo-shimmer 3s ease-in-out infinite" : "none",
         }}
       />

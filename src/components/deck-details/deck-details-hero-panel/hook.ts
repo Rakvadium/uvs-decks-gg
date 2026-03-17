@@ -1,5 +1,4 @@
 import { useMemo, useState } from "react";
-import { formatUniversusCardType } from "@/config/universus";
 import { useCardIdMap } from "@/hooks/useCardIdMap";
 import { useCardData } from "@/lib/universus";
 import { useDeckDetails } from "@/providers/DeckDetailsProvider";
@@ -33,15 +32,6 @@ export function useDeckDetailsHeroPanelModel() {
     return [...new Set(rawSymbols)];
   }, [startingCharacterSymbols]);
 
-  const characterOptions = useMemo(
-    () =>
-      allCards
-        .filter((card) => formatUniversusCardType(card.type) === "Character")
-        .filter((card) => card.isFrontFace !== false)
-        .sort((a, b) => a.name.localeCompare(b.name)),
-    [allCards]
-  );
-
   const mainCount = useMemo(() => {
     if (!deck) return 0;
     return Object.values(deck.mainQuantities).reduce((sum, quantity) => sum + quantity, 0);
@@ -52,9 +42,10 @@ export function useDeckDetailsHeroPanelModel() {
     setCharacterOpen(false);
   };
 
-  const handleViewCharacterDetails = () => {
-    setCharacterOpen(false);
-    setCharacterDetailsOpen(true);
+  const handleImageClick = () => {
+    if (startingCharacter) {
+      setCharacterDetailsOpen(true);
+    }
   };
 
   const handleSelectSymbol = (symbol: string) => {
@@ -76,11 +67,10 @@ export function useDeckDetailsHeroPanelModel() {
     imageCard,
     selectedSymbol,
     characterSymbols,
-    characterOptions,
     mainCount,
     handleSelectCharacter,
-    handleViewCharacterDetails,
     handleSelectSymbol,
+    handleImageClick,
   };
 }
 

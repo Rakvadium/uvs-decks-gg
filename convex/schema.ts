@@ -78,6 +78,7 @@ export default defineSchema({
     .index("by_setNumber", ["setNumber"])
     .index("by_rarity", ["rarity"])
     .index("by_type", ["type"])
+    .index("by_type_and_name", ["type", "name"])
     .index("by_difficulty", ["difficulty"])
     .index("by_oracleId", ["oracleId"])
     .index("by_backCardId", ["backCardId"])

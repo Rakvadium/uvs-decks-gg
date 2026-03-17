@@ -3,7 +3,6 @@
 import { type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { CardDeckActions } from "./deck-actions";
-import { CardDeckCountBadge } from "./deck-count-badge";
 import { CardFlipControl } from "./flip-control";
 import { useCardGridItemContext } from "./context";
 
@@ -51,7 +50,6 @@ export function CardGridItemFrame({ children }: { children: ReactNode }) {
 
       {children}
       <CardFlipControl />
-      <CardDeckCountBadge />
       <CardDeckActions />
     </div>
   );

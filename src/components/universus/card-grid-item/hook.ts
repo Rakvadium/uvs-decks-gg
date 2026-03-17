@@ -5,7 +5,7 @@ import { useIsMobile } from "@/hooks/useIsMobile";
 import { usePrefersReducedMotion } from "@/lib/reduced-motion";
 import type { CardGridItemProps } from "./types";
 
-export function useCardGridItem({ card, backCard }: CardGridItemProps) {
+export function useCardGridItem({ card, backCard, onCardClick }: CardGridItemProps) {
   const isMobile = useIsMobile();
   const [usesTouchControls, setUsesTouchControls] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -88,15 +88,26 @@ export function useCardGridItem({ card, backCard }: CardGridItemProps) {
 
   const handleCardClick = useCallback(() => {
     if (dragBlockRef.current) return;
-    setIsDialogOpen(true);
-  }, []);
-
-  const handleKeyDown = useCallback((event: React.KeyboardEvent) => {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
+    if (onCardClick) {
+      void onCardClick(card);
+    } else {
       setIsDialogOpen(true);
     }
-  }, []);
+  }, [card, onCardClick]);
+
+  const handleKeyDown = useCallback(
+    (event: React.KeyboardEvent) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        if (onCardClick) {
+          void onCardClick(card);
+        } else {
+          setIsDialogOpen(true);
+        }
+      }
+    },
+    [card, onCardClick]
+  );
 
   const addToDeck = useCallback(
     (event: React.MouseEvent) => {

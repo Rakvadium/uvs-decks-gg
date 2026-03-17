@@ -22,12 +22,14 @@ function DeckDetailsTopBarContent() {
     return (
       <div className="flex w-full min-w-0 items-center gap-2">
         <Link href="/decks">
-          <Button variant="ghost" size="icon" className="h-8 w-8">
+          <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0">
             <ArrowLeft className="h-4 w-4" />
           </Button>
         </Link>
 
-        <div className="ml-auto flex items-center gap-2">
+        <DeckDetailsTopBarTitleSection compact />
+
+        <div className="ml-auto flex shrink-0 items-center gap-2">
           {isEditing ? <DeckDetailsTopBarEditActions compact /> : <DeckDetailsTopBarViewActions compact />}
         </div>
       </div>

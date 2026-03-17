@@ -385,7 +385,7 @@
       inset 0 0 25px oklch(from var(--primary) l c h / 0.1),
       0 0 20px oklch(from var(--primary) l c h / 0.2);
   }
-  
+
   .status-indicator {
     width: 8px;
     height: 8px;

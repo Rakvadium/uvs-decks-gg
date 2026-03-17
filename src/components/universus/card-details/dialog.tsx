@@ -97,7 +97,17 @@ export function CardDetailsDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent size="md" className="max-h-[90vh] overflow-hidden p-0 md:pb-0" showCloseButton={false}>
+      <DialogContent
+        size="md"
+        className="max-h-[90vh] overflow-hidden p-0 md:pb-0"
+        showCloseButton={false}
+        onPointerDownOutside={(e) => {
+          const target = e.target as HTMLElement;
+          if (target.closest("[data-card-dialog-nav]")) {
+            e.preventDefault();
+          }
+        }}
+      >
         <DialogTitle className="sr-only">{displayCard.name} - Card Details</DialogTitle>
 
         <CardDetailsV2
@@ -138,7 +148,7 @@ export function CardDetailsDialog({
 
       {hasNavigation && open && typeof document !== "undefined" &&
         createPortal(
-          <div className="pointer-events-none fixed inset-0 z-[60] flex items-center justify-between px-4 md:px-8">
+          <div data-card-dialog-nav className="pointer-events-none fixed inset-0 z-[60] flex items-center justify-between px-4 md:px-8">
             <button
               type="button"
               onClick={goToPrev}

@@ -1,10 +1,48 @@
 import { query, mutation, action, internalMutation } from "./_generated/server";
+import type { Id } from "./_generated/dataModel";
 import { paginationOptsValidator } from "convex/server";
 import { v } from "convex/values";
 import { cardValidator } from "./validators";
 import { api } from "./_generated/api";
 
 const PUBLIC_R2_BASE_URL = "https://pub-53d81abf7a7f442a90c9383c1e7bdc60.r2.dev";
+
+function toPublicCardImageUrl(imageUrl?: string) {
+  if (!imageUrl) {
+    return undefined;
+  }
+
+  if (imageUrl.startsWith("http")) {
+    return imageUrl;
+  }
+
+  return `${PUBLIC_R2_BASE_URL}/cards/${imageUrl}`;
+}
+
+function matchesCharacterSearch(name: string, searchName: string | undefined, search: string | undefined) {
+  if (!search) {
+    return true;
+  }
+
+  const normalizedSearch = search.toLowerCase();
+  return name.toLowerCase().includes(normalizedSearch) || searchName?.includes(normalizedSearch) === true;
+}
+
+function matchesCharacterSymbol(symbols: string | undefined, symbol: string | undefined) {
+  if (!symbol) {
+    return true;
+  }
+
+  if (!symbols) {
+    return false;
+  }
+
+  return symbols
+    .split(/[,|]/)
+    .map((entry) => entry.trim().toLowerCase())
+    .filter(Boolean)
+    .includes(symbol.toLowerCase());
+}
 
 export const list = query({
   args: {
@@ -492,6 +530,105 @@ export const listCharacters = query({
       .collect();
 
     return allCards.filter((card) => card.type === cardType && card.isFrontFace !== false);
+  },
+});
+
+export const listCharactersPaginated = query({
+  args: {
+    paginationOpts: paginationOptsValidator,
+    search: v.optional(v.string()),
+    symbol: v.optional(v.string()),
+  },
+  returns: v.object({
+    page: v.array(cardValidator),
+    isDone: v.boolean(),
+    continueCursor: v.string(),
+  }),
+  handler: async (ctx, args) => {
+    const numItems = Math.min(Math.max(args.paginationOpts.numItems, 1), 20);
+    const search = args.search?.trim() || undefined;
+    const symbol = args.symbol?.trim().toLowerCase() || undefined;
+    const page: Array<{
+      _id: Id<"cards">;
+      _creationTime: number;
+      oracleId?: string;
+      name: string;
+      imageUrl?: string;
+      backCardId?: Id<"cards">;
+      frontCardId?: Id<"cards">;
+      isFrontFace?: boolean;
+      isVariant?: boolean;
+      setCode?: string;
+      setName?: string;
+      setNumber?: number;
+      collectorNumber?: string;
+      rarity?: string;
+      type?: string;
+      difficulty?: number;
+      control?: number;
+      speed?: number;
+      damage?: number;
+      blockModifier?: number;
+      handSize?: number;
+      health?: number;
+      stamina?: number;
+      attackZone?: string;
+      blockZone?: string;
+      text?: string;
+      keywords?: string;
+      symbols?: string;
+      searchName?: string;
+      searchText?: string;
+      searchAll?: string;
+      copyLimit?: number;
+    }> = [];
+
+    let cursor = args.paginationOpts.cursor;
+    let isDone = false;
+    let continueCursor = args.paginationOpts.cursor ?? "";
+
+    while (page.length < numItems && !isDone) {
+      const result = await ctx.db
+        .query("cards")
+        .withIndex("by_type_and_name", (q) => q.eq("type", "Character"))
+        .paginate({
+          numItems: Math.max(numItems * 4, 80),
+          cursor,
+        });
+
+      cursor = result.continueCursor;
+      continueCursor = result.continueCursor;
+      isDone = result.isDone;
+
+      for (const card of result.page) {
+        if (card.isFrontFace === false || card.isVariant === true) {
+          continue;
+        }
+
+        if (!matchesCharacterSearch(card.name, card.searchName, search)) {
+          continue;
+        }
+
+        if (!matchesCharacterSymbol(card.symbols, symbol)) {
+          continue;
+        }
+
+        page.push({
+          ...card,
+          imageUrl: toPublicCardImageUrl(card.imageUrl) ?? card.imageUrl,
+        });
+
+        if (page.length >= numItems) {
+          break;
+        }
+      }
+    }
+
+    return {
+      page,
+      isDone,
+      continueCursor,
+    };
   },
 });
 

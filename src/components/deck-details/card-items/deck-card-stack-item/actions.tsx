@@ -1,7 +1,6 @@
 "use client";
 
-import { Minus, Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { CardDeckControls } from "@/components/universus/card-item/deck-controls";
 import { canAddCardToSection, useDeckEditor } from "@/lib/deck";
 import { useDeckDetailsOptional } from "@/providers/DeckDetailsProvider";
 import { useDeckCardsSectionContext } from "../../deck-details-cards-section-context";
@@ -11,9 +10,10 @@ import type { CachedCard } from "@/lib/universus";
 interface DeckCardStackItemActionsProps {
   card: CachedCard;
   quantity: number;
+  isHovered: boolean;
 }
 
-export function DeckCardStackItemActions({ card, quantity }: DeckCardStackItemActionsProps) {
+export function DeckCardStackItemActions({ card, quantity, isHovered }: DeckCardStackItemActionsProps) {
   const deckDetails = useDeckDetailsOptional();
   const { activeSection } = useDeckCardsSectionContext();
   const { addCard, removeCard } = useDeckEditor();
@@ -29,25 +29,14 @@ export function DeckCardStackItemActions({ card, quantity }: DeckCardStackItemAc
   });
 
   return (
-    <div className="flex items-center gap-0.5" onClick={(event) => event.stopPropagation()}>
-      <Button
-        variant="outline"
-        size="icon-sm"
-        className="h-7 w-7 border-primary/40 text-primary hover:bg-primary/15 hover:border-primary/60"
-        onClick={() => removeCard(card._id, activeSection)}
-        disabled={quantity <= 0}
-      >
-        <Minus className="h-3.5 w-3.5" />
-      </Button>
-      <Button
-        variant="outline"
-        size="icon-sm"
-        className="h-7 w-7 border-primary/40 text-primary hover:bg-primary/15 hover:border-primary/60"
-        onClick={() => addCard(card._id, activeSection)}
-        disabled={!canAdd}
-      >
-        <Plus className="h-3.5 w-3.5" />
-      </Button>
+    <div onClick={(e) => e.stopPropagation()}>
+      <CardDeckControls
+        deckCount={quantity}
+        isHovered={isHovered}
+        canAdd={canAdd}
+        onAdd={(e) => { e.stopPropagation(); addCard(card._id, activeSection); }}
+        onRemove={(e) => { e.stopPropagation(); removeCard(card._id, activeSection); }}
+      />
     </div>
   );
 }

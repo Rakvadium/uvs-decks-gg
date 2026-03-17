@@ -3,10 +3,7 @@
 import { AlertTriangle } from "lucide-react";
 import { CardHoverPreviewPortal } from "@/components/deck/shared";
 import { SIDEBAR_SIDEBOARD_LIMIT } from "./uvs-import-export";
-import {
-  DeckCardsSectionProvider,
-  useDeckCardsSectionContext,
-} from "./deck-details-cards-section-context";
+import { useDeckCardsSectionContext } from "./deck-details-cards-section-context";
 import { DeckCardsToolbar } from "./deck-details-cards-toolbar";
 import { DeckCardsContent } from "./deck-details-cards-content";
 
@@ -40,9 +37,5 @@ function DeckCardsSectionContent() {
 }
 
 export function DeckCardsSection() {
-  return (
-    <DeckCardsSectionProvider>
-      <DeckCardsSectionContent />
-    </DeckCardsSectionProvider>
-  );
+  return <DeckCardsSectionContent />;
 }
