@@ -1,6 +1,7 @@
 import { Loader2, Save, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useDeckDetailsTopBarContext } from "./context";
+import { DeckDetailsTopBarDeleteAction } from "./delete-action";
 
 export function DeckDetailsTopBarEditActions() {
   const { cancelEditing, isSaving, saveEdits } = useDeckDetailsTopBarContext();
@@ -15,6 +16,7 @@ export function DeckDetailsTopBarEditActions() {
         {isSaving ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <Save className="mr-1 h-4 w-4" />}
         Save
       </Button>
+      <DeckDetailsTopBarDeleteAction />
     </>
   );
 }

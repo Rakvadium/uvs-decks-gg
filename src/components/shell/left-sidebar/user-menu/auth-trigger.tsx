@@ -19,7 +19,7 @@ export function LeftSidebarUserMenuTrigger({ className, ...props }: LeftSidebarU
       )}
       {...props}
     >
-      <Avatar className="h-8 w-8 shrink-0 border border-primary/30 shadow-[0_0_10px_-3px_var(--primary)]">
+      <Avatar className="h-8 w-8 shrink-0 border border-primary/30 shadow-[0_0_2px_var(--primary)/40,0_0_6px_var(--primary)/35]">
         {user?.image ? <AvatarImage src={user.image} alt={user.username || "User"} /> : null}
         <AvatarFallback className="bg-primary/20 font-mono text-sm font-bold text-primary">
           {user?.username?.charAt(0).toUpperCase() || "?"}

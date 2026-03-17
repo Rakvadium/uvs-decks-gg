@@ -243,7 +243,7 @@ export function CardDetailsV3({
                   <RotateCcw
                     className={cn(
                       "h-4 w-4",
-                      !prefersReducedMotion && "transition-transform duration-300",
+                      !prefersReducedMotion && "transition-transform duration-150",
                       isFlipped && "rotate-180"
                     )}
                   />

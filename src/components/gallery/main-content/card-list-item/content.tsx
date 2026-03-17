@@ -26,9 +26,9 @@ function CardListItemContent() {
     <>
       <div
         className={cn(
-          "group flex min-h-[84px] w-full items-center gap-4 rounded-xl border border-border/50 bg-card/50 px-4 py-3 text-foreground",
-          "shadow-[0_0_20px_-18px_var(--primary)]",
-          "[contain:layout_paint] transition-colors hover:border-primary/40 hover:bg-card/70",
+          "group flex min-h-[84px] w-full items-center gap-4 rounded-xl border border-primary/20 bg-card/50 px-4 py-3 text-foreground",
+          "shadow-[0_0_0_1px_var(--primary)/20,0_0_5px_var(--primary)/40]",
+          "[contain:layout_paint] transition-all duration-150 hover:border-primary/50 hover:bg-card/70 hover:shadow-[0_0_0_1px_var(--primary)/50,0_0_8px_var(--primary)/70,0_0_14px_var(--primary)/15]",
           isDragging && "opacity-60"
         )}
         style={{

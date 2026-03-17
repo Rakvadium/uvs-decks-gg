@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { canAddCardToSection, canMoveCardToSection } from "@/lib/deck";
 import {
   DECK_SECTION_KEYS,
@@ -11,6 +11,7 @@ import type { ActiveDeckCardRowProps } from "./types";
 export function useActiveDeckCardRowModel({ card, count, sectionKey }: ActiveDeckCardRowProps) {
   const {
     addCard,
+    getBackCard,
     moveCard,
     onHoverEnter,
     onHoverLeave,
@@ -18,6 +19,9 @@ export function useActiveDeckCardRowModel({ card, count, sectionKey }: ActiveDec
     removeCard,
     sectionCounts,
   } = useActiveDeckSectionsContext();
+
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const dragBlockRef = useRef(false);
 
   const canAddToDeck = canAddCardToSection({
     card,
@@ -35,6 +39,27 @@ export function useActiveDeckCardRowModel({ card, count, sectionKey }: ActiveDec
     card,
     sourceId: `active-deck:${sectionKey}`,
   });
+
+  useEffect(() => {
+    if (isDragging) {
+      dragBlockRef.current = true;
+      return;
+    }
+    if (dragBlockRef.current) {
+      const timeout = window.setTimeout(() => {
+        dragBlockRef.current = false;
+      }, 120);
+      return () => window.clearTimeout(timeout);
+    }
+    return undefined;
+  }, [isDragging]);
+
+  const handleCardClick = useCallback(() => {
+    if (dragBlockRef.current) return;
+    setIsDialogOpen(true);
+  }, []);
+
+  const backCard = getBackCard(card);
 
   const canMoveToSection = (target: DeckSection) => {
     if (count <= 0) return false;
@@ -58,6 +83,7 @@ export function useActiveDeckCardRowModel({ card, count, sectionKey }: ActiveDec
 
   return {
     card,
+    backCard,
     count,
     sectionKey,
     moveTargets,
@@ -67,10 +93,13 @@ export function useActiveDeckCardRowModel({ card, count, sectionKey }: ActiveDec
     canMoveToSection,
     handlePointerEnter,
     handlePointerMove,
+    handleCardClick,
     onHoverLeave,
     addCard,
     removeCard,
     moveCard,
+    isDialogOpen,
+    setIsDialogOpen,
   };
 }
 

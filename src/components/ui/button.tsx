@@ -9,18 +9,18 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_0_15px_-3px_var(--primary)] hover:shadow-[0_0_25px_-3px_var(--primary)] border border-primary/50",
+        default: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_0_2px_var(--primary),0_0_8px_var(--primary)/60] hover:shadow-[0_0_4px_var(--primary),0_0_14px_var(--primary),0_0_20px_var(--primary)/25] border border-primary/50",
         destructive:
-          "bg-destructive text-white hover:bg-destructive/90 shadow-[0_0_15px_-3px_var(--destructive)] hover:shadow-[0_0_25px_-3px_var(--destructive)] border border-destructive/50",
+          "bg-destructive text-white hover:bg-destructive/90 shadow-[0_0_2px_var(--destructive),0_0_8px_var(--destructive)/60] hover:shadow-[0_0_4px_var(--destructive),0_0_14px_var(--destructive),0_0_20px_var(--destructive)/25] border border-destructive/50",
         outline:
-          "border border-primary/30 bg-transparent text-primary hover:bg-primary/10 hover:border-primary/60 hover:shadow-[0_0_20px_-5px_var(--primary)]",
+          "border border-primary/30 bg-transparent text-primary hover:bg-primary/10 hover:border-primary/60 hover:shadow-[0_0_3px_var(--primary),0_0_10px_var(--primary)/70]",
         secondary:
-          "bg-secondary/80 text-secondary-foreground hover:bg-secondary border border-secondary/50 hover:shadow-[0_0_15px_-5px_var(--secondary)]",
+          "bg-secondary/80 text-secondary-foreground hover:bg-secondary border border-secondary/50 hover:shadow-[0_0_3px_var(--secondary),0_0_10px_var(--secondary)/70]",
         ghost:
           "hover:bg-accent/50 hover:text-accent-foreground border border-transparent hover:border-accent/30",
         link: "text-primary underline-offset-4 hover:underline hover:text-primary/80",
-        neon: "bg-transparent text-primary border-2 border-primary hover:bg-primary/10 shadow-[0_0_10px_var(--primary),inset_0_0_10px_var(--primary)/20] hover:shadow-[0_0_20px_var(--primary),0_0_40px_var(--primary)/50,inset_0_0_15px_var(--primary)/30]",
-        "neon-magenta": "bg-transparent text-secondary border-2 border-secondary hover:bg-secondary/10 shadow-[0_0_10px_var(--secondary),inset_0_0_10px_var(--secondary)/20] hover:shadow-[0_0_20px_var(--secondary),0_0_40px_var(--secondary)/50,inset_0_0_15px_var(--secondary)/30]",
+        neon: "bg-transparent text-primary border-2 border-primary hover:bg-primary/10 shadow-[0_0_3px_var(--primary),0_0_10px_var(--primary),inset_0_0_5px_var(--primary)/30] hover:shadow-[0_0_5px_var(--primary),0_0_18px_var(--primary),0_0_28px_var(--primary)/35,inset_0_0_8px_var(--primary)/40]",
+        "neon-magenta": "bg-transparent text-secondary border-2 border-secondary hover:bg-secondary/10 shadow-[0_0_3px_var(--secondary),0_0_10px_var(--secondary),inset_0_0_5px_var(--secondary)/30] hover:shadow-[0_0_5px_var(--secondary),0_0_18px_var(--secondary),0_0_28px_var(--secondary)/35,inset_0_0_8px_var(--secondary)/40]",
         cyber: "bg-gradient-to-r from-primary/20 to-secondary/20 text-foreground border border-primary/40 hover:from-primary/30 hover:to-secondary/30 hover:border-primary/60 backdrop-blur-sm",
       },
       size: {

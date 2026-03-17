@@ -28,7 +28,7 @@ export function DeckCreateDialog() {
           <div className="relative p-6">
             <DialogHeader className="border-border/20 pb-4">
               <div className="flex items-start gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-lg border border-primary/30 bg-primary/10 shadow-[0_0_20px_-6px_var(--primary)]">
+                <div className="flex h-11 w-11 items-center justify-center rounded-lg border border-primary/30 bg-primary/10 shadow-[0_0_2px_var(--primary)/40,0_0_6px_var(--primary)/40]">
                   <Layers className="h-5 w-5 text-primary" />
                 </div>
                 <div>

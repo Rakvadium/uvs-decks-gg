@@ -8,6 +8,11 @@ import { useRouter } from "next/navigation";
 import { useSiloedDeckOptional } from "@/lib/deck";
 import { useActiveDeck } from "./ActiveDeckProvider";
 
+function useIsDeckOwner(deck: { userId: Id<"users"> } | null | undefined) {
+  const currentUser = useQuery(api.user.currentUser);
+  return Boolean(deck && currentUser && deck.userId === currentUser._id);
+}
+
 type DeckSection = "main" | "side" | "reference";
 type DeckDetailsUpdate = {
   name?: string;
@@ -22,6 +27,7 @@ interface DeckDetailsContextValue {
   deckId: Id<"decks"> | null;
   deck: ReturnType<typeof useQuery<typeof api.decks.getById>> | undefined;
   isLoading: boolean;
+  isOwner: boolean;
   activeSection: DeckSection;
   setActiveSection: (section: DeckSection) => void;
   isEditing: boolean;
@@ -73,6 +79,7 @@ export function DeckDetailsProvider({ children, deckId }: DeckDetailsProviderPro
   const queriedDeck = useQuery(api.decks.getById, siloedDeck ? "skip" : { deckId: typedDeckId });
   const deck = siloedDeck?.deck ?? queriedDeck;
   const isDeckLoading = siloedDeck ? siloedDeck.isLoading : queriedDeck === undefined;
+  const isOwner = useIsDeckOwner(deck);
   const updateDeckMutation = useMutation(api.decks.update);
   const deleteDeckMutation = useMutation(api.decks.deleteDeck);
 
@@ -89,10 +96,10 @@ export function DeckDetailsProvider({ children, deckId }: DeckDetailsProviderPro
   }, []);
 
   const setAsActiveDeck = useCallback(() => {
-    if (deck) {
+    if (deck && isOwner) {
       setActiveDeck(deck._id);
     }
-  }, [deck, setActiveDeck]);
+  }, [deck, isOwner, setActiveDeck]);
 
   const isActiveDeck = !!(deck && activeDeckId === deck._id);
 
@@ -172,6 +179,7 @@ export function DeckDetailsProvider({ children, deckId }: DeckDetailsProviderPro
     deckId: typedDeckId,
     deck,
     isLoading: isDeckLoading,
+    isOwner,
     activeSection,
     setActiveSection,
     isEditing,
@@ -200,6 +208,7 @@ export function DeckDetailsProvider({ children, deckId }: DeckDetailsProviderPro
     typedDeckId,
     deck,
     isDeckLoading,
+    isOwner,
     activeSection,
     isEditing,
     startEditing,

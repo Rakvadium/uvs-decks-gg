@@ -40,7 +40,7 @@ export function CardDetailsListItem({ card }: CardDetailsListItemProps) {
               <div
                 className={cn(
                   "relative aspect-[2.5/3.5] w-full overflow-hidden rounded-xl border border-border/50 bg-muted/40",
-                  "shadow-[0_0_24px_-8px_var(--primary)/40]"
+                  "shadow-[0_0_0_1px_var(--primary)/15,0_0_5px_var(--primary)/50]"
                 )}
                 style={{
                   ...dragHandleProps.style,
@@ -72,7 +72,7 @@ export function CardDetailsListItem({ card }: CardDetailsListItemProps) {
                   <RotateCcw
                     className={cn(
                       "h-4 w-4",
-                      !prefersReducedMotion && "transition-transform duration-300",
+                      !prefersReducedMotion && "transition-transform duration-150",
                       isFlipped && "rotate-180"
                     )}
                   />

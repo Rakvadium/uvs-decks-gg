@@ -39,7 +39,7 @@ function SelectTrigger({
       className={cn(
         "flex w-fit items-center justify-between gap-2 rounded-md border bg-background/50 px-3 py-2 text-sm whitespace-nowrap shadow-xs transition-all duration-200 outline-none",
         "border-border/50 hover:border-primary/30",
-        "focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:shadow-[0_0_15px_-3px_var(--primary)]",
+        "focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:shadow-[0_0_2px_var(--primary),0_0_8px_var(--primary)/60]",
         "disabled:cursor-not-allowed disabled:opacity-50",
         "data-[placeholder]:text-muted-foreground",
         "[&_svg:not([class*='text-'])]:text-muted-foreground",
@@ -72,9 +72,9 @@ function SelectContent({
       <SelectPrimitive.Content
         data-slot="select-content"
         className={cn(
-          "relative z-50 max-h-(--radix-select-content-available-height) min-w-[8rem] origin-(--radix-select-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-md border shadow-lg",
+          "relative z-50 max-h-(--radix-select-content-available-height) min-w-[8rem] origin-(--radix-select-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-md border shadow-sm",
           "bg-popover/95 text-popover-foreground backdrop-blur-lg border-primary/20",
-          "shadow-[0_0_25px_-5px_var(--primary)]",
+          "shadow-[0_0_2px_var(--primary)/30,0_0_8px_var(--primary)/50]",
           "data-[state=open]:animate-in data-[state=closed]:animate-out",
           "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
           "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",

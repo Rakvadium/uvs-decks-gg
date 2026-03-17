@@ -27,7 +27,6 @@ export function DeckDetailsHeroCharacterImagePicker() {
           {displayImage ? (
             <>
               <Image src={displayImage} alt={deck.name} fill className="object-cover object-top" />
-              <div className="absolute inset-0 bg-gradient-to-t from-card via-card/30 to-transparent" />
             </>
           ) : (
             <div className="absolute inset-0 flex items-center justify-center">

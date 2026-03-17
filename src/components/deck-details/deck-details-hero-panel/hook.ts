@@ -6,7 +6,7 @@ import { useDeckDetails } from "@/providers/DeckDetailsProvider";
 import type { Id } from "../../../../convex/_generated/dataModel";
 
 export function useDeckDetailsHeroPanelModel() {
-  const { deck, updateDeck } = useDeckDetails();
+  const { deck, isOwner, updateDeck } = useDeckDetails();
   const { cards: allCards } = useCardData();
   const cardIdMap = useCardIdMap(allCards);
 
@@ -64,6 +64,7 @@ export function useDeckDetailsHeroPanelModel() {
 
   return {
     deck,
+    isOwner,
     characterOpen,
     setCharacterOpen,
     symbolOpen,

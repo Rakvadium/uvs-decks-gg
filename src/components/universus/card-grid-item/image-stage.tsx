@@ -12,8 +12,8 @@ export function CardGridItemImageStage() {
     <div
       className={cn(
         "relative h-full w-full overflow-hidden rounded-lg",
-        "shadow-[0_0_6px_-2px_var(--primary)/20]",
-        isHovered && "shadow-[0_0_15px_-3px_var(--primary)/60]"
+        "shadow-[0_0_0_1px_var(--primary)/30,0_0_5px_var(--primary)/50]",
+        isHovered && "shadow-[0_0_0_1px_var(--primary)/70,0_0_8px_var(--primary)/90,0_0_16px_var(--primary)/25]"
       )}
     >
       <AnimatePresence mode="wait">
@@ -31,7 +31,7 @@ export function CardGridItemImageStage() {
 
       <div
         className={cn(
-          "pointer-events-none absolute inset-0 rounded-lg bg-gradient-to-t from-background/80 via-transparent to-transparent transition-opacity duration-300",
+          "pointer-events-none absolute inset-0 rounded-lg bg-gradient-to-t from-background/80 via-transparent to-transparent transition-opacity duration-150",
           isHovered ? "opacity-25" : "opacity-0"
         )}
       />
@@ -40,7 +40,7 @@ export function CardGridItemImageStage() {
         className={cn(
           "pointer-events-none absolute inset-0 rounded-lg",
           "bg-[linear-gradient(135deg,transparent_40%,var(--primary)/10_50%,transparent_60%)]",
-          "transition-opacity duration-300",
+          "transition-opacity duration-150",
           isHovered ? "opacity-100" : "opacity-0"
         )}
         style={{

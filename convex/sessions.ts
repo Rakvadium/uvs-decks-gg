@@ -48,6 +48,13 @@ export const setActiveDeck = mutation({
             return null;
         }
 
+        if (args.deckId) {
+            const deck = await ctx.db.get(args.deckId);
+            if (!deck || deck.userId !== userId) {
+                return null;
+            }
+        }
+
         const existingSession = await ctx.db
             .query("sessions")
             .withIndex("by_user", (q) => q.eq("userId", userId))

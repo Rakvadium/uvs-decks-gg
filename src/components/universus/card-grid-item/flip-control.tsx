@@ -35,7 +35,7 @@ export function CardFlipControl() {
             <RotateCcw
               className={cn(
                 "h-3.5 w-3.5 text-primary",
-                prefersReducedMotion ? "" : "transition-transform duration-300",
+                prefersReducedMotion ? "" : "transition-transform duration-150",
                 isFlipped && "rotate-180"
               )}
             />

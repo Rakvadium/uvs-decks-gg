@@ -74,14 +74,13 @@ function DialogContent({
       <DialogPrimitive.Content
         data-slot="dialog-content"
         className={cn(
-          "fixed z-50 shadow-2xl duration-200 overflow-x-hidden",
+          "fixed z-50 shadow-lg duration-200 overflow-x-hidden md:shadow-[0_0_2px_var(--primary)/40,0_0_12px_var(--primary)/50,0_0_28px_var(--primary)/12]",
           "bg-card/95 backdrop-blur-lg border-primary/20",
           "data-[state=open]:animate-in data-[state=closed]:animate-out",
           "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
           "inset-0 h-[100dvh] w-full rounded-none border-0 flex flex-col",
           "md:inset-auto md:top-[50%] md:left-[50%] md:h-auto md:max-h-[85vh] md:translate-x-[-50%] md:translate-y-[-50%] md:rounded-lg md:border md:overflow-y-auto",
           "md:data-[state=closed]:zoom-out-95 md:data-[state=open]:zoom-in-95",
-          "md:shadow-[0_0_50px_-10px_var(--primary)]",
           dialogSizeStyles[size],
           className
         )}

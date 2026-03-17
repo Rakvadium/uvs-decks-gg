@@ -31,7 +31,7 @@ export function DecksTopBar() {
       <Separator orientation="vertical" className="mx-1 h-5" />
 
       <div className="flex gap-1 rounded-md border border-border/50 bg-muted/50 p-0.5">
-        {TABS.map((tab) => {
+        {TABS.filter((tab) => (tab.id === "my-decks" ? isAuthenticated : true)).map((tab) => {
           const Icon = tab.icon;
           const isActive = state.activeTab === tab.id;
           const count = deckCounts[tab.id];

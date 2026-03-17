@@ -245,6 +245,13 @@ export function UIStateProvider({ children }: UIStateProviderProps) {
   }, [isHydrated, isAuthenticated, authLoading, serverActiveDeckId, uiState.activeDeckId]);
 
   useEffect(() => {
+    if (isHydrated && !isAuthenticated && !authLoading && uiState.activeDeckId) {
+      setUIState((prev) => ({ ...prev, activeDeckId: undefined }));
+      localStorage.removeItem(getStorageKey("activeDeckId"));
+    }
+  }, [isHydrated, isAuthenticated, authLoading, uiState.activeDeckId]);
+
+  useEffect(() => {
     if (isHydrated) {
       persistUIState(uiState);
     }

@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useMemo, ReactNode } from "react";
+import { createContext, useContext, useState, useMemo, useEffect, ReactNode } from "react";
 import { useDeckCatalogData, type DeckTab } from "@/hooks/useDeckCatalogData";
 
 interface DecksState {
@@ -25,10 +25,19 @@ interface DecksContextValue {
 const DecksContext = createContext<DecksContextValue | null>(null);
 
 export function DecksProvider({ children }: { children: ReactNode }) {
-  const [activeTab, setActiveTab] = useState<DeckTab>("my-decks");
+  const [activeTab, setActiveTab] = useState<DeckTab>("public");
   const [searchQuery, setSearchQuery] = useState("");
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const catalog = useDeckCatalogData(searchQuery, activeTab);
+
+  useEffect(() => {
+    if (catalog.authLoading) return;
+    if (catalog.isAuthenticated) {
+      setActiveTab("my-decks");
+    } else {
+      setActiveTab("public");
+    }
+  }, [catalog.authLoading, catalog.isAuthenticated]);
 
   const value = useMemo(
     (): DecksContextValue => ({

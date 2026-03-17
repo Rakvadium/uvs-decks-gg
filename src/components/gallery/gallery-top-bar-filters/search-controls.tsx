@@ -44,7 +44,7 @@ export function GallerySearchControls() {
         }
         value={state.search}
         onChange={(event) => actions.setSearch(event.target.value)}
-        className="h-9 border-primary/40 bg-background/50 pl-[6.5rem] pr-20 text-sm shadow-[0_0_10px_-3px_var(--primary)] focus-visible:border-primary focus-visible:shadow-[0_0_15px_-3px_var(--primary)]"
+        className="h-9 border-primary/40 bg-background/50 pl-[6.5rem] pr-20 text-sm shadow-[0_0_0_1px_var(--primary)/15,0_0_4px_var(--primary)/40] focus-visible:border-primary focus-visible:shadow-[0_0_2px_var(--primary),0_0_8px_var(--primary)/60]"
         name="gallery-search"
         spellCheck={false}
       />

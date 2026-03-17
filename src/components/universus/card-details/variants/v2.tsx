@@ -234,7 +234,7 @@ export function CardDetailsV2({
                   className="absolute inset-0 overflow-hidden rounded-xl"
                   style={{
                     boxShadow:
-                      "0 0 30px -5px var(--primary), 0 0 60px -15px var(--secondary)",
+                      "0 0 0 1px color-mix(in oklch, var(--primary) 35%, transparent), 0 0 5px color-mix(in oklch, var(--primary) 80%, transparent), 0 0 0 1px color-mix(in oklch, var(--secondary) 25%, transparent), 0 0 10px color-mix(in oklch, var(--secondary) 50%, transparent)",
                   }}
                 >
                   {displayCard.imageUrl ? (
@@ -260,7 +260,7 @@ export function CardDetailsV2({
                   <RotateCcw
                     className={cn(
                       "h-4 w-4",
-                      !prefersReducedMotion && "transition-transform duration-300",
+                      !prefersReducedMotion && "transition-transform duration-150",
                       isFlipped && "rotate-180"
                     )}
                   />

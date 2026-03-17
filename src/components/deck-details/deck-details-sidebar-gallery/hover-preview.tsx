@@ -30,7 +30,7 @@ export function DeckDetailsGallerySidebarHoverPreview() {
         height: previewHeight,
       }}
     >
-      <div className="relative h-full w-full overflow-hidden rounded-xl border border-primary/40 bg-background/90 shadow-[0_0_28px_-8px_var(--primary)]">
+      <div className="relative h-full w-full overflow-hidden rounded-xl border border-primary/40 bg-background/90 shadow-[0_0_0_1px_var(--primary)/30,0_0_6px_var(--primary)/70,0_0_14px_var(--primary)/20]">
         {hoveredListCard.imageUrl ? (
           <Image src={hoveredListCard.imageUrl} alt={hoveredListCard.name} fill className="object-cover object-top" />
         ) : (

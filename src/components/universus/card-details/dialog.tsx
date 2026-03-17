@@ -12,6 +12,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
+import { useDeckDetailsOptional } from "@/providers/DeckDetailsProvider";
 import { DeckSectionControls } from "./deck-section-controls";
 import { useCardDetailsVariant } from "./use-card-details-variant";
 import { VariantSelector } from "./variant-selector";
@@ -49,6 +50,8 @@ export function CardDetailsDialog({
   const [isFlipped, setIsFlipped] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(-1);
   const { variant } = useCardDetailsVariant();
+  const deckDetails = useDeckDetailsOptional();
+  const showDeckControls = !deckDetails || deckDetails.isOwner;
 
   // Sync current index when card changes or dialog opens
   useEffect(() => {
@@ -123,7 +126,9 @@ export function CardDetailsDialog({
         />
 
         <div className="flex items-center gap-3 border-t border-border/20 px-4 py-2">
-          <DeckSectionControls card={currentCard} layout="horizontal" />
+          {showDeckControls && (
+            <DeckSectionControls card={currentCard} layout="horizontal" />
+          )}
 
           <div className="ml-auto flex items-center gap-3">
             <VariantSelector />
@@ -159,7 +164,7 @@ export function CardDetailsDialog({
               className={cn(
                 "pointer-events-auto flex h-10 w-10 items-center justify-center rounded-full transition-all md:h-12 md:w-12 z-[60]",
                 canGoPrev
-                  ? "bg-card/90 text-primary border border-primary/30 hover:bg-primary/20 hover:border-primary/50 shadow-[0_0_15px_-3px_var(--primary)]"
+                  ? "bg-card/90 text-primary border border-primary/30 hover:bg-primary/20 hover:border-primary/50 shadow-[0_0_2px_var(--primary),0_0_8px_var(--primary)/70]"
                   : "bg-card/50 text-muted-foreground/30 border border-border/20 cursor-not-allowed"
               )}
               aria-label="Previous card"
@@ -173,7 +178,7 @@ export function CardDetailsDialog({
               className={cn(
                 "pointer-events-auto flex h-10 w-10 items-center justify-center rounded-full transition-all md:h-12 md:w-12 z-[60]",
                 canGoNext
-                  ? "bg-card/90 text-primary border border-primary/30 hover:bg-primary/20 hover:border-primary/50 shadow-[0_0_15px_-3px_var(--primary)]"
+                  ? "bg-card/90 text-primary border border-primary/30 hover:bg-primary/20 hover:border-primary/50 shadow-[0_0_2px_var(--primary),0_0_8px_var(--primary)/70]"
                   : "bg-card/50 text-muted-foreground/30 border border-border/20 cursor-not-allowed"
               )}
               aria-label="Next card"

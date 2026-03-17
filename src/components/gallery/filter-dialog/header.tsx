@@ -9,8 +9,8 @@ export function GalleryFilterDialogHeader() {
     <div className="relative z-10 shrink-0 border-b border-border/30 p-6">
       <div className="flex items-center justify-between">
         <div className="min-w-0 flex flex-1 items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-primary/40 bg-primary/20 shadow-[0_0_12px_-3px_var(--primary)]">
-            <Filter className="h-5 w-5 text-primary drop-shadow-[0_0_4px_var(--primary)]" />
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-primary/40 bg-primary/20 shadow-[0_0_2px_var(--primary)/50,0_0_6px_var(--primary)/40]">
+            <Filter className="h-5 w-5 text-primary drop-shadow-[0_0_3px_var(--primary)]" />
           </div>
           <div className="min-w-0">
             <h2 className="text-xl font-display font-bold uppercase tracking-wide">Filter Cards</h2>

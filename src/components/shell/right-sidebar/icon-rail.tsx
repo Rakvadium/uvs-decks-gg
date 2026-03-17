@@ -28,8 +28,8 @@ export function RightSidebarIconRail() {
             className={cn(
               "relative h-16 w-1 rounded-full transition-all duration-150",
               isResizing
-                ? "bg-primary shadow-[0_0_15px_var(--primary)]"
-                : "bg-border/40 group-hover:bg-primary/70 group-hover:shadow-[0_0_8px_var(--primary)]"
+                ? "bg-primary shadow-[0_0_3px_var(--primary),0_0_8px_var(--primary)/60]"
+                : "bg-border/40 group-hover:bg-primary/70 group-hover:shadow-[0_0_2px_var(--primary),0_0_6px_var(--primary)/50]"
             )}
           >
             <div
@@ -60,7 +60,7 @@ export function RightSidebarIconRail() {
                   className={cn(
                     "h-9 w-9 border border-transparent transition-all duration-200",
                     isActive
-                      ? "border-primary/30 bg-primary/15 text-primary shadow-[0_0_15px_-5px_var(--primary)]"
+                      ? "border-primary/30 bg-primary/15 text-primary shadow-[0_0_2px_var(--primary)/60,0_0_6px_var(--primary)/40]"
                       : "hover:border-primary/20 hover:bg-primary/10 hover:text-primary"
                   )}
                   onClick={() => setActiveSidebarAction(isActive ? null : slot.id)}
@@ -68,7 +68,7 @@ export function RightSidebarIconRail() {
                   {Icon ? (
                     <span className="flex h-full w-full items-center justify-center">
                       <Icon
-                        className={cn("h-full w-full rounded-md", isActive && "drop-shadow-[0_0_6px_var(--primary)]")}
+                        className={cn("h-full w-full rounded-md", isActive && "drop-shadow-[0_0_3px_var(--primary)]")}
                       />
                     </span>
                   ) : (

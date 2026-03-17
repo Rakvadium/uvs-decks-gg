@@ -26,7 +26,7 @@ export function LeftSidebarNav() {
                     "relative flex items-center gap-3 rounded-md border px-3 py-2.5 text-sm font-medium transition-all duration-200",
                     collapsed && "justify-center px-2",
                     isActive
-                      ? "border-primary/30 bg-primary/15 text-primary shadow-[0_0_10px_-5px_var(--primary)]"
+                      ? "border-primary/30 bg-primary/15 text-primary shadow-[0_0_2px_var(--primary)/50,0_0_6px_var(--primary)/30]"
                       : "border-transparent text-sidebar-foreground/70 hover:border-sidebar-border/50 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
                   )}
                   style={{ animationDelay: `${index * 50}ms` }}
@@ -34,7 +34,7 @@ export function LeftSidebarNav() {
                   <Icon
                     className={cn(
                       "h-4 w-4 shrink-0 transition-all duration-200",
-                      isActive && "drop-shadow-[0_0_4px_var(--primary)]"
+                      isActive && "drop-shadow-[0_0_3px_var(--primary)]"
                     )}
                   />
                   {!collapsed ? (
@@ -70,7 +70,7 @@ export function LeftSidebarNav() {
 
       {isOnAdminPage ? (
         <div className={cn("flex items-center gap-2 px-3 py-2.5 text-sm font-semibold", collapsed && "justify-center px-2")}>
-          <Shield className="h-4 w-4 shrink-0 text-primary drop-shadow-[0_0_8px_var(--primary)]" />
+          <Shield className="h-4 w-4 shrink-0 text-primary drop-shadow-[0_0_3px_var(--primary)]" />
           {!collapsed ? (
             <span className="whitespace-nowrap font-display text-xs uppercase tracking-widest text-primary">
               Admin Panel

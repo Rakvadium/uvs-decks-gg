@@ -32,7 +32,7 @@ export function useDeckCardsSectionModel() {
   const prefersReducedMotion = usePrefersReducedMotion();
   const { cards: allCards } = useCardData();
   const { addCard } = useDeckEditor();
-  const { deck, activeSection, setActiveSection } = useDeckDetails();
+  const { deck, activeSection, isOwner, setActiveSection } = useDeckDetails();
 
   const [viewMode, setViewMode] = useState<DeckViewMode>("stacked");
   const [listSortKey, setListSortKey] = useState<DeckListSortKey>("difficulty");
@@ -183,7 +183,7 @@ export function useDeckCardsSectionModel() {
     id: `deck-details-drop-${activeSection}`,
     accepts: ["card"],
     onDrop: handleDropToActiveSection,
-    isDisabled: !deck,
+    isDisabled: !deck || !isOwner,
   });
 
   const selectedListSortValue = (

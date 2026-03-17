@@ -1,6 +1,8 @@
 "use client";
 
+import { useCallback } from "react";
 import { cn } from "@/lib/utils";
+import { CardDetailsDialog } from "@/components/universus/card-details/dialog";
 import { ActiveDeckCardRowControls } from "./controls";
 import { ActiveDeckCardRowProvider, useActiveDeckCardRowContext } from "./context";
 import { ActiveDeckCardRowThumbnail } from "./thumbnail";
@@ -9,37 +11,56 @@ import type { ActiveDeckCardRowProps } from "./types";
 function ActiveDeckCardRowContent() {
   const {
     card,
+    backCard,
     count,
     dragHandleProps,
+    handleCardClick,
     handlePointerEnter,
     handlePointerMove,
+    isDialogOpen,
     isDragging,
     onHoverLeave,
+    setIsDialogOpen,
   } = useActiveDeckCardRowContext();
 
+  const handleKeyDown = useCallback(
+    (event: React.KeyboardEvent) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        handleCardClick();
+      }
+    },
+    [handleCardClick]
+  );
+
   return (
-    <div
-      className={cn(
-        "group relative flex min-h-9 items-stretch overflow-hidden rounded-sm border border-border/30 bg-card/20 transition",
-        "hover:border-primary/30 hover:bg-primary/6",
-        isDragging && "opacity-60"
-      )}
-      style={{
-        ...dragHandleProps.style,
-        cursor: isDragging ? "grabbing" : dragHandleProps.style.cursor,
-      }}
-      data-slot="deck-card-row"
-      onMouseDown={dragHandleProps.onMouseDown}
-      onTouchStart={dragHandleProps.onTouchStart}
-      onDragStart={(event) => event.preventDefault()}
-      onMouseEnter={(event) => {
-        handlePointerEnter(event.currentTarget.getBoundingClientRect());
-      }}
-      onMouseMove={(event) => {
-        handlePointerMove(event.currentTarget.getBoundingClientRect());
-      }}
-      onMouseLeave={onHoverLeave}
-    >
+    <>
+      <div
+        className={cn(
+          "group relative flex min-h-9 cursor-pointer items-stretch overflow-hidden rounded-sm border border-border/30 bg-card/20 transition",
+          "hover:border-primary/30 hover:bg-primary/6",
+          isDragging && "opacity-60"
+        )}
+        style={{
+          ...dragHandleProps.style,
+          cursor: isDragging ? "grabbing" : "pointer",
+        }}
+        data-slot="deck-card-row"
+        role="button"
+        tabIndex={0}
+        onMouseDown={dragHandleProps.onMouseDown}
+        onTouchStart={dragHandleProps.onTouchStart}
+        onDragStart={(event) => event.preventDefault()}
+        onClick={handleCardClick}
+        onKeyDown={handleKeyDown}
+        onMouseEnter={(event) => {
+          handlePointerEnter(event.currentTarget.getBoundingClientRect());
+        }}
+        onMouseMove={(event) => {
+          handlePointerMove(event.currentTarget.getBoundingClientRect());
+        }}
+        onMouseLeave={onHoverLeave}
+      >
       <ActiveDeckCardRowThumbnail />
 
       <div className="min-w-0 flex flex-1 items-center px-2.5 py-1.5 transition-all duration-200 group-hover:pr-24">
@@ -52,6 +73,14 @@ function ActiveDeckCardRowContent() {
 
       <ActiveDeckCardRowControls />
     </div>
+
+    <CardDetailsDialog
+      card={card}
+      backCard={backCard ?? undefined}
+      open={isDialogOpen}
+      onOpenChange={setIsDialogOpen}
+    />
+    </>
   );
 }
 

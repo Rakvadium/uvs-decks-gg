@@ -46,7 +46,7 @@ export function DeckCardStackItem(props: DeckCardStackItemProps) {
               className={cn(
                 "absolute inset-0 z-10 overflow-hidden rounded-lg",
                 "shadow-[0_10px_30px_-16px_rgba(0,0,0,0.7)]",
-                "transition-transform duration-300",
+                "transition-transform duration-150",
                 !prefersReducedMotion && "group-hover:-translate-x-1 group-hover:-translate-y-1"
               )}
               aria-label={`Open ${card.name} details`}

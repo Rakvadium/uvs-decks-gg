@@ -1,9 +1,13 @@
 import { Minus, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useDeckDetailsOptional } from "@/providers/DeckDetailsProvider";
 import { useDeckListItemContext } from "./context";
 
 export function DeckListItemActions() {
+  const deckDetails = useDeckDetailsOptional();
   const { addCard, canAdd, card, quantity, removeCard, section } = useDeckListItemContext();
+
+  if (!deckDetails?.isOwner) return null;
 
   return (
     <div className="flex items-center gap-1" onClick={(event) => event.stopPropagation()}>

@@ -10,8 +10,8 @@ function Card({ className, ...props }: React.ComponentProps<"div">) {
         "group relative bg-card/80 text-card-foreground flex flex-col gap-6 py-6 backdrop-blur-sm",
         "border border-border/50 rounded-lg",
         "shadow-[0_0_20px_-5px_var(--primary)/10] hover:shadow-[0_0_30px_-5px_var(--primary)/20]",
-        "hover:border-primary/30 transition-all duration-300",
-        "before:absolute before:inset-0 before:rounded-lg before:bg-gradient-to-br before:from-primary/5 before:to-transparent before:opacity-0 before:transition-opacity before:duration-300 hover:before:opacity-100",
+        "hover:border-primary/30 transition-all duration-150",
+        "before:absolute before:inset-0 before:rounded-lg before:bg-gradient-to-br before:from-primary/5 before:to-transparent before:opacity-0 before:transition-opacity before:duration-150 hover:before:opacity-100",
         "overflow-hidden",
         className
       )}

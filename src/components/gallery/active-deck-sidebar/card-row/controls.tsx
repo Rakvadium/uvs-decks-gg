@@ -25,7 +25,10 @@ export function ActiveDeckCardRowControls() {
   } = useActiveDeckCardRowContext();
 
   return (
-    <div className="pointer-events-none absolute right-2 top-1/2 flex -translate-y-1/2 items-center gap-1 opacity-0 transition-opacity duration-150 group-hover:pointer-events-auto group-hover:opacity-100">
+    <div
+      className="pointer-events-none absolute right-2 top-1/2 flex -translate-y-1/2 items-center gap-1 opacity-0 transition-opacity duration-150 group-hover:pointer-events-auto group-hover:opacity-100"
+      onClick={(e) => e.stopPropagation()}
+    >
       <Button
         variant="ghost"
         size="icon-sm"

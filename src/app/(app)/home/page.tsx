@@ -23,8 +23,8 @@ function StatCard({ label, value, icon: Icon, delay = 0, animate = true }: { lab
       transition={{ duration: 0.5, delay }}
       className="relative group"
     >
-      <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-lg blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-      <div className="relative flex items-center gap-4 p-4 rounded-lg border border-border/50 bg-card/50 backdrop-blur-sm hover:border-primary/30 transition-all duration-300">
+      <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-lg blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-150" />
+      <div className="relative flex items-center gap-4 p-4 rounded-lg border border-border/50 bg-card/50 backdrop-blur-sm hover:border-primary/30 transition-all duration-150">
         <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 border border-primary/30">
           <Icon className="h-5 w-5 text-primary" />
         </div>
@@ -66,16 +66,16 @@ function NavCard({ href, icon: Icon, title, description, accentColor = "primary"
       transition={{ duration: 0.6, delay }}
     >
       <Link href={href} className="block group">
-        <div className={`relative overflow-hidden rounded-xl border bg-gradient-to-br p-6 transition-all duration-300 ${colorClasses[accentColor]}`}>
+        <div className={`relative overflow-hidden rounded-xl border bg-gradient-to-br p-6 transition-all duration-150 ${colorClasses[accentColor]}`}>
           <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-current to-transparent opacity-30" />
-          <div className="absolute -top-20 -right-20 w-40 h-40 bg-gradient-to-br from-current to-transparent opacity-10 rounded-full blur-3xl group-hover:opacity-20 transition-opacity duration-500" />
+          <div className="absolute -top-20 -right-20 w-40 h-40 bg-gradient-to-br from-current to-transparent opacity-10 rounded-full blur-3xl group-hover:opacity-20 transition-opacity duration-150" />
           
           <div className="relative z-10 flex flex-col gap-4">
             <div className="flex items-start justify-between">
               <div className={`flex h-14 w-14 items-center justify-center rounded-xl bg-background/50 border border-current/20 backdrop-blur-sm ${iconClasses[accentColor]}`}>
                 <Icon className="h-7 w-7" />
               </div>
-              <ArrowRight className="h-5 w-5 text-muted-foreground opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
+              <ArrowRight className="h-5 w-5 text-muted-foreground opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-150" />
             </div>
             
             <div className="space-y-2">

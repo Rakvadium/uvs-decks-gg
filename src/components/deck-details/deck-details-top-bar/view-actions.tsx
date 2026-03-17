@@ -2,10 +2,11 @@ import { Edit3, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useDeckDetailsTopBarContext } from "./context";
-import { DeckDetailsTopBarDeleteAction } from "./delete-action";
 
 export function DeckDetailsTopBarViewActions() {
-  const { isActiveDeck, setAsActiveDeck, startEditing } = useDeckDetailsTopBarContext();
+  const { isActiveDeck, isOwner, setAsActiveDeck, startEditing } = useDeckDetailsTopBarContext();
+
+  if (!isOwner) return null;
 
   return (
     <>
@@ -14,7 +15,7 @@ export function DeckDetailsTopBarViewActions() {
         size="sm"
         onClick={setAsActiveDeck}
         disabled={isActiveDeck}
-        className="h-8"
+        className={cn("h-8", isActiveDeck && "disabled:opacity-100")}
       >
         <Zap className={cn("mr-1 h-4 w-4", isActiveDeck && "text-yellow-400")} />
         {isActiveDeck ? "Active" : "Set Active"}
@@ -24,8 +25,6 @@ export function DeckDetailsTopBarViewActions() {
         <Edit3 className="mr-1 h-4 w-4" />
         Edit
       </Button>
-
-      <DeckDetailsTopBarDeleteAction />
     </>
   );
 }

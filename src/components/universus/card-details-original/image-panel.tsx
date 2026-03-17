@@ -38,7 +38,7 @@ export function CardDetailsImagePanel({
               animate={prefersReducedMotion ? {} : { rotateY: 0, opacity: 1 }}
               exit={prefersReducedMotion ? {} : { rotateY: 90, opacity: 0 }}
               transition={{ duration: 0.3 }}
-              className="absolute inset-0 overflow-hidden rounded-xl shadow-[0_0_22px_-12px_var(--primary)]"
+              className="absolute inset-0 overflow-hidden rounded-xl shadow-[0_0_0_1px_var(--primary)/30,0_0_5px_var(--primary)/70]"
             >
               {displayCard.imageUrl ? (
                 <Image src={displayCard.imageUrl} alt={displayCard.name} fill className="object-cover" priority />
@@ -64,7 +64,7 @@ export function CardDetailsImagePanel({
               <RotateCcw
                 className={cn(
                   "h-4 w-4",
-                  !prefersReducedMotion && "transition-transform duration-300",
+                  !prefersReducedMotion && "transition-transform duration-150",
                   isFlipped && "rotate-180"
                 )}
               />

@@ -1,5 +1,6 @@
 import {
   createContext,
+  useCallback,
   useContext,
   useMemo,
   type ReactNode,
@@ -24,6 +25,7 @@ interface ActiveDeckSectionsContextValue {
   addCard: (cardId: CachedCard["_id"], section: DeckSection) => void;
   removeCard: (cardId: CachedCard["_id"], section: DeckSection) => void;
   moveCard: (cardId: CachedCard["_id"], from: DeckSection, to: DeckSection) => void;
+  getBackCard: (card: CachedCard) => CachedCard | null;
   onHoverEnter: (card: CachedCard, rect: DOMRect) => void;
   onHoverMove: (rect: DOMRect) => void;
   onHoverLeave: () => void;
@@ -83,6 +85,14 @@ export function ActiveDeckSectionsProvider({
     ]
   );
 
+  const getBackCard = useCallback(
+    (card: CachedCard): CachedCard | null => {
+      if (!card.backCardId) return null;
+      return cardMap.get(card.backCardId) ?? null;
+    },
+    [cardMap]
+  );
+
   const value = useMemo(
     () => ({
       groupsBySection,
@@ -91,6 +101,7 @@ export function ActiveDeckSectionsProvider({
       addCard,
       removeCard,
       moveCard,
+      getBackCard,
       onHoverEnter,
       onHoverMove,
       onHoverLeave,
@@ -102,6 +113,7 @@ export function ActiveDeckSectionsProvider({
       addCard,
       removeCard,
       moveCard,
+      getBackCard,
       onHoverEnter,
       onHoverMove,
       onHoverLeave,

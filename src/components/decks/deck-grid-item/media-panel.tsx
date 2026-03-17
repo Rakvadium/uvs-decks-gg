@@ -9,16 +9,15 @@ export function DeckGridItemMediaPanel() {
   } = useDeckGridItemContext();
 
   return (
-    <div className="relative w-[120px] shrink-0 overflow-hidden bg-gradient-to-br from-primary/10 via-card to-secondary/10">
+    <div className="relative w-[120px] shrink-0 overflow-hidden bg-card">
       {displayImage ? (
         <>
           <Image
             src={displayImage}
             alt={name}
             fill
-            className="object-cover object-top opacity-80 transition-all duration-500 group-hover:scale-110 group-hover:opacity-100"
+            className="object-cover object-top transition-all duration-150 group-hover:scale-105"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent to-card/80" />
         </>
       ) : (
         <div className="absolute inset-0 flex items-center justify-center">
