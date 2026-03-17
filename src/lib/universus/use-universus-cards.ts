@@ -100,7 +100,7 @@ export function useUniversusCards(): UseUniversusCardsResult {
     let isDone = false;
 
     while (!isDone) {
-      const result = await convex.query(api.cards.listReleasedPaginated, {
+      const result: { cards: CachedCard[]; cursor: string; isDone: boolean } = await convex.query(api.cards.listReleasedPaginated, {
         cursor,
         limit: 1000,
       });

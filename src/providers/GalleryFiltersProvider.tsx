@@ -78,7 +78,7 @@ export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
   const sortOptions = useMemo(
     () => ({
       field: uiState.gallerySortField ?? "default",
-      direction: (uiState.gallerySortDirection ?? "asc") as const,
+      direction: (uiState.gallerySortDirection ?? "asc") as "asc" | "desc",
     }),
     [uiState.gallerySortField, uiState.gallerySortDirection]
   );
