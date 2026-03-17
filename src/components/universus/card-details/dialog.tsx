@@ -94,31 +94,27 @@ export function CardDetailsDialog({
   if (!currentCard) return null;
 
   const displayCard = isFlipped && currentBackCard ? currentBackCard : currentCard;
+  const navigationButtonClassName = (enabled: boolean) =>
+    cn(
+      "flex h-10 w-10 items-center justify-center rounded-full border transition-all",
+      enabled
+        ? "bg-card/90 text-primary border-primary/30 hover:bg-primary/20 hover:border-primary/50 shadow-[0_0_2px_var(--primary),0_0_8px_var(--primary)/70]"
+        : "bg-card/50 text-muted-foreground/30 border-border/20 cursor-not-allowed"
+    );
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         size="md"
         className="max-h-[90vh] overflow-hidden p-0 md:pb-0"
-        showCloseButton={false}
         footer={
-          <div className="flex items-center gap-3">
+          <div className="flex w-full items-stretch gap-3 md:items-center">
             {showDeckControls && (
               <DeckSectionControls card={currentCard} layout="horizontal" />
             )}
             <div className="ml-auto flex items-center gap-3">
-              {hasNavigation && (
-                <span className="text-[10px] font-mono text-muted-foreground/50">
-                  {currentIndex + 1} / {cards!.length}
-                </span>
-              )}
               <DialogClose asChild className="md:hidden">
-                <Button variant="outline" size="sm">
-                  <span className="text-xs font-mono uppercase tracking-wider">Close</span>
-                </Button>
-              </DialogClose>
-              <DialogClose asChild className="hidden md:inline-flex">
-                <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+                <Button variant="outline" size="sm" className="h-8">
                   <span className="text-xs font-mono uppercase tracking-wider">Close</span>
                 </Button>
               </DialogClose>
@@ -141,21 +137,48 @@ export function CardDetailsDialog({
           hasBack={Boolean(currentBackCard)}
           isFlipped={isFlipped}
           onToggleFlip={() => setIsFlipped((v) => !v)}
+          mobileNavigationPrevious={
+            hasNavigation ? (
+              <button
+                type="button"
+                onClick={goToPrev}
+                disabled={!canGoPrev}
+                className={navigationButtonClassName(Boolean(canGoPrev))}
+                aria-label="Previous card"
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </button>
+            ) : null
+          }
+          mobileNavigationNext={
+            hasNavigation ? (
+              <button
+                type="button"
+                onClick={goToNext}
+                disabled={!canGoNext}
+                className={navigationButtonClassName(Boolean(canGoNext))}
+                aria-label="Next card"
+              >
+                <ChevronRight className="h-5 w-5" />
+              </button>
+            ) : null
+          }
         />
       </DialogContent>
 
       {hasNavigation && open && typeof document !== "undefined" &&
         createPortal(
-          <div data-card-dialog-nav className="pointer-events-none fixed inset-0 z-[60] flex items-center justify-between px-4 md:px-8">
+          <div
+            data-card-dialog-nav
+            className="pointer-events-none fixed inset-0 z-[60] hidden items-center justify-between px-4 md:flex md:px-8"
+          >
             <button
               type="button"
               onClick={goToPrev}
               disabled={!canGoPrev}
               className={cn(
-                "pointer-events-auto flex h-10 w-10 items-center justify-center rounded-full transition-all md:h-12 md:w-12 z-[60]",
-                canGoPrev
-                  ? "bg-card/90 text-primary border border-primary/30 hover:bg-primary/20 hover:border-primary/50 shadow-[0_0_2px_var(--primary),0_0_8px_var(--primary)/70]"
-                  : "bg-card/50 text-muted-foreground/30 border border-border/20 cursor-not-allowed"
+                "pointer-events-auto z-[60] md:h-12 md:w-12",
+                navigationButtonClassName(Boolean(canGoPrev))
               )}
               aria-label="Previous card"
             >
@@ -166,10 +189,8 @@ export function CardDetailsDialog({
               onClick={goToNext}
               disabled={!canGoNext}
               className={cn(
-                "pointer-events-auto flex h-10 w-10 items-center justify-center rounded-full transition-all md:h-12 md:w-12 z-[60]",
-                canGoNext
-                  ? "bg-card/90 text-primary border border-primary/30 hover:bg-primary/20 hover:border-primary/50 shadow-[0_0_2px_var(--primary),0_0_8px_var(--primary)/70]"
-                  : "bg-card/50 text-muted-foreground/30 border border-border/20 cursor-not-allowed"
+                "pointer-events-auto z-[60] md:h-12 md:w-12",
+                navigationButtonClassName(Boolean(canGoNext))
               )}
               aria-label="Next card"
             >

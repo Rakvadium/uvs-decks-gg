@@ -12,9 +12,6 @@ export function MobileActionsSlotGrid() {
 
   return (
     <div className="p-4">
-      <div className="mb-3">
-        <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Side Panels</p>
-      </div>
 
       <div className="space-y-3">
         {sidebarSlots.map((slot) => {

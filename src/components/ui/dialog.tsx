@@ -93,24 +93,24 @@ function DialogContent({
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
         <div
           className={cn(
-            "relative z-10 flex-1 min-h-0 overflow-y-auto",
+            "relative z-10 flex-1 min-h-0 overflow-y-auto flex flex-col",
             hasFooter && "pb-24 md:pb-0"
           )}
         >
           {children}
+          {hasFooter && (
+            <div
+              data-slot="dialog-footer-slot"
+              className={cn(
+                "flex flex-col-reverse gap-2 pt-4 sm:flex-row sm:justify-end w-full flex-shrink-0 border-t border-border/30",
+                "max-md:fixed max-md:bottom-0 max-md:left-0 max-md:right-0 max-md:z-20 max-md:bg-card/95 max-md:backdrop-blur-lg max-md:p-4 max-md:pb-[max(1rem,env(safe-area-inset-bottom))]",
+                "md:relative md:z-10 md:border-0 md:px-6 md:pt-4 md:pb-4"
+              )}
+            >
+              {footer}
+            </div>
+          )}
         </div>
-        {hasFooter && (
-          <div
-            data-slot="dialog-footer-slot"
-            className={cn(
-              "flex flex-col-reverse gap-2 pt-4 sm:flex-row sm:justify-end border-t border-border/30",
-              "flex-shrink-0",
-              "fixed bottom-0 left-0 right-0 z-20 bg-card/95 backdrop-blur-lg p-4 pb-[max(1rem,env(safe-area-inset-bottom))] md:static md:bg-transparent md:backdrop-blur-none md:p-0 md:pb-0 md:pt-4 md:z-10 md:border-0"
-            )}
-          >
-            {footer}
-          </div>
-        )}
         {showCloseButton && (
           <DialogPrimitive.Close
             data-slot="dialog-close"

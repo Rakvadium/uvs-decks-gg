@@ -35,6 +35,11 @@ export function MobileActionsSheetContent() {
       </div>
       <div className="shrink-0 border-t bg-background px-4 py-3">
         <div className="flex flex-wrap items-center justify-between gap-2">
+          {ActiveFooter ? (
+            <div className="flex flex-wrap items-center justify-end gap-2">
+              <ActiveFooter />
+            </div>
+          ) : null}
           <Button
             variant="outline"
             size="icon"
@@ -43,11 +48,6 @@ export function MobileActionsSheetContent() {
           >
             <ChevronDown className="size-5" />
           </Button>
-          {ActiveFooter ? (
-            <div className="flex flex-wrap items-center justify-end gap-2">
-              <ActiveFooter />
-            </div>
-          ) : null}
         </div>
       </div>
     </>

@@ -72,9 +72,11 @@ export function MobileActionsDraggableDrawer({ children }: MobileActionsDraggabl
   const [maxHeight, setMaxHeight] = useState(getMaxDrawerHeight);
   const [bottomStackHeight, setBottomStackHeight] = useState(0);
   const [drawerHeight, setDrawerHeight] = useState(0);
+  const [isCloseTapShieldActive, setIsCloseTapShieldActive] = useState(false);
   const dragStateRef = useRef<DragState | null>(null);
   const isDraggingRef = useRef(false);
   const bottomStackRef = useRef<HTMLDivElement | null>(null);
+  const closeTapShieldTimeoutRef = useRef<number | null>(null);
 
   const minHeight = bottomStackHeight;
   const actionPanelHeight = Math.max(0, drawerHeight - minHeight);
@@ -139,14 +141,35 @@ export function MobileActionsDraggableDrawer({ children }: MobileActionsDraggabl
     }
   }, [activeSlot, expandedHeight, minHeight]);
 
+  useEffect(() => {
+    return () => {
+      if (closeTapShieldTimeoutRef.current !== null) {
+        window.clearTimeout(closeTapShieldTimeoutRef.current);
+      }
+    };
+  }, []);
+
   if (sidebarSlots.length === 0) {
     return null;
   }
+
+  const activateCloseTapShield = () => {
+    if (closeTapShieldTimeoutRef.current !== null) {
+      window.clearTimeout(closeTapShieldTimeoutRef.current);
+    }
+
+    setIsCloseTapShieldActive(true);
+    closeTapShieldTimeoutRef.current = window.setTimeout(() => {
+      setIsCloseTapShieldActive(false);
+      closeTapShieldTimeoutRef.current = null;
+    }, 350);
+  };
 
   const settleDrawer = (height: number) => {
     const nextHeight = clampHeight(height);
 
     if (nextHeight <= minHeight + 24) {
+      activateCloseTapShield();
       closeSheet();
       return;
     }
@@ -160,6 +183,7 @@ export function MobileActionsDraggableDrawer({ children }: MobileActionsDraggabl
       return;
     }
 
+    event.preventDefault();
     isDraggingRef.current = true;
     dragStateRef.current = {
       moved: false,
@@ -177,6 +201,7 @@ export function MobileActionsDraggableDrawer({ children }: MobileActionsDraggabl
       return;
     }
 
+    event.preventDefault();
     const nextHeight = clampHeight(dragState.startHeight + (dragState.startY - event.clientY));
 
     if (Math.abs(nextHeight - dragState.startHeight) > 2) {
@@ -193,11 +218,13 @@ export function MobileActionsDraggableDrawer({ children }: MobileActionsDraggabl
       return;
     }
 
+    event.preventDefault();
     if (!dragState.moved) {
       if (drawerHeight <= minHeight + 12) {
         setDrawerHeight(Math.max(expandedHeight, minHeight));
         openSheet();
       } else {
+        activateCloseTapShield();
         setDrawerHeight(minHeight);
         closeSheet();
       }
@@ -220,6 +247,15 @@ export function MobileActionsDraggableDrawer({ children }: MobileActionsDraggabl
       className="pointer-events-auto relative mx-0 overflow-visible"
       style={{ height: drawerHeight + HANDLE_OVERLAP }}
     >
+      {isCloseTapShieldActive ? (
+        <div
+          aria-hidden
+          className="fixed inset-0 z-10"
+          onClick={(event) => event.preventDefault()}
+          onPointerDown={(event) => event.preventDefault()}
+          onPointerUp={(event) => event.preventDefault()}
+        />
+      ) : null}
       <div
         className="absolute inset-x-0 bottom-0 flex flex-col overflow-hidden rounded-t-[8px] border-x border-t border-primary/25 bg-background/96 shadow-[0_-12px_28px_-20px_var(--primary)] backdrop-blur-md"
         style={{ height: drawerHeight }}

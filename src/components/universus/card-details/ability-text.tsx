@@ -17,19 +17,19 @@ export function AbilityText({ text }: AbilityTextProps) {
 
         if (colonIndex === -1) {
           return (
-            <p key={index} className="text-sm leading-relaxed">
+            <p key={index} className="text-sm leading-relaxed text-foreground/80">
               {segment}
             </p>
           );
         }
 
         const beforeColon = segment.slice(0, colonIndex);
-        const afterColon = segment.slice(colonIndex);
+        const afterColon = segment.slice(colonIndex + 1).trim();
         const abilityMatch = beforeColon.match(/^(.*?)(enhance|response|blitz|form)/i);
 
         if (!abilityMatch) {
           return (
-            <p key={index} className="text-sm leading-relaxed">
+            <p key={index} className="text-sm leading-relaxed text-foreground/80">
               {segment}
             </p>
           );
@@ -38,24 +38,22 @@ export function AbilityText({ text }: AbilityTextProps) {
         const prefix = abilityMatch[1];
         const abilityKeyword = abilityMatch[2];
         const abilityColor = TIMING_COLORS[abilityKeyword.toLowerCase()];
-        const highlightedPart = prefix + abilityKeyword;
-        const remainingBeforeColon = beforeColon.slice(highlightedPart.length);
+        const highlightedPart = (prefix + abilityKeyword).trim();
+        const remainingBeforeColon = beforeColon.slice((prefix + abilityKeyword).length).trim();
 
         return (
-          <p key={index} className="text-sm leading-relaxed">
+          <p key={index} className="text-sm leading-relaxed text-foreground/90">
             <span
-              className="inline-block px-2.5 py-0.5 text-xs font-semibold font-mono uppercase tracking-widest"
+              className="mr-2 inline-flex items-center rounded-sm px-1.5 py-px text-[10px] font-bold font-mono uppercase tracking-[0.1em] align-middle"
               style={{
-                borderLeft: `2px solid ${abilityColor}`,
-                borderTop: `1px solid color-mix(in srgb, ${abilityColor} 30%, transparent)`,
-                borderBottom: `1px solid color-mix(in srgb, ${abilityColor} 30%, transparent)`,
-                background: `linear-gradient(to right, ${abilityColor}35, ${abilityColor}10)`,
-                color: abilityColor,
+                backgroundColor: abilityColor,
+                color: "#fff",
+                boxShadow: `0 0 10px ${abilityColor}40`,
               }}
             >
               {highlightedPart}
             </span>
-            {remainingBeforeColon}
+            {remainingBeforeColon && <>{remainingBeforeColon} </>}
             {afterColon}
           </p>
         );
