@@ -29,16 +29,25 @@ function DeckDetailsGallerySidebarContent() {
 }
 
 function DeckDetailsGallerySidebarAvailableContent() {
-  const { isFilterDialogOpen, setIsFilterDialogOpen } = useAvailableGallerySidebarContext();
+  const { isFilterDialogOpen, setIsFilterDialogOpen, isMobile } = useAvailableGallerySidebarContext();
 
   return (
     <>
       <DeckDetailsGallerySidebarHoverPreview />
       <div className="flex h-full min-h-0 flex-col">
-        <DeckDetailsGallerySidebarBody />
-        <DeckDetailsGallerySidebarBottomBar />
-        <GalleryFilterDialog open={isFilterDialogOpen} onOpenChange={setIsFilterDialogOpen} />
+        {isMobile ? (
+          <>
+            <DeckDetailsGallerySidebarBody />
+            <DeckDetailsGallerySidebarBottomBar position="bottom" />
+          </>
+        ) : (
+          <>
+            <DeckDetailsGallerySidebarBottomBar position="top" />
+            <DeckDetailsGallerySidebarBody />
+          </>
+        )}
       </div>
+      <GalleryFilterDialog open={isFilterDialogOpen} onOpenChange={setIsFilterDialogOpen} />
     </>
   );
 }

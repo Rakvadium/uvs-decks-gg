@@ -63,19 +63,6 @@ export function DeckCardsToolbar() {
         {isMobile ? <div className="w-full">{sectionTabs}</div> : sectionTabs}
 
         <div className={cn("inline-flex items-center gap-1.5 shrink-0", isMobile ? "w-full" : "ml-auto")}>
-          <Select value={model.viewMode} onValueChange={(value) => model.setViewMode(value as DeckViewMode)}>
-            <SelectTrigger className="h-7 w-[110px] text-[11px]">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {VIEW_MODE_OPTIONS.map((option) => (
-                <SelectItem key={option.value} value={option.value} className="text-[11px]">
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
           {model.viewMode === "list" && (
             <Select value={model.selectedListSortValue} onValueChange={model.onSelectSort}>
               <SelectTrigger className={cn("h-7 text-[11px]", isMobile ? "flex-1 min-w-0" : "w-[180px]")}>
@@ -90,6 +77,19 @@ export function DeckCardsToolbar() {
               </SelectContent>
             </Select>
           )}
+
+          <Select value={model.viewMode} onValueChange={(value) => model.setViewMode(value as DeckViewMode)}>
+            <SelectTrigger className="h-7 w-[110px] text-[11px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {VIEW_MODE_OPTIONS.map((option) => (
+                <SelectItem key={option.value} value={option.value} className="text-[11px]">
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
     </div>

@@ -7,11 +7,16 @@ import { useDeckCardsSectionContext } from "../deck-details-cards-section-contex
 export function DeckCardsListView() {
   const model = useDeckCardsSectionContext();
 
+  const columns = [
+    { column: "left" as const, groups: model.listGroups.left },
+    { column: "right" as const, groups: model.listGroups.right },
+  ].filter(({ groups }) => groups.length > 0);
+
   return (
     <div className="flex flex-wrap gap-4">
-      {[model.listGroups.left, model.listGroups.right].map((columnGroups, columnIndex) => (
-        <div key={columnIndex} className="min-w-[280px] flex-1 space-y-4">
-          {columnGroups.map((group) => (
+      {columns.map(({ column, groups }) => (
+        <div key={column} className="min-w-[280px] max-w-[50%] flex-1 space-y-4">
+          {groups.map((group) => (
             <div key={group.key} className="space-y-2.5">
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-2">

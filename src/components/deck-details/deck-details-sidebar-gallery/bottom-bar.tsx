@@ -1,15 +1,25 @@
 import { Search, SlidersHorizontal, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 import { useAvailableGallerySidebarContext } from "./context";
 import { DeckDetailsGalleryViewModePopover } from "./view-mode-popover";
 
-export function DeckDetailsGallerySidebarBottomBar() {
+interface DeckDetailsGallerySidebarBottomBarProps {
+  position?: "top" | "bottom";
+}
+
+export function DeckDetailsGallerySidebarBottomBar({ position = "bottom" }: DeckDetailsGallerySidebarBottomBarProps) {
   const { gallery, setIsFilterDialogOpen } = useAvailableGallerySidebarContext();
   const { state, actions, meta } = gallery;
 
   return (
-    <div className="sticky bottom-0 z-20 shrink-0 border-t border-border/40 bg-background/95 px-3 py-3 backdrop-blur-lg">
+    <div
+      className={cn(
+        "z-20 shrink-0 bg-background/95 px-3 py-3 backdrop-blur-lg",
+        position === "top" ? "border-b border-border/40" : "sticky bottom-0 border-t border-border/40"
+      )}
+    >
       <div className="flex w-full items-center gap-2">
         <div className="relative min-w-0 flex-1">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-primary/70" />

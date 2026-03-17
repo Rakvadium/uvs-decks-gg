@@ -14,13 +14,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useDeckDetailsOptional } from "@/providers/DeckDetailsProvider";
 import { DeckSectionControls } from "./deck-section-controls";
-import { useCardDetailsVariant } from "./use-card-details-variant";
-import { VariantSelector } from "./variant-selector";
-import { CardDetailsV1 } from "./variants/v1";
 import { CardDetailsV2 } from "./variants/v2";
-import { CardDetailsV3 } from "./variants/v3";
-import { CardDetailsV4 } from "./variants/v4";
-import { CardDetailsV5 } from "./variants/v5";
 
 interface CardDetailsDialogProps {
   card: CachedCard | null;
@@ -30,14 +24,6 @@ interface CardDetailsDialogProps {
   cards?: CachedCard[];
   getBackCard?: (card: CachedCard) => CachedCard | null | undefined;
 }
-
-const VARIANT_COMPONENTS = {
-  v1: CardDetailsV1,
-  v2: CardDetailsV2,
-  v3: CardDetailsV3,
-  v4: CardDetailsV4,
-  v5: CardDetailsV5,
-};
 
 export function CardDetailsDialog({
   card,
@@ -49,7 +35,6 @@ export function CardDetailsDialog({
 }: CardDetailsDialogProps) {
   const [isFlipped, setIsFlipped] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(-1);
-  const { variant } = useCardDetailsVariant();
   const deckDetails = useDeckDetailsOptional();
   const showDeckControls = !deckDetails || deckDetails.isOwner;
 
@@ -109,14 +94,13 @@ export function CardDetailsDialog({
   if (!currentCard) return null;
 
   const displayCard = isFlipped && currentBackCard ? currentBackCard : currentCard;
-  const VariantComponent = VARIANT_COMPONENTS[variant];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent size="md" className="max-h-[90vh] overflow-hidden p-0 md:pb-0" showCloseButton={false}>
         <DialogTitle className="sr-only">{displayCard.name} - Card Details</DialogTitle>
 
-        <VariantComponent
+        <CardDetailsV2
           card={currentCard}
           displayCard={displayCard}
           backCard={currentBackCard ?? null}
@@ -131,8 +115,6 @@ export function CardDetailsDialog({
           )}
 
           <div className="ml-auto flex items-center gap-3">
-            <VariantSelector />
-
             {hasNavigation && (
               <span className="text-[10px] font-mono text-muted-foreground/50">
                 {currentIndex + 1} / {cards!.length}

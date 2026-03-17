@@ -16,7 +16,7 @@ import {
 } from "./deck-details-sidebars";
 
 function DeckDetailsGallerySlotRegistration() {
-  const gallerySlotOptions = useMemo(() => ({ label: "Gallery", icon: LayoutGrid }), []);
+  const gallerySlotOptions = useMemo(() => ({ label: "Gallery", icon: LayoutGrid, priority: 0 }), []);
   useRegisterSlot("right-sidebar", "deck-gallery", GallerySidebar, gallerySlotOptions);
   return null;
 }
@@ -24,12 +24,12 @@ function DeckDetailsGallerySlotRegistration() {
 export function DeckDetailsView() {
   const { deck, isLoading, isOwner } = useDeckDetails();
 
-  const statsSlotOptions = useMemo(() => ({ label: "Stats", icon: BarChart3 }), []);
+  const statsSlotOptions = useMemo(() => ({ label: "Stats", icon: BarChart3, priority: 1 }), []);
   const simulatorSlotOptions = useMemo(
-    () => ({ label: "Simulator", icon: Shuffle, footer: HandSimulatorSidebarFooter }),
+    () => ({ label: "Simulator", icon: Shuffle, footer: HandSimulatorSidebarFooter, priority: 1 }),
     []
   );
-  const importExportSlotOptions = useMemo(() => ({ label: "Import/Export", icon: Download }), []);
+  const importExportSlotOptions = useMemo(() => ({ label: "Import/Export", icon: Download, priority: 1 }), []);
 
   useRegisterSlot("right-sidebar", "deck-stats", StatsSidebar, statsSlotOptions);
   useRegisterSlot("right-sidebar", "deck-simulator", HandSimulatorSidebar, simulatorSlotOptions);

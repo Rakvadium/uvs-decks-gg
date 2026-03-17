@@ -5,6 +5,7 @@ import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { CardDetailsDialog } from "@/components/universus";
 import { cn } from "@/lib/utils";
+import { DeckCardStackItemActions } from "./actions";
 import { useDeckCardStackItemModel } from "./hook";
 import type { DeckCardStackItemProps } from "./types";
 
@@ -26,7 +27,12 @@ export function DeckCardStackItem(props: DeckCardStackItemProps) {
     <>
       <div className="group flex flex-col gap-2">
         <div className="relative pb-6 pr-6">
-          <div className="relative aspect-[2.5/3.5] overflow-visible">
+          <div
+            className={cn(
+              "relative aspect-[2.5/3.5] overflow-visible transition-transform duration-150",
+              !prefersReducedMotion && "group-hover:-translate-x-1 group-hover:-translate-y-1"
+            )}
+          >
             {stackedLayers.map((layer) => (
               <div
                 key={layer}
@@ -39,18 +45,7 @@ export function DeckCardStackItem(props: DeckCardStackItemProps) {
               />
             ))}
 
-            <button
-              type="button"
-              onClick={openDialog}
-              onKeyDown={handleKeyDownOpen as unknown as (event: KeyboardEvent<HTMLButtonElement>) => void}
-              className={cn(
-                "absolute inset-0 z-10 overflow-hidden rounded-lg",
-                "shadow-[0_10px_30px_-16px_rgba(0,0,0,0.7)]",
-                "transition-transform duration-150",
-                !prefersReducedMotion && "group-hover:-translate-x-1 group-hover:-translate-y-1"
-              )}
-              aria-label={`Open ${card.name} details`}
-            >
+            <div className="absolute inset-0 z-10 overflow-hidden rounded-lg shadow-[0_10px_30px_-16px_rgba(0,0,0,0.7)]">
               {card.imageUrl ? (
                 <Image
                   src={card.imageUrl}
@@ -71,7 +66,7 @@ export function DeckCardStackItem(props: DeckCardStackItemProps) {
                   </div>
                 </div>
               )}
-            </button>
+            </div>
 
             <div className="absolute right-2 top-2 z-20">
               <Badge variant="outline" className="bg-background/80 font-mono text-[10px] backdrop-blur-sm">
@@ -79,6 +74,18 @@ export function DeckCardStackItem(props: DeckCardStackItemProps) {
               </Badge>
             </div>
           </div>
+
+          <div className="absolute bottom-2 left-2 z-30 rounded-lg border border-border/60 bg-background/95 px-1 py-0.5 backdrop-blur-sm shadow-md">
+            <DeckCardStackItemActions card={card} quantity={quantity} />
+          </div>
+
+          <button
+            type="button"
+            onClick={openDialog}
+            onKeyDown={handleKeyDownOpen as unknown as (event: KeyboardEvent<HTMLButtonElement>) => void}
+            className="absolute inset-0 z-20 rounded-lg"
+            aria-label={`Open ${card.name} details`}
+          />
         </div>
       </div>
 
