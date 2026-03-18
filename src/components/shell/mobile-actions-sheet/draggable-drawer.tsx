@@ -150,7 +150,13 @@ export function MobileActionsDraggableDrawer({ children }: MobileActionsDraggabl
   }, []);
 
   if (sidebarSlots.length === 0) {
-    return null;
+    return (
+      <div className="pointer-events-auto relative mx-0 overflow-visible">
+        <div ref={bottomStackRef} className="shrink-0">
+          {children}
+        </div>
+      </div>
+    );
   }
 
   const activateCloseTapShield = () => {
