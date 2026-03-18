@@ -105,8 +105,8 @@ export const COMMUNITY_LABS: Array<{
   icon: LucideIcon;
 }> = [
   {
-    title: "Deck Lab",
-    description: "Drop a list and get tuning advice within 24 hours.",
+    title: "Tier List Lab",
+    description: "Rank card pools with custom tiers and publish them to the feed.",
     kicker: "Open lab",
     icon: Layers,
   },

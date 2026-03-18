@@ -1,10 +1,10 @@
 "use client";
 
 import {
-  CommunityBuildersPulseSection,
   CommunityDeckSpotlightsSection,
   CommunityLabsSection,
   CommunityMediaFeedSection,
+  CommunityTierListsSection,
 } from "./community-sections";
 
 export function CommunityView() {
@@ -15,7 +15,7 @@ export function CommunityView() {
       <div className="pointer-events-none absolute inset-0 grid-pattern opacity-25" />
 
       <CommunityMediaFeedSection />
-      <CommunityBuildersPulseSection />
+      <CommunityTierListsSection />
       <CommunityDeckSpotlightsSection />
       <CommunityLabsSection />
     </div>

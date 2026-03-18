@@ -5,4 +5,5 @@ export {
   CommunityDeckSpotlightsSection,
   CommunityLabsSection,
   CommunityMediaFeedSection,
+  CommunityTierListsSection,
 } from "./sections";

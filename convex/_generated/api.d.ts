@@ -25,6 +25,7 @@ import type * as r2 from "../r2.js";
 import type * as sessions from "../sessions.js";
 import type * as sets from "../sets.js";
 import type * as social from "../social.js";
+import type * as tierLists from "../tierLists.js";
 import type * as user from "../user.js";
 import type * as utils_filtering from "../utils/filtering.js";
 import type * as utils_validation from "../utils/validation.js";
@@ -54,6 +55,7 @@ declare const fullApi: ApiFromModules<{
   sessions: typeof sessions;
   sets: typeof sets;
   social: typeof social;
+  tierLists: typeof tierLists;
   user: typeof user;
   "utils/filtering": typeof utils_filtering;
   "utils/validation": typeof utils_validation;

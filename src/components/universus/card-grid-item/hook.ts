@@ -5,7 +5,13 @@ import { useIsMobile } from "@/hooks/useIsMobile";
 import { usePrefersReducedMotion } from "@/lib/reduced-motion";
 import type { CardGridItemProps } from "./types";
 
-export function useCardGridItem({ card, backCard, onCardClick }: CardGridItemProps) {
+export function useCardGridItem({
+  card,
+  backCard,
+  onCardClick,
+  dragSourceId = "gallery-grid",
+  showDeckActions = true,
+}: CardGridItemProps) {
   const isMobile = useIsMobile();
   const [usesTouchControls, setUsesTouchControls] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -24,7 +30,7 @@ export function useCardGridItem({ card, backCard, onCardClick }: CardGridItemPro
   } = useDeckEditor();
   const { isDragging, dragHandleProps } = useTcgDraggable({
     card,
-    sourceId: "gallery-grid",
+    sourceId: dragSourceId,
   });
 
   const dragBlockRef = useRef(false);
@@ -45,7 +51,8 @@ export function useCardGridItem({ card, backCard, onCardClick }: CardGridItemPro
   const hasBackCardId = Boolean(card.backCardId);
   const hasBackCardData = Boolean(backCard);
   const displayCard = isFlipped && backCard ? backCard : card;
-  const showDeckCount = hasDeck && deckCount > 0;
+  const deckInteractionsEnabled = showDeckActions && hasDeck;
+  const showDeckCount = deckInteractionsEnabled && deckCount > 0;
   const showInlineControls = isMobile || usesTouchControls;
 
   useEffect(() => {
@@ -132,7 +139,7 @@ export function useCardGridItem({ card, backCard, onCardClick }: CardGridItemPro
     dragHandleProps,
     hasBackCardData,
     hasBackCardId,
-    hasDeck,
+    hasDeck: deckInteractionsEnabled,
     isDialogOpen,
     isDragging,
     isMobile: showInlineControls,
@@ -141,7 +148,7 @@ export function useCardGridItem({ card, backCard, onCardClick }: CardGridItemPro
     prefersReducedMotion,
     showDeckCount,
     deckCount,
-    canAddToDeck,
+    canAddToDeck: deckInteractionsEnabled ? canAddToDeck : false,
     setIsDialogOpen,
     setIsHovered,
     handleFlip,

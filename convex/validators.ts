@@ -79,6 +79,66 @@ export const deckValidator = v.object({
   cardLayouts: v.optional(v.record(v.string(), cardLayoutValidator)),
 });
 
+export const tierDefinitionValidator = v.object({
+  id: v.string(),
+  label: v.string(),
+  color: v.string(),
+  order: v.number(),
+});
+
+export const tierListValidator = v.object({
+  _id: v.id("tierLists"),
+  _creationTime: v.number(),
+  userId: v.id("users"),
+  title: v.string(),
+  description: v.optional(v.string()),
+  isPublic: v.boolean(),
+  selectedSetCodes: v.array(v.string()),
+  previewCardIds: v.array(v.id("cards")),
+  tiers: v.array(tierDefinitionValidator),
+  itemCount: v.number(),
+  tierCount: v.number(),
+  likeCount: v.number(),
+  commentCount: v.number(),
+  featuredCardId: v.optional(v.id("cards")),
+  updatedAt: v.number(),
+});
+
+export const tierListItemValidator = v.object({
+  _id: v.id("tierListItems"),
+  _creationTime: v.number(),
+  tierListId: v.id("tierLists"),
+  cardId: v.id("cards"),
+  laneKey: v.string(),
+  order: v.number(),
+});
+
+export const tierListLikeValidator = v.object({
+  _id: v.id("tierListLikes"),
+  _creationTime: v.number(),
+  userId: v.id("users"),
+  tierListId: v.id("tierLists"),
+});
+
+export const tierListCommentStatusValidator = v.union(
+  v.literal("approved"),
+  v.literal("pending"),
+  v.literal("flagged"),
+  v.literal("rejected")
+);
+
+export const tierListCommentValidator = v.object({
+  _id: v.id("tierListComments"),
+  _creationTime: v.number(),
+  tierListId: v.id("tierLists"),
+  userId: v.id("users"),
+  content: v.string(),
+  status: tierListCommentStatusValidator,
+  moderationReason: v.optional(v.string()),
+  createdAt: v.number(),
+  updatedAt: v.number(),
+});
+
 export const collectionEntryValidator = v.object({
   _id: v.id("collections"),
   _creationTime: v.number(),
