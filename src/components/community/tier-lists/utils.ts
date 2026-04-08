@@ -1,5 +1,13 @@
 import type { Id } from "../../../../convex/_generated/dataModel";
 import type { CachedCard } from "@/lib/universus";
+import type { BuilderLaneMap, BuilderTier } from "./types";
+import {
+  buildCanonicalRankedTiers,
+  COMMUNITY_TIER_RANKING,
+  isCanonicalRankedTierDefinitions,
+  type CommunityTierRankingScope,
+  getRankingScopeLabel,
+} from "../../../../shared/app-config";
 
 export const POOL_LANE_KEY = "pool";
 
@@ -14,14 +22,6 @@ export const TIER_COLOR_SWATCHES = [
   "#64748b",
 ] as const;
 
-export type BuilderTier = {
-  id: string;
-  label: string;
-  color: string;
-};
-
-export type BuilderLaneMap = Record<string, Id<"cards">[]>;
-
 export function createDefaultTiers(): BuilderTier[] {
   return [
     { id: "tier-a", label: "A", color: "#f97316" },
@@ -29,6 +29,26 @@ export function createDefaultTiers(): BuilderTier[] {
     { id: "tier-c", label: "C", color: "#3b82f6" },
     { id: "tier-d", label: "D", color: "#14b8a6" },
   ];
+}
+
+export function createCanonicalRankedTiers(): BuilderTier[] {
+  return buildCanonicalRankedTiers().map(({ id, label, color }) => ({
+    id,
+    label,
+    color,
+  }));
+}
+
+export function isRankedTierListScope(scope: CommunityTierRankingScope | undefined) {
+  return scope === COMMUNITY_TIER_RANKING.scopes.global || scope === COMMUNITY_TIER_RANKING.scopes.setScope;
+}
+
+export function isCanonicalRankedTierList(tiers: BuilderTier[]) {
+  return isCanonicalRankedTierDefinitions(tiers);
+}
+
+export function getTierListScopeLabel(scope: CommunityTierRankingScope | undefined) {
+  return getRankingScopeLabel(scope ?? COMMUNITY_TIER_RANKING.scopes.unranked);
 }
 
 export function getTierLaneKeys(tiers: BuilderTier[]) {

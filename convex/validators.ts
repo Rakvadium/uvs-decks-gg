@@ -1,5 +1,11 @@
 import { v } from "convex/values";
 
+export const tierListRankingScopeValidator = v.union(
+  v.literal("unranked"),
+  v.literal("global"),
+  v.literal("set_scope")
+);
+
 export const cardValidator = v.object({
   _id: v.id("cards"),
   _creationTime: v.number(),
@@ -93,6 +99,8 @@ export const tierListValidator = v.object({
   title: v.string(),
   description: v.optional(v.string()),
   isPublic: v.boolean(),
+  rankingScope: v.optional(tierListRankingScopeValidator),
+  rankingScopeKey: v.optional(v.string()),
   selectedSetCodes: v.array(v.string()),
   previewCardIds: v.array(v.id("cards")),
   tiers: v.array(tierDefinitionValidator),
@@ -111,6 +119,41 @@ export const tierListItemValidator = v.object({
   cardId: v.id("cards"),
   laneKey: v.string(),
   order: v.number(),
+});
+
+export const communityCardRankingValidator = v.object({
+  _id: v.id("communityCardRankings"),
+  _creationTime: v.number(),
+  scopeType: v.union(v.literal("global"), v.literal("set_scope")),
+  scopeKey: v.string(),
+  scopeLabel: v.string(),
+  cardId: v.id("cards"),
+  voteCount: v.number(),
+  rawMeanScore: v.number(),
+  adjustedScore: v.number(),
+  topLaneRate: v.number(),
+  bottomLaneRate: v.number(),
+  lastComputedAt: v.number(),
+});
+
+export const communityTierSnapshotValidator = v.object({
+  _id: v.id("communityTierSnapshots"),
+  _creationTime: v.number(),
+  scopeType: v.union(v.literal("global"), v.literal("set_scope")),
+  scopeKey: v.string(),
+  scopeLabel: v.string(),
+  setCodes: v.array(v.string()),
+  contributorCount: v.number(),
+  rankedCardCount: v.number(),
+  insufficientCardCount: v.number(),
+  tiers: v.array(v.object({
+    id: v.string(),
+    label: v.string(),
+    color: v.string(),
+    cardIds: v.array(v.id("cards")),
+  })),
+  insufficientDataCardIds: v.array(v.id("cards")),
+  lastComputedAt: v.number(),
 });
 
 export const tierListLikeValidator = v.object({

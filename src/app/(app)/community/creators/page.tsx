@@ -1,6 +1,6 @@
 "use client";
 
-import { CreatorProgramView } from "@/components/community";
+import { CreatorProgramView } from "@/components/community/creator-program-view";
 
 export default function CreatorProgramPage() {
   return (

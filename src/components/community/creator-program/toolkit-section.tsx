@@ -1,21 +1,20 @@
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { CREATOR_TOOLKIT } from "./data";
+import { CommunitySectionHeader } from "../shared/section-header";
 
 export function CreatorProgramToolkitSection() {
   return (
     <section id="creator-toolkit" className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h2 className="text-xl font-display font-bold uppercase tracking-[0.18em]">Creator Toolkit</h2>
-          <p className="text-sm text-muted-foreground">
-            Everything you need to publish, engage, and grow your community presence.
-          </p>
-        </div>
-        <Button variant="outline" size="sm">
-          See All Tools
-        </Button>
-      </div>
+      <CommunitySectionHeader
+        title="Creator Toolkit"
+        description="Everything you need to publish, engage, and grow your community presence."
+        action={
+          <Button variant="outline" size="sm">
+            See All Tools
+          </Button>
+        }
+      />
 
       <div className="grid gap-4 md:grid-cols-2">
         {CREATOR_TOOLKIT.map((tool) => {

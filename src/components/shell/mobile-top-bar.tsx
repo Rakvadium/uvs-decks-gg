@@ -45,5 +45,15 @@ export function MobileTopBar({ pageType }: MobileTopBarProps) {
     )
   }
 
+  if (pageType === "community" && hasTopBarSlots) {
+    return (
+      <div className={mobileTopBarClassName}>
+        <div className="relative px-4 py-3">
+          <SlotRenderer area="top-bar" />
+        </div>
+      </div>
+    )
+  }
+
   return null
 }

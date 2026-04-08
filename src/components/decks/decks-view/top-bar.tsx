@@ -1,8 +1,8 @@
 import { Plus, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { SegmentedControl } from "@/components/ui/segmented-control";
 import { Separator } from "@/components/ui/separator";
-import { cn } from "@/lib/utils";
 import { useDecksOptional } from "@/providers/DecksProvider";
 import { TABS } from "./constants";
 
@@ -30,39 +30,17 @@ export function DecksTopBar() {
 
       <Separator orientation="vertical" className="mx-1 h-5" />
 
-      <div className="flex gap-1 rounded-md border border-border/50 bg-muted/50 p-0.5">
-        {TABS.filter((tab) => (tab.id === "my-decks" ? isAuthenticated : true)).map((tab) => {
-          const Icon = tab.icon;
-          const isActive = state.activeTab === tab.id;
-          const count = deckCounts[tab.id];
-
-          return (
-            <button
-              key={tab.id}
-              onClick={() => actions.setActiveTab(tab.id)}
-              className={cn(
-                "flex items-center gap-1.5 rounded px-3 py-1.5 text-xs font-mono uppercase tracking-wider transition-all",
-                isActive
-                  ? "bg-primary/20 text-primary shadow-[0_0_10px_-3px_var(--primary)]"
-                  : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
-              )}
-            >
-              <Icon className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">{tab.shortLabel}</span>
-              {count > 0 ? (
-                <span
-                  className={cn(
-                    "rounded px-1 py-0.5 text-[10px]",
-                    isActive ? "bg-primary/30" : "bg-muted"
-                  )}
-                >
-                  {count}
-                </span>
-              ) : null}
-            </button>
-          );
-        })}
-      </div>
+      <SegmentedControl
+        size="sm"
+        value={state.activeTab}
+        onValueChange={(value) => actions.setActiveTab(value as typeof state.activeTab)}
+        items={TABS.filter((tab) => (tab.id === "my-decks" ? isAuthenticated : true)).map((tab) => ({
+          value: tab.id,
+          label: <span className="hidden sm:inline">{tab.shortLabel}</span>,
+          icon: tab.icon,
+          badge: deckCounts[tab.id] > 0 ? deckCounts[tab.id] : undefined,
+        }))}
+      />
 
       {isAuthenticated ? (
         <div className="ml-auto">

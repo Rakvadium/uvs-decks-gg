@@ -13,6 +13,7 @@ import type * as admin from "../admin.js";
 import type * as auth from "../auth.js";
 import type * as cards from "../cards.js";
 import type * as collections from "../collections.js";
+import type * as communityRankings from "../communityRankings.js";
 import type * as deckValidation from "../deckValidation.js";
 import type * as decks from "../decks.js";
 import type * as errors from "../errors.js";
@@ -43,6 +44,7 @@ declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   cards: typeof cards;
   collections: typeof collections;
+  communityRankings: typeof communityRankings;
   deckValidation: typeof deckValidation;
   decks: typeof decks;
   errors: typeof errors;

@@ -2,7 +2,9 @@ import { getAuthUserId } from "@convex-dev/auth/server";
 import { v } from "convex/values";
 import type { Doc, Id } from "./_generated/dataModel";
 import { mutation, query, type MutationCtx, type QueryCtx } from "./_generated/server";
+import { internal } from "./_generated/api";
 import {
+  tierListRankingScopeValidator,
   tierDefinitionValidator,
   tierListCommentStatusValidator,
   tierListCommentValidator,
@@ -11,6 +13,14 @@ import {
   userValidator,
 } from "./validators";
 import { requireAuth } from "./utils/validation";
+import {
+  COMMUNITY_TIER_RANKING,
+  buildCanonicalRankedTiers,
+  isCanonicalRankedTierDefinitions,
+  isRankedTierScope,
+  resolveRankingScopeKey,
+  type CommunityTierRankingScope,
+} from "../shared/app-config";
 
 const tierListSaveItemValidator = v.object({
   cardId: v.id("cards"),
@@ -67,7 +77,14 @@ function normalizeSetCodes(setCodes: string[]) {
   return Array.from(deduped);
 }
 
-function normalizeTiers(tiers: Array<{ id: string; label: string; color: string; order: number }>) {
+function normalizeTiers(
+  tiers: Array<{ id: string; label: string; color: string; order: number }>,
+  rankingScope: CommunityTierRankingScope
+) {
+  if (isRankedTierScope(rankingScope)) {
+    return buildCanonicalRankedTiers();
+  }
+
   const seen = new Set<string>();
   return tiers
     .map((tier, index) => {
@@ -82,6 +99,65 @@ function normalizeTiers(tiers: Array<{ id: string; label: string; color: string;
       };
     })
     .slice(0, 12);
+}
+
+type RankingScopeRef = {
+  scopeType: "global" | "set_scope";
+  scopeKey: string;
+};
+
+function getEligibleRankingScopeRefs({
+  isPublic,
+  rankingScope,
+  rankingScopeKey,
+  selectedSetCodes,
+  tiers,
+}: {
+  isPublic: boolean;
+  rankingScope?: CommunityTierRankingScope;
+  rankingScopeKey?: string;
+  selectedSetCodes: string[];
+  tiers: Array<{ id: string; label: string; color: string; order: number }>;
+}) {
+  const resolvedRankingScope = rankingScope ?? COMMUNITY_TIER_RANKING.scopes.unranked;
+
+  if (!isPublic || !isRankedTierScope(resolvedRankingScope) || !isCanonicalRankedTierDefinitions(tiers)) {
+    return [] as RankingScopeRef[];
+  }
+
+  if (resolvedRankingScope === COMMUNITY_TIER_RANKING.scopes.global) {
+    return [
+      {
+        scopeType: "global" as const,
+        scopeKey: COMMUNITY_TIER_RANKING.globalScopeKey,
+      },
+    ];
+  }
+
+  if (selectedSetCodes.length === 0 || !rankingScopeKey) {
+    return [] as RankingScopeRef[];
+  }
+
+  return [
+    {
+      scopeType: "set_scope" as const,
+      scopeKey: rankingScopeKey,
+    },
+  ];
+}
+
+async function recomputeAffectedRankingScopes(
+  ctx: MutationCtx,
+  scopes: RankingScopeRef[]
+) {
+  const deduped = new Map<string, RankingScopeRef>();
+  for (const scope of scopes) {
+    deduped.set(`${scope.scopeType}:${scope.scopeKey}`, scope);
+  }
+
+  for (const scope of deduped.values()) {
+    await ctx.runMutation(internal.communityRankings.recomputeScope, scope);
+  }
 }
 
 function normalizeItems(
@@ -295,6 +371,7 @@ export const save = mutation({
     title: v.string(),
     description: v.optional(v.string()),
     isPublic: v.boolean(),
+    rankingScope: tierListRankingScopeValidator,
     selectedSetCodes: v.array(v.string()),
     tiers: v.array(tierDefinitionValidator),
     items: v.array(tierListSaveItemValidator),
@@ -306,15 +383,23 @@ export const save = mutation({
     const userId = await requireAuth(ctx);
     const normalizedTitle = sanitizeText(args.title, 80) ?? "Untitled Tier List";
     const normalizedDescription = sanitizeText(args.description, 280);
-    const normalizedTiers = normalizeTiers(args.tiers);
+    const normalizedSetCodes = normalizeSetCodes(args.selectedSetCodes);
+    const normalizedRankingScopeKey = resolveRankingScopeKey(args.rankingScope, normalizedSetCodes);
+    const normalizedTiers = normalizeTiers(args.tiers, args.rankingScope);
 
     if (normalizedTiers.length === 0) {
       throw new Error("At least one tier is required");
     }
 
+    if (
+      isRankedTierScope(args.rankingScope) &&
+      normalizedTiers.length !== COMMUNITY_TIER_RANKING.rankedTierCount
+    ) {
+      throw new Error("Ranked tier lists must use the canonical S-F lanes");
+    }
+
     const validLaneKeys = new Set<string>(["pool", ...normalizedTiers.map((tier) => tier.id)]);
     const normalizedItems = normalizeItems(args.items, validLaneKeys);
-    const normalizedSetCodes = normalizeSetCodes(args.selectedSetCodes);
     const assignedItems = normalizedItems.filter((item) => item.laneKey !== "pool");
     const previewSource = assignedItems.length > 0 ? assignedItems : normalizedItems;
     const previewCardIds = previewSource.slice(0, 4).map((item) => item.cardId);
@@ -324,6 +409,7 @@ export const save = mutation({
     let tierListId = args.tierListId;
     let previousCommentCount = 0;
     let previousLikeCount = 0;
+    let previousScopeRefs: RankingScopeRef[] = [];
 
     if (tierListId) {
       const existing = await ctx.db.get(tierListId);
@@ -335,6 +421,7 @@ export const save = mutation({
       }
       previousCommentCount = existing.commentCount;
       previousLikeCount = existing.likeCount;
+      previousScopeRefs = getEligibleRankingScopeRefs(existing);
     }
 
     if (!tierListId) {
@@ -342,6 +429,8 @@ export const save = mutation({
         userId,
         title: normalizedTitle,
         isPublic: args.isPublic,
+        rankingScope: args.rankingScope,
+        rankingScopeKey: normalizedRankingScopeKey,
         selectedSetCodes: normalizedSetCodes,
         previewCardIds,
         tiers: normalizedTiers,
@@ -359,6 +448,8 @@ export const save = mutation({
         userId,
         title: normalizedTitle,
         isPublic: args.isPublic,
+        rankingScope: args.rankingScope,
+        rankingScopeKey: normalizedRankingScopeKey,
         selectedSetCodes: normalizedSetCodes,
         previewCardIds,
         tiers: normalizedTiers,
@@ -389,6 +480,16 @@ export const save = mutation({
         order: item.order,
       });
     }
+
+    const nextScopeRefs = getEligibleRankingScopeRefs({
+      isPublic: args.isPublic,
+      rankingScope: args.rankingScope,
+      rankingScopeKey: normalizedRankingScopeKey,
+      selectedSetCodes: normalizedSetCodes,
+      tiers: normalizedTiers,
+    });
+
+    await recomputeAffectedRankingScopes(ctx, [...previousScopeRefs, ...nextScopeRefs]);
 
     return { tierListId: resolvedTierListId };
   },
@@ -494,5 +595,42 @@ export const addComment = mutation({
     }
 
     return moderation;
+  },
+});
+
+export const remove = mutation({
+  args: {
+    tierListId: v.id("tierLists"),
+  },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    const userId = await requireAuth(ctx);
+    const tierList = await ctx.db.get(args.tierListId);
+
+    if (!tierList) {
+      throw new Error("Tier list not found");
+    }
+
+    if (tierList.userId !== userId) {
+      throw new Error("Not authorized");
+    }
+
+    const previousScopeRefs = getEligibleRankingScopeRefs(tierList);
+
+    for await (const item of ctx.db.query("tierListItems").withIndex("by_tierList", (q) => q.eq("tierListId", args.tierListId))) {
+      await ctx.db.delete(item._id);
+    }
+
+    for await (const like of ctx.db.query("tierListLikes").withIndex("by_tierList", (q) => q.eq("tierListId", args.tierListId))) {
+      await ctx.db.delete(like._id);
+    }
+
+    for await (const comment of ctx.db.query("tierListComments").withIndex("by_tierList", (q) => q.eq("tierListId", args.tierListId))) {
+      await ctx.db.delete(comment._id);
+    }
+
+    await ctx.db.delete(args.tierListId);
+    await recomputeAffectedRankingScopes(ctx, previousScopeRefs);
+    return null;
   },
 });
