@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { SegmentedControl } from "@/components/ui/segmented-control";
+import { cn } from "@/lib/utils";
 import { useCardData } from "@/lib/universus";
 import { CardImageDisplay } from "@/components/universus/card-grid-item/image-display";
 
@@ -29,7 +30,7 @@ function formatScore(value: number) {
   return value.toFixed(3);
 }
 
-export function CommunityRankingsView() {
+export function CommunityRankingsView({ embedded = false }: { embedded?: boolean }) {
   const { cards } = useCardData();
   const setScopes = useQuery(api.communityRankings.listSetScopes, {});
   const [scopeType, setScopeType] = useState<ScopeType>("global");
@@ -57,46 +58,77 @@ export function CommunityRankingsView() {
     { value: "set_scope", label: "Set Scope", badge: setScopes?.length || undefined },
   ];
 
+  const scopeControls = (
+    <div className="flex flex-col gap-3 md:min-w-[26rem]">
+      <SegmentedControl
+        value={scopeType}
+        onValueChange={(value) => setScopeType(value as ScopeType)}
+        items={scopeItems}
+        size="sm"
+      />
+
+      {scopeType === "set_scope" ? (
+        <Select value={selectedSetScopeKey} onValueChange={setSelectedSetScopeKey}>
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Choose a set scope" />
+          </SelectTrigger>
+          <SelectContent>
+            {(setScopes ?? []).map((scope) => (
+              <SelectItem key={scope.scopeKey} value={scope.scopeKey}>
+                {scope.scopeLabel}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      ) : null}
+    </div>
+  );
+
   return (
-    <div className="relative flex h-full flex-col overflow-y-auto">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.08),transparent_30%),radial-gradient(circle_at_80%_10%,rgba(20,184,166,0.10),transparent_26%)]" />
+    <div className={cn("relative flex h-full flex-col overflow-y-auto", embedded && "overflow-visible")}>
+      {!embedded ? (
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.08),transparent_30%),radial-gradient(circle_at_80%_10%,rgba(20,184,166,0.10),transparent_26%)]" />
+      ) : null}
 
-      <div className="relative z-10 flex min-h-full flex-col gap-6 p-4 md:p-6">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div className="space-y-2">
-            <Badge variant="cyber">Community Rankings</Badge>
-            <div>
-              <h1 className="text-2xl font-display font-bold uppercase tracking-[0.18em]">Tier Statistics</h1>
-              <p className="max-w-3xl text-sm text-muted-foreground">
-                Aggregated community rankings based on the latest public ranked list per user and scope.
-              </p>
+      <div className={cn("relative z-10 flex min-h-full flex-col gap-6", embedded ? "py-2" : "p-4 md:p-6")}>
+        {embedded ? (
+          <Card className="overflow-hidden border-border/60 bg-[linear-gradient(135deg,rgba(15,23,42,0.06),rgba(15,23,42,0.02)_45%,rgba(59,130,246,0.10))]">
+            <CardContent className="grid gap-5 p-5 md:grid-cols-[minmax(0,1fr)_auto] md:items-end md:p-6">
+              <div className="space-y-3">
+                <Badge variant="cyber" className="w-fit">
+                  Community Rankings
+                </Badge>
+                <div className="space-y-1.5">
+                  <h2 className="text-xl font-display font-bold uppercase tracking-[0.18em]">
+                    Live Tier Snapshot
+                  </h2>
+                  <p className="max-w-2xl text-sm text-muted-foreground">
+                    Read the current community consensus, swap between global and set-scoped views, and compare the
+                    generated tier snapshot against the full leaderboard without leaving the tier-list browser.
+                  </p>
+                </div>
+              </div>
+
+              <div className="rounded-2xl border border-border/60 bg-background/80 p-3 shadow-sm backdrop-blur">
+                {scopeControls}
+              </div>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div className="space-y-2">
+              <Badge variant="cyber">Community Rankings</Badge>
+              <div>
+                <h1 className="text-2xl font-display font-bold uppercase tracking-[0.18em]">Tier Statistics</h1>
+                <p className="max-w-3xl text-sm text-muted-foreground">
+                  Aggregated community rankings based on the latest public ranked list per user and scope.
+                </p>
+              </div>
             </div>
-          </div>
 
-          <div className="flex flex-col gap-3 md:min-w-[26rem]">
-            <SegmentedControl
-              value={scopeType}
-              onValueChange={(value) => setScopeType(value as ScopeType)}
-              items={scopeItems}
-              size="sm"
-            />
-
-            {scopeType === "set_scope" ? (
-              <Select value={selectedSetScopeKey} onValueChange={setSelectedSetScopeKey}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Choose a set scope" />
-                </SelectTrigger>
-                <SelectContent>
-                  {(setScopes ?? []).map((scope) => (
-                    <SelectItem key={scope.scopeKey} value={scope.scopeKey}>
-                      {scope.scopeLabel}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            ) : null}
+            {scopeControls}
           </div>
-        </div>
+        )}
 
         {!leaderboard ? (
           <Card className="border-dashed border-border/60 bg-card/65">

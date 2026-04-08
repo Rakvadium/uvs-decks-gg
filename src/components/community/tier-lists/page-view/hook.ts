@@ -1,9 +1,9 @@
 "use client";
 
-import { useDeferredValue, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { startTransition, useDeferredValue, useEffect, useMemo, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useConvexAuth, useMutation, useQuery } from "convex/react";
-import { FolderOpen, Globe } from "lucide-react";
+import { BarChart3, FolderOpen, Globe } from "lucide-react";
 import { toast } from "sonner";
 import type { Doc } from "../../../../../convex/_generated/dataModel";
 import { api } from "../../../../../convex/_generated/api";
@@ -15,12 +15,21 @@ import {
 } from "../../../../../shared/app-config";
 import { buildCardMap, createCanonicalRankedTiers, createDefaultTiers } from "../utils";
 
-export type TierListBrowserTab = "public" | "mine";
+export type TierListBrowserTab = "public" | "mine" | "rankings";
 
 export const BROWSER_TABS = [
+  { id: "rankings", label: "Rankings", icon: BarChart3 },
   { id: "public", label: "Public", icon: Globe },
   { id: "mine", label: "My Lists", icon: FolderOpen },
 ] as const;
+
+function resolveBrowserTab(value: string | null): TierListBrowserTab {
+  if (value === "mine" || value === "rankings") {
+    return value;
+  }
+
+  return "public";
+}
 
 function matchesTierListSearch({
   search,
@@ -45,6 +54,8 @@ function matchesTierListSearch({
 
 export function useCommunityTierListsPageModel() {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const { isAuthenticated } = useConvexAuth();
   const { openAuthDialog } = useAuthDialog();
   const publicLists = useQuery(api.tierLists.listPublicFeed, { limit: 48 });
@@ -52,7 +63,8 @@ export function useCommunityTierListsPageModel() {
   const saveTierList = useMutation(api.tierLists.save);
   const { cards } = useCardData();
 
-  const [activeTab, setActiveTab] = useState<TierListBrowserTab>("public");
+  const tabFromUrl = resolveBrowserTab(searchParams.get("tab"));
+  const [activeTab, setActiveTabState] = useState<TierListBrowserTab>(tabFromUrl);
   const [searchQuery, setSearchQuery] = useState("");
   const deferredSearchQuery = useDeferredValue(searchQuery);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -61,6 +73,10 @@ export function useCommunityTierListsPageModel() {
     COMMUNITY_TIER_RANKING.scopes.unranked
   );
   const [isCreating, setIsCreating] = useState(false);
+
+  useEffect(() => {
+    setActiveTabState(tabFromUrl);
+  }, [tabFromUrl]);
 
   const normalizedSearch = deferredSearchQuery.trim().toLowerCase();
   const cardMap = useMemo(() => buildCardMap(cards), [cards]);
@@ -91,9 +107,28 @@ export function useCommunityTierListsPageModel() {
   const isLoadingActiveTab =
     activeTab === "public"
       ? publicLists === undefined
-      : isAuthenticated
-        ? myLists === undefined
+      : activeTab === "mine"
+        ? isAuthenticated
+          ? myLists === undefined
+          : false
         : false;
+
+  const setActiveTab = (nextTab: TierListBrowserTab) => {
+    setActiveTabState(nextTab);
+
+    const params = new URLSearchParams(searchParams.toString());
+    if (nextTab === "public") {
+      params.delete("tab");
+    } else {
+      params.set("tab", nextTab);
+    }
+
+    const nextQuery = params.toString();
+    const nextHref = nextQuery ? `${pathname}?${nextQuery}` : pathname;
+    startTransition(() => {
+      router.replace(nextHref, { scroll: false });
+    });
+  };
 
   const handleOpenCreateDialog = () => {
     if (!isAuthenticated) {

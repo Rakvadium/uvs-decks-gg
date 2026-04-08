@@ -1,7 +1,5 @@
-"use client";
-
-import { CommunityRankingsView } from "@/components/community/community-rankings-view";
+import { redirect } from "next/navigation";
 
 export default function CommunityRankingsPage() {
-  return <CommunityRankingsView />;
+  redirect("/community/tier-lists?tab=rankings");
 }

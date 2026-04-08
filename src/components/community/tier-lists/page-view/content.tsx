@@ -1,5 +1,6 @@
 "use client";
 
+import { CommunityRankingsView } from "@/components/community/community-rankings-view";
 import { useRegisterSlot } from "@/components/shell/shell-slot-provider";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -30,7 +31,9 @@ export function CommunityTierListsPageView() {
 
       <div className="relative z-10 flex min-h-full flex-col p-4 md:p-6">
         <div className="flex-1">
-          {activeTab === "mine" && !isAuthenticated ? (
+          {activeTab === "rankings" ? (
+            <CommunityRankingsView embedded />
+          ) : activeTab === "mine" && !isAuthenticated ? (
             <Card className="border-dashed border-border/60 bg-card/65">
               <CardContent className="flex flex-col items-center gap-4 py-14 text-center">
                 <p className="max-w-lg text-sm text-muted-foreground">

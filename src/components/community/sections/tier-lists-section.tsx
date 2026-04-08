@@ -37,7 +37,7 @@ export function CommunityTierListsSection() {
           limit={4}
           action={
             <Button variant="outline" asChild>
-              <Link href="/community/rankings">View Community Rankings</Link>
+              <Link href="/community/tier-lists?tab=rankings">View Community Rankings</Link>
             </Button>
           }
         />
