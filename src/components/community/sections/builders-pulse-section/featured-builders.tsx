@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { FEATURED_BUILDERS } from "../../community-content-data";
+import { CommunitySectionHeader } from "../../shared/section-header";
 
 function FeaturedBuilderCard({ index }: { index: number }) {
   const creator = FEATURED_BUILDERS[index];
@@ -62,17 +63,15 @@ function FeaturedBuilderCard({ index }: { index: number }) {
 export function CommunityFeaturedBuildersPanel() {
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h2 className="font-display text-xl font-bold uppercase tracking-[0.18em]">Featured Builders</h2>
-          <p className="text-sm text-muted-foreground">
-            Community members shaping the next wave of decks and strategies.
-          </p>
-        </div>
-        <Button variant="cyber" size="sm">
-          View More Builders
-        </Button>
-      </div>
+      <CommunitySectionHeader
+        title="Featured Builders"
+        description="Community members shaping the next wave of decks and strategies."
+        action={
+          <Button variant="cyber" size="sm">
+            View More Builders
+          </Button>
+        }
+      />
 
       <div className="grid gap-4 md:grid-cols-2">
         {FEATURED_BUILDERS.map((creator, index) => (

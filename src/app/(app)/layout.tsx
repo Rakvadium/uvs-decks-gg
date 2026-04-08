@@ -23,6 +23,8 @@ import { TcgDndProvider } from "@/lib/dnd";
 import { SiloedDeckProvider } from "@/lib/deck";
 import { GalleryFiltersProvider } from "@/providers/GalleryFiltersProvider";
 import { DecksProvider } from "@/providers/DecksProvider";
+import { CommunityTierListsPageProvider } from "@/components/community/tier-lists/page-view/context";
+import { CommunityTierListDetailProvider } from "@/components/community/tier-lists/detail-view/context";
 
 const LeftSidebar = dynamic(
   () => import("@/components/shell").then((module) => module.LeftSidebar),
@@ -120,6 +122,7 @@ function ShellLayoutInner({ children }: { children: ReactNode }) {
 
   const pageType = getPageType(pathname);
   const deckId = params?.deckId as string | undefined;
+  const tierListId = params?.tierListId as string | undefined;
 
   const hasRightSidebar = (state.slots.get("right-sidebar")?.length ?? 0) > 0;
 
@@ -204,6 +207,18 @@ function ShellLayoutInner({ children }: { children: ReactNode }) {
           <DeckDetailsProvider deckId={deckId}>{content}</DeckDetailsProvider>
         </SiloedDeckProvider>
       </GalleryFiltersProvider>
+    );
+  }
+
+  if (pathname === "/community/tier-lists") {
+    return <CommunityTierListsPageProvider>{content}</CommunityTierListsPageProvider>;
+  }
+
+  if (pathname.startsWith("/community/tier-lists/") && tierListId) {
+    return (
+      <CommunityTierListDetailProvider tierListId={tierListId}>
+        {content}
+      </CommunityTierListDetailProvider>
     );
   }
 

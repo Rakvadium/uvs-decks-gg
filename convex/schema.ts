@@ -129,6 +129,81 @@ export default defineSchema({
     .index("by_user", ["userId"])
     .index("by_isPublic", ["isPublic"]),
 
+  tierLists: defineTable({
+    userId: v.id("users"),
+    title: v.string(),
+    description: v.optional(v.string()),
+    isPublic: v.boolean(),
+    rankingScope: v.optional(v.union(
+      v.literal("unranked"),
+      v.literal("global"),
+      v.literal("set_scope")
+    )),
+    rankingScopeKey: v.optional(v.string()),
+    selectedSetCodes: v.array(v.string()),
+    previewCardIds: v.array(v.id("cards")),
+    tiers: v.array(v.object({
+      id: v.string(),
+      label: v.string(),
+      color: v.string(),
+      order: v.number(),
+    })),
+    itemCount: v.number(),
+    tierCount: v.number(),
+    likeCount: v.number(),
+    commentCount: v.number(),
+    featuredCardId: v.optional(v.id("cards")),
+    updatedAt: v.number(),
+  })
+    .index("by_user_and_updatedAt", ["userId", "updatedAt"])
+    .index("by_isPublic_and_updatedAt", ["isPublic", "updatedAt"])
+    .index("by_isPublic_and_rankingScope_and_updatedAt", ["isPublic", "rankingScope", "updatedAt"])
+    .index("by_isPublic_and_rankingScope_and_scopeKey_and_updatedAt", ["isPublic", "rankingScope", "rankingScopeKey", "updatedAt"]),
+
+  tierListItems: defineTable({
+    tierListId: v.id("tierLists"),
+    cardId: v.id("cards"),
+    laneKey: v.string(),
+    order: v.number(),
+  })
+    .index("by_tierList", ["tierListId"])
+    .index("by_tierList_and_laneKey_and_order", ["tierListId", "laneKey", "order"]),
+
+  communityCardRankings: defineTable({
+    scopeType: v.union(v.literal("global"), v.literal("set_scope")),
+    scopeKey: v.string(),
+    scopeLabel: v.string(),
+    cardId: v.id("cards"),
+    voteCount: v.number(),
+    rawMeanScore: v.number(),
+    adjustedScore: v.number(),
+    topLaneRate: v.number(),
+    bottomLaneRate: v.number(),
+    lastComputedAt: v.number(),
+  })
+    .index("by_scope", ["scopeType", "scopeKey"])
+    .index("by_scope_and_adjustedScore", ["scopeType", "scopeKey", "adjustedScore"]),
+
+  communityTierSnapshots: defineTable({
+    scopeType: v.union(v.literal("global"), v.literal("set_scope")),
+    scopeKey: v.string(),
+    scopeLabel: v.string(),
+    setCodes: v.array(v.string()),
+    contributorCount: v.number(),
+    rankedCardCount: v.number(),
+    insufficientCardCount: v.number(),
+    tiers: v.array(v.object({
+      id: v.string(),
+      label: v.string(),
+      color: v.string(),
+      cardIds: v.array(v.id("cards")),
+    })),
+    insufficientDataCardIds: v.array(v.id("cards")),
+    lastComputedAt: v.number(),
+  })
+    .index("by_scope", ["scopeType", "scopeKey"])
+    .index("by_scopeType_and_lastComputedAt", ["scopeType", "lastComputedAt"]),
+
   collections: defineTable({
     userId: v.id("users"),
     cardId: v.id("cards"),
@@ -174,6 +249,32 @@ export default defineSchema({
     .index("by_user", ["userId"])
     .index("by_deck", ["deckId"])
     .index("by_user_and_deck", ["userId", "deckId"]),
+
+  tierListLikes: defineTable({
+    userId: v.id("users"),
+    tierListId: v.id("tierLists"),
+  })
+    .index("by_user", ["userId"])
+    .index("by_tierList", ["tierListId"])
+    .index("by_user_and_tierList", ["userId", "tierListId"]),
+
+  tierListComments: defineTable({
+    tierListId: v.id("tierLists"),
+    userId: v.id("users"),
+    content: v.string(),
+    status: v.union(
+      v.literal("approved"),
+      v.literal("pending"),
+      v.literal("flagged"),
+      v.literal("rejected")
+    ),
+    moderationReason: v.optional(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_tierList", ["tierListId"])
+    .index("by_user", ["userId"])
+    .index("by_tierList_and_status_and_createdAt", ["tierListId", "status", "createdAt"]),
 
   deckViews: defineTable({
     userId: v.id("users"),

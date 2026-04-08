@@ -3,19 +3,34 @@ import { ArrowUpRight, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { COMMUNITY_LABS, COMMUNITY_RESOURCES } from "../community-content-data";
+import { CommunitySectionHeader } from "../shared/section-header";
 
 export function CommunityLabsSection() {
   return (
     <section className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
       <div className="space-y-4">
-        <div>
-          <h2 className="text-xl font-display font-bold uppercase tracking-[0.18em]">
-            Community Labs
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            Join collaborative spaces for deckbuilding, polls, and playtests.
-          </p>
-        </div>
+        <CommunitySectionHeader
+          title="Community Labs"
+          description="Join collaborative spaces for tier ranking, deckbuilding, polls, and playtests."
+        />
+
+        <Card className="border-primary/20 bg-card/70">
+          <CardHeader className="space-y-2">
+            <CardTitle className="text-lg">New: Tier List Lab</CardTitle>
+            <CardDescription>
+              Build private or public card rankings from cached set data, drag cards between custom lanes, and publish them to the
+              community feed.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-wrap gap-2">
+            <Button asChild>
+              <Link href="/community/tier-lists">Open tier list maker</Link>
+            </Button>
+            <Button variant="outline" asChild>
+              <Link href="/community/tier-lists">Browse shared rankings</Link>
+            </Button>
+          </CardContent>
+        </Card>
 
         <div className="grid gap-4 md:grid-cols-2">
           {COMMUNITY_LABS.map((tool) => {
