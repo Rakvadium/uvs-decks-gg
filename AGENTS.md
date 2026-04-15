@@ -7,3 +7,5 @@ The current skills are:
 - vercel-design-guidelines
 
 Use ShadCN and MagicUI for all styling and component choices when possible.
+
+Project documentation hub: [docs/README.md](docs/README.md). UI module structure: [docs/component-architecture-playbook.md](docs/component-architecture-playbook.md).

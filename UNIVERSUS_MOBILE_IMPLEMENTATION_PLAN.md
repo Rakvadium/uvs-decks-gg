@@ -27,17 +27,19 @@ This document outlines the implementation plan for a React Native mobile applica
 
 ## Tech Stack
 
-| Technology | Purpose |
-|------------|---------|
-| React Native | Cross-platform mobile framework |
-| Expo | Development toolchain & native APIs |
-| ConvexDB | Real-time backend database (existing) |
-| Convex Auth | Authentication system |
-| Convex Stripe Component | Subscription management |
-| StyleSheet API | Native styling (React Native) |
-| AsyncStorage | Local data persistence |
-| expo-camera | QR code scanning for Rival Sync |
-| expo-screen-orientation | Lock orientation per screen |
+
+| Technology              | Purpose                               |
+| ----------------------- | ------------------------------------- |
+| React Native            | Cross-platform mobile framework       |
+| Expo                    | Development toolchain & native APIs   |
+| ConvexDB                | Real-time backend database (existing) |
+| Convex Auth             | Authentication system                 |
+| Convex Stripe Component | Subscription management               |
+| StyleSheet API          | Native styling (React Native)         |
+| AsyncStorage            | Local data persistence                |
+| expo-camera             | QR code scanning for Rival Sync       |
+| expo-screen-orientation | Lock orientation per screen           |
+
 
 ---
 
@@ -250,21 +252,23 @@ const convex = new ConvexReactClient(process.env.EXPO_PUBLIC_CONVEX_URL!);
 
 Download and analyze these ShadCN components for React Native recreation:
 
-| ShadCN Component | RN Implementation | Priority |
-|------------------|-------------------|----------|
-| Button | Pressable + StyleSheet | High |
-| Card | View + StyleSheet | High |
-| Dialog | Modal + Animated | High |
-| Input | TextInput + StyleSheet | Medium |
-| Select | Custom Picker/Sheet | Medium |
-| Slider | Slider + StyleSheet | High |
-| Switch | Switch + StyleSheet | Medium |
-| Tabs | Custom + Animated | Medium |
-| Toast | Animated View | Medium |
-| Badge | View + Text | High |
-| Avatar | Image + View | Medium |
-| Separator | View | Low |
-| Sheet | Modal + PanGesture | High |
+
+| ShadCN Component | RN Implementation      | Priority |
+| ---------------- | ---------------------- | -------- |
+| Button           | Pressable + StyleSheet | High     |
+| Card             | View + StyleSheet      | High     |
+| Dialog           | Modal + Animated       | High     |
+| Input            | TextInput + StyleSheet | Medium   |
+| Select           | Custom Picker/Sheet    | Medium   |
+| Slider           | Slider + StyleSheet    | High     |
+| Switch           | Switch + StyleSheet    | Medium   |
+| Tabs             | Custom + Animated      | Medium   |
+| Toast            | Animated View          | Medium   |
+| Badge            | View + Text            | High     |
+| Avatar           | Image + View           | Medium   |
+| Separator        | View                   | Low      |
+| Sheet            | Modal + PanGesture     | High     |
+
 
 ### 2.2 Theme System
 
@@ -335,6 +339,7 @@ const CHARACTER_THEME_COLORS: Record<string, { light: string; dark: string }> = 
 ### 3.1 Main Screen Layout
 
 The life tracker displays two player panels:
+
 - **Top (Rival)**: Rotated 180° for opponent viewing
 - **Bottom (You)**: Normal orientation for player
 
@@ -409,6 +414,7 @@ const characters = useQuery(api.cards.listCharacters);
 ```
 
 Each character card contains:
+
 - `name`: Character name
 - `health`: Starting health value
 - `imageUrl`: Character artwork
@@ -472,6 +478,7 @@ The phone is placed **flat on the table** between two players who sit across fro
 ```
 
 This means:
+
 - **Rival's health** (top of screen, upside down) appears right-side-up to the rival
 - **Player's health** (bottom of screen, normal) appears right-side-up to the player
 - **Attack sequence** (middle, sideways) can be read by both players from their positions
@@ -523,6 +530,7 @@ This means:
 ### 4.4 Attack Mode Layout
 
 When attack mode activates:
+
 1. **Center controls disappear** (Reset, Attack, History buttons)
 2. **Rival panel slides UP** slightly to make room
 3. **Player panel slides DOWN** slightly to make room
@@ -700,6 +708,7 @@ interface AttackState {
 ### 4.9 Animation Sequences
 
 #### Entry Animation ("Thud" Effect)
+
 ```typescript
 const attackEntryAnimation = {
   duration: 400,
@@ -852,29 +861,29 @@ function AttackModeHealth({
 1. **Player taps Attack Mode button** in center controls
 2. **Center controls fade out** (Reset, Attack, History buttons disappear)
 3. **Health panels slide apart**:
-   - Rival panel slides UP ~50px
-   - Player panel slides DOWN ~50px
-   - Sub-counters temporarily hidden to save space
+  - Rival panel slides UP ~50px
+  - Player panel slides DOWN ~50px
+  - Sub-counters temporarily hidden to save space
 4. **Attack panel animates in**:
-   - Elements burst from center with "thud" haptic
-   - Panel is rotated 90° (sideways) for dual-player readability
+  - Elements burst from center with "thud" haptic
+  - Panel is rotated 90° (sideways) for dual-player readability
 5. **Player configures attack**:
-   - Selects zone (High/Mid/Low)
-   - Adjusts speed/damage with +/- buttons
-   - Optionally enables Throw toggle
+  - Selects zone (High/Mid/Low)
+  - Adjusts speed/damage with +/- buttons
+  - Optionally enables Throw toggle
 6. **During attack sequence**:
-   - Both health totals remain visible at top/bottom
-   - Health still adjustable (for healing/damage card effects)
-   - Block buttons show damage preview in real-time
+  - Both health totals remain visible at top/bottom
+  - Health still adjustable (for healing/damage card effects)
+  - Block buttons show damage preview in real-time
 7. **Resolution** (one of three options):
-   - **FULL**: Deflect animation on defender health, damage = 0 (or half if Throw)
-   - **PARTIAL**: Graze animation on defender health, half damage applied
-   - **NO BLOCK**: Devastate animation on defender health, full damage applied
+  - **FULL**: Deflect animation on defender health, damage = 0 (or half if Throw)
+  - **PARTIAL**: Graze animation on defender health, half damage applied
+  - **NO BLOCK**: Devastate animation on defender health, full damage applied
 8. **Exit sequence**:
-   - Attack panel shrinks/fades away
-   - Health panels slide back to original positions
-   - Sub-counters reappear
-   - Center controls fade back in
+  - Attack panel shrinks/fades away
+  - Health panels slide back to original positions
+  - Sub-counters reappear
+  - Center controls fade back in
 9. **History record created** for the attack
 
 ### 4.13 Abort Functionality
@@ -1014,6 +1023,7 @@ interface MatchRecord {
 ### 6.2 Game Session Creation
 
 A game record is created when:
+
 1. Health totals change for the first time after app load or reset
 2. The session persists until reset is pressed
 
@@ -1033,10 +1043,12 @@ interface GameSession {
 ### 6.3 Statistics Views
 
 **Free Tier:**
+
 - Current session tracking
 - Basic win/loss display (last 10 matches)
 
 **Premium Tier:**
+
 - Full match history
 - Per-character statistics
 - Win rate by matchup
@@ -1487,68 +1499,77 @@ const initialAttackState: AttackState = {
 ## Implementation Timeline
 
 ### Week 1-2: Foundation
-- [ ] Initialize Expo project
-- [ ] Set up Convex connection
-- [ ] Create base UI components (Button, Card, etc.)
-- [ ] Implement theme system
+
+- Initialize Expo project
+- Set up Convex connection
+- Create base UI components (Button, Card, etc.)
+- Implement theme system
 
 ### Week 3-4: Life Tracker Core
-- [ ] Build PlayerPanel component
-- [ ] Implement health counter interactions
-- [ ] Add character selection
-- [ ] Create sub-counter system
-- [ ] Build center controls
+
+- Build PlayerPanel component
+- Implement health counter interactions
+- Add character selection
+- Create sub-counter system
+- Build center controls
 
 ### Week 5-6: Attack Mode
-- [ ] Build AttackModeOverlay container
-- [ ] Create entry animation with "thud" effect
-- [ ] Implement rotated AttackPanel layout
-- [ ] Build AttackStatCircle components (speed/damage)
-- [ ] Implement ZoneSelector with zone highlighting
-- [ ] Add ThrowToggle component
-- [ ] Create BlockButtonGroup with preview damage
-- [ ] Implement AbortButton with cancel flow
-- [ ] Build AttackHealthDisplay (adjustable during attack)
+
+- Build AttackModeOverlay container
+- Create entry animation with "thud" effect
+- Implement rotated AttackPanel layout
+- Build AttackStatCircle components (speed/damage)
+- Implement ZoneSelector with zone highlighting
+- Add ThrowToggle component
+- Create BlockButtonGroup with preview damage
+- Implement AbortButton with cancel flow
+- Build AttackHealthDisplay (adjustable during attack)
 
 ### Week 7: Attack Mode Animations
-- [ ] Create shake animation for damage
-- [ ] Build pulse animation for blocks
-- [ ] Implement particle effects (impact sparks)
-- [ ] Add haptic feedback integration
-- [ ] Build number roll animation for health changes
-- [ ] Polish exit animations
+
+- Create shake animation for damage
+- Build pulse animation for blocks
+- Implement particle effects (impact sparks)
+- Add haptic feedback integration
+- Build number roll animation for health changes
+- Polish exit animations
 
 ### Week 8-9: History & Persistence
-- [ ] Implement debounced history recording
-- [ ] Build history drawer UI
-- [ ] Add undo functionality
-- [ ] Set up game session creation
-- [ ] Implement reset flow
+
+- Implement debounced history recording
+- Build history drawer UI
+- Add undo functionality
+- Set up game session creation
+- Implement reset flow
 
 ### Week 10-11: Statistics & Subscription
-- [ ] Create match record system
-- [ ] Build statistics views
-- [ ] Integrate Stripe subscriptions
-- [ ] Add premium feature gating
+
+- Create match record system
+- Build statistics views
+- Integrate Stripe subscriptions
+- Add premium feature gating
 
 ### Week 12-13: Offline & Polish
-- [ ] Implement offline queue
-- [ ] Add network sync handling
-- [ ] Polish animations
-- [ ] Performance optimization
-- [ ] Testing & bug fixes
+
+- Implement offline queue
+- Add network sync handling
+- Polish animations
+- Performance optimization
+- Testing & bug fixes
 
 ### Week 14+ (Stretch): Rival Sync
-- [ ] QR code generation
-- [ ] Deep linking setup
-- [ ] Real-time sync implementation
-- [ ] Session management
+
+- QR code generation
+- Deep linking setup
+- Real-time sync implementation
+- Session management
 
 ---
 
 ## Testing Strategy
 
 ### Unit Tests
+
 - Damage calculation functions
 - Health validation logic
 - Debounce behavior
@@ -1557,18 +1578,21 @@ const initialAttackState: AttackState = {
 - Block result previews (with/without Throw)
 
 ### Integration Tests
+
 - Convex mutations/queries
 - Authentication flow
 - Subscription verification
 - Attack mode entry/exit with health persistence
 
 ### Animation Tests
+
 - Entry animation timing
 - Block resolution animations
 - Health adjustment during attack
 - Abort flow restores original state
 
 ### E2E Tests
+
 - Complete game session flow
 - Attack mode resolution
 - History recording
@@ -1619,3 +1643,4 @@ const initialAttackState: AttackState = {
 6. **Social Features**: Friend lists, match sharing
 7. **Replay System**: Step-through match history
 8. **Analytics Dashboard**: Advanced statistics visualization
+
