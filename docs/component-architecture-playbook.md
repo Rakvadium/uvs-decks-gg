@@ -2,6 +2,8 @@
 
 This document captures the architecture pattern used during the refactor pass so future features follow the same structure.
 
+**Documentation hub:** [README.md](./README.md) · **How this fits the repo:** [ARCHITECTURE_PLAN.md](./ARCHITECTURE_PLAN.md) · **File-size targets:** [CODE_SIZE_POLICY.md](./CODE_SIZE_POLICY.md) · **Coding agents:** [agent-onboarding.md](./agent-onboarding.md)
+
 ## Goals
 
 - Keep components small and focused.
@@ -107,8 +109,8 @@ After each feature/module refactor:
 Commands:
 
 ```bash
-npx eslint <touched files...>
-npx tsc --noEmit
+bun run lint
+bunx tsc --noEmit
 ```
 
 ## Suggested Workflow for New Features
