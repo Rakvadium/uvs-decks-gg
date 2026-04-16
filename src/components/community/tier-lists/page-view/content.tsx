@@ -1,6 +1,7 @@
 "use client";
 
 import { CommunityRankingsView } from "@/components/community/community-rankings-view";
+import { AppPageHeader } from "@/components/shell/app-page-header";
 import { useRegisterSlot } from "@/components/shell/shell-slot-provider";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -28,6 +29,18 @@ export function CommunityTierListsPageView() {
   return (
     <div className="relative flex h-full flex-col overflow-y-auto">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.08),transparent_28%),radial-gradient(circle_at_80%_10%,rgba(20,184,166,0.10),transparent_24%)]" />
+
+      <div className="sticky top-0 z-20 hidden border-b border-border/50 bg-background/90 backdrop-blur-md supports-[backdrop-filter]:bg-background/80 md:block">
+        <AppPageHeader
+          title="Tier lists"
+          description="Browse public lists, manage yours, and explore community rankings."
+          withBottomBorder={false}
+          innerClassName="pb-3 md:pb-4"
+        />
+        <div className="border-t border-border/40 px-4 pb-4 pt-1 md:px-6">
+          <CommunityTierListsPageTopBar />
+        </div>
+      </div>
 
       <div className="relative z-10 flex min-h-full flex-col p-4 md:p-6">
         <div className="flex-1">

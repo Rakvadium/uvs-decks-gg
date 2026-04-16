@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef, useSyncExternalStore } from "react";
+import { useState, useEffect, useCallback, useRef, useSyncExternalStore, useMemo } from "react";
 import { useConvex, useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import {
@@ -220,22 +220,39 @@ export function useUniversusCards(): UseUniversusCardsResult {
     checkAndSync();
   }, [isHydrated, isCheckingVersion, serverVersion, cachedVersion, cards.length, fetchFromConvex, syncFromConvex]);
 
-  return {
-    cards,
-    isLoading: isLoading && cards.length === 0,
-    isLoadingMore,
-    loadProgress,
-    totalCards: cards.length,
-    cachedVersion,
-    serverVersion,
-    isCheckingVersion,
-    isSyncing,
-    error,
-    index,
-    uniqueValues,
-    refreshCache,
-    isHydrated,
-  };
+  return useMemo(
+    () => ({
+      cards,
+      isLoading: isLoading && cards.length === 0,
+      isLoadingMore,
+      loadProgress,
+      totalCards: cards.length,
+      cachedVersion,
+      serverVersion,
+      isCheckingVersion,
+      isSyncing,
+      error,
+      index,
+      uniqueValues,
+      refreshCache,
+      isHydrated,
+    }),
+    [
+      cards,
+      isLoading,
+      isLoadingMore,
+      loadProgress,
+      cachedVersion,
+      serverVersion,
+      isCheckingVersion,
+      isSyncing,
+      error,
+      index,
+      uniqueValues,
+      refreshCache,
+      isHydrated,
+    ]
+  );
 }
 
 function matchesStatFilter(cardValue: number | undefined, filter: StatFilterValue | undefined): boolean {

@@ -28,8 +28,8 @@ export function RightSidebarIconRail() {
             className={cn(
               "relative h-16 w-1 rounded-full transition-all duration-150",
               isResizing
-                ? "bg-primary shadow-[0_0_3px_var(--primary),0_0_8px_var(--primary)/60]"
-                : "bg-border/40 group-hover:bg-primary/70 group-hover:shadow-[0_0_2px_var(--primary),0_0_6px_var(--primary)/50]"
+                ? "bg-primary shadow-[var(--chrome-shell-rail-resize-shadow)]"
+                : "bg-border/40 group-hover:bg-primary/70 group-hover:shadow-[var(--chrome-shell-rail-resize-shadow-hover)]"
             )}
           >
             <div
@@ -43,7 +43,7 @@ export function RightSidebarIconRail() {
         </div>
       ) : null}
 
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-secondary/5" />
+      <div className="pointer-events-none absolute inset-0" style={{ background: "var(--chrome-shell-sidebar-wash)" }} />
 
       <div className="relative z-10 flex flex-col items-center gap-1.5">
         {sidebarSlots.map((slot) => {
@@ -60,7 +60,7 @@ export function RightSidebarIconRail() {
                   className={cn(
                     "h-9 w-9 border border-transparent transition-all duration-200",
                     isActive
-                      ? "border-primary/30 bg-primary/15 text-primary shadow-[0_0_2px_var(--primary)/60,0_0_6px_var(--primary)/40]"
+                      ? "border-primary/30 bg-primary/15 text-primary shadow-[var(--chrome-shell-rail-active-shadow)]"
                       : "hover:border-primary/20 hover:bg-primary/10 hover:text-primary"
                   )}
                   onClick={() => setActiveSidebarAction(isActive ? null : slot.id)}
@@ -68,7 +68,7 @@ export function RightSidebarIconRail() {
                   {Icon ? (
                     <span className="flex h-full w-full items-center justify-center">
                       <Icon
-                        className={cn("h-full w-full rounded-md", isActive && "drop-shadow-[0_0_3px_var(--primary)]")}
+                        className={cn("h-full w-full rounded-md", isActive && "[filter:var(--chrome-shell-icon-drop-shadow)]")}
                       />
                     </span>
                   ) : (

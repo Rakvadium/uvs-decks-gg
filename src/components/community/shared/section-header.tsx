@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import { SectionHeading } from "@/components/ui/typography-headings";
 
 interface CommunitySectionHeaderProps {
   title: string;
@@ -17,7 +18,7 @@ export function CommunitySectionHeader({
   return (
     <div className={cn("flex flex-wrap items-center justify-between gap-3", className)}>
       <div>
-        <h2 className="text-xl font-display font-bold uppercase tracking-[0.18em]">{title}</h2>
+        <SectionHeading className="text-xl font-display font-bold uppercase tracking-[0.18em]">{title}</SectionHeading>
         <p className="text-sm text-muted-foreground">{description}</p>
       </div>
       {action}

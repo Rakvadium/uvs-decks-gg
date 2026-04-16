@@ -7,7 +7,7 @@ export function DecksEmptyState({ mode, onCreateDeck }: DecksEmptyStateProps) {
   return (
     <Card className="border-2 border-dashed border-primary/20">
       <CardContent className="flex flex-col items-center justify-center py-16">
-        <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-lg border border-primary/30 shadow-[0_0_20px_-5px_var(--primary)]">
+        <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-lg border border-primary/30" style={{ boxShadow: "var(--chrome-deck-state-icon-shadow)" }}>
           {mode === "search" ? <Search className="h-8 w-8 text-primary/50" /> : <Layers className="h-8 w-8 text-primary/50" />}
         </div>
 
@@ -19,7 +19,7 @@ export function DecksEmptyState({ mode, onCreateDeck }: DecksEmptyStateProps) {
         ) : mode === "my-decks" ? (
           <>
             <p className="mb-6 font-mono text-sm uppercase tracking-wider text-muted-foreground">No decks yet</p>
-            <Button variant="neon" onClick={onCreateDeck}>
+            <Button variant="default" onClick={onCreateDeck}>
               <Plus className="mr-2 h-4 w-4" />
               Create Your First Deck
             </Button>

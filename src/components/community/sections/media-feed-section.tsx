@@ -1,20 +1,26 @@
+"use client";
+
 import Link from "next/link";
 import { ArrowUpRight, Play } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { useChromeMode } from "@/lib/theme";
 import { VIDEO_FEED } from "../community-content-data";
 import { CommunitySectionHeader } from "../shared/section-header";
+import { SectionHeading } from "@/components/ui/typography-headings";
 
 export function CommunityMediaFeedSection() {
+  const chrome = useChromeMode();
+  const scanlineClass = chrome === "expressive" ? "scanlines" : "";
   const [featuredVideo, ...supportingVideos] = VIDEO_FEED;
 
   return (
-    <section id="community-feed" className="space-y-5 scroll-mt-24">
+    <section id="universus-content" className="space-y-5 scroll-mt-24">
       <CommunitySectionHeader
-        title="Community Feed"
-        description="Clips, deck techs, and event recaps from the community in one cleaner stream."
+        title="UniVersus Content"
+        description="Deck tech, matches, and event recaps from the UniVersus scene in one feed."
         action={
           <Button variant="outline" size="sm" asChild>
             <Link href="/community/creators">Creator program</Link>
@@ -32,7 +38,7 @@ export function CommunityMediaFeedSection() {
               )}
             >
               <div className={cn("absolute inset-0 bg-gradient-to-br opacity-90", featuredVideo.accent)} />
-              <div className="scanlines absolute inset-0 opacity-20" />
+              <div className={cn("absolute inset-0 opacity-20", scanlineClass)} />
               <div className="absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
 
               <div className="relative flex flex-wrap items-center justify-between gap-3">
@@ -45,7 +51,7 @@ export function CommunityMediaFeedSection() {
               </div>
 
               <div className="relative space-y-5">
-                <div className="flex h-14 w-14 items-center justify-center rounded-full border border-primary/30 bg-background/75 shadow-[0_0_30px_-12px_rgba(255,255,255,0.35)]">
+                <div className="flex h-14 w-14 items-center justify-center rounded-full border border-primary/30 bg-background/75 shadow-[var(--chrome-elevation-mid)]">
                   <Play className="h-6 w-6 text-primary" />
                 </div>
 
@@ -59,9 +65,9 @@ export function CommunityMediaFeedSection() {
                     </Badge>
                   </div>
                   <div className="space-y-2">
-                    <h3 className="max-w-xl text-2xl font-semibold leading-tight text-foreground md:text-3xl">
+                    <SectionHeading className="max-w-xl text-2xl font-semibold leading-tight text-foreground md:text-3xl">
                       {featuredVideo.title}
-                    </h3>
+                    </SectionHeading>
                     <p className="max-w-xl text-sm leading-6 text-muted-foreground">
                       Start here for the biggest recent community update, then scan the queue for the rest of the highlights.
                     </p>
@@ -78,7 +84,7 @@ export function CommunityMediaFeedSection() {
               <CardContent className="p-0">
                 <div className="grid gap-0 sm:grid-cols-[160px_minmax(0,1fr)]">
                   <div className={cn("relative min-h-[140px] overflow-hidden border-b border-border/50 sm:border-b-0 sm:border-r", "bg-gradient-to-br", video.accent)}>
-                    <div className="scanlines absolute inset-0 opacity-20" />
+                    <div className={cn("absolute inset-0 opacity-20", scanlineClass)} />
                     <div className="absolute left-3 top-3">
                       <Badge variant="secondary" className="bg-background/75 text-[9px] uppercase tracking-[0.2em]">
                         {video.label}
@@ -96,7 +102,7 @@ export function CommunityMediaFeedSection() {
                         <span>{video.duration}</span>
                       </div>
                       <div className="space-y-2">
-                        <h3 className="text-sm font-semibold leading-snug text-foreground">{video.title}</h3>
+                        <SectionHeading className="text-sm font-semibold leading-snug text-foreground">{video.title}</SectionHeading>
                         <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
                           {video.creator} / {video.views} views
                         </p>

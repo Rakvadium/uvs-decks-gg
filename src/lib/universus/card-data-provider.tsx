@@ -81,6 +81,19 @@ function CardDataProviderInner({ children }: CardDataProviderProps) {
   const setsData = useSets({ serverVersion: cardData.serverVersion });
   const formatsData = useFormats();
 
+  const stableFormatsData = useMemo(
+    () => formatsData,
+    [
+      formatsData.formats,
+      formatsData.setLegalities,
+      formatsData.isLoading,
+      formatsData.error,
+      formatsData.getFormatByKey,
+      formatsData.isSetLegalInFormat,
+      formatsData.isHydrated,
+    ]
+  );
+
   const value = useMemo((): CardDataContextValue => {
     const isSetLegalInFormat = (setCode: string, formatKey: string): boolean => {
       const set = setsData.getSetByCode(setCode);
@@ -122,17 +135,17 @@ function CardDataProviderInner({ children }: CardDataProviderProps) {
       ...cardData,
       sets: setsData.sets,
       setsLoading: setsData.isLoading,
-      formats: formatsData.formats,
-      formatsLoading: formatsData.isLoading,
+      formats: stableFormatsData.formats,
+      formatsLoading: stableFormatsData.isLoading,
       getSetByCode: setsData.getSetByCode,
-      getFormatByKey: formatsData.getFormatByKey,
+      getFormatByKey: stableFormatsData.getFormatByKey,
       isSetLegalInFormat,
       getFilteredCards,
       getSortedCards,
       getPaginatedCards,
       getFilteredAndSortedCards,
     };
-  }, [cardData, setsData, formatsData]);
+  }, [cardData, setsData, stableFormatsData]);
 
   return (
     <CardDataContext.Provider value={value}>

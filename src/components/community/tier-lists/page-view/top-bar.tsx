@@ -1,9 +1,9 @@
 "use client";
 
-import { Plus, Search } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { GallerySearchField } from "@/components/ui/gallery-search-field";
 import { SegmentedControl } from "@/components/ui/segmented-control";
 import { useOptionalCommunityTierListsPageContext } from "./context";
 import { BROWSER_TABS } from "./hook";
@@ -44,13 +44,11 @@ export function CommunityTierListsPageTopBar() {
       <div className="flex w-full flex-col gap-2">
         <div className="flex items-center gap-2">
           {showSearch ? (
-            <div className="relative min-w-0 flex-1">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-primary/70" />
-              <Input
+            <div className="min-w-0 flex-1">
+              <GallerySearchField
                 placeholder="Search tier lists..."
                 value={searchQuery}
                 onChange={(event) => setSearchQuery(event.target.value)}
-                className="h-9 border-primary/40 bg-background/50 pl-9 text-sm shadow-[0_0_10px_-3px_var(--primary)] focus-visible:border-primary focus-visible:shadow-[0_0_15px_-3px_var(--primary)]"
                 name="tier-lists-search"
                 spellCheck={false}
               />
@@ -83,17 +81,15 @@ export function CommunityTierListsPageTopBar() {
       <div className="flex min-w-0 flex-1 items-center gap-2">
         <div className="w-full max-w-sm">
           {showSearch ? (
-            <div className="relative">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                placeholder="Search tier lists..."
-                value={searchQuery}
-                onChange={(event) => setSearchQuery(event.target.value)}
-                className="h-10 border-border/60 bg-background/55 pl-10 text-sm"
-                name="tier-lists-search"
-                spellCheck={false}
-              />
-            </div>
+            <GallerySearchField
+              placeholder="Search tier lists..."
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              name="tier-lists-search"
+              spellCheck={false}
+              appearance="quiet"
+              inputClassName="h-10 pl-10"
+            />
           ) : (
             <div className="flex h-10 items-center rounded-md border border-transparent px-3">
               <p className="text-xs font-mono uppercase tracking-[0.22em] text-muted-foreground">

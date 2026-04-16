@@ -1,3 +1,3 @@
 "use client";
 
-export { DeckDetailsTopBar } from "./deck-details-top-bar/content";
+export { DeckDetailsTopBar, DeckDetailsTopBarInner } from "./deck-details-top-bar/content";

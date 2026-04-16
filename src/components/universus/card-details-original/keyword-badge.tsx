@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { useChromeMode } from "@/lib/theme";
 import { KEYWORD_ABILITY_MAP, TIMING_COLORS } from "./constants";
 
 interface KeywordBadgeProps {
@@ -9,6 +10,7 @@ interface KeywordBadgeProps {
 
 export function KeywordBadge({ keyword }: KeywordBadgeProps) {
   const [tooltipOpen, setTooltipOpen] = useState(false);
+  const chromeMode = useChromeMode();
   const keywordName = keyword.replace(/[:\s]+\d+$/, "").trim();
   const abilityDef = KEYWORD_ABILITY_MAP.get(keywordName.toLowerCase());
 
@@ -46,7 +48,7 @@ export function KeywordBadge({ keyword }: KeywordBadgeProps) {
         className="max-w-xs border-l-2 bg-background/80 backdrop-blur-md"
         style={{
           borderLeftColor: color,
-          boxShadow: `0 0 20px ${color}20`,
+          boxShadow: chromeMode === "expressive" ? `0 0 20px ${color}20` : undefined,
         }}
         onPointerDownOutside={() => setTooltipOpen(false)}
       >

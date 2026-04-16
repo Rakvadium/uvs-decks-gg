@@ -1,3 +1,4 @@
+import { PageHeading } from "@/components/ui/typography-headings";
 import { CreatorProgramHeroActions } from "./actions";
 import { CreatorProgramHeroBadges } from "./badges";
 import { CreatorProgramHeroSpotlightCard } from "./spotlight-card";
@@ -14,9 +15,9 @@ export function CreatorProgramHeroSection() {
           <CreatorProgramHeroBadges />
 
           <div className="space-y-4">
-            <h1 className="text-glow-cyan text-3xl font-display font-bold uppercase tracking-[0.15em] md:text-5xl">
+            <PageHeading className="text-glow-cyan text-3xl font-display font-bold uppercase tracking-[0.15em] md:text-5xl">
               Build with the community. Publish like a creator.
-            </h1>
+            </PageHeading>
             <p className="max-w-2xl text-base text-muted-foreground md:text-lg">
               Verified creators get a broadcast-ready toolkit: post updates, sync video drops, run community labs, and
               spotlight standout decks. Apply once you have a track record of decks, guides, or recurring content.

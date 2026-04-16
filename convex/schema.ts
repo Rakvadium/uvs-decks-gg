@@ -229,6 +229,13 @@ export default defineSchema({
         v.literal("holoterminal")
       )
     ),
+    chromePreference: v.optional(
+      v.union(
+        v.literal("auto"),
+        v.literal("calm"),
+        v.literal("expressive")
+      )
+    ),
     galleryFilters: v.optional(v.any()),
     rightSidebarAction: v.optional(v.string()),
     lastActiveAt: v.number(),

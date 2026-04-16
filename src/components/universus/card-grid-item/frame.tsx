@@ -21,9 +21,10 @@ export function CardGridItemFrame({ children }: { children: ReactNode }) {
     <div
       className={cn(
         "group relative aspect-[2.5/3.5] cursor-pointer [perspective:1000px]",
-        prefersReducedMotion ? "transition-none" : "transition-all duration-150",
-        isHovered && !prefersReducedMotion && "z-10 scale-105",
-        isDragging && "scale-[0.98] opacity-60"
+        prefersReducedMotion ? "transition-none" : "transition-[transform,opacity] duration-150",
+        isDragging
+          ? "z-20 scale-[0.98] opacity-60"
+          : isHovered && !prefersReducedMotion && "z-10"
       )}
       style={{
         ...dragHandleProps.style,
@@ -43,9 +44,22 @@ export function CardGridItemFrame({ children }: { children: ReactNode }) {
     >
       <div
         className={cn(
-          "absolute -inset-px rounded-xl bg-gradient-to-r from-primary via-secondary to-primary blur-[2px] transition-opacity duration-150",
-          isHovered ? "opacity-70" : "opacity-20"
+          "absolute -inset-px rounded-2xl blur-[2px] transition-opacity duration-150",
+          isDragging ? "opacity-0" : isHovered ? "opacity-70" : "opacity-20"
         )}
+        style={{
+          background: "var(--chrome-card-frame-halo)",
+          opacity: isDragging
+            ? 0
+            : isHovered
+              ? "var(--chrome-card-frame-halo-hover-opacity, 0.7)"
+              : undefined,
+          boxShadow: isDragging
+            ? "none"
+            : isHovered
+              ? "var(--chrome-card-frame-glow-hover)"
+              : "var(--chrome-card-frame-glow-rest)",
+        }}
       />
 
       {children}

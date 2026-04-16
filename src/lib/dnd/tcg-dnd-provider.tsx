@@ -13,6 +13,10 @@ export interface DragItem {
   sourceId?: string;
 }
 
+export const TCG_DND_ACCEPTS_CARD_ONLY: DragItem["type"][] = ["card"];
+
+export const UNIVERSUS_CARD_DND_ENABLED = true;
+
 export interface DropZoneConfig {
   id: string;
   accepts: DragItem["type"][];
@@ -107,7 +111,7 @@ function DragOverlay() {
       }}
     >
       <div
-        className="drag-float overflow-hidden rounded-xl border bg-background/70 shadow-2xl ring-1 ring-primary/20"
+        className="overflow-hidden rounded-xl border bg-background/70 shadow-2xl ring-1 ring-primary/20"
         style={{ width: overlayWidth, height: overlayHeight }}
       >
         {imageUrl ? (
@@ -139,6 +143,7 @@ export function TcgDndProvider({ children }: { children: React.ReactNode }) {
   }, [activeDropZone]);
 
   const startDrag = React.useCallback((item: DragItem) => {
+    if (!UNIVERSUS_CARD_DND_ENABLED) return;
     dndLog("startDrag", {
       type: item.type,
       cardId: item.card?._id,

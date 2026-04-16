@@ -1,4 +1,7 @@
+"use client";
+
 import { Minus, Plus } from "lucide-react";
+import { useChromeMode } from "@/providers/ColorSchemeProvider";
 import { cn } from "@/lib/utils";
 
 interface CardDeckControlsProps {
@@ -7,22 +10,33 @@ interface CardDeckControlsProps {
   canAdd: boolean;
   onAdd: (e: React.MouseEvent) => void;
   onRemove: (e: React.MouseEvent) => void;
+  showQuantity?: boolean;
+  forceSolidSurface?: boolean;
 }
 
-export function CardDeckControls({ deckCount, isHovered, canAdd, onAdd, onRemove }: CardDeckControlsProps) {
+export function CardDeckControls({
+  deckCount,
+  isHovered,
+  canAdd,
+  onAdd,
+  onRemove,
+  showQuantity = true,
+  forceSolidSurface = false,
+}: CardDeckControlsProps) {
+  const chromeMode = useChromeMode();
+  const frosted = !forceSolidSurface && chromeMode === "expressive";
   const showButtons = isHovered;
-  const showCount = deckCount > 0 || showButtons;
+  const showCount = showQuantity ? deckCount > 0 || showButtons : showButtons;
 
   if (!showCount) return null;
 
   return (
     <div
       className={cn(
-        "absolute bottom-0 right-0 z-30 flex flex-col items-center overflow-hidden",
+        "pointer-events-none absolute bottom-0 right-0 z-30 flex flex-col items-center overflow-hidden",
         "rounded-tl-lg rounded-br-lg rounded-tr-none rounded-bl-none",
-        "bg-background/80 backdrop-blur-sm",
-        "border-l border-t border-border/40",
-        "transition-all duration-200"
+        "border-l border-t border-border/40 shadow-sm",
+        frosted ? "bg-background/80 backdrop-blur-sm" : "bg-background/92"
       )}
     >
       {showButtons && (
@@ -31,10 +45,11 @@ export function CardDeckControls({ deckCount, isHovered, canAdd, onAdd, onRemove
           onClick={onAdd}
           disabled={!canAdd}
           className={cn(
-            "flex h-6 w-7 items-center justify-center",
+            "pointer-events-auto flex h-6 w-7 items-center justify-center",
             "text-primary transition-colors duration-150",
             "hover:bg-primary/10",
-            "disabled:opacity-40 disabled:cursor-not-allowed"
+            "disabled:opacity-40 disabled:cursor-not-allowed",
+            !showQuantity && "border-b border-border/40"
           )}
           aria-label="Add to deck"
         >
@@ -42,16 +57,18 @@ export function CardDeckControls({ deckCount, isHovered, canAdd, onAdd, onRemove
         </button>
       )}
 
-      <div
-        className={cn(
-          "flex h-6 w-7 items-center justify-center",
-          "font-mono text-xs font-bold",
-          showButtons && "border-t border-b border-border/40",
-          deckCount > 0 ? "text-primary" : "text-muted-foreground"
-        )}
-      >
-        {deckCount}
-      </div>
+      {showQuantity ? (
+        <div
+          className={cn(
+            "flex h-6 w-7 items-center justify-center",
+            "font-mono text-xs font-bold",
+            showButtons && "border-t border-b border-border/40",
+            deckCount > 0 ? "text-primary" : "text-muted-foreground"
+          )}
+        >
+          {deckCount}
+        </div>
+      ) : null}
 
       {showButtons && (
         <button
@@ -59,7 +76,7 @@ export function CardDeckControls({ deckCount, isHovered, canAdd, onAdd, onRemove
           onClick={onRemove}
           disabled={deckCount === 0}
           className={cn(
-            "flex h-6 w-7 items-center justify-center",
+            "pointer-events-auto flex h-6 w-7 items-center justify-center",
             "text-destructive transition-colors duration-150",
             "hover:bg-destructive/10",
             "disabled:opacity-40 disabled:cursor-not-allowed"

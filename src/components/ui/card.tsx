@@ -2,23 +2,44 @@ import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
-function Card({ className, ...props }: React.ComponentProps<"div">) {
+type CardVariant = "fx" | "quiet"
+
+const cardVariantStyles: Record<CardVariant, string> = {
+  fx: cn(
+    "shadow-[var(--chrome-card-shadow)] hover:shadow-[var(--chrome-card-shadow-hover)]",
+    "hover:border-[var(--chrome-card-border-hover)] transition-all duration-150",
+    "before:absolute before:inset-0 before:rounded-lg before:bg-gradient-to-br before:from-primary/5 before:to-transparent before:opacity-0 before:transition-opacity before:duration-150 hover:before:opacity-100",
+  ),
+  quiet: cn(
+    "shadow-[var(--chrome-elevation-low)] hover:shadow-[var(--chrome-elevation-mid)]",
+    "hover:border-border transition-all duration-150",
+  ),
+}
+
+interface CardProps extends React.ComponentProps<"div"> {
+  variant?: CardVariant
+}
+
+function Card({ className, variant = "fx", ...props }: CardProps) {
   return (
     <div
       data-slot="card"
       className={cn(
         "group relative bg-card/80 text-card-foreground flex flex-col gap-6 py-6 backdrop-blur-sm",
         "border border-border/50 rounded-lg",
-        "shadow-[0_0_20px_-5px_var(--primary)/10] hover:shadow-[0_0_30px_-5px_var(--primary)/20]",
-        "hover:border-primary/30 transition-all duration-150",
-        "before:absolute before:inset-0 before:rounded-lg before:bg-gradient-to-br before:from-primary/5 before:to-transparent before:opacity-0 before:transition-opacity before:duration-150 hover:before:opacity-100",
         "overflow-hidden",
+        cardVariantStyles[variant],
         className
       )}
       {...props}
     />
   )
 }
+
+const Surface = React.forwardRef<HTMLDivElement, Omit<CardProps, "variant">>(
+  ({ ...props }, ref) => <Card ref={ref} variant="quiet" {...props} />
+)
+Surface.displayName = "Surface"
 
 function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
   return (
@@ -38,10 +59,14 @@ function CardTitle({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="card-title"
       className={cn(
-        "leading-none font-semibold tracking-wide uppercase text-foreground",
-        "font-display",
+        "leading-none font-semibold text-foreground",
         className
       )}
+      style={{
+        fontFamily: "var(--chrome-card-title-font)",
+        textTransform: "var(--chrome-heading-transform)" as React.CSSProperties["textTransform"],
+        letterSpacing: "var(--chrome-heading-letter-spacing)",
+      }}
       {...props}
     />
   )
@@ -52,9 +77,13 @@ function CardDescription({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="card-description"
       className={cn(
-        "text-muted-foreground text-sm font-mono tracking-wide",
+        "text-muted-foreground text-sm",
         className
       )}
+      style={{
+        fontFamily: "var(--chrome-card-description-font)",
+        letterSpacing: "var(--chrome-card-description-tracking)",
+      }}
       {...props}
     />
   )
@@ -99,6 +128,7 @@ function CardFooter({ className, ...props }: React.ComponentProps<"div">) {
 
 export {
   Card,
+  Surface,
   CardHeader,
   CardFooter,
   CardTitle,
@@ -106,3 +136,5 @@ export {
   CardDescription,
   CardContent,
 }
+
+export type { CardVariant, CardProps }

@@ -9,18 +9,18 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_0_2px_var(--primary),0_0_8px_var(--primary)/60] hover:shadow-[0_0_4px_var(--primary),0_0_14px_var(--primary),0_0_20px_var(--primary)/25] border border-primary/50",
+        default: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary/50",
         destructive:
-          "bg-destructive text-white hover:bg-destructive/90 shadow-[0_0_2px_var(--destructive),0_0_8px_var(--destructive)/60] hover:shadow-[0_0_4px_var(--destructive),0_0_14px_var(--destructive),0_0_20px_var(--destructive)/25] border border-destructive/50",
+          "bg-destructive text-white hover:bg-destructive/90 shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive/50",
         outline:
-          "border border-primary/30 bg-transparent text-primary hover:bg-primary/10 hover:border-primary/60 hover:shadow-[0_0_3px_var(--primary),0_0_10px_var(--primary)/70]",
+          "border border-primary/30 bg-transparent text-primary hover:bg-primary/10 hover:border-primary/60 hover:shadow-[var(--chrome-button-shadow-outline-hover)]",
         secondary:
-          "bg-secondary/80 text-secondary-foreground hover:bg-secondary border border-secondary/50 hover:shadow-[0_0_3px_var(--secondary),0_0_10px_var(--secondary)/70]",
+          "bg-secondary/80 text-secondary-foreground hover:bg-secondary border border-secondary/50 hover:shadow-[var(--chrome-button-shadow-secondary-hover)]",
         ghost:
           "hover:bg-accent/50 hover:text-accent-foreground border border-transparent hover:border-accent/30",
         link: "text-primary underline-offset-4 hover:underline hover:text-primary/80",
-        neon: "bg-transparent text-primary border-2 border-primary hover:bg-primary/10 shadow-[0_0_3px_var(--primary),0_0_10px_var(--primary),inset_0_0_5px_var(--primary)/30] hover:shadow-[0_0_5px_var(--primary),0_0_18px_var(--primary),0_0_28px_var(--primary)/35,inset_0_0_8px_var(--primary)/40]",
-        "neon-magenta": "bg-transparent text-secondary border-2 border-secondary hover:bg-secondary/10 shadow-[0_0_3px_var(--secondary),0_0_10px_var(--secondary),inset_0_0_5px_var(--secondary)/30] hover:shadow-[0_0_5px_var(--secondary),0_0_18px_var(--secondary),0_0_28px_var(--secondary)/35,inset_0_0_8px_var(--secondary)/40]",
+        neon: "bg-transparent text-primary border-2 border-primary hover:bg-primary/10 shadow-[var(--chrome-button-shadow-neon)] hover:shadow-[var(--chrome-button-shadow-neon-hover)]",
+        "neon-magenta": "bg-transparent text-secondary border-2 border-secondary hover:bg-secondary/10 shadow-[var(--chrome-button-shadow-neon-magenta)] hover:shadow-[var(--chrome-button-shadow-neon-magenta-hover)]",
         cyber: "bg-gradient-to-r from-primary/20 to-secondary/20 text-foreground border border-primary/40 hover:from-primary/30 hover:to-secondary/30 hover:border-primary/60 backdrop-blur-sm",
       },
       size: {
@@ -39,27 +39,25 @@ const buttonVariants = cva(
   }
 )
 
-export type ButtonProps = React.ComponentProps<"button"> &
+export type ButtonProps = React.ComponentPropsWithoutRef<"button"> &
   VariantProps<typeof buttonVariants> & {
     asChild?: boolean
   }
 
-function Button({
-  className,
-  variant,
-  size,
-  asChild = false,
-  ...props
-}: ButtonProps) {
-  const Comp = asChild ? Slot : "button"
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, variant, size, asChild = false, ...props }, ref) => {
+    const Comp = asChild ? Slot : "button"
 
-  return (
-    <Comp
-      data-slot="button"
-      className={cn(buttonVariants({ variant, size, className }))}
-      {...props}
-    />
-  )
-}
+    return (
+      <Comp
+        data-slot="button"
+        className={cn(buttonVariants({ variant, size, className }))}
+        ref={ref}
+        {...props}
+      />
+    )
+  }
+)
+Button.displayName = "Button"
 
 export { Button, buttonVariants }

@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { usePrefersReducedMotion } from "@/lib/reduced-motion";
 import { SymbolIcon } from "../../symbol-icon";
 import { AbilityText } from "../ability-text";
+import { SectionHeading } from "@/components/ui/typography-headings";
 import {
   CardDetailsContentProvider,
   useCardDetailsContent,
@@ -46,7 +47,6 @@ function StatCell({
           style={{
             width: `${fill * 100}%`,
             backgroundColor: color,
-            boxShadow: `0 0 6px ${color}90`,
           }}
         />
       </div>
@@ -128,9 +128,9 @@ function V2Content() {
   return (
     <div className="flex flex-col gap-4 p-4 md:gap-5 md:p-6">
       <div>
-        <h2 className="font-display text-xl font-bold uppercase tracking-wide md:text-2xl">
+        <SectionHeading className="font-display text-xl font-bold uppercase tracking-wide md:text-2xl">
           {card.name}
-        </h2>
+        </SectionHeading>
         <div className="mt-2 flex flex-wrap items-center gap-2">
           {card.type && (
             <span
@@ -138,8 +138,7 @@ function V2Content() {
               style={{
                 backgroundColor: "var(--primary)",
                 color: "var(--primary-foreground)",
-                boxShadow:
-                  "0 0 10px color-mix(in oklch, var(--primary) 40%, transparent)",
+                boxShadow: "var(--chrome-badge-default-shadow)",
               }}
             >
               {card.type}
@@ -243,7 +242,7 @@ export function CardDetailsV2({
   return (
     <CardDetailsContentProvider card={displayCard}>
       <div className="flex flex-col lg:flex-row">
-        <div className="relative flex shrink-0 flex-col items-center justify-center p-4 md:p-6 lg:sticky lg:top-0 lg:w-[300px] lg:self-start">
+        <div className="relative flex shrink-0 flex-col items-center justify-center p-4 md:p-6 lg:sticky lg:top-0 lg:w-[400px] lg:self-start">
           <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-card/20 to-background/80" />
           <div className="absolute inset-y-0 right-0 hidden w-px bg-gradient-to-b from-transparent via-border/40 to-transparent lg:block" />
           <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-border/30 to-transparent lg:hidden" />
@@ -258,7 +257,7 @@ export function CardDetailsV2({
               >
                 {mobileNavigationPrevious}
               </div>
-              <div className="w-full max-w-[200px] md:max-w-[240px]">
+              <div className="w-full max-w-[260px] md:max-w-[340px]">
                 <motion.div
                   className="relative aspect-[2.5/3.5] w-full"
                   style={{ perspective: 1000 }}
@@ -278,13 +277,9 @@ export function CardDetailsV2({
                           : { rotateY: 90, opacity: 0 }
                       }
                       transition={{ duration: 0.3 }}
-                      className="absolute inset-0 overflow-hidden rounded-xl"
+                      className="absolute inset-0 overflow-hidden rounded-2xl"
                       style={{
-                        boxShadow: [
-                          "0 0 0 1px color-mix(in oklch, var(--primary) 30%, transparent)",
-                          "0 4px 20px -4px color-mix(in oklch, var(--primary) 25%, transparent)",
-                          "0 0 40px -8px color-mix(in oklch, var(--primary) 15%, transparent)",
-                        ].join(", "),
+                        boxShadow: "var(--chrome-card-image-glow-rest)",
                       }}
                     >
                       {displayCard.imageUrl ? (
@@ -338,7 +333,7 @@ export function CardDetailsV2({
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto">
+        <div className="min-w-0 flex-1 overflow-y-auto">
           <V2Content />
         </div>
       </div>

@@ -15,7 +15,7 @@ export function CardListItemDetails() {
 
       <div className="mt-1 flex flex-wrap items-center gap-2 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
         {card.type ? (
-          <Badge variant="cyber" className="border-primary/40 bg-card/40 backdrop-blur-none">
+          <Badge tone="entity" className="border-primary/40 bg-card/40 backdrop-blur-none">
             {card.type}
           </Badge>
         ) : null}

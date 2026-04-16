@@ -2,6 +2,7 @@
 
 import { Hexagon } from "lucide-react"
 import Link from "next/link"
+import { Kicker } from "@/components/ui/typography-headings"
 
 export function MobileHeader() {
   return (
@@ -15,9 +16,9 @@ export function MobileHeader() {
           <Hexagon className="relative h-4 w-4 text-primary drop-shadow-[0_0_6px_var(--primary)]" />
         </div>
         <div className="flex flex-col">
-          <span className="text-sm font-display font-bold tracking-widest text-foreground uppercase">
+          <Kicker className="text-sm font-display font-bold text-foreground">
             UVS<span className="text-primary">DECKS</span>
-          </span>
+          </Kicker>
         </div>
       </Link>
 

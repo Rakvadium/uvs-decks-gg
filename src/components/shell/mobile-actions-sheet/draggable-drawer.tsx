@@ -263,7 +263,7 @@ export function MobileActionsDraggableDrawer({ children }: MobileActionsDraggabl
         />
       ) : null}
       <div
-        className="absolute inset-x-0 bottom-0 flex flex-col overflow-hidden rounded-t-[8px] border-x border-t border-primary/25 bg-background/96 shadow-[0_-12px_28px_-20px_var(--primary)] backdrop-blur-md"
+        className="absolute inset-x-0 bottom-0 flex flex-col overflow-hidden rounded-t-[8px] border-x border-t [border-color:var(--chrome-sheet-border)] bg-background/96 shadow-[var(--chrome-sheet-shadow)] backdrop-blur-md"
         style={{ height: drawerHeight }}
       >
         <div

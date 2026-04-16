@@ -4,7 +4,7 @@ import * as React from "react";
 import { Doc } from "../../../convex/_generated/dataModel";
 
 type Card = Doc<"cards">;
-import { useTcgDnd } from "./tcg-dnd-provider";
+import { UNIVERSUS_CARD_DND_ENABLED, useTcgDnd } from "./tcg-dnd-provider";
 import { useIsMobile } from "@/hooks/useIsMobile";
 
 function isDndDebugEnabled(): boolean {
@@ -149,7 +149,7 @@ export function useTcgDraggable({
     [isDisabled, skipDragSelector, dragStartDistance, card, sourceId, startDrag, endDrag]
   );
 
-  if (isDisabled || isMobile) {
+  if (!UNIVERSUS_CARD_DND_ENABLED || isDisabled || isMobile) {
     return emptyResult;
   }
 

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { COMMUNITY_LABS, COMMUNITY_RESOURCES } from "../community-content-data";
 import { CommunitySectionHeader } from "../shared/section-header";
+import { SectionHeading } from "@/components/ui/typography-headings";
 
 export function CommunityLabsSection() {
   return (
@@ -46,7 +47,7 @@ export function CommunityLabsSection() {
                     <Icon className="h-4 w-4 text-primary" />
                   </div>
                 </div>
-                <h3 className="mt-3 text-sm font-semibold">{tool.title}</h3>
+                <SectionHeading className="mt-3 text-sm font-semibold">{tool.title}</SectionHeading>
                 <p className="mt-1 text-xs text-muted-foreground">{tool.description}</p>
               </div>
             );

@@ -31,9 +31,6 @@
   --sidebar-accent-foreground: oklch(0.3211 0 0);
   --sidebar-border: oklch(0.8228 0.1095 346.0184);
   --sidebar-ring: oklch(0.6559 0.2118 354.3084);
-  --font-sans: Poppins, sans-serif;
-  --font-serif: Lora, serif;
-  --font-mono: Fira Code, monospace;
   --radius: 0.4rem;
   --shadow-x: 3px;
   --shadow-y: 3px;
@@ -96,9 +93,6 @@
   --sidebar-accent-foreground: oklch(0.2781 0.0296 256.848);
   --sidebar-border: oklch(0.3729 0.0306 259.7328);
   --sidebar-ring: oklch(0.6559 0.2118 354.3084);
-  --font-sans: Poppins, sans-serif;
-  --font-serif: Lora, serif;
-  --font-mono: Fira Code, monospace;
   --radius: 0.4rem;
   --shadow-x: 3px;
   --shadow-y: 3px;

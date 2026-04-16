@@ -1,7 +1,7 @@
 "use client";
 
-export { useColorScheme, COLOR_SCHEMES, ColorSchemeProvider } from "@/providers/ColorSchemeProvider";
-export type { ColorScheme, ThemePreference } from "@/providers/ColorSchemeProvider";
+export { useColorScheme, useChromeMode, COLOR_SCHEMES, ColorSchemeProvider } from "@/providers/ColorSchemeProvider";
+export type { ColorScheme, ThemePreference, ChromePreference, ChromeMode } from "@/providers/ColorSchemeProvider";
 import { useColorScheme } from "@/providers/ColorSchemeProvider";
 
 export function useTheme() {

@@ -2,7 +2,7 @@
 
 import { PageType } from "@/app/(app)/layout"
 import { DecksMobileTopBar } from "@/components/decks/decks-view/mobile-top-bar"
-import { GalleryTopBarFilters } from "@/components/gallery/gallery-header"
+import { GalleryTopBarFilters } from "@/components/gallery/gallery-top-bar-filters"
 import { SlotRenderer, useShellSlot } from "./shell-slot-provider"
 
 interface MobileTopBarProps {

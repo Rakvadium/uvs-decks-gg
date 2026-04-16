@@ -42,9 +42,9 @@ function DropdownMenuContent({
         data-slot="dropdown-menu-content"
         sideOffset={sideOffset}
         className={cn(
-          "z-50 max-h-(--radix-dropdown-menu-content-available-height) min-w-[8rem] origin-(--radix-dropdown-menu-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-lg border p-1.5 shadow-sm",
-          "bg-popover/95 text-popover-foreground backdrop-blur-lg border-primary/20",
-          "shadow-[0_0_2px_var(--primary)/30,0_0_8px_var(--primary)/50]",
+          "z-[300] max-h-(--radix-dropdown-menu-content-available-height) min-w-[8rem] origin-(--radix-dropdown-menu-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-lg border p-1.5",
+          "bg-popover/95 text-popover-foreground backdrop-blur-lg [border-color:var(--chrome-popover-border)]",
+          "shadow-[var(--chrome-popover-shadow)]",
           "data-[state=open]:animate-in data-[state=closed]:animate-out",
           "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
           "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
@@ -254,9 +254,9 @@ function DropdownMenuSubContent({
       <DropdownMenuPrimitive.SubContent
         data-slot="dropdown-menu-sub-content"
         className={cn(
-          "z-50 min-w-[8rem] origin-(--radix-dropdown-menu-content-transform-origin) overflow-hidden rounded-lg border p-1.5 shadow-sm",
-          "bg-popover text-popover-foreground border-border",
-          "shadow-[0_0_2px_var(--primary)/30,0_0_8px_var(--primary)/50]",
+          "z-[300] min-w-[8rem] origin-(--radix-dropdown-menu-content-transform-origin) overflow-hidden rounded-lg border p-1.5",
+          "bg-popover text-popover-foreground [border-color:var(--chrome-popover-border)]",
+          "shadow-[var(--chrome-popover-shadow)]",
           "data-[state=open]:animate-in data-[state=closed]:animate-out",
           "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
           "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",

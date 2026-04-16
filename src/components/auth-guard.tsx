@@ -122,7 +122,7 @@ function AuthLoadingSkeleton() {
 
         <div className="pointer-events-none fixed inset-x-0 bottom-0 z-40">
           <div className="relative overflow-visible">
-            <div className="mx-0 overflow-hidden rounded-t-[8px] border-x border-t border-primary/25 bg-background/96 shadow-[0_-12px_28px_-20px_var(--primary)] backdrop-blur-md">
+            <div className="mx-0 overflow-hidden rounded-t-[8px] border-x border-t [border-color:var(--chrome-sheet-border)] bg-background/96 shadow-[var(--chrome-sheet-shadow)] backdrop-blur-md">
               <div className="flex justify-center">
                 <Skeleton className="mt-2 h-2 w-24 rounded-full" />
               </div>

@@ -1,19 +1,21 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --font-geist-sans: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system,
+  --font-geist-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system,
     "Segoe UI", sans-serif;
   --font-geist-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo,
     Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-  --font-display: "Orbitron", var(--font-geist-sans);
+  --font-display: var(--font-geist-sans);
+  --font-serif: var(--font-geist-sans);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
+  --font-serif: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-  --font-display: var(--font-display, var(--font-sans));
+  --font-display: var(--font-geist-sans);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -54,6 +56,275 @@
   --color-glow-green: var(--glow-green, oklch(0.72 0.15 140));
 }
 
+@layer chrome-calm {
+  :root[data-chrome="calm"] {
+    --font-display: var(--font-sans);
+
+    --chrome-focus-ring-width: 2px;
+    --chrome-focus-ring-color: var(--ring);
+    --chrome-focus-shadow: 0 0 0 2px var(--ring);
+
+    --chrome-elevation-low: 0 1px 3px 0 oklch(0 0 0 / 0.06);
+    --chrome-elevation-mid: 0 4px 12px -2px oklch(0 0 0 / 0.1);
+
+    --chrome-heading-transform: none;
+    --chrome-heading-letter-spacing: normal;
+
+    --chrome-scrollbar-thumb: var(--muted-foreground);
+    --chrome-scrollbar-thumb-hover: var(--muted-foreground);
+    --chrome-scrollbar-thumb-hover-shadow: none;
+    --chrome-scrollbar-thumb-solid: var(--muted-foreground);
+    --chrome-scrollbar-track: transparent;
+
+    --chrome-button-shadow-default: 0 1px 3px 0 oklch(0 0 0 / 0.06);
+    --chrome-button-shadow-default-hover: 0 2px 6px -1px oklch(0 0 0 / 0.1), 0 1px 3px 0 oklch(0 0 0 / 0.06);
+    --chrome-button-shadow-destructive: 0 1px 3px 0 oklch(0 0 0 / 0.06);
+    --chrome-button-shadow-destructive-hover: 0 2px 6px -1px oklch(0 0 0 / 0.1), 0 1px 3px 0 oklch(0 0 0 / 0.06);
+    --chrome-button-shadow-outline-hover: 0 1px 3px 0 oklch(0 0 0 / 0.08);
+    --chrome-button-shadow-secondary-hover: 0 1px 3px 0 oklch(0 0 0 / 0.08);
+    --chrome-button-shadow-neon: var(--chrome-button-shadow-default);
+    --chrome-button-shadow-neon-hover: var(--chrome-button-shadow-default-hover);
+    --chrome-button-shadow-neon-magenta: var(--chrome-button-shadow-default);
+    --chrome-button-shadow-neon-magenta-hover: var(--chrome-button-shadow-default-hover);
+
+    --chrome-badge-default-shadow: 0 1px 2px 0 oklch(0 0 0 / 0.05);
+    --chrome-badge-default-shadow-hover: 0 1px 3px 0 oklch(0 0 0 / 0.08);
+    --chrome-badge-secondary-shadow: 0 1px 2px 0 oklch(0 0 0 / 0.05);
+    --chrome-badge-secondary-shadow-hover: 0 1px 3px 0 oklch(0 0 0 / 0.08);
+    --chrome-badge-destructive-shadow: 0 1px 2px 0 oklch(0 0 0 / 0.05);
+    --chrome-badge-destructive-shadow-hover: 0 1px 3px 0 oklch(0 0 0 / 0.08);
+    --chrome-badge-outline-shadow-hover: 0 1px 2px 0 oklch(0 0 0 / 0.06);
+    --chrome-badge-signal-shadow: var(--chrome-badge-default-shadow);
+    --chrome-badge-signal-magenta-shadow: var(--chrome-badge-secondary-shadow);
+    --chrome-badge-signal-violet-shadow: var(--chrome-badge-outline-shadow-hover);
+    --chrome-badge-signal-pulse: none;
+
+    --chrome-search-field-shadow: 0 1px 3px 0 oklch(0 0 0 / 0.06);
+    --chrome-search-field-shadow-focus: 0 1px 4px 0 oklch(0 0 0 / 0.1);
+
+    --chrome-tooltip-shadow: var(--chrome-elevation-low);
+    --chrome-tooltip-border: var(--border);
+
+    --chrome-popover-shadow: var(--chrome-elevation-mid);
+    --chrome-popover-border: var(--border);
+
+    --chrome-sheet-border: var(--border);
+    --chrome-sheet-shadow: 0 -4px 12px -2px oklch(0 0 0 / 0.1);
+
+    --chrome-card-shadow: var(--chrome-elevation-low);
+    --chrome-card-shadow-hover: var(--chrome-elevation-mid);
+    --chrome-card-border-hover: var(--border);
+
+    --chrome-card-title-font: var(--font-geist-sans);
+    --chrome-card-description-font: var(--font-geist-sans);
+    --chrome-card-description-tracking: normal;
+
+    --chrome-card-image-glow-rest: 0 0 0 1px oklch(0 0 0 / 0.08);
+    --chrome-card-image-glow-hover: 0 0 0 1px oklch(0 0 0 / 0.15), 0 1px 4px oklch(0 0 0 / 0.1);
+
+    --chrome-card-frame-glow-rest: none;
+    --chrome-card-frame-glow-hover: 0 0 0 1px oklch(0 0 0 / 0.12);
+    --chrome-card-frame-halo: transparent;
+    --chrome-card-frame-halo-hover-opacity: 0;
+
+    --chrome-filter-icon-well-shadow: var(--chrome-elevation-low);
+    --chrome-filter-icon-drop-shadow: none;
+    --chrome-filter-tile-shadow-selected: none;
+    --chrome-filter-tile-shadow-selected-inset: none;
+
+    --chrome-shell-sidebar-wash: none;
+    --chrome-shell-icon-drop-shadow: none;
+    --chrome-shell-nav-active-shadow: 0 1px 3px 0 oklch(0 0 0 / 0.06);
+    --chrome-shell-brand-shadow: 0 1px 3px 0 oklch(0 0 0 / 0.06);
+    --chrome-shell-brand-shadow-hover: 0 2px 6px -1px oklch(0 0 0 / 0.1);
+    --chrome-shell-rail-active-shadow: 0 1px 3px 0 oklch(0 0 0 / 0.06);
+    --chrome-shell-rail-resize-shadow: none;
+    --chrome-shell-rail-resize-shadow-hover: 0 1px 3px 0 oklch(0 0 0 / 0.08);
+    --chrome-shell-deck-label-drop-shadow: none;
+    --chrome-shell-avatar-ring: 0 1px 3px 0 oklch(0 0 0 / 0.06);
+
+    --chrome-page-hero-wash-opacity: 0;
+    --chrome-page-bg: linear-gradient(
+      180deg,
+      oklch(from var(--muted) l c h / 0.65) 0%,
+      var(--background) 38%,
+      var(--background) 100%
+    );
+    --chrome-page-status-dot-shadow: none;
+    --chrome-page-heading-drop-shadow: none;
+
+    --chrome-page-nav-card-border-hover: var(--border);
+    --chrome-page-nav-card-shadow-hover: var(--chrome-elevation-mid);
+    --chrome-page-nav-card-bg: linear-gradient(to bottom right, var(--muted) / 0.3, var(--muted) / 0.1);
+    --chrome-page-nav-card-icon-drop-shadow: none;
+
+    --chrome-decks-heading-dot-shadow: none;
+    --chrome-decks-heading-dot-animation: none;
+    --chrome-decks-heading-blur: none;
+
+    --chrome-deck-grid-border-hover: var(--border);
+    --chrome-deck-grid-shadow-hover: var(--chrome-elevation-mid);
+    --chrome-deck-grid-accent-line: 0;
+
+    --chrome-deck-state-icon-shadow: var(--chrome-elevation-low);
+
+    --chrome-deck-details-hero-border: var(--border);
+    --chrome-deck-details-hero-shadow: var(--chrome-elevation-low);
+    --chrome-deck-details-loader-drop-shadow: none;
+    --chrome-deck-details-wash: none;
+    --chrome-deck-details-list-item-shadow: var(--chrome-elevation-low);
+    --chrome-deck-details-sidebar-search-shadow: var(--chrome-search-field-shadow);
+    --chrome-deck-details-sidebar-search-shadow-focus: var(--chrome-search-field-shadow-focus);
+    --chrome-deck-details-hover-preview-border: var(--border);
+    --chrome-deck-details-hover-preview-shadow: var(--chrome-elevation-mid);
+
+    --chrome-gallery-loading-shadow: var(--chrome-elevation-mid);
+    --chrome-gallery-progress-bar-glow: none;
+    --chrome-gallery-empty-icon-shadow: var(--chrome-elevation-low);
+    --chrome-gallery-empty-wash: none;
+    --chrome-gallery-stats-dot-shadow: none;
+
+    --chrome-dialog-nav-shadow-enabled: 0 1px 3px 0 oklch(0 0 0 / 0.08);
+    --chrome-dialog-nav-border-enabled: var(--border);
+
+    --chrome-keyword-chip-shadow: none;
+
+    --chrome-card-detail-image-shadow: 0 4px 12px -4px oklch(0 0 0 / 0.15);
+    --chrome-card-detail-stat-bar-glow: none;
+  }
+}
+
+@layer chrome-expressive {
+  :root[data-chrome="expressive"] {
+    --chrome-focus-ring-width: 2px;
+    --chrome-focus-ring-color: var(--primary);
+    --chrome-focus-shadow: 0 0 0 2px var(--primary), 0 0 12px oklch(from var(--primary) l c h / 0.4);
+
+    --chrome-elevation-low: 0 2px 8px -2px oklch(from var(--primary) l c h / 0.15), 0 0 4px oklch(from var(--primary) l c h / 0.08);
+    --chrome-elevation-mid: 0 4px 16px -2px oklch(from var(--primary) l c h / 0.25), 0 0 12px oklch(from var(--primary) l c h / 0.12);
+
+    --chrome-heading-transform: uppercase;
+    --chrome-heading-letter-spacing: 0.05em;
+
+    --chrome-scrollbar-thumb: linear-gradient(180deg, var(--primary) 0%, var(--secondary) 100%);
+    --chrome-scrollbar-thumb-hover: linear-gradient(180deg, var(--primary) 0%, var(--secondary) 100%);
+    --chrome-scrollbar-thumb-hover-shadow: 0 0 10px var(--primary);
+    --chrome-scrollbar-thumb-solid: var(--primary);
+    --chrome-scrollbar-track: transparent;
+
+    --chrome-button-shadow-default: 0 0 2px var(--primary), 0 0 8px oklch(from var(--primary) l c h / 0.6);
+    --chrome-button-shadow-default-hover: 0 0 4px var(--primary), 0 0 14px var(--primary), 0 0 20px oklch(from var(--primary) l c h / 0.25);
+    --chrome-button-shadow-destructive: 0 0 2px var(--destructive), 0 0 8px oklch(from var(--destructive) l c h / 0.6);
+    --chrome-button-shadow-destructive-hover: 0 0 4px var(--destructive), 0 0 14px var(--destructive), 0 0 20px oklch(from var(--destructive) l c h / 0.25);
+    --chrome-button-shadow-outline-hover: 0 0 3px var(--primary), 0 0 10px oklch(from var(--primary) l c h / 0.7);
+    --chrome-button-shadow-secondary-hover: 0 0 3px var(--secondary), 0 0 10px oklch(from var(--secondary) l c h / 0.7);
+    --chrome-button-shadow-neon: 0 0 3px var(--primary), 0 0 10px var(--primary), inset 0 0 5px oklch(from var(--primary) l c h / 0.3);
+    --chrome-button-shadow-neon-hover: 0 0 5px var(--primary), 0 0 18px var(--primary), 0 0 28px oklch(from var(--primary) l c h / 0.35), inset 0 0 8px oklch(from var(--primary) l c h / 0.4);
+    --chrome-button-shadow-neon-magenta: 0 0 3px var(--secondary), 0 0 10px var(--secondary), inset 0 0 5px oklch(from var(--secondary) l c h / 0.3);
+    --chrome-button-shadow-neon-magenta-hover: 0 0 5px var(--secondary), 0 0 18px var(--secondary), 0 0 28px oklch(from var(--secondary) l c h / 0.35), inset 0 0 8px oklch(from var(--secondary) l c h / 0.4);
+
+    --chrome-badge-default-shadow: 0 0 8px -2px var(--primary);
+    --chrome-badge-default-shadow-hover: 0 0 12px -2px var(--primary);
+    --chrome-badge-secondary-shadow: 0 0 8px -2px var(--secondary);
+    --chrome-badge-secondary-shadow-hover: 0 0 12px -2px var(--secondary);
+    --chrome-badge-destructive-shadow: 0 0 8px -2px var(--destructive);
+    --chrome-badge-destructive-shadow-hover: 0 0 12px -2px var(--destructive);
+    --chrome-badge-outline-shadow-hover: 0 0 10px -3px var(--primary);
+    --chrome-badge-signal-shadow: 0 0 10px var(--primary), inset 0 0 8px oklch(from var(--primary) l c h / 0.2);
+    --chrome-badge-signal-magenta-shadow: 0 0 10px var(--secondary), inset 0 0 8px oklch(from var(--secondary) l c h / 0.2);
+    --chrome-badge-signal-violet-shadow: 0 0 10px var(--accent), inset 0 0 8px oklch(from var(--accent) l c h / 0.2);
+    --chrome-badge-signal-pulse: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+
+    --chrome-search-field-shadow: 0 0 10px -3px var(--primary);
+    --chrome-search-field-shadow-focus: 0 0 15px -3px var(--primary);
+
+    --chrome-tooltip-shadow: 0 0 15px -5px var(--primary);
+    --chrome-tooltip-border: oklch(from var(--primary) l c h / 0.2);
+
+    --chrome-popover-shadow: 0 0 2px oklch(from var(--primary) l c h / 0.3), 0 0 8px oklch(from var(--primary) l c h / 0.5);
+    --chrome-popover-border: oklch(from var(--primary) l c h / 0.2);
+
+    --chrome-sheet-border: oklch(from var(--primary) l c h / 0.25);
+    --chrome-sheet-shadow: 0 -12px 28px -20px var(--primary);
+
+    --chrome-card-shadow: 0 0 20px -5px oklch(from var(--primary) l c h / 0.1);
+    --chrome-card-shadow-hover: 0 0 30px -5px oklch(from var(--primary) l c h / 0.2);
+    --chrome-card-border-hover: oklch(from var(--primary) l c h / 0.3);
+
+    --chrome-card-title-font: var(--font-display);
+    --chrome-card-description-font: var(--font-geist-mono);
+    --chrome-card-description-tracking: 0.05em;
+
+    --chrome-card-image-glow-rest: 0 0 0 1px color-mix(in oklch, var(--primary) 18%, transparent), 0 0 4px color-mix(in oklch, var(--primary) 35%, transparent), 0 0 0 1px color-mix(in oklch, var(--secondary) 12%, transparent), 0 0 6px color-mix(in oklch, var(--secondary) 22%, transparent);
+    --chrome-card-image-glow-hover: 0 0 0 1px color-mix(in oklch, var(--primary) 35%, transparent), 0 0 5px color-mix(in oklch, var(--primary) 80%, transparent), 0 0 0 1px color-mix(in oklch, var(--secondary) 25%, transparent), 0 0 10px color-mix(in oklch, var(--secondary) 50%, transparent);
+
+    --chrome-card-frame-glow-rest: 0 0 0 1px color-mix(in oklch, var(--primary) 12%, transparent);
+    --chrome-card-frame-glow-hover: 0 0 0 1px color-mix(in oklch, var(--primary) 25%, transparent), 0 0 6px color-mix(in oklch, var(--primary) 30%, transparent);
+    --chrome-card-frame-halo: linear-gradient(to right, var(--primary), var(--secondary), var(--primary));
+    --chrome-card-frame-halo-hover-opacity: 0.7;
+
+    --chrome-filter-icon-well-shadow: 0 0 2px oklch(from var(--primary) l c h / 0.5), 0 0 6px oklch(from var(--primary) l c h / 0.4);
+    --chrome-filter-icon-drop-shadow: drop-shadow(0 0 3px var(--primary));
+    --chrome-filter-tile-shadow-selected: 0 0 10px -3px var(--primary);
+    --chrome-filter-tile-shadow-selected-inset: inset 0 0 8px -3px var(--primary);
+
+    --chrome-shell-sidebar-wash: linear-gradient(to bottom, oklch(from var(--primary) l c h / 0.05) 0%, transparent 50%, oklch(from var(--secondary) l c h / 0.05) 100%);
+    --chrome-shell-icon-drop-shadow: drop-shadow(0 0 3px var(--primary));
+    --chrome-shell-nav-active-shadow: 0 0 2px oklch(from var(--primary) l c h / 0.5), 0 0 6px oklch(from var(--primary) l c h / 0.3);
+    --chrome-shell-brand-shadow: 0 0 2px oklch(from var(--primary) l c h / 0.5), 0 0 5px oklch(from var(--primary) l c h / 0.4);
+    --chrome-shell-brand-shadow-hover: 0 0 3px var(--primary), 0 0 8px oklch(from var(--primary) l c h / 0.6);
+    --chrome-shell-rail-active-shadow: 0 0 2px oklch(from var(--primary) l c h / 0.6), 0 0 6px oklch(from var(--primary) l c h / 0.4);
+    --chrome-shell-rail-resize-shadow: 0 0 3px var(--primary), 0 0 8px oklch(from var(--primary) l c h / 0.6);
+    --chrome-shell-rail-resize-shadow-hover: 0 0 2px var(--primary), 0 0 6px oklch(from var(--primary) l c h / 0.5);
+    --chrome-shell-deck-label-drop-shadow: drop-shadow(0 0 8px var(--primary));
+    --chrome-shell-avatar-ring: 0 0 2px oklch(from var(--primary) l c h / 0.4), 0 0 6px oklch(from var(--primary) l c h / 0.35);
+
+    --chrome-page-hero-wash-opacity: 1;
+    --chrome-page-bg: linear-gradient(to bottom, var(--background), oklch(from var(--muted) l c h / 0.2));
+    --chrome-page-status-dot-shadow: 0 0 10px #22c55e;
+    --chrome-page-heading-drop-shadow: drop-shadow(0 0 20px var(--primary));
+
+    --chrome-page-nav-card-border-hover: oklch(from var(--primary) l c h / 0.6);
+    --chrome-page-nav-card-shadow-hover: 0 0 30px -5px var(--primary);
+    --chrome-page-nav-card-bg: initial;
+    --chrome-page-nav-card-icon-drop-shadow: drop-shadow(0 0 8px var(--primary));
+
+    --chrome-decks-heading-dot-shadow: 0 0 8px var(--primary);
+    --chrome-decks-heading-dot-animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    --chrome-decks-heading-blur: blur(16px);
+
+    --chrome-deck-grid-border-hover: oklch(from var(--primary) l c h / 0.5);
+    --chrome-deck-grid-shadow-hover: 0 0 0 1px oklch(from var(--primary) l c h / 0.5), 0 0 8px oklch(from var(--primary) l c h / 0.8), 0 0 16px oklch(from var(--primary) l c h / 0.2);
+    --chrome-deck-grid-accent-line: 1;
+
+    --chrome-deck-state-icon-shadow: 0 0 30px -5px var(--primary);
+
+    --chrome-deck-details-hero-border: oklch(from var(--primary) l c h / 0.2);
+    --chrome-deck-details-hero-shadow: 0 0 0 1px oklch(from var(--primary) l c h / 0.15), 0 0 8px oklch(from var(--primary) l c h / 0.3);
+    --chrome-deck-details-loader-drop-shadow: drop-shadow(0 0 10px var(--primary));
+    --chrome-deck-details-wash: linear-gradient(to right, oklch(from var(--primary) l c h / 0.05), oklch(from var(--secondary) l c h / 0.05), oklch(from var(--accent) l c h / 0.05));
+    --chrome-deck-details-list-item-shadow: 0 0 14px -12px var(--primary);
+    --chrome-deck-details-sidebar-search-shadow: 0 0 10px -3px var(--primary);
+    --chrome-deck-details-sidebar-search-shadow-focus: 0 0 15px -3px var(--primary);
+    --chrome-deck-details-hover-preview-border: oklch(from var(--primary) l c h / 0.4);
+    --chrome-deck-details-hover-preview-shadow: 0 0 0 1px oklch(from var(--primary) l c h / 0.3), 0 0 6px oklch(from var(--primary) l c h / 0.7), 0 0 14px oklch(from var(--primary) l c h / 0.2);
+
+    --chrome-gallery-loading-shadow: 0 0 30px -5px var(--primary);
+    --chrome-gallery-progress-bar-glow: 0 0 10px var(--primary);
+    --chrome-gallery-empty-icon-shadow: 0 0 30px -5px var(--primary);
+    --chrome-gallery-empty-wash: linear-gradient(to right, oklch(from var(--primary) l c h / 0.1), oklch(from var(--secondary) l c h / 0.1), oklch(from var(--primary) l c h / 0.1));
+    --chrome-gallery-stats-dot-shadow: 0 0 8px #22c55e;
+
+    --chrome-dialog-nav-shadow-enabled: 0 0 2px var(--primary), 0 0 8px oklch(from var(--primary) l c h / 0.7);
+    --chrome-dialog-nav-border-enabled: oklch(from var(--primary) l c h / 0.3);
+
+    --chrome-keyword-chip-shadow: 0 0 8px color-mix(in srgb, var(--keyword-color, var(--primary)) 15%, transparent);
+
+    --chrome-card-detail-image-shadow: 0 0 0 1px color-mix(in oklch, var(--primary) 30%, transparent), 0 4px 20px -4px color-mix(in oklch, var(--primary) 25%, transparent), 0 0 40px -8px color-mix(in oklch, var(--primary) 15%, transparent);
+    --chrome-card-detail-stat-bar-glow: 0 0 6px currentColor;
+  }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -68,30 +339,30 @@
   }
   
   ::-webkit-scrollbar-track {
-    background: transparent;
+    background: var(--chrome-scrollbar-track, transparent);
   }
-  
+
   ::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, var(--primary) 0%, var(--secondary) 100%);
+    background: var(--chrome-scrollbar-thumb);
     border-radius: 2px;
     border: 1px solid transparent;
     background-clip: padding-box;
   }
-  
+
   ::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(180deg, var(--primary) 0%, var(--secondary) 100%);
+    background: var(--chrome-scrollbar-thumb-hover, var(--chrome-scrollbar-thumb));
     border: 1px solid transparent;
     background-clip: padding-box;
-    box-shadow: 0 0 10px var(--primary);
+    box-shadow: var(--chrome-scrollbar-thumb-hover-shadow, none);
   }
-  
+
   ::-webkit-scrollbar-corner {
     background: transparent;
   }
-  
+
   * {
     scrollbar-width: thin;
-    scrollbar-color: var(--primary) transparent;
+    scrollbar-color: var(--chrome-scrollbar-thumb-solid, var(--muted-foreground)) var(--chrome-scrollbar-track, transparent);
   }
 }
 
@@ -100,55 +371,55 @@
     font-family: var(--font-display);
   }
   
-  .text-glow-cyan {
+  :root:is([data-chrome="expressive"], [data-fx="on"]) .text-glow-cyan {
     text-shadow: 0 0 10px var(--glow-cyan, oklch(0.78 0.18 195)),
                  0 0 20px var(--glow-cyan, oklch(0.78 0.18 195) / 0.5),
                  0 0 40px var(--glow-cyan, oklch(0.78 0.18 195) / 0.3);
   }
-  
-  .text-glow-magenta {
+
+  :root:is([data-chrome="expressive"], [data-fx="on"]) .text-glow-magenta {
     text-shadow: 0 0 10px var(--glow-magenta, oklch(0.65 0.22 310)),
                  0 0 20px var(--glow-magenta, oklch(0.65 0.22 310) / 0.5),
                  0 0 40px var(--glow-magenta, oklch(0.65 0.22 310) / 0.3);
   }
-  
-  .text-glow-violet {
+
+  :root:is([data-chrome="expressive"], [data-fx="on"]) .text-glow-violet {
     text-shadow: 0 0 10px var(--glow-violet, oklch(0.68 0.19 280)),
                  0 0 20px var(--glow-violet, oklch(0.68 0.19 280) / 0.5),
                  0 0 40px var(--glow-violet, oklch(0.68 0.19 280) / 0.3);
   }
-  
-  .box-glow-cyan {
+
+  :root:is([data-chrome="expressive"], [data-fx="on"]) .box-glow-cyan {
     box-shadow: 0 0 10px var(--glow-cyan, oklch(0.78 0.18 195) / 0.4),
                 0 0 20px var(--glow-cyan, oklch(0.78 0.18 195) / 0.2),
                 inset 0 0 15px var(--glow-cyan, oklch(0.78 0.18 195) / 0.1);
   }
-  
-  .box-glow-magenta {
+
+  :root:is([data-chrome="expressive"], [data-fx="on"]) .box-glow-magenta {
     box-shadow: 0 0 10px var(--glow-magenta, oklch(0.65 0.22 310) / 0.4),
                 0 0 20px var(--glow-magenta, oklch(0.65 0.22 310) / 0.2),
                 inset 0 0 15px var(--glow-magenta, oklch(0.65 0.22 310) / 0.1);
   }
-  
-  .box-glow-violet {
+
+  :root:is([data-chrome="expressive"], [data-fx="on"]) .box-glow-violet {
     box-shadow: 0 0 10px var(--glow-violet, oklch(0.68 0.19 280) / 0.4),
                 0 0 20px var(--glow-violet, oklch(0.68 0.19 280) / 0.2),
                 inset 0 0 15px var(--glow-violet, oklch(0.68 0.19 280) / 0.1);
   }
-  
+
   .border-glow {
     position: relative;
   }
-  
-  .border-glow::before {
+
+  :root:is([data-chrome="expressive"], [data-fx="on"]) .border-glow::before {
     content: "";
     position: absolute;
     inset: -1px;
     border-radius: inherit;
     padding: 1px;
-    background: linear-gradient(135deg, 
-      var(--glow-cyan, oklch(0.78 0.18 195)) 0%, 
-      var(--glow-magenta, oklch(0.65 0.22 310)) 50%, 
+    background: linear-gradient(135deg,
+      var(--glow-cyan, oklch(0.78 0.18 195)) 0%,
+      var(--glow-magenta, oklch(0.65 0.22 310)) 50%,
       var(--glow-cyan, oklch(0.78 0.18 195)) 100%
     );
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
@@ -158,13 +429,13 @@
     pointer-events: none;
     opacity: 0.6;
   }
-  
+
   .scanlines {
     position: relative;
     overflow: hidden;
   }
-  
-  .scanlines::after {
+
+  :root:is([data-chrome="expressive"], [data-fx="on"]) .scanlines::after {
     content: "";
     position: absolute;
     inset: 0;
@@ -178,7 +449,7 @@
     pointer-events: none;
     z-index: 50;
   }
-  
+
   .grid-pattern {
     background-image: 
       linear-gradient(to right, var(--border) 1px, transparent 1px),
@@ -190,7 +461,7 @@
     background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0v15M30 45v15M0 30h15M45 30h60M30 30h0' stroke='%2300d4ff' stroke-opacity='0.08' stroke-width='1' fill='none'/%3E%3Ccircle cx='30' cy='30' r='3' fill='%2300d4ff' fill-opacity='0.06'/%3E%3C/svg%3E");
   }
   
-  .holo-shimmer {
+  :root:is([data-chrome="expressive"], [data-fx="on"]) .holo-shimmer {
     background: linear-gradient(
       135deg,
       transparent 20%,

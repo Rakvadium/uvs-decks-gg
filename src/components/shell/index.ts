@@ -1,5 +1,6 @@
 export { LeftSidebar } from "./left-sidebar";
-export { TopHeader } from "./top-header";
+export { AppPageHeader } from "./app-page-header";
+export type { AppPageHeaderProps } from "./app-page-header";
 export { RightSidebar } from "./right-sidebar";
 export { SidebarFooter } from "./sidebar-footer";
 export {

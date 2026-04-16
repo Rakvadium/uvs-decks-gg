@@ -6,10 +6,12 @@ Give this document to an agent whose job is **only** to **delegate** work to **c
 
 ## Two roles — do not mix them
 
-| Role | What it does |
-| --- | --- |
+
+| Role                    | What it does                                                                                                                                                                              |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Orchestration agent** | Chooses the next unit of work, spawns **one** coding sub-agent with a filled handoff, waits for completion criteria, records outcome, repeats. May update coordination docs listed below. |
-| **Coding sub-agent** | Edits `src/`, `convex/`, and related tests or config **for the assigned task**; runs verification from onboarding. |
+| **Coding sub-agent**    | Edits `src/`, `convex/`, and related tests or config **for the assigned task**; runs verification from onboarding.                                                                        |
+
 
 ## Hard prohibition — no application codebase
 
@@ -22,12 +24,14 @@ Implementation is **exclusively** the coding sub-agent’s responsibility.
 
 ## What the orchestrator may touch
 
-| Allowed | Purpose |
-| --- | --- |
-| `docs/` | Short factual notes: run logs, decisions, handoff archives |
-| [BACKLOG.md](./BACKLOG.md) | Reserve, block, or complete rows if your process uses it |
-| [orchestration/run-log.md](./orchestration/run-log.md) | Session log for multi-step coordination |
-| Chat / ticket / tracker | Status and handoff text |
+
+| Allowed                                                | Purpose                                                    |
+| ------------------------------------------------------ | ---------------------------------------------------------- |
+| `docs/`                                                | Short factual notes: run logs, decisions, handoff archives |
+| [BACKLOG.md](./BACKLOG.md)                             | Reserve, block, or complete rows if your process uses it   |
+| [orchestration/run-log.md](./orchestration/run-log.md) | Session log for multi-step coordination                    |
+| Chat / ticket / tracker                                | Status and handoff text                                    |
+
 
 ## Execution model
 
@@ -48,4 +52,4 @@ Implementation is **exclusively** the coding sub-agent’s responsibility.
 
 ## Structural reference
 
-The `_reference/docs/reference/ORCHESTRATION_AGENT.md` file (under **`_reference/docs/`**) shows the same **shape** with examples from another project. Prefer **this file** for tcg-decks paths and verification commands.
+The `_reference/docs/reference/ORCHESTRATION_AGENT.md` file (under `**_reference/docs/`**) shows the same **shape** with examples from another project. Prefer **this file** for tcg-decks paths and verification commands.

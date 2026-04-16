@@ -1,13 +1,14 @@
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { SectionHeading } from "@/components/ui/typography-headings";
 
 export function CreatorProgramCtaSection() {
   return (
     <section className="rounded-2xl border border-border/60 bg-card/60 p-6 md:p-8">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div className="space-y-2">
-          <h2 className="text-xl font-display font-bold uppercase tracking-[0.18em]">Ready to Apply?</h2>
+          <SectionHeading className="text-xl font-display font-bold uppercase tracking-[0.18em]">Ready to Apply?</SectionHeading>
           <p className="text-sm text-muted-foreground">
             Share your best decklists and community wins, then submit your verification request.
           </p>

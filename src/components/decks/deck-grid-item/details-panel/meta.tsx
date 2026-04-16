@@ -1,4 +1,5 @@
 import { ChevronRight } from "lucide-react";
+import { SectionHeading } from "@/components/ui/typography-headings";
 import { useDeckGridItemContext } from "../context";
 
 export function DeckGridItemMeta() {
@@ -10,15 +11,15 @@ export function DeckGridItemMeta() {
   return (
     <>
       <div className="mb-1 flex items-start justify-between gap-1.5 sm:mb-1.5 sm:gap-2">
-        <h3 className="truncate font-display text-sm font-bold uppercase tracking-wide transition-colors group-hover:text-primary sm:text-base">
+        <SectionHeading className="truncate font-display text-sm font-bold uppercase tracking-wide transition-colors group-hover:text-primary sm:text-base">
           {name}
-        </h3>
+        </SectionHeading>
         <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground/30 transition-all group-hover:translate-x-0.5 group-hover:text-primary" />
       </div>
 
       {format ? (
         <div className="mb-1.5 flex items-center gap-1.5 sm:mb-2">
-          <div className="h-1 w-1 rounded-full bg-primary shadow-[0_0_4px_var(--primary)]" />
+          <div className="h-1 w-1 rounded-full bg-primary" style={{ boxShadow: "var(--chrome-decks-heading-dot-shadow)" }} />
           <span className="font-mono text-[10px] uppercase tracking-widest text-primary/80 sm:text-[11px]">
             {format}
             {subFormat ? <span className="text-muted-foreground"> / {subFormat}</span> : null}

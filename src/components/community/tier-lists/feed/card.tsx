@@ -77,7 +77,7 @@ export function TierListFeedCard({
       <CardHeader className="space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex flex-wrap items-center gap-2">
-            <Badge variant="cyber">Tier List</Badge>
+            <Badge tone="entity">Tier List</Badge>
             <Badge variant="outline">{tierList.isPublic ? "Public" : "Private"}</Badge>
             <Badge variant="outline">{getTierListScopeLabel(tierList.rankingScope)}</Badge>
           </div>

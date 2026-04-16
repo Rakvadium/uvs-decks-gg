@@ -31,9 +31,6 @@
   --sidebar-accent-foreground: oklch(0.293 0.066 243.157);
   --sidebar-border: oklch(0.901 0.058 230.902);
   --sidebar-ring: oklch(0.828 0.111 230.318);
-  --font-sans: Oxanium, sans-serif;
-  --font-serif: Oxanium, sans-serif;
-  --font-mono: Oxanium, sans-serif;
   --radius: 0.5rem;
 }
 
@@ -70,8 +67,5 @@
   --sidebar-accent-foreground: oklch(0.901 0.058 230.902);
   --sidebar-border: oklch(0.37 0.013 285.805);
   --sidebar-ring: oklch(0.828 0.111 230.318);
-  --font-sans: Oxanium, sans-serif;
-  --font-serif: Oxanium, sans-serif;
-  --font-mono: Oxanium, sans-serif;
   --radius: 0.5rem;
 }

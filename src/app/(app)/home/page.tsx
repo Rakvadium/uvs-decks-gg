@@ -1,6 +1,6 @@
 "use client";
 
-import { memo, useEffect, useRef } from "react";
+import { memo, useEffect, useState } from "react";
 import { Library, Layers, LayoutGrid, ArrowRight, Hexagon, Users, Zap, Database, Activity, Terminal, ChevronRight, Lock, AlertTriangle } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -23,8 +23,7 @@ function StatCard({ label, value, icon: Icon, delay = 0, animate = true }: { lab
       transition={{ duration: 0.5, delay }}
       className="relative group"
     >
-      <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-lg blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-150" />
-      <div className="relative flex items-center gap-4 p-4 rounded-lg border border-border/50 bg-card/50 backdrop-blur-sm hover:border-primary/30 transition-all duration-150">
+      <div className="relative flex items-center gap-4 p-4 rounded-lg border border-border/50 bg-card/80 shadow-[var(--chrome-elevation-low)] hover:shadow-[var(--chrome-elevation-mid)] hover:border-[var(--chrome-card-border-hover)] transition-all duration-150">
         <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 border border-primary/30">
           <Icon className="h-5 w-5 text-primary" />
         </div>
@@ -49,14 +48,14 @@ function NavCard({ href, icon: Icon, title, description, accentColor = "primary"
   const prefersReducedMotion = usePrefersReducedMotion();
   const motionEnabled = animate && !prefersReducedMotion;
   const colorClasses = {
-    primary: "from-primary/20 to-primary/5 border-primary/30 hover:border-primary/60 hover:shadow-[0_0_30px_-5px_var(--primary)]",
-    secondary: "from-secondary/20 to-secondary/5 border-secondary/30 hover:border-secondary/60 hover:shadow-[0_0_30px_-5px_var(--secondary)]",
-    accent: "from-accent/20 to-accent/5 border-accent/30 hover:border-accent/60 hover:shadow-[0_0_30px_-5px_var(--accent)]",
+    primary: "from-primary/20 to-primary/5 border-primary/30 hover:border-[var(--chrome-page-nav-card-border-hover)] hover:shadow-[var(--chrome-page-nav-card-shadow-hover)]",
+    secondary: "from-secondary/20 to-secondary/5 border-secondary/30 hover:border-[var(--chrome-page-nav-card-border-hover)] hover:shadow-[var(--chrome-page-nav-card-shadow-hover)]",
+    accent: "from-accent/20 to-accent/5 border-accent/30 hover:border-[var(--chrome-page-nav-card-border-hover)] hover:shadow-[var(--chrome-page-nav-card-shadow-hover)]",
   };
   const iconClasses = {
-    primary: "text-primary drop-shadow-[0_0_8px_var(--primary)]",
-    secondary: "text-secondary drop-shadow-[0_0_8px_var(--secondary)]",
-    accent: "text-accent drop-shadow-[0_0_8px_var(--accent)]",
+    primary: "text-primary",
+    secondary: "text-secondary",
+    accent: "text-accent",
   };
   
   return (
@@ -72,7 +71,7 @@ function NavCard({ href, icon: Icon, title, description, accentColor = "primary"
           
           <div className="relative z-10 flex flex-col gap-4">
             <div className="flex items-start justify-between">
-              <div className={`flex h-14 w-14 items-center justify-center rounded-xl bg-background/50 border border-current/20 backdrop-blur-sm ${iconClasses[accentColor]}`}>
+              <div className={`flex h-14 w-14 items-center justify-center rounded-xl bg-background/50 border border-current/20 backdrop-blur-sm ${iconClasses[accentColor]}`} style={{ filter: "var(--chrome-page-nav-card-icon-drop-shadow)" }}>
                 <Icon className="h-7 w-7" />
               </div>
               <ArrowRight className="h-5 w-5 text-muted-foreground opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-150" />
@@ -118,16 +117,16 @@ function HomePage() {
   const decks = useQuery(api.decks.listByUser, user ? { userId: user._id } : "skip");
   const prefersReducedMotion = usePrefersReducedMotion();
   const { openAuthDialog } = useAuthDialog();
-  const introRef = useRef(true);
+  const [isFirstPaint, setIsFirstPaint] = useState(true);
 
   useEffect(() => {
-    introRef.current = false;
+    setIsFirstPaint(false);
   }, []);
 
   const totalCards = cards.length;
   const totalDecks = decks?.length ?? 0;
   const username = user?.username ?? "Operator";
-  const introAnimations = !prefersReducedMotion && introRef.current;
+  const introAnimations = !prefersReducedMotion && isFirstPaint;
   const authLabel = isLoading ? "Linking Session" : isAuthenticated ? "Session Verified" : "Access Denied";
   const authDetail = isLoading
     ? "Establishing encrypted handshake..."
@@ -148,7 +147,7 @@ function HomePage() {
 
   return (
     <div className="relative flex h-full flex-col overflow-y-auto" style={{ transform: "translateZ(0)" }}>
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none" style={{ opacity: "var(--chrome-page-hero-wash-opacity)" as unknown as number }}>
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
         <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-secondary/5 rounded-full blur-3xl" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-r from-primary/3 via-transparent to-secondary/3 rounded-full blur-3xl" />
@@ -162,7 +161,7 @@ function HomePage() {
           className="space-y-6"
         >
           <div className="flex flex-wrap items-center gap-3">
-            <div className="flex h-3 w-3 rounded-full bg-green-500 shadow-[0_0_10px_#22c55e] animate-pulse" />
+            <div className="flex h-3 w-3 rounded-full bg-green-500" style={{ boxShadow: "var(--chrome-page-status-dot-shadow)", animation: "var(--chrome-decks-heading-dot-animation)" }} />
             <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground">System Online</span>
             <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground/60">Auth: {authBadge}</span>
           </div>
@@ -171,7 +170,7 @@ function HomePage() {
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold tracking-tight">
               <span className="text-foreground">{greetingLead}</span>
               <br />
-              <span className="text-primary drop-shadow-[0_0_20px_var(--primary)]">
+              <span className="text-primary" style={{ filter: "var(--chrome-page-heading-drop-shadow)" }}>
                 {isAuthenticated ? username : "Guest Operator"}
               </span>
             </h1>
@@ -247,11 +246,10 @@ function HomePage() {
           initial={introAnimations ? { opacity: 0, y: 20 } : false}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.5 }}
-          className="relative overflow-hidden rounded-xl border border-border/50 bg-card/30 backdrop-blur-sm"
+          className="relative overflow-hidden rounded-xl border border-border/50 bg-card/80 shadow-[var(--chrome-elevation-low)]"
         >
-          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5 pointer-events-none" />
-          
+          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" style={{ opacity: "var(--chrome-page-hero-wash-opacity)" as unknown as number }} />
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5 pointer-events-none" style={{ opacity: "var(--chrome-page-hero-wash-opacity)" as unknown as number }} />
           <div className="relative z-10 p-6 md:p-8 space-y-6">
             <div className="flex items-center gap-3">
               <Terminal className="h-5 w-5 text-primary" />
@@ -286,7 +284,7 @@ function HomePage() {
               </div>
 
               <div className="relative overflow-hidden rounded-lg border border-border/30 bg-background/40 p-4">
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-secondary/10 pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-secondary/10 pointer-events-none" style={{ opacity: "var(--chrome-page-hero-wash-opacity)" as unknown as number }} />
                 <div className="relative z-10 space-y-4">
                   <div className="space-y-1">
                     <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Community Relay</p>
@@ -301,7 +299,7 @@ function HomePage() {
                   </div>
                   <div className="flex flex-wrap gap-3">
                     {showPersonalStats ? (
-                      <Button variant="neon" asChild>
+                      <Button variant="default" asChild>
                         <Link href="/community">
                           <Users className="mr-2 h-4 w-4" />
                           Open Community

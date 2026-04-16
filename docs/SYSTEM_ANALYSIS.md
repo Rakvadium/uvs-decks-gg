@@ -36,6 +36,8 @@ flowchart LR
 - **Framework:** Next.js (App Router), React 19.
 - **Routes:** Under `src/app/`; authenticated areas use `(app)` grouping (decks, gallery, collection, community, settings, admin).
 - **UI:** Component library patterns aligned with Shadcn/Radix-style primitives; non-trivial features should follow [component-architecture-playbook.md](./component-architecture-playbook.md).
+- **Theme:** `ColorSchemeProvider` applies named palettes via `data-color-scheme`, light/dark via the `dark` class, and chrome density via `data-chrome` (`calm` | `expressive`). Details and extension steps: [theme-and-chrome.md](./theme-and-chrome.md).
+- **Feature folders:** Several surfaces use the playbook layout (`content.tsx`, `hook.ts`, `types.ts`) — for example gallery view, deck details view, community rankings view, and collection entry re-exports.
 
 ## Backend (Convex)
 
@@ -70,4 +72,6 @@ flowchart LR
 
 - [ARCHITECTURE_PLAN.md](./ARCHITECTURE_PLAN.md)
 - [TECH_STACK_DETAILS.md](./TECH_STACK_DETAILS.md)
+- [theme-and-chrome.md](./theme-and-chrome.md)
+- [smoke-checklist.md](./smoke-checklist.md)
 

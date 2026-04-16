@@ -57,7 +57,7 @@ export function StatInput({ label, filterKey }: StatInputProps) {
         className={cn(
           "relative flex h-7 flex-1 items-center overflow-hidden rounded-md border bg-background/50 transition-all",
           hasValue
-            ? "border-primary/40 shadow-[0_0_8px_-3px_var(--primary)]"
+            ? "border-primary/40 shadow-[var(--chrome-filter-tile-shadow-selected)]"
             : "border-border/50"
         )}
       >

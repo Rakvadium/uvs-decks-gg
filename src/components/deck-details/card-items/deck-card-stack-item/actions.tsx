@@ -29,14 +29,13 @@ export function DeckCardStackItemActions({ card, quantity, isHovered }: DeckCard
   });
 
   return (
-    <div onClick={(e) => e.stopPropagation()}>
-      <CardDeckControls
-        deckCount={quantity}
-        isHovered={isHovered}
-        canAdd={canAdd}
-        onAdd={(e) => { e.stopPropagation(); addCard(card._id, activeSection); }}
-        onRemove={(e) => { e.stopPropagation(); removeCard(card._id, activeSection); }}
-      />
-    </div>
+    <CardDeckControls
+      deckCount={quantity}
+      isHovered={isHovered}
+      canAdd={canAdd}
+      forceSolidSurface
+      onAdd={(e) => { e.stopPropagation(); addCard(card._id, activeSection); }}
+      onRemove={(e) => { e.stopPropagation(); removeCard(card._id, activeSection); }}
+    />
   );
 }

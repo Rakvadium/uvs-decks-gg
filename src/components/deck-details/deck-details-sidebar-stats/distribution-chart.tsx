@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { PIE_CHART_COLORS } from "./constants";
+import { type PieChartColorStrategy, resolvePieBucketColor } from "./constants";
 
 interface DistributionBucket {
   label: string;
@@ -10,9 +10,15 @@ interface PieDistributionChartProps {
   title: string;
   buckets: DistributionBucket[];
   total: number;
+  colorStrategy?: PieChartColorStrategy;
 }
 
-export function PieDistributionChart({ title, buckets, total }: PieDistributionChartProps) {
+export function PieDistributionChart({
+  title,
+  buckets,
+  total,
+  colorStrategy = "default",
+}: PieDistributionChartProps) {
   const chartTotal = total > 0 ? total : buckets.reduce((sum, bucket) => sum + bucket.value, 0);
   const nonZeroBuckets = buckets.filter((bucket) => bucket.value > 0);
 
@@ -28,20 +34,26 @@ export function PieDistributionChart({ title, buckets, total }: PieDistributionC
   const gradient = useMemo(() => {
     if (chartTotal <= 0 || visibleBuckets.length === 0) return "transparent";
 
-    let cursor = 0;
+    const raw = visibleBuckets.map((b) => (b.value / chartTotal) * 100);
+    const sum = raw.reduce((a, b) => a + b, 0) || 1;
+    const slices = raw.map((p) => (p / sum) * 100);
+
+    const edges: number[] = [0];
+    for (const s of slices) {
+      edges.push(edges[edges.length - 1]! + s);
+    }
+    edges[edges.length - 1] = 100;
+
     const stops: string[] = [];
-
     for (const [index, bucket] of visibleBuckets.entries()) {
-      const slice = (bucket.value / chartTotal) * 100;
-      const start = cursor;
-      cursor += slice;
-      const color = PIE_CHART_COLORS[index % PIE_CHART_COLORS.length];
-
-      stops.push(`${color} ${start.toFixed(3)}% ${cursor.toFixed(3)}%`);
+      const color = resolvePieBucketColor(colorStrategy, bucket.label, index);
+      const start = edges[index]!;
+      const end = edges[index + 1]!;
+      stops.push(`${color} ${start.toFixed(4)}% ${end.toFixed(4)}%`);
     }
 
-    return `conic-gradient(${stops.join(", ")})`;
-  }, [chartTotal, visibleBuckets]);
+    return `conic-gradient(from 359.92deg, ${stops.join(", ")})`;
+  }, [chartTotal, visibleBuckets, colorStrategy]);
 
   return (
     <div className="space-y-2 rounded-lg border border-border/50 bg-card/30 p-3">
@@ -55,10 +67,10 @@ export function PieDistributionChart({ title, buckets, total }: PieDistributionC
       ) : (
         <div className="grid grid-cols-[86px_1fr] items-start gap-3">
           <div
-            className="relative h-[86px] w-[86px] shrink-0 rounded-full border border-border/40"
+            className="relative isolate h-[86px] w-[86px] shrink-0 rounded-full ring-1 ring-inset ring-border/40 [transform:translateZ(0)]"
             style={{ background: gradient }}
           >
-            <div className="absolute inset-[19px] flex items-center justify-center rounded-full border border-border/40 bg-background/90">
+            <div className="absolute inset-[19px] flex items-center justify-center rounded-full bg-background/90 ring-1 ring-inset ring-border/40">
               <span className="font-mono text-[10px] text-primary">{chartTotal}</span>
             </div>
           </div>
@@ -66,7 +78,7 @@ export function PieDistributionChart({ title, buckets, total }: PieDistributionC
           <div className="space-y-1.5">
             {visibleBuckets.map((bucket, index) => {
               const ratio = chartTotal > 0 ? (bucket.value / chartTotal) * 100 : 0;
-              const color = PIE_CHART_COLORS[index % PIE_CHART_COLORS.length];
+              const color = resolvePieBucketColor(colorStrategy, bucket.label, index);
 
               return (
                 <div key={`${title}-${bucket.label}`} className="flex items-center justify-between gap-2 font-mono text-[10px]">

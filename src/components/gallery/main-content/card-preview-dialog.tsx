@@ -47,7 +47,7 @@ function CardPreviewSection({ title, description, icon, badge, children, classNa
 
 function HeroCardMockup() {
   return (
-    <div className="relative h-48 w-36 shrink-0 overflow-hidden rounded-xl border border-primary/20 bg-card shadow-[0_0_0_1px_var(--primary)/15,0_0_8px_var(--primary)/30]">
+    <div className="relative h-48 w-36 shrink-0 overflow-hidden rounded-xl border bg-card" style={{ borderColor: "var(--chrome-deck-details-hero-border)", boxShadow: "var(--chrome-deck-details-hero-shadow)" }}>
       <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-primary/5 via-card to-secondary/5">
         <UserRound className="h-16 w-16 text-primary/20" />
       </div>

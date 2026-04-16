@@ -5,6 +5,7 @@ import { api } from "../../../../convex/_generated/api";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { SectionHeading } from "@/components/ui/typography-headings";
 
 export function CommunityDeckSpotlightsSection() {
   const publicDecks = useQuery(api.decks.listPublic, {});
@@ -15,9 +16,9 @@ export function CommunityDeckSpotlightsSection() {
     <section id="deck-spotlights" className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-xl font-display font-bold uppercase tracking-[0.18em]">
+          <SectionHeading className="text-xl font-display font-bold uppercase tracking-[0.18em]">
             Deck Spotlights
-          </h2>
+          </SectionHeading>
           <p className="text-sm text-muted-foreground">
             Community-curated decks lighting up the ladder right now.
           </p>
@@ -47,7 +48,7 @@ export function CommunityDeckSpotlightsSection() {
               <Card className="h-full cursor-pointer transition-colors hover:bg-accent/40">
                 <CardHeader className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <Badge variant="cyber" className="text-[9px]">
+                    <Badge tone="entity" className="text-[9px]">
                       Spotlight
                     </Badge>
                     <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">

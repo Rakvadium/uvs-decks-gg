@@ -35,6 +35,7 @@ import {
   X,
 } from "lucide-react";
 import { useOptionalCommunityTierListDetailContext } from "./context";
+import { PageHeading } from "@/components/ui/typography-headings";
 
 export function CommunityTierListDetailTopBar() {
   const isMobile = useIsMobile();
@@ -233,9 +234,9 @@ export function CommunityTierListDetailTopBar() {
               placeholder="Tier list name..."
             />
           ) : (
-            <h1 className="truncate font-display text-sm font-bold uppercase tracking-[0.2em]" title={title}>
+            <PageHeading className="truncate font-display text-sm font-bold uppercase tracking-[0.2em]" title={title}>
               {title}
-            </h1>
+            </PageHeading>
           )}
         </div>
 
@@ -280,9 +281,9 @@ export function CommunityTierListDetailTopBar() {
               placeholder="Tier list name..."
             />
           ) : (
-            <h1 className="truncate font-display text-sm font-bold uppercase tracking-[0.2em]" title={title}>
+            <PageHeading className="truncate font-display text-sm font-bold uppercase tracking-[0.2em]" title={title}>
               {title}
-            </h1>
+            </PageHeading>
           )}
 
           {publicityControl}

@@ -6,7 +6,6 @@ import { CardDetailsDialog } from "@/components/universus";
 import { CardFlipButton } from "@/components/universus/card-item/flip-button";
 import { CARD_GLOW_REST, CARD_GLOW_HOVER } from "@/components/universus/card-item/glow";
 import { CardImageDisplay } from "@/components/universus/card-grid-item/image-display";
-import { cn } from "@/lib/utils";
 import { DeckCardStackItemActions } from "./actions";
 import { useDeckCardStackItemModel } from "./hook";
 import type { DeckCardStackItemProps } from "./types";
@@ -39,13 +38,7 @@ export function DeckCardStackItem(props: DeckCardStackItemProps) {
         onMouseLeave={() => setIsHovered(false)}
       >
         <div className="relative pb-3 pr-3">
-          <div
-            className={cn(
-              "relative aspect-[2.5/3.5] overflow-visible [perspective:1000px]",
-              "transition-transform duration-150",
-              !prefersReducedMotion && "group-hover:-translate-x-0.5 group-hover:-translate-y-0.5"
-            )}
-          >
+          <div className="relative aspect-[2.5/3.5] overflow-visible [perspective:1000px]">
             {stackedLayers.map((layer) => (
               <div
                 key={layer}
@@ -82,6 +75,7 @@ export function DeckCardStackItem(props: DeckCardStackItemProps) {
                 isFlipped={isFlipped}
                 isHovered={isHovered}
                 prefersReducedMotion={prefersReducedMotion}
+                forceSolidSurface
                 onFlip={handleFlip}
               />
             )}

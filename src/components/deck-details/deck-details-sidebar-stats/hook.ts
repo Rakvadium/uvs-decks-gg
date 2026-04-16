@@ -59,9 +59,20 @@ export function useStatsSidebarModel() {
     [deck?.mainQuantities, cardMap]
   );
 
+  const attackEntries = useMemo(
+    () =>
+      mainEntries.filter((entry) => formatUniversusCardType(entry.card.type) === "Attack"),
+    [mainEntries]
+  );
+
   const mainTotal = useMemo(
     () => mainEntries.reduce((sum, entry) => sum + entry.quantity, 0),
     [mainEntries]
+  );
+
+  const attackCardsTotal = useMemo(
+    () => attackEntries.reduce((sum, entry) => sum + entry.quantity, 0),
+    [attackEntries]
   );
 
   const typeDistribution = useMemo(() => {
@@ -96,23 +107,24 @@ export function useStatsSidebarModel() {
   );
 
   const attackZoneDistribution = useMemo(
-    () => buildZoneDistribution(mainEntries, (card) => card.attackZone),
-    [mainEntries]
+    () => buildZoneDistribution(attackEntries, (card) => card.attackZone),
+    [attackEntries]
   );
 
   const attackSpeedDistribution = useMemo(
-    () => buildNumericDistribution(mainEntries, (card) => card.speed),
-    [mainEntries]
+    () => buildNumericDistribution(attackEntries, (card) => card.speed),
+    [attackEntries]
   );
 
   const attackDamageDistribution = useMemo(
-    () => buildNumericDistribution(mainEntries, (card) => card.damage),
-    [mainEntries]
+    () => buildNumericDistribution(attackEntries, (card) => card.damage),
+    [attackEntries]
   );
 
   return {
     deck,
     mainTotal,
+    attackCardsTotal,
     typeDistribution,
     difficultyDistribution,
     checkValueDistribution,

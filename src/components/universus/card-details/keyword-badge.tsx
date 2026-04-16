@@ -32,7 +32,6 @@ export function KeywordBadge({ keyword }: KeywordBadgeProps) {
             backgroundColor: `${color}20`,
             color,
             border: `1px solid ${color}40`,
-            boxShadow: `0 0 8px ${color}15`,
           }}
           onFocus={(event) => event.preventDefault()}
         >
@@ -44,7 +43,6 @@ export function KeywordBadge({ keyword }: KeywordBadgeProps) {
         className="max-w-xs bg-background/90 backdrop-blur-md"
         style={{
           borderColor: `${color}40`,
-          boxShadow: `0 0 16px ${color}20`,
         }}
         onPointerDownOutside={() => setTooltipOpen(false)}
       >

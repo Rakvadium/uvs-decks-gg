@@ -1,6 +1,7 @@
 import { Database, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { usePrefersReducedMotion } from "@/lib/reduced-motion";
+import { Kicker, SectionHeading } from "@/components/ui/typography-headings";
 
 interface GalleryStatsProps {
   totalCards: number;
@@ -22,12 +23,12 @@ export function GalleryStats({ totalCards, filteredCount, isLoading }: GallerySt
           <Database className="h-4 w-4 text-primary" />
         </div>
         <div className="flex flex-col">
-          <span className="text-lg leading-none font-display font-bold text-foreground">
+          <SectionHeading className="text-lg leading-none font-display font-bold text-foreground sm:text-lg">
             {filteredCount.toLocaleString()}
-          </span>
-          <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+          </SectionHeading>
+          <Kicker className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
             {filteredCount === totalCards ? "Total Cards" : `of ${totalCards.toLocaleString()}`}
-          </span>
+          </Kicker>
         </div>
       </div>
 
@@ -37,12 +38,12 @@ export function GalleryStats({ totalCards, filteredCount, isLoading }: GallerySt
         {isLoading ? (
           <>
             <Loader2 className="h-4 w-4 animate-spin text-primary" />
-            <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Loading</span>
+            <Kicker className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Loading</Kicker>
           </>
         ) : (
           <>
-            <div className="h-2 w-2 animate-pulse rounded-full bg-green-500 shadow-[0_0_8px_#22c55e]" />
-            <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Ready</span>
+            <div className="h-2 w-2 animate-pulse rounded-full bg-green-500" style={{ boxShadow: "var(--chrome-gallery-stats-dot-shadow)" }} />
+            <Kicker className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Ready</Kicker>
           </>
         )}
       </div>

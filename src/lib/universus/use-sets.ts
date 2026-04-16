@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef, useSyncExternalStore } from "react";
+import { useState, useEffect, useCallback, useRef, useSyncExternalStore, useMemo } from "react";
 import { useConvex } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import {
@@ -161,15 +161,28 @@ export function useSets(options: UseSetsOptions = {}): UseSetsResult {
     checkAndSync();
   }, [isHydrated, serverVersion, cachedVersion, fetchFromConvex, syncFromConvex]);
 
-  return {
-    sets,
-    isLoading: isLoading && sets.length === 0,
-    isSyncing,
-    cachedVersion,
-    error,
-    index,
-    refreshSets,
-    getSetByCode: getSetByCodeFn,
-    isHydrated,
-  };
+  return useMemo(
+    () => ({
+      sets,
+      isLoading: isLoading && sets.length === 0,
+      isSyncing,
+      cachedVersion,
+      error,
+      index,
+      refreshSets,
+      getSetByCode: getSetByCodeFn,
+      isHydrated,
+    }),
+    [
+      sets,
+      isLoading,
+      isSyncing,
+      cachedVersion,
+      error,
+      index,
+      refreshSets,
+      getSetByCodeFn,
+      isHydrated,
+    ]
+  );
 }

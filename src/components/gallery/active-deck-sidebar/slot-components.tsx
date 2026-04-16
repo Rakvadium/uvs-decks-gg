@@ -35,7 +35,7 @@ export function ActiveDeckHeader() {
 
   return (
     <h3
-      className="truncate font-display text-[13px] font-bold uppercase tracking-[0.2em] text-primary drop-shadow-[0_0_8px_var(--primary)]"
+      className="truncate font-display text-[13px] font-bold uppercase tracking-[0.2em] text-primary [filter:var(--chrome-shell-deck-label-drop-shadow)]"
       title={label}
     >
       {label}

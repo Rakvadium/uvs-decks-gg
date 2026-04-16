@@ -1,7 +1,12 @@
 "use client";
 
 import * as React from "react";
-import { useTcgDnd, DropZoneConfig, DragItem } from "./tcg-dnd-provider";
+import {
+  UNIVERSUS_CARD_DND_ENABLED,
+  useTcgDnd,
+  DropZoneConfig,
+  DragItem,
+} from "./tcg-dnd-provider";
 
 function isDndDebugEnabled(): boolean {
   if (typeof window === "undefined") return false;
@@ -37,6 +42,19 @@ export interface UseTcgDroppableResult {
   };
 }
 
+const disabledDroppableResult: UseTcgDroppableResult = {
+  isOver: false,
+  canDrop: false,
+  droppableProps: {
+    onMouseEnter: () => {},
+    onMouseLeave: () => {},
+    onPointerEnter: () => {},
+    onPointerLeave: () => {},
+    "data-drop-active": false,
+    "data-can-drop": false,
+  },
+};
+
 export function useTcgDroppable({
   id,
   accepts,
@@ -56,6 +74,7 @@ export function useTcgDroppable({
   const canDrop = isDragging && dragItem !== null && accepts.includes(dragItem.type) && !isDisabled;
 
   React.useEffect(() => {
+    if (!UNIVERSUS_CARD_DND_ENABLED) return;
     const config: DropZoneConfig = {
       id,
       accepts,
@@ -71,7 +90,7 @@ export function useTcgDroppable({
       dndLog("droppable.enter", { id, canDrop, dragItemType: dragItem?.type, dragCardId: dragItem?.card?._id });
       setActiveDropZone(id);
     }
-  }, [isDragging, canDrop, setActiveDropZone, id]);
+  }, [isDragging, canDrop, setActiveDropZone, id, dragItem]);
 
   const handleMouseLeave = React.useCallback(() => {
     if (activeDropZone === id) {
@@ -80,16 +99,24 @@ export function useTcgDroppable({
     }
   }, [activeDropZone, setActiveDropZone, id]);
 
-  return {
-    isOver,
-    canDrop,
-    droppableProps: {
+  const droppableProps = React.useMemo(
+    () => ({
       onMouseEnter: handleMouseEnter,
       onMouseLeave: handleMouseLeave,
       onPointerEnter: handleMouseEnter,
       onPointerLeave: handleMouseLeave,
       "data-drop-active": isOver,
       "data-can-drop": canDrop,
-    },
-  };
+    }),
+    [handleMouseEnter, handleMouseLeave, isOver, canDrop]
+  );
+
+  return React.useMemo(() => {
+    if (!UNIVERSUS_CARD_DND_ENABLED) return disabledDroppableResult;
+    return {
+      isOver,
+      canDrop,
+      droppableProps,
+    };
+  }, [isOver, canDrop, droppableProps]);
 }

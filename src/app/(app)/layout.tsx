@@ -5,7 +5,6 @@ import dynamic from "next/dynamic";
 import { AuthGuard } from "@/components/auth-guard";
 import { UIStateProvider, ActiveDeckProvider, DeckDetailsProvider } from "@/providers";
 import {
-  TopHeader,
   ShellSlotProvider,
   useShellSlot,
   useRegisterSlot,
@@ -21,6 +20,7 @@ import { Upload, Layers, CreditCard, Settings } from "lucide-react";
 import Link from "next/link";
 import { TcgDndProvider } from "@/lib/dnd";
 import { SiloedDeckProvider } from "@/lib/deck";
+import { cn } from "@/lib/utils";
 import { GalleryFiltersProvider } from "@/providers/GalleryFiltersProvider";
 import { DecksProvider } from "@/providers/DecksProvider";
 import { CommunityTierListsPageProvider } from "@/components/community/tier-lists/page-view/context";
@@ -36,6 +36,9 @@ const RightSidebar = dynamic(
 );
 
 const LEFT_SIDEBAR_KEY = "uvs-decks-left-sidebar-collapsed";
+
+const SHOW_DESKTOP_RIGHT_SIDEBAR = true;
+const SHOW_DESKTOP_LEFT_SIDEBAR = true;
 
 export type PageType = "gallery" | "decks" | "deckDetails" | "collection" | "community" | "home" | "admin" | "settings";
 
@@ -124,7 +127,8 @@ function ShellLayoutInner({ children }: { children: ReactNode }) {
   const deckId = params?.deckId as string | undefined;
   const tierListId = params?.tierListId as string | undefined;
 
-  const hasRightSidebar = (state.slots.get("right-sidebar")?.length ?? 0) > 0;
+  const hasRightSidebar =
+    SHOW_DESKTOP_RIGHT_SIDEBAR && (state.slots.get("right-sidebar")?.length ?? 0) > 0;
 
   const toggleLeftSidebar = () => {
     setLeftSidebarCollapsed((prev) => {
@@ -136,29 +140,38 @@ function ShellLayoutInner({ children }: { children: ReactNode }) {
 
   const desktopLayout = (
     <div className="hidden md:flex h-screen w-full overflow-hidden">
-      <LeftSidebar
-        collapsed={leftSidebarCollapsed}
-        onToggle={toggleLeftSidebar}
-      />
+      {SHOW_DESKTOP_LEFT_SIDEBAR ? (
+        <LeftSidebar
+          collapsed={leftSidebarCollapsed}
+          onToggle={toggleLeftSidebar}
+        />
+      ) : null}
       <div className="flex flex-1 flex-col overflow-hidden bg-sidebar">
-        <TopHeader />
         <div className="flex flex-1 overflow-hidden">
           <div className="relative flex flex-1 flex-col min-w-0">
-            <div className="pointer-events-none absolute -top-3 left-0 z-10 h-3 w-3">
-              <div className="h-full w-full rounded-br-xl bg-sidebar" />
-            </div>
-            {!hasRightSidebar && (
+            {SHOW_DESKTOP_LEFT_SIDEBAR ? (
+              <div className="pointer-events-none absolute -top-3 left-0 z-10 h-3 w-3">
+                <div className="h-full w-full rounded-br-xl bg-sidebar" />
+              </div>
+            ) : null}
+            {!hasRightSidebar ? (
               <div className="pointer-events-none absolute -top-3 right-0 z-10 h-3 w-3">
                 <div className="h-full w-full rounded-bl-xl bg-sidebar" />
               </div>
-            )}
-            <main className="flex-1 overflow-hidden rounded-tl-xl bg-background">
+            ) : null}
+            <main
+              className={cn(
+                "flex-1 overflow-hidden bg-background",
+                SHOW_DESKTOP_LEFT_SIDEBAR ? "rounded-tl-xl" : "rounded-t-xl"
+              )}
+              style={{ backgroundImage: "var(--chrome-page-bg)" }}
+            >
               {children}
             </main>
           </div>
         </div>
       </div>
-      {hasRightSidebar && <RightSidebar />}
+      {hasRightSidebar ? <RightSidebar /> : null}
     </div>
   );
 
@@ -166,7 +179,10 @@ function ShellLayoutInner({ children }: { children: ReactNode }) {
     <MobileShellProvider>
       <div className="flex md:hidden h-[100dvh] w-full flex-col bg-background relative">
         <MobileHeader />
-        <main className="min-h-0 flex-1 overflow-y-auto">
+        <main
+          className="min-h-0 flex-1 overflow-y-auto bg-background"
+          style={{ backgroundImage: "var(--chrome-page-bg)" }}
+        >
           <div className="min-h-full pb-[calc(env(safe-area-inset-bottom)+11rem)]">
             {children}
           </div>

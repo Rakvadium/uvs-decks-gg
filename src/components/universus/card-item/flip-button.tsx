@@ -1,5 +1,8 @@
+"use client";
+
 import { RotateCcw } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { useChromeMode } from "@/providers/ColorSchemeProvider";
 import { cn } from "@/lib/utils";
 
 interface CardFlipButtonProps {
@@ -8,9 +11,20 @@ interface CardFlipButtonProps {
   disabled?: boolean;
   prefersReducedMotion: boolean;
   onFlip: (e: React.MouseEvent) => void;
+  forceSolidSurface?: boolean;
 }
 
-export function CardFlipButton({ isFlipped, isHovered, disabled, prefersReducedMotion, onFlip }: CardFlipButtonProps) {
+export function CardFlipButton({
+  isFlipped,
+  isHovered,
+  disabled,
+  prefersReducedMotion,
+  onFlip,
+  forceSolidSurface = false,
+}: CardFlipButtonProps) {
+  const chromeMode = useChromeMode();
+  const frosted = !forceSolidSurface && chromeMode === "expressive";
+
   return (
     <Tooltip>
       <TooltipTrigger asChild>
@@ -21,9 +35,10 @@ export function CardFlipButton({ isFlipped, isHovered, disabled, prefersReducedM
           className={cn(
             "absolute left-0 top-0 z-30 flex h-7 w-7 items-center justify-center",
             "rounded-tl-lg rounded-br-lg rounded-tr-none rounded-bl-none",
-            "bg-background/80 backdrop-blur-sm",
             "border-r border-b border-border/40",
-            "transition-all duration-200",
+            frosted
+              ? "bg-background/80 backdrop-blur-sm transition-[opacity,colors,transform,background-color,border-color] duration-200"
+              : "bg-background/92 transition-[opacity,colors] duration-200",
             "hover:bg-primary/10 hover:border-primary/40",
             isHovered ? "opacity-100" : "opacity-50"
           )}

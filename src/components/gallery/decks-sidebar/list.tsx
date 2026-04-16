@@ -59,7 +59,7 @@ export function DecksSidebarList() {
 
         {!searchQuery.trim() && activeTab === "my-decks" && isAuthenticated && !isMobile ? (
           <Button
-            variant="neon"
+            variant="outline"
             size="sm"
             className="mt-3"
             onClick={() => setIsCreateOpen(true)}

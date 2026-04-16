@@ -168,15 +168,22 @@ function DialogFooter({ className, ...props }: React.ComponentProps<"div">) {
 
 function DialogTitle({
   className,
+  style,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Title>) {
   return (
     <DialogPrimitive.Title
       data-slot="dialog-title"
       className={cn(
-        "text-lg leading-none font-semibold font-display uppercase tracking-wider",
+        "text-lg leading-none font-semibold",
         className
       )}
+      style={{
+        fontFamily: "var(--chrome-card-title-font)",
+        textTransform: "var(--chrome-heading-transform)" as React.CSSProperties["textTransform"],
+        letterSpacing: "var(--chrome-heading-letter-spacing)",
+        ...style,
+      }}
       {...props}
     />
   )

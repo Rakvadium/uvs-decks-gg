@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { canAddCardToSection, canMoveCardToSection } from "@/lib/deck";
-import { useTcgDroppable } from "@/lib/dnd";
+import { TCG_DND_ACCEPTS_CARD_ONLY, useTcgDroppable } from "@/lib/dnd";
 import {
   DECK_SECTION_META as SECTION_META,
   type DeckSection,
@@ -67,7 +67,7 @@ export function useActiveDeckSectionModel({ sectionKey }: ActiveDeckSectionProps
 
   const { isOver, canDrop, droppableProps } = useTcgDroppable({
     id: `active-deck-section-${sectionKey}`,
-    accepts: ["card"],
+    accepts: TCG_DND_ACCEPTS_CARD_ONLY,
     onDrop: handleDrop,
     isDisabled: false,
   });

@@ -26,7 +26,7 @@ function ZoneSelector({
                 "h-full flex-1 text-[10px] font-mono transition-all",
                 index !== 0 && "border-l border-border/50",
                 selected
-                  ? "bg-primary/20 text-primary shadow-[inset_0_0_8px_-3px_var(--primary)]"
+                  ? "bg-primary/20 text-primary shadow-[var(--chrome-filter-tile-shadow-selected-inset)]"
                   : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
               )}
               onClick={() => toggleStringFilter(filterKey, zone)}

@@ -1,5 +1,6 @@
 import { ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Kicker } from "@/components/ui/typography-headings";
 import { useMobileActionsSheetContext } from "./context";
 
 const SLOT_DESCRIPTIONS: Record<string, string> = {
@@ -41,7 +42,7 @@ export function MobileActionsSlotGrid() {
               </div>
 
               <div className="min-w-0 flex-1 text-left">
-                <p className="truncate font-display text-sm font-semibold uppercase tracking-wide">{label}</p>
+                <Kicker className="truncate font-display text-sm tracking-wide text-card-foreground">{label}</Kicker>
                 <p className="line-clamp-2 text-[10px] font-mono uppercase tracking-wide text-muted-foreground">
                   {description}
                 </p>

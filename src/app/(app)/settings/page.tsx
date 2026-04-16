@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import { useRouter } from "next/navigation";
-import { useTheme, useColorScheme, COLOR_SCHEMES } from "@/lib/theme";
+import { useTheme, useColorScheme, COLOR_SCHEMES, type ChromePreference } from "@/lib/theme";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -62,7 +62,7 @@ export default function SettingsPage() {
   const user = useQuery(api.user.currentUser);
   const updateProfile = useMutation(api.user.updateProfile);
   const { isDark, toggleTheme } = useTheme();
-  const { colorScheme, setColorScheme } = useColorScheme();
+  const { colorScheme, setColorScheme, chromePreference, setChromePreference } = useColorScheme();
 
   const [username, setUsername] = useState("");
   const [imageUrl, setImageUrl] = useState("");
@@ -121,7 +121,7 @@ export default function SettingsPage() {
   });
 
   return (
-    <div className="h-full overflow-y-auto bg-gradient-to-b from-background to-muted/20">
+    <div className="h-full overflow-y-auto">
       <div className="mx-auto max-w-3xl px-6 py-8">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -360,6 +360,35 @@ export default function SettingsPage() {
                       </div>
                     </button>
                   ))}
+                </div>
+
+                <div className="space-y-3 border-t pt-4">
+                  <Label className="flex items-center gap-2">
+                    <Sparkles className="h-4 w-4 text-muted-foreground" />
+                    Chrome
+                  </Label>
+                  <div className="space-y-2 text-sm text-muted-foreground">
+                    <p>
+                      <span className="font-medium text-foreground">Calm</span> uses flat surfaces, neutral elevation, and sans headings.
+                      <span className="font-medium text-foreground"> Expressive</span> keeps glow, display typography, and stronger depth.
+                    </p>
+                    <p>
+                      <span className="font-medium text-foreground">Auto</span> picks chrome from your color scheme: Holoterminal and most palettes stay expressive; Default and Calm Storm use calm. Choose Calm or Expressive here to override.
+                    </p>
+                  </div>
+                  <Select
+                    value={chromePreference}
+                    onValueChange={(value) => setChromePreference(value as ChromePreference)}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select chrome mode" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="auto">Auto (from color scheme)</SelectItem>
+                      <SelectItem value="calm">Calm</SelectItem>
+                      <SelectItem value="expressive">Expressive</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </CardContent>
             </Card>

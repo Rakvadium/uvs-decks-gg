@@ -64,7 +64,7 @@ export function SetSection() {
                   className={cn(
                     "flex cursor-pointer items-center gap-1.5 rounded-md border px-2 py-1 transition-all",
                     isSelected
-                      ? "border-primary/30 bg-primary/15 shadow-[0_0_10px_-5px_var(--primary)]"
+                      ? "border-primary/30 bg-primary/15 shadow-[var(--chrome-filter-tile-shadow-selected)]"
                       : "border-transparent hover:bg-muted/50"
                   )}
                   onClick={() => toggleStringFilter("set", setOption.code)}

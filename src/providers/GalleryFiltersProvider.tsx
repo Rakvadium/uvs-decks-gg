@@ -41,6 +41,7 @@ interface GalleryFiltersMeta {
   filteredCards: CachedCard[];
   uniqueValues: ReturnType<typeof useCardData>["uniqueValues"];
   formats: Array<{ key: string; name: string }>;
+  defaultFormatKey: string;
   activeFilterCount: number;
   isLoading: boolean;
   isLoadingMore: boolean;
@@ -211,6 +212,7 @@ export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
         filteredCards,
         uniqueValues,
         formats: formatsForSelect,
+        defaultFormatKey: defaultFormat,
         activeFilterCount,
         isLoading,
         isLoadingMore,
@@ -232,6 +234,7 @@ export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
       filteredCards,
       uniqueValues,
       formatsForSelect,
+      defaultFormat,
       activeFilterCount,
       isLoading,
       isLoadingMore,

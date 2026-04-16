@@ -7,6 +7,20 @@ import { api } from "../../convex/_generated/api";
 export type ColorScheme = "default" | "calm-storm" | "cyberpunk" | "bubblegum" | "caffeine" | "darkmatter" | "holoterminal";
 export type ThemePreference = "light" | "dark" | "system";
 type ResolvedTheme = "light" | "dark";
+export type ChromeMode = "calm" | "expressive";
+export type ChromePreference = "auto" | "calm" | "expressive";
+
+const VALID_CHROME_PREFERENCES: ChromePreference[] = ["auto", "calm", "expressive"];
+
+const COLOR_SCHEME_CHROME_MAP: Record<ColorScheme, ChromeMode> = {
+  default: "calm",
+  "calm-storm": "calm",
+  cyberpunk: "expressive",
+  bubblegum: "expressive",
+  caffeine: "expressive",
+  darkmatter: "expressive",
+  holoterminal: "expressive",
+};
 
 export const COLOR_SCHEMES: { value: ColorScheme; label: string }[] = [
   { value: "holoterminal", label: "Holoterminal" },
@@ -33,6 +47,9 @@ const DEFAULT_THEME_PREFERENCE: ThemePreference = "dark";
 interface ColorSchemeContextValue {
   colorScheme: ColorScheme;
   setColorScheme: (scheme: ColorScheme) => void;
+  chromePreference: ChromePreference;
+  setChromePreference: (pref: ChromePreference) => void;
+  chromeMode: ChromeMode;
   theme: ThemePreference;
   setTheme: (theme: ThemePreference) => void;
   resolvedTheme: ResolvedTheme;
@@ -48,6 +65,13 @@ function normalizeColorScheme(value: string | null | undefined): ColorScheme | n
     return value as ColorScheme;
   }
   return null;
+}
+
+function normalizeChromePreference(value: string | null | undefined): ChromePreference {
+  if (value && VALID_CHROME_PREFERENCES.includes(value as ChromePreference)) {
+    return value as ChromePreference;
+  }
+  return "auto";
 }
 
 function normalizeThemePreference(value: string | null | undefined): ThemePreference | null {
@@ -71,6 +95,11 @@ function applyColorScheme(scheme: ColorScheme) {
   }
 }
 
+function applyChrome(mode: ChromeMode) {
+  if (typeof document === "undefined") return;
+  document.documentElement.setAttribute("data-chrome", mode);
+}
+
 function applyResolvedTheme(theme: ResolvedTheme) {
   if (typeof document === "undefined") return;
   const root = document.documentElement;
@@ -84,6 +113,11 @@ export function ColorSchemeProvider({ children }: { children: ReactNode }) {
   const updateSession = useMutation(api.sessions.updateSession);
 
   const colorScheme = normalizeColorScheme(session?.colorScheme) ?? DEFAULT_COLOR_SCHEME;
+  const chromePreference = normalizeChromePreference(session?.chromePreference);
+  const effectiveChrome: ChromeMode =
+    chromePreference === "calm" || chromePreference === "expressive"
+      ? chromePreference
+      : COLOR_SCHEME_CHROME_MAP[colorScheme];
   const theme = normalizeThemePreference(session?.theme) ?? DEFAULT_THEME_PREFERENCE;
   const [systemTheme, setSystemTheme] = useState<ResolvedTheme>(() => getSystemTheme());
   const resolvedTheme: ResolvedTheme = theme === "system" ? systemTheme : theme;
@@ -92,7 +126,8 @@ export function ColorSchemeProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     applyColorScheme(colorScheme);
-  }, [colorScheme]);
+    applyChrome(effectiveChrome);
+  }, [colorScheme, effectiveChrome]);
 
   useEffect(() => {
     applyResolvedTheme(resolvedTheme);
@@ -126,6 +161,18 @@ export function ColorSchemeProvider({ children }: { children: ReactNode }) {
     });
   }, [isAuthenticated, authLoading, colorScheme, updateSession]);
 
+  const setChromePreference = useCallback((pref: ChromePreference) => {
+    if (!isAuthenticated || authLoading) {
+      return;
+    }
+    if (pref === chromePreference) {
+      return;
+    }
+    void updateSession({
+      chromePreference: pref,
+    });
+  }, [isAuthenticated, authLoading, chromePreference, updateSession]);
+
   const setTheme = useCallback((nextTheme: ThemePreference) => {
     if (!isAuthenticated || authLoading) {
       return;
@@ -146,13 +193,16 @@ export function ColorSchemeProvider({ children }: { children: ReactNode }) {
   const value = useMemo<ColorSchemeContextValue>(() => ({
     colorScheme,
     setColorScheme,
+    chromePreference,
+    setChromePreference,
+    chromeMode: effectiveChrome,
     theme,
     setTheme,
     resolvedTheme,
     toggleTheme,
     isDark,
     mounted,
-  }), [colorScheme, setColorScheme, theme, setTheme, resolvedTheme, toggleTheme, isDark, mounted]);
+  }), [colorScheme, setColorScheme, chromePreference, setChromePreference, effectiveChrome, theme, setTheme, resolvedTheme, toggleTheme, isDark, mounted]);
 
   return (
     <ColorSchemeContext.Provider value={value}>
@@ -167,4 +217,10 @@ export function useColorScheme() {
     throw new Error("useColorScheme must be used within a ColorSchemeProvider");
   }
   return context;
+}
+
+export function useChromeMode(): ChromeMode {
+  const context = useContext(ColorSchemeContext);
+  if (!context) return "calm";
+  return context.chromeMode;
 }

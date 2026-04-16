@@ -1,7 +1,7 @@
 import { query, mutation } from "./_generated/server";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { v } from "convex/values";
-import { colorSchemeValidator, sessionValidator, themePreferenceValidator } from "./validators";
+import { chromePreferenceValidator, colorSchemeValidator, sessionValidator, themePreferenceValidator } from "./validators";
 
 export const getSession = query({
     args: {},
@@ -83,6 +83,7 @@ export const updateSession = mutation({
         rightSidebarAction: v.optional(v.string()),
         theme: themePreferenceValidator,
         colorScheme: colorSchemeValidator,
+        chromePreference: chromePreferenceValidator,
     },
     returns: v.null(),
     handler: async (ctx, args) => {
@@ -108,6 +109,9 @@ export const updateSession = mutation({
         }
         if (args.colorScheme !== undefined) {
             updates.colorScheme = args.colorScheme;
+        }
+        if (args.chromePreference !== undefined) {
+            updates.chromePreference = args.chromePreference;
         }
 
         if (existingSession) {

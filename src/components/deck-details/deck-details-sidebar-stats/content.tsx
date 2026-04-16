@@ -8,6 +8,7 @@ function StatsSidebarContent() {
   const {
     deck,
     mainTotal,
+    attackCardsTotal,
     typeDistribution,
     difficultyDistribution,
     checkValueDistribution,
@@ -36,15 +37,54 @@ function StatsSidebarContent() {
         </div>
       ) : (
         <div className="space-y-3">
-          <PieDistributionChart title="Card Type Ratios" buckets={typeDistribution} total={mainTotal} />
-          <PieDistributionChart title="Difficulty" buckets={difficultyDistribution} total={mainTotal} />
-          <PieDistributionChart title="Check Value" buckets={checkValueDistribution} total={mainTotal} />
-          <PieDistributionChart title="Block Mods" buckets={blockModifierDistribution} total={mainTotal} />
-          <PieDistributionChart title="Block Zones" buckets={blockZoneDistribution} total={mainTotal} />
-          <PieDistributionChart title="Attack Zones" buckets={attackZoneDistribution} total={mainTotal} />
-          <PieDistributionChart title="Attack Speed" buckets={attackSpeedDistribution} total={mainTotal} />
-          <PieDistributionChart title="Attack Damage" buckets={attackDamageDistribution} total={mainTotal} />
-          <PieDistributionChart title="Block Modifier" buckets={blockModifierDistribution} total={mainTotal} />
+          <PieDistributionChart
+            title="Card Type Ratios"
+            buckets={typeDistribution}
+            total={mainTotal}
+            colorStrategy="cardTypeLabels"
+          />
+          <PieDistributionChart
+            title="Difficulty"
+            buckets={difficultyDistribution}
+            total={mainTotal}
+            colorStrategy="characterNumeric"
+          />
+          <PieDistributionChart
+            title="Check Value"
+            buckets={checkValueDistribution}
+            total={mainTotal}
+            colorStrategy="actionNumeric"
+          />
+          <PieDistributionChart
+            title="Block Mods"
+            buckets={blockModifierDistribution}
+            total={mainTotal}
+            colorStrategy="foundationNumeric"
+          />
+          <PieDistributionChart
+            title="Block Zones"
+            buckets={blockZoneDistribution}
+            total={mainTotal}
+            colorStrategy="zoneLabels"
+          />
+          <PieDistributionChart
+            title="Attack Zones"
+            buckets={attackZoneDistribution}
+            total={attackCardsTotal}
+            colorStrategy="zoneLabels"
+          />
+          <PieDistributionChart
+            title="Attack Speed"
+            buckets={attackSpeedDistribution}
+            total={attackCardsTotal}
+            colorStrategy="attackNumeric"
+          />
+          <PieDistributionChart
+            title="Attack Damage"
+            buckets={attackDamageDistribution}
+            total={attackCardsTotal}
+            colorStrategy="attackNumeric"
+          />
         </div>
       )}
     </div>

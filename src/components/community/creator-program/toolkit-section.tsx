@@ -2,6 +2,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { CREATOR_TOOLKIT } from "./data";
 import { CommunitySectionHeader } from "../shared/section-header";
+import { SectionHeading } from "@/components/ui/typography-headings";
 
 export function CreatorProgramToolkitSection() {
   return (
@@ -35,7 +36,7 @@ export function CreatorProgramToolkitSection() {
                     <Icon className="h-4 w-4 text-primary" />
                   </div>
                 </div>
-                <h3 className="text-sm font-semibold">{tool.title}</h3>
+                <SectionHeading className="text-sm font-semibold">{tool.title}</SectionHeading>
                 <p className="text-xs text-muted-foreground">{tool.description}</p>
               </div>
             </div>

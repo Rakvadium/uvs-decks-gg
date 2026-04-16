@@ -98,14 +98,14 @@ export function CardDetailsDialog({
     cn(
       "flex h-10 w-10 items-center justify-center rounded-full border transition-all",
       enabled
-        ? "bg-card/90 text-primary border-primary/30 hover:bg-primary/20 hover:border-primary/50 shadow-[0_0_2px_var(--primary),0_0_8px_var(--primary)/70]"
+        ? "bg-card/90 text-primary shadow-[var(--chrome-dialog-nav-shadow-enabled)] border-[var(--chrome-dialog-nav-border-enabled)] hover:bg-primary/20 hover:border-primary/50"
         : "bg-card/50 text-muted-foreground/30 border-border/20 cursor-not-allowed"
     );
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        size="md"
+        size="lg"
         className="max-h-[90vh] overflow-hidden p-0 md:pb-0"
         footer={
           <div className="flex w-full items-stretch gap-3 md:items-center">

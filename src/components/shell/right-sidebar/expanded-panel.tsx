@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { SectionHeading } from "@/components/ui/typography-headings";
 import { useRightSidebarContext } from "./context";
 
 export function RightSidebarExpandedPanel() {
@@ -37,7 +38,7 @@ export function RightSidebarExpandedPanel() {
               {ActiveHeader ? (
                 <ActiveHeader />
               ) : (
-                <h3 className="font-display text-sm font-medium uppercase tracking-wider">{activeSlot?.label}</h3>
+                <SectionHeading className="font-display text-sm font-medium uppercase tracking-wider">{activeSlot?.label}</SectionHeading>
               )}
             </div>
             <Button

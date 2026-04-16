@@ -39,8 +39,8 @@ export function CardDetailsListItem({ card }: CardDetailsListItemProps) {
             <div className="relative mx-auto w-full max-w-[260px] lg:mx-0">
               <div
                 className={cn(
-                  "relative aspect-[2.5/3.5] w-full overflow-hidden rounded-xl border border-border/50 bg-muted/40",
-                  "shadow-[0_0_0_1px_var(--primary)/15,0_0_5px_var(--primary)/50]"
+                  "relative aspect-[2.5/3.5] w-full overflow-hidden rounded-2xl border border-border/50 bg-muted/40",
+                  "shadow-[var(--chrome-card-image-glow-rest)]"
                 )}
                 style={{
                   ...dragHandleProps.style,

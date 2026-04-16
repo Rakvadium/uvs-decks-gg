@@ -16,17 +16,35 @@ export function CommunityTierListDetailView() {
 
   useRegisterSlot("top-bar", "community-tier-list-detail", CommunityTierListDetailTopBar);
 
+  const desktopStickyTopBar = (
+    <div className="sticky top-0 z-30 hidden shrink-0 border-b border-border/50 bg-background/90 px-4 py-3 backdrop-blur-md supports-[backdrop-filter]:bg-background/80 md:block md:px-6">
+      <CommunityTierListDetailTopBar />
+    </div>
+  );
+
   if (detail === undefined) {
-    return <CommunityTierListDetailLoadingState />;
+    return (
+      <div className="relative flex h-full flex-col overflow-y-auto">
+        {desktopStickyTopBar}
+        <CommunityTierListDetailLoadingState />
+      </div>
+    );
   }
 
   if (!detail) {
-    return <CommunityTierListDetailUnavailableState />;
+    return (
+      <div className="relative flex h-full flex-col overflow-y-auto">
+        {desktopStickyTopBar}
+        <CommunityTierListDetailUnavailableState />
+      </div>
+    );
   }
 
   return (
     <div className="relative flex h-full flex-col overflow-y-auto">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.08),transparent_28%),radial-gradient(circle_at_80%_10%,rgba(20,184,166,0.10),transparent_24%)]" />
+
+      {desktopStickyTopBar}
 
       <CardNavigationProvider cards={selectedCards} getBackCard={getBackCard}>
         <div className="relative z-10 flex min-h-full flex-col">

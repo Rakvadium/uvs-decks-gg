@@ -226,6 +226,10 @@ export const colorSchemeValidator = v.optional(
   )
 );
 
+export const chromePreferenceValidator = v.optional(
+  v.union(v.literal("auto"), v.literal("calm"), v.literal("expressive"))
+);
+
 export const sessionValidator = v.object({
   _id: v.id("sessions"),
   _creationTime: v.number(),
@@ -233,6 +237,7 @@ export const sessionValidator = v.object({
   activeDeckId: v.optional(v.id("decks")),
   theme: themePreferenceValidator,
   colorScheme: colorSchemeValidator,
+  chromePreference: chromePreferenceValidator,
   galleryFilters: v.optional(galleryFiltersValidator),
   rightSidebarAction: v.optional(v.string()),
   lastActiveAt: v.number(),

@@ -1,5 +1,6 @@
 import { Filter, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { SectionHeading, Kicker } from "@/components/ui/typography-headings";
 import { useGalleryFilterDialogContext } from "./context";
 
 export function GalleryFilterDialogHeader() {
@@ -9,14 +10,14 @@ export function GalleryFilterDialogHeader() {
     <div className="relative z-10 shrink-0 border-b border-border/30 p-6">
       <div className="flex items-center justify-between">
         <div className="min-w-0 flex flex-1 items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-primary/40 bg-primary/20 shadow-[0_0_2px_var(--primary)/50,0_0_6px_var(--primary)/40]">
-            <Filter className="h-5 w-5 text-primary drop-shadow-[0_0_3px_var(--primary)]" />
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-primary/40 bg-primary/20 shadow-[var(--chrome-filter-icon-well-shadow)]">
+            <Filter className="h-5 w-5 text-primary [filter:var(--chrome-filter-icon-drop-shadow)]" />
           </div>
           <div className="min-w-0">
-            <h2 className="text-xl font-display font-bold uppercase tracking-wide">Filter Cards</h2>
-            <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
+            <SectionHeading className="text-xl font-display font-bold uppercase tracking-wide sm:text-xl">Filter Cards</SectionHeading>
+            <Kicker className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
               {meta.filteredCount.toLocaleString()} of {meta.totalCards.toLocaleString()} cards
-            </p>
+            </Kicker>
           </div>
         </div>
 

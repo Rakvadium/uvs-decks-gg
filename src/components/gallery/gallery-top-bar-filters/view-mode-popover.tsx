@@ -32,7 +32,7 @@ export function GalleryViewModePopover() {
   }, [isMobile, state.viewMode, actions]);
 
   return (
-    <Popover>
+    <Popover modal={false}>
       <PopoverTrigger asChild>
         <button
           type="button"
@@ -40,14 +40,14 @@ export function GalleryViewModePopover() {
             "flex items-center justify-center rounded-md transition-colors",
             isMobile
               ? "h-9 w-9 border border-primary/30 bg-background/60 text-muted-foreground hover:border-primary/60 hover:bg-primary/10 hover:text-primary"
-              : "h-6 w-6 text-muted-foreground hover:bg-muted hover:text-foreground"
+              : "h-8 w-8 border border-border/60 bg-background/60 text-muted-foreground hover:border-primary/40 hover:bg-muted hover:text-foreground"
           )}
           aria-label="Change view mode"
         >
-          <CurrentViewIcon className={cn(isMobile ? "h-4 w-4" : "h-3.5 w-3.5")} />
+          <CurrentViewIcon className="h-4 w-4" />
         </button>
       </PopoverTrigger>
-      <PopoverContent className="w-48 p-3" align="end">
+      <PopoverContent className="z-[200] w-48 p-3" align="end">
         <div className="space-y-3">
           <span className="font-mono text-xs uppercase tracking-widest text-muted-foreground">View Mode</span>
 
