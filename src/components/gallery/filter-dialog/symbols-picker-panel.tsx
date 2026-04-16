@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Separator } from "@/components/ui/separator"
 import { getSymbolPath } from "@/components/universus/symbol-icon/utils";
 import { cn } from "@/lib/utils";
 
@@ -27,7 +28,7 @@ function SymbolButton({
       title={symbol}
       className={cn(
         "relative h-8 w-8 overflow-hidden border border-border/60 bg-background p-0 transition-colors hover:bg-muted",
-        shape === "circle" ? "rounded-full" : "rounded-md",
+        shape === "circle" ? "rounded-full" : "rounded-xs",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
         selected && "ring-2 ring-primary ring-offset-1 ring-offset-background"
       )}
@@ -53,7 +54,7 @@ function SymbolGrid({
   onToggle: (symbol: string) => void;
 }) {
   return (
-    <div className="mx-auto grid w-fit grid-cols-6 justify-items-center gap-1.5">
+    <div className="mx-auto grid w-fit grid-cols-6 justify-items-center gap-3">
       {symbols.map((symbol) => {
         const selected = selectedSymbols.includes(symbol);
 
@@ -79,6 +80,7 @@ export interface SymbolsPickerPanelProps {
   onToggleSymbol: (symbol: string) => void;
   onInfinityChange: (checked: boolean) => void;
   onSymbolMatchAllChange: (checked: boolean) => void;
+  plain?: boolean;
 }
 
 export function SymbolsPickerPanel({
@@ -89,9 +91,15 @@ export function SymbolsPickerPanel({
   onToggleSymbol,
   onInfinityChange,
   onSymbolMatchAllChange,
+  plain = false,
 }: SymbolsPickerPanelProps) {
   return (
-    <div className="space-y-3 rounded-lg border border-border/50 bg-card/30 p-3 backdrop-blur-sm">
+    <div
+      className={cn(
+        "space-y-3",
+        !plain && "rounded-lg border p-3 border-border/50 bg-card/30 backdrop-blur-sm"
+      )}
+    >
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-2">
           <Switch
@@ -111,11 +119,13 @@ export function SymbolsPickerPanel({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-        <div className="space-y-2">
-          <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70">
-            Standard
-          </span>
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-1">
+        <div className="space-y-2 mt-4">
+          {!plain ? (
+            <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70">
+              Standard
+            </span>
+          ) : null}
           <SymbolGrid
             symbols={standardSymbols}
             selectedSymbols={selectedSymbols}
@@ -123,11 +133,13 @@ export function SymbolsPickerPanel({
             onToggle={onToggleSymbol}
           />
         </div>
-
-        <div className="space-y-2">
-          <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70">
-            Attuned
-          </span>
+        <Separator />
+        <div className="space-y-2 mt-2">
+          {!plain ? (
+            <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70">
+              Attuned
+            </span>
+          ) : null}
           <SymbolGrid
             symbols={attunedSymbols}
             selectedSymbols={selectedSymbols}

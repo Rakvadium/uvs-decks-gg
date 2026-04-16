@@ -7,13 +7,41 @@ export function ToggleBadgeRow({
   isSelected,
   onToggle,
   topAligned = false,
+  hideLabel = false,
 }: {
   label: string;
   options: string[];
   isSelected: (option: string) => boolean;
   onToggle: (option: string) => void;
   topAligned?: boolean;
+  hideLabel?: boolean;
 }) {
+  const badges = (
+    <div className="flex flex-wrap gap-1">
+      {options.map((option) => {
+        const selected = isSelected(option);
+
+        return (
+          <Badge
+            key={option}
+            variant={selected ? "default" : "outline"}
+            className={cn(
+              "cursor-pointer px-2 py-0.5 text-[10px] transition-all",
+              selected && "shadow-[var(--chrome-filter-tile-shadow-selected)]"
+            )}
+            onClick={() => onToggle(option)}
+          >
+            {option}
+          </Badge>
+        );
+      })}
+    </div>
+  );
+
+  if (hideLabel) {
+    return badges;
+  }
+
   return (
     <div className="flex items-start gap-2">
       <span
@@ -24,25 +52,7 @@ export function ToggleBadgeRow({
       >
         {label}
       </span>
-      <div className="flex flex-wrap gap-1">
-        {options.map((option) => {
-          const selected = isSelected(option);
-
-          return (
-            <Badge
-              key={option}
-              variant={selected ? "default" : "outline"}
-              className={cn(
-                "cursor-pointer px-2 py-0.5 text-[10px] transition-all",
-                selected && "shadow-[var(--chrome-filter-tile-shadow-selected)]"
-              )}
-              onClick={() => onToggle(option)}
-            >
-              {option}
-            </Badge>
-          );
-        })}
-      </div>
+      {badges}
     </div>
   );
 }

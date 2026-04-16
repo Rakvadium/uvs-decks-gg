@@ -41,10 +41,16 @@ export function FormatTypeRaritySection() {
 
   if (!isMobile) {
     return (
-      <div className="space-y-3 rounded-lg border border-border/50 bg-card/30 p-3 backdrop-blur-sm">
-        <FormatRow />
-        <TypeRow />
-        <RarityRow />
+      <div className="space-y-3">
+        <div className="space-y-3 rounded-lg border border-border/50 bg-card/30 p-3 backdrop-blur-sm">
+          <FormatRow />
+        </div>
+        <div className="space-y-3 rounded-lg border border-border/50 bg-card/30 p-3 backdrop-blur-sm">
+          <TypeRow />
+        </div>
+        <div className="space-y-3 rounded-lg border border-border/50 bg-card/30 p-3 backdrop-blur-sm">
+          <RarityRow />
+        </div>
       </div>
     );
   }

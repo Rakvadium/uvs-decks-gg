@@ -27,10 +27,14 @@ function SelectValue({
 function SelectTrigger({
   className,
   size = "default",
+  hideIcon = false,
+  compactValue = false,
   children,
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Trigger> & {
   size?: "sm" | "default"
+  hideIcon?: boolean
+  compactValue?: boolean
 }) {
   return (
     <SelectPrimitive.Trigger
@@ -46,16 +50,20 @@ function SelectTrigger({
         "aria-invalid:ring-destructive/20 aria-invalid:border-destructive",
         "data-[size=default]:h-10 data-[size=sm]:h-8",
         "font-mono text-sm tracking-wide uppercase",
-        "*:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-2",
+        compactValue
+          ? "[&>[data-slot=select-value]]:block [&>[data-slot=select-value]]:leading-none"
+          : "*:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-2",
         "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className
       )}
       {...props}
     >
       {children}
-      <SelectPrimitive.Icon asChild>
-        <ChevronDownIcon className="size-4 opacity-50" />
-      </SelectPrimitive.Icon>
+      {hideIcon ? null : (
+        <SelectPrimitive.Icon asChild>
+          <ChevronDownIcon className="size-4 opacity-50" />
+        </SelectPrimitive.Icon>
+      )}
     </SelectPrimitive.Trigger>
   )
 }

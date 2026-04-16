@@ -30,6 +30,7 @@ interface GalleryFiltersActions {
   setSearch: (search: string) => void;
   setSearchMode: (mode: SearchMode) => void;
   updateFilter: <K extends keyof CardFilters>(key: K, value: CardFilters[K]) => void;
+  removeFilterKeys: (keys: (keyof CardFilters)[]) => void;
   clearAllFilters: () => void;
   setViewMode: (mode: ViewMode) => void;
   setCardsPerRow: (count: number) => void;
@@ -188,6 +189,17 @@ export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
     setGalleryFilters({});
   }, [setGalleryFilters]);
 
+  const removeFilterKeys = useCallback(
+    (keys: (keyof CardFilters)[]) => {
+      const nextFilters: CardFilters = { ...galleryFilters };
+      for (const key of keys) {
+        delete nextFilters[key];
+      }
+      setGalleryFilters(nextFilters);
+    },
+    [galleryFilters, setGalleryFilters]
+  );
+
   const value = useMemo(
     (): GalleryFiltersContextValue => ({
       state: {
@@ -202,6 +214,7 @@ export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
         setSearch,
         setSearchMode,
         updateFilter,
+        removeFilterKeys,
         clearAllFilters,
         setViewMode: handleSetViewMode,
         setCardsPerRow: handleSetCardsPerRow,
@@ -227,6 +240,7 @@ export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
       viewMode,
       cardsPerRow,
       updateFilter,
+      removeFilterKeys,
       clearAllFilters,
       handleSetViewMode,
       handleSetCardsPerRow,

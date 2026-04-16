@@ -1,11 +1,13 @@
 import { FileText, LayoutGrid, List } from "lucide-react";
 import { useEffect } from "react";
+import { Button } from "@/components/ui/button";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Slider } from "@/components/ui/slider";
+import { galleryToolbarControlClassName } from "@/components/ui/gallery-search-field";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { cn } from "@/lib/utils";
 import { useGalleryTopBarFiltersContext } from "./context";
@@ -16,7 +18,7 @@ const VIEW_MODE_ICONS = {
   details: FileText,
 };
 
-export function GalleryViewModePopover() {
+export function GalleryViewModePopover({ triggerStyle = "icon" }: { triggerStyle?: "icon" | "labeled" }) {
   const { state, actions } = useGalleryTopBarFiltersContext();
   const isMobile = useIsMobile();
   const availableModes = isMobile
@@ -34,18 +36,30 @@ export function GalleryViewModePopover() {
   return (
     <Popover modal={false}>
       <PopoverTrigger asChild>
-        <button
-          type="button"
-          className={cn(
-            "flex items-center justify-center rounded-md transition-colors",
-            isMobile
-              ? "h-9 w-9 border border-primary/30 bg-background/60 text-muted-foreground hover:border-primary/60 hover:bg-primary/10 hover:text-primary"
-              : "h-8 w-8 border border-border/60 bg-background/60 text-muted-foreground hover:border-primary/40 hover:bg-muted hover:text-foreground"
-          )}
-          aria-label="Change view mode"
-        >
-          <CurrentViewIcon className="h-4 w-4" />
-        </button>
+        {triggerStyle === "labeled" ? (
+          <Button
+            type="button"
+            variant="outline"
+            className={cn(galleryToolbarControlClassName, "shrink-0 gap-1.5 px-4")}
+            aria-label="Change view mode"
+          >
+            <CurrentViewIcon className="size-4 shrink-0" />
+            View mode
+          </Button>
+        ) : (
+          <button
+            type="button"
+            className={cn(
+              "flex items-center justify-center rounded-md transition-colors",
+              isMobile
+                ? "h-9 w-9 border border-primary/40 bg-background/50 text-muted-foreground shadow-[var(--chrome-search-field-shadow)] hover:border-primary/50 hover:bg-primary/10 hover:text-primary"
+                : "h-9 w-9 border border-primary/40 bg-background/50 text-muted-foreground shadow-[var(--chrome-search-field-shadow)] hover:border-primary/50 hover:bg-muted hover:text-foreground"
+            )}
+            aria-label="Change view mode"
+          >
+            <CurrentViewIcon className="h-4 w-4" />
+          </button>
+        )}
       </PopoverTrigger>
       <PopoverContent className="z-[200] w-48 p-3" align="end">
         <div className="space-y-3">

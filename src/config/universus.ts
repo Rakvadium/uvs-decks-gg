@@ -622,3 +622,26 @@ export function formatUniversusCardType(type?: string): UniversusCardType | unde
   }
   return type as UniversusCardType;
 }
+
+export const CARD_TYPE_CHIP_COLORS: Record<string, string> = {
+  Character: UNIVERSUS_COLORS.CHARACTER,
+  Attack: UNIVERSUS_COLORS.ATTACK,
+  Action: UNIVERSUS_COLORS.ACTION,
+  Asset: UNIVERSUS_COLORS.ASSET,
+  Foundation: UNIVERSUS_COLORS.FOUNDATION,
+  Backup: UNIVERSUS_COLORS.BACKUP,
+  Token: "#9ca3af",
+  Other: "#94a3b8",
+};
+
+export function getCardTypeChipColor(type: string): string {
+  const formatted = formatUniversusCardType(type);
+  if (formatted && CARD_TYPE_CHIP_COLORS[formatted]) {
+    return CARD_TYPE_CHIP_COLORS[formatted];
+  }
+  if (CARD_TYPE_CHIP_COLORS[type]) {
+    return CARD_TYPE_CHIP_COLORS[type];
+  }
+  const title = type.charAt(0).toUpperCase() + type.slice(1).toLowerCase();
+  return CARD_TYPE_CHIP_COLORS[title] ?? CARD_TYPE_CHIP_COLORS.Other;
+}

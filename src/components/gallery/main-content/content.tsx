@@ -20,8 +20,8 @@ function GalleryMainContentBody() {
 
   return (
     <div className="relative z-10 flex min-h-0 flex-1 flex-col">
-      <div className="relative z-30 hidden shrink-0 border-b border-border/40 bg-background/85 shadow-[0_1px_0_rgba(0,0,0,0.04)] backdrop-blur-md supports-[backdrop-filter]:bg-background/70 md:block">
-        <div className="w-full px-4 py-2 md:px-6">
+      <div className="relative z-30 hidden shrink-0 border-b border-border/40 bg-background shadow-[0_1px_0_rgba(0,0,0,0.04)] md:block">
+        <div className="w-full px-4 py-3 md:px-6">
           <GalleryTopBarFilters />
         </div>
       </div>

@@ -27,6 +27,7 @@ export function GallerySearchControls() {
         placeholder={placeholder}
         value={state.search}
         onChange={(event) => actions.setSearch(event.target.value)}
+        onClear={() => actions.setSearch("")}
         name="gallery-search"
         spellCheck={false}
       />
@@ -38,6 +39,7 @@ export function GallerySearchControls() {
       placeholder={placeholder}
       value={state.search}
       onChange={(event) => actions.setSearch(event.target.value)}
+      onClear={() => actions.setSearch("")}
       name="gallery-search"
       spellCheck={false}
       leadingSlot={
@@ -49,7 +51,7 @@ export function GallerySearchControls() {
           >
             <SelectTrigger
               size="sm"
-              className="mx-1 h-6 min-w-[3.5rem] rounded-none border-x-1 border-y-0 border-primary/40 px-2 py-0 text-[10px] shadow-none focus-visible:ring-0 focus-visible:shadow-none"
+              className="mx-1 h-7 min-w-[3.5rem] rounded-sm border-x border-y-0 border-primary/40 bg-transparent px-2 py-0 text-xs shadow-none focus-visible:ring-0 focus-visible:shadow-none"
             >
               <SelectValue />
             </SelectTrigger>
