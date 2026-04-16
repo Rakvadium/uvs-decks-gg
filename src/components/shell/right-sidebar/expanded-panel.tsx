@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import * as m from "framer-motion/m";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -19,7 +19,7 @@ export function RightSidebarExpandedPanel() {
   const width = isExpanded ? panelWidth : 0;
 
   return (
-    <motion.div
+    <m.div
       initial={false}
       animate={{ width }}
       transition={isResizing ? { duration: 0 } : { duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
@@ -60,6 +60,6 @@ export function RightSidebarExpandedPanel() {
           ) : null}
         </>
       ) : null}
-    </motion.div>
+    </m.div>
   );
 }

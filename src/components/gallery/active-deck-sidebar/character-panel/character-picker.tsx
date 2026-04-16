@@ -29,7 +29,13 @@ export function ActiveDeckCharacterPicker() {
           )}
         >
           {startingCharacter?.imageUrl ? (
-            <Image src={startingCharacter.imageUrl} alt={startingCharacter.name} fill className="object-cover object-top" />
+            <Image
+              src={startingCharacter.imageUrl}
+              alt={startingCharacter.name}
+              fill
+              sizes="86px"
+              className="object-cover object-top"
+            />
           ) : (
             <div className="flex h-full w-full items-center justify-center">
               <Hexagon className="h-4 w-4 text-muted-foreground/40" />

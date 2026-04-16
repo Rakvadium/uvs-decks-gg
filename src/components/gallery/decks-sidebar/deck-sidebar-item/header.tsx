@@ -14,7 +14,13 @@ export function DeckSidebarItemHeader() {
       {isMobile ? (
         <div className="relative h-14 w-10 shrink-0 overflow-hidden rounded-md border border-border/50 bg-muted/40">
           {deckImageUrl ? (
-            <Image src={deckImageUrl} alt={deckImageName} fill className="object-cover object-top" />
+            <Image
+              src={deckImageUrl}
+              alt={deckImageName}
+              fill
+              sizes="40px"
+              className="object-cover object-top"
+            />
           ) : (
             <div className="flex h-full w-full items-center justify-center">
               <Hexagon className="h-4 w-4 text-muted-foreground/50" />

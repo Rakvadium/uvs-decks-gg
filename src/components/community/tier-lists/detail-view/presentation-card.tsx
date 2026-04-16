@@ -1,6 +1,6 @@
 "use client";
 
-import { CardGridItem } from "@/components/universus";
+import { CardGridItem } from "@/components/universus/card-grid-item";
 import { useCommunityTierListDetailContext } from "./context";
 
 export function CommunityTierListPresentationCard() {

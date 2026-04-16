@@ -1,10 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { motion } from "framer-motion";
+import * as m from "framer-motion/m";
 import { createPortal } from "react-dom";
 import { Hexagon } from "lucide-react";
-import type { CachedCard } from "@/lib/universus";
+import type { CachedCard } from "@/lib/universus/card-store";
 
 interface CardHoverPreviewPortalProps {
   card: CachedCard | null;
@@ -37,15 +37,24 @@ export function CardHoverPreviewPortal({
   );
 
   return createPortal(
-    <motion.div
+    <m.div
       initial={false}
       animate={prefersReducedMotion ? {} : { opacity: 1, scale: 1 }}
+      transition={{ duration: prefersReducedMotion ? 0 : 0.2 }}
       className={`pointer-events-none fixed ${zIndexClassName}`}
       style={{ left, top, width: previewWidth, height: previewHeight }}
     >
       <div className="relative h-full w-full overflow-hidden rounded-xl border border-primary/30 bg-background/80 shadow-[0_0_30px_-10px_var(--primary)]">
         {card.imageUrl ? (
-          <Image src={card.imageUrl} alt={card.name} fill className="object-cover object-top" />
+          <Image
+            src={card.imageUrl}
+            alt={card.name}
+            fill
+            sizes={`${previewWidth}px`}
+            className="object-cover object-top"
+            loading="lazy"
+            fetchPriority="low"
+          />
         ) : (
           <div className="flex h-full w-full items-center justify-center px-4 text-center text-xs font-mono uppercase tracking-wider text-muted-foreground">
             <Hexagon className="mr-2 h-4 w-4 text-muted-foreground/60" />
@@ -53,7 +62,7 @@ export function CardHoverPreviewPortal({
           </div>
         )}
       </div>
-    </motion.div>,
+    </m.div>,
     document.body
   );
 }

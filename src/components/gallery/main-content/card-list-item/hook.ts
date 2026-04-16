@@ -3,14 +3,16 @@ import { useTcgDraggable } from "@/lib/dnd";
 import { useGalleryCardMap } from "../card-map-context";
 import type { CardListItemProps } from "./types";
 
-export function useCardListItemModel({ card }: CardListItemProps) {
+export function useCardListItemModel({ card, onOpenCardDetails, thumbnailPriority = false }: CardListItemProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { getBackCard } = useGalleryCardMap();
   const backCard = getBackCard(card);
 
+  const dragPreviewImageRef = useRef<HTMLImageElement | null>(null);
   const { isDragging, dragHandleProps } = useTcgDraggable({
     card,
     sourceId: "gallery-list",
+    previewImageRef: dragPreviewImageRef,
   });
 
   const dragBlockRef = useRef(false);
@@ -33,8 +35,12 @@ export function useCardListItemModel({ card }: CardListItemProps) {
 
   const handleOpen = useCallback(() => {
     if (dragBlockRef.current) return;
-    setIsDialogOpen(true);
-  }, []);
+    if (onOpenCardDetails) {
+      onOpenCardDetails(card);
+    } else {
+      setIsDialogOpen(true);
+    }
+  }, [card, onOpenCardDetails]);
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
@@ -49,9 +55,11 @@ export function useCardListItemModel({ card }: CardListItemProps) {
   return {
     card,
     backCard,
+    thumbnailPriority,
     isDialogOpen,
     setIsDialogOpen,
     isDragging,
+    dragPreviewImageRef,
     dragHandleProps,
     handleOpen,
     handleKeyDown,

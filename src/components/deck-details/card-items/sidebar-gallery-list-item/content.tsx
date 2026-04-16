@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { CardDetailsDialog } from "@/components/universus";
+import { CardDetailsDialog } from "@/components/universus/card-details/dialog";
 import { SidebarGalleryListItemActions } from "./actions";
 import {
   SidebarGalleryListItemProvider,

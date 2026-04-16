@@ -1,60 +1,85 @@
-import { useMemo, type CSSProperties } from "react";
-import { motion } from "framer-motion";
-import { CardGridItem } from "@/components/universus";
+import { useVirtualizer } from "@tanstack/react-virtual";
+import { CardGridItem } from "@/components/universus/card-grid-item";
 import { CardNavigationProvider } from "@/components/universus/card-details/navigation-context";
-import { useInfiniteSlice } from "@/hooks/useInfiniteSlice";
 import { useIsMobile } from "@/hooks/useIsMobile";
-import { usePrefersReducedMotion } from "@/lib/reduced-motion";
-import type { CachedCard } from "@/lib/universus";
-import { CARDS_PER_PAGE } from "./constants";
-import { LoadMoreIndicator } from "./load-more-indicator";
-import { NoCardsFound } from "./no-cards-found";
+import type { CachedCard } from "@/lib/universus/card-store";
 import { useGalleryCardMap } from "./card-map-context";
+import { useGalleryMainScrollRootRef } from "./gallery-main-scroll-root";
+import { NoCardsFound } from "./no-cards-found";
 
 interface GalleryGridViewProps {
   cards: CachedCard[];
   cardsPerRow: number;
+  onOpenCardDetails: (card: CachedCard) => void;
 }
 
-export function GalleryGridView({ cards, cardsPerRow }: GalleryGridViewProps) {
+export function GalleryGridView({ cards, cardsPerRow, onOpenCardDetails }: GalleryGridViewProps) {
   const isMobile = useIsMobile();
-  const prefersReducedMotion = usePrefersReducedMotion();
+  const scrollRef = useGalleryMainScrollRootRef();
   const { getBackCard } = useGalleryCardMap();
   const clampedCardsPerRow = Math.min(10, Math.max(1, Math.round(cardsPerRow)));
-  const mobileGridColsClassName = clampedCardsPerRow <= 1 ? "grid-cols-1" : "grid-cols-2";
-  const gridStyle = useMemo(
-    () => ({ "--cards-per-row": clampedCardsPerRow }) as CSSProperties,
-    [clampedCardsPerRow]
-  );
-  const { visibleItems: visibleCards, hasMore, loadMoreRef } = useInfiniteSlice({
-    items: cards,
-    pageSize: CARDS_PER_PAGE,
-    rootMargin: isMobile ? "0px 0px 480px 0px" : undefined,
+  const columnCount = isMobile ? (clampedCardsPerRow <= 1 ? 1 : 2) : clampedCardsPerRow;
+  const rowCount = cards.length === 0 ? 0 : Math.ceil(cards.length / columnCount);
+
+  const rowVirtualizer = useVirtualizer({
+    count: rowCount,
+    getScrollElement: () => scrollRef.current,
+    estimateSize: () => 400,
+    overscan: 3,
+    gap: 16,
+    getItemKey: (index) => {
+      const first = cards[index * columnCount];
+      return first?._id ?? index;
+    },
   });
 
   return (
     <CardNavigationProvider cards={cards} getBackCard={getBackCard}>
-      <div
-        className={`grid gap-4 ${mobileGridColsClassName} md:grid-cols-[repeat(var(--cards-per-row),minmax(0,1fr))]`}
-        style={gridStyle}
-      >
-        {visibleCards.map((card, index) => (
-          <motion.div
-            key={card._id}
-            initial={false}
-            animate={prefersReducedMotion ? {} : { opacity: 1, y: 0 }}
-            transition={{
-              duration: 0.3,
-              delay: prefersReducedMotion ? 0 : Math.min(index * 0.02, 0.5),
-            }}
-          >
-            <CardGridItem card={card} backCard={getBackCard(card) ?? undefined} />
-          </motion.div>
-        ))}
-      </div>
-
-      {hasMore ? <LoadMoreIndicator loadMoreRef={loadMoreRef} /> : null}
-      {visibleCards.length === 0 ? <NoCardsFound /> : null}
+      {cards.length === 0 ? (
+        <NoCardsFound />
+      ) : (
+        <div
+          className="w-full"
+          style={{
+            height: `${rowVirtualizer.getTotalSize()}px`,
+            position: "relative",
+          }}
+        >
+          {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+            const startIndex = virtualRow.index * columnCount;
+            const rowCards = cards.slice(startIndex, startIndex + columnCount);
+            return (
+              <div
+                key={virtualRow.key}
+                data-index={virtualRow.index}
+                ref={rowVirtualizer.measureElement}
+                className="left-0 w-full"
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  transform: `translateY(${virtualRow.start}px)`,
+                }}
+              >
+                <div
+                  className="grid gap-4"
+                  style={{ gridTemplateColumns: `repeat(${columnCount}, minmax(0, 1fr))` }}
+                >
+                  {rowCards.map((card) => (
+                    <div key={card._id}>
+                      <CardGridItem
+                        card={card}
+                        backCard={getBackCard(card) ?? undefined}
+                        onOpenCardDetails={onOpenCardDetails}
+                        imagePriority={virtualRow.index === 0}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </CardNavigationProvider>
   );
 }

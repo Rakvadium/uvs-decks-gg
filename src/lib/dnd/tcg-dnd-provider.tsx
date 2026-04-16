@@ -11,11 +11,14 @@ export interface DragItem {
   type: "card";
   card: Card;
   sourceId?: string;
+  previewImageUrl?: string;
 }
 
 export const TCG_DND_ACCEPTS_CARD_ONLY: DragItem["type"][] = ["card"];
 
 export const UNIVERSUS_CARD_DND_ENABLED = true;
+
+export const TCG_DROP_ZONE_DATA_ATTR = "data-tcg-drop-zone" as const;
 
 export interface DropZoneConfig {
   id: string;
@@ -35,19 +38,36 @@ interface TcgDndContextValue {
   setActiveDropZone: (id: string | null) => void;
 }
 
-const TcgDndContext = React.createContext<TcgDndContextValue | null>(null);
+type TcgDndActionsContextValue = Pick<
+  TcgDndContextValue,
+  "startDrag" | "endDrag" | "registerDropZone" | "unregisterDropZone" | "setActiveDropZone"
+>;
+
+type TcgDndDragStateContextValue = Pick<TcgDndContextValue, "dragItem" | "isDragging">;
+
+type TcgDndActiveDropZoneContextValue = Pick<TcgDndContextValue, "activeDropZone">;
+
+const TcgDndActionsContext = React.createContext<TcgDndActionsContextValue | null>(null);
+const TcgDndDragStateContext = React.createContext<TcgDndDragStateContextValue | null>(null);
+const TcgDndActiveDropZoneContext = React.createContext<TcgDndActiveDropZoneContextValue | null>(null);
+
+type WindowWithDndDebug = Window & { __TCG_DND_DEBUG__?: boolean };
+
+function readDndDebugFlag(w: Window): boolean {
+  return (w as WindowWithDndDebug).__TCG_DND_DEBUG__ === true;
+}
 
 function isDndDebugEnabled(): boolean {
   if (typeof window === "undefined") return false;
   try {
     const urlEnabled = new URLSearchParams(window.location.search).get("dndDebug") === "1";
-    return urlEnabled || (window as any).__TCG_DND_DEBUG__ === true || window.localStorage?.getItem("tcg:dndDebug") === "1";
+    return urlEnabled || readDndDebugFlag(window) || window.localStorage?.getItem("tcg:dndDebug") === "1";
   } catch {
-    return (window as any).__TCG_DND_DEBUG__ === true;
+    return readDndDebugFlag(window);
   }
 }
 
-function dndLog(...args: any[]) {
+function dndLog(...args: unknown[]) {
   if (!isDndDebugEnabled()) return;
   console.log("[tcg-dnd]", ...args);
 }
@@ -59,33 +79,103 @@ function resolveImageUrl(imageUrl: string | undefined, imageBaseUrl: string | un
   return imageUrl;
 }
 
+const DRAG_OVERLAY_WIDTH = 144;
+const DRAG_OVERLAY_HEIGHT = 201;
+
+function getPointerFromMoveEvent(evt: Event): { x: number; y: number } | null {
+  if (typeof TouchEvent !== "undefined" && evt instanceof TouchEvent) {
+    if (evt.touches.length > 0) {
+      const t = evt.touches[0];
+      return { x: t.clientX, y: t.clientY };
+    }
+    if (evt.changedTouches.length > 0) {
+      const t = evt.changedTouches[0];
+      return { x: t.clientX, y: t.clientY };
+    }
+    return null;
+  }
+  if (evt instanceof MouseEvent) {
+    return { x: evt.clientX, y: evt.clientY };
+  }
+  return null;
+}
+
+function resolveRegisteredDropZoneIdAtClientPoint(
+  clientX: number,
+  clientY: number,
+  dragItem: DragItem,
+  zones: Map<string, DropZoneConfig>
+): string | null {
+  if (typeof document === "undefined") return null;
+  const top = document.elementFromPoint(clientX, clientY);
+  if (!top) return null;
+  const marked = top.closest(`[${TCG_DROP_ZONE_DATA_ATTR}]`);
+  if (!marked) return null;
+  const id = marked.getAttribute(TCG_DROP_ZONE_DATA_ATTR);
+  if (!id) return null;
+  const config = zones.get(id);
+  if (!config || config.isDisabled) return null;
+  if (!config.accepts.includes(dragItem.type)) return null;
+  return id;
+}
+
+function useTcgDndDragState(): TcgDndDragStateContextValue {
+  const ctx = React.useContext(TcgDndDragStateContext);
+  if (!ctx) {
+    throw new Error("useTcgDndDragState must be used within a TcgDndProvider");
+  }
+  return ctx;
+}
+
 function DragOverlay() {
-  const { dragItem } = useTcgDnd();
-  const [pos, setPos] = React.useState<{ x: number; y: number } | null>(null);
+  const { dragItem } = useTcgDndDragState();
+  const [seeded, setSeeded] = React.useState(false);
+  const seededRef = React.useRef(false);
+  const overlayOuterRef = React.useRef<HTMLDivElement>(null);
+  const pendingRef = React.useRef<{ x: number; y: number } | null>(null);
+  const rafRef = React.useRef<number | null>(null);
+
+  const applyTransform = React.useCallback(() => {
+    const el = overlayOuterRef.current;
+    const p = pendingRef.current;
+    if (!el || !p) return;
+    el.style.transform = `translate3d(${p.x - DRAG_OVERLAY_WIDTH / 2}px, ${p.y - DRAG_OVERLAY_HEIGHT / 2}px, 0)`;
+  }, []);
+
+  const flushTransform = React.useCallback(() => {
+    rafRef.current = null;
+    applyTransform();
+  }, [applyTransform]);
+
+  const scheduleFlush = React.useCallback(() => {
+    if (rafRef.current !== null) return;
+    rafRef.current = window.requestAnimationFrame(flushTransform);
+  }, [flushTransform]);
 
   React.useEffect(() => {
     if (!dragItem) {
-      setPos(null);
+      seededRef.current = false;
+      setSeeded(false);
+      pendingRef.current = null;
+      if (rafRef.current !== null) {
+        window.cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
       return;
     }
 
-    const getPoint = (evt: any): { x: number; y: number } | null => {
-      if (evt?.touches && evt.touches.length > 0) {
-        return { x: evt.touches[0].clientX, y: evt.touches[0].clientY };
-      }
-      if (evt?.changedTouches && evt.changedTouches.length > 0) {
-        return { x: evt.changedTouches[0].clientX, y: evt.changedTouches[0].clientY };
-      }
-      if (typeof evt?.clientX === "number" && typeof evt?.clientY === "number") {
-        return { x: evt.clientX, y: evt.clientY };
-      }
-      return null;
-    };
+    seededRef.current = false;
+    setSeeded(false);
 
-    const handleMove = (evt: any) => {
-      const p = getPoint(evt);
+    const handleMove = (evt: Event) => {
+      const p = getPointerFromMoveEvent(evt);
       if (!p) return;
-      setPos(p);
+      pendingRef.current = p;
+      if (!seededRef.current) {
+        seededRef.current = true;
+        setSeeded(true);
+      }
+      scheduleFlush();
     };
 
     window.addEventListener("mousemove", handleMove, { passive: true });
@@ -94,36 +184,84 @@ function DragOverlay() {
     return () => {
       window.removeEventListener("mousemove", handleMove);
       window.removeEventListener("touchmove", handleMove);
+      if (rafRef.current !== null) {
+        window.cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
     };
-  }, [dragItem]);
+  }, [dragItem, scheduleFlush]);
 
-  if (!dragItem || !pos) return null;
+  React.useLayoutEffect(() => {
+    if (!dragItem || !seeded) return;
+    applyTransform();
+  }, [dragItem, seeded, applyTransform]);
 
-  const imageUrl = resolveImageUrl(dragItem.card?.imageUrl, IMAGE_BASE_URL);
-  const overlayWidth = 144;
-  const overlayHeight = 201;
+  if (!dragItem || !seeded) return null;
+
+  const preview = dragItem.previewImageUrl?.trim();
+  const imageUrl =
+    preview && preview.length > 0 ? preview : resolveImageUrl(dragItem.card?.imageUrl, IMAGE_BASE_URL);
+
+  const cardName = dragItem.card?.name ?? "";
 
   return createPortal(
+    <DragOverlayImage
+      overlayOuterRef={overlayOuterRef}
+      imageUrl={imageUrl}
+      alt={cardName}
+      fallbackLabel={cardName || "Card"}
+    />,
+    document.body
+  );
+}
+
+function DragOverlayImage({
+  overlayOuterRef,
+  imageUrl,
+  alt,
+  fallbackLabel,
+}: {
+  overlayOuterRef: React.RefObject<HTMLDivElement | null>;
+  imageUrl: string | undefined;
+  alt: string;
+  fallbackLabel: string;
+}) {
+  const overlayImgRef = React.useRef<HTMLImageElement | null>(null);
+
+  React.useEffect(() => {
+    if (!imageUrl) return;
+    const id = window.requestAnimationFrame(() => {
+      const img = overlayImgRef.current;
+      if (!img?.decode) return;
+      void img.decode().catch(() => {});
+    });
+    return () => window.cancelAnimationFrame(id);
+  }, [imageUrl]);
+
+  return (
     <div
-      className="pointer-events-none fixed left-0 top-0 z-[9999] transition-transform duration-75 ease-out"
-      style={{
-        transform: `translate3d(${pos.x - overlayWidth / 2}px, ${pos.y - overlayHeight / 2}px, 0)`,
-      }}
+      ref={overlayOuterRef}
+      className="pointer-events-none fixed left-0 top-0 z-[9999] will-change-transform"
     >
       <div
         className="overflow-hidden rounded-xl border bg-background/70 shadow-2xl ring-1 ring-primary/20"
-        style={{ width: overlayWidth, height: overlayHeight }}
+        style={{ width: DRAG_OVERLAY_WIDTH, height: DRAG_OVERLAY_HEIGHT }}
       >
         {imageUrl ? (
-          <img src={imageUrl} alt={dragItem.card?.name ?? ""} draggable={false} className="block h-full w-full object-cover" />
+          <img
+            ref={overlayImgRef}
+            src={imageUrl}
+            alt={alt}
+            draggable={false}
+            className="block h-full w-full object-cover"
+          />
         ) : (
           <div className="flex h-full w-full items-center justify-center px-3 text-center text-xs font-medium">
-            {dragItem.card?.name ?? "Card"}
+            {fallbackLabel}
           </div>
         )}
       </div>
-    </div>,
-    document.body
+    </div>
   );
 }
 
@@ -213,6 +351,50 @@ export function TcgDndProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   React.useEffect(() => {
+    if (!dragItem) return;
+
+    const lastPointerRef = { current: null as { x: number; y: number } | null };
+    let hitTestRafId: number | null = null;
+
+    const flushHitTest = () => {
+      hitTestRafId = null;
+      const item = dragItemRef.current;
+      const p = lastPointerRef.current;
+      if (!item || !p) return;
+      const next = resolveRegisteredDropZoneIdAtClientPoint(p.x, p.y, item, dropZonesRef.current);
+      if (next !== activeDropZoneRef.current) {
+        setActiveDropZoneSafe(next);
+      }
+    };
+
+    const scheduleHitTest = () => {
+      if (hitTestRafId !== null) return;
+      hitTestRafId = window.requestAnimationFrame(flushHitTest);
+    };
+
+    const handleMove = (evt: Event) => {
+      const p = getPointerFromMoveEvent(evt);
+      if (!p) return;
+      lastPointerRef.current = p;
+      scheduleHitTest();
+    };
+
+    window.addEventListener("pointermove", handleMove, { passive: true });
+    window.addEventListener("mousemove", handleMove, { passive: true });
+    window.addEventListener("touchmove", handleMove, { passive: true });
+
+    return () => {
+      window.removeEventListener("pointermove", handleMove);
+      window.removeEventListener("mousemove", handleMove);
+      window.removeEventListener("touchmove", handleMove);
+      if (hitTestRafId !== null) {
+        window.cancelAnimationFrame(hitTestRafId);
+        hitTestRafId = null;
+      }
+    };
+  }, [dragItem, setActiveDropZoneSafe]);
+
+  React.useEffect(() => {
     if (!isDndDebugEnabled()) return;
     dndLog("state", {
       isDragging: dragItem !== null,
@@ -223,29 +405,63 @@ export function TcgDndProvider({ children }: { children: React.ReactNode }) {
     });
   }, [dragItem, activeDropZone]);
 
-  const value: TcgDndContextValue = React.useMemo(() => ({
-    dragItem,
-    isDragging: dragItem !== null,
-    activeDropZone,
-    startDrag,
-    endDrag,
-    registerDropZone,
-    unregisterDropZone,
-    setActiveDropZone: setActiveDropZoneSafe,
-  }), [dragItem, activeDropZone, startDrag, endDrag, registerDropZone, unregisterDropZone, setActiveDropZoneSafe]);
+  const actionsValue = React.useMemo(
+    () => ({
+      startDrag,
+      endDrag,
+      registerDropZone,
+      unregisterDropZone,
+      setActiveDropZone: setActiveDropZoneSafe,
+    }),
+    [startDrag, endDrag, registerDropZone, unregisterDropZone, setActiveDropZoneSafe]
+  );
+
+  const dragStateValue = React.useMemo(
+    () => ({
+      dragItem,
+      isDragging: dragItem !== null,
+    }),
+    [dragItem]
+  );
+
+  const activeDropZoneValue = React.useMemo(
+    () => ({ activeDropZone }),
+    [activeDropZone]
+  );
 
   return (
-    <TcgDndContext.Provider value={value}>
-      {children}
-      <DragOverlay />
-    </TcgDndContext.Provider>
+    <TcgDndActionsContext.Provider value={actionsValue}>
+      <TcgDndDragStateContext.Provider value={dragStateValue}>
+        <TcgDndActiveDropZoneContext.Provider value={activeDropZoneValue}>
+          {children}
+          <DragOverlay />
+        </TcgDndActiveDropZoneContext.Provider>
+      </TcgDndDragStateContext.Provider>
+    </TcgDndActionsContext.Provider>
   );
 }
 
-export function useTcgDnd() {
-  const context = React.useContext(TcgDndContext);
-  if (!context) {
+export function useTcgDndActions(): TcgDndActionsContextValue {
+  const ctx = React.useContext(TcgDndActionsContext);
+  if (!ctx) {
+    throw new Error("useTcgDndActions must be used within a TcgDndProvider");
+  }
+  return ctx;
+}
+
+export function useTcgDnd(): TcgDndContextValue {
+  const actions = React.useContext(TcgDndActionsContext);
+  const dragState = React.useContext(TcgDndDragStateContext);
+  const activeZone = React.useContext(TcgDndActiveDropZoneContext);
+  if (!actions || !dragState || !activeZone) {
     throw new Error("useTcgDnd must be used within a TcgDndProvider");
   }
-  return context;
+  return React.useMemo(
+    () => ({
+      ...actions,
+      ...dragState,
+      ...activeZone,
+    }),
+    [actions, dragState, activeZone]
+  );
 }

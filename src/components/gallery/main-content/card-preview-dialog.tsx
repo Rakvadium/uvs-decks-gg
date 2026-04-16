@@ -7,9 +7,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CardNavigationProvider } from "@/components/universus/card-details/navigation-context";
-import { CardGridItem, CardDetailsDialog } from "@/components/universus";
+import { CardGridItem } from "@/components/universus/card-grid-item";
+import { CardDetailsDialog } from "@/components/universus/card-details/dialog";
 import { CARD_GLOW_REST } from "@/components/universus/card-item/glow";
-import { useCardData, type CachedCard } from "@/lib/universus";
+import { useCardData } from "@/lib/universus/card-data-provider";
+import type { CachedCard } from "@/lib/universus/card-store";
 import { cn } from "@/lib/utils";
 
 interface CardPreviewSectionProps {
@@ -118,6 +120,7 @@ function StackedCardMockup({ card }: { card: CachedCard }) {
                   fill
                   sizes="176px"
                   className="object-cover"
+                  loading="lazy"
                   draggable={false}
                 />
               )}

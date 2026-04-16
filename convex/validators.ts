@@ -92,6 +92,11 @@ export const tierDefinitionValidator = v.object({
   order: v.number(),
 });
 
+export const tierListPoolScopeValidator = v.object({
+  setCode: v.string(),
+  cardType: v.string(),
+});
+
 export const tierListValidator = v.object({
   _id: v.id("tierLists"),
   _creationTime: v.number(),
@@ -102,6 +107,7 @@ export const tierListValidator = v.object({
   rankingScope: v.optional(tierListRankingScopeValidator),
   rankingScopeKey: v.optional(v.string()),
   selectedSetCodes: v.array(v.string()),
+  poolScopes: v.optional(v.array(tierListPoolScopeValidator)),
   previewCardIds: v.array(v.id("cards")),
   tiers: v.array(tierDefinitionValidator),
   itemCount: v.number(),

@@ -7,7 +7,7 @@ import { Heart, Loader2, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 import type { Doc } from "../../../../../convex/_generated/dataModel";
 import { api } from "../../../../../convex/_generated/api";
-import type { CachedCard } from "@/lib/universus";
+import type { CachedCard } from "@/lib/universus/card-store";
 import { useAuthDialog } from "@/components/auth/auth-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";

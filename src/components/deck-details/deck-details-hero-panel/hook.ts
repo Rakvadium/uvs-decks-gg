@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useCardIdMap } from "@/hooks/useCardIdMap";
-import { useCardData } from "@/lib/universus";
+import { useCardData } from "@/lib/universus/card-data-provider";
 import { useDeckDetails } from "@/providers/DeckDetailsProvider";
 import type { Id } from "../../../../convex/_generated/dataModel";
 

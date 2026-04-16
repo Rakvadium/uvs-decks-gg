@@ -1,4 +1,4 @@
-import type { CachedCard } from "@/lib/universus";
+import type { CachedCard } from "@/lib/universus/card-store";
 import { cn } from "@/lib/utils";
 import { CardDetailsAttackStatsSection } from "./attack-stats-section";
 import { CardDetailsContentProvider } from "./content-context";

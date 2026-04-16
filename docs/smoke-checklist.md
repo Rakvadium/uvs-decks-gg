@@ -26,3 +26,5 @@ Signed-in:
 ## Notes
 
 Repository lint currently may report pre-existing issues; goal is zero new violations in changed files and a clean build. Add or wire CI when the team wants these steps enforced on every push.
+
+For card drag-and-drop verification (gallery, deck sidebar, deck details, tier list lanes), use [dnd-regression-checklist.md](./dnd-regression-checklist.md).

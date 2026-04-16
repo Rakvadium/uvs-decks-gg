@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { type CachedCard } from "@/lib/universus";
+import type { CachedCard } from "@/lib/universus/card-store";
 import { DECK_SECTION_KEYS, type DeckSection } from "./sections-context";
 import { ActiveDeckSection } from "./section";
 import { ActiveDeckSectionsProvider } from "./sections-context";

@@ -1,9 +1,13 @@
+"use client";
+
 import { createPortal } from "react-dom";
 import Image from "next/image";
-import { motion } from "framer-motion";
+import * as m from "framer-motion/m";
+import { usePrefersReducedMotion } from "@/lib/reduced-motion";
 import { useGallerySidebarContext } from "./context";
 
 export function DeckDetailsGallerySidebarHoverPreview() {
+  const prefersReducedMotion = usePrefersReducedMotion();
   const { hoveredListCard, isMobile, shellSidebarWidth, viewMode } = useGallerySidebarContext();
 
   if (isMobile || viewMode !== "list" || !hoveredListCard || typeof document === "undefined") return null;
@@ -19,9 +23,10 @@ export function DeckDetailsGallerySidebarHoverPreview() {
   const right = shellSidebarWidth + iconRailWidth + gap;
 
   return createPortal(
-    <motion.div
+    <m.div
       initial={false}
       animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: prefersReducedMotion ? 0 : 0.2 }}
       className="pointer-events-none fixed z-[80]"
       style={{
         right,
@@ -32,14 +37,22 @@ export function DeckDetailsGallerySidebarHoverPreview() {
     >
       <div className="relative h-full w-full overflow-hidden rounded-xl border border-primary/40 bg-background/90 shadow-[0_0_0_1px_var(--primary)/30,0_0_6px_var(--primary)/70,0_0_14px_var(--primary)/20]">
         {hoveredListCard.imageUrl ? (
-          <Image src={hoveredListCard.imageUrl} alt={hoveredListCard.name} fill className="object-cover object-top" />
+          <Image
+            src={hoveredListCard.imageUrl}
+            alt={hoveredListCard.name}
+            fill
+            sizes={`${previewWidth}px`}
+            className="object-cover object-top"
+            loading="lazy"
+            fetchPriority="low"
+          />
         ) : (
           <div className="flex h-full w-full items-center justify-center px-4 text-center font-mono text-xs uppercase tracking-wider text-muted-foreground">
             {hoveredListCard.name}
           </div>
         )}
       </div>
-    </motion.div>,
+    </m.div>,
     document.body
   );
 }

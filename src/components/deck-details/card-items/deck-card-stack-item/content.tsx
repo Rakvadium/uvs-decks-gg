@@ -1,11 +1,11 @@
 "use client";
 
 import type { KeyboardEvent } from "react";
-import { AnimatePresence, motion } from "framer-motion";
-import { CardDetailsDialog } from "@/components/universus";
+import { CardDetailsDialog } from "@/components/universus/card-details/dialog";
 import { CardFlipButton } from "@/components/universus/card-item/flip-button";
 import { CARD_GLOW_REST, CARD_GLOW_HOVER } from "@/components/universus/card-item/glow";
 import { CardImageDisplay } from "@/components/universus/card-grid-item/image-display";
+import { cn } from "@/lib/utils";
 import { DeckCardStackItemActions } from "./actions";
 import { useDeckCardStackItemModel } from "./hook";
 import type { DeckCardStackItemProps } from "./types";
@@ -14,7 +14,6 @@ export function DeckCardStackItem(props: DeckCardStackItemProps) {
   const {
     backCard,
     card,
-    displayCard,
     handleFlip,
     handleKeyDownOpen,
     hasBack,
@@ -29,6 +28,9 @@ export function DeckCardStackItem(props: DeckCardStackItemProps) {
     stackedLayers,
     stackOffset,
   } = useDeckCardStackItemModel(props);
+
+  const hasBackFace = Boolean(backCard);
+  const transitionClass = prefersReducedMotion ? "duration-0" : "duration-200 ease-out";
 
   return (
     <>
@@ -56,18 +58,40 @@ export function DeckCardStackItem(props: DeckCardStackItemProps) {
               className="absolute inset-0 z-10 overflow-hidden rounded-lg transition-shadow duration-150"
               style={{ boxShadow: isHovered ? CARD_GLOW_HOVER : CARD_GLOW_REST }}
             >
-              <AnimatePresence initial={false} mode="wait">
-                <motion.div
-                  key={isFlipped ? "back" : "front"}
-                  initial={false}
-                  animate={prefersReducedMotion ? {} : { rotateY: 0, opacity: 1 }}
-                  exit={prefersReducedMotion ? {} : { rotateY: 90, opacity: 0 }}
-                  transition={{ duration: 0.25 }}
-                  className="absolute inset-0 [backface-visibility:hidden]"
-                >
-                  <CardImageDisplay imageUrl={displayCard.imageUrl} name={displayCard.name} />
-                </motion.div>
-              </AnimatePresence>
+              {!hasBackFace ? (
+                <div className="absolute inset-0 [backface-visibility:hidden]">
+                  <CardImageDisplay imageUrl={card.imageUrl} name={card.name} />
+                </div>
+              ) : (
+                <>
+                  <div
+                    className={cn(
+                      "absolute inset-0 [backface-visibility:hidden] transition-opacity",
+                      transitionClass,
+                      isFlipped ? "pointer-events-none opacity-0" : "opacity-100"
+                    )}
+                  >
+                    <CardImageDisplay
+                      imageUrl={card.imageUrl}
+                      name={card.name}
+                      fetchPriority={isFlipped ? "low" : undefined}
+                    />
+                  </div>
+                  <div
+                    className={cn(
+                      "absolute inset-0 [backface-visibility:hidden] transition-opacity",
+                      transitionClass,
+                      !isFlipped ? "pointer-events-none opacity-0" : "opacity-100"
+                    )}
+                  >
+                    <CardImageDisplay
+                      imageUrl={backCard!.imageUrl}
+                      name={backCard!.name}
+                      fetchPriority={!isFlipped ? "low" : undefined}
+                    />
+                  </div>
+                </>
+              )}
             </div>
 
             {hasBack && (

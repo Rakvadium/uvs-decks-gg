@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import type { CachedCard } from "@/lib/universus";
+import type { CachedCard } from "@/lib/universus/card-store";
 import { CharacterThumbnail } from "./character-thumbnail";
 import { useCharacterPickerContentContext } from "./context";
 

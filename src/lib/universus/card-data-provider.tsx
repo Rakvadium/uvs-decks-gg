@@ -6,6 +6,7 @@ import {
   useMemo,
   ReactNode,
   useSyncExternalStore,
+  useCallback,
 } from "react";
 import {
   useUniversusCards,
@@ -20,7 +21,7 @@ import { useSets, CachedSet, parseSetLegality } from "./use-sets";
 import { useFormats, CachedFormat } from "./use-formats";
 import type { CardFilters } from "@/providers/UIStateProvider";
 
-interface CardDataContextValue extends UseUniversusCardsResult {
+export type CardReferenceContextValue = {
   sets: CachedSet[];
   setsLoading: boolean;
   formats: CachedFormat[];
@@ -28,18 +29,36 @@ interface CardDataContextValue extends UseUniversusCardsResult {
   getSetByCode: (code: string) => CachedSet | undefined;
   getFormatByKey: (key: string) => CachedFormat | undefined;
   isSetLegalInFormat: (setCode: string, formatKey: string) => boolean;
+};
+
+export type CardCatalogContextValue = UseUniversusCardsResult & {
   getFilteredCards: (filters: CardFilters) => CachedCard[];
   getSortedCards: (cards: CachedCard[], options: CardSortOptions) => CachedCard[];
-  getPaginatedCards: (cards: CachedCard[], page: number, pageSize: number) => ReturnType<typeof paginateCards>;
-  getFilteredAndSortedCards: (filters: CardFilters, sortOptions: CardSortOptions) => CachedCard[];
-}
+  getPaginatedCards: (
+    cards: CachedCard[],
+    page: number,
+    pageSize: number
+  ) => ReturnType<typeof paginateCards>;
+  getFilteredAndSortedCards: (
+    filters: CardFilters,
+    sortOptions: CardSortOptions
+  ) => CachedCard[];
+};
 
-const defaultContextValue: CardDataContextValue = {
-  cards: [],
+export type CardDataContextValue = CardCatalogContextValue & CardReferenceContextValue;
+
+const defaultReference: CardReferenceContextValue = {
   sets: [],
   setsLoading: true,
   formats: [],
   formatsLoading: true,
+  getSetByCode: () => undefined,
+  getFormatByKey: () => undefined,
+  isSetLegalInFormat: () => true,
+};
+
+const defaultCatalog: CardCatalogContextValue = {
+  cards: [],
   isLoading: true,
   isLoadingMore: false,
   loadProgress: 0,
@@ -53,16 +72,14 @@ const defaultContextValue: CardDataContextValue = {
   uniqueValues: null,
   isHydrated: false,
   refreshCache: async () => {},
-  getSetByCode: () => undefined,
-  getFormatByKey: () => undefined,
-  isSetLegalInFormat: () => true,
   getFilteredCards: () => [],
   getSortedCards: (cards) => cards,
   getPaginatedCards: () => ({ cards: [], totalPages: 0, hasMore: false }),
   getFilteredAndSortedCards: () => [],
 };
 
-const CardDataContext = createContext<CardDataContextValue>(defaultContextValue);
+const CardReferenceContext = createContext<CardReferenceContextValue>(defaultReference);
+const CardCatalogContext = createContext<CardCatalogContextValue>(defaultCatalog);
 
 interface CardDataProviderProps {
   children: ReactNode;
@@ -94,28 +111,39 @@ function CardDataProviderInner({ children }: CardDataProviderProps) {
     ]
   );
 
-  const value = useMemo((): CardDataContextValue => {
-    const isSetLegalInFormat = (setCode: string, formatKey: string): boolean => {
+  const isSetLegalInFormat = useCallback(
+    (setCode: string, formatKey: string): boolean => {
       const set = setsData.getSetByCode(setCode);
       if (!set) return true;
-      
+
       const legalFormats = parseSetLegality(set.legality);
       if (legalFormats.length === 0) return true;
-      
-      return legalFormats.includes(formatKey);
-    };
 
+      return legalFormats.includes(formatKey);
+    },
+    [setsData.getSetByCode]
+  );
+
+  const referenceValue = useMemo((): CardReferenceContextValue => {
+    return {
+      sets: setsData.sets,
+      setsLoading: setsData.isLoading,
+      formats: stableFormatsData.formats,
+      formatsLoading: stableFormatsData.isLoading,
+      getSetByCode: setsData.getSetByCode,
+      getFormatByKey: stableFormatsData.getFormatByKey,
+      isSetLegalInFormat,
+    };
+  }, [setsData, stableFormatsData, isSetLegalInFormat]);
+
+  const catalogValue = useMemo((): CardCatalogContextValue => {
     const getFilteredCards = (filters: CardFilters) => {
-      let cards = filterCards(cardData.cards, filters);
-      
-      if (filters.format) {
-        cards = cards.filter((card) => {
-          if (!card.setCode) return true;
-          return isSetLegalInFormat(card.setCode, filters.format!);
-        });
-      }
-      
-      return cards;
+      const formatKey = filters.format;
+      return filterCards(cardData.cards, filters, {
+        passesFormatLegality: formatKey
+          ? (setCode) => !setCode || isSetLegalInFormat(setCode, formatKey)
+          : undefined,
+      });
     };
 
     const getSortedCards = (cards: CachedCard[], options: CardSortOptions) => {
@@ -126,31 +154,27 @@ function CardDataProviderInner({ children }: CardDataProviderProps) {
       return paginateCards(cards, page, pageSize);
     };
 
-    const getFilteredAndSortedCards = (filters: CardFilters, sortOptions: CardSortOptions) => {
+    const getFilteredAndSortedCards = (
+      filters: CardFilters,
+      sortOptions: CardSortOptions
+    ) => {
       const filtered = getFilteredCards(filters);
       return sortCards(filtered, sortOptions);
     };
 
     return {
       ...cardData,
-      sets: setsData.sets,
-      setsLoading: setsData.isLoading,
-      formats: stableFormatsData.formats,
-      formatsLoading: stableFormatsData.isLoading,
-      getSetByCode: setsData.getSetByCode,
-      getFormatByKey: stableFormatsData.getFormatByKey,
-      isSetLegalInFormat,
       getFilteredCards,
       getSortedCards,
       getPaginatedCards,
       getFilteredAndSortedCards,
     };
-  }, [cardData, setsData, stableFormatsData]);
+  }, [cardData, isSetLegalInFormat]);
 
   return (
-    <CardDataContext.Provider value={value}>
-      {children}
-    </CardDataContext.Provider>
+    <CardReferenceContext.Provider value={referenceValue}>
+      <CardCatalogContext.Provider value={catalogValue}>{children}</CardCatalogContext.Provider>
+    </CardReferenceContext.Provider>
   );
 }
 
@@ -159,21 +183,42 @@ export function CardDataProvider({ children }: CardDataProviderProps) {
 
   if (!isClient) {
     return (
-      <CardDataContext.Provider value={defaultContextValue}>
-        {children}
-      </CardDataContext.Provider>
+      <CardReferenceContext.Provider value={defaultReference}>
+        <CardCatalogContext.Provider value={defaultCatalog}>{children}</CardCatalogContext.Provider>
+      </CardReferenceContext.Provider>
     );
   }
 
   return <CardDataProviderInner>{children}</CardDataProviderInner>;
 }
 
-export function useCardData() {
-  return useContext(CardDataContext);
+export function useCardReferenceData(): CardReferenceContextValue {
+  return useContext(CardReferenceContext);
+}
+
+export function useCardCatalog(): CardCatalogContextValue {
+  return useContext(CardCatalogContext);
+}
+
+export function useCardIndex() {
+  const { index } = useCardCatalog();
+  return index;
+}
+
+export function useCardData(): CardDataContextValue {
+  const catalog = useContext(CardCatalogContext);
+  const reference = useContext(CardReferenceContext);
+  return useMemo(
+    () => ({
+      ...catalog,
+      ...reference,
+    }),
+    [catalog, reference]
+  );
 }
 
 export function useFilteredCards(filters: CardFilters): CachedCard[] {
-  const { cards } = useCardData();
+  const { cards } = useCardCatalog();
   return useMemo(() => filterCards(cards, filters), [cards, filters]);
 }
 
@@ -181,7 +226,7 @@ export function useFilteredAndSortedCards(
   filters: CardFilters,
   sortOptions: CardSortOptions
 ): CachedCard[] {
-  const { cards } = useCardData();
+  const { cards } = useCardCatalog();
   return useMemo(() => {
     const filtered = filterCards(cards, filters);
     return sortCards(filtered, sortOptions);

@@ -3,7 +3,7 @@ import { Hexagon, Loader2 } from "lucide-react";
 import { CardHoverPreviewPortal } from "@/components/deck/shared";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { usePrefersReducedMotion } from "@/lib/reduced-motion";
-import { type CachedCard } from "@/lib/universus";
+import type { CachedCard } from "@/lib/universus/card-store";
 import { useActiveDeck } from "@/providers/ActiveDeckProvider";
 import { ActiveDeckCharacterPanel } from "./character-panel";
 import { ActiveDeckSections } from "./sections";

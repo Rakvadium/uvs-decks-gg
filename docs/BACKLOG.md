@@ -8,6 +8,7 @@ Use this list when **no specific task** was assigned. Work from **top to bottom*
 2. Mark it **In progress** (and optionally add your id or date in parentheses).
 3. When done, mark **Done** and record a summary in [CHANGELOG.md](./CHANGELOG.md) or the PR description.
 4. If you split work, add new backlog rows for the remainder.
+5. When the active list gets noisy, move **Done** rows to [archive/backlog-completed.md](./archive/backlog-completed.md).
 
 Statuses: `Open` | `In progress` | `Blocked` | `Done`
 
@@ -17,164 +18,53 @@ Statuses: `Open` | `In progress` | `Blocked` | `Done`
 
 ---
 
-## Priority band — product and reliability
+## Active items
+
+**Open:** Card catalog sync and Convex query hygiene — **CAT-001–CAT-008** (section below). Work top-down unless a row is marked optional/spike.
+
+**Also open:** Right sidebar and shell performance — **RSC-001–RSC-008**.
+
+### Card catalog sync and Convex query hygiene
+
+**Goal:** Keep the **local IndexedDB + in-memory filter** gallery model (fast UX at ~5k+ primary cards) while **minimizing sync bytes, round-trips, and full-table Convex reads**. Align bulk export with what the UI actually uses; eliminate or quarantine `collect()`-scale queries from hot paths (especially admin).
+
+**References:** `src/lib/universus/use-universus-cards.ts` (`fetchFromConvex`, progress), `src/lib/universus/card-store.ts`, `convex/cards.ts` (`listReleasedPaginated`, `listAllCardsChunked`, `list`, `getRarities`, `getTypes`, `getSets`, `listCharacters`, `listReleased`), `src/app/(app)/admin/cards/cards-page-client.tsx`. Convex rules: indexed queries, pagination over `collect()` for large tables.
 
 
-| ID    | Status | Area | Summary                                                                                                              |
-| ----- | ------ | ---- | -------------------------------------------------------------------------------------------------------------------- |
-| P-001 | Done   | Docs | Keep `docs/` aligned with shipped behavior when features change (update SYSTEM_ANALYSIS or feature deep-dives).      |
-| P-002 | Done   | QA   | Establish a minimal automated test or smoke checklist (build + lint + critical flows) if not already enforced in CI. |
+| ID      | Status | Area            | Summary                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| ------- | ------ | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| CAT-001 | Open   | Convex + client | **Bulk sync only gallery catalog rows:** Change the query used for full card cache sync (today `listReleasedPaginated` in `fetchFromConvex`) so each page returns only rows matching `isGalleryCatalogCard` / same rule as `filterCards` (`isFrontFace !== false`, `isVariant !== true`), mirroring `listAllCardsChunked` filtering. Remap `imageUrl` to public R2 URLs as today. **Acceptance:** fresh sync no longer stores backs/variants in IDB; gallery + deck resolution still find backs via `backCardId` / `getBackCard` as today; bump cache metadata or document one-time `clearCardCache` if old blobs incompatible.                                                                                                       |
+| CAT-002 | Open   | Client          | **Tune sync chunk size and invocation count:** In `fetchFromConvex`, pick a `limit` (and document rationale) that balances **fewer `convex.query` round-trips** vs **payload size / browser parse cost** (try 1000 → measure; stay within Convex practical limits for `cardValidator` doc size). **Acceptance:** comment or small doc note with measured row count and approximate JSON size per chunk; no unnecessary extra loops.                                                                                                                                                                                                                                                                                                   |
+| CAT-003 | Open   | Client          | **Accurate sync progress:** Replace `loadProgress` math that divides by hard-coded `3000` in `use-universus-cards.ts` with a real total — e.g. `serverVersionData.cardCount` from `getCardDataVersion`, or `totalEstimate` from an existing query (`listAllCardsChunked` / aligned API). **Acceptance:** progress reaches 100% when the last page is written; works when the catalog grows well past three thousand rows.                                                                                                                                                                                                                                                                                                             |
+| CAT-004 | Open   | Client          | **Remove fragile global `sortCards` cache:** The module-level `lastSortCache` in `use-universus-cards.ts` only tracks one sort and can confuse future callers. **Acceptance:** sorting relies on `useMemo` (e.g. `GalleryFiltersProvider` pipeline) or explicit memo at each call site; behavior and sort order unchanged; grep shows no stale reliance on global cache.                                                                                                                                                                                                                                                                                                                                                              |
+| CAT-005 | Open   | Client / perf   | **Optional spike — main-thread budget:** If profiling shows filter/sort jank with large catalogs, prototype **Web Worker** offload for `filterCards` + `sortCards`, or a **client search index** for name/text/all modes. **Acceptance:** spike doc in `docs/implementation/notes/` with verdict, bundle cost, and whether to merge; no merge required to close if spike says “not needed yet” with profiler evidence.                                                                                                                                                                                                                                                                                                                |
+| CAT-006 | Open   | Infra           | **Optional — versioned static catalog:** Publish a **gzip JSON** (or similar) full catalog to R2/CDN keyed by `cardDataVersion`; client downloads blob when version changes; Convex holds version metadata only. **Acceptance:** design note (security, cache headers, fallback to Convex sync); implementation can be a follow-up row if split.                                                                                                                                                                                                                                                                                                                                                                                      |
+| CAT-007 | Open   | Convex + admin  | **Eliminate hot full-table scans on `cards`:** Audit `convex/cards.ts` for `ctx.db.query("cards").collect()` and equivalent unbounded reads: `list` (branch when `search` empty), `listReleased`, `getRarities`, `getTypes`, `getSets`, `listCharacters` without search, etc. **Acceptance:** each replaced with **pagination**, **indexed narrow queries**, **search indexes**, or **precomputed aggregates** (e.g. small `cardFacetSnapshot` table updated on ingest); **must fix** `src/app/(app)/admin/cards/cards-page-client.tsx` which calls `useQuery(api.cards.list, { limit: 100 })` with empty search — today that hits the `collect()` path per subscription tick. Add tests or manual checklist for admin list + facets. |
+| CAT-008 | Open   | Gallery / UX    | **Large `filteredCards` in context / dialog:** `GalleryFiltersProvider` and `CardDetailsDialog` hold the full filtered array for navigation. **Acceptance:** document peak memory tradeoff in `docs/card-data-hooks.md` (or sibling); if needed, implement **lazy navigation** (e.g. pass sorted filtered ids + `index.byId`, or cap dialog “nearby” slice) so pathological 10k+ result sets do not clone huge arrays into dialog props — scope behind measurement.                                                                                                                                                                                                                                                                   |
 
 
-## Priority band — refactors and hygiene
+### Right sidebar & contextual shell performance
 
-Refactors should preserve behavior unless explicitly scoped otherwise. Split oversized modules using the playbook.
+**Goal:** The desktop **right sidebar** (icon rail + expanded contextual panel for gallery deck/decks, etc.) should **open, close, and resize** without jank; **shell state** should not force unrelated routes to re-render; **gallery ↔ sidebar** interactions (including DnD) should not stack layout work. Work top-down: fix layout animation and context fan-out first, then DnD edge cases, then optional UX polish (resizable, preload).
 
-
-| ID    | Status | Area    | Summary                                                                                                                      |
-| ----- | ------ | ------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| R-001 | Done   | Hygiene | Identify the largest route and dialog components; file issues or rows here with concrete target folder layouts per playbook. |
+**References:** Performance analysis 2026-04-16 — `RightSidebarExpandedPanel` (`m.div` width animation), `ShellSlotProvider` coarse context, `GalleryFiltersProvider` sidebar coupling, `TcgDndProvider` `activeDropZone` updates, `useRegisterSlot` effect deps; [shadcn Resizable](https://ui.shadcn.com/docs/components/radix/resizable) as optional follow-up.
 
 
-## Priority band — content-first calm UI (chrome mode)
-
-**Goal:** Default to a **calm, content-first** chrome (surfaces, type, controls) while keeping **expressive / futuristic** styling available via `data-chrome` (and optional user preference). Centralize behavior in **tokens + primitives** so feature code does not re-create glow, display fonts, or shadows. See deep-dive analysis in prior planning; implementation follows [component-architecture-playbook.md](./component-architecture-playbook.md).
-
-**Dependency hint:** Complete Epic A (foundation) before wide primitive refactors; migrate feature routes (Epic I) after primitives (C–G) land.
-
-### Epic A — Chrome mode and tokens
-
-
-| ID       | Status | Area       | Summary                                                                                                                                        |
-| -------- | ------ | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| CALM-001 | Done   | Foundation | Set `data-chrome` to `calm` or `expressive` on `documentElement`; derive from color-scheme map in `ColorSchemeProvider` (or sibling provider). |
-| CALM-002 | Done   | Docs       | Document color-scheme → chrome defaults in one place; how to add new schemes.                                                                  |
-| CALM-003 | Done   | Foundation | Add `chrome-calm` / `chrome-expressive` CSS layers: semantic vars (focus shadow, elevation, heading transform, scrollbar).                     |
-| CALM-004 | Done   | Backend/UI | Optional Convex `sessions` field `chromePreference` (`auto`, `calm`, or `expressive`) + settings UI; `auto` uses scheme map.                   |
-| CALM-005 | Done   | Product    | Decide default scheme + chrome for new users; update `DEFAULT_COLOR_SCHEME` / onboarding if needed.                                            |
+| ID      | Status | Area       | Summary                                                                                                                                                                                                                                                                                                                  |
+| ------- | ------ | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| RSC-001 | Open   | Shell / UX | **Panel open/close without layout animation:** Replace Framer `animate={{ width }}` on `RightSidebarExpandedPanel` with a compositor-friendly approach (e.g. `transform` slide + fixed track, `clip-path`, or instant toggle). Avoid per-frame width layout thrash against the gallery virtualizer and main flex column. |
+| RSC-002 | Open   | Shell      | **Narrow `ShellSlot` subscriptions:** Split or select from shell slot state so consumers that only need `activeSidebarActionId` (e.g. `GalleryFiltersProvider`) do not re-render when `sidebarWidth` changes or the `slots` `Map` reference updates for unrelated reasons.                                               |
+| RSC-003 | Open   | Gallery    | **Decouple gallery density from sidebar toggle:** Reduce simultaneous churn when opening the right sidebar (e.g. defer or CSS-driven `cardsPerRow` / container queries so virtualized grid column count does not flip in the same window as the panel width transition).                                                 |
+| RSC-004 | Open   | DnD        | **Stable drop-zone targeting at boundaries:** Add hysteresis, short debounce, or consecutive-frame agreement before committing `activeDropZone` changes so grazing the gallery/sidebar edge does not queue rapid `setState` while the main thread is busy with layout.                                                   |
+| RSC-005 | Open   | DnD        | **Narrow droppable re-renders:** Evolve `useTcgDroppable` so hover/`isOver` styling does not require merging full `useTcgDnd()` on every `activeDropZone` tick (e.g. per-zone external store, ref-driven class on the marked node, or context split beyond DND-003’s draggable path).                                    |
+| RSC-006 | Open   | Shell      | **Stable slot registration:** Harden `useRegisterSlot` so `Component` (and similar) in the `useEffect` dependency list cannot thrash register/unregister when callers pass unstable references; prefer refs or explicit registration payloads.                                                                           |
+| RSC-007 | Open   | Shell / UX | **Evaluate resizable panel primitive:** Spike [shadcn Resizable](https://ui.shadcn.com/docs/components/radix/resizable) / `react-resizable-panels` for the right sidebar width (vs. custom `useRightSidebarResize`) only if it simplifies hit targets and reduces resize jank; keep calm/expressive tokens.              |
+| RSC-008 | Open   | Bundle     | **Preload right sidebar chunk:** On routes that expose right-sidebar slots (e.g. gallery), `import()` prefetch or `router.prefetch`-style warmup so the first icon-rail open does not pay dynamic-import latency on top of layout work.                                                                                  |
 
 
-### Epic B — Typography and headings
+---
 
-
-| ID       | Status | Area       | Summary                                                                                           |
-| -------- | ------ | ---------- | ------------------------------------------------------------------------------------------------- |
-| CALM-006 | Done   | Primitives | Add `PageHeading`, `SectionHeading`, `Kicker` (or equivalent) driven by CSS variables per chrome. |
-| CALM-007 | Done   | Shell      | Migrate shell titles: `brand`, `nav`, `mobile-header`, `expanded-panel`, `slot-grid`.             |
-| CALM-008 | Done   | Gallery    | Migrate gallery headings: stats, no-cards, loading, filter dialog header.                         |
-| CALM-009 | Done   | Decks      | Migrate deck + deck-details titles: `heading`, meta panel, top bar, list/stack group labels.      |
-| CALM-010 | Done   | Community  | Migrate community headings: `section-header`, rankings, tier list top bars / lanes.               |
-| CALM-011 | Done   | Cards      | Migrate card details titles: `title-section` (both paths), v2 layout, dialog titles.              |
-
-
-### Epic C — Button and badge system
-
-
-| ID       | Status | Area       | Summary                                                                                                                  |
-| -------- | ------ | ---------- | ------------------------------------------------------------------------------------------------------------------------ |
-| CALM-012 | Done   | Primitives | Refactor `button.tsx` variants to token-backed shadows; calm removes outer glow from default/outline/etc.                |
-| CALM-013 | Done   | UX         | CTA policy: use `default`/`outline` for calm flows; migrate `neon` in empty/auth/home paths.                             |
-| CALM-014 | Done   | Primitives | Refactor `badge.tsx` with `tone` prop (or equivalent); map to calm vs expressive; keep `variant` alias during migration. |
-| CALM-015 | Done   | Migration  | Migrate `Badge variant="cyber"` → semantic tone (e.g. entity); grep-driven.                                              |
-| CALM-016 | Done   | Migration  | Migrate `Badge variant="neon"`; keep expressive styling behind tokens only.                                              |
-
-
-### Epic D — Card and surface system
-
-
-| ID       | Status | Area       | Summary                                                                                                   |
-| -------- | ------ | ---------- | --------------------------------------------------------------------------------------------------------- |
-| CALM-017 | Done   | Primitives | Split `Card` into variants or add `Surface`: `quiet` (flat border, no gradient wash) vs `fx`/elevated.    |
-| CALM-018 | Done   | Primitives | `CardTitle` / `CardDescription` defaults from CSS vars per chrome (not forced display/uppercase on calm). |
-| CALM-019 | Done   | Community  | Migrate large rounded community sections to `Surface` + token elevation (`community-view/content`).       |
-
-
-### Epic E — Form controls and search
-
-
-| ID       | Status | Area       | Summary                                                                                      |
-| -------- | ------ | ---------- | -------------------------------------------------------------------------------------------- |
-| CALM-020 | Done   | Primitives | Refactor `input.tsx` focus/hover to tokens; consider non-mono default for general inputs.    |
-| CALM-021 | Done   | Primitives | Refactor `select` + `dropdown-menu` popover chrome to shared shadow/border tokens.           |
-| CALM-022 | Done   | Gallery    | Shared `GallerySearchField` (or extend `SearchBar`) for gallery + tier list search controls. |
-| CALM-023 | Done   | Gallery    | Filter dialog icon header + option tiles: move glow to expressive tokens only.               |
-
-
-### Epic F — Overlays, tooltips, sheets
-
-
-| ID       | Status | Area       | Summary                                                                                                |
-| -------- | ------ | ---------- | ------------------------------------------------------------------------------------------------------ |
-| CALM-024 | Done   | Primitives | `tooltip.tsx`: neutral shadow calm vs primary-tint expressive.                                         |
-| CALM-025 | Done   | Primitives | `dialog.tsx`: title styling via typography roles; drop forced `font-display`+uppercase default.        |
-| CALM-026 | Done   | Shell      | `draggable-drawer`, `auth-guard`, mobile sheets: tokenized border/shadow (not hardcoded primary glow). |
-
-
-### Epic G — Globals and motion
-
-
-| ID       | Status | Area    | Summary                                                                                                |
-| -------- | ------ | ------- | ------------------------------------------------------------------------------------------------------ |
-| CALM-027 | Done   | Globals | Scrollbar: calm neutral thumb; expressive optional gradient; wire via vars in `base.css`.              |
-| CALM-028 | Done   | Globals | Gate `text-glow`, `border-glow`, `scanlines`, `holo-shimmer` for calm (or require explicit `data-fx`). |
-| CALM-029 | Done   | Cards   | `CARD_GLOW_`* + `card-grid-item/image-stage` holo: calm outline-only path.                             |
-| CALM-030 | Done   | Gallery | `CardGridItemFrame` gradient halo: chrome-aware via prop or CSS (single implementation for all tiles). |
-
-
-### Epic H — Shell
-
-
-| ID       | Status | Area    | Summary                                                                                   |
-| -------- | ------ | ------- | ----------------------------------------------------------------------------------------- |
-| CALM-031 | Done   | Shell   | Left-sidebar frame + right `icon-rail`: tokenize gradients and active-state glow.         |
-| CALM-032 | Done   | Gallery | Active deck sidebar slot label: remove primary `drop-shadow` on calm (`slot-components`). |
-| CALM-033 | Done   | Shell   | User menu avatar trigger: calm border without neon shadow (`auth-trigger`).               |
-
-
-### Epic I — Pages and flows (feature migration)
-
-
-| ID       | Status | Area      | Summary                                                                                                  |
-| -------- | ------ | --------- | -------------------------------------------------------------------------------------------------------- |
-| CALM-034 | Done   | Home      | Home `page.tsx`: `Surface` + calm CTA; reduce gradient hero chrome; preserve layout.                     |
-| CALM-035 | Done   | Settings  | Settings `page.tsx`: flat `bg-background` on calm; optional gradient on expressive.                      |
-| CALM-036 | Done   | Decks     | Decks view: heading pulse/blur → tokens; empty + auth-required CTAs per CALM-013.                        |
-| CALM-037 | Done   | Decks     | Deck grid item + details panel: calm borders/shadows (`deck-grid-item`, `details-panel`).                |
-| CALM-038 | Done   | Deck      | Deck details: loader, hero gradients, `deck-list-item` shadows.                                          |
-| CALM-039 | Done   | Deck      | Card details dialog in deck flow: `card-details/dialog` buttons use button tokens.                       |
-| CALM-040 | Done   | Gallery   | Gallery main: list items, loading, preview dialog align with Surface + frame policy.                     |
-| CALM-041 | Done   | Cards     | Card details v2 + original: image halos, panels, keyword badges.                                         |
-| CALM-042 | Done   | Community | Creator program hero: `SectionFx` wrapper or expressive-only (`border-glow`, `holo-shimmer`, text glow). |
-| CALM-043 | Done   | Community | Media feed: `scanlines` only when expressive (`media-feed-section`).                                     |
-| CALM-044 | Done   | Community | Tier lists: search (CALM-022) + badges + headings.                                                       |
-| CALM-045 | Done   | Community | Community rankings: badges + headings (CALM-014–CALM-015 + typography).                                  |
-
-
-### Epic J — QA, docs, cleanup
-
-
-| ID       | Status | Area    | Summary                                                                               |
-| -------- | ------ | ------- | ------------------------------------------------------------------------------------- |
-| CALM-046 | Done   | QA      | UI matrix page or Storybook: primitives × calm vs expressive; screenshot baseline.    |
-| CALM-047 | Done   | Hygiene | Post-migration: grep/CI allowlist for forbidden raw glow patterns in app directories. |
-| CALM-048 | Done   | A11y    | Focus visibility and contrast without relying on glow (calm mode).                    |
-| CALM-049 | Done   | Perf    | Document fewer blur layers on calm; optional follow-up metrics.                       |
-
-
-## Priority band — community video feed (YouTube)
-
-Goal: replace static `VIDEO_FEED` in [community-content-data.ts](../src/components/community/community-content-data.ts) with real metadata for **Community Feed** ([media-feed-section.tsx](../src/components/community/sections/media-feed-section.tsx)), using the YouTube Data API v3 with server-side keys and caching. Prefer `playlistItems.list` + `videos.list` (or curated IDs + `videos.list`) over `search.list` for quota.
-
-
-| ID     | Status | Area       | Summary                                                                                                                                                                                                          |
-| ------ | ------ | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| CF-001 | Open   | Infra      | Create or use a Google Cloud project, enable YouTube Data API v3, issue a **server-only** API key; document env var name(s) and where it is read.                                                                |
-| CF-002 | Open   | Data       | Define storage for the feed (Convex table and/or config): curated YouTube **video IDs**, optional editorial fields (label, accent, sort order).                                                                  |
-| CF-003 | Open   | Backend    | Implement fetch + normalize: batched `videos.list` (snippet, contentDetails, statistics); optional `channels.list` + `playlistItems.list` for “latest from channel” sync; persist `fetchedAt` and respect a TTL. |
-| CF-004 | Open   | UI         | Update `CommunityMediaFeedSection` to consume live data: thumbnails, titles, channel, duration, view counts, and outbound or embed playback; keep playbook layout.                                               |
-| CF-005 | Open   | UX/QA      | Loading skeletons, empty and error states, and safe degradation when quota or network fails; verify no API key is exposed to the client bundle.                                                                  |
-| CF-006 | Open   | Compliance | Align with [YouTube API Services Terms](https://developers.google.com/youtube/terms/api-services-terms-of-service); attribution/branding; monitor daily quota in Cloud Console.                                  |
-
+**Completed backlog:** [archive/backlog-completed.md](./archive/backlog-completed.md)
 
 ---
 

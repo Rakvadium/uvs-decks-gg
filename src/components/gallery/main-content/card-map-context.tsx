@@ -5,7 +5,8 @@ import {
   useMemo,
   type ReactNode,
 } from "react";
-import { useCardData, type CachedCard } from "@/lib/universus";
+import { useCardData } from "@/lib/universus/card-data-provider";
+import type { CachedCard } from "@/lib/universus/card-store";
 import { useCardIdMap } from "@/hooks/useCardIdMap";
 
 interface GalleryCardMapContextValue {

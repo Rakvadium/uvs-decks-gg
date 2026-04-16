@@ -7,8 +7,8 @@ import { Button } from "@/components/ui/button";
 import { useQuery } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import { useConvexAuth } from "convex/react";
-import { useCardData } from "@/lib/universus";
-import { motion } from "framer-motion";
+import { useCardData } from "@/lib/universus/card-data-provider";
+import * as m from "framer-motion/m";
 import { usePrefersReducedMotion } from "@/lib/reduced-motion";
 import { useAuthDialog } from "@/components/auth/auth-dialog";
 
@@ -17,7 +17,7 @@ function StatCard({ label, value, icon: Icon, delay = 0, animate = true }: { lab
   const motionEnabled = animate && !prefersReducedMotion;
   
   return (
-    <motion.div
+    <m.div
       initial={motionEnabled ? { opacity: 0, y: 20 } : false}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay }}
@@ -32,7 +32,7 @@ function StatCard({ label, value, icon: Icon, delay = 0, animate = true }: { lab
           <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">{label}</p>
         </div>
       </div>
-    </motion.div>
+    </m.div>
   );
 }
 
@@ -59,7 +59,7 @@ function NavCard({ href, icon: Icon, title, description, accentColor = "primary"
   };
   
   return (
-    <motion.div
+    <m.div
       initial={motionEnabled ? { opacity: 0, y: 30 } : false}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, delay }}
@@ -89,7 +89,7 @@ function NavCard({ href, icon: Icon, title, description, accentColor = "primary"
           </div>
         </div>
       </Link>
-    </motion.div>
+    </m.div>
   );
 }
 
@@ -98,7 +98,7 @@ function TerminalLine({ children, prefix = "$", delay = 0, animate = true }: { c
   const motionEnabled = animate && !prefersReducedMotion;
   
   return (
-    <motion.div
+    <m.div
       initial={motionEnabled ? { opacity: 0, x: -10 } : false}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.3, delay }}
@@ -106,7 +106,7 @@ function TerminalLine({ children, prefix = "$", delay = 0, animate = true }: { c
     >
       <span className="text-primary">{prefix}</span>
       <span className="text-muted-foreground">{children}</span>
-    </motion.div>
+    </m.div>
   );
 }
 
@@ -154,7 +154,7 @@ function HomePage() {
       </div>
 
       <div className="relative z-10 p-6 md:p-8 lg:p-10 space-y-10">
-        <motion.div 
+        <m.div 
           initial={introAnimations ? { opacity: 0, y: -20 } : false}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
@@ -203,7 +203,7 @@ function HomePage() {
               )}
             </div>
           </div>
-        </motion.div>
+        </m.div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <StatCard label="Cards in DB" value={totalCards.toLocaleString()} icon={Database} delay={0.1} animate={introAnimations} />
@@ -242,7 +242,7 @@ function HomePage() {
           />
         </div>
 
-        <motion.div
+        <m.div
           initial={introAnimations ? { opacity: 0, y: 20 } : false}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.5 }}
@@ -316,9 +316,9 @@ function HomePage() {
               </div>
             </div>
           </div>
-        </motion.div>
+        </m.div>
 
-        <motion.div
+        <m.div
           initial={introAnimations ? { opacity: 0 } : false}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.8 }}
@@ -327,7 +327,7 @@ function HomePage() {
           <Hexagon className="h-4 w-4" />
           <span className="uppercase tracking-[0.3em]">UVSDECKS.GG Terminal v1.0</span>
           <Hexagon className="h-4 w-4" />
-        </motion.div>
+        </m.div>
       </div>
     </div>
   );

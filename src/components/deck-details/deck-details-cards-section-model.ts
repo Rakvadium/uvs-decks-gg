@@ -5,7 +5,8 @@ import { Id } from "../../../convex/_generated/dataModel";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { useDeckDetails } from "@/providers/DeckDetailsProvider";
 import { usePrefersReducedMotion } from "@/lib/reduced-motion";
-import { useCardData, type CachedCard } from "@/lib/universus";
+import { useCardData } from "@/lib/universus/card-data-provider";
+import type { CachedCard } from "@/lib/universus/card-store";
 import { canAddCardToSection, useDeckEditor } from "@/lib/deck";
 import { useCardIdMap } from "@/hooks/useCardIdMap";
 import {
@@ -13,7 +14,7 @@ import {
   CARD_TYPE_ORDER,
 } from "@/lib/deck/display-config";
 import { formatUniversusCardType } from "@/config/universus";
-import { useTcgDroppable } from "@/lib/dnd";
+import { TCG_DND_ACCEPTS_CARD_ONLY, useTcgDroppable } from "@/lib/dnd";
 import {
   LIST_SORT_SELECT_OPTIONS,
   LIST_VIEW_GROUPS,
@@ -185,7 +186,7 @@ export function useDeckCardsSectionModel() {
 
   const { isOver: isDeckDropOver, canDrop: canDropToActiveSection, droppableProps: deckDropProps } = useTcgDroppable({
     id: `deck-details-drop-${activeSection}`,
-    accepts: ["card"],
+    accepts: TCG_DND_ACCEPTS_CARD_ONLY,
     onDrop: handleDropToActiveSection,
     isDisabled: !deck || !isOwner,
   });

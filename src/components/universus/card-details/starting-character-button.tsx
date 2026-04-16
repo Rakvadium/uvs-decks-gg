@@ -1,6 +1,6 @@
 import { Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import type { CachedCard } from "@/lib/universus";
+import type { CachedCard } from "@/lib/universus/card-store";
 import { useDeckEditor } from "@/lib/deck";
 import { cn } from "@/lib/utils";
 

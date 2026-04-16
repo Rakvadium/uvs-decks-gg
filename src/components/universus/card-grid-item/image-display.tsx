@@ -1,4 +1,5 @@
 import Image from "next/image";
+import type { RefObject } from "react";
 import { cn } from "@/lib/utils";
 
 function isValidUrl(value: string): boolean {
@@ -14,9 +15,21 @@ interface CardImageDisplayProps {
   imageUrl?: string;
   name: string;
   className?: string;
+  imgRef?: RefObject<HTMLImageElement | null>;
+  priority?: boolean;
+  sizes?: string;
+  fetchPriority?: "auto" | "high" | "low";
 }
 
-export function CardImageDisplay({ imageUrl, name, className }: CardImageDisplayProps) {
+export function CardImageDisplay({
+  imageUrl,
+  name,
+  className,
+  imgRef,
+  priority,
+  sizes,
+  fetchPriority,
+}: CardImageDisplayProps) {
   const hasValidImageUrl = Boolean(imageUrl && isValidUrl(imageUrl));
 
   if (!hasValidImageUrl) {
@@ -32,14 +45,20 @@ export function CardImageDisplay({ imageUrl, name, className }: CardImageDisplay
     );
   }
 
+  const defaultSizes =
+    "(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, (max-width: 1280px) 20vw, 16vw";
+
   return (
     <Image
+      ref={imgRef}
       src={imageUrl as string}
       alt={name}
       fill
-      sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, (max-width: 1280px) 20vw, 16vw"
+      sizes={sizes ?? defaultSizes}
       className={cn("object-cover", className)}
-      loading="lazy"
+      priority={priority ?? false}
+      loading={priority ? undefined : "lazy"}
+      fetchPriority={fetchPriority}
       draggable={false}
     />
   );

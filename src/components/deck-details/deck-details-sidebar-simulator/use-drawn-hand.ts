@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import type { CachedCard } from "@/lib/universus";
+import type { CachedCard } from "@/lib/universus/card-store";
 import { SIMULATOR_REDRAW_EVENT } from "./constants";
 
 interface UseDrawnHandParams {

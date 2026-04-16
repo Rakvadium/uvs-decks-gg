@@ -11,7 +11,7 @@ import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { Id, Doc } from "../../convex/_generated/dataModel";
 import { useUIState } from "./UIStateProvider";
-import { useCardData } from "@/lib/universus";
+import { useCardIndex } from "@/lib/universus/card-data-provider";
 import { canAddCardToSection, canMoveCardToSection } from "@/lib/deck";
 
 type Deck = Doc<"decks">;
@@ -73,7 +73,7 @@ interface ActiveDeckProviderProps {
 export function ActiveDeckProvider({ children }: ActiveDeckProviderProps) {
   const { uiState, setActiveDeckId: setActiveDeckIdInUI } = useUIState();
   const activeDeckId = uiState.activeDeckId;
-  const { cards } = useCardData();
+  const cardIndex = useCardIndex();
 
   const activeDeck = useQuery(
     api.decks.getById,
@@ -106,14 +106,6 @@ export function ActiveDeckProvider({ children }: ActiveDeckProviderProps) {
     return counts;
   }, [mainCounts, sideCounts, referenceCounts]);
 
-  const cardMap = useMemo(() => {
-    const map = new Map<string, Doc<"cards">>();
-    for (const card of cards) {
-      map.set(card._id, card as Doc<"cards">);
-    }
-    return map;
-  }, [cards]);
-
   const sectionCounts = useMemo(
     () => ({ mainCounts, sideCounts, referenceCounts }),
     [mainCounts, sideCounts, referenceCounts]
@@ -121,7 +113,7 @@ export function ActiveDeckProvider({ children }: ActiveDeckProviderProps) {
 
   const canAddToSection = useCallback(
     (cardId: Id<"cards">, section: DeckSection, quantity?: number) => {
-      const card = cardMap.get(cardId.toString());
+      const card = cardIndex?.byId.get(cardId.toString());
       return canAddCardToSection({
         card,
         cardId: cardId.toString(),
@@ -130,12 +122,12 @@ export function ActiveDeckProvider({ children }: ActiveDeckProviderProps) {
         quantity,
       });
     },
-    [cardMap, sectionCounts]
+    [cardIndex, sectionCounts]
   );
 
   const canMoveToSection = useCallback(
     (cardId: Id<"cards">, fromSection: DeckSection, toSection: DeckSection, quantity?: number) => {
-      const card = cardMap.get(cardId.toString());
+      const card = cardIndex?.byId.get(cardId.toString());
       return canMoveCardToSection({
         card,
         cardId: cardId.toString(),
@@ -145,7 +137,7 @@ export function ActiveDeckProvider({ children }: ActiveDeckProviderProps) {
         quantity,
       });
     },
-    [cardMap, sectionCounts]
+    [cardIndex, sectionCounts]
   );
 
   const setActiveDeck = useCallback(

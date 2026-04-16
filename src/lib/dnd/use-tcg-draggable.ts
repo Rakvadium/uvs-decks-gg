@@ -4,7 +4,7 @@ import * as React from "react";
 import { Doc } from "../../../convex/_generated/dataModel";
 
 type Card = Doc<"cards">;
-import { UNIVERSUS_CARD_DND_ENABLED, useTcgDnd } from "./tcg-dnd-provider";
+import { UNIVERSUS_CARD_DND_ENABLED, useTcgDndActions } from "./tcg-dnd-provider";
 import { useIsMobile } from "@/hooks/useIsMobile";
 
 function isDndDebugEnabled(): boolean {
@@ -21,9 +21,17 @@ function dndLog(...args: any[]) {
   console.log("[tcg-dnd]", ...args);
 }
 
+function readPreviewImageUrlFromRef(ref: React.RefObject<HTMLImageElement | null> | undefined): string | undefined {
+  const el = ref?.current;
+  if (!el) return undefined;
+  const raw = (el.currentSrc || el.src || "").trim();
+  return raw.length > 0 ? raw : undefined;
+}
+
 export interface UseTcgDraggableOptions {
   card: Card;
   sourceId?: string;
+  previewImageRef?: React.RefObject<HTMLImageElement | null>;
   isDisabled?: boolean;
   dragStartDistance?: number;
   skipDragSelector?: string;
@@ -50,6 +58,7 @@ const emptyResult: UseTcgDraggableResult = {
 export function useTcgDraggable({
   card,
   sourceId,
+  previewImageRef,
   isDisabled = false,
   dragStartDistance = 6,
   skipDragSelector = 'button, [role="menuitem"], a, input, textarea, select, [data-no-drag]',
@@ -57,7 +66,7 @@ export function useTcgDraggable({
   const [localIsDragging, setLocalIsDragging] = React.useState(false);
   const startPointRef = React.useRef<{ x: number; y: number } | null>(null);
   const startedRef = React.useRef(false);
-  const { startDrag, endDrag } = useTcgDnd();
+  const { startDrag, endDrag } = useTcgDndActions();
   const isMobile = useIsMobile();
 
   const handleDragStart = React.useCallback(
@@ -110,6 +119,7 @@ export function useTcgDraggable({
           type: "card",
           card,
           sourceId,
+          previewImageUrl: readPreviewImageUrlFromRef(previewImageRef),
         });
 
         if (evt?.preventDefault) evt.preventDefault();
@@ -146,7 +156,7 @@ export function useTcgDraggable({
       window.addEventListener("drop", handleEnd);
       window.addEventListener("blur", handleEnd);
     },
-    [isDisabled, skipDragSelector, dragStartDistance, card, sourceId, startDrag, endDrag]
+    [isDisabled, skipDragSelector, dragStartDistance, card, sourceId, previewImageRef, startDrag, endDrag]
   );
 
   if (!UNIVERSUS_CARD_DND_ENABLED || isDisabled || isMobile) {

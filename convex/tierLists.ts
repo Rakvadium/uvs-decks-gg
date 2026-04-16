@@ -21,6 +21,10 @@ import {
   resolveRankingScopeKey,
   type CommunityTierRankingScope,
 } from "../shared/app-config";
+import {
+  normalizeTierListPoolScopes,
+  TIER_LIST_POOL_ALL_TYPES,
+} from "../shared/tier-list-pool";
 
 const tierListSaveItemValidator = v.object({
   cardId: v.id("cards"),
@@ -373,6 +377,14 @@ export const save = mutation({
     isPublic: v.boolean(),
     rankingScope: tierListRankingScopeValidator,
     selectedSetCodes: v.array(v.string()),
+    poolScopes: v.optional(
+      v.array(
+        v.object({
+          setCode: v.string(),
+          cardType: v.string(),
+        })
+      )
+    ),
     tiers: v.array(tierDefinitionValidator),
     items: v.array(tierListSaveItemValidator),
   },
@@ -383,7 +395,17 @@ export const save = mutation({
     const userId = await requireAuth(ctx);
     const normalizedTitle = sanitizeText(args.title, 80) ?? "Untitled Tier List";
     const normalizedDescription = sanitizeText(args.description, 280);
-    const normalizedSetCodes = normalizeSetCodes(args.selectedSetCodes);
+    const poolScopesFromRequest =
+      args.poolScopes !== undefined
+        ? normalizeTierListPoolScopes(args.poolScopes)
+        : normalizeTierListPoolScopes(
+            normalizeSetCodes(args.selectedSetCodes).map((setCode) => ({
+              setCode,
+              cardType: TIER_LIST_POOL_ALL_TYPES,
+            }))
+          );
+    const normalizedSetCodes = normalizeSetCodes(poolScopesFromRequest.map((scope) => scope.setCode));
+    const storedPoolScopes = poolScopesFromRequest.length > 0 ? poolScopesFromRequest : undefined;
     const normalizedRankingScopeKey = resolveRankingScopeKey(args.rankingScope, normalizedSetCodes);
     const normalizedTiers = normalizeTiers(args.tiers, args.rankingScope);
 
@@ -432,6 +454,7 @@ export const save = mutation({
         rankingScope: args.rankingScope,
         rankingScopeKey: normalizedRankingScopeKey,
         selectedSetCodes: normalizedSetCodes,
+        poolScopes: storedPoolScopes,
         previewCardIds,
         tiers: normalizedTiers,
         itemCount: normalizedItems.length,
@@ -451,6 +474,7 @@ export const save = mutation({
         rankingScope: args.rankingScope,
         rankingScopeKey: normalizedRankingScopeKey,
         selectedSetCodes: normalizedSetCodes,
+        poolScopes: storedPoolScopes,
         previewCardIds,
         tiers: normalizedTiers,
         itemCount: normalizedItems.length,

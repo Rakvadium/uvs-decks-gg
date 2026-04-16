@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 import { canAddCardToSection, useDeckEditor } from "@/lib/deck";
 import { useTcgDraggable } from "@/lib/dnd";
 import { useCardDetailsDialogTrigger, useDeckSectionCounts, useDragClickGuard } from "../hooks";
@@ -9,9 +9,11 @@ export function useSidebarGalleryListItemModel({ card, backCard, onHoverCard, on
   const sectionCounts = useDeckSectionCounts();
   const { isDialogOpen, setIsDialogOpen, openDialog, handleKeyDownOpen } = useCardDetailsDialogTrigger();
 
+  const dragPreviewImageRef = useRef<HTMLImageElement | null>(null);
   const { isDragging, dragHandleProps } = useTcgDraggable({
     card,
     sourceId: "deck-details-gallery-list",
+    previewImageRef: dragPreviewImageRef,
   });
 
   const { canOpenDialog } = useDragClickGuard(isDragging);
@@ -35,6 +37,7 @@ export function useSidebarGalleryListItemModel({ card, backCard, onHoverCard, on
     quantity,
     canAddToMain,
     isDragging,
+    dragPreviewImageRef,
     dragHandleProps,
     canOpenDialog,
     isDialogOpen,

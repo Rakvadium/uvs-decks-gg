@@ -1,7 +1,8 @@
 import { useMemo } from "react";
 import { formatUniversusCardType } from "@/config/universus";
 import { useCardIdMap } from "@/hooks/useCardIdMap";
-import { useCardData, type CachedCard } from "@/lib/universus";
+import { useCardData } from "@/lib/universus/card-data-provider";
+import type { CachedCard } from "@/lib/universus/card-store";
 import { useDeckDetailsOptional } from "@/providers/DeckDetailsProvider";
 import { buildDeckEntriesFromQuantities, extractZones, toSortedBuckets } from "../deck-list-utils";
 

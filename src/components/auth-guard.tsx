@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useConvexAuth } from "convex/react";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -13,26 +13,18 @@ interface AuthGuardProps {
 export function AuthGuard({ children, requireAuth = false }: AuthGuardProps) {
   const { isLoading, isAuthenticated } = useConvexAuth();
   const router = useRouter();
-  const [showContent, setShowContent] = useState(false);
 
   useEffect(() => {
     if (!isLoading && requireAuth && !isAuthenticated) {
       router.replace("/sign-in");
-      return;
-    }
-    if (!isLoading) {
-      setShowContent(true);
     }
   }, [isLoading, isAuthenticated, requireAuth, router]);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowContent(true);
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, []);
+  if (isLoading) {
+    return <AuthLoadingSkeleton />;
+  }
 
-  if (!showContent && isLoading) {
+  if (requireAuth && !isAuthenticated) {
     return <AuthLoadingSkeleton />;
   }
 

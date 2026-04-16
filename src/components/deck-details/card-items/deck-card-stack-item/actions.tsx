@@ -5,7 +5,7 @@ import { canAddCardToSection, useDeckEditor } from "@/lib/deck";
 import { useDeckDetailsOptional } from "@/providers/DeckDetailsProvider";
 import { useDeckCardsSectionContext } from "../../deck-details-cards-section-context";
 import { useDeckSectionCounts } from "../hooks";
-import type { CachedCard } from "@/lib/universus";
+import type { CachedCard } from "@/lib/universus/card-store";
 
 interface DeckCardStackItemActionsProps {
   card: CachedCard;

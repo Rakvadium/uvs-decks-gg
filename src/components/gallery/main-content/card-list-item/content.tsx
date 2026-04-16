@@ -1,6 +1,6 @@
 "use client";
 
-import { CardDetailsDialog } from "@/components/universus";
+import { CardDetailsDialog } from "@/components/universus/card-details/dialog";
 import { useCardNavigation } from "@/components/universus/card-details/navigation-context";
 import { cn } from "@/lib/utils";
 import { CardDeckControlsCompact } from "../card-deck-controls";
@@ -9,7 +9,7 @@ import { CardListItemDetails } from "./details";
 import { CardListItemThumbnail } from "./thumbnail";
 import type { CardListItemProps } from "./types";
 
-function CardListItemContent() {
+function CardListItemContent({ embedDetailsDialog }: { embedDetailsDialog: boolean }) {
   const {
     backCard,
     card,
@@ -54,22 +54,25 @@ function CardListItemContent() {
         />
       </div>
 
-      <CardDetailsDialog
-        card={card}
-        backCard={backCard}
-        open={isDialogOpen}
-        onOpenChange={setIsDialogOpen}
-        cards={nav?.cards}
-        getBackCard={nav?.getBackCard}
-      />
+      {embedDetailsDialog ? (
+        <CardDetailsDialog
+          card={card}
+          backCard={backCard}
+          open={isDialogOpen}
+          onOpenChange={setIsDialogOpen}
+          cards={nav?.cards}
+          getBackCard={nav?.getBackCard}
+        />
+      ) : null}
     </>
   );
 }
 
 export function CardListItem(props: CardListItemProps) {
+  const embedDetailsDialog = !props.onOpenCardDetails;
   return (
     <CardListItemProvider {...props}>
-      <CardListItemContent />
+      <CardListItemContent embedDetailsDialog={embedDetailsDialog} />
     </CardListItemProvider>
   );
 }

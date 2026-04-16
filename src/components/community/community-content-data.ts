@@ -33,41 +33,6 @@ export const FEATURED_BUILDERS = [
   },
 ] as const;
 
-export const VIDEO_FEED = [
-  {
-    title: "Season 5 Meta Map: the three archetypes you must answer",
-    creator: "NovaEdge",
-    duration: "14:22",
-    views: "34k",
-    label: "Meta Briefing",
-    accent: "from-primary/20 via-primary/5 to-transparent",
-  },
-  {
-    title: "From locals to regionals: deck prep checklist",
-    creator: "RiftStream",
-    duration: "10:48",
-    views: "21k",
-    label: "Tournament Ready",
-    accent: "from-secondary/20 via-secondary/5 to-transparent",
-  },
-  {
-    title: "Tech package guide for mirror matches",
-    creator: "ArcLight",
-    duration: "18:02",
-    views: "12k",
-    label: "Deck Tech",
-    accent: "from-emerald-400/20 via-emerald-400/5 to-transparent",
-  },
-  {
-    title: "Top 5 deck spotlights from the weekend",
-    creator: "NovaEdge",
-    duration: "8:36",
-    views: "28k",
-    label: "Spotlights",
-    accent: "from-primary/20 via-primary/5 to-transparent",
-  },
-] as const;
-
 export const COMMUNITY_PULSE = [
   {
     title: "Matchup matrix: Control vs Tempo",

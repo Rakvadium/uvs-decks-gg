@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Home, Shield } from "lucide-react";
-import { motion } from "framer-motion";
+import * as m from "framer-motion/m";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { Kicker } from "@/components/ui/typography-headings";
@@ -19,7 +19,7 @@ export function LeftSidebarNav() {
 
             const navLink = (
               <Link key={item.path} href={href}>
-                <motion.div
+                <m.div
                   initial={false}
                   whileHover={prefersReducedMotion ? undefined : { x: collapsed ? 0 : 4 }}
                   whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}
@@ -44,14 +44,9 @@ export function LeftSidebarNav() {
                     </span>
                   ) : null}
                   {isActive ? (
-                    <motion.div
-                      initial={false}
-                      layoutId="activeNav"
-                      className="absolute inset-0 rounded-md border border-primary/20"
-                      transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                    />
+                    <div className="pointer-events-none absolute inset-0 rounded-md border border-primary/20" />
                   ) : null}
-                </motion.div>
+                </m.div>
               </Link>
             );
 

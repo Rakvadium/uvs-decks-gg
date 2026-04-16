@@ -1,15 +1,76 @@
 "use client";
 
-import { Plus } from "lucide-react";
-import { useIsMobile } from "@/hooks/useIsMobile";
+import { Plus, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { GallerySearchField } from "@/components/ui/gallery-search-field";
+import { Input } from "@/components/ui/input";
 import { SegmentedControl } from "@/components/ui/segmented-control";
+import { Separator } from "@/components/ui/separator";
 import { useOptionalCommunityTierListsPageContext } from "./context";
 import { BROWSER_TABS } from "./hook";
 
+export function CommunityTierListsPagePrimaryAction() {
+  const context = useOptionalCommunityTierListsPageContext();
+  if (!context) return null;
+
+  const { handleOpenCreateDialog } = context;
+
+  return (
+    <Button variant="outline" size="sm" className="h-9 gap-1.5" onClick={handleOpenCreateDialog}>
+      <Plus className="h-3.5 w-3.5" />
+      <span className="text-xs">New List</span>
+    </Button>
+  );
+}
+
+export function CommunityTierListsPageToolbar() {
+  const context = useOptionalCommunityTierListsPageContext();
+  if (!context) return null;
+
+  const { activeTab, setActiveTab, searchQuery, setSearchQuery, publicLists, myLists } = context;
+  const showSearch = activeTab !== "rankings";
+
+  const items = BROWSER_TABS.map((tab) => ({
+    value: tab.id,
+    label: <span>{tab.label}</span>,
+    icon: tab.icon,
+    badge:
+      tab.id === "public"
+        ? publicLists?.length || undefined
+        : tab.id === "mine"
+          ? myLists?.length || undefined
+          : undefined,
+  }));
+
+  return (
+    <div className="flex w-full min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:gap-2">
+      {showSearch ? (
+        <div className="relative min-w-0 max-w-md flex-1">
+          <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            placeholder="Search tier lists..."
+            value={searchQuery}
+            onChange={(event) => setSearchQuery(event.target.value)}
+            className="h-9 pl-8 text-sm"
+            name="tier-lists-search-desktop"
+            spellCheck={false}
+          />
+        </div>
+      ) : null}
+
+      <div className="flex min-w-0 items-center gap-2 overflow-x-auto pb-0.5 sm:pb-0 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        {showSearch ? <Separator orientation="vertical" className="mx-1 hidden h-6 sm:block" /> : null}
+        <SegmentedControl
+          size="sm"
+          value={activeTab}
+          onValueChange={(value) => setActiveTab(value as typeof activeTab)}
+          items={items}
+        />
+      </div>
+    </div>
+  );
+}
+
 export function CommunityTierListsPageTopBar() {
-  const isMobile = useIsMobile();
   const context = useOptionalCommunityTierListsPageContext();
 
   if (!context) {
@@ -39,82 +100,36 @@ export function CommunityTierListsPageTopBar() {
           : undefined,
   }));
 
-  if (isMobile) {
-    return (
-      <div className="flex w-full flex-col gap-2">
-        <div className="flex items-center gap-2">
-          {showSearch ? (
-            <div className="min-w-0 flex-1">
-              <GallerySearchField
-                placeholder="Search tier lists..."
-                value={searchQuery}
-                onChange={(event) => setSearchQuery(event.target.value)}
-                name="tier-lists-search"
-                spellCheck={false}
-              />
-            </div>
-          ) : (
-            <div className="min-w-0 flex-1">
-              <p className="text-xs font-mono uppercase tracking-[0.2em] text-muted-foreground">
-                Community rankings
-              </p>
-            </div>
-          )}
-          <Button variant="outline" size="sm" className="h-9 shrink-0 gap-1.5" onClick={handleOpenCreateDialog}>
-            <Plus className="h-3.5 w-3.5" />
-            <span>New</span>
-          </Button>
-        </div>
-
-        <SegmentedControl
-          size="sm"
-          value={activeTab}
-          onValueChange={(value) => setActiveTab(value as typeof activeTab)}
-          items={items}
-        />
-      </div>
-    );
-  }
-
   return (
-    <div className="flex w-full items-center justify-between gap-2">
-      <div className="flex min-w-0 flex-1 items-center gap-2">
-        <div className="w-full max-w-sm">
-          {showSearch ? (
-            <GallerySearchField
+    <div className="flex w-full flex-col gap-2">
+      <div className="flex items-center gap-2">
+        {showSearch ? (
+          <div className="relative min-w-0 flex-1">
+            <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-primary/70" />
+            <Input
               placeholder="Search tier lists..."
               value={searchQuery}
               onChange={(event) => setSearchQuery(event.target.value)}
+              className="h-9 border-primary/40 bg-background/50 pl-8 pr-3 text-sm shadow-[0_0_10px_-3px_var(--primary)] focus-visible:border-primary focus-visible:shadow-[0_0_15px_-3px_var(--primary)]"
               name="tier-lists-search"
               spellCheck={false}
-              appearance="quiet"
-              inputClassName="h-10 pl-10"
             />
-          ) : (
-            <div className="flex h-10 items-center rounded-md border border-transparent px-3">
-              <p className="text-xs font-mono uppercase tracking-[0.22em] text-muted-foreground">
-                Community rankings
-              </p>
-            </div>
-          )}
-        </div>
-
-        <SegmentedControl
-          size="md"
-          value={activeTab}
-          onValueChange={(value) => setActiveTab(value as typeof activeTab)}
-          items={items}
-        />
+          </div>
+        ) : (
+          <div className="min-w-0 flex-1" />
+        )}
+        <Button variant="outline" size="sm" className="h-9 shrink-0 gap-1.5" onClick={handleOpenCreateDialog}>
+          <Plus className="h-3.5 w-3.5" />
+          <span>New</span>
+        </Button>
       </div>
 
-      <div className="shrink-0">
-        <div className="flex items-center gap-2">
-          <Button variant="outline" className="h-10 gap-2" onClick={handleOpenCreateDialog}>
-            <Plus className="h-4 w-4" />
-            <span>New List</span>
-          </Button>
-        </div>
-      </div>
+      <SegmentedControl
+        size="sm"
+        value={activeTab}
+        onValueChange={(value) => setActiveTab(value as typeof activeTab)}
+        items={items}
+      />
     </div>
   );
 }

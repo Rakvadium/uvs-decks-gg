@@ -12,7 +12,14 @@ export function DeckDetailsHeroStaticImage() {
     <div className="absolute inset-0 z-10 overflow-hidden">
       {displayImage ? (
         <>
-          <Image src={displayImage} alt={deck?.name ?? "Character"} fill className="object-cover object-top" />
+          <Image
+            src={displayImage}
+            alt={deck?.name ?? "Character"}
+            fill
+            sizes="(max-width: 1023px) 100vw, 192px"
+            className="object-cover object-top"
+            priority
+          />
         </>
       ) : (
         <div className="absolute inset-0 flex items-center justify-center">

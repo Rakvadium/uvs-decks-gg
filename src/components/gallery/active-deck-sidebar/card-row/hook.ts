@@ -37,9 +37,11 @@ export function useActiveDeckCardRowModel({ card, count, sectionKey }: ActiveDec
     [sectionKey]
   );
 
+  const dragPreviewImageRef = useRef<HTMLImageElement | null>(null);
   const { isDragging, dragHandleProps } = useTcgDraggable({
     card,
     sourceId: `active-deck:${sectionKey}`,
+    previewImageRef: dragPreviewImageRef,
   });
 
   useEffect(() => {
@@ -93,6 +95,7 @@ export function useActiveDeckCardRowModel({ card, count, sectionKey }: ActiveDec
     moveTargets,
     isMobile,
     isDragging,
+    dragPreviewImageRef,
     dragHandleProps,
     canAddToDeck,
     canMoveToSection,

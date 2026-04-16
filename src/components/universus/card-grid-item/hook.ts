@@ -9,8 +9,10 @@ export function useCardGridItem({
   card,
   backCard,
   onCardClick,
+  onOpenCardDetails,
   dragSourceId = "gallery-grid",
   showDeckActions = true,
+  imagePriority = false,
 }: CardGridItemProps) {
   const isMobile = useIsMobile();
   const [usesTouchControls, setUsesTouchControls] = useState(false);
@@ -28,9 +30,11 @@ export function useCardGridItem({
     sideCounts,
     referenceCounts,
   } = useDeckEditor();
+  const dragPreviewImageRef = useRef<HTMLImageElement | null>(null);
   const { isDragging, dragHandleProps } = useTcgDraggable({
     card,
     sourceId: dragSourceId,
+    previewImageRef: dragPreviewImageRef,
   });
 
   const dragBlockRef = useRef(false);
@@ -97,10 +101,12 @@ export function useCardGridItem({
     if (dragBlockRef.current) return;
     if (onCardClick) {
       void onCardClick(card);
+    } else if (onOpenCardDetails) {
+      onOpenCardDetails(card);
     } else {
       setIsDialogOpen(true);
     }
-  }, [card, onCardClick]);
+  }, [card, onCardClick, onOpenCardDetails]);
 
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent) => {
@@ -108,12 +114,14 @@ export function useCardGridItem({
         event.preventDefault();
         if (onCardClick) {
           void onCardClick(card);
+        } else if (onOpenCardDetails) {
+          onOpenCardDetails(card);
         } else {
           setIsDialogOpen(true);
         }
       }
     },
-    [card, onCardClick]
+    [card, onCardClick, onOpenCardDetails]
   );
 
   const addToDeck = useCallback(
@@ -135,7 +143,9 @@ export function useCardGridItem({
   return {
     card,
     backCard,
+    imagePriority,
     displayCard,
+    dragPreviewImageRef,
     dragHandleProps,
     hasBackCardData,
     hasBackCardId,

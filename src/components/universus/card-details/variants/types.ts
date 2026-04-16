@@ -1,4 +1,4 @@
-import type { CachedCard } from "@/lib/universus";
+import type { CachedCard } from "@/lib/universus/card-store";
 import type { ReactNode } from "react";
 
 export interface CardDetailsVariantProps {

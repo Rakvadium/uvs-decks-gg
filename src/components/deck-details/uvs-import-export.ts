@@ -1,5 +1,5 @@
 import type { Id } from "../../../convex/_generated/dataModel";
-import type { CachedCard } from "@/lib/universus";
+import type { CachedCard } from "@/lib/universus/card-store";
 
 export const SIDEBAR_SIDEBOARD_LIMIT = 10;
 

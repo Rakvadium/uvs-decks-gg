@@ -1,21 +1,24 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { FileText, Hexagon, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { CardDetailsContent, CardDetailsDialog } from "@/components/universus";
+import { CardDetailsContent } from "@/components/universus/card-details/content";
+import { CardDetailsDialog } from "@/components/universus/card-details/dialog";
 import { useCardNavigation } from "@/components/universus/card-details/navigation-context";
 import { usePrefersReducedMotion } from "@/lib/reduced-motion";
 import { useTcgDraggable } from "@/lib/dnd";
 import { cn } from "@/lib/utils";
-import type { CachedCard } from "@/lib/universus";
+import type { CachedCard } from "@/lib/universus/card-store";
 import { CardDeckControlsStandard } from "./card-deck-controls";
 import { useGalleryCardMap } from "./card-map-context";
 
 interface CardDetailsListItemProps {
   card: CachedCard;
+  onOpenCardDetails?: (card: CachedCard) => void;
+  imagePriority?: boolean;
 }
 
-export function CardDetailsListItem({ card }: CardDetailsListItemProps) {
+export function CardDetailsListItem({ card, onOpenCardDetails, imagePriority = false }: CardDetailsListItemProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isFlipped, setIsFlipped] = useState(false);
   const prefersReducedMotion = usePrefersReducedMotion();
@@ -24,9 +27,11 @@ export function CardDetailsListItem({ card }: CardDetailsListItemProps) {
   const backCard = getBackCard(card);
   const hasBack = Boolean(backCard);
   const displayCard = useMemo(() => (isFlipped && backCard ? backCard : card), [isFlipped, backCard, card]);
+  const dragPreviewImageRef = useRef<HTMLImageElement | null>(null);
   const { isDragging, dragHandleProps } = useTcgDraggable({
     card,
     sourceId: "gallery-details",
+    previewImageRef: dragPreviewImageRef,
   });
 
   return (
@@ -51,7 +56,17 @@ export function CardDetailsListItem({ card }: CardDetailsListItemProps) {
                 onDragStart={(event) => event.preventDefault()}
               >
                 {displayCard.imageUrl ? (
-                  <Image src={displayCard.imageUrl} alt={displayCard.name} fill className="object-cover" draggable={false} />
+                  <Image
+                    ref={dragPreviewImageRef}
+                    src={displayCard.imageUrl}
+                    alt={displayCard.name}
+                    fill
+                    sizes="(max-width: 1024px) min(90vw, 260px), 260px"
+                    className="object-cover"
+                    priority={imagePriority}
+                    loading={imagePriority ? undefined : "lazy"}
+                    draggable={false}
+                  />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center border border-border/50 bg-muted/50">
                     <div className="text-center">
@@ -82,7 +97,12 @@ export function CardDetailsListItem({ card }: CardDetailsListItemProps) {
 
               <CardDeckControlsStandard card={card} />
 
-              <Button variant="outline" size="sm" onClick={() => setIsDialogOpen(true)} className="gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => (onOpenCardDetails ? onOpenCardDetails(card) : setIsDialogOpen(true))}
+                className="gap-2"
+              >
                 <FileText className="h-4 w-4" />
                 <span className="text-xs font-mono uppercase tracking-wider">Open Dialog</span>
               </Button>
@@ -93,14 +113,16 @@ export function CardDetailsListItem({ card }: CardDetailsListItemProps) {
         </div>
       </div>
 
-      <CardDetailsDialog
-        card={card}
-        backCard={backCard}
-        open={isDialogOpen}
-        onOpenChange={setIsDialogOpen}
-        cards={nav?.cards}
-        getBackCard={nav?.getBackCard}
-      />
+      {onOpenCardDetails ? null : (
+        <CardDetailsDialog
+          card={card}
+          backCard={backCard}
+          open={isDialogOpen}
+          onOpenChange={setIsDialogOpen}
+          cards={nav?.cards}
+          getBackCard={nav?.getBackCard}
+        />
+      )}
     </>
   );
 }

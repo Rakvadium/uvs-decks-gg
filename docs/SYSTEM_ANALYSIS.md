@@ -49,6 +49,7 @@ flowchart LR
 
 - **Storage:** `@convex-dev/r2` and AWS S3 client usage for card imagery and uploads (see codebase and Convex component config).
 - **Email:** `resend` for transactional email when wired.
+- **YouTube (community media feed):** Curated video IDs live in Convex (`communityYoutubeCurations`); metadata is fetched server-side with the YouTube Data API v3 **`videos.list`** (parts `snippet`, `contentDetails`, `statistics`), batched up to 50 IDs per request, and cached in `youtubeVideoMetadataCache` with `fetchedAt` (six-hour freshness target; Convex cron refreshes every two hours). The **Convex deployment environment variable** `YOUTUBE_DATA_API_KEY` must be set in the Convex dashboard (never `NEXT_PUBLIC_*`); it is read only inside Convex actions in `convex/communityYoutube.ts`. Restrict the Google API key to **YouTube Data API v3** in Google Cloud and monitor quota there. The community UI uses `api.communityYoutube.getFeed` and does not call Google APIs directly.
 
 ## Major data flows
 
@@ -61,7 +62,7 @@ flowchart LR
 
 - **Authorization:** Mutations must enforce ownership or role checks consistent with Convex validators and auth identity.
 - **Realtime:** Convex subscriptions drive live UI updates where used.
-- **Performance:** Heavy aggregates lean on snapshot tables so read paths stay bounded.
+- **Performance:** Heavy aggregates lean on snapshot tables so read paths stay bounded. Client card **catalog** vs **formats/sets** use split React contexts in `CardDataProvider` so metadata consumers can avoid re-rendering on every catalog chunk; see [card-data-hooks.md](./card-data-hooks.md).
 
 ## Code structure expectations
 

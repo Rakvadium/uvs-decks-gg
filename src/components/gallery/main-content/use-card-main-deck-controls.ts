@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { canAddCardToSection, useDeckEditor } from "@/lib/deck";
-import type { CachedCard } from "@/lib/universus";
+import type { CachedCard } from "@/lib/universus/card-store";
 
 export function useCardMainDeckControls(card: CachedCard) {
   const {

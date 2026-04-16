@@ -1,5 +1,5 @@
 import { createContext, useContext, useMemo, type ReactNode } from "react";
-import type { CachedCard } from "@/lib/universus";
+import type { CachedCard } from "@/lib/universus/card-store";
 import { parseKeywords, parseSymbols, splitKeywordGroups } from "./parsers";
 
 type CardDetailsContentValue = {

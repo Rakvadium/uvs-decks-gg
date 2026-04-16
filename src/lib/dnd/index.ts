@@ -2,6 +2,7 @@ export {
   TcgDndProvider,
   useTcgDnd,
   TCG_DND_ACCEPTS_CARD_ONLY,
+  TCG_DROP_ZONE_DATA_ATTR,
   UNIVERSUS_CARD_DND_ENABLED,
   type DragItem,
   type DropZoneConfig,

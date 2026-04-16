@@ -44,6 +44,10 @@ function matchesCharacterSymbol(symbols: string | undefined, symbol: string | un
     .includes(symbol.toLowerCase());
 }
 
+function isGalleryCatalogCard(card: { isFrontFace?: boolean; isVariant?: boolean }) {
+  return card.isFrontFace !== false && card.isVariant !== true;
+}
+
 export const list = query({
   args: {
     search: v.optional(v.string()),
@@ -168,6 +172,77 @@ export const listReleasedPaginated = query({
       cursor: result.continueCursor,
       isDone: result.isDone,
     };
+  },
+});
+
+export const galleryIndexedSearchSpike = query({
+  args: {
+    searchText: v.optional(v.string()),
+    setCode: v.optional(v.string()),
+    type: v.optional(v.string()),
+    rarity: v.optional(v.string()),
+    namePrefixInSet: v.optional(
+      v.object({
+        setCode: v.string(),
+        prefix: v.string(),
+      })
+    ),
+    limit: v.optional(v.number()),
+  },
+  returns: v.array(cardValidator),
+  handler: async (ctx, args) => {
+    const limit = Math.min(Math.max(args.limit ?? 50, 1), 200);
+    const prefixArg = args.namePrefixInSet;
+    const trimmedPrefix = prefixArg?.prefix.trim() ?? "";
+
+    if (prefixArg && trimmedPrefix.length > 0) {
+      const upper = `${trimmedPrefix}\uffff`;
+      const rows = await ctx.db
+        .query("cards")
+        .withIndex("by_setCode_and_name", (q) =>
+          q.eq("setCode", prefixArg.setCode).gte("name", trimmedPrefix).lt("name", upper)
+        )
+        .take(limit * 2);
+      return rows.filter(isGalleryCatalogCard).slice(0, limit);
+    }
+
+    const text = args.searchText?.trim() ?? "";
+    if (text.length > 0) {
+      const rows = await ctx.db
+        .query("cards")
+        .withSearchIndex("search_gallery_name", (q) => {
+          let chain = q.search("searchName", text);
+          if (args.setCode) {
+            chain = chain.eq("setCode", args.setCode);
+          }
+          if (args.type) {
+            chain = chain.eq("type", args.type);
+          }
+          if (args.rarity) {
+            chain = chain.eq("rarity", args.rarity);
+          }
+          return chain;
+        })
+        .take(limit * 2);
+      return rows.filter(isGalleryCatalogCard).slice(0, limit);
+    }
+
+    if (args.setCode && args.setCode.length > 0) {
+      const rows = await ctx.db
+        .query("cards")
+        .withIndex("by_setCode_and_collectorNumber", (q) => q.eq("setCode", args.setCode!))
+        .take(limit * 2);
+      let out = rows.filter(isGalleryCatalogCard);
+      if (args.type) {
+        out = out.filter((c) => c.type === args.type);
+      }
+      if (args.rarity) {
+        out = out.filter((c) => c.rarity === args.rarity);
+      }
+      return out.slice(0, limit);
+    }
+
+    return [];
   },
 });
 

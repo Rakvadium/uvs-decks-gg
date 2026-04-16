@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import type { CachedCard } from "@/lib/universus";
+import type { CachedCard } from "@/lib/universus/card-store";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -46,6 +46,7 @@ export function CardDetailsDialog({ card, backCard, open, onOpenChange }: CardDe
           <CardDetailsImagePanel
             displayCard={displayCard}
             deckCard={card}
+            backCard={backCard ?? undefined}
             hasBack={Boolean(backCard)}
             isFlipped={isFlipped}
             onToggleFlip={() => setIsFlipped((value) => !value)}

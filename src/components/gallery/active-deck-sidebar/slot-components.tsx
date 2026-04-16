@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { ChevronRight, UserIcon } from "lucide-react";
 import { SidebarFooter } from "@/components/shell";
-import { useCardData } from "@/lib/universus";
+import { useCardData } from "@/lib/universus/card-data-provider";
 import { cn } from "@/lib/utils";
 import { useActiveDeck } from "@/providers/ActiveDeckProvider";
 import { useCardIdMap } from "@/hooks/useCardIdMap";
@@ -19,7 +19,13 @@ export function ActiveDeckIcon({ className }: { className?: string }) {
 
   return (
     <div className={cn("relative h-full w-full overflow-hidden", className)}>
-      <Image src={startingCharacter.imageUrl} alt={startingCharacter.name} fill className="object-cover object-top" />
+      <Image
+        src={startingCharacter.imageUrl}
+        alt={startingCharacter.name}
+        fill
+        sizes="40px"
+        className="object-cover object-top"
+      />
     </div>
   );
 }

@@ -1,16 +1,30 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import type { CachedCard } from "@/lib/universus";
+import type { CachedCard } from "@/lib/universus/card-store";
 import {
   Dialog,
   DialogContent,
   DialogTitle,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
-import { CardDetailsV2 } from "./variants/v2";
+
+const CardDetailsV2 = lazy(() =>
+  import("./variants/v2").then((module) => ({ default: module.CardDetailsV2 }))
+);
+
+function CardDetailsPanelFallback() {
+  return (
+    <div className="flex min-h-[min(400px,60vh)] w-full items-center justify-center p-8">
+      <div
+        className="h-9 w-9 animate-spin rounded-full border-2 border-primary border-t-transparent"
+        aria-hidden
+      />
+    </div>
+  );
+}
 
 interface CardDetailsDialogProps {
   card: CachedCard | null;
@@ -110,40 +124,44 @@ export function CardDetailsDialog({
       >
         <DialogTitle className="sr-only">{displayCard.name} - Card Details</DialogTitle>
 
-        <CardDetailsV2
-          card={currentCard}
-          displayCard={displayCard}
-          backCard={currentBackCard ?? null}
-          hasBack={Boolean(currentBackCard)}
-          isFlipped={isFlipped}
-          onToggleFlip={() => setIsFlipped((v) => !v)}
-          mobileNavigationPrevious={
-            hasNavigation ? (
-              <button
-                type="button"
-                onClick={goToPrev}
-                disabled={!canGoPrev}
-                className={navigationButtonClassName(Boolean(canGoPrev))}
-                aria-label="Previous card"
-              >
-                <ChevronLeft className="h-5 w-5" />
-              </button>
-            ) : null
-          }
-          mobileNavigationNext={
-            hasNavigation ? (
-              <button
-                type="button"
-                onClick={goToNext}
-                disabled={!canGoNext}
-                className={navigationButtonClassName(Boolean(canGoNext))}
-                aria-label="Next card"
-              >
-                <ChevronRight className="h-5 w-5" />
-              </button>
-            ) : null
-          }
-        />
+        {open ? (
+          <Suspense fallback={<CardDetailsPanelFallback />}>
+            <CardDetailsV2
+              card={currentCard}
+              displayCard={displayCard}
+              backCard={currentBackCard ?? null}
+              hasBack={Boolean(currentBackCard)}
+              isFlipped={isFlipped}
+              onToggleFlip={() => setIsFlipped((v) => !v)}
+              mobileNavigationPrevious={
+                hasNavigation ? (
+                  <button
+                    type="button"
+                    onClick={goToPrev}
+                    disabled={!canGoPrev}
+                    className={navigationButtonClassName(Boolean(canGoPrev))}
+                    aria-label="Previous card"
+                  >
+                    <ChevronLeft className="h-5 w-5" />
+                  </button>
+                ) : null
+              }
+              mobileNavigationNext={
+                hasNavigation ? (
+                  <button
+                    type="button"
+                    onClick={goToNext}
+                    disabled={!canGoNext}
+                    className={navigationButtonClassName(Boolean(canGoNext))}
+                    aria-label="Next card"
+                  >
+                    <ChevronRight className="h-5 w-5" />
+                  </button>
+                ) : null
+              }
+            />
+          </Suspense>
+        ) : null}
       </DialogContent>
 
       {hasNavigation && open && typeof document !== "undefined" &&

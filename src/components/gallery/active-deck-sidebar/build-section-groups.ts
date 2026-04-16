@@ -3,7 +3,7 @@ import {
   CARD_TYPE_LABELS,
   CARD_TYPE_ORDER,
 } from "@/lib/deck/display-config";
-import type { CachedCard } from "@/lib/universus";
+import type { CachedCard } from "@/lib/universus/card-store";
 import type { SectionGroup } from "./types";
 
 export function buildSectionGroups(

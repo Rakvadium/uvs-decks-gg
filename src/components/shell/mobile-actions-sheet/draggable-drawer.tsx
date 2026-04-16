@@ -77,9 +77,21 @@ export function MobileActionsDraggableDrawer({ children }: MobileActionsDraggabl
   const isDraggingRef = useRef(false);
   const bottomStackRef = useRef<HTMLDivElement | null>(null);
   const closeTapShieldTimeoutRef = useRef<number | null>(null);
+  const drawerShellRef = useRef<HTMLDivElement | null>(null);
+  const drawerPanelRef = useRef<HTMLDivElement | null>(null);
+  const actionPanelRef = useRef<HTMLDivElement | null>(null);
+  const minHeightRef = useRef(0);
+  const dragAppliedHeightRef = useRef(drawerHeight);
+  const pendingDragHeightRef = useRef<number | null>(null);
+  const dragRafRef = useRef<number | null>(null);
 
   const minHeight = bottomStackHeight;
   const actionPanelHeight = Math.max(0, drawerHeight - minHeight);
+
+  minHeightRef.current = minHeight;
+  if (!isDraggingRef.current) {
+    dragAppliedHeightRef.current = drawerHeight;
+  }
 
   const expandedHeight = useMemo(() => Math.min(DEFAULT_HEIGHT, maxHeight), [maxHeight]);
 
@@ -146,7 +158,51 @@ export function MobileActionsDraggableDrawer({ children }: MobileActionsDraggabl
       if (closeTapShieldTimeoutRef.current !== null) {
         window.clearTimeout(closeTapShieldTimeoutRef.current);
       }
+      if (dragRafRef.current !== null) {
+        cancelAnimationFrame(dragRafRef.current);
+      }
     };
+  }, []);
+
+  const flushDragHeights = useCallback((height: number) => {
+    const mh = minHeightRef.current;
+    const actionH = Math.max(0, height - mh);
+    const shell = drawerShellRef.current;
+    const panel = drawerPanelRef.current;
+    const actionPanel = actionPanelRef.current;
+    if (shell) {
+      shell.style.height = `${height + HANDLE_OVERLAP}px`;
+    }
+    if (panel) {
+      panel.style.height = `${height}px`;
+    }
+    if (actionPanel) {
+      actionPanel.style.height = `${actionH}px`;
+    }
+    dragAppliedHeightRef.current = height;
+  }, []);
+
+  const scheduleDragHeightApply = useCallback(() => {
+    if (dragRafRef.current !== null) {
+      return;
+    }
+    dragRafRef.current = window.requestAnimationFrame(() => {
+      dragRafRef.current = null;
+      if (!isDraggingRef.current) {
+        return;
+      }
+      const pending = pendingDragHeightRef.current;
+      if (pending !== null) {
+        flushDragHeights(pending);
+      }
+    });
+  }, [flushDragHeights]);
+
+  const cancelDragRaf = useCallback(() => {
+    if (dragRafRef.current !== null) {
+      cancelAnimationFrame(dragRafRef.current);
+      dragRafRef.current = null;
+    }
   }, []);
 
   if (sidebarSlots.length === 0) {
@@ -190,6 +246,8 @@ export function MobileActionsDraggableDrawer({ children }: MobileActionsDraggabl
     }
 
     event.preventDefault();
+    cancelDragRaf();
+    pendingDragHeightRef.current = null;
     isDraggingRef.current = true;
     dragStateRef.current = {
       moved: false,
@@ -197,6 +255,7 @@ export function MobileActionsDraggableDrawer({ children }: MobileActionsDraggabl
       startHeight: drawerHeight,
       startY: event.clientY,
     };
+    dragAppliedHeightRef.current = drawerHeight;
     event.currentTarget.setPointerCapture(event.pointerId);
   };
 
@@ -214,7 +273,8 @@ export function MobileActionsDraggableDrawer({ children }: MobileActionsDraggabl
       dragState.moved = true;
     }
 
-    setDrawerHeight(nextHeight);
+    pendingDragHeightRef.current = nextHeight;
+    scheduleDragHeightApply();
   };
 
   const endDrag = (event: ReactPointerEvent<HTMLElement>) => {
@@ -225,8 +285,16 @@ export function MobileActionsDraggableDrawer({ children }: MobileActionsDraggabl
     }
 
     event.preventDefault();
+    cancelDragRaf();
+    const pending = pendingDragHeightRef.current;
+    if (pending !== null) {
+      flushDragHeights(pending);
+    }
+    pendingDragHeightRef.current = null;
+    const appliedHeight = dragAppliedHeightRef.current;
+
     if (!dragState.moved) {
-      if (drawerHeight <= minHeight + 12) {
+      if (appliedHeight <= minHeight + 12) {
         setDrawerHeight(Math.max(expandedHeight, minHeight));
         openSheet();
       } else {
@@ -235,7 +303,7 @@ export function MobileActionsDraggableDrawer({ children }: MobileActionsDraggabl
         closeSheet();
       }
     } else {
-      settleDrawer(drawerHeight);
+      settleDrawer(appliedHeight);
     }
 
     dragStateRef.current = null;
@@ -243,13 +311,21 @@ export function MobileActionsDraggableDrawer({ children }: MobileActionsDraggabl
   };
 
   const cancelDrag = () => {
+    cancelDragRaf();
+    const pending = pendingDragHeightRef.current;
+    if (pending !== null) {
+      flushDragHeights(pending);
+    }
+    pendingDragHeightRef.current = null;
+    const appliedHeight = dragAppliedHeightRef.current;
     dragStateRef.current = null;
     isDraggingRef.current = false;
-    settleDrawer(drawerHeight);
+    settleDrawer(appliedHeight);
   };
 
   return (
     <div
+      ref={drawerShellRef}
       className="pointer-events-auto relative mx-0 overflow-visible"
       style={{ height: drawerHeight + HANDLE_OVERLAP }}
     >
@@ -263,6 +339,7 @@ export function MobileActionsDraggableDrawer({ children }: MobileActionsDraggabl
         />
       ) : null}
       <div
+        ref={drawerPanelRef}
         className="absolute inset-x-0 bottom-0 flex flex-col overflow-hidden rounded-t-[8px] border-x border-t [border-color:var(--chrome-sheet-border)] bg-background/96 shadow-[var(--chrome-sheet-shadow)] backdrop-blur-md"
         style={{ height: drawerHeight }}
       >
@@ -279,7 +356,7 @@ export function MobileActionsDraggableDrawer({ children }: MobileActionsDraggabl
         <div className="pointer-events-none absolute inset-x-0 top-0 h-14 rounded-t-4 bg-gradient-to-b from-white/[0.06] via-primary/[0.025] to-transparent" />
         <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
         <div className="min-h-0 flex flex-1 flex-col overflow-hidden">
-          <div className="min-h-0 overflow-hidden" style={{ height: actionPanelHeight }}>
+          <div ref={actionPanelRef} className="min-h-0 overflow-hidden" style={{ height: actionPanelHeight }}>
             <div className="flex h-full min-h-0 flex-col overflow-hidden">
               <MobileActionsSheetHeader
                 className="touch-none"

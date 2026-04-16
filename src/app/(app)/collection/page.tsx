@@ -1,11 +1,11 @@
-"use client";
+import dynamic from "next/dynamic";
+import { RouteChunkFallback } from "@/components/shell/route-chunk-fallback";
 
-import { CollectionView } from "@/components/collection";
+const CollectionPageClient = dynamic(() => import("./collection-page-client"), {
+  loading: () => <RouteChunkFallback />,
+  ssr: true,
+});
 
 export default function CollectionPage() {
-  return (
-    <div className="flex h-full flex-col overflow-y-auto p-6">
-      <CollectionView />
-    </div>
-  );
+  return <CollectionPageClient />;
 }

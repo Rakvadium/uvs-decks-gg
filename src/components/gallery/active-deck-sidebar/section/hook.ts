@@ -5,7 +5,7 @@ import {
   DECK_SECTION_META as SECTION_META,
   type DeckSection,
 } from "@/lib/deck/display-config";
-import type { CachedCard } from "@/lib/universus";
+import type { CachedCard } from "@/lib/universus/card-store";
 import { useActiveDeckSectionsContext } from "../sections-context";
 import type { ActiveDeckSectionProps } from "./types";
 

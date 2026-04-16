@@ -1,12 +1,12 @@
 import { useMemo } from "react";
-import { useCardData } from "@/lib/universus";
+import { useCardData } from "@/lib/universus/card-data-provider";
 import type { DeckGridItemProps } from "./types";
 
 function countSectionCards(quantities: Record<string, number>) {
   return Object.values(quantities).reduce((sum, quantity) => sum + quantity, 0);
 }
 
-export function useDeckGridItemModel({ deck, showAuthor = false }: DeckGridItemProps) {
+export function useDeckGridItemModel({ deck, showAuthor = false, coverImagePriority = false }: DeckGridItemProps) {
   const { cards } = useCardData();
 
   const imageCard = useMemo(() => {
@@ -31,6 +31,7 @@ export function useDeckGridItemModel({ deck, showAuthor = false }: DeckGridItemP
   return {
     deck,
     showAuthor,
+    coverImagePriority,
     displayImage: imageCard?.imageUrl || startingCharacter?.imageUrl,
     startingCharacterName: startingCharacter?.name,
     counts,

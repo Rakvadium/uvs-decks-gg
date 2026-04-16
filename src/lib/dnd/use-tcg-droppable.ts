@@ -3,24 +3,11 @@
 import * as React from "react";
 import {
   UNIVERSUS_CARD_DND_ENABLED,
+  TCG_DROP_ZONE_DATA_ATTR,
   useTcgDnd,
   DropZoneConfig,
   DragItem,
 } from "./tcg-dnd-provider";
-
-function isDndDebugEnabled(): boolean {
-  if (typeof window === "undefined") return false;
-  try {
-    return (window as any).__TCG_DND_DEBUG__ === true || window.localStorage?.getItem("tcg:dndDebug") === "1";
-  } catch {
-    return (window as any).__TCG_DND_DEBUG__ === true;
-  }
-}
-
-function dndLog(...args: any[]) {
-  if (!isDndDebugEnabled()) return;
-  console.log("[tcg-dnd]", ...args);
-}
 
 export interface UseTcgDroppableOptions {
   id: string;
@@ -33,10 +20,8 @@ export interface UseTcgDroppableResult {
   isOver: boolean;
   canDrop: boolean;
   droppableProps: {
-    onMouseEnter: () => void;
-    onMouseLeave: () => void;
-    onPointerEnter: () => void;
-    onPointerLeave: () => void;
+    [K in typeof TCG_DROP_ZONE_DATA_ATTR]?: string;
+  } & {
     "data-drop-active": boolean;
     "data-can-drop": boolean;
   };
@@ -46,10 +31,6 @@ const disabledDroppableResult: UseTcgDroppableResult = {
   isOver: false,
   canDrop: false,
   droppableProps: {
-    onMouseEnter: () => {},
-    onMouseLeave: () => {},
-    onPointerEnter: () => {},
-    onPointerLeave: () => {},
     "data-drop-active": false,
     "data-can-drop": false,
   },
@@ -61,14 +42,7 @@ export function useTcgDroppable({
   onDrop,
   isDisabled = false,
 }: UseTcgDroppableOptions): UseTcgDroppableResult {
-  const { 
-    registerDropZone, 
-    unregisterDropZone, 
-    dragItem, 
-    isDragging,
-    activeDropZone,
-    setActiveDropZone,
-  } = useTcgDnd();
+  const { registerDropZone, unregisterDropZone, dragItem, isDragging, activeDropZone } = useTcgDnd();
 
   const isOver = activeDropZone === id;
   const canDrop = isDragging && dragItem !== null && accepts.includes(dragItem.type) && !isDisabled;
@@ -85,30 +59,13 @@ export function useTcgDroppable({
     return () => unregisterDropZone(id);
   }, [id, accepts, onDrop, isDisabled, registerDropZone, unregisterDropZone]);
 
-  const handleMouseEnter = React.useCallback(() => {
-    if (isDragging && canDrop) {
-      dndLog("droppable.enter", { id, canDrop, dragItemType: dragItem?.type, dragCardId: dragItem?.card?._id });
-      setActiveDropZone(id);
-    }
-  }, [isDragging, canDrop, setActiveDropZone, id, dragItem]);
-
-  const handleMouseLeave = React.useCallback(() => {
-    if (activeDropZone === id) {
-      dndLog("droppable.leave", { id });
-      setActiveDropZone(null);
-    }
-  }, [activeDropZone, setActiveDropZone, id]);
-
   const droppableProps = React.useMemo(
     () => ({
-      onMouseEnter: handleMouseEnter,
-      onMouseLeave: handleMouseLeave,
-      onPointerEnter: handleMouseEnter,
-      onPointerLeave: handleMouseLeave,
+      [TCG_DROP_ZONE_DATA_ATTR]: id,
       "data-drop-active": isOver,
       "data-can-drop": canDrop,
     }),
-    [handleMouseEnter, handleMouseLeave, isOver, canDrop]
+    [id, isOver, canDrop]
   );
 
   return React.useMemo(() => {

@@ -21,24 +21,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { useIsMobile } from "@/hooks/useIsMobile";
-import { COMMUNITY_TIER_RANKING, getRankingScopeLabel } from "../../../../../shared/app-config";
-import {
-  ArrowLeft,
-  ChevronDown,
-  Edit3,
-  Globe,
-  Loader2,
-  Lock,
-  Save,
-  Trash2,
-  X,
-} from "lucide-react";
-import { useOptionalCommunityTierListDetailContext } from "./context";
 import { PageHeading } from "@/components/ui/typography-headings";
+import { COMMUNITY_TIER_RANKING, getRankingScopeLabel } from "../../../../../shared/app-config";
+import { ArrowLeft, ChevronDown, Edit3, Globe, Loader2, Lock, Save, Trash2, X } from "lucide-react";
+import { useOptionalCommunityTierListDetailContext } from "./context";
 
 export function CommunityTierListDetailTopBar() {
-  const isMobile = useIsMobile();
   const context = useOptionalCommunityTierListDetailContext();
 
   if (!context) {
@@ -52,7 +40,6 @@ export function CommunityTierListDetailTopBar() {
     setTitle,
     isPublic,
     setIsPublic,
-    rankingScope,
     rankingScopeLabel,
     isSaving,
     isDeleting,
@@ -216,8 +203,8 @@ export function CommunityTierListDetailTopBar() {
     </Button>
   ) : null;
 
-  if (isMobile) {
-    return (
+  return (
+    <>
       <div className="flex w-full min-w-0 items-center gap-2">
         <Link href="/community/tier-lists">
           <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0">
@@ -260,52 +247,6 @@ export function CommunityTierListDetailTopBar() {
           {deleteButton}
         </div>
       </div>
-    );
-  }
-
-  return (
-    <>
-      <div className="flex w-full min-w-0 items-center gap-2">
-        <Link href="/community/tier-lists">
-          <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0">
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-        </Link>
-
-        <div className="flex min-w-0 flex-1 items-center gap-2">
-          {canEdit && isEditingMeta ? (
-            <Input
-              value={title}
-              onChange={(event) => setTitle(event.target.value)}
-              className="h-8 min-w-0 max-w-48 shrink font-display text-sm font-bold uppercase tracking-[0.2em] sm:max-w-sm"
-              placeholder="Tier list name..."
-            />
-          ) : (
-            <PageHeading className="truncate font-display text-sm font-bold uppercase tracking-[0.2em]" title={title}>
-              {title}
-            </PageHeading>
-          )}
-
-          {publicityControl}
-          {rankingScopeControl}
-        </div>
-
-        <div className="ml-auto flex items-center gap-2">
-          {canEdit ? (isEditingMeta ? saveMetaButton : (
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-8 shrink-0"
-              onClick={() => setIsEditingMeta(true)}
-              aria-label="Edit tier list details"
-            >
-              <Edit3 className="h-4 w-4" />
-            </Button>
-          )) : null}
-          {cancelButton}
-          {deleteButton}
-        </div>
-      </div>
 
       <AlertDialog open={shouldConfirmRankedScopeReset} onOpenChange={(open) => !open && cancelPendingRankingScopeChange()}>
         <AlertDialogContent>
@@ -317,9 +258,7 @@ export function CommunityTierListDetailTopBar() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel onClick={cancelPendingRankingScopeChange}>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmPendingRankingScopeChange}>
-              Convert to Ranked Lanes
-            </AlertDialogAction>
+            <AlertDialogAction onClick={confirmPendingRankingScopeChange}>Convert to Ranked Lanes</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

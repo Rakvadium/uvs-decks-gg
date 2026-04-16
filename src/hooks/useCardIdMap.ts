@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import type { CachedCard } from "@/lib/universus";
+import type { CachedCard } from "@/lib/universus/card-store";
 
 export function useCardIdMap(cards: CachedCard[]) {
   return useMemo(() => {

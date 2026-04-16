@@ -1,8 +1,17 @@
 import type { Metadata } from "next";
+import dynamic from "next/dynamic";
 import { fetchQuery } from "convex/nextjs";
-import { CommunityTierListDetailView } from "@/components/community/tier-lists/detail-view";
+import { RouteChunkFallback } from "@/components/shell/route-chunk-fallback";
 import { api } from "../../../../../../convex/_generated/api";
 import type { Id } from "../../../../../../convex/_generated/dataModel";
+
+const CommunityTierListDetailView = dynamic(
+  () =>
+    import("@/components/community/tier-lists/detail-view").then((m) => ({
+      default: m.CommunityTierListDetailView,
+    })),
+  { loading: () => <RouteChunkFallback />, ssr: true }
+);
 
 type PageProps = {
   params: Promise<{ tierListId: string }>;
@@ -42,5 +51,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default function CommunityTierListDetailPage() {
-  return <CommunityTierListDetailView />;
+  return (
+    <div className="h-full min-w-0 overflow-y-auto overflow-x-hidden p-3 md:p-6">
+      <CommunityTierListDetailView />
+    </div>
+  );
 }

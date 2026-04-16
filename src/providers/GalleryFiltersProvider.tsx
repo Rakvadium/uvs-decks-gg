@@ -7,9 +7,13 @@ import {
   useMemo,
   useCallback,
   useState,
+  useDeferredValue,
+  startTransition,
   ReactNode,
 } from "react";
-import { useCardData, sortCards, CachedCard } from "@/lib/universus";
+import { useCardCatalog, useCardReferenceData } from "@/lib/universus/card-data-provider";
+import { sortCards } from "@/lib/universus/use-universus-cards";
+import type { CachedCard } from "@/lib/universus/card-store";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { useUIState, type CardFilters, type GalleryViewMode } from "@/providers/UIStateProvider";
 import { useShellSlot } from "@/components/shell/shell-slot-provider";
@@ -40,7 +44,8 @@ interface GalleryFiltersMeta {
   totalCards: number;
   filteredCount: number;
   filteredCards: CachedCard[];
-  uniqueValues: ReturnType<typeof useCardData>["uniqueValues"];
+  filteredListKey: string;
+  uniqueValues: ReturnType<typeof useCardCatalog>["uniqueValues"];
   formats: Array<{ key: string; name: string }>;
   defaultFormatKey: string;
   activeFilterCount: number;
@@ -67,9 +72,9 @@ export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
     isLoadingMore,
     loadProgress,
     uniqueValues,
-    formats,
     getFilteredCards,
-  } = useCardData();
+  } = useCardCatalog();
+  const { formats } = useCardReferenceData();
   const [search, setSearch] = useState("");
   const [searchMode, setSearchMode] = useState<SearchMode>("all");
   const isSidebarOpen = useMemo(() => Boolean(shellState.activeSidebarActionId), [shellState.activeSidebarActionId]);
@@ -149,10 +154,39 @@ export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
     [uiState.gallerySortField, uiState.gallerySortDirection]
   );
 
+  const deferredSearch = useDeferredValue(search);
+  const deferredSearchMode = useDeferredValue(searchMode);
+  const deferredGalleryFilters = useDeferredValue(galleryFilters);
+  const deferredSortOptions = useDeferredValue(sortOptions);
+
+  const pipelineEffectiveFormat = useMemo(
+    () => deferredGalleryFilters.format ?? defaultFormat,
+    [deferredGalleryFilters, defaultFormat]
+  );
+
+  const pipelineFilters = useMemo(
+    () => ({
+      ...deferredGalleryFilters,
+      search: deferredSearch,
+      searchMode: deferredSearchMode,
+      format: pipelineEffectiveFormat,
+    }),
+    [deferredGalleryFilters, deferredSearch, deferredSearchMode, pipelineEffectiveFormat]
+  );
+
   const filteredCards = useMemo(() => {
-    const filtered = getFilteredCards(filters);
-    return sortCards(filtered, sortOptions);
-  }, [getFilteredCards, filters, sortOptions]);
+    const filtered = getFilteredCards(pipelineFilters);
+    return sortCards(filtered, deferredSortOptions);
+  }, [getFilteredCards, pipelineFilters, deferredSortOptions]);
+
+  const filteredListKey = useMemo(
+    () =>
+      JSON.stringify({
+        filters: pipelineFilters,
+        sort: deferredSortOptions,
+      }),
+    [pipelineFilters, deferredSortOptions]
+  );
 
   const formatsForSelect = useMemo(
     () => formats.map((format) => ({ key: format.key, name: format.name })),
@@ -174,28 +208,34 @@ export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
 
   const updateFilter = useCallback(
     <K extends keyof CardFilters>(key: K, value: CardFilters[K]) => {
-      const nextFilters: CardFilters = { ...galleryFilters };
-      if (value === undefined || (Array.isArray(value) && value.length === 0)) {
-        delete nextFilters[key];
-      } else {
-        nextFilters[key] = value;
-      }
-      setGalleryFilters(nextFilters);
+      startTransition(() => {
+        const nextFilters: CardFilters = { ...galleryFilters };
+        if (value === undefined || (Array.isArray(value) && value.length === 0)) {
+          delete nextFilters[key];
+        } else {
+          nextFilters[key] = value;
+        }
+        setGalleryFilters(nextFilters);
+      });
     },
     [galleryFilters, setGalleryFilters]
   );
 
   const clearAllFilters = useCallback(() => {
-    setGalleryFilters({});
+    startTransition(() => {
+      setGalleryFilters({});
+    });
   }, [setGalleryFilters]);
 
   const removeFilterKeys = useCallback(
     (keys: (keyof CardFilters)[]) => {
-      const nextFilters: CardFilters = { ...galleryFilters };
-      for (const key of keys) {
-        delete nextFilters[key];
-      }
-      setGalleryFilters(nextFilters);
+      startTransition(() => {
+        const nextFilters: CardFilters = { ...galleryFilters };
+        for (const key of keys) {
+          delete nextFilters[key];
+        }
+        setGalleryFilters(nextFilters);
+      });
     },
     [galleryFilters, setGalleryFilters]
   );
@@ -223,6 +263,7 @@ export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
         totalCards: cards.length,
         filteredCount: filteredCards.length,
         filteredCards,
+        filteredListKey,
         uniqueValues,
         formats: formatsForSelect,
         defaultFormatKey: defaultFormat,
@@ -246,6 +287,7 @@ export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
       handleSetCardsPerRow,
       cards.length,
       filteredCards,
+      filteredListKey,
       uniqueValues,
       formatsForSelect,
       defaultFormat,

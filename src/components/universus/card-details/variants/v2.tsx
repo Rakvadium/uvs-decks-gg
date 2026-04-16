@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import { AnimatePresence, motion } from "framer-motion";
 import { Hexagon, RotateCcw, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DialogClose } from "@/components/ui/dialog";
@@ -17,6 +16,8 @@ import {
 import type { CardDetailsVariantProps } from "./types";
 
 export function CardDetailsV2({
+  card,
+  backCard,
   displayCard,
   hasBack,
   isFlipped,
@@ -25,6 +26,9 @@ export function CardDetailsV2({
   mobileNavigationNext,
 }: CardDetailsVariantProps) {
   const prefersReducedMotion = usePrefersReducedMotion();
+  const hasBackFace = Boolean(backCard);
+  const transitionClass = prefersReducedMotion ? "duration-0" : "duration-300 ease-out";
+  const heroSizes = "(max-width: 768px) min(92vw, 340px), 340px";
 
   return (
     <CardDetailsContentProvider card={displayCard}>
@@ -46,35 +50,18 @@ export function CardDetailsV2({
                 {mobileNavigationPrevious}
               </div>
               <div className="w-full max-w-[260px] md:max-w-[340px]">
-                <motion.div
-                  className="relative aspect-[2.5/3.5] w-full"
-                  style={{ perspective: 1000 }}
-                >
-                  <AnimatePresence initial={false} mode="wait">
-                    <motion.div
-                      key={isFlipped ? "back" : "front"}
-                      initial={false}
-                      animate={
-                        prefersReducedMotion
-                          ? {}
-                          : { rotateY: 0, opacity: 1 }
-                      }
-                      exit={
-                        prefersReducedMotion
-                          ? {}
-                          : { rotateY: 90, opacity: 0 }
-                      }
-                      transition={{ duration: 0.3 }}
+                <div className="relative aspect-[2.5/3.5] w-full" style={{ perspective: 1000 }}>
+                  {!hasBackFace ? (
+                    <div
                       className="absolute inset-0 overflow-hidden rounded-(--radius-2xl)"
-                      style={{
-                        boxShadow: "var(--chrome-card-image-glow-rest)",
-                      }}
+                      style={{ boxShadow: "var(--chrome-card-image-glow-rest)" }}
                     >
                       {displayCard.imageUrl ? (
                         <Image
                           src={displayCard.imageUrl}
                           alt={displayCard.name}
                           fill
+                          sizes={heroSizes}
                           className="object-cover"
                           priority
                         />
@@ -83,8 +70,61 @@ export function CardDetailsV2({
                           <Hexagon className="h-12 w-12 text-primary/30" />
                         </div>
                       )}
-                    </motion.div>
-                  </AnimatePresence>
+                    </div>
+                  ) : (
+                    <>
+                      <div
+                        className={cn(
+                          "absolute inset-0 overflow-hidden rounded-(--radius-2xl) transition-opacity",
+                          transitionClass,
+                          isFlipped ? "pointer-events-none opacity-0" : "opacity-100"
+                        )}
+                        style={{ boxShadow: "var(--chrome-card-image-glow-rest)" }}
+                      >
+                        {card.imageUrl ? (
+                          <Image
+                            src={card.imageUrl}
+                            alt={card.name}
+                            fill
+                            sizes={heroSizes}
+                            className="object-cover"
+                            priority={!isFlipped}
+                            loading={!isFlipped ? undefined : "lazy"}
+                            fetchPriority={isFlipped ? "low" : undefined}
+                          />
+                        ) : (
+                          <div className="flex h-full w-full items-center justify-center border border-border/50 bg-muted/50">
+                            <Hexagon className="h-12 w-12 text-primary/30" />
+                          </div>
+                        )}
+                      </div>
+                      <div
+                        className={cn(
+                          "absolute inset-0 overflow-hidden rounded-(--radius-2xl) transition-opacity",
+                          transitionClass,
+                          !isFlipped ? "pointer-events-none opacity-0" : "opacity-100"
+                        )}
+                        style={{ boxShadow: "var(--chrome-card-image-glow-rest)" }}
+                      >
+                        {backCard!.imageUrl ? (
+                          <Image
+                            src={backCard!.imageUrl}
+                            alt={backCard!.name}
+                            fill
+                            sizes={heroSizes}
+                            className="object-cover"
+                            priority={isFlipped}
+                            loading={isFlipped ? undefined : "lazy"}
+                            fetchPriority={!isFlipped ? "low" : undefined}
+                          />
+                        ) : (
+                          <div className="flex h-full w-full items-center justify-center border border-border/50 bg-muted/50">
+                            <Hexagon className="h-12 w-12 text-primary/30" />
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  )}
                   {hasBack && (
                     <button
                       type="button"
@@ -104,7 +144,7 @@ export function CardDetailsV2({
                       </span>
                     </button>
                   )}
-                </motion.div>
+                </div>
               </div>
               <div
                 className={cn(

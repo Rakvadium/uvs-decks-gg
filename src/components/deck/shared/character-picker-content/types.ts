@@ -1,4 +1,4 @@
-import type { CachedCard } from "@/lib/universus";
+import type { CachedCard } from "@/lib/universus/card-store";
 
 export interface DeckCharacterPickerContentProps {
   characters: CachedCard[];

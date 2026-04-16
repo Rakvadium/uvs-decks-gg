@@ -14,7 +14,7 @@ export function CharacterThumbnail({
   return (
     <div className={cn("relative overflow-hidden rounded border border-border/40 bg-muted/40", className)}>
       {imageUrl ? (
-        <Image src={imageUrl} alt={name} fill className="object-cover object-top" />
+        <Image src={imageUrl} alt={name} fill sizes="48px" className="object-cover object-top" />
       ) : (
         <div className="flex h-full w-full items-center justify-center">
           <Hexagon className="h-3 w-3 text-muted-foreground/40" />

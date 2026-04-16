@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import type { Doc } from "../../../../../convex/_generated/dataModel";
 import { api } from "../../../../../convex/_generated/api";
 import { useAuthDialog } from "@/components/auth/auth-dialog";
-import { useCardData } from "@/lib/universus";
+import { useCardData } from "@/lib/universus/card-data-provider";
 import {
   COMMUNITY_TIER_RANKING,
   type CommunityTierRankingScope,
@@ -44,7 +44,14 @@ function matchesTierListSearch({
     return true;
   }
 
-  const haystack = [tierList.title, tierList.description, authorLabel, tierList.selectedSetCodes.join(" ")]
+  const poolTokens = (tierList.poolScopes ?? []).flatMap((scope) => [scope.setCode, scope.cardType]);
+  const haystack = [
+    tierList.title,
+    tierList.description,
+    authorLabel,
+    tierList.selectedSetCodes.join(" "),
+    poolTokens.join(" "),
+  ]
     .filter(Boolean)
     .join(" ")
     .toLowerCase();
@@ -164,6 +171,7 @@ export function useCommunityTierListsPageModel() {
         isPublic: false,
         rankingScope: newRankingScope,
         selectedSetCodes: [],
+        poolScopes: [],
         tiers: starterTiers,
         items: [],
       });

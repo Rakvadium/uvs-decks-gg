@@ -74,6 +74,7 @@ export default defineSchema({
     legality: v.optional(v.string()),
   })
     .index("by_setCode_and_collectorNumber", ["setCode", "collectorNumber"])
+    .index("by_setCode_and_name", ["setCode", "name"])
     .index("by_setName", ["setName"])
     .index("by_setNumber", ["setNumber"])
     .index("by_rarity", ["rarity"])
@@ -98,6 +99,10 @@ export default defineSchema({
     .searchIndex("search_tier3_all", {
       searchField: "searchAll",
       filterFields: ["type", "rarity"],
+    })
+    .searchIndex("search_gallery_name", {
+      searchField: "searchName",
+      filterFields: ["setCode", "type", "rarity"],
     }),
 
   decks: defineTable({
@@ -141,6 +146,14 @@ export default defineSchema({
     )),
     rankingScopeKey: v.optional(v.string()),
     selectedSetCodes: v.array(v.string()),
+    poolScopes: v.optional(
+      v.array(
+        v.object({
+          setCode: v.string(),
+          cardType: v.string(),
+        })
+      )
+    ),
     previewCardIds: v.array(v.id("cards")),
     tiers: v.array(v.object({
       id: v.string(),
@@ -356,4 +369,29 @@ export default defineSchema({
     isLegal: v.boolean(),
     rotatesOutAt: v.optional(v.number()),
   }).index("by_format", ["formatKey"]),
+
+  communityYoutubeCurations: defineTable({
+    youtubeVideoId: v.string(),
+    label: v.optional(v.string()),
+    accentClass: v.optional(v.string()),
+    sortOrder: v.number(),
+  })
+    .index("by_sortOrder", ["sortOrder"])
+    .index("by_youtubeVideoId", ["youtubeVideoId"]),
+
+  youtubeVideoMetadataCache: defineTable({
+    youtubeVideoId: v.string(),
+    title: v.string(),
+    channelTitle: v.string(),
+    durationSeconds: v.number(),
+    viewCount: v.number(),
+    thumbnailUrl: v.string(),
+    fetchedAt: v.number(),
+    fetchError: v.optional(v.string()),
+  }).index("by_youtubeVideoId", ["youtubeVideoId"]),
+
+  youtubeFeedRefreshSettings: defineTable({
+    key: v.string(),
+    lastRefreshAttemptAt: v.number(),
+  }).index("by_key", ["key"]),
 });

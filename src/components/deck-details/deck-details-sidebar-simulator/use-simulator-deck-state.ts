@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { useCardIdMap } from "@/hooks/useCardIdMap";
-import { useCardData } from "@/lib/universus";
+import { useCardData } from "@/lib/universus/card-data-provider";
 import { useDeckDetailsOptional } from "@/providers/DeckDetailsProvider";
 
 export function useSimulatorDeckState() {

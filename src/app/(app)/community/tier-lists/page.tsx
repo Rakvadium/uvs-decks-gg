@@ -1,7 +1,11 @@
-"use client";
+import dynamic from "next/dynamic";
+import { RouteChunkFallback } from "@/components/shell/route-chunk-fallback";
 
-import { CommunityTierListsPageView } from "@/components/community/tier-lists/page-view";
+const TierListsPageClient = dynamic(() => import("./tier-lists-page-client"), {
+  loading: () => <RouteChunkFallback />,
+  ssr: true,
+});
 
 export default function CommunityTierListsPage() {
-  return <CommunityTierListsPageView />;
+  return <TierListsPageClient />;
 }

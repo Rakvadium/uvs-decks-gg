@@ -6,11 +6,18 @@ import { useMutation, useQuery } from "convex/react";
 import { toast } from "sonner";
 import type { Id } from "../../../../../convex/_generated/dataModel";
 import { api } from "../../../../../convex/_generated/api";
-import { useCardData, type CachedCard } from "@/lib/universus";
+import { useCardCatalog, useCardReferenceData } from "@/lib/universus/card-data-provider";
+import type { CachedCard } from "@/lib/universus/card-store";
 import {
   COMMUNITY_TIER_RANKING,
+  normalizeScopeSetCodes,
   type CommunityTierRankingScope,
 } from "../../../../../shared/app-config";
+import {
+  tierListPoolScopeKey,
+  TIER_LIST_POOL_ALL_TYPES,
+  type TierListPoolScope,
+} from "../../../../../shared/tier-list-pool";
 import type { BuilderLaneMap, BuilderTier } from "../types";
 import {
   POOL_LANE_KEY,
@@ -25,6 +32,7 @@ import {
   isRankedTierListScope,
   reconcileLaneMap,
   serializeLaneMap,
+  tierListCardMatchesPool,
 } from "../utils";
 
 type TierListDraftSnapshot = {
@@ -32,7 +40,7 @@ type TierListDraftSnapshot = {
   description: string;
   isPublic: boolean;
   rankingScope: CommunityTierRankingScope;
-  selectedSetCodes: string[];
+  poolScopes: TierListPoolScope[];
   tiers: BuilderTier[];
   laneMap: BuilderLaneMap;
 };
@@ -42,7 +50,8 @@ export function useCommunityTierListDetailModel(tierListId: string) {
   const detail = useQuery(api.tierLists.getDetail, { tierListId: tierListId as Id<"tierLists"> });
   const saveTierList = useMutation(api.tierLists.save);
   const deleteTierList = useMutation(api.tierLists.remove);
-  const { cards, sets } = useCardData();
+  const { cards } = useCardCatalog();
+  const { sets } = useCardReferenceData();
 
   const [title, setTitle] = useState("Untitled Tier List");
   const [description, setDescription] = useState("");
@@ -50,7 +59,7 @@ export function useCommunityTierListDetailModel(tierListId: string) {
   const [rankingScope, setRankingScope] = useState<CommunityTierRankingScope>(
     COMMUNITY_TIER_RANKING.scopes.unranked
   );
-  const [selectedSetCodes, setSelectedSetCodes] = useState<string[]>([]);
+  const [poolScopes, setPoolScopes] = useState<TierListPoolScope[]>([]);
   const [tiers, setTiers] = useState<BuilderTier[]>(() => createDefaultTiers());
   const [laneMap, setLaneMap] = useState<BuilderLaneMap>(() => reconcileLaneMap([], createDefaultTiers()));
   const [poolSearch, setPoolSearch] = useState("");
@@ -75,7 +84,7 @@ export function useCommunityTierListDetailModel(tierListId: string) {
       description,
       isPublic,
       rankingScope,
-      selectedSetCodes,
+      poolScopes,
       tiers,
       laneMap,
     };
@@ -85,6 +94,11 @@ export function useCommunityTierListDetailModel(tierListId: string) {
       ...overrides,
     };
   };
+
+  const selectedSetCodes = useMemo(
+    () => normalizeScopeSetCodes(poolScopes.map((scope) => scope.setCode)),
+    [poolScopes]
+  );
 
   useEffect(() => {
     if (!detail) {
@@ -114,7 +128,18 @@ export function useCommunityTierListDetailModel(tierListId: string) {
     setDescription(detail.tierList.description ?? "");
     setIsPublic(detail.tierList.isPublic);
     setRankingScope(detail.tierList.rankingScope ?? COMMUNITY_TIER_RANKING.scopes.unranked);
-    setSelectedSetCodes(detail.tierList.selectedSetCodes);
+    if (detail.tierList.poolScopes && detail.tierList.poolScopes.length > 0) {
+      setPoolScopes(detail.tierList.poolScopes);
+    } else if (detail.tierList.selectedSetCodes.length > 0) {
+      setPoolScopes(
+        detail.tierList.selectedSetCodes.map((setCode) => ({
+          setCode,
+          cardType: TIER_LIST_POOL_ALL_TYPES,
+        }))
+      );
+    } else {
+      setPoolScopes([]);
+    }
     setTiers(nextTiers);
     setLaneMap(reconcileLaneMap(detail.items.map((item) => item.cardId), nextTiers, nextLaneMap));
     hydratedTierListIdRef.current = currentId;
@@ -126,21 +151,19 @@ export function useCommunityTierListDetailModel(tierListId: string) {
       description,
       isPublic,
       rankingScope,
-      selectedSetCodes,
+      poolScopes,
       tiers,
       laneMap,
     };
-  }, [description, isPublic, laneMap, rankingScope, selectedSetCodes, tiers, title]);
+  }, [description, isPublic, laneMap, rankingScope, poolScopes, tiers, title]);
 
   const sourceCards = useMemo(() => {
-    if (selectedSetCodes.length === 0) {
+    if (poolScopes.length === 0) {
       return [] as typeof cards;
     }
 
-    const allowedSetCodes = new Set(selectedSetCodes);
     return cards
-      .filter((card) => card.isFrontFace !== false && card.isVariant !== true)
-      .filter((card) => card.setCode && allowedSetCodes.has(card.setCode))
+      .filter((card) => tierListCardMatchesPool(card, poolScopes))
       .sort((left, right) => {
         if (left.setCode !== right.setCode) {
           return (left.setCode ?? "").localeCompare(right.setCode ?? "");
@@ -152,7 +175,7 @@ export function useCommunityTierListDetailModel(tierListId: string) {
         }
         return left.name.localeCompare(right.name);
       });
-  }, [cards, selectedSetCodes]);
+  }, [cards, poolScopes]);
 
   const sourceCardIds = useMemo(() => sourceCards.map((card) => card._id), [sourceCards]);
   const sourceCardSignature = useMemo(() => sourceCardIds.map((cardId) => cardId.toString()).join("|"), [sourceCardIds]);
@@ -240,7 +263,8 @@ export function useCommunityTierListDetailModel(tierListId: string) {
         title: snapshot.title,
         isPublic: snapshot.isPublic,
         rankingScope: snapshot.rankingScope,
-        selectedSetCodes: snapshot.selectedSetCodes,
+        selectedSetCodes: normalizeScopeSetCodes(snapshot.poolScopes.map((scope) => scope.setCode)),
+        poolScopes: snapshot.poolScopes,
         tiers: snapshot.tiers.map((tier, order) => ({
           id: tier.id,
           label: tier.label,
@@ -331,14 +355,27 @@ export function useCommunityTierListDetailModel(tierListId: string) {
     setTiers((current) => current.map((entry) => (entry.id === tierId ? { ...entry, color: value } : entry)));
   };
 
-  const toggleSetCode = (setCode: string) => {
+  const addPoolScope = (scope: TierListPoolScope) => {
     if (!canEdit) {
       return;
     }
 
-    setSelectedSetCodes((current) =>
-      current.includes(setCode) ? current.filter((code) => code !== setCode) : [...current, setCode]
-    );
+    setPoolScopes((current) => {
+      const key = tierListPoolScopeKey(scope);
+      if (current.some((entry) => tierListPoolScopeKey(entry) === key)) {
+        return current;
+      }
+      return [...current, scope];
+    });
+  };
+
+  const removePoolScope = (scope: TierListPoolScope) => {
+    if (!canEdit) {
+      return;
+    }
+
+    const key = tierListPoolScopeKey(scope);
+    setPoolScopes((current) => current.filter((entry) => tierListPoolScopeKey(entry) !== key));
   };
 
   const addTier = () => {
@@ -470,8 +507,8 @@ export function useCommunityTierListDetailModel(tierListId: string) {
     shouldConfirmRankedScopeReset,
     cancelPendingRankingScopeChange,
     confirmPendingRankingScopeChange,
+    poolScopes,
     selectedSetCodes,
-    setSelectedSetCodes,
     tiers,
     laneMap,
     poolSearch,
@@ -496,7 +533,8 @@ export function useCommunityTierListDetailModel(tierListId: string) {
     moveCardToLane,
     setTierLabel,
     setTierColor,
-    toggleSetCode,
+    addPoolScope,
+    removePoolScope,
     addTier,
     removeTier,
     persistTierList,

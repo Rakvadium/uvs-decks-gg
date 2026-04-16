@@ -10,7 +10,7 @@ import {
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { Id, Doc } from "../../../convex/_generated/dataModel";
-import { useCardData } from "@/lib/universus";
+import { useCardIndex } from "@/lib/universus/card-data-provider";
 import { canAddCardToSection, canMoveCardToSection } from "./card-eligibility";
 
 type Deck = Doc<"decks">;
@@ -53,7 +53,7 @@ export function SiloedDeckProvider({ children, deckId }: SiloedDeckProviderProps
     api.decks.getById,
     { deckId: deckId as Id<"decks"> }
   );
-  const { cards } = useCardData();
+  const cardIndex = useCardIndex();
 
   const addCardMutation = useMutation(api.decks.addCard);
   const removeCardMutation = useMutation(api.decks.removeCard);
@@ -81,14 +81,6 @@ export function SiloedDeckProvider({ children, deckId }: SiloedDeckProviderProps
     return counts;
   }, [mainCounts, sideCounts, referenceCounts]);
 
-  const cardMap = useMemo(() => {
-    const map = new Map<string, Doc<"cards">>();
-    for (const card of cards) {
-      map.set(card._id, card as Doc<"cards">);
-    }
-    return map;
-  }, [cards]);
-
   const sectionCounts = useMemo(
     () => ({ mainCounts, sideCounts, referenceCounts }),
     [mainCounts, sideCounts, referenceCounts]
@@ -96,7 +88,7 @@ export function SiloedDeckProvider({ children, deckId }: SiloedDeckProviderProps
 
   const canAddToSection = useCallback(
     (cardId: Id<"cards">, section: DeckSection, quantity?: number) => {
-      const card = cardMap.get(cardId.toString());
+      const card = cardIndex?.byId.get(cardId.toString());
       return canAddCardToSection({
         card,
         cardId: cardId.toString(),
@@ -105,12 +97,12 @@ export function SiloedDeckProvider({ children, deckId }: SiloedDeckProviderProps
         quantity,
       });
     },
-    [cardMap, sectionCounts]
+    [cardIndex, sectionCounts]
   );
 
   const canMoveToSection = useCallback(
     (cardId: Id<"cards">, fromSection: DeckSection, toSection: DeckSection, quantity?: number) => {
-      const card = cardMap.get(cardId.toString());
+      const card = cardIndex?.byId.get(cardId.toString());
       return canMoveCardToSection({
         card,
         cardId: cardId.toString(),
@@ -120,7 +112,7 @@ export function SiloedDeckProvider({ children, deckId }: SiloedDeckProviderProps
         quantity,
       });
     },
-    [cardMap, sectionCounts]
+    [cardIndex, sectionCounts]
   );
 
   const addCard = useCallback(

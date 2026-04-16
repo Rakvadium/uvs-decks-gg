@@ -1,4 +1,4 @@
-import type { CachedCard } from "@/lib/universus";
+import type { CachedCard } from "@/lib/universus/card-store";
 import { CardImageDisplay } from "@/components/universus/card-grid-item/image-display";
 import { cn } from "@/lib/utils";
 

@@ -3,7 +3,7 @@ import { useMutation } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import { useDeckCatalogData, type DeckTab } from "@/hooks/useDeckCatalogData";
 import { useCardIdMap } from "@/hooks/useCardIdMap";
-import { useCardData } from "@/lib/universus";
+import { useCardData } from "@/lib/universus/card-data-provider";
 import { useActiveDeck } from "@/providers/ActiveDeckProvider";
 
 interface DecksSidebarContextValue {

@@ -1,8 +1,10 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
+import * as m from "framer-motion/m";
+import { usePrefersReducedMotion } from "@/lib/reduced-motion";
 import { Layers3, Presentation } from "lucide-react";
-import { CardGridItem } from "@/components/universus";
+import { CardGridItem } from "@/components/universus/card-grid-item";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -10,6 +12,7 @@ import { useCommunityTierListDetailContext } from "./context";
 import { CommunityTierListPresentationCard } from "./presentation-card";
 
 export function CommunityTierListDetailPoolPanel() {
+  const prefersReducedMotion = usePrefersReducedMotion();
   const {
     canEdit,
     poolCardIds,
@@ -19,7 +22,7 @@ export function CommunityTierListDetailPoolPanel() {
     filteredPoolCardIds,
     cardMap,
     getBackCard,
-    selectedSetCodes,
+    poolScopes,
     isPresentationMode,
     setIsPresentationMode,
     presentationCard,
@@ -33,15 +36,15 @@ export function CommunityTierListDetailPoolPanel() {
     <div className="sticky bottom-0 z-20 border-t border-border/50 bg-background/92 backdrop-blur-xl">
       <AnimatePresence>
         {isPresentationMode && presentationCard ? (
-          <motion.div
-            initial={{ opacity: 0, y: 18, scale: 0.96 }}
+          <m.div
+            initial={prefersReducedMotion ? false : { opacity: 0, y: 18, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 14, scale: 0.96 }}
-            transition={{ duration: 0.22, ease: "easeOut" }}
+            exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 14, scale: 0.96 }}
+            transition={{ duration: prefersReducedMotion ? 0 : 0.22, ease: "easeOut" }}
             className="absolute bottom-full right-0 z-30"
           >
             <CommunityTierListPresentationCard />
-          </motion.div>
+          </m.div>
         ) : null}
       </AnimatePresence>
 
@@ -83,12 +86,12 @@ export function CommunityTierListDetailPoolPanel() {
 
       <AnimatePresence initial={false}>
         {!isPresentationMode ? (
-          <motion.div
+          <m.div
             key="pool-body"
-            initial={{ height: 0, opacity: 0 }}
+            initial={prefersReducedMotion ? false : { height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.24, ease: "easeInOut" }}
+            exit={prefersReducedMotion ? { opacity: 0 } : { height: 0, opacity: 0 }}
+            transition={{ duration: prefersReducedMotion ? 0 : 0.24, ease: "easeInOut" }}
             className="overflow-hidden"
           >
             <div className="px-4 py-3 md:px-6">
@@ -116,13 +119,13 @@ export function CommunityTierListDetailPoolPanel() {
                 </div>
               ) : (
                 <div className="flex min-h-20 items-center justify-center border-t border-dashed border-border/40 px-4 text-sm text-muted-foreground">
-                  {selectedSetCodes.length > 0
+                  {poolScopes.length > 0
                     ? "No cards in the pool match that search."
-                    : "Choose one or more sets to populate the card pool."}
+                    : "Add set and card type rules to populate the card pool."}
                 </div>
               )}
             </div>
-          </motion.div>
+          </m.div>
         ) : null}
       </AnimatePresence>
     </div>

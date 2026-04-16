@@ -15,7 +15,7 @@ import {
   cardHasKeyword,
 } from "./card-store";
 import type { CachedCard } from "./card-store";
-import type { CardFilters, StatFilterValue, StatOperator } from "@/providers/UIStateProvider";
+import type { CardFilters, StatFilterValue } from "@/providers/UIStateProvider";
 
 export type { CachedCard } from "./card-store";
 
@@ -25,6 +25,10 @@ export interface CardSortOptions {
   field: string;
   direction: SortDirection;
 }
+
+export type FilterCardsFormatOptions = {
+  passesFormatLegality?: (setCode: string | undefined) => boolean;
+};
 
 export interface UseUniversusCardsResult {
   cards: CachedCard[];
@@ -101,7 +105,7 @@ export function useUniversusCards(): UseUniversusCardsResult {
     let isDone = false;
 
     while (!isDone) {
-      const result: { cards: Array<any>; cursor: string | null; isDone: boolean } = await convex.query(api.cards.listReleasedPaginated, {
+      const result: { cards: CachedCard[]; cursor: string | null; isDone: boolean } = await convex.query(api.cards.listReleasedPaginated, {
         cursor,
         limit: 1000,
       });
@@ -280,145 +284,160 @@ function matchesStatFilter(cardValue: number | undefined, filter: StatFilterValu
 
 export function filterCards(
   cards: CachedCard[],
-  filters: CardFilters
+  filters: CardFilters,
+  formatOpts?: FilterCardsFormatOptions
 ): CachedCard[] {
-  let result = cards.filter((card) => card.isFrontFace !== false && card.isVariant !== true);
+  const passesFormatLegality = formatOpts?.passesFormatLegality;
 
-  if (filters.search && filters.search.trim()) {
-    const searchLower = filters.search.toLowerCase();
-    const searchMode = filters.searchMode ?? "name";
-    
-    result = result.filter((card) => {
+  const searchTrimmed = filters.search?.trim();
+  const hasSearch = Boolean(searchTrimmed);
+  const searchLower = hasSearch && filters.search ? filters.search.toLowerCase() : "";
+  const searchMode = filters.searchMode ?? "name";
+
+  const types = filters.type;
+  const hasTypeFilter = Boolean(types?.length);
+
+  const rarities = filters.rarity;
+  const hasRarityFilter = Boolean(rarities?.length);
+
+  const sets = filters.set;
+  const hasSetFilter = Boolean(sets?.length);
+
+  const symbolFilters = filters.symbols;
+  const hasSymbolFilter = Boolean(symbolFilters?.length);
+  const symbolMatchAll = filters.symbolMatchAll === true;
+  const isAttunedFilter = hasSymbolFilter && symbolFilters!.some((s) => s.toLowerCase().startsWith("attuned"));
+
+  const keywordFilters = filters.keywords;
+  const hasKeywordFilter = Boolean(keywordFilters?.length);
+  const keywordMatchAll = filters.keywordMatchAll === true;
+
+  const hasDifficultyRange =
+    filters.difficultyMin !== undefined || filters.difficultyMax !== undefined;
+  const hasControlRange = filters.controlMin !== undefined || filters.controlMax !== undefined;
+  const hasSpeedRange = filters.speedMin !== undefined || filters.speedMax !== undefined;
+  const hasDamageRange = filters.damageMin !== undefined || filters.damageMax !== undefined;
+
+  const attackZonesLower =
+    filters.attackZone && filters.attackZone.length > 0
+      ? filters.attackZone.map((z) => z.toLowerCase())
+      : null;
+  const blockZonesLower =
+    filters.blockZone && filters.blockZone.length > 0
+      ? filters.blockZone.map((z) => z.toLowerCase())
+      : null;
+
+  const statDifficulty = filters.difficulty;
+  const statControl = filters.control;
+  const statSpeed = filters.speed;
+  const statDamage = filters.damage;
+  const statBlockModifier = filters.blockModifier;
+  const statHealth = filters.health;
+  const statHandSize = filters.handSize;
+  const statStamina = filters.stamina;
+
+  const out: CachedCard[] = [];
+  for (const card of cards) {
+    if (card.isFrontFace === false || card.isVariant === true) continue;
+
+    if (hasSearch) {
+      let ok = false;
       if (searchMode === "name" || searchMode === "all") {
-        if (card.name.toLowerCase().includes(searchLower)) return true;
-        if (card.searchName?.toLowerCase().includes(searchLower)) return true;
+        if (card.name.toLowerCase().includes(searchLower)) ok = true;
+        else if (card.searchName?.toLowerCase().includes(searchLower)) ok = true;
       }
-      if (searchMode === "text" || searchMode === "all") {
-        if (card.text?.toLowerCase().includes(searchLower)) return true;
-        if (card.searchText?.toLowerCase().includes(searchLower)) return true;
+      if (!ok && (searchMode === "text" || searchMode === "all")) {
+        if (card.text?.toLowerCase().includes(searchLower)) ok = true;
+        else if (card.searchText?.toLowerCase().includes(searchLower)) ok = true;
       }
-      if (searchMode === "all") {
-        if (card.searchAll?.toLowerCase().includes(searchLower)) return true;
+      if (!ok && searchMode === "all") {
+        if (card.searchAll?.toLowerCase().includes(searchLower)) ok = true;
       }
-      return false;
-    });
-  }
+      if (!ok) continue;
+    }
 
-  if (filters.type && filters.type.length > 0) {
-    result = result.filter((card) => card.type && filters.type!.includes(card.type));
-  }
+    if (passesFormatLegality && !passesFormatLegality(card.setCode)) continue;
 
-  if (filters.rarity && filters.rarity.length > 0) {
-    result = result.filter((card) => card.rarity && filters.rarity!.includes(card.rarity));
-  }
+    if (hasTypeFilter) {
+      if (!card.type || !types!.includes(card.type)) continue;
+    }
 
-  if (filters.set && filters.set.length > 0) {
-    result = result.filter((card) => card.setCode && filters.set!.includes(card.setCode));
-  }
+    if (hasRarityFilter) {
+      if (!card.rarity || !rarities!.includes(card.rarity)) continue;
+    }
 
-  if (filters.symbols && filters.symbols.length > 0) {
-    result = result.filter((card) => {
-      if (!card.symbols) return false;
-      let cardSymbols = card.symbols.split("|").map(s => s.trim().toLowerCase());
-      if (filters.symbolMatchAll) {
-        return filters.symbols!.every(s => cardSymbols.includes(s.toLowerCase()));  
+    if (hasSetFilter) {
+      if (!card.setCode || !sets!.includes(card.setCode)) continue;
+    }
+
+    if (hasSymbolFilter) {
+      if (!card.symbols) continue;
+      let cardSymbols = card.symbols.split("|").map((s) => s.trim().toLowerCase());
+      if (symbolMatchAll) {
+        if (!symbolFilters!.every((s) => cardSymbols.includes(s.toLowerCase()))) continue;
+      } else {
+        const isAttuned = cardSymbols.some((s) => s.toLowerCase().startsWith("attuned"));
+        if (isAttuned && !isAttunedFilter) {
+          cardSymbols = cardSymbols.map((s) => s.replace("attuned:", "").toLowerCase());
+        }
+        if (!symbolFilters!.some((s) => cardSymbols.includes(s.toLowerCase()))) continue;
       }
-      const isAttuned = cardSymbols.some(s => s.toLowerCase().startsWith("attuned"));
-      const isAttunedFilter = filters.symbols?.some(s => s.toLowerCase().startsWith("attuned"));
-      if (isAttuned && !isAttunedFilter) {
-        cardSymbols = cardSymbols.map(s => s.replace("attuned:", "").toLowerCase());
+    }
+
+    if (hasKeywordFilter) {
+      if (!card.keywords) continue;
+      if (keywordMatchAll) {
+        if (!keywordFilters!.every((k) => cardHasKeyword(card, k))) continue;
+      } else {
+        if (!keywordFilters!.some((k) => cardHasKeyword(card, k))) continue;
       }
-      return filters.symbols!.some(s => cardSymbols.includes(s.toLowerCase()));
-    });
+    }
+
+    if (hasDifficultyRange) {
+      if (card.difficulty === undefined) continue;
+      if (filters.difficultyMin !== undefined && card.difficulty < filters.difficultyMin) continue;
+      if (filters.difficultyMax !== undefined && card.difficulty > filters.difficultyMax) continue;
+    }
+
+    if (hasControlRange) {
+      if (card.control === undefined) continue;
+      if (filters.controlMin !== undefined && card.control < filters.controlMin) continue;
+      if (filters.controlMax !== undefined && card.control > filters.controlMax) continue;
+    }
+
+    if (hasSpeedRange) {
+      if (card.speed === undefined) continue;
+      if (filters.speedMin !== undefined && card.speed < filters.speedMin) continue;
+      if (filters.speedMax !== undefined && card.speed > filters.speedMax) continue;
+    }
+
+    if (hasDamageRange) {
+      if (card.damage === undefined) continue;
+      if (filters.damageMin !== undefined && card.damage < filters.damageMin) continue;
+      if (filters.damageMax !== undefined && card.damage > filters.damageMax) continue;
+    }
+
+    if (attackZonesLower) {
+      if (!card.attackZone || !attackZonesLower.includes(card.attackZone.toLowerCase())) continue;
+    }
+
+    if (blockZonesLower) {
+      if (!card.blockZone || !blockZonesLower.includes(card.blockZone.toLowerCase())) continue;
+    }
+
+    if (statDifficulty && !matchesStatFilter(card.difficulty, statDifficulty)) continue;
+    if (statControl && !matchesStatFilter(card.control, statControl)) continue;
+    if (statSpeed && !matchesStatFilter(card.speed, statSpeed)) continue;
+    if (statDamage && !matchesStatFilter(card.damage, statDamage)) continue;
+    if (statBlockModifier && !matchesStatFilter(card.blockModifier, statBlockModifier)) continue;
+    if (statHealth && !matchesStatFilter(card.health, statHealth)) continue;
+    if (statHandSize && !matchesStatFilter(card.handSize, statHandSize)) continue;
+    if (statStamina && !matchesStatFilter(card.stamina, statStamina)) continue;
+
+    out.push(card);
   }
 
-  if (filters.keywords && filters.keywords.length > 0) {
-    result = result.filter((card) => {
-      if (!card.keywords) return false;
-      if (filters.keywordMatchAll) {
-        return filters.keywords!.every(k => cardHasKeyword(card, k));
-      }
-      return filters.keywords!.some(k => cardHasKeyword(card, k));
-    });
-  }
-
-  if (filters.difficultyMin !== undefined || filters.difficultyMax !== undefined) {
-    result = result.filter((card) => {
-      if (card.difficulty === undefined) return false;
-      if (filters.difficultyMin !== undefined && card.difficulty < filters.difficultyMin) return false;
-      if (filters.difficultyMax !== undefined && card.difficulty > filters.difficultyMax) return false;
-      return true;
-    });
-  }
-
-  if (filters.controlMin !== undefined || filters.controlMax !== undefined) {
-    result = result.filter((card) => {
-      if (card.control === undefined) return false;
-      if (filters.controlMin !== undefined && card.control < filters.controlMin) return false;
-      if (filters.controlMax !== undefined && card.control > filters.controlMax) return false;
-      return true;
-    });
-  }
-
-  if (filters.speedMin !== undefined || filters.speedMax !== undefined) {
-    result = result.filter((card) => {
-      if (card.speed === undefined) return false;
-      if (filters.speedMin !== undefined && card.speed < filters.speedMin) return false;
-      if (filters.speedMax !== undefined && card.speed > filters.speedMax) return false;
-      return true;
-    });
-  }
-
-  if (filters.damageMin !== undefined || filters.damageMax !== undefined) {
-    result = result.filter((card) => {
-      if (card.damage === undefined) return false;
-      if (filters.damageMin !== undefined && card.damage < filters.damageMin) return false;
-      if (filters.damageMax !== undefined && card.damage > filters.damageMax) return false;
-      return true;
-    });
-  }
-
-  if (filters.attackZone && filters.attackZone.length > 0) {
-    result = result.filter((card) => card.attackZone && filters.attackZone?.map(z => z.toLowerCase())!.includes(card.attackZone!.toLowerCase()));
-  }
-
-  if (filters.blockZone && filters.blockZone.length > 0) {
-    result = result.filter((card) => card.blockZone && filters.blockZone?.map(z => z.toLowerCase())!.includes(card.blockZone!.toLowerCase()));
-  }
-
-  if (filters.difficulty) {
-    result = result.filter((card) => matchesStatFilter(card.difficulty, filters.difficulty));
-  }
-
-  if (filters.control) {
-    result = result.filter((card) => matchesStatFilter(card.control, filters.control));
-  }
-
-  if (filters.speed) {
-    result = result.filter((card) => matchesStatFilter(card.speed, filters.speed));
-  }
-
-  if (filters.damage) {
-    result = result.filter((card) => matchesStatFilter(card.damage, filters.damage));
-  }
-
-  if (filters.blockModifier) {
-    result = result.filter((card) => matchesStatFilter(card.blockModifier, filters.blockModifier));
-  }
-
-  if (filters.health) {
-    result = result.filter((card) => matchesStatFilter(card.health, filters.health));
-  }
-
-  if (filters.handSize) {
-    result = result.filter((card) => matchesStatFilter(card.handSize, filters.handSize));
-  }
-
-  if (filters.stamina) {
-    result = result.filter((card) => matchesStatFilter(card.stamina, filters.stamina));
-  }
-
-  return result;
+  return out;
 }
 
 function defaultCardSort(a: CachedCard, b: CachedCard): number {
@@ -433,59 +452,82 @@ function defaultCardSort(a: CachedCard, b: CachedCard): number {
   return collectorA - collectorB;
 }
 
+type SortPairComparator = (a: CachedCard, b: CachedCard) => number;
+
+function getSortPairComparator(field: string, multiplier: number): SortPairComparator {
+  switch (field) {
+    case "name":
+      return (a, b) => a.name.localeCompare(b.name) * multiplier;
+    case "type":
+      return (a, b) => (a.type ?? "").localeCompare(b.type ?? "") * multiplier;
+    case "rarity":
+      return (a, b) => (a.rarity ?? "").localeCompare(b.rarity ?? "") * multiplier;
+    case "setCode":
+    case "set":
+      return (a, b) => (a.setCode ?? "").localeCompare(b.setCode ?? "") * multiplier;
+    case "setNumber":
+      return (a, b) => ((a.setNumber ?? 0) - (b.setNumber ?? 0)) * multiplier;
+    case "collectorNumber":
+      return (a, b) =>
+        (parseInt(a.collectorNumber ?? "0", 10) - parseInt(b.collectorNumber ?? "0", 10)) * multiplier;
+    case "difficulty":
+      return (a, b) => ((a.difficulty ?? 0) - (b.difficulty ?? 0)) * multiplier;
+    case "control":
+      return (a, b) => ((a.control ?? 0) - (b.control ?? 0)) * multiplier;
+    case "speed":
+      return (a, b) => ((a.speed ?? 0) - (b.speed ?? 0)) * multiplier;
+    case "damage":
+      return (a, b) => ((a.damage ?? 0) - (b.damage ?? 0)) * multiplier;
+    default:
+      return defaultCardSort;
+  }
+}
+
+let lastSortCache: {
+  input: CachedCard[];
+  field: string;
+  direction: SortDirection;
+  output: CachedCard[];
+} | null = null;
+
 export function sortCards(
   cards: CachedCard[],
   options: CardSortOptions
 ): CachedCard[] {
   const { field, direction } = options;
-  
-  if (field === "default") {
-    return [...cards].sort(defaultCardSort);
+
+  if (
+    lastSortCache !== null &&
+    lastSortCache.input === cards &&
+    lastSortCache.field === field &&
+    lastSortCache.direction === direction
+  ) {
+    return lastSortCache.output;
   }
-  
-  const multiplier = direction === "desc" ? -1 : 1;
 
-  return [...cards].sort((a, b) => {
-    let comparison = 0;
+  if (cards.length === 0) {
+    const empty: CachedCard[] = [];
+    lastSortCache = { input: cards, field, direction, output: empty };
+    return empty;
+  }
 
-    switch (field) {
-      case "name":
-        comparison = a.name.localeCompare(b.name);
-        break;
-      case "type":
-        comparison = (a.type ?? "").localeCompare(b.type ?? "");
-        break;
-      case "rarity":
-        comparison = (a.rarity ?? "").localeCompare(b.rarity ?? "");
-        break;
-      case "setCode":
-      case "set":
-        comparison = (a.setCode ?? "").localeCompare(b.setCode ?? "");
-        break;
-      case "setNumber":
-        comparison = (a.setNumber ?? 0) - (b.setNumber ?? 0);
-        break;
-      case "collectorNumber":
-        comparison = parseInt(a.collectorNumber ?? "0", 10) - parseInt(b.collectorNumber ?? "0", 10);
-        break;
-      case "difficulty":
-        comparison = (a.difficulty ?? 0) - (b.difficulty ?? 0);
-        break;
-      case "control":
-        comparison = (a.control ?? 0) - (b.control ?? 0);
-        break;
-      case "speed":
-        comparison = (a.speed ?? 0) - (b.speed ?? 0);
-        break;
-      case "damage":
-        comparison = (a.damage ?? 0) - (b.damage ?? 0);
-        break;
-      default:
-        return defaultCardSort(a, b);
-    }
+  if (cards.length === 1) {
+    const single = [cards[0]];
+    lastSortCache = { input: cards, field, direction, output: single };
+    return single;
+  }
 
-    return comparison * multiplier;
-  });
+  let output: CachedCard[];
+  if (field === "default") {
+    output = [...cards].sort(defaultCardSort);
+  } else {
+    const multiplier = direction === "desc" ? -1 : 1;
+    const compare = getSortPairComparator(field, multiplier);
+    output = [...cards].sort(compare);
+  }
+
+  lastSortCache = { input: cards, field, direction, output };
+  return output;
 }
 
 export function paginateCards(

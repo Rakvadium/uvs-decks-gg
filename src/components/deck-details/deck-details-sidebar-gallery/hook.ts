@@ -2,7 +2,7 @@ import { useCallback, useMemo, useState } from "react";
 import { useShellSlot } from "@/components/shell/shell-slot-provider";
 import { useCardIdMap } from "@/hooks/useCardIdMap";
 import { useIsMobile } from "@/hooks/useIsMobile";
-import { useCardData } from "@/lib/universus";
+import { useCardData } from "@/lib/universus/card-data-provider";
 import { useGalleryFiltersOptional } from "@/providers/GalleryFiltersProvider";
 
 const SIDEBAR_GALLERY_PAGE_SIZE = 36;
@@ -25,12 +25,7 @@ export function useGallerySidebarModel() {
   const filterKey = useMemo(() => {
     if (!gallery) return `gallery-unavailable-${viewMode}`;
 
-    return JSON.stringify({
-      search: gallery.state.search,
-      searchMode: gallery.state.searchMode,
-      filters: gallery.state.filters,
-      viewMode,
-    });
+    return `${gallery.meta.filteredListKey}:${viewMode}`;
   }, [gallery, viewMode]);
 
   const visibleCount = visibleCountByKey[filterKey] ?? SIDEBAR_GALLERY_PAGE_SIZE;

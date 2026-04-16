@@ -1,6 +1,6 @@
 "use client";
 
-import { CardDetailsDialog } from "@/components/universus";
+import { CardDetailsDialog } from "@/components/universus/card-details/dialog";
 import { ActiveDeckCharacterPanelProvider, useActiveDeckCharacterPanelContext } from "./context";
 import { ActiveDeckCharacterPicker } from "./character-picker";
 import { ActiveDeckCharacterSummary } from "./summary";

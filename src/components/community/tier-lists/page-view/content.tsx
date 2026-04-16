@@ -9,8 +9,13 @@ import { TierListBrowserCard } from "./browser-card";
 import { useCommunityTierListsPageContext } from "./context";
 import { CommunityTierListsPageCreateDialog } from "./create-dialog";
 import { CommunityTierListsPageEmptyState } from "./empty-state";
+import { CommunityTierListsPageHeading } from "./heading";
 import { CommunityTierListsPageLoadingState } from "./loading-state";
-import { CommunityTierListsPageTopBar } from "./top-bar";
+import {
+  CommunityTierListsPagePrimaryAction,
+  CommunityTierListsPageToolbar,
+  CommunityTierListsPageTopBar,
+} from "./top-bar";
 
 export function CommunityTierListsPageView() {
   const {
@@ -27,23 +32,24 @@ export function CommunityTierListsPageView() {
   useRegisterSlot("top-bar", "community-tier-lists-page", CommunityTierListsPageTopBar);
 
   return (
-    <div className="relative flex h-full flex-col overflow-y-auto">
+    <div className="relative space-y-6">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.08),transparent_28%),radial-gradient(circle_at_80%_10%,rgba(20,184,166,0.10),transparent_24%)]" />
 
-      <div className="sticky top-0 z-20 hidden border-b border-border/50 bg-background/90 backdrop-blur-md supports-[backdrop-filter]:bg-background/80 md:block">
-        <AppPageHeader
-          title="Tier lists"
-          description="Browse public lists, manage yours, and explore community rankings."
-          withBottomBorder={false}
-          innerClassName="pb-3 md:pb-4"
-        />
-        <div className="border-t border-border/40 px-4 pb-4 pt-1 md:px-6">
-          <CommunityTierListsPageTopBar />
+      <div className="relative z-10">
+        <div className="md:hidden">
+          <CommunityTierListsPageHeading />
         </div>
-      </div>
 
-      <div className="relative z-10 flex min-h-full flex-col p-4 md:p-6">
-        <div className="flex-1">
+        <div className="hidden md:block">
+          <AppPageHeader
+            title="Tier lists"
+            description="Browse public lists, manage yours, and explore community rankings."
+            toolbar={<CommunityTierListsPageToolbar />}
+            actions={<CommunityTierListsPagePrimaryAction />}
+          />
+        </div>
+
+        <div className="flex-1 pt-2 md:pt-0">
           {activeTab === "rankings" ? (
             <CommunityRankingsView embedded />
           ) : activeTab === "mine" && !isAuthenticated ? (

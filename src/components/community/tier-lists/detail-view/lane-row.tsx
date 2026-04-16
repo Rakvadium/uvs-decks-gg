@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import type { BuilderTier } from "../types";
-import { useTcgDroppable } from "@/lib/dnd";
-import { CardGridItem } from "@/components/universus";
+import { TCG_DND_ACCEPTS_CARD_ONLY, type DragItem, useTcgDroppable } from "@/lib/dnd";
+import { CardGridItem } from "@/components/universus/card-grid-item";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +11,8 @@ import { cn } from "@/lib/utils";
 import { useCommunityTierListDetailContext } from "./context";
 import { Check, Pencil, Trash2 } from "lucide-react";
 import { SectionHeading } from "@/components/ui/typography-headings";
+
+const TCG_DND_ACCEPTS_NONE: DragItem["type"][] = [];
 
 function withAlpha(color: string, alpha: string) {
   if (color.startsWith("#") && color.length === 7) {
@@ -36,19 +38,26 @@ export function CommunityTierListLaneRow({ tier }: { tier: BuilderTier }) {
   const cardIds = laneMap[tier.id] ?? [];
   const [isEditingLane, setIsEditingLane] = useState(false);
 
+  const handleLaneDrop = useCallback(
+    (item: DragItem) => {
+      moveCardToLane(item.card._id, tier.id);
+    },
+    [moveCardToLane, tier.id]
+  );
+
   const { isOver, canDrop, droppableProps } = useTcgDroppable({
     id: `tier-list-${tier.id}`,
-    accepts: canEdit ? ["card"] : [],
-    onDrop: (item) => moveCardToLane(item.card._id, tier.id),
+    accepts: canEdit ? TCG_DND_ACCEPTS_CARD_ONLY : TCG_DND_ACCEPTS_NONE,
+    onDrop: handleLaneDrop,
   });
 
   return (
     <div
       {...droppableProps}
       className={cn(
-        "rounded-2xl border px-4 py-2.5 transition-all",
+        "rounded-2xl border px-4 py-2.5 transition-shadow transition-colors duration-150",
         canEdit && canDrop && "shadow-[0_0_20px_-15px_var(--primary)]",
-        canEdit && isOver && "scale-[1.005]"
+        canEdit && isOver && "ring-2 ring-primary/45"
       )}
       style={{
         borderColor: canEdit && canDrop ? withAlpha(tier.color, "88") : withAlpha(tier.color, "44"),

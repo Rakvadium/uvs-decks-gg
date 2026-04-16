@@ -1,5 +1,5 @@
 import type { Id } from "../../../../convex/_generated/dataModel";
-import type { CachedCard } from "@/lib/universus";
+import type { CachedCard } from "@/lib/universus/card-store";
 import type { BuilderLaneMap, BuilderTier } from "./types";
 import {
   buildCanonicalRankedTiers,
@@ -8,8 +8,34 @@ import {
   type CommunityTierRankingScope,
   getRankingScopeLabel,
 } from "../../../../shared/app-config";
+import {
+  TIER_LIST_POOL_ALL_TYPES,
+  type TierListPoolScope,
+} from "../../../../shared/tier-list-pool";
+
+export { TIER_LIST_POOL_ALL_TYPES, type TierListPoolScope };
 
 export const POOL_LANE_KEY = "pool";
+
+export function tierListCardMatchesPool(card: CachedCard, poolScopes: TierListPoolScope[]) {
+  if (card.isFrontFace === false || card.isVariant === true) {
+    return false;
+  }
+  if (poolScopes.length === 0) {
+    return false;
+  }
+  return poolScopes.some(
+    (scope) =>
+      card.setCode === scope.setCode &&
+      (scope.cardType === TIER_LIST_POOL_ALL_TYPES || card.type === scope.cardType)
+  );
+}
+
+export function formatTierListPoolScopeLabel(scope: TierListPoolScope, setName?: string) {
+  const setLabel = setName ?? scope.setCode;
+  const typeLabel = scope.cardType === TIER_LIST_POOL_ALL_TYPES ? "All types" : scope.cardType;
+  return `${setLabel} — ${typeLabel}`;
+}
 
 export const TIER_COLOR_SWATCHES = [
   "#f97316",

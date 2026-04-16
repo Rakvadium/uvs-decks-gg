@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import * as m from "framer-motion/m";
 import type { ReactNode } from "react";
 import { useLeftSidebarContext } from "./context";
 
@@ -12,7 +12,7 @@ export function LeftSidebarFrame({ children }: LeftSidebarFrameProps) {
   const width = collapsed ? 64 : 256;
 
   return (
-    <motion.aside
+    <m.aside
       initial={false}
       animate={{ width }}
       transition={{ duration: prefersReducedMotion ? 0 : 0.22, ease: [0.22, 1, 0.36, 1] }}
@@ -20,6 +20,6 @@ export function LeftSidebarFrame({ children }: LeftSidebarFrameProps) {
     >
       <div className="pointer-events-none absolute inset-0" style={{ background: "var(--chrome-shell-sidebar-wash)" }} />
       <div className="relative z-10 flex h-full flex-col">{children}</div>
-    </motion.aside>
+    </m.aside>
   );
 }

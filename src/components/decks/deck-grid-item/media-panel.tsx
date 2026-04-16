@@ -6,6 +6,7 @@ export function DeckGridItemMediaPanel() {
   const {
     deck: { isPublic, name },
     displayImage,
+    coverImagePriority,
   } = useDeckGridItemContext();
 
   return (
@@ -16,7 +17,10 @@ export function DeckGridItemMediaPanel() {
             src={displayImage}
             alt={name}
             fill
+            sizes="120px"
             className="object-cover object-top transition-all duration-150 group-hover:scale-105"
+            priority={coverImagePriority}
+            loading={coverImagePriority ? undefined : "lazy"}
           />
         </>
       ) : (

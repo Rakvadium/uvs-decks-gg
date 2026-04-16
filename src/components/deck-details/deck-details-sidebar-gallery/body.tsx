@@ -21,9 +21,16 @@ export function DeckDetailsGallerySidebarBody() {
         </div>
       ) : viewMode === "card" ? (
         <div className="grid grid-cols-2 gap-2">
-          {visibleCards.map((card) => {
+          {visibleCards.map((card, index) => {
             const backCard = card.backCardId ? cardIdMap.get(card.backCardId) : undefined;
-            return <CardGridItem key={card._id} card={card} backCard={backCard} />;
+            return (
+              <CardGridItem
+                key={card._id}
+                card={card}
+                backCard={backCard}
+                imagePriority={index < 4}
+              />
+            );
           })}
         </div>
       ) : (

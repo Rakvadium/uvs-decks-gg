@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { CardDetailsDialog } from "@/components/universus";
+import { CardDetailsDialog } from "@/components/universus/card-details/dialog";
 import { DeckListItemActions } from "./actions";
 import { DeckListItemProvider, useDeckListItemContext } from "./context";
 import { DeckListItemDetails } from "./details";

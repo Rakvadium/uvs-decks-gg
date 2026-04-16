@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { formatUniversusCardType } from "@/config/universus";
 import { useCardIdMap } from "@/hooks/useCardIdMap";
-import { useCardData } from "@/lib/universus";
+import { useCardData } from "@/lib/universus/card-data-provider";
 import { useActiveDeck } from "@/providers/ActiveDeckProvider";
 import type { Id } from "../../../../../convex/_generated/dataModel";
 

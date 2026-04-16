@@ -8,6 +8,7 @@ import {
   ReactNode,
   useEffect,
   useMemo,
+  useRef,
 } from "react";
 import { useQuery, useMutation, useConvexAuth } from "convex/react";
 import { api } from "../../convex/_generated/api";
@@ -216,6 +217,9 @@ function persistUIState(state: UIState) {
   }
 }
 
+const PERSIST_DEBOUNCE_MS = 120;
+const IDLE_PERSIST_TIMEOUT_MS = 2500;
+
 interface UIStateProviderProps {
   children: ReactNode;
 }
@@ -224,6 +228,10 @@ export function UIStateProvider({ children }: UIStateProviderProps) {
   const [uiState, setUIState] = useState<UIState>(() =>
     typeof window === "undefined" ? {} : loadPersistedUIState()
   );
+  const latestUIStateRef = useRef(uiState);
+  latestUIStateRef.current = uiState;
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const idleRef = useRef<{ id: number; isIdleCallback: boolean } | null>(null);
   const isHydrated = typeof window !== "undefined";
   const { isAuthenticated, isLoading: authLoading } = useConvexAuth();
 
@@ -251,11 +259,80 @@ export function UIStateProvider({ children }: UIStateProviderProps) {
     }
   }, [isHydrated, isAuthenticated, authLoading, uiState.activeDeckId]);
 
-  useEffect(() => {
-    if (isHydrated) {
-      persistUIState(uiState);
+  const cancelScheduledPersist = useCallback(() => {
+    if (debounceRef.current !== null) {
+      clearTimeout(debounceRef.current);
+      debounceRef.current = null;
     }
-  }, [isHydrated, uiState]);
+    const idle = idleRef.current;
+    if (idle !== null) {
+      if (idle.isIdleCallback && typeof cancelIdleCallback !== "undefined") {
+        cancelIdleCallback(idle.id);
+      } else {
+        clearTimeout(idle.id);
+      }
+      idleRef.current = null;
+    }
+  }, []);
+
+  const flushPersistUIState = useCallback(() => {
+    cancelScheduledPersist();
+    persistUIState(latestUIStateRef.current);
+  }, [cancelScheduledPersist]);
+
+  useEffect(() => {
+    if (!isHydrated) return;
+    cancelScheduledPersist();
+    debounceRef.current = setTimeout(() => {
+      debounceRef.current = null;
+      const run = () => {
+        idleRef.current = null;
+        persistUIState(latestUIStateRef.current);
+      };
+      if (typeof requestIdleCallback !== "undefined") {
+        idleRef.current = {
+          id: requestIdleCallback(run, { timeout: IDLE_PERSIST_TIMEOUT_MS }),
+          isIdleCallback: true,
+        };
+      } else {
+        idleRef.current = {
+          id: window.setTimeout(run, 0),
+          isIdleCallback: false,
+        };
+      }
+    }, PERSIST_DEBOUNCE_MS);
+    return () => {
+      cancelScheduledPersist();
+    };
+  }, [isHydrated, uiState, cancelScheduledPersist]);
+
+  useEffect(() => {
+    if (!isHydrated) return;
+    const onLifecycleFlush = () => {
+      flushPersistUIState();
+    };
+    const onVisibilityChange = () => {
+      if (document.visibilityState === "hidden") {
+        flushPersistUIState();
+      }
+    };
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    window.addEventListener("pagehide", onLifecycleFlush);
+    window.addEventListener("beforeunload", onLifecycleFlush);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+      window.removeEventListener("pagehide", onLifecycleFlush);
+      window.removeEventListener("beforeunload", onLifecycleFlush);
+    };
+  }, [isHydrated, flushPersistUIState]);
+
+  useEffect(() => {
+    if (!isHydrated) return;
+    return () => {
+      cancelScheduledPersist();
+      persistUIState(latestUIStateRef.current);
+    };
+  }, [isHydrated, cancelScheduledPersist]);
 
   const updateUIState = useCallback((updates: Partial<UIState>) => {
     setUIState((prev) => ({ ...prev, ...updates }));
