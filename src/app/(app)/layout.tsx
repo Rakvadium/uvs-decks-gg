@@ -162,7 +162,6 @@ function ShellLayoutInner({ children }: { children: ReactNode }) {
             <main
               className={cn(
                 "flex-1 overflow-hidden bg-background",
-                SHOW_DESKTOP_LEFT_SIDEBAR ? "rounded-tl-xl" : "rounded-t-xl"
               )}
               style={{ backgroundImage: "var(--chrome-page-bg)" }}
             >

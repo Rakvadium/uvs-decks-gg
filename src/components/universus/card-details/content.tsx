@@ -1,13 +1,12 @@
 import type { CachedCard } from "@/lib/universus";
 import { cn } from "@/lib/utils";
-import { CardDetailsAttackStatsSection } from "./attack-stats-section";
 import { CardDetailsContentProvider } from "./content-context";
 import { CardDetailsCopyLimitSection } from "./copy-limit-section";
-import { CardDetailsGeneralStatsSection } from "./general-stats-section";
-import { CardDetailsKeywordsSection } from "./keywords-section";
 import { CardDetailsMetaSection } from "./meta-section";
-import { CardDetailsTextSection } from "./card-text-section";
-import { CardDetailsTitleSection } from "./title-section";
+import {
+  CardDetailsReadoutPanel,
+  CardDetailsReadoutSurface,
+} from "./readout-panel";
 
 interface CardDetailsContentProps {
   card: CachedCard;
@@ -17,15 +16,13 @@ interface CardDetailsContentProps {
 export function CardDetailsContent({ card, className }: CardDetailsContentProps) {
   return (
     <CardDetailsContentProvider card={card}>
-      <div className={cn("flex-1 space-y-6 overflow-y-auto p-6", className)}>
-        <CardDetailsTitleSection />
-        <CardDetailsGeneralStatsSection />
-        <CardDetailsAttackStatsSection />
-        <CardDetailsKeywordsSection />
-        <CardDetailsTextSection />
-        <CardDetailsCopyLimitSection />
-        <CardDetailsMetaSection />
-      </div>
+      <CardDetailsReadoutSurface className={cn("flex-1", className)}>
+        <CardDetailsReadoutPanel />
+        <div className="relative z-[1] space-y-4 px-5 pb-6 md:px-8 md:pb-7 lg:px-9">
+          <CardDetailsCopyLimitSection />
+          <CardDetailsMetaSection />
+        </div>
+      </CardDetailsReadoutSurface>
     </CardDetailsContentProvider>
   );
 }

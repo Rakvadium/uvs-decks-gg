@@ -1,7 +1,10 @@
 import { useState } from "react";
-import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { cn } from "@/lib/utils";
 import { KEYWORD_ABILITY_MAP, TIMING_COLORS } from "./constants";
+
+const keywordChipClassName =
+  "inline-flex items-center rounded-sm border px-2 py-0.5 text-[10px] font-bold font-mono uppercase tracking-[0.12em]";
 
 interface KeywordBadgeProps {
   keyword: string;
@@ -14,9 +17,11 @@ export function KeywordBadge({ keyword }: KeywordBadgeProps) {
 
   if (!abilityDef || !abilityDef.timing) {
     return (
-      <Badge variant="outline" className="text-xs">
+      <span
+        className={cn(keywordChipClassName, "border-border/40 bg-muted/10 text-foreground/90")}
+      >
         {keyword}
-      </Badge>
+      </span>
     );
   }
 
@@ -27,7 +32,7 @@ export function KeywordBadge({ keyword }: KeywordBadgeProps) {
       <TooltipTrigger asChild>
         <button
           type="button"
-          className="inline-flex cursor-pointer items-center rounded-sm px-2 py-0.5 text-[10px] font-bold font-mono uppercase tracking-[0.12em] transition-all hover:scale-105"
+          className={cn(keywordChipClassName, "cursor-pointer transition-all hover:scale-105")}
           style={{
             backgroundColor: `${color}20`,
             color,

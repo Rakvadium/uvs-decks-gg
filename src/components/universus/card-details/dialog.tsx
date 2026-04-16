@@ -4,16 +4,12 @@ import { useCallback, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { CachedCard } from "@/lib/universus";
-import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogTitle,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
-import { useDeckDetailsOptional } from "@/providers/DeckDetailsProvider";
-import { DeckSectionControls } from "./deck-section-controls";
 import { CardDetailsV2 } from "./variants/v2";
 
 interface CardDetailsDialogProps {
@@ -35,9 +31,6 @@ export function CardDetailsDialog({
 }: CardDetailsDialogProps) {
   const [isFlipped, setIsFlipped] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(-1);
-  const deckDetails = useDeckDetailsOptional();
-  const showDeckControls = !deckDetails || deckDetails.isOwner;
-
   // Sync current index when card changes or dialog opens
   useEffect(() => {
     if (!open || !card || !cards?.length) {
@@ -106,21 +99,8 @@ export function CardDetailsDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         size="lg"
-        className="max-h-[90vh] overflow-hidden p-0 md:pb-0"
-        footer={
-          <div className="flex w-full items-stretch gap-3 md:items-center">
-            {showDeckControls && (
-              <DeckSectionControls card={currentCard} layout="horizontal" />
-            )}
-            <div className="ml-auto flex items-center gap-3">
-              <DialogClose asChild className="md:hidden">
-                <Button variant="outline" size="sm" className="h-8">
-                  <span className="text-xs font-mono uppercase tracking-wider">Close</span>
-                </Button>
-              </DialogClose>
-            </div>
-          </div>
-        }
+        presentation="plain"
+        className="max-h-[90vh] overflow-hidden p-0 md:pb-0 md:w-[65vw] md:min-w-[65vw] md:max-w-[65vw]"
         onPointerDownOutside={(e) => {
           const target = e.target as HTMLElement;
           if (target.closest("[data-card-dialog-nav]")) {
