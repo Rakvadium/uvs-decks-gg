@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
-import { useShellSlot } from "@/components/shell/shell-slot-provider";
+import { useSidebarWidth } from "@/components/shell/shell-slot-provider";
 import { useCardIdMap } from "@/hooks/useCardIdMap";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { useCardData } from "@/lib/universus/card-data-provider";
@@ -11,7 +11,7 @@ export type SidebarGalleryViewMode = "card" | "list";
 
 export function useGallerySidebarModel() {
   const gallery = useGalleryFiltersOptional();
-  const { state: shellState } = useShellSlot();
+  const shellSidebarWidthValue = useSidebarWidth();
   const isMobile = useIsMobile();
   const { cards: allCards } = useCardData();
 
@@ -51,7 +51,7 @@ export function useGallerySidebarModel() {
 
   return {
     gallery,
-    shellSidebarWidth: shellState.sidebarWidth,
+    shellSidebarWidth: shellSidebarWidthValue,
     isMobile,
     viewMode,
     setViewMode,

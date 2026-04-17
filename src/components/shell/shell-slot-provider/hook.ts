@@ -7,12 +7,11 @@ import {
   MIN_SIDEBAR_WIDTH,
   SIDEBAR_WIDTH_KEY,
   type ShellSlotActions,
-  type ShellSlotContextValue,
   type SlotArea,
   type SlotRegistration,
 } from "./types";
 
-export function useShellSlotModel(): ShellSlotContextValue {
+export function useShellSlotModel() {
   const [slots, setSlots] = useState<Map<SlotArea, SlotRegistration[]>>(() => new Map());
   const [activeSidebarActionId, setActiveSidebarActionIdState] = useState<string | null>(null);
   const [sidebarWidth, setSidebarWidthState] = useState<number>(() => getInitialSidebarWidth());
@@ -65,15 +64,14 @@ export function useShellSlotModel(): ShellSlotContextValue {
     [registerSlot, unregisterSlot, setActiveSidebarAction, setSidebarWidth]
   );
 
-  return useMemo(
-    (): ShellSlotContextValue => ({
-      state: {
-        slots,
-        activeSidebarActionId,
-        sidebarWidth,
-      },
-      actions,
-    }),
-    [slots, activeSidebarActionId, sidebarWidth, actions]
+  const slotData = useMemo(
+    () => ({ slots, sidebarWidth }),
+    [slots, sidebarWidth]
   );
+
+  return {
+    actions,
+    activeSidebarActionId,
+    slotData,
+  };
 }

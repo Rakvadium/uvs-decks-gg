@@ -1,20 +1,59 @@
 "use client";
 
-import { createContext, useContext, useRef, type ReactNode, type RefObject } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+  type RefObject,
+} from "react";
 
-const GalleryMainScrollRootRefContext = createContext<RefObject<HTMLDivElement | null> | null>(null);
+type GalleryMainScrollRootContextValue = {
+  scrollRef: RefObject<HTMLDivElement | null>;
+  scrollRootElement: HTMLDivElement | null;
+  attachScrollRootRef: (el: HTMLDivElement | null) => void;
+};
+
+const GalleryMainScrollRootContext = createContext<GalleryMainScrollRootContextValue | null>(null);
 
 export function GalleryMainScrollRootProvider({ children }: { children: ReactNode }) {
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+  const [scrollRootElement, setScrollRootElement] = useState<HTMLDivElement | null>(null);
+
+  const attachScrollRootRef = useCallback((el: HTMLDivElement | null) => {
+    scrollRef.current = el;
+    setScrollRootElement((prev) => (prev === el ? prev : el));
+  }, []);
+
+  const value = useMemo(
+    (): GalleryMainScrollRootContextValue => ({
+      scrollRef,
+      scrollRootElement,
+      attachScrollRootRef,
+    }),
+    [scrollRootElement, attachScrollRootRef]
+  );
+
   return (
-    <GalleryMainScrollRootRefContext.Provider value={scrollRef}>{children}</GalleryMainScrollRootRefContext.Provider>
+    <GalleryMainScrollRootContext.Provider value={value}>{children}</GalleryMainScrollRootContext.Provider>
   );
 }
 
-export function useGalleryMainScrollRootRef(): RefObject<HTMLDivElement | null> {
-  const ctx = useContext(GalleryMainScrollRootRefContext);
+export function useGalleryMainScrollRoot(): GalleryMainScrollRootContextValue {
+  const ctx = useContext(GalleryMainScrollRootContext);
   if (!ctx) {
-    throw new Error("useGalleryMainScrollRootRef requires GalleryMainScrollRootProvider");
+    throw new Error("useGalleryMainScrollRoot requires GalleryMainScrollRootProvider");
   }
   return ctx;
+}
+
+export function useGalleryMainScrollRootRef(): RefObject<HTMLDivElement | null> {
+  return useGalleryMainScrollRoot().scrollRef;
+}
+
+export function useGalleryMainScrollRootElement(): HTMLDivElement | null {
+  return useGalleryMainScrollRoot().scrollRootElement;
 }

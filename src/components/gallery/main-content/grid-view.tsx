@@ -4,7 +4,7 @@ import { CardNavigationProvider } from "@/components/universus/card-details/navi
 import { useIsMobile } from "@/hooks/useIsMobile";
 import type { CachedCard } from "@/lib/universus/card-store";
 import { useGalleryCardMap } from "./card-map-context";
-import { useGalleryMainScrollRootRef } from "./gallery-main-scroll-root";
+import { useGalleryMainScrollRootElement } from "./gallery-main-scroll-root";
 import { NoCardsFound } from "./no-cards-found";
 
 interface GalleryGridViewProps {
@@ -15,7 +15,7 @@ interface GalleryGridViewProps {
 
 export function GalleryGridView({ cards, cardsPerRow, onOpenCardDetails }: GalleryGridViewProps) {
   const isMobile = useIsMobile();
-  const scrollRef = useGalleryMainScrollRootRef();
+  const scrollRootElement = useGalleryMainScrollRootElement();
   const { getBackCard } = useGalleryCardMap();
   const clampedCardsPerRow = Math.min(10, Math.max(1, Math.round(cardsPerRow)));
   const columnCount = isMobile ? (clampedCardsPerRow <= 1 ? 1 : 2) : clampedCardsPerRow;
@@ -23,7 +23,7 @@ export function GalleryGridView({ cards, cardsPerRow, onOpenCardDetails }: Galle
 
   const rowVirtualizer = useVirtualizer({
     count: rowCount,
-    getScrollElement: () => scrollRef.current,
+    getScrollElement: () => scrollRootElement,
     estimateSize: () => 400,
     overscan: 3,
     gap: 16,

@@ -114,12 +114,13 @@ export function useUniversusCards(): UseUniversusCardsResult {
       cursor = result.cursor;
       isDone = result.isDone;
       
-      const progress = Math.min(95, Math.round((allCards.length / 3000) * 100));
+      const total = serverVersionData?.cardCount ?? allCards.length;
+      const progress = total > 0 ? Math.min(95, Math.round((allCards.length / total) * 100)) : 0;
       setLoadProgress(progress);
     }
 
     return allCards;
-  }, [convex]);
+  }, [convex, serverVersionData]);
 
   const syncFromConvex = useCallback(async (serverCards: CachedCard[], version: number) => {
     if (syncInProgress.current) return;
@@ -483,51 +484,22 @@ function getSortPairComparator(field: string, multiplier: number): SortPairCompa
   }
 }
 
-let lastSortCache: {
-  input: CachedCard[];
-  field: string;
-  direction: SortDirection;
-  output: CachedCard[];
-} | null = null;
-
 export function sortCards(
   cards: CachedCard[],
   options: CardSortOptions
 ): CachedCard[] {
+  if (cards.length === 0) return [];
+  if (cards.length === 1) return [cards[0]];
+
   const { field, direction } = options;
 
-  if (
-    lastSortCache !== null &&
-    lastSortCache.input === cards &&
-    lastSortCache.field === field &&
-    lastSortCache.direction === direction
-  ) {
-    return lastSortCache.output;
-  }
-
-  if (cards.length === 0) {
-    const empty: CachedCard[] = [];
-    lastSortCache = { input: cards, field, direction, output: empty };
-    return empty;
-  }
-
-  if (cards.length === 1) {
-    const single = [cards[0]];
-    lastSortCache = { input: cards, field, direction, output: single };
-    return single;
-  }
-
-  let output: CachedCard[];
   if (field === "default") {
-    output = [...cards].sort(defaultCardSort);
-  } else {
-    const multiplier = direction === "desc" ? -1 : 1;
-    const compare = getSortPairComparator(field, multiplier);
-    output = [...cards].sort(compare);
+    return [...cards].sort(defaultCardSort);
   }
 
-  lastSortCache = { input: cards, field, direction, output };
-  return output;
+  const multiplier = direction === "desc" ? -1 : 1;
+  const compare = getSortPairComparator(field, multiplier);
+  return [...cards].sort(compare);
 }
 
 export function paginateCards(

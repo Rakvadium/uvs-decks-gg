@@ -8,7 +8,12 @@ import {
   type MouseEvent as ReactMouseEvent,
   type ReactNode,
 } from "react";
-import { useShellSlot, type SlotRegistration } from "../shell-slot-provider";
+import {
+  useShellSlotActions,
+  useActiveSidebarActionId,
+  useShellSlotData,
+  type SlotRegistration,
+} from "../shell-slot-provider";
 import { useRightSidebarResize } from "./use-resize";
 
 type SlotComponent = ComponentType;
@@ -30,10 +35,10 @@ interface RightSidebarContextValue {
 const RightSidebarContext = createContext<RightSidebarContextValue | null>(null);
 
 export function RightSidebarProvider({ children }: { children: ReactNode }) {
-  const { state, actions } = useShellSlot();
-  const sidebarSlots = useMemo(() => state.slots.get("right-sidebar") ?? [], [state.slots]);
-  const activeActionId = state.activeSidebarActionId;
-  const sidebarWidth = state.sidebarWidth;
+  const actions = useShellSlotActions();
+  const activeActionId = useActiveSidebarActionId();
+  const { slots, sidebarWidth } = useShellSlotData();
+  const sidebarSlots = useMemo(() => slots.get("right-sidebar") ?? [], [slots]);
   const setActiveSidebarAction = actions.setActiveSidebarAction;
 
   const activeSlot = sidebarSlots.find((slot) => slot.id === activeActionId);

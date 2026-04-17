@@ -87,29 +87,54 @@ export const list = query({
       return cards.filter((card) => card.isFrontFace !== false && card.isVariant !== true);
     }
 
-    let cards = await ctx.db
-      .query("cards")
-      .collect();
+    const limit = args.limit ?? 100;
+    const overFetch = limit * 3;
+
+    if (args.set && args.set.length === 1) {
+      const raw = await ctx.db
+        .query("cards")
+        .withIndex("by_setCode_and_name", (q) => q.eq("setCode", args.set![0]))
+        .take(overFetch);
+      let cards = raw.filter((card) => card.isFrontFace !== false && card.isVariant !== true);
+      if (args.rarity && args.rarity.length > 0) {
+        cards = cards.filter((c) => c.rarity && args.rarity!.includes(c.rarity));
+      }
+      if (args.type && args.type.length > 0) {
+        cards = cards.filter((c) => c.type && args.type!.includes(c.type));
+      }
+      return cards.slice(0, limit);
+    }
+
+    if (args.rarity && args.rarity.length === 1 && (!args.type || args.type.length === 0) && (!args.set || args.set.length === 0)) {
+      const raw = await ctx.db
+        .query("cards")
+        .withIndex("by_rarity", (q) => q.eq("rarity", args.rarity![0]))
+        .take(overFetch);
+      const cards = raw.filter((card) => card.isFrontFace !== false && card.isVariant !== true);
+      return cards.slice(0, limit);
+    }
+
+    if (args.type && args.type.length === 1 && (!args.rarity || args.rarity.length === 0) && (!args.set || args.set.length === 0)) {
+      const raw = await ctx.db
+        .query("cards")
+        .withIndex("by_type_and_name", (q) => q.eq("type", args.type![0]))
+        .take(overFetch);
+      const cards = raw.filter((card) => card.isFrontFace !== false && card.isVariant !== true);
+      return cards.slice(0, limit);
+    }
+
+    const raw = await ctx.db.query("cards").take(overFetch);
+    let cards = raw.filter((card) => card.isFrontFace !== false && card.isVariant !== true);
 
     if (args.rarity && args.rarity.length > 0) {
-      cards = cards.filter(
-        (card) => card.rarity && args.rarity!.includes(card.rarity)
-      );
+      cards = cards.filter((c) => c.rarity && args.rarity!.includes(c.rarity));
     }
-
     if (args.type && args.type.length > 0) {
-      cards = cards.filter(
-        (card) => card.type && args.type!.includes(card.type)
-      );
+      cards = cards.filter((c) => c.type && args.type!.includes(c.type));
     }
-
     if (args.set && args.set.length > 0) {
-      cards = cards.filter(
-        (card) => card.setCode && args.set!.includes(card.setCode)
-      );
+      cards = cards.filter((c) => c.setCode && args.set!.includes(c.setCode));
     }
-
-    cards = cards.filter((card) => card.isFrontFace !== false && card.isVariant !== true);
 
     if (args.sortField) {
       const direction = args.sortDirection === "desc" ? -1 : 1;
@@ -123,23 +148,7 @@ export const list = query({
       });
     }
 
-    if (args.limit) {
-      cards = cards.slice(0, args.limit);
-    }
-
-    return cards;
-  },
-});
-
-export const listReleased = query({
-  args: {},
-  returns: v.array(cardValidator),
-  handler: async (ctx) => {
-    const cards = await ctx.db
-      .query("cards")
-      .collect();
-
-    return cards.filter((card) => card.isFrontFace !== false);
+    return cards.slice(0, limit);
   },
 });
 
@@ -159,7 +168,9 @@ export const listReleasedPaginated = query({
       .query("cards")
       .paginate({ numItems: limit, cursor: args.cursor ?? null });
 
-    const cardsWithUrls = result.page.map((card) => {
+    const catalogCards = result.page.filter(isGalleryCatalogCard);
+
+    const cardsWithUrls = catalogCards.map((card) => {
       if (card.imageUrl && !card.imageUrl.startsWith("http")) {
         const publicUrl = `${PUBLIC_R2_BASE_URL}/cards/${card.imageUrl}`;
         return { ...card, imageUrl: publicUrl };
@@ -483,17 +494,23 @@ export const getRarities = query({
   args: {},
   returns: v.array(v.string()),
   handler: async (ctx) => {
-    const cards = await ctx.db
-      .query("cards")
-      .collect();
+    const rarities: string[] = [];
+    let lastSeen: string | undefined = undefined;
 
-    const rarities = new Set<string>();
-    for (const card of cards) {
-      if (card.rarity && card.isFrontFace !== false) {
-        rarities.add(card.rarity);
-      }
+    for (;;) {
+      const card = await ctx.db
+        .query("cards")
+        .withIndex("by_rarity", (q) =>
+          lastSeen !== undefined ? q.gt("rarity", lastSeen) : q
+        )
+        .first();
+
+      if (!card || !card.rarity) break;
+      rarities.push(card.rarity);
+      lastSeen = card.rarity;
     }
-    return Array.from(rarities).sort();
+
+    return rarities.sort();
   },
 });
 
@@ -501,17 +518,23 @@ export const getTypes = query({
   args: {},
   returns: v.array(v.string()),
   handler: async (ctx) => {
-    const cards = await ctx.db
-      .query("cards")
-      .collect();
+    const types: string[] = [];
+    let lastSeen: string | undefined = undefined;
 
-    const types = new Set<string>();
-    for (const card of cards) {
-      if (card.type && card.isFrontFace !== false) {
-        types.add(card.type);
-      }
+    for (;;) {
+      const card = await ctx.db
+        .query("cards")
+        .withIndex("by_type", (q) =>
+          lastSeen !== undefined ? q.gt("type", lastSeen) : q
+        )
+        .first();
+
+      if (!card || !card.type) break;
+      types.push(card.type);
+      lastSeen = card.type;
     }
-    return Array.from(types).sort();
+
+    return types.sort();
   },
 });
 
@@ -519,17 +542,23 @@ export const getSets = query({
   args: {},
   returns: v.array(v.string()),
   handler: async (ctx) => {
-    const cards = await ctx.db
-      .query("cards")
-      .collect();
+    const sets: string[] = [];
+    let lastSeen: string | undefined = undefined;
 
-    const sets = new Set<string>();
-    for (const card of cards) {
-      if (card.setCode && card.isFrontFace !== false) {
-        sets.add(card.setCode);
-      }
+    for (;;) {
+      const card = await ctx.db
+        .query("cards")
+        .withIndex("by_setCode_and_collectorNumber", (q) =>
+          lastSeen !== undefined ? q.gt("setCode", lastSeen) : q
+        )
+        .first();
+
+      if (!card || !card.setCode) break;
+      sets.push(card.setCode);
+      lastSeen = card.setCode;
     }
-    return Array.from(sets).sort();
+
+    return sets.sort();
   },
 });
 
@@ -600,11 +629,12 @@ export const listCharacters = query({
       return cards.filter((card) => card.type === cardType && card.isFrontFace !== false && card.isVariant !== true);
     }
 
-    const allCards = await ctx.db
+    const raw = await ctx.db
       .query("cards")
-      .collect();
+      .withIndex("by_type_and_name", (q) => q.eq("type", cardType))
+      .take(500);
 
-    return allCards.filter((card) => card.type === cardType && card.isFrontFace !== false);
+    return raw.filter((card) => card.isFrontFace !== false);
   },
 });
 

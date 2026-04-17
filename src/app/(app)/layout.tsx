@@ -1,12 +1,12 @@
 "use client";
 
-import { ReactNode, useState, useMemo } from "react";
+import { ReactNode, useState, useMemo, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { AuthGuard } from "@/components/auth-guard";
 import { UIStateProvider, ActiveDeckProvider, DeckDetailsProvider } from "@/providers";
 import {
   ShellSlotProvider,
-  useShellSlot,
+  useShellSlots,
   useRegisterSlot,
   MobileShellProvider,
   MobileHeader,
@@ -16,7 +16,7 @@ import {
   MobileActionsSheet,
 } from "@/components/shell";
 import { usePathname, useParams } from "next/navigation";
-import { Upload, Layers, CreditCard, Settings } from "lucide-react";
+import { Upload, Layers, CreditCard, Settings, Video } from "lucide-react";
 import Link from "next/link";
 import { TcgDndProvider } from "@/lib/dnd";
 import { SiloedDeckProvider } from "@/lib/deck";
@@ -94,6 +94,13 @@ function AdminSidebarContent() {
             <Upload className="h-4 w-4" />
             Import
           </Link>
+          <Link 
+            href="/admin/community-media"
+            className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm hover:bg-muted ${pathname.includes("/community-media") ? "bg-muted font-medium" : ""}`}
+          >
+            <Video className="h-4 w-4" />
+            Community media
+          </Link>
         </div>
       </div>
     </div>
@@ -121,14 +128,18 @@ function ShellLayoutInner({ children }: { children: ReactNode }) {
     const stored = window.localStorage.getItem(LEFT_SIDEBAR_KEY);
     return stored === "true";
   });
-  const { state } = useShellSlot();
+  const slots = useShellSlots();
+
+  useEffect(() => {
+    void import("@/components/shell").then((m) => m.RightSidebar);
+  }, []);
 
   const pageType = getPageType(pathname);
   const deckId = params?.deckId as string | undefined;
   const tierListId = params?.tierListId as string | undefined;
 
   const hasRightSidebar =
-    SHOW_DESKTOP_RIGHT_SIDEBAR && (state.slots.get("right-sidebar")?.length ?? 0) > 0;
+    SHOW_DESKTOP_RIGHT_SIDEBAR && (slots.get("right-sidebar")?.length ?? 0) > 0;
 
   const toggleLeftSidebar = () => {
     setLeftSidebarCollapsed((prev) => {

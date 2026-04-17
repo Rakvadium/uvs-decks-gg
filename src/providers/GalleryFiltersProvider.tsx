@@ -16,7 +16,7 @@ import { sortCards } from "@/lib/universus/use-universus-cards";
 import type { CachedCard } from "@/lib/universus/card-store";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { useUIState, type CardFilters, type GalleryViewMode } from "@/providers/UIStateProvider";
-import { useShellSlot } from "@/components/shell/shell-slot-provider";
+import { useActiveSidebarActionId } from "@/components/shell/shell-slot-provider";
 
 type SearchMode = "name" | "text" | "all";
 type ViewMode = "card" | "list" | "details";
@@ -64,7 +64,7 @@ const GalleryFiltersContext = createContext<GalleryFiltersContextValue | null>(n
 
 export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
   const { uiState, setGalleryFilters, setGalleryViewMode, setGalleryCardsPerRow } = useUIState();
-  const { state: shellState } = useShellSlot();
+  const activeSidebarActionId = useActiveSidebarActionId();
   const isMobile = useIsMobile();
   const {
     cards,
@@ -77,7 +77,8 @@ export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
   const { formats } = useCardReferenceData();
   const [search, setSearch] = useState("");
   const [searchMode, setSearchMode] = useState<SearchMode>("all");
-  const isSidebarOpen = useMemo(() => Boolean(shellState.activeSidebarActionId), [shellState.activeSidebarActionId]);
+  const isSidebarOpen = useMemo(() => Boolean(activeSidebarActionId), [activeSidebarActionId]);
+  const deferredIsSidebarOpen = useDeferredValue(isSidebarOpen);
   const viewMode: ViewMode = useMemo(() => {
     const storedMode = uiState.galleryViewMode;
     if (storedMode === "grid") return "card";
@@ -99,12 +100,12 @@ export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
     const openValue = clampCardsPerRow(uiState.galleryCardsPerRowOpen ?? legacy, openDefault);
     const closedValue = clampCardsPerRow(uiState.galleryCardsPerRowClosed ?? legacy, closedDefault);
 
-    return isSidebarOpen ? openValue : closedValue;
+    return deferredIsSidebarOpen ? openValue : closedValue;
   }, [
     uiState.galleryCardsPerRow,
     uiState.galleryCardsPerRowOpen,
     uiState.galleryCardsPerRowClosed,
-    isSidebarOpen,
+    deferredIsSidebarOpen,
     isMobile,
   ]);
 

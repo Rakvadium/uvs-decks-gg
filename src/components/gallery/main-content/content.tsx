@@ -12,7 +12,10 @@ import { GalleryDetailsView } from "./details-view";
 import { GalleryGridView } from "./grid-view";
 import { GalleryInitializationState } from "./initial-loading-state";
 import { GalleryListView } from "./list-view";
-import { GalleryMainScrollRootProvider, useGalleryMainScrollRootRef } from "./gallery-main-scroll-root";
+import {
+  GalleryMainScrollRootProvider,
+  useGalleryMainScrollRoot,
+} from "./gallery-main-scroll-root";
 import { LoadMoreIndicator } from "./load-more-indicator";
 import { LoadingProgress } from "./loading-progress";
 
@@ -23,7 +26,7 @@ function GalleryMainContentBody() {
   const { getBackCard } = useGalleryCardMap();
   const [detailsCard, setDetailsCard] = useState<CachedCard | null>(null);
   const filterKey = meta.filteredListKey;
-  const scrollRef = useGalleryMainScrollRootRef();
+  const { scrollRef, attachScrollRootRef } = useGalleryMainScrollRoot();
   const isMobile = useIsMobile();
   const {
     visibleItems: visibleFilteredCards,
@@ -55,7 +58,7 @@ function GalleryMainContentBody() {
         </div>
       </div>
 
-      <div ref={scrollRef} className="relative z-0 min-h-0 flex-1 overflow-y-auto">
+      <div ref={attachScrollRootRef} className="relative z-0 min-h-0 flex-1 overflow-y-auto">
         <div className="space-y-4 p-4 pb-6 md:px-6 md:pb-4 md:pt-4">
           {state.viewMode === "card" ? (
             <GalleryGridView

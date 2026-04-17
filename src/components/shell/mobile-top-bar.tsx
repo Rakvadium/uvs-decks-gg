@@ -3,7 +3,7 @@
 import { PageType } from "@/app/(app)/layout"
 import { DecksMobileTopBar } from "@/components/decks/decks-view/mobile-top-bar"
 import { GalleryTopBarFilters } from "@/components/gallery/gallery-top-bar-filters"
-import { SlotRenderer, useShellSlot } from "./shell-slot-provider"
+import { SlotRenderer, useShellSlots } from "./shell-slot-provider"
 
 interface MobileTopBarProps {
   pageType?: PageType | null
@@ -12,8 +12,8 @@ interface MobileTopBarProps {
 const mobileTopBarClassName = "relative shrink-0 bg-background pt-3"
 
 export function MobileTopBar({ pageType }: MobileTopBarProps) {
-  const { state } = useShellSlot()
-  const hasTopBarSlots = (state.slots.get("top-bar")?.length ?? 0) > 0
+  const slots = useShellSlots()
+  const hasTopBarSlots = (slots.get("top-bar")?.length ?? 0) > 0
 
   if (pageType === "gallery") {
     return (

@@ -14,6 +14,14 @@ export type {
   SlotRegistrationOptions,
 } from "./shell-slot-provider/types";
 
-export { ShellSlotProvider, useShellSlot } from "./shell-slot-provider/context";
+export {
+  ShellSlotProvider,
+  useShellSlot,
+  useShellSlotActions,
+  useActiveSidebarActionId,
+  useShellSlotData,
+  useShellSlots,
+  useSidebarWidth,
+} from "./shell-slot-provider/context";
 export { useRegisterSlot } from "./shell-slot-provider/use-register-slot";
 export { SlotRenderer } from "./shell-slot-provider/slot-renderer";

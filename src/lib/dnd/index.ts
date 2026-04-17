@@ -1,6 +1,9 @@
 export {
   TcgDndProvider,
   useTcgDnd,
+  useTcgDndActions,
+  useTcgDndDragState,
+  useActiveDropZoneIsOver,
   TCG_DND_ACCEPTS_CARD_ONLY,
   TCG_DROP_ZONE_DATA_ATTR,
   UNIVERSUS_CARD_DND_ENABLED,

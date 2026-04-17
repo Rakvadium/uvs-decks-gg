@@ -1,11 +1,11 @@
 "use client";
 
-import { useShellSlot } from "./context";
+import { useShellSlots } from "./context";
 import type { SlotArea } from "./types";
 
 export function SlotRenderer({ area }: { area: SlotArea }) {
-  const { state } = useShellSlot();
-  const areaSlots = state.slots.get(area) ?? [];
+  const slots = useShellSlots();
+  const areaSlots = slots.get(area) ?? [];
 
   return (
     <>

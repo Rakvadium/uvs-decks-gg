@@ -17,7 +17,7 @@ import { YoutubeEmbed } from "./youtube-embed";
 
 function MediaFeedSkeleton() {
   return (
-    <div className="grid gap-4 xl:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)]">
+    <div className="grid gap-4 xl:grid-cols-[minmax(0,1.4fr)_minmax(300px,0.6fr)]">
       <Card className="overflow-hidden border-border/60 bg-background/50 shadow-none">
         <CardContent className="p-0">
           <Skeleton className="aspect-video w-full rounded-none" />
@@ -37,23 +37,17 @@ function MediaFeedSkeleton() {
           </div>
         </CardContent>
       </Card>
-      <div className="grid gap-4">
+      <div className="flex flex-col rounded-lg border border-border/60 bg-background/50">
         {[0, 1, 2].map((key) => (
-          <Card key={key} className="overflow-hidden border-border/60 bg-background/50 shadow-none">
-            <CardContent className="p-0">
-              <div className="grid gap-0 sm:grid-cols-[160px_minmax(0,1fr)]">
-                <Skeleton className="min-h-[140px] rounded-none sm:min-h-[140px]" />
-                <div className="flex min-w-0 flex-col justify-between gap-4 p-4">
-                  <div className="space-y-3">
-                    <Skeleton className="h-3 w-full" />
-                    <Skeleton className="h-4 w-5/6" />
-                    <Skeleton className="h-3 w-2/3" />
-                  </div>
-                  <Skeleton className="h-3 w-32" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <div key={key} className="flex items-center gap-3 border-b border-border/30 px-3 py-2 last:border-b-0">
+            <div className="w-28 shrink-0">
+              <Skeleton className="aspect-video w-full rounded-md" />
+            </div>
+            <div className="flex min-w-0 flex-1 flex-col gap-2">
+              <Skeleton className="h-4 w-4/5" />
+              <Skeleton className="h-3 w-1/2" />
+            </div>
+          </div>
         ))}
       </div>
     </div>
@@ -169,7 +163,7 @@ export function CommunityMediaFeedSection() {
         </div>
       ) : null}
 
-      <div className="grid gap-4 xl:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)]">
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,1.4fr)_minmax(300px,0.6fr)]">
         <Card className="overflow-hidden border-border/60 bg-background/50 shadow-none">
           <CardContent className="p-0">
             {activeVideo.rowStatus === "error" ? (
@@ -280,97 +274,89 @@ export function CommunityMediaFeedSection() {
           </CardContent>
         </Card>
 
-        <div className="grid gap-4">
-          {feed.items.map((video, index) => (
-            <Card
-              key={video.youtubeVideoId}
-              className={cn(
-                "overflow-hidden border-border/60 bg-background/50 shadow-none transition-[box-shadow]",
-                video.youtubeVideoId === resolvedActiveId &&
-                  "ring-2 ring-primary/50 ring-offset-2 ring-offset-background"
-              )}
-            >
-              <CardContent className="p-0">
-                <div className="grid gap-0 sm:grid-cols-[160px_minmax(0,1fr)]">
-                  <button
-                    type="button"
-                    onClick={() => setActiveVideoId(video.youtubeVideoId)}
-                    className={cn(
-                      "relative block min-h-[140px] w-full cursor-pointer overflow-hidden border-b border-border/50 text-left sm:border-b-0 sm:border-r",
-                      "bg-gradient-to-br outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-                      video.accentClass ?? "from-secondary/20 via-secondary/5 to-transparent"
-                    )}
-                  >
+        <div className="flex flex-col rounded-lg border border-border/60 bg-background/50">
+          {feed.items.map((video, index) => {
+            const isActive = video.youtubeVideoId === resolvedActiveId;
+            return (
+              <button
+                key={video.youtubeVideoId}
+                type="button"
+                onClick={() => setActiveVideoId(video.youtubeVideoId)}
+                className={cn(
+                  "group flex w-full cursor-pointer items-center gap-3 overflow-hidden px-3 py-2 text-left outline-none",
+                  "border-b border-border/30 transition-colors last:border-b-0 last:rounded-b-lg first:rounded-t-lg",
+                  "hover:bg-primary/[0.04] focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                  isActive && "bg-primary/[0.06]"
+                )}
+              >
+                <div className="relative w-28 shrink-0 overflow-hidden rounded-md">
+                  <div className="aspect-video w-full">
                     {video.thumbnailUrl ? (
                       <Image
                         src={video.thumbnailUrl}
                         alt={video.title ?? "Video thumbnail"}
                         fill
-                        className="object-cover opacity-80"
-                        sizes="160px"
+                        className="object-cover transition-transform group-hover:scale-105"
+                        sizes="112px"
                       />
+                    ) : (
+                      <div
+                        className={cn(
+                          "absolute inset-0 bg-gradient-to-br",
+                          video.accentClass ?? "from-secondary/20 via-secondary/5 to-transparent"
+                        )}
+                      />
+                    )}
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors group-hover:bg-black/30">
+                      <Play
+                        className={cn(
+                          "h-5 w-5 text-white drop-shadow-md transition-opacity",
+                          isActive ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+                        )}
+                      />
+                    </div>
+                    {video.rowStatus === "ok" && video.durationLabel ? (
+                      <span className="absolute bottom-1 right-1 rounded bg-black/70 px-1 py-px font-mono text-[10px] leading-none text-white">
+                        {video.durationLabel}
+                      </span>
                     ) : null}
-                    <div className={cn("absolute inset-0 opacity-20", scanlineClass)} />
-                    <div className="absolute left-3 top-3">
-                      {video.editorialLabel ? (
-                        <Badge variant="secondary" className="bg-background/75 text-[9px] uppercase tracking-[0.2em]">
-                          {video.editorialLabel}
-                        </Badge>
-                      ) : null}
-                    </div>
-                    <div className="absolute bottom-3 left-3 flex h-11 w-11 items-center justify-center rounded-full border border-primary/30 bg-background/75">
-                      <Play className="h-4 w-4 text-primary" />
-                    </div>
-                    <span className="sr-only">Play {video.title ?? "video"} in the main player</span>
-                  </button>
-
-                  <div className="flex min-w-0 flex-col justify-between gap-4 p-4">
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between gap-3 text-[10px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
-                        <span>{index === 0 ? "Featured" : `Queue ${index}`}</span>
-                        <span>
-                          {video.rowStatus === "ok"
-                            ? video.durationLabel
-                            : video.rowStatus === "pending"
-                              ? "—"
-                              : "—"}
-                        </span>
-                      </div>
-                      <div className="space-y-2">
-                        <SectionHeading className="text-sm font-semibold leading-snug text-foreground">
-                          {video.title ??
-                            (video.rowStatus === "error" ? "Could not load video" : "Loading…")}
-                        </SectionHeading>
-                        <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
-                          {video.rowStatus === "ok" ? (
-                            <>
-                              {video.channelTitle} / {video.viewCountLabel} views
-                            </>
-                          ) : video.rowStatus === "pending" ? (
-                            <>Fetching from YouTube…</>
-                          ) : (
-                            <span className="normal-case tracking-normal text-destructive/90">
-                              {video.fetchError ?? "Error"}
-                            </span>
-                          )}
-                        </p>
-                      </div>
-                    </div>
-
-                    <a
-                      href={video.watchUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-[10px] font-mono uppercase tracking-[0.22em] text-primary transition-colors hover:text-primary/80"
-                    >
-                      Watch on YouTube
-                      <ArrowUpRight className="h-3.5 w-3.5" />
-                    </a>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-          ))}
+
+                <div className="flex min-w-0 flex-1 flex-col gap-1">
+                  <p
+                    className={cn(
+                      "line-clamp-2 text-sm font-medium leading-snug transition-colors",
+                      isActive ? "text-primary" : "text-foreground"
+                    )}
+                  >
+                    {video.title ??
+                      (video.rowStatus === "error" ? "Could not load video" : "Loading…")}
+                  </p>
+                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <span className="truncate">
+                      {video.rowStatus === "ok"
+                        ? video.channelTitle
+                        : video.rowStatus === "pending"
+                          ? "YouTube"
+                          : "Error"}
+                    </span>
+                    {video.rowStatus === "ok" ? (
+                      <>
+                        <span className="shrink-0 text-muted-foreground/40">·</span>
+                        <span className="shrink-0">{video.viewCountLabel} views</span>
+                      </>
+                    ) : null}
+                  </div>
+                  {video.editorialLabel ? (
+                    <Badge variant="secondary" className="w-fit bg-primary/10 px-1.5 py-0 text-[9px] uppercase leading-4 tracking-[0.12em] text-primary">
+                      {video.editorialLabel}
+                    </Badge>
+                  ) : null}
+                </div>
+              </button>
+            );
+          })}
         </div>
       </div>
 

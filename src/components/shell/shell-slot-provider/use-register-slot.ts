@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, type ComponentType } from "react";
-import { useShellSlot } from "./context";
+import { createElement, useEffect, useRef, type ComponentType } from "react";
+import { useShellSlotActions } from "./context";
 import type { SlotArea, SlotRegistrationOptions } from "./types";
 
 export function useRegisterSlot(
@@ -10,15 +10,28 @@ export function useRegisterSlot(
   Component: ComponentType,
   options?: number | SlotRegistrationOptions
 ) {
-  const { actions } = useShellSlot();
+  const actions = useShellSlotActions();
+  const componentRef = useRef(Component);
+  const optionsRef = useRef(options);
+
+  componentRef.current = Component;
+  optionsRef.current = options;
+
+  const stableRef = useRef<ComponentType | null>(null);
+  if (!stableRef.current) {
+    stableRef.current = function StableSlot() {
+      return createElement(componentRef.current);
+    };
+  }
 
   useEffect(() => {
+    const opts = optionsRef.current;
     const registration =
-      typeof options === "number" || options === undefined
-        ? { id, component: Component, priority: options }
-        : { id, component: Component, ...options };
+      typeof opts === "number" || opts === undefined
+        ? { id, component: stableRef.current!, priority: opts }
+        : { id, component: stableRef.current!, ...opts };
 
     actions.registerSlot(area, registration);
     return () => actions.unregisterSlot(area, id);
-  }, [area, id, Component, options, actions]);
+  }, [area, id, actions]);
 }

@@ -5,7 +5,7 @@ import { useMobileShell } from "./mobile-shell-context"
 import { useConvexAuth, useQuery } from "convex/react"
 import { api } from "../../../convex/_generated/api"
 import { cn } from "@/lib/utils"
-import { LayoutGrid, Layers, Library } from "lucide-react"
+import { LayoutGrid, Layers, Users } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 interface NavItem {
@@ -17,7 +17,7 @@ interface NavItem {
 const navItems: NavItem[] = [
   { path: "gallery", label: "Cards", icon: LayoutGrid },
   { path: "decks", label: "Decks", icon: Layers },
-  { path: "collection", label: "Collection", icon: Library },
+  { path: "community", label: "Community", icon: Users },
 ]
 
 export function MobileBottomNav() {

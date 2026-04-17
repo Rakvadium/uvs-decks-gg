@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { CreditCard, Layers, Upload } from "lucide-react";
+import { CreditCard, Layers, Upload, Video } from "lucide-react";
 import { useQuery } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 
@@ -17,7 +17,7 @@ export function AdminDashboardClient() {
           <p className="text-muted-foreground">Manage UniVersus cards, sets, and data</p>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <Link href="/admin/cards">
             <div className="rounded-lg border bg-card p-6 hover:bg-accent transition-colors">
               <div className="flex items-center gap-4">
@@ -53,6 +53,20 @@ export function AdminDashboardClient() {
                 <div>
                   <h2 className="text-lg font-semibold">Import</h2>
                   <p className="text-sm text-muted-foreground">Import card data</p>
+                </div>
+              </div>
+            </div>
+          </Link>
+
+          <Link href="/admin/community-media">
+            <div className="rounded-lg border bg-card p-6 hover:bg-accent transition-colors">
+              <div className="flex items-center gap-4">
+                <Video className="h-8 w-8 text-primary" />
+                <div>
+                  <h2 className="text-lg font-semibold">Community media</h2>
+                  <p className="text-sm text-muted-foreground">
+                    YouTube feed on Community
+                  </p>
                 </div>
               </div>
             </div>

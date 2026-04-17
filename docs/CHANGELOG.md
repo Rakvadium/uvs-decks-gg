@@ -88,6 +88,55 @@ All notable changes to this project are recorded here.
 - **CALM-046 — UI matrix** — Admin route `/admin/ui-matrix` for Button / Badge / Card chrome sampling.
   - **Context:** Backlog CALM-046.
 
+- **CAT-001 — Bulk sync gallery-only rows** — `listReleasedPaginated` now filters through `isGalleryCatalogCard` before R2 URL remap; backs/variants excluded from IDB sync.
+  - **Context:** Backlog CAT-001.
+  - **Files:** `convex/cards.ts`.
+- **CAT-002 — Sync chunk size rationale** — Documented `limit: 1000` tradeoff (~5 round-trips, ~700KB/chunk).
+  - **Context:** Backlog CAT-002.
+  - **Files:** `docs/implementation/notes/sync-chunk-size.md`.
+- **CAT-003 — Accurate sync progress** — Replaced hard-coded 3000 divisor with `serverVersionData?.cardCount` for real progress tracking.
+  - **Context:** Backlog CAT-003.
+  - **Files:** `src/lib/universus/use-universus-cards.ts`.
+- **CAT-004 — Remove global sortCards cache** — Removed module-level `lastSortCache`; all call sites already `useMemo`-wrapped.
+  - **Context:** Backlog CAT-004.
+  - **Files:** `src/lib/universus/use-universus-cards.ts`.
+- **CAT-005 — Filter/sort spike** — Spike verdict: "not needed yet" — filter <5ms, sort <15ms at 3.5k cards.
+  - **Context:** Backlog CAT-005.
+  - **Files:** `docs/implementation/notes/filter-sort-spike.md`.
+- **CAT-006 — Versioned static catalog spike** — Design note: "defer" — R2 static catalog marginal at current scale.
+  - **Context:** Backlog CAT-006.
+  - **Files:** `docs/implementation/notes/versioned-static-catalog.md`.
+- **CAT-007 — Eliminate hot full-table scans** — Removed `.collect()` from `list`, `getRarities`, `getTypes`, `getSets`, `listCharacters`; removed unused `listReleased`; index-walk for facet queries; admin list bounded with `.take()`.
+  - **Context:** Backlog CAT-007.
+  - **Files:** `convex/cards.ts`, `src/app/(app)/admin/cards/cards-page-client.tsx`.
+- **CAT-008 — filteredCards memory analysis** — Documented peak memory tradeoff; dialog uses ref (zero clone cost); lazy nav not needed at current scale.
+  - **Context:** Backlog CAT-008.
+  - **Files:** `docs/card-data-hooks.md`.
+- **RSC-001 — Panel open/close without layout animation** — Replaced Framer `animate={{ width }}` with instant toggle + opacity CSS transition.
+  - **Context:** Backlog RSC-001.
+  - **Files:** `src/components/shell/right-sidebar/expanded-panel.tsx`.
+- **RSC-002 — Narrow ShellSlot subscriptions** — Split into 3 contexts (actions/activeSidebar/slotData); narrow hooks per consumer.
+  - **Context:** Backlog RSC-002.
+  - **Files:** `src/components/shell/shell-slot-provider/context.tsx`, `hook.ts`, `use-register-slot.ts`, `slot-renderer.tsx`, consumers.
+- **RSC-003 — Decouple gallery density from sidebar** — `useDeferredValue(isSidebarOpen)` defers `cardsPerRow` change from sidebar toggle.
+  - **Context:** Backlog RSC-003.
+  - **Files:** `src/providers/GalleryFiltersProvider.tsx`.
+- **RSC-004 — Stable drop-zone targeting** — 2-frame consecutive agreement before committing `activeDropZone` changes; eliminates rapid zone flipping.
+  - **Context:** Backlog RSC-004.
+  - **Files:** `src/lib/dnd/tcg-dnd-provider.tsx`.
+- **RSC-005 — Narrow droppable re-renders** — `useSyncExternalStore`-backed activeDropZone store; per-zone `isOver` selector; only affected zones re-render.
+  - **Context:** Backlog RSC-005.
+  - **Files:** `src/lib/dnd/tcg-dnd-provider.tsx`, `src/lib/dnd/use-tcg-droppable.ts`.
+- **RSC-006 — Stable slot registration** — Stable wrapper component via ref in `useRegisterSlot`; `Component`/`options` out of effect deps.
+  - **Context:** Backlog RSC-006.
+  - **Files:** `src/components/shell/shell-slot-provider/use-register-slot.ts`.
+- **RSC-007 — Resizable panel spike** — "Keep current" — `react-resizable-panels` adds bundle cost without simplification.
+  - **Context:** Backlog RSC-007.
+  - **Files:** `docs/implementation/notes/resizable-panel-spike.md`.
+- **RSC-008 — Preload right sidebar chunk** — Mount-time `import("@/components/shell")` preload; sidebar chunk cached before first icon-rail click.
+  - **Context:** Backlog RSC-008.
+  - **Files:** `src/app/(app)/layout.tsx`.
+
 ### Changed
 
 - **PERF-012 — Direct imports (universus barrels)** — Gallery, deck, provider, home, community card surfaces, and `universus` internals import `card-data-provider`, `use-universus-cards`, `card-store`, `card-details/*`, and `card-grid-item` directly instead of `@/lib/universus` and `@/components/universus` index re-exports, trimming webpack re-export graphs on hot paths.
