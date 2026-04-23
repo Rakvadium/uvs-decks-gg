@@ -1,4 +1,4 @@
-import { SlidersHorizontal } from "lucide-react";
+import { FilterX, SlidersHorizontal } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { galleryToolbarControlClassName } from "@/components/ui/gallery-search-field";
@@ -19,7 +19,7 @@ export function GalleryTopBarEndActions({ placement }: { placement: GalleryTopBa
     <div
       className={cn("flex shrink-0 items-center", isMobileToolbar ? "gap-1.5" : "gap-2")}
     >
-      <GalleryViewModePopover triggerStyle={isDesktopToolbar ? "labeled" : "icon"} />
+      {isDesktopToolbar ? <GalleryViewModePopover triggerStyle="labeled" /> : null}
 
       {isDesktopToolbar ? (
         <Button
@@ -63,12 +63,30 @@ export function GalleryTopBarEndActions({ placement }: { placement: GalleryTopBa
 }
 
 export function GalleryFilterControls() {
-  const { isFilterPanelOpen, setFilterPanelOpen } = useGalleryTopBarFiltersContext();
+  const { isFilterPanelOpen, setFilterPanelOpen, meta, actions } = useGalleryTopBarFiltersContext();
   const isMobile = useIsMobile();
 
   return (
     <>
-      {isMobile ? <GalleryTopBarEndActions placement="mobile-toolbar" /> : null}
+      {isMobile ? (
+        <div className="flex shrink-0 items-center gap-1.5">
+          {meta.activeFilterCount > 0 ? (
+            <Button
+              type="button"
+              variant="outline"
+              size="icon-sm"
+              className={cn(
+                "size-9 shrink-0 border-destructive/50 text-destructive hover:border-destructive hover:bg-destructive/10 hover:text-destructive focus-visible:border-destructive focus-visible:ring-destructive/30"
+              )}
+              aria-label="Clear all filters"
+              onClick={actions.clearAllFilters}
+            >
+              <FilterX className="size-4 shrink-0" />
+            </Button>
+          ) : null}
+          <GalleryTopBarEndActions placement="mobile-toolbar" />
+        </div>
+      ) : null}
       <GalleryFilterDialog open={isFilterPanelOpen} onOpenChange={setFilterPanelOpen} />
     </>
   );
