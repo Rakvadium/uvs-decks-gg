@@ -1,18 +1,23 @@
 import { ChevronRight } from "lucide-react";
 import { SectionHeading } from "@/components/ui/typography-headings";
+import { useProfanityDisplayText } from "@/lib/moderation/use-profanity-display-text";
 import { useDeckGridItemContext } from "../context";
 
 export function DeckGridItemMeta() {
   const {
-    deck: { description, format, name, subFormat },
+    deck: { description, format, name, subFormat, userId },
     startingCharacterName,
   } = useDeckGridItemContext();
+  const { display, viewerUserId } = useProfanityDisplayText();
+  const isOwnDeck = viewerUserId != null && userId === viewerUserId;
+  const showName = display(name, isOwnDeck);
+  const showDescription = description ? display(description, isOwnDeck) : null;
 
   return (
     <>
       <div className="mb-1 flex items-start justify-between gap-1.5 sm:mb-1.5 sm:gap-2">
         <SectionHeading className="truncate font-display text-sm font-bold uppercase tracking-wide transition-colors group-hover:text-primary sm:text-base">
-          {name}
+          {showName}
         </SectionHeading>
         <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground/30 transition-all group-hover:translate-x-0.5 group-hover:text-primary" />
       </div>
@@ -27,9 +32,9 @@ export function DeckGridItemMeta() {
         </div>
       ) : null}
 
-      {description ? (
+      {showDescription ? (
         <p className="mb-auto line-clamp-2 text-[11px] leading-relaxed text-muted-foreground sm:text-[12px]">
-          {description}
+          {showDescription}
         </p>
       ) : startingCharacterName ? (
         <div className="mb-auto flex items-center gap-1.5">

@@ -10,4 +10,18 @@ crons.interval(
   {}
 );
 
+crons.interval(
+  "prune stale deck presence",
+  { minutes: 2 },
+  internal.teams.deckCollaboration.pruneStaleDeckPresence,
+  {}
+);
+
+crons.interval(
+  "expire account status windows",
+  { minutes: 5 },
+  internal.accountStatusExpiry.runExpireStaleStatuses,
+  { cursor: null }
+);
+
 export default crons;

@@ -13,7 +13,7 @@ const AdminDashboardClient = dynamic(
 export const metadata: Metadata = {
   title: "Admin",
   description:
-    "Administrator dashboard for UniVersus card data — cards, sets, and imports on UVSDECKS.GG.",
+    "Administrator dashboard — sets, formats, content, and per-set card tools on UVSDECKS.GG.",
 };
 
 export default function AdminPage() {

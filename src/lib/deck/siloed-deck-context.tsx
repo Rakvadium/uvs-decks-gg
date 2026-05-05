@@ -5,20 +5,30 @@ import {
   useContext,
   useCallback,
   useMemo,
+  useEffect,
+  useRef,
+  useState,
   ReactNode,
 } from "react";
 import { useQuery, useMutation } from "convex/react";
+import { toast } from "sonner";
 import { api } from "../../../convex/_generated/api";
 import { Id, Doc } from "../../../convex/_generated/dataModel";
 import { useCardIndex } from "@/lib/universus/card-data-provider";
 import { canAddCardToSection, canMoveCardToSection } from "./card-eligibility";
+import {
+  type DeckVisibility,
+  deckRevisionNumber,
+  isDeckWriteConflictError,
+  isTeamEditableDeck,
+} from "@/lib/deck/visibility";
 
 type Deck = Doc<"decks">;
 type DeckSection = "main" | "side" | "reference";
 type DeckUpdate = {
   name?: string;
   description?: string;
-  isPublic?: boolean;
+  visibility?: DeckVisibility;
   imageCardId?: Id<"cards"> | null;
   startingCharacterId?: Id<"cards"> | null;
   selectedIdentity?: string | null;
@@ -39,6 +49,8 @@ interface SiloedDeckContextValue {
   getCardSection: (cardId: Id<"cards">) => DeckSection | null;
   getTotalCardCount: () => number;
   getSectionCardCount: (section: DeckSection) => number;
+  teamEditableWriteConflict: boolean;
+  dismissTeamEditableWriteConflict: () => void;
 }
 
 const SiloedDeckContext = createContext<SiloedDeckContextValue | null>(null);
@@ -62,6 +74,17 @@ export function SiloedDeckProvider({ children, deckId }: SiloedDeckProviderProps
 
   const deck = (deckData as Deck | null | undefined) ?? null;
   const isLoading = deckData === undefined;
+  const expectedRevisionRef = useRef(0);
+  const [teamEditableWriteConflict, setTeamEditableWriteConflict] = useState(false);
+  const dismissTeamEditableWriteConflict = useCallback(() => {
+    setTeamEditableWriteConflict(false);
+  }, []);
+
+  useEffect(() => {
+    if (deck) {
+      expectedRevisionRef.current = deckRevisionNumber(deck);
+    }
+  }, [deck?._id, deck?.revision]);
 
   const mainCounts = useMemo(() => deck?.mainQuantities ?? {}, [deck?.mainQuantities]);
   const sideCounts = useMemo(() => deck?.sideQuantities ?? {}, [deck?.sideQuantities]);
@@ -117,39 +140,78 @@ export function SiloedDeckProvider({ children, deckId }: SiloedDeckProviderProps
 
   const addCard = useCallback(
     async (cardId: Id<"cards">, section: DeckSection = "main") => {
+      if (!deck) return;
       if (!canAddToSection(cardId, section)) return;
-      await addCardMutation({
+      const payload: Parameters<typeof addCardMutation>[0] = {
         deckId: deckId as Id<"decks">,
         cardId,
         section,
-      });
+        ...(isTeamEditableDeck(deck) ? { expectedRevision: expectedRevisionRef.current } : {}),
+      };
+      try {
+        const r = await addCardMutation(payload);
+        expectedRevisionRef.current = r.revision;
+      } catch (e) {
+        if (isDeckWriteConflictError(e)) {
+          setTeamEditableWriteConflict(true);
+          toast.error("This deck was updated elsewhere. The latest version is shown.");
+        } else {
+          throw e;
+        }
+      }
     },
-    [deckId, addCardMutation, canAddToSection]
+    [deck, deckId, addCardMutation, canAddToSection]
   );
 
   const removeCard = useCallback(
     async (cardId: Id<"cards">, section: DeckSection) => {
-      await removeCardMutation({
+      if (!deck) return;
+      const payload: Parameters<typeof removeCardMutation>[0] = {
         deckId: deckId as Id<"decks">,
         cardId,
         section,
-      });
+        ...(isTeamEditableDeck(deck) ? { expectedRevision: expectedRevisionRef.current } : {}),
+      };
+      try {
+        const r = await removeCardMutation(payload);
+        expectedRevisionRef.current = r.revision;
+      } catch (e) {
+        if (isDeckWriteConflictError(e)) {
+          setTeamEditableWriteConflict(true);
+          toast.error("This deck was updated elsewhere. The latest version is shown.");
+        } else {
+          throw e;
+        }
+      }
     },
-    [deckId, removeCardMutation]
+    [deck, deckId, removeCardMutation]
   );
 
   const moveCard = useCallback(
     async (cardId: Id<"cards">, fromSection: DeckSection, toSection: DeckSection, quantity?: number) => {
+      if (!deck) return;
       if (!canMoveToSection(cardId, fromSection, toSection, quantity)) return;
-      await moveCardMutation({
+      const payload: Parameters<typeof moveCardMutation>[0] = {
         deckId: deckId as Id<"decks">,
         cardId,
         fromSection,
         toSection,
         quantity,
-      });
+        ...(isTeamEditableDeck(deck) ? { expectedRevision: expectedRevisionRef.current } : {}),
+      };
+      try {
+        const r = await moveCardMutation(payload);
+        expectedRevisionRef.current = r.revision;
+      } catch (e) {
+        if (isDeckWriteConflictError(e)) {
+          setTeamEditableWriteConflict(true);
+          toast.error("This deck was updated elsewhere. The latest version is shown.");
+        } else {
+          throw e;
+        }
+      }
     },
-    [deckId, moveCardMutation, canMoveToSection]
+    [deck, deckId, moveCardMutation, canMoveToSection]
   );
 
   const updateDeck = useCallback(
@@ -207,6 +269,8 @@ export function SiloedDeckProvider({ children, deckId }: SiloedDeckProviderProps
       getCardSection,
       getTotalCardCount,
       getSectionCardCount,
+      teamEditableWriteConflict,
+      dismissTeamEditableWriteConflict,
     }),
     [
       deck,
@@ -223,6 +287,8 @@ export function SiloedDeckProvider({ children, deckId }: SiloedDeckProviderProps
       getCardSection,
       getTotalCardCount,
       getSectionCardCount,
+      teamEditableWriteConflict,
+      dismissTeamEditableWriteConflict,
     ]
   );
 

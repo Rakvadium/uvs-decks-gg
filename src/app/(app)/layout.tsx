@@ -1,12 +1,17 @@
 "use client";
 
-import { ReactNode, useState, useMemo } from "react";
+import { ReactNode, useState, useMemo, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { AuthGuard } from "@/components/auth-guard";
-import { UIStateProvider, ActiveDeckProvider, DeckDetailsProvider } from "@/providers";
+import {
+  UIStateProvider,
+  ActiveDeckProvider,
+  DeckCollaborationProvider,
+  DeckDetailsProvider,
+} from "@/providers";
 import {
   ShellSlotProvider,
-  useShellSlot,
+  useShellSlotSlots,
   useRegisterSlot,
   MobileShellProvider,
   MobileHeader,
@@ -16,7 +21,15 @@ import {
   MobileActionsSheet,
 } from "@/components/shell";
 import { usePathname, useParams } from "next/navigation";
-import { Upload, Layers, CreditCard, Settings } from "lucide-react";
+import {
+  Upload,
+  Layers,
+  CreditCard,
+  Settings,
+  BookOpen,
+  Newspaper,
+  Users,
+} from "lucide-react";
 import Link from "next/link";
 import { TcgDndProvider } from "@/lib/dnd";
 import { SiloedDeckProvider } from "@/lib/deck";
@@ -25,15 +38,18 @@ import { GalleryFiltersProvider } from "@/providers/GalleryFiltersProvider";
 import { DecksProvider } from "@/providers/DecksProvider";
 import { CommunityTierListsPageProvider } from "@/components/community/tier-lists/page-view/context";
 import { CommunityTierListDetailProvider } from "@/components/community/tier-lists/detail-view/context";
+import { AccountStatusBanner } from "@/components/shell/account-status-banner";
 
 const LeftSidebar = dynamic(
   () => import("@/components/shell").then((module) => module.LeftSidebar),
   { ssr: false }
 );
-const RightSidebar = dynamic(
-  () => import("@/components/shell").then((module) => module.RightSidebar),
-  { ssr: false }
-);
+
+function loadRightSidebarShell() {
+  return import("@/components/shell").then((module) => module.RightSidebar);
+}
+
+const RightSidebar = dynamic(() => loadRightSidebarShell(), { ssr: false });
 
 const LEFT_SIDEBAR_KEY = "uvs-decks-left-sidebar-collapsed";
 
@@ -56,43 +72,109 @@ function getPageType(pathname: string): PageType | null {
 
 function AdminSidebarContent() {
   const pathname = usePathname();
+  const params = useParams();
+  const setCode =
+    typeof params?.code === "string" ? params.code : undefined;
+  const setOverviewHref = setCode
+    ? `/admin/sets/${encodeURIComponent(setCode)}`
+    : null;
+  const setCardsHref = setCode
+    ? `/admin/sets/${encodeURIComponent(setCode)}/cards`
+    : null;
+  const setImportHref = setCode
+    ? `/admin/sets/${encodeURIComponent(setCode)}/import`
+    : null;
+  const showSetNav =
+    Boolean(setCode) &&
+    /^\/admin\/sets\/[^/]+/.test(pathname) &&
+    pathname !== "/admin/sets";
+
+  const setsAreaActive =
+    pathname === "/admin/sets" || pathname.startsWith("/admin/sets/");
+  const formatsActive = pathname.startsWith("/admin/formats");
+  const contentAreaActive =
+    pathname.startsWith("/admin/content") ||
+    pathname.startsWith("/admin/moderation") ||
+    pathname.startsWith("/admin/ui-matrix");
+  const usersActive = pathname.startsWith("/admin/users");
 
   return (
     <div className="space-y-4">
       <div className="space-y-1">
-        <Link 
-          href="/admin" 
+        <Link
+          href="/admin"
           className={`block px-3 py-2 rounded-md text-sm hover:bg-muted ${pathname === "/admin" ? "bg-muted font-medium" : ""}`}
         >
           Dashboard
         </Link>
       </div>
 
-      <div className="border-t pt-4">
-        <p className="px-3 text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">
-          Management
-        </p>
-        <div className="space-y-1">
-          <Link 
-            href="/admin/cards"
-            className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm hover:bg-muted ${pathname.includes("/cards") ? "bg-muted font-medium" : ""}`}
+      {showSetNav && setOverviewHref && setCardsHref && setImportHref ? (
+        <div className="rounded-md border bg-muted/30 p-2 space-y-1">
+          <Link
+            href="/admin/sets"
+            className="block px-2 py-1.5 rounded text-xs text-muted-foreground hover:text-foreground hover:bg-muted"
+          >
+            ← All sets
+          </Link>
+          <p className="px-2 pt-1 text-xs font-medium text-muted-foreground uppercase tracking-wide">
+            Set · <span className="font-mono normal-case">{setCode}</span>
+          </p>
+          <Link
+            href={setOverviewHref}
+            className={`block px-3 py-2 rounded-md text-sm hover:bg-muted ${pathname === setOverviewHref ? "bg-muted font-medium" : ""}`}
+          >
+            Overview
+          </Link>
+          <Link
+            href={setCardsHref}
+            className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm hover:bg-muted ${pathname === setCardsHref ? "bg-muted font-medium" : ""}`}
           >
             <CreditCard className="h-4 w-4" />
             Cards
           </Link>
-          <Link 
+          <Link
+            href={setImportHref}
+            className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm hover:bg-muted ${pathname === setImportHref ? "bg-muted font-medium" : ""}`}
+          >
+            <Upload className="h-4 w-4" />
+            Import
+          </Link>
+        </div>
+      ) : null}
+
+      <div className="border-t pt-4">
+        <p className="px-3 text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">
+          Catalog
+        </p>
+        <div className="space-y-1">
+          <Link
             href="/admin/sets"
-            className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm hover:bg-muted ${pathname.includes("/sets") ? "bg-muted font-medium" : ""}`}
+            className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm hover:bg-muted ${setsAreaActive ? "bg-muted font-medium" : ""}`}
           >
             <Layers className="h-4 w-4" />
             Sets
           </Link>
-          <Link 
-            href="/admin/import"
-            className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm hover:bg-muted ${pathname.includes("/import") ? "bg-muted font-medium" : ""}`}
+          <Link
+            href="/admin/formats"
+            className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm hover:bg-muted ${formatsActive ? "bg-muted font-medium" : ""}`}
           >
-            <Upload className="h-4 w-4" />
-            Import
+            <BookOpen className="h-4 w-4" />
+            Formats
+          </Link>
+          <Link
+            href="/admin/content"
+            className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm hover:bg-muted ${contentAreaActive ? "bg-muted font-medium" : ""}`}
+          >
+            <Newspaper className="h-4 w-4" />
+            Content
+          </Link>
+          <Link
+            href="/admin/users"
+            className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm hover:bg-muted ${usersActive ? "bg-muted font-medium" : ""}`}
+          >
+            <Users className="h-4 w-4" />
+            Users
           </Link>
         </div>
       </div>
@@ -121,14 +203,20 @@ function ShellLayoutInner({ children }: { children: ReactNode }) {
     const stored = window.localStorage.getItem(LEFT_SIDEBAR_KEY);
     return stored === "true";
   });
-  const { state } = useShellSlot();
+  const shellSlots = useShellSlotSlots();
 
   const pageType = getPageType(pathname);
   const deckId = params?.deckId as string | undefined;
   const tierListId = params?.tierListId as string | undefined;
 
+  useEffect(() => {
+    if (!SHOW_DESKTOP_RIGHT_SIDEBAR) return;
+    if (pageType !== "gallery" && pageType !== "deckDetails" && pageType !== "admin") return;
+    void loadRightSidebarShell();
+  }, [pageType]);
+
   const hasRightSidebar =
-    SHOW_DESKTOP_RIGHT_SIDEBAR && (state.slots.get("right-sidebar")?.length ?? 0) > 0;
+    SHOW_DESKTOP_RIGHT_SIDEBAR && (shellSlots.get("right-sidebar")?.length ?? 0) > 0;
 
   const toggleLeftSidebar = () => {
     setLeftSidebarCollapsed((prev) => {
@@ -161,11 +249,21 @@ function ShellLayoutInner({ children }: { children: ReactNode }) {
             ) : null}
             <main
               className={cn(
-                "flex-1 overflow-hidden bg-background",
+                "min-h-0 flex-1 flex flex-col overflow-hidden bg-background",
               )}
               style={{ backgroundImage: "var(--chrome-page-bg)" }}
             >
-              {children}
+              <AccountStatusBanner />
+              <div
+                className={cn(
+                  "min-h-0 flex-1",
+                  pathname.startsWith("/admin")
+                    ? "overflow-y-auto overflow-x-hidden"
+                    : "overflow-hidden"
+                )}
+              >
+                {children}
+              </div>
             </main>
           </div>
         </div>
@@ -179,10 +277,11 @@ function ShellLayoutInner({ children }: { children: ReactNode }) {
       <div className="flex md:hidden h-[100dvh] w-full flex-col bg-background relative">
         <MobileHeader />
         <main
-          className="min-h-0 flex-1 overflow-y-auto bg-background"
+          className="min-h-0 flex-1 flex flex-col overflow-y-auto bg-background"
           style={{ backgroundImage: "var(--chrome-page-bg)" }}
         >
-          <div className="min-h-full pb-[calc(env(safe-area-inset-bottom)+11rem)]">
+          <AccountStatusBanner />
+          <div className="min-h-full flex-1 pb-[calc(env(safe-area-inset-bottom)+11rem)]">
             {children}
           </div>
         </main>
@@ -219,7 +318,9 @@ function ShellLayoutInner({ children }: { children: ReactNode }) {
     return (
       <GalleryFiltersProvider>
         <SiloedDeckProvider deckId={deckId}>
-          <DeckDetailsProvider deckId={deckId}>{content}</DeckDetailsProvider>
+          <DeckDetailsProvider deckId={deckId}>
+          <DeckCollaborationProvider>{content}</DeckCollaborationProvider>
+        </DeckDetailsProvider>
         </SiloedDeckProvider>
       </GalleryFiltersProvider>
     );

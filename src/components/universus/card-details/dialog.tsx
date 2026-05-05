@@ -114,6 +114,7 @@ export function CardDetailsDialog({
       <DialogContent
         size="lg"
         presentation="plain"
+        showCloseButton={false}
         className="max-h-[90vh] overflow-hidden p-0 md:pb-0 md:w-[65vw] md:min-w-[65vw] md:max-w-[65vw]"
         onPointerDownOutside={(e) => {
           const target = e.target as HTMLElement;

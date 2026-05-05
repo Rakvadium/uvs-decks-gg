@@ -1,15 +1,16 @@
 import { cn } from "@/lib/utils";
-import { NAV_ITEMS } from "./constants";
+import { buildMainNavItems } from "../main-nav-build";
 import { useMobileProfileSheetContext } from "./context";
 
 export function MobileProfileNavigationSection() {
   const { pathname, handleNavClick } = useMobileProfileSheetContext();
+  const navItems = buildMainNavItems();
 
   return (
     <div className="p-4">
       <p className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">Navigation</p>
       <div className="space-y-1">
-        {NAV_ITEMS.map((item) => {
+        {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = pathname.includes(`/${item.path}`);
 

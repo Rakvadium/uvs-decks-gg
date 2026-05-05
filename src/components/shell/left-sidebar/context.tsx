@@ -6,14 +6,14 @@ import { api } from "../../../../convex/_generated/api";
 import { useAuthDialog } from "@/components/auth/auth-dialog";
 import { usePrefersReducedMotion } from "@/lib/reduced-motion";
 import { useColorScheme, useTheme } from "@/lib/theme";
-import { NAV_ITEMS } from "./constants";
+import { buildMainNavItems } from "./constants";
 
 interface LeftSidebarContextValue {
   collapsed: boolean;
   onToggle: () => void;
   pathname: string;
   isOnAdminPage: boolean;
-  navItems: typeof NAV_ITEMS;
+  navItems: ReturnType<typeof buildMainNavItems>;
   prefersReducedMotion: boolean;
   isLoading: boolean;
   isAuthenticated: boolean;
@@ -63,13 +63,15 @@ export function LeftSidebarProvider({ collapsed, onToggle, children }: LeftSideb
     router.push("/");
   }, [authActions, router]);
 
+  const navItems = useMemo(() => buildMainNavItems(), []);
+
   const value = useMemo(
     () => ({
       collapsed,
       onToggle,
       pathname,
       isOnAdminPage,
-      navItems: NAV_ITEMS,
+      navItems,
       prefersReducedMotion,
       isLoading,
       isAuthenticated,
@@ -88,6 +90,7 @@ export function LeftSidebarProvider({ collapsed, onToggle, children }: LeftSideb
       onToggle,
       pathname,
       isOnAdminPage,
+      navItems,
       prefersReducedMotion,
       isLoading,
       isAuthenticated,

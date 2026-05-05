@@ -1,4 +1,4 @@
-import { Loader2, Lock, Plus, Trophy } from "lucide-react";
+import { Loader2, Lock, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { useDecksSidebarContext } from "./context";
@@ -14,17 +14,6 @@ export function DecksSidebarList() {
     searchQuery,
     setIsCreateOpen,
   } = useDecksSidebarContext();
-
-  if (activeTab === "tournament") {
-    return (
-      <div className="rounded-lg border border-dashed border-secondary/30 bg-secondary/5 px-4 py-6 text-center">
-        <Trophy className="mx-auto h-8 w-8 text-secondary/60" />
-        <p className="mt-3 text-xs font-mono uppercase tracking-wider text-muted-foreground">
-          Tournament decks coming soon
-        </p>
-      </div>
-    );
-  }
 
   if (!isAuthenticated && activeTab === "my-decks") {
     return (
@@ -54,7 +43,9 @@ export function DecksSidebarList() {
             ? "No decks match your search"
             : activeTab === "public"
               ? "No public decks available"
-              : "No decks yet"}
+              : activeTab === "tournament"
+                ? "No tournament decks available"
+                : "No decks yet"}
         </p>
 
         {!searchQuery.trim() && activeTab === "my-decks" && isAuthenticated && !isMobile ? (

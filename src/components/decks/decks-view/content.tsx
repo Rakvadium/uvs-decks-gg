@@ -6,12 +6,12 @@ import {
   DecksEmptyState,
   DecksGrid,
   DecksLoadingState,
-  DecksTournamentState,
 } from "./content-states";
 
 function getEmptyMode(searchQuery: string, activeTab: "my-decks" | "public" | "tournament") {
   if (searchQuery.trim()) return "search";
   if (activeTab === "my-decks") return "my-decks";
+  if (activeTab === "tournament") return "tournament";
   return "public";
 }
 
@@ -32,17 +32,13 @@ export function DecksViewContent() {
     return <DecksAuthRequiredState />;
   }
 
-  if (state.activeTab === "tournament") {
-    return <DecksTournamentState />;
-  }
-
   if (currentDecks.length === 0) {
     return <DecksEmptyState mode={emptyMode} onCreateDeck={actions.openCreateDialog} />;
   }
 
   return (
     <>
-      <DecksGrid decks={currentDecks} showAuthor={state.activeTab === "public"} />
+      <DecksGrid decks={currentDecks} showAuthor={state.activeTab === "public" || state.activeTab === "tournament"} />
       <DecksCountFooter count={currentDecks.length} />
     </>
   );

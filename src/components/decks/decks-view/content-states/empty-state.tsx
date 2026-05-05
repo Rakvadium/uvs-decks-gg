@@ -24,6 +24,10 @@ export function DecksEmptyState({ mode, onCreateDeck }: DecksEmptyStateProps) {
               Create Your First Deck
             </Button>
           </>
+        ) : mode === "tournament" ? (
+          <p className="font-mono text-sm uppercase tracking-wider text-muted-foreground">
+            No tournament decks available
+          </p>
         ) : (
           <p className="font-mono text-sm uppercase tracking-wider text-muted-foreground">
             No public decks available

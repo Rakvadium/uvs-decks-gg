@@ -1,8 +1,19 @@
 "use client";
 
-import { useEffect, type ComponentType } from "react";
-import { useShellSlot } from "./context";
-import type { SlotArea, SlotRegistrationOptions } from "./types";
+import { useLayoutEffect, useEffectEvent, type ComponentType } from "react";
+import { useShellSlotActions } from "./context";
+import type { SlotArea, SlotRegistration, SlotRegistrationOptions } from "./types";
+
+function toRegistration(
+  id: string,
+  component: ComponentType,
+  options: number | SlotRegistrationOptions | undefined
+): SlotRegistration {
+  if (typeof options === "number" || options === undefined) {
+    return { id, component, priority: options };
+  }
+  return { id, component, ...options };
+}
 
 export function useRegisterSlot(
   area: SlotArea,
@@ -10,15 +21,19 @@ export function useRegisterSlot(
   Component: ComponentType,
   options?: number | SlotRegistrationOptions
 ) {
-  const { actions } = useShellSlot();
+  const actions = useShellSlotActions();
 
-  useEffect(() => {
-    const registration =
-      typeof options === "number" || options === undefined
-        ? { id, component: Component, priority: options }
-        : { id, component: Component, ...options };
+  const commitRegistration = useEffectEvent(() => {
+    actions.registerSlot(area, toRegistration(id, Component, options));
+  });
 
-    actions.registerSlot(area, registration);
-    return () => actions.unregisterSlot(area, id);
+  useLayoutEffect(() => {
+    return () => {
+      actions.unregisterSlot(area, id);
+    };
+  }, [actions, area, id]);
+
+  useLayoutEffect(() => {
+    commitRegistration();
   }, [area, id, Component, options, actions]);
 }

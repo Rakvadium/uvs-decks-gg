@@ -41,7 +41,7 @@ flowchart LR
 
 ## Backend (Convex)
 
-- **Data:** `convex/schema.ts` defines tables including users (beyond auth tables), sets, cards (with search indexes), decks, collections, tier lists and items, community ranking snapshots, sessions, subscriptions, and engagement tables (likes, views, comments) as implemented.
+- **Data:** `convex/schema.ts` defines tables including users (beyond auth tables), sets, cards (with search indexes), a singleton **`cardFacetSnapshot`** (rarities, types, set codes) rebuilt on admin release/import/clear, decks, collections, tier lists and items, community ranking snapshots, sessions, subscriptions, and engagement tables (likes, views, comments) as implemented. **Moderated binary uploads** use the `mediaAssets` table (`kind`: `team_logo` \| `profile_avatar`; `status` flows `pending` → `approved` \| `rejected` \| `needs_review`). Team logos: `api.mediaAssets.generateTeamLogoUploadUrl` / `submitTeamLogoUpload` → `internal.mediaAssetActions.runTeamLogoModeration` → `internal.mediaAssets.finalizeTeamLogoModeration`; `teams.logoAssetId` is set only when an asset is approved. Client-visible image URLs for that path come from `api.teams.logo.getTeamLogoPresentation`, which resolves `storage.getUrl` only for an **approved** asset on `logoAssetId` (not for pending or rejected rows). See [content-moderation-and-language-filter.md](./content-moderation-and-language-filter.md) §3.2.
 - **API surface:** TypeScript modules under `convex/` expose queries, mutations, and actions consumed via generated `api`.
 - **Auth:** `@convex-dev/auth` extends the schema with auth tables; app-specific `users` table stores profile and role fields used by the product.
 
@@ -54,7 +54,7 @@ flowchart LR
 ## Major data flows
 
 1. **Gallery and search** — Client subscribes to Convex queries; card search uses Convex search indexes on derived fields such as `searchName`, `searchText`, `searchAll`.
-2. **Deck build** — Deck documents store ordered card ids, quantities, layout metadata, and format fields; mutations persist edits; public decks are readable under index rules.
+2. **Deck build** — Deck documents store ordered card ids, quantities, layout metadata, and format fields; mutations persist edits; public decks are readable under index rules. Format validation uses `setLegality` (`rotatesOutAt` vs `Date.now()` in `convex/formats.ts`) and `cardLegality` (bans/restrictions honor `effectiveDate` in `convex/deckValidation.ts`). Admin: `/admin/formats/[key]` tabs; note [legality-dates.md](./implementation/notes/legality-dates.md).
 3. **Collection** — Per-user rows keyed by user and card with quantity and optional condition/foil.
 4. **Tier lists and rankings** — Tier list documents hold tier definitions and metadata; items assign cards to lanes; scheduled or triggered jobs compute community rankings and snapshots (details in [community-tier-list-system.md](./community-tier-list-system.md)).
 
@@ -62,7 +62,7 @@ flowchart LR
 
 - **Authorization:** Mutations must enforce ownership or role checks consistent with Convex validators and auth identity.
 - **Realtime:** Convex subscriptions drive live UI updates where used.
-- **Performance:** Heavy aggregates lean on snapshot tables so read paths stay bounded. Client card **catalog** vs **formats/sets** use split React contexts in `CardDataProvider` so metadata consumers can avoid re-rendering on every catalog chunk; see [card-data-hooks.md](./card-data-hooks.md).
+- **Performance:** Heavy aggregates lean on snapshot tables so read paths stay bounded. Client card **catalog** vs **formats/sets** use split React contexts in `CardDataProvider` so metadata consumers can avoid re-rendering on every catalog chunk; see [card-data-hooks.md](./card-data-hooks.md). The local card catalog **IndexedDB** blob (CAT-001) stores only gallery catalog rows; back faces load into memory after sync or cache read. If troubleshooting stale all-cards blobs, `clearCardCache()` in `src/lib/universus/card-store.ts` forces a full resync.
 
 ## Code structure expectations
 

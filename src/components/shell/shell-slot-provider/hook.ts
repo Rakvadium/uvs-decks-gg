@@ -7,20 +7,35 @@ import {
   MIN_SIDEBAR_WIDTH,
   SIDEBAR_WIDTH_KEY,
   type ShellSlotActions,
-  type ShellSlotContextValue,
+  type ShellSlotModel,
   type SlotArea,
   type SlotRegistration,
 } from "./types";
 
-export function useShellSlotModel(): ShellSlotContextValue {
+function slotRegistrationEqual(a: SlotRegistration, b: SlotRegistration): boolean {
+  return (
+    a.component === b.component &&
+    a.priority === b.priority &&
+    a.label === b.label &&
+    a.icon === b.icon &&
+    a.header === b.header &&
+    a.footer === b.footer
+  );
+}
+
+export function useShellSlotModel(): ShellSlotModel {
   const [slots, setSlots] = useState<Map<SlotArea, SlotRegistration[]>>(() => new Map());
   const [activeSidebarActionId, setActiveSidebarActionIdState] = useState<string | null>(null);
   const [sidebarWidth, setSidebarWidthState] = useState<number>(() => getInitialSidebarWidth());
 
   const registerSlot = useCallback((area: SlotArea, registration: SlotRegistration) => {
     setSlots((prev) => {
+      const areaSlots = prev.get(area) ?? [];
+      const existing = areaSlots.find((slot) => slot.id === registration.id);
+      if (existing && slotRegistrationEqual(existing, registration)) {
+        return prev;
+      }
       const next = new Map(prev);
-      const areaSlots = next.get(area) ?? [];
       const filtered = areaSlots.filter((slot) => slot.id !== registration.id);
       const updated = [...filtered, registration].sort((a, b) => (a.priority ?? 0) - (b.priority ?? 0));
 
@@ -66,12 +81,10 @@ export function useShellSlotModel(): ShellSlotContextValue {
   );
 
   return useMemo(
-    (): ShellSlotContextValue => ({
-      state: {
-        slots,
-        activeSidebarActionId,
-        sidebarWidth,
-      },
+    (): ShellSlotModel => ({
+      slots,
+      activeSidebarActionId,
+      sidebarWidth,
       actions,
     }),
     [slots, activeSidebarActionId, sidebarWidth, actions]

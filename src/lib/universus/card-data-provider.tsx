@@ -60,6 +60,8 @@ const defaultReference: CardReferenceContextValue = {
 const defaultCatalog: CardCatalogContextValue = {
   cards: [],
   isLoading: true,
+  isCatalogDataLoading: true,
+  isCatalogIndexReady: false,
   isLoadingMore: false,
   loadProgress: 0,
   totalCards: 0,

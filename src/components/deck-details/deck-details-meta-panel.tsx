@@ -1,26 +1,60 @@
 "use client";
 
-import { Globe, Lock } from "lucide-react";
+import { useMemo } from "react";
+import { DeckVisibilityBadgeMenu } from "@/components/deck-details/deck-visibility-badge-menu";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import type { DeckVisibility } from "@/lib/deck/visibility";
+import { deckVisibilityLabel, normalizeDeckVisibility } from "@/lib/deck/visibility";
 import { useDeckDetails } from "@/providers/DeckDetailsProvider";
+
+const VISIBILITY_OPTIONS: DeckVisibility[] = [
+  "private",
+  "share",
+  "unlisted",
+  "public",
+  "tournament",
+  "team",
+];
 
 export function DeckDetailsMetaPanel() {
   const {
     deck,
     isEditing,
+    isOwner,
+    isAdmin,
+    startEditing,
     editDescription,
-    editIsPublic,
+    editVisibility,
     editName,
     setEditDescription,
-    setEditIsPublic,
+    setEditVisibility,
     setEditName,
   } = useDeckDetails();
 
   if (!deck) return null;
+
+  const selectVisibilityOptions = useMemo(
+    () =>
+      VISIBILITY_OPTIONS.filter(
+        (v) => v !== "tournament" || isAdmin || editVisibility === "tournament",
+      ).filter((v) => v !== "team" || editVisibility === "team"),
+    [isAdmin, editVisibility],
+  );
+
+  const handleVisibilitySelect = (value: DeckVisibility) => {
+    if (!isEditing) startEditing();
+    setEditVisibility(value);
+  };
 
   return (
     <section className="min-w-0 flex-1 rounded-xl border border-border/50 bg-card/70 p-3 backdrop-blur-sm sm:p-4">
@@ -54,12 +88,22 @@ export function DeckDetailsMetaPanel() {
               />
             </div>
 
-            <div className="flex items-center justify-between rounded-lg border border-border/60 bg-background/50 px-3 py-2">
-              <div className="space-y-0.5">
-                <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">Visibility</p>
-                <p className="text-xs">{editIsPublic ? "Public deck" : "Private deck"}</p>
-              </div>
-              <Switch checked={editIsPublic} onCheckedChange={setEditIsPublic} aria-label="Toggle deck visibility" />
+            <div className="space-y-1.5">
+              <Label htmlFor="deck-visibility-mobile" className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+                Visibility
+              </Label>
+              <Select value={editVisibility} onValueChange={(v) => setEditVisibility(v as DeckVisibility)}>
+                <SelectTrigger id="deck-visibility-mobile" className="h-9 w-full" size="sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {selectVisibilityOptions.map((opt) => (
+                    <SelectItem key={opt} value={opt}>
+                      {deckVisibilityLabel(opt)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </>
         ) : (
@@ -69,10 +113,15 @@ export function DeckDetailsMetaPanel() {
                 {deck.name}
               </h1>
               <div className="flex flex-wrap items-center gap-1.5">
-                <Badge variant={deck.isPublic ? "default" : "outline"} className="text-[10px]">
-                  {deck.isPublic ? <Globe className="mr-1 h-3 w-3" /> : <Lock className="mr-1 h-3 w-3" />}
-                  {deck.isPublic ? "Public" : "Private"}
-                </Badge>
+                <DeckVisibilityBadgeMenu
+                  deck={deck}
+                  isOwner={isOwner}
+                  isEditing={false}
+                  editVisibility={normalizeDeckVisibility(deck)}
+                  onSelect={handleVisibilitySelect}
+                  compact
+                  canSetTournamentVisibility={isAdmin}
+                />
                 {deck.format ? (
                   <Badge variant="cyber" className="text-[10px]">
                     {deck.format}

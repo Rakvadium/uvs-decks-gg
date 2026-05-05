@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { useProfanityDisplayText } from "@/lib/moderation/use-profanity-display-text";
 import { useCommunityTierListDetailContext } from "./context";
 import { Check, Pencil, Trash2 } from "lucide-react";
 import { SectionHeading } from "@/components/ui/typography-headings";
@@ -35,6 +36,8 @@ export function CommunityTierListLaneRow({ tier }: { tier: BuilderTier }) {
     tiers,
     getBackCard,
   } = useCommunityTierListDetailContext();
+  const { display } = useProfanityDisplayText();
+  const showLaneLabel = canEdit ? tier.label : display(tier.label, false);
   const cardIds = laneMap[tier.id] ?? [];
   const [isEditingLane, setIsEditingLane] = useState(false);
 
@@ -94,8 +97,11 @@ export function CommunityTierListLaneRow({ tier }: { tier: BuilderTier }) {
               className="h-7 min-w-0 max-w-36 bg-background/70 font-display text-sm font-bold uppercase tracking-[0.2em]"
             />
           ) : (
-            <SectionHeading className="truncate text-sm font-semibold uppercase tracking-[0.18em]" title={tier.label}>
-              {tier.label}
+            <SectionHeading
+              className="truncate text-sm font-semibold uppercase tracking-[0.18em]"
+              title={showLaneLabel}
+            >
+              {showLaneLabel}
             </SectionHeading>
           )}
 

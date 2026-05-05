@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import dynamic from "next/dynamic";
 import { RouteChunkFallback } from "@/components/shell/route-chunk-fallback";
 
@@ -7,5 +8,9 @@ const AdminSetsPageClient = dynamic(() => import("./sets-page-client"), {
 });
 
 export default function AdminSetsPage() {
-  return <AdminSetsPageClient />;
+  return (
+    <Suspense fallback={<RouteChunkFallback />}>
+      <AdminSetsPageClient />
+    </Suspense>
+  );
 }

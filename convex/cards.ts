@@ -1,9 +1,22 @@
-import { query, mutation, action, internalMutation } from "./_generated/server";
-import type { Id } from "./_generated/dataModel";
+import {
+  query,
+  mutation,
+  action,
+  internalMutation,
+} from "./_generated/server";
+import type { QueryCtx } from "./_generated/server";
+import type { Doc, Id } from "./_generated/dataModel";
 import { paginationOptsValidator } from "convex/server";
 import { v } from "convex/values";
 import { cardValidator } from "./validators";
 import { api } from "./_generated/api";
+import { runCatalogAggregateRefresh } from "./cardFacets";
+
+const LIST_CATALOG_PAGE = 200;
+const LIST_CATALOG_MAX_ROUNDS = 50;
+const LIST_SORT_MAX_GALLERY = 5000;
+const SET_NAME_INDEX_MAX = 20_000;
+const LIST_ORACLE_VARIANT_MAX = 200;
 
 const PUBLIC_R2_BASE_URL = "https://pub-53d81abf7a7f442a90c9383c1e7bdc60.r2.dev";
 
@@ -48,6 +61,109 @@ function isGalleryCatalogCard(card: { isFrontFace?: boolean; isVariant?: boolean
   return card.isFrontFace !== false && card.isVariant !== true;
 }
 
+function matchesListFilterFields(
+  card: Doc<"cards">,
+  args: { rarity?: string[]; type?: string[]; set?: string[] },
+) {
+  if (args.rarity && args.rarity.length > 0) {
+    if (!card.rarity || !args.rarity.includes(card.rarity)) {
+      return false;
+    }
+  }
+  if (args.type && args.type.length > 0) {
+    if (!card.type || !args.type.includes(card.type)) {
+      return false;
+    }
+  }
+  if (args.set && args.set.length > 0) {
+    if (!card.setCode || !args.set.includes(card.setCode)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+function isListGalleryRow(card: Doc<"cards">) {
+  return card.isFrontFace !== false && card.isVariant !== true;
+}
+
+async function listCatalogCardsNoSearch(
+  ctx: QueryCtx,
+  args: {
+    rarity?: string[];
+    type?: string[];
+    set?: string[];
+    sortField?: string;
+    sortDirection?: "asc" | "desc";
+    limit: number;
+  },
+): Promise<Doc<"cards">[]> {
+  const limit = Math.max(1, args.limit);
+  if (args.sortField) {
+    const pool: Doc<"cards">[] = [];
+    let cursor: string | null = null;
+    let isDone = false;
+    let rounds = 0;
+    while (pool.length < LIST_SORT_MAX_GALLERY && !isDone && rounds < LIST_CATALOG_MAX_ROUNDS) {
+      rounds += 1;
+      const result = await ctx.db
+        .query("cards")
+        .paginate({ numItems: LIST_CATALOG_PAGE, cursor });
+      for (const card of result.page) {
+        if (!isListGalleryRow(card) || !matchesListFilterFields(card, args)) {
+          continue;
+        }
+        pool.push(card);
+        if (pool.length >= LIST_SORT_MAX_GALLERY) {
+          break;
+        }
+      }
+      isDone = result.isDone;
+      cursor = result.isDone ? null : result.continueCursor;
+    }
+    const direction = args.sortDirection === "desc" ? -1 : 1;
+    const field = args.sortField;
+    pool.sort((a, b) => {
+      const aVal = (a as Record<string, unknown>)[field];
+      const bVal = (b as Record<string, unknown>)[field];
+      if (aVal === bVal) {
+        return 0;
+      }
+      if (aVal === undefined || aVal === null) {
+        return 1;
+      }
+      if (bVal === undefined || bVal === null) {
+        return -1;
+      }
+      return aVal < bVal ? -1 * direction : 1 * direction;
+    });
+    return pool.slice(0, limit);
+  }
+
+  const out: Doc<"cards">[] = [];
+  let cursor: string | null = null;
+  let isDone = false;
+  let rounds = 0;
+  while (out.length < limit && !isDone && rounds < LIST_CATALOG_MAX_ROUNDS) {
+    rounds += 1;
+    const result = await ctx.db
+      .query("cards")
+      .paginate({ numItems: LIST_CATALOG_PAGE, cursor });
+    for (const card of result.page) {
+      if (!isListGalleryRow(card) || !matchesListFilterFields(card, args)) {
+        continue;
+      }
+      out.push(card);
+      if (out.length >= limit) {
+        break;
+      }
+    }
+    isDone = result.isDone;
+    cursor = result.isDone ? null : result.continueCursor;
+  }
+  return out;
+}
+
 export const list = query({
   args: {
     search: v.optional(v.string()),
@@ -87,59 +203,45 @@ export const list = query({
       return cards.filter((card) => card.isFrontFace !== false && card.isVariant !== true);
     }
 
-    let cards = await ctx.db
-      .query("cards")
-      .collect();
-
-    if (args.rarity && args.rarity.length > 0) {
-      cards = cards.filter(
-        (card) => card.rarity && args.rarity!.includes(card.rarity)
-      );
-    }
-
-    if (args.type && args.type.length > 0) {
-      cards = cards.filter(
-        (card) => card.type && args.type!.includes(card.type)
-      );
-    }
-
-    if (args.set && args.set.length > 0) {
-      cards = cards.filter(
-        (card) => card.setCode && args.set!.includes(card.setCode)
-      );
-    }
-
-    cards = cards.filter((card) => card.isFrontFace !== false && card.isVariant !== true);
-
-    if (args.sortField) {
-      const direction = args.sortDirection === "desc" ? -1 : 1;
-      cards.sort((a, b) => {
-        const aVal = (a as Record<string, unknown>)[args.sortField!];
-        const bVal = (b as Record<string, unknown>)[args.sortField!];
-        if (aVal === bVal) return 0;
-        if (aVal === undefined || aVal === null) return 1;
-        if (bVal === undefined || bVal === null) return -1;
-        return aVal < bVal ? -1 * direction : 1 * direction;
-      });
-    }
-
-    if (args.limit) {
-      cards = cards.slice(0, args.limit);
-    }
-
-    return cards;
+    return await listCatalogCardsNoSearch(ctx, {
+      rarity: args.rarity,
+      type: args.type,
+      set: args.set,
+      sortField: args.sortField,
+      sortDirection: args.sortDirection,
+      limit: args.limit ?? 100,
+    });
   },
 });
 
 export const listReleased = query({
-  args: {},
+  args: {
+    limit: v.optional(v.number()),
+  },
   returns: v.array(cardValidator),
-  handler: async (ctx) => {
-    const cards = await ctx.db
-      .query("cards")
-      .collect();
-
-    return cards.filter((card) => card.isFrontFace !== false);
+  handler: async (ctx, args) => {
+    const cap = Math.min(args.limit ?? 10_000, 25_000);
+    const out: Doc<"cards">[] = [];
+    let cursor: string | null = null;
+    let isDone = false;
+    const pageSize = 200;
+    while (out.length < cap && !isDone) {
+      const result = await ctx.db
+        .query("cards")
+        .paginate({ numItems: pageSize, cursor });
+      for (const card of result.page) {
+        if (card.isFrontFace === false) {
+          continue;
+        }
+        out.push(card);
+        if (out.length >= cap) {
+          break;
+        }
+      }
+      isDone = result.isDone;
+      cursor = result.isDone ? null : result.continueCursor;
+    }
+    return out;
   },
 });
 
@@ -154,17 +256,14 @@ export const listReleasedPaginated = query({
     isDone: v.boolean(),
   }),
   handler: async (ctx, args) => {
-    const limit = args.limit ?? 500;
+    const limit = args.limit ?? 1000;
     const result = await ctx.db
       .query("cards")
       .paginate({ numItems: limit, cursor: args.cursor ?? null });
 
-    const cardsWithUrls = result.page.map((card) => {
-      if (card.imageUrl && !card.imageUrl.startsWith("http")) {
-        const publicUrl = `${PUBLIC_R2_BASE_URL}/cards/${card.imageUrl}`;
-        return { ...card, imageUrl: publicUrl };
-      }
-      return card;
+    const cardsWithUrls = result.page.filter(isGalleryCatalogCard).map((card) => {
+      const imageUrl = toPublicCardImageUrl(card.imageUrl);
+      return imageUrl !== card.imageUrl ? { ...card, imageUrl } : card;
     });
 
     return {
@@ -172,6 +271,27 @@ export const listReleasedPaginated = query({
       cursor: result.continueCursor,
       isDone: result.isDone,
     };
+  },
+});
+
+export const batchGetCardsByIds = query({
+  args: {
+    ids: v.array(v.id("cards")),
+  },
+  returns: v.array(cardValidator),
+  handler: async (ctx, args) => {
+    const seen = new Set<string>();
+    const out: Doc<"cards">[] = [];
+    for (const id of args.ids) {
+      const key = id as string;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      const card = await ctx.db.get(id);
+      if (!card) continue;
+      const imageUrl = toPublicCardImageUrl(card.imageUrl);
+      out.push(imageUrl !== card.imageUrl ? { ...card, imageUrl } : card);
+    }
+    return out;
   },
 });
 
@@ -393,10 +513,8 @@ export const listPaginated = query({
         args.setName.map((setName) =>
           ctx.db
             .query("cards")
-            .withIndex("by_setName", (q) =>
-              q.eq("setName", setName)
-            )
-            .collect()
+            .withIndex("by_setName", (q) => q.eq("setName", setName))
+            .take(SET_NAME_INDEX_MAX)
         )
       );
 
@@ -461,10 +579,8 @@ export const getCardVariants = query({
   handler: async (ctx, args) => {
     const cards = await ctx.db
       .query("cards")
-      .withIndex("by_oracleId", (q) =>
-        q.eq("oracleId", args.oracleId)
-      )
-      .collect();
+      .withIndex("by_oracleId", (q) => q.eq("oracleId", args.oracleId))
+      .take(LIST_ORACLE_VARIANT_MAX);
     return cards.filter((card) => card.isFrontFace !== false);
   },
 });
@@ -483,17 +599,11 @@ export const getRarities = query({
   args: {},
   returns: v.array(v.string()),
   handler: async (ctx) => {
-    const cards = await ctx.db
-      .query("cards")
-      .collect();
-
-    const rarities = new Set<string>();
-    for (const card of cards) {
-      if (card.rarity && card.isFrontFace !== false) {
-        rarities.add(card.rarity);
-      }
-    }
-    return Array.from(rarities).sort();
+    const row = await ctx.db
+      .query("cardFacetSnapshot")
+      .withIndex("by_key", (q) => q.eq("key", "default"))
+      .first();
+    return row?.rarities ?? [];
   },
 });
 
@@ -501,17 +611,11 @@ export const getTypes = query({
   args: {},
   returns: v.array(v.string()),
   handler: async (ctx) => {
-    const cards = await ctx.db
-      .query("cards")
-      .collect();
-
-    const types = new Set<string>();
-    for (const card of cards) {
-      if (card.type && card.isFrontFace !== false) {
-        types.add(card.type);
-      }
-    }
-    return Array.from(types).sort();
+    const row = await ctx.db
+      .query("cardFacetSnapshot")
+      .withIndex("by_key", (q) => q.eq("key", "default"))
+      .first();
+    return row?.types ?? [];
   },
 });
 
@@ -519,17 +623,11 @@ export const getSets = query({
   args: {},
   returns: v.array(v.string()),
   handler: async (ctx) => {
-    const cards = await ctx.db
-      .query("cards")
-      .collect();
-
-    const sets = new Set<string>();
-    for (const card of cards) {
-      if (card.setCode && card.isFrontFace !== false) {
-        sets.add(card.setCode);
-      }
-    }
-    return Array.from(sets).sort();
+    const row = await ctx.db
+      .query("cardFacetSnapshot")
+      .withIndex("by_key", (q) => q.eq("key", "default"))
+      .first();
+    return row?.setCodes ?? [];
   },
 });
 
@@ -584,10 +682,12 @@ export const listCharacters = query({
   args: {
     search: v.optional(v.string()),
     characterType: v.optional(v.string()),
+    limit: v.optional(v.number()),
   },
   returns: v.array(cardValidator),
   handler: async (ctx, args) => {
     const cardType = args.characterType ?? "Character";
+    const charLimit = Math.min(args.limit ?? 2_000, 10_000);
 
     if (args.search && args.search.trim().length > 0) {
       const cards = await ctx.db
@@ -597,14 +697,36 @@ export const listCharacters = query({
         )
         .take(100);
 
-      return cards.filter((card) => card.type === cardType && card.isFrontFace !== false && card.isVariant !== true);
+      return cards.filter(
+        (card) =>
+          card.type === cardType &&
+          card.isFrontFace !== false &&
+          card.isVariant !== true,
+      );
     }
 
-    const allCards = await ctx.db
-      .query("cards")
-      .collect();
-
-    return allCards.filter((card) => card.type === cardType && card.isFrontFace !== false);
+    const out: Doc<"cards">[] = [];
+    let cursor: string | null = null;
+    let isDone = false;
+    const page = 200;
+    while (out.length < charLimit && !isDone) {
+      const result = await ctx.db
+        .query("cards")
+        .withIndex("by_type_and_name", (q) => q.eq("type", cardType))
+        .paginate({ numItems: page, cursor });
+      for (const card of result.page) {
+        if (card.isFrontFace === false) {
+          continue;
+        }
+        out.push(card);
+        if (out.length >= charLimit) {
+          break;
+        }
+      }
+      isDone = result.isDone;
+      cursor = result.isDone ? null : result.continueCursor;
+    }
+    return out;
   },
 });
 
@@ -798,14 +920,11 @@ export const updateCardDataVersion = internalMutation({
   args: {},
   returns: v.number(),
   handler: async (ctx) => {
-    const cards = await ctx.db.query("cards").collect();
-    const cardCount = cards.filter(
-      (card) => card.isFrontFace !== false && card.isVariant !== true
-    ).length;
-    
+    const { galleryCount: cardCount } = await runCatalogAggregateRefresh(ctx);
+
     const existingVersion = await ctx.db.query("cardDataVersion").first();
     const now = Date.now();
-    
+
     if (existingVersion) {
       const newVersion = existingVersion.version + 1;
       await ctx.db.patch(existingVersion._id, {
@@ -814,14 +933,13 @@ export const updateCardDataVersion = internalMutation({
         cardCount,
       });
       return newVersion;
-    } else {
-      await ctx.db.insert("cardDataVersion", {
-        version: 1,
-        updatedAt: now,
-        cardCount,
-      });
-      return 1;
     }
+    await ctx.db.insert("cardDataVersion", {
+      version: 1,
+      updatedAt: now,
+      cardCount,
+    });
+    return 1;
   },
 });
 
@@ -829,24 +947,18 @@ export const initializeCardDataVersion = mutation({
   args: {},
   returns: v.number(),
   handler: async (ctx) => {
-    const cards = await ctx.db.query("cards").collect();
-    const cardCount = cards.filter(
-      (card) => card.isFrontFace !== false && card.isVariant !== true
-    ).length;
-    
     const existingVersion = await ctx.db.query("cardDataVersion").first();
-    const now = Date.now();
-    
     if (existingVersion) {
       return existingVersion.version;
-    } else {
-      await ctx.db.insert("cardDataVersion", {
-        version: 1,
-        updatedAt: now,
-        cardCount,
-      });
-      return 1;
     }
+    const { galleryCount: cardCount } = await runCatalogAggregateRefresh(ctx);
+    const now = Date.now();
+    await ctx.db.insert("cardDataVersion", {
+      version: 1,
+      updatedAt: now,
+      cardCount,
+    });
+    return 1;
   },
 });
 
@@ -901,6 +1013,7 @@ export const updateImageUrlsRemoveLeadingZeros = mutation({
       if (newImageUrl !== card.imageUrl) {
         await ctx.db.patch(card._id, {
           imageUrl: newImageUrl,
+          contentRevisionAt: Date.now(),
         });
         updated++;
       } else {

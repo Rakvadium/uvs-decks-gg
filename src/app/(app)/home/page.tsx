@@ -113,7 +113,7 @@ function TerminalLine({ children, prefix = "$", delay = 0, animate = true }: { c
 function HomePage() {
   const { isAuthenticated, isLoading } = useConvexAuth();
   const user = useQuery(api.user.currentUser, isAuthenticated ? {} : "skip");
-  const { cards, isLoading: cardsLoading } = useCardData();
+  const { isLoading: cardsLoading, totalCards: catalogTotalCards } = useCardData();
   const decks = useQuery(api.decks.listByUser, user ? { userId: user._id } : "skip");
   const prefersReducedMotion = usePrefersReducedMotion();
   const { openAuthDialog } = useAuthDialog();
@@ -123,7 +123,7 @@ function HomePage() {
     setIsFirstPaint(false);
   }, []);
 
-  const totalCards = cards.length;
+  const totalCards = catalogTotalCards;
   const totalDecks = decks?.length ?? 0;
   const username = user?.username ?? "Operator";
   const introAnimations = !prefersReducedMotion && isFirstPaint;

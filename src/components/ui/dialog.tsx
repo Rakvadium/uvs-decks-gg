@@ -205,9 +205,9 @@ function DialogFooter({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="dialog-footer"
       className={cn(
-        "flex flex-col-reverse gap-2 pt-4 sm:flex-row sm:justify-end border-t border-border/30",
-        "md:relative md:z-10",
-        "fixed bottom-0 left-0 right-0 z-20 bg-card/95 backdrop-blur-lg p-4 border-t border-border/30 md:border-0 md:p-0 md:pt-4",
+        "flex w-full shrink-0 flex-col-reverse gap-2 border-t border-border/30 sm:flex-row sm:justify-end",
+        "max-md:fixed max-md:bottom-0 max-md:left-0 max-md:right-0 max-md:z-20 max-md:bg-card/95 max-md:backdrop-blur-lg max-md:px-4 max-md:pt-4 max-md:pb-[max(1rem,env(safe-area-inset-bottom))]",
+        "md:relative md:z-10 md:px-6 md:pb-6 md:pt-4",
         className
       )}
       {...props}

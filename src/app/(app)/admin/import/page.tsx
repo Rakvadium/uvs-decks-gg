@@ -1,11 +1,14 @@
-import dynamic from "next/dynamic";
-import { RouteChunkFallback } from "@/components/shell/route-chunk-fallback";
+import { redirect } from "next/navigation";
+import { AdminImportLegacyGate } from "./import-legacy-gate";
 
-const AdminImportPageClient = dynamic(() => import("./import-page-client"), {
-  loading: () => <RouteChunkFallback />,
-  ssr: true,
-});
+type PageProps = {
+  searchParams: Promise<{ legacy?: string }>;
+};
 
-export default function AdminImportPage() {
-  return <AdminImportPageClient />;
+export default async function AdminImportPage({ searchParams }: PageProps) {
+  const p = await searchParams;
+  if (p.legacy === "1") {
+    return <AdminImportLegacyGate />;
+  }
+  redirect("/admin/sets?deprecatedGlobalImport=1");
 }

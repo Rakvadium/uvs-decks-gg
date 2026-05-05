@@ -1,6 +1,7 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
 import { getAuthUserId } from "@convex-dev/auth/server";
+import { requireUserCanPostContent } from "./utils/validation";
 
 export const likeDeck = mutation({
   args: {
@@ -10,6 +11,7 @@ export const likeDeck = mutation({
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new Error("Not authenticated");
+    await requireUserCanPostContent(ctx, userId);
 
     const existing = await ctx.db
       .query("deckLikes")
@@ -39,6 +41,7 @@ export const unlikeDeck = mutation({
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new Error("Not authenticated");
+    await requireUserCanPostContent(ctx, userId);
 
     const existing = await ctx.db
       .query("deckLikes")
@@ -176,6 +179,7 @@ export const followUser = mutation({
   handler: async (ctx, args) => {
     const followerId = await getAuthUserId(ctx);
     if (!followerId) throw new Error("Not authenticated");
+    await requireUserCanPostContent(ctx, followerId);
 
     if (followerId === args.followingId) {
       throw new Error("Cannot follow yourself");
@@ -209,6 +213,7 @@ export const unfollowUser = mutation({
   handler: async (ctx, args) => {
     const followerId = await getAuthUserId(ctx);
     if (!followerId) throw new Error("Not authenticated");
+    await requireUserCanPostContent(ctx, followerId);
 
     const existing = await ctx.db
       .query("follows")

@@ -25,7 +25,14 @@ export function SignUpFormDialog({
         <div className="mt-4 flex items-center justify-between py-1">
           <label htmlFor="dialog-username">Username</label>
         </div>
-        <Input type="text" id="dialog-username" name="username" autoComplete="new-password" />
+        <Input
+          type="text"
+          id="dialog-username"
+          name="username"
+          required
+          maxLength={20}
+          autoComplete="username"
+        />
         <div className="mt-4 flex items-center justify-between py-1">
           <label htmlFor="dialog-signup-email">Email</label>
         </div>

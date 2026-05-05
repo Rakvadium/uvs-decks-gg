@@ -38,7 +38,7 @@ function AdminRoleCheck({ children }: { children: ReactNode }) {
 export default function AdminLayout({ children }: { children: ReactNode }) {
   return (
     <AdminRoleCheck>
-      <div className="p-6">
+      <div className="w-full max-w-full overflow-x-hidden p-6">
         {children}
       </div>
     </AdminRoleCheck>

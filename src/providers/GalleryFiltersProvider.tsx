@@ -15,8 +15,11 @@ import { useCardCatalog, useCardReferenceData } from "@/lib/universus/card-data-
 import { sortCards } from "@/lib/universus/use-universus-cards";
 import type { CachedCard } from "@/lib/universus/card-store";
 import { useIsMobile } from "@/hooks/useIsMobile";
+import { usePrefersReducedMotion } from "@/lib/reduced-motion";
 import { useUIState, type CardFilters, type GalleryViewMode } from "@/providers/UIStateProvider";
-import { useShellSlot } from "@/components/shell/shell-slot-provider";
+import { useShellSlotActiveSidebarActionId } from "@/components/shell/shell-slot-provider";
+
+const DENSITY_LAYOUT_SIDEBAR_SYNC_MS = 220;
 
 type SearchMode = "name" | "text" | "all";
 type ViewMode = "card" | "list" | "details";
@@ -50,8 +53,12 @@ interface GalleryFiltersMeta {
   defaultFormatKey: string;
   activeFilterCount: number;
   isLoading: boolean;
+  isCatalogDataLoading: boolean;
+  isCatalogIndexReady: boolean;
   isLoadingMore: boolean;
   loadProgress: number;
+  isCheckingVersion: boolean;
+  isSyncing: boolean;
 }
 
 interface GalleryFiltersContextValue {
@@ -64,20 +71,38 @@ const GalleryFiltersContext = createContext<GalleryFiltersContextValue | null>(n
 
 export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
   const { uiState, setGalleryFilters, setGalleryViewMode, setGalleryCardsPerRow } = useUIState();
-  const { state: shellState } = useShellSlot();
+  const activeSidebarActionId = useShellSlotActiveSidebarActionId();
+  const prefersReducedMotion = usePrefersReducedMotion();
   const isMobile = useIsMobile();
   const {
-    cards,
     isLoading,
+    isCatalogDataLoading,
+    isCatalogIndexReady,
     isLoadingMore,
     loadProgress,
+    isCheckingVersion,
+    isSyncing,
     uniqueValues,
     getFilteredCards,
+    totalCards: catalogTotalCards,
   } = useCardCatalog();
   const { formats } = useCardReferenceData();
   const [search, setSearch] = useState("");
   const [searchMode, setSearchMode] = useState<SearchMode>("all");
-  const isSidebarOpen = useMemo(() => Boolean(shellState.activeSidebarActionId), [shellState.activeSidebarActionId]);
+  const isSidebarOpen = useMemo(() => Boolean(activeSidebarActionId), [activeSidebarActionId]);
+  const [densityLayoutSidebarOpen, setDensityLayoutSidebarOpen] = useState(isSidebarOpen);
+
+  useEffect(() => {
+    if (prefersReducedMotion) {
+      setDensityLayoutSidebarOpen(isSidebarOpen);
+      return;
+    }
+    const id = window.setTimeout(() => {
+      setDensityLayoutSidebarOpen(isSidebarOpen);
+    }, DENSITY_LAYOUT_SIDEBAR_SYNC_MS);
+    return () => window.clearTimeout(id);
+  }, [isSidebarOpen, prefersReducedMotion]);
+
   const viewMode: ViewMode = useMemo(() => {
     const storedMode = uiState.galleryViewMode;
     if (storedMode === "grid") return "card";
@@ -99,12 +124,12 @@ export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
     const openValue = clampCardsPerRow(uiState.galleryCardsPerRowOpen ?? legacy, openDefault);
     const closedValue = clampCardsPerRow(uiState.galleryCardsPerRowClosed ?? legacy, closedDefault);
 
-    return isSidebarOpen ? openValue : closedValue;
+    return densityLayoutSidebarOpen ? openValue : closedValue;
   }, [
     uiState.galleryCardsPerRow,
     uiState.galleryCardsPerRowOpen,
     uiState.galleryCardsPerRowClosed,
-    isSidebarOpen,
+    densityLayoutSidebarOpen,
     isMobile,
   ]);
 
@@ -260,7 +285,7 @@ export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
         setCardsPerRow: handleSetCardsPerRow,
       },
       meta: {
-        totalCards: cards.length,
+        totalCards: catalogTotalCards,
         filteredCount: filteredCards.length,
         filteredCards,
         filteredListKey,
@@ -269,8 +294,12 @@ export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
         defaultFormatKey: defaultFormat,
         activeFilterCount,
         isLoading,
+        isCatalogDataLoading,
+        isCatalogIndexReady,
         isLoadingMore,
         loadProgress,
+        isCheckingVersion,
+        isSyncing,
       },
     }),
     [
@@ -285,7 +314,7 @@ export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
       clearAllFilters,
       handleSetViewMode,
       handleSetCardsPerRow,
-      cards.length,
+      catalogTotalCards,
       filteredCards,
       filteredListKey,
       uniqueValues,
@@ -293,8 +322,12 @@ export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
       defaultFormat,
       activeFilterCount,
       isLoading,
+      isCatalogDataLoading,
+      isCatalogIndexReady,
       isLoadingMore,
       loadProgress,
+      isCheckingVersion,
+      isSyncing,
     ]
   );
 

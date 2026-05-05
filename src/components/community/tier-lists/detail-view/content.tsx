@@ -7,6 +7,7 @@ import { CommunityTierListDetailBoard } from "./board";
 import { useCommunityTierListDetailContext } from "./context";
 import { CommunityTierListDetailDesktopHeader } from "./desktop-header";
 import { CommunityTierListDetailLoadingState } from "./loading-state";
+import { CommunityTierListDetailCommentsSection } from "./comments-section";
 import { CommunityTierListDetailPoolDialog } from "./pool-dialog";
 import { CommunityTierListDetailPoolPanel } from "./pool-panel";
 import { CommunityTierListDetailTopBar } from "./top-bar";
@@ -42,6 +43,7 @@ export function CommunityTierListDetailView() {
             )}
           >
             <CommunityTierListDetailBoard />
+            <CommunityTierListDetailCommentsSection />
           </div>
 
           <CommunityTierListDetailPoolPanel />

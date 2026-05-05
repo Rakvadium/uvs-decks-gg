@@ -4,6 +4,7 @@ import { CardHoverPreviewPortal } from "@/components/deck/shared";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { usePrefersReducedMotion } from "@/lib/reduced-motion";
 import type { CachedCard } from "@/lib/universus/card-store";
+import { TeamEditableWriteConflictBanner } from "@/components/deck/team-editable-write-conflict-banner";
 import { useActiveDeck } from "@/providers/ActiveDeckProvider";
 import { ActiveDeckCharacterPanel } from "./character-panel";
 import { ActiveDeckSections } from "./sections";
@@ -61,6 +62,7 @@ export function ActiveDeckSidebar() {
 
   return (
     <div className="relative h-full space-y-3 overflow-y-auto p-4">
+      <TeamEditableWriteConflictBanner />
       <CardHoverPreviewPortal
         card={isMobile ? null : hoveredCard}
         rect={isMobile ? null : hoveredRect}

@@ -19,6 +19,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { useProfanityDisplayText } from "@/lib/moderation/use-profanity-display-text";
 import { TierListPreviewGrid } from "../preview-grid";
 import { getTierListScopeLabel } from "../utils";
 
@@ -39,8 +40,15 @@ export function TierListFeedCard({
 }: TierListFeedCardProps) {
   const { isAuthenticated } = useConvexAuth();
   const { openAuthDialog } = useAuthDialog();
+  const { display, viewerUserId } = useProfanityDisplayText();
   const toggleLike = useMutation(api.tierLists.toggleLike);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const isOwnList =
+    viewerUserId != null && tierList.userId === viewerUserId;
+  const showTitle = display(tierList.title, isOwnList);
+  const showDescription = tierList.description
+    ? display(tierList.description, isOwnList)
+    : null;
 
   const previewCards = useMemo(
     () =>
@@ -86,10 +94,10 @@ export function TierListFeedCard({
           </span>
         </div>
         <div className="space-y-1">
-          <CardTitle className="text-base leading-snug">{tierList.title}</CardTitle>
+          <CardTitle className="text-base leading-snug">{showTitle}</CardTitle>
           <CardDescription>by {author?.username ?? author?.email ?? "Unknown duelist"}</CardDescription>
         </div>
-        {tierList.description ? <p className="text-sm text-muted-foreground">{tierList.description}</p> : null}
+        {showDescription ? <p className="text-sm text-muted-foreground">{showDescription}</p> : null}
       </CardHeader>
 
       <CardContent className="space-y-4">
@@ -106,7 +114,7 @@ export function TierListFeedCard({
                 color: tier.color,
               }}
             >
-              {tier.label}
+              {display(tier.label, isOwnList)}
             </span>
           ))}
         </div>

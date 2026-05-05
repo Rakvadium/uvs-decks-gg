@@ -3,7 +3,7 @@ import { CardNavigationProvider } from "@/components/universus/card-details/navi
 import type { CachedCard } from "@/lib/universus/card-store";
 import { useGalleryCardMap } from "./card-map-context";
 import { CardListItem } from "./card-list-item";
-import { useGalleryMainScrollRootRef } from "./gallery-main-scroll-root";
+import { useGalleryMainScrollElement, useGalleryMainScrollRootRef } from "./gallery-main-scroll-root";
 import { NoCardsFound } from "./no-cards-found";
 
 interface GalleryListViewProps {
@@ -12,12 +12,12 @@ interface GalleryListViewProps {
 }
 
 export function GalleryListView({ cards, onOpenCardDetails }: GalleryListViewProps) {
-  const scrollRef = useGalleryMainScrollRootRef();
+  const scrollElement = useGalleryMainScrollElement();
   const { getBackCard } = useGalleryCardMap();
 
   const rowVirtualizer = useVirtualizer({
     count: cards.length,
-    getScrollElement: () => scrollRef.current,
+    getScrollElement: () => scrollElement,
     estimateSize: () => 108,
     overscan: 6,
     gap: 12,

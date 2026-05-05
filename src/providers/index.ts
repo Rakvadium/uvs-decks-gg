@@ -4,6 +4,7 @@ export { ActiveDeckProvider, useActiveDeck } from "./ActiveDeckProvider";
 export { GalleryFiltersProvider, useGalleryFilters } from "./GalleryFiltersProvider";
 export { DecksProvider, useDecks, useDecksOptional } from "./DecksProvider";
 export { DeckDetailsProvider, useDeckDetails, useDeckDetailsOptional } from "./DeckDetailsProvider";
+export { DeckCollaborationProvider, useDeckCollaborationState } from "./DeckCollaborationProvider";
 export type { 
   UIState, 
   CardFilters, 

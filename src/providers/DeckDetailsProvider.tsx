@@ -6,18 +6,15 @@ import { api } from "../../convex/_generated/api";
 import { Id } from "../../convex/_generated/dataModel";
 import { useRouter } from "next/navigation";
 import { useSiloedDeckOptional } from "@/lib/deck";
+import type { DeckVisibility } from "@/lib/deck/visibility";
+import { normalizeDeckVisibility } from "@/lib/deck/visibility";
 import { useActiveDeck } from "./ActiveDeckProvider";
-
-function useIsDeckOwner(deck: { userId: Id<"users"> } | null | undefined) {
-  const currentUser = useQuery(api.user.currentUser);
-  return Boolean(deck && currentUser && deck.userId === currentUser._id);
-}
 
 type DeckSection = "main" | "side" | "reference";
 type DeckDetailsUpdate = {
   name?: string;
   description?: string;
-  isPublic?: boolean;
+  visibility?: DeckVisibility;
   imageCardId?: Id<"cards"> | null;
   startingCharacterId?: Id<"cards"> | null;
   selectedIdentity?: string | null;
@@ -28,6 +25,7 @@ interface DeckDetailsContextValue {
   deck: ReturnType<typeof useQuery<typeof api.decks.getById>> | undefined;
   isLoading: boolean;
   isOwner: boolean;
+  isAdmin: boolean;
   activeSection: DeckSection;
   setActiveSection: (section: DeckSection) => void;
   isEditing: boolean;
@@ -39,8 +37,8 @@ interface DeckDetailsContextValue {
   setEditDescription: (value: string) => void;
   editFormat: string;
   setEditFormat: (value: string) => void;
-  editIsPublic: boolean;
-  setEditIsPublic: (value: boolean) => void;
+  editVisibility: DeckVisibility;
+  setEditVisibility: (value: DeckVisibility) => void;
   isSaving: boolean;
   saveEdits: () => Promise<void>;
   updateDeck: (updates: DeckDetailsUpdate) => Promise<void>;
@@ -68,7 +66,7 @@ export function DeckDetailsProvider({ children, deckId }: DeckDetailsProviderPro
   const [editName, setEditName] = useState("");
   const [editDescription, setEditDescription] = useState("");
   const [editFormat, setEditFormat] = useState("");
-  const [editIsPublic, setEditIsPublic] = useState(false);
+  const [editVisibility, setEditVisibility] = useState<DeckVisibility>("private");
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const router = useRouter();
@@ -76,10 +74,12 @@ export function DeckDetailsProvider({ children, deckId }: DeckDetailsProviderPro
   const { activeDeckId, setActiveDeck } = useActiveDeck();
   const siloedDeck = useSiloedDeckOptional();
   const typedDeckId = deckId as Id<"decks">;
+  const currentUser = useQuery(api.user.currentUser);
   const queriedDeck = useQuery(api.decks.getById, siloedDeck ? "skip" : { deckId: typedDeckId });
   const deck = siloedDeck?.deck ?? queriedDeck;
   const isDeckLoading = siloedDeck ? siloedDeck.isLoading : queriedDeck === undefined;
-  const isOwner = useIsDeckOwner(deck);
+  const isOwner = Boolean(deck && currentUser && deck.userId === currentUser._id);
+  const isAdmin = currentUser?.role === "Admin";
   const updateDeckMutation = useMutation(api.decks.update);
   const deleteDeckMutation = useMutation(api.decks.deleteDeck);
 
@@ -108,7 +108,7 @@ export function DeckDetailsProvider({ children, deckId }: DeckDetailsProviderPro
     setEditName(deck.name);
     setEditDescription(deck.description || "");
     setEditFormat(deck.format || "");
-    setEditIsPublic(deck.isPublic);
+    setEditVisibility(normalizeDeckVisibility(deck));
     setIsEditing(true);
   }, [deck]);
 
@@ -117,7 +117,7 @@ export function DeckDetailsProvider({ children, deckId }: DeckDetailsProviderPro
       setEditName(deck.name);
       setEditDescription(deck.description || "");
       setEditFormat(deck.format || "");
-      setEditIsPublic(deck.isPublic);
+      setEditVisibility(normalizeDeckVisibility(deck));
     }
     setIsEditing(false);
   }, [deck]);
@@ -129,7 +129,7 @@ export function DeckDetailsProvider({ children, deckId }: DeckDetailsProviderPro
       const updates: DeckDetailsUpdate = {
         name: editName.trim() || deck.name,
         description: editDescription.trim() || undefined,
-        isPublic: editIsPublic,
+        visibility: editVisibility,
       };
       if (siloedDeck) {
         await siloedDeck.updateDeck(updates);
@@ -143,7 +143,7 @@ export function DeckDetailsProvider({ children, deckId }: DeckDetailsProviderPro
     } finally {
       setIsSaving(false);
     }
-  }, [deck, editName, editDescription, editIsPublic, siloedDeck, updateDeckMutation]);
+  }, [deck, editName, editDescription, editVisibility, siloedDeck, updateDeckMutation]);
 
   const updateDeckDetails = useCallback(async (updates: DeckDetailsUpdate) => {
     if (!deck) return;
@@ -172,7 +172,7 @@ export function DeckDetailsProvider({ children, deckId }: DeckDetailsProviderPro
     setEditName(deck.name);
     setEditDescription(deck.description || "");
     setEditFormat(deck.format || "");
-    setEditIsPublic(deck.isPublic);
+    setEditVisibility(normalizeDeckVisibility(deck));
   }, [deck, isEditing]);
 
   const value = useMemo((): DeckDetailsContextValue => ({
@@ -180,6 +180,7 @@ export function DeckDetailsProvider({ children, deckId }: DeckDetailsProviderPro
     deck,
     isLoading: isDeckLoading,
     isOwner,
+    isAdmin,
     activeSection,
     setActiveSection,
     isEditing,
@@ -191,8 +192,8 @@ export function DeckDetailsProvider({ children, deckId }: DeckDetailsProviderPro
     setEditDescription,
     editFormat,
     setEditFormat,
-    editIsPublic,
-    setEditIsPublic,
+    editVisibility,
+    setEditVisibility,
     isSaving,
     saveEdits,
     updateDeck: updateDeckDetails,
@@ -209,6 +210,7 @@ export function DeckDetailsProvider({ children, deckId }: DeckDetailsProviderPro
     deck,
     isDeckLoading,
     isOwner,
+    isAdmin,
     activeSection,
     isEditing,
     startEditing,
@@ -216,7 +218,7 @@ export function DeckDetailsProvider({ children, deckId }: DeckDetailsProviderPro
     editName,
     editDescription,
     editFormat,
-    editIsPublic,
+    editVisibility,
     isSaving,
     saveEdits,
     updateDeckDetails,

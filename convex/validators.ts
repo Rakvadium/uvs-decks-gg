@@ -1,4 +1,38 @@
 import { v } from "convex/values";
+import type { Doc } from "./_generated/dataModel";
+
+export const deckVisibilityValidator = v.union(
+  v.literal("private"),
+  v.literal("share"),
+  v.literal("unlisted"),
+  v.literal("public"),
+  v.literal("tournament"),
+  v.literal("team"),
+);
+
+export const deckTeamCollaborationValidator = v.union(
+  v.literal("none"),
+  v.literal("team_viewable"),
+  v.literal("team_editable"),
+);
+
+export const deckBuilderUiStateV1Validator = v.object({
+  v: v.literal(1),
+  rightSidebarAction: v.optional(v.string()),
+  galleryFilters: v.optional(v.any()),
+  activeDeckSection: v.optional(
+    v.union(v.literal("main"), v.literal("side"), v.literal("reference")),
+  ),
+});
+
+export const deckPresenceCursorValidator = v.object({
+  x: v.number(),
+  y: v.number(),
+  viewportW: v.number(),
+  viewportH: v.number(),
+  normX: v.number(),
+  normY: v.number(),
+});
 
 export const tierListRankingScopeValidator = v.union(
   v.literal("unranked"),
@@ -16,6 +50,7 @@ export const cardValidator = v.object({
   frontCardId: v.optional(v.id("cards")),
   isFrontFace: v.optional(v.boolean()),
   isVariant: v.optional(v.boolean()),
+  number: v.optional(v.number()),
   setCode: v.optional(v.string()),
   setName: v.optional(v.string()),
   setNumber: v.optional(v.number()),
@@ -38,7 +73,9 @@ export const cardValidator = v.object({
   searchName: v.optional(v.string()),
   searchText: v.optional(v.string()),
   searchAll: v.optional(v.string()),
-  copyLimit: v.optional(v.number())
+  copyLimit: v.optional(v.number()),
+  legality: v.optional(v.string()),
+  contentRevisionAt: v.optional(v.number()),
 });
 
 export const userValidator = v.object({
@@ -50,7 +87,37 @@ export const userValidator = v.object({
   image: v.optional(v.string()),
   isAnonymous: v.optional(v.boolean()),
   role: v.optional(v.string()),
+  profanityFilterEnabled: v.boolean(),
 });
+
+export const currentUserSelfValidator = v.object({
+  _id: v.id("users"),
+  _creationTime: v.number(),
+  username: v.optional(v.string()),
+  email: v.optional(v.string()),
+  emailVerificationTime: v.optional(v.number()),
+  image: v.optional(v.string()),
+  isAnonymous: v.optional(v.boolean()),
+  role: v.optional(v.string()),
+  profanityFilterEnabled: v.boolean(),
+  accountStatus: v.optional(
+    v.union(
+      v.literal("active"),
+      v.literal("suspended"),
+      v.literal("banned"),
+      v.literal("write_restricted")
+    )
+  ),
+  statusExpiresAt: v.optional(v.number()),
+  userFacingMessage: v.optional(v.string()),
+});
+
+export function publicUserFromDocument(doc: Doc<"users">) {
+  return {
+    ...doc,
+    profanityFilterEnabled: doc.profanityFilterEnabled !== false,
+  };
+}
 
 export const cardLayoutColumnValidator = v.object({
   id: v.string(),
@@ -70,6 +137,7 @@ export const deckValidator = v.object({
   userId: v.id("users"),
   name: v.string(),
   description: v.optional(v.string()),
+  visibility: v.optional(deckVisibilityValidator),
   isPublic: v.boolean(),
   format: v.optional(v.string()),
   subFormat: v.optional(v.string()),
@@ -83,6 +151,22 @@ export const deckValidator = v.object({
   referenceCardIds: v.array(v.id("cards")),
   referenceQuantities: v.record(v.string(), v.number()),
   cardLayouts: v.optional(v.record(v.string(), cardLayoutValidator)),
+  teamId: v.optional(v.id("teams")),
+  teamCollaboration: v.optional(deckTeamCollaborationValidator),
+  revision: v.optional(v.number()),
+});
+
+export const deckCardMutationResultValidator = v.object({
+  revision: v.number(),
+});
+
+export const deckShareEntryValidator = v.object({
+  _id: v.id("deckShares"),
+  userId: v.id("users"),
+  status: v.union(v.literal("pending"), v.literal("accepted")),
+  username: v.optional(v.string()),
+  image: v.optional(v.string()),
+  createdAt: v.number(),
 });
 
 export const tierDefinitionValidator = v.object({
@@ -116,6 +200,13 @@ export const tierListValidator = v.object({
   commentCount: v.number(),
   featuredCardId: v.optional(v.id("cards")),
   updatedAt: v.number(),
+  listModerationStatus: v.optional(
+    v.union(
+      v.literal("pending"),
+      v.literal("approved"),
+      v.literal("rejected")
+    )
+  ),
 });
 
 export const tierListItemValidator = v.object({
@@ -184,6 +275,8 @@ export const tierListCommentValidator = v.object({
   content: v.string(),
   status: tierListCommentStatusValidator,
   moderationReason: v.optional(v.string()),
+  textModerationProvider: v.optional(v.string()),
+  textModerationResult: v.optional(v.any()),
   createdAt: v.number(),
   updatedAt: v.number(),
 });
@@ -306,6 +399,8 @@ export const setDocValidator = v.object({
   isRotating: v.optional(v.boolean()),
   isFuture: v.optional(v.boolean()),
   spotlightIP: v.optional(v.string()),
+  updatedAt: v.optional(v.number()),
+  updatedBy: v.optional(v.id("users")),
 });
 
 export const cardInputValidator = v.object({
@@ -365,4 +460,89 @@ export const cardDataVersionValidator = v.object({
   version: v.number(),
   updatedAt: v.number(),
   cardCount: v.number(),
+});
+
+export const teamRoleValidator = v.union(
+  v.literal("captain"),
+  v.literal("co_captain"),
+  v.literal("architect"),
+  v.literal("analyst"),
+  v.literal("scout"),
+  v.literal("pilot"),
+);
+
+export const teamMemberStatusValidator = v.union(
+  v.literal("active"),
+  v.literal("removed"),
+);
+
+export const teamValidator = v.object({
+  _id: v.id("teams"),
+  _creationTime: v.number(),
+  name: v.string(),
+  slug: v.optional(v.string()),
+  captainUserId: v.id("users"),
+  description: v.optional(v.string()),
+  imageStorageId: v.optional(v.id("_storage")),
+  logoAssetId: v.optional(v.id("mediaAssets")),
+  createdAt: v.number(),
+  updatedAt: v.number(),
+});
+
+export const teamMemberValidator = v.object({
+  _id: v.id("teamMembers"),
+  _creationTime: v.number(),
+  teamId: v.id("teams"),
+  userId: v.id("users"),
+  role: teamRoleValidator,
+  joinedAt: v.number(),
+  status: teamMemberStatusValidator,
+});
+
+export const teamInviteValidator = v.object({
+  _id: v.id("teamInvites"),
+  _creationTime: v.number(),
+  teamId: v.id("teams"),
+  email: v.optional(v.string()),
+  invitedUserId: v.optional(v.id("users")),
+  tokenHash: v.string(),
+  role: teamRoleValidator,
+  invitedByUserId: v.id("users"),
+  createdAt: v.number(),
+  expiresAt: v.number(),
+  acceptedAt: v.optional(v.number()),
+});
+
+export const teamAnnouncementValidator = v.object({
+  _id: v.id("teamAnnouncements"),
+  _creationTime: v.number(),
+  teamId: v.id("teams"),
+  authorUserId: v.id("users"),
+  title: v.string(),
+  body: v.string(),
+  pinned: v.boolean(),
+  createdAt: v.number(),
+});
+
+export const teamChatMessageValidator = v.object({
+  _id: v.id("teamChatMessages"),
+  _creationTime: v.number(),
+  teamId: v.id("teams"),
+  authorUserId: v.id("users"),
+  body: v.string(),
+  createdAt: v.number(),
+  textModerationProvider: v.optional(v.string()),
+  textModerationResult: v.optional(v.any()),
+});
+
+export const teamEventValidator = v.object({
+  _id: v.id("teamEvents"),
+  _creationTime: v.number(),
+  teamId: v.id("teams"),
+  title: v.string(),
+  description: v.optional(v.string()),
+  startsAt: v.number(),
+  endsAt: v.optional(v.number()),
+  createdByUserId: v.id("users"),
+  createdAt: v.number(),
 });

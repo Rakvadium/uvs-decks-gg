@@ -2,7 +2,12 @@
 
 import { createContext, useCallback, useContext, useMemo, type ReactNode } from "react";
 import { useMobileShell } from "../mobile-shell-context";
-import { useShellSlot, type SlotRegistration } from "../shell-slot-provider";
+import {
+  useShellSlotActions,
+  useShellSlotActiveSidebarActionId,
+  useShellSlotSlots,
+  type SlotRegistration,
+} from "../shell-slot-provider";
 
 interface MobileActionsSheetContextValue {
   isActionsSheetOpen: boolean;
@@ -22,11 +27,11 @@ const MobileActionsSheetContext = createContext<MobileActionsSheetContextValue |
 
 export function MobileActionsSheetProvider({ children }: { children: ReactNode }) {
   const { isActionsSheetOpen, setActionsSheetOpen } = useMobileShell();
-  const { state, actions } = useShellSlot();
+  const slots = useShellSlotSlots();
+  const activeActionId = useShellSlotActiveSidebarActionId();
+  const { setActiveSidebarAction } = useShellSlotActions();
 
-  const sidebarSlots = useMemo(() => state.slots.get("right-sidebar") ?? [], [state.slots]);
-  const activeActionId = state.activeSidebarActionId;
-  const setActiveSidebarAction = actions.setActiveSidebarAction;
+  const sidebarSlots = useMemo(() => slots.get("right-sidebar") ?? [], [slots]);
 
   const activeSlot = sidebarSlots.find((slot) => slot.id === activeActionId);
   const ActiveComponent = activeSlot?.component;

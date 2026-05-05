@@ -4,7 +4,9 @@ import * as React from "react";
 import {
   UNIVERSUS_CARD_DND_ENABLED,
   TCG_DROP_ZONE_DATA_ATTR,
-  useTcgDnd,
+  useTcgActiveDropZoneIsOver,
+  useTcgDndActions,
+  useTcgDndDragState,
   DropZoneConfig,
   DragItem,
 } from "./tcg-dnd-provider";
@@ -42,9 +44,9 @@ export function useTcgDroppable({
   onDrop,
   isDisabled = false,
 }: UseTcgDroppableOptions): UseTcgDroppableResult {
-  const { registerDropZone, unregisterDropZone, dragItem, isDragging, activeDropZone } = useTcgDnd();
-
-  const isOver = activeDropZone === id;
+  const { registerDropZone, unregisterDropZone } = useTcgDndActions();
+  const { dragItem, isDragging } = useTcgDndDragState();
+  const isOver = useTcgActiveDropZoneIsOver(id);
   const canDrop = isDragging && dragItem !== null && accepts.includes(dragItem.type) && !isDisabled;
 
   React.useEffect(() => {

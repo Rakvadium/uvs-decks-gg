@@ -112,7 +112,7 @@ export function CardDetailsImagePanel({
           )}
         </div>
 
-        <DeckSectionControls card={deckCard} />
+        <DeckSectionControls key={deckCard._id} card={deckCard} />
       </div>
     </div>
   );

@@ -14,6 +14,7 @@ export function useDeckCatalogData(searchQuery: string, activeTab: DeckTab) {
 
   const myDecksAll = useQuery(api.decks.listByUser, user ? { userId: user._id } : "skip");
   const publicDecksAll = useQuery(api.decks.listPublic, {});
+  const tournamentDecksAll = useQuery(api.decks.listTournament, {});
 
   const myDecks = useQuery(
     api.decks.listByUser,
@@ -26,26 +27,29 @@ export function useDeckCatalogData(searchQuery: string, activeTab: DeckTab) {
   );
 
   const publicDecks = useQuery(api.decks.listPublic, deckSearch ? { search: deckSearch } : {});
+  const tournamentDecks = useQuery(api.decks.listTournament, deckSearch ? { search: deckSearch } : {});
 
   const deckCounts = useMemo(
     () => ({
       "my-decks": myDecksAll?.length ?? 0,
       public: publicDecksAll?.length ?? 0,
-      tournament: 0,
+      tournament: tournamentDecksAll?.length ?? 0,
     }),
-    [myDecksAll?.length, publicDecksAll?.length]
+    [myDecksAll?.length, publicDecksAll?.length, tournamentDecksAll?.length]
   );
 
   const currentDecks: Doc<"decks">[] = useMemo(() => {
     if (activeTab === "my-decks") return myDecks ?? [];
     if (activeTab === "public") return publicDecks ?? [];
+    if (activeTab === "tournament") return tournamentDecks ?? [];
     return [];
-  }, [activeTab, myDecks, publicDecks]);
+  }, [activeTab, myDecks, publicDecks, tournamentDecks]);
 
   const isTabLoading =
     authLoading ||
     (activeTab === "my-decks" && isAuthenticated && myDecks === undefined) ||
-    (activeTab === "public" && publicDecks === undefined);
+    (activeTab === "public" && publicDecks === undefined) ||
+    (activeTab === "tournament" && tournamentDecks === undefined);
 
   return {
     isAuthenticated,
@@ -54,8 +58,10 @@ export function useDeckCatalogData(searchQuery: string, activeTab: DeckTab) {
     deckSearch,
     myDecks,
     publicDecks,
+    tournamentDecks,
     myDecksAll,
     publicDecksAll,
+    tournamentDecksAll,
     deckCounts,
     currentDecks,
     isTabLoading,

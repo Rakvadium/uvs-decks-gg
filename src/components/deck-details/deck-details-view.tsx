@@ -1,7 +1,12 @@
 "use client";
 
 import { useMemo } from "react";
+import { useConvexAuth, useQuery } from "convex/react";
 import { BarChart3, Download, LayoutGrid, Loader2, Shuffle } from "lucide-react";
+import { api } from "../../../convex/_generated/api";
+import type { Id } from "../../../convex/_generated/dataModel";
+import { DeckInvitePendingGate } from "@/components/deck-details/deck-invite-pending-gate";
+import { DeckDetailsSharePanel } from "@/components/deck-details/deck-details-share-panel";
 import { useDeckDetails } from "@/providers/DeckDetailsProvider";
 import { useRegisterSlot } from "@/components/shell/shell-slot-provider";
 import { DeckDetailsDesktopHeader } from "./deck-details-desktop-header";
@@ -19,6 +24,7 @@ import {
 import { DeckCardsSectionProvider } from "./deck-details-cards-section-context";
 import { DeckDetailsSectionTabs } from "./deck-details-section-tabs";
 import { DeckDetailsViewModeToggle } from "./deck-details-view-mode-toggle";
+import { TeamEditableWriteConflictBanner } from "@/components/deck/team-editable-write-conflict-banner";
 
 function DeckDetailsGallerySlotRegistration() {
   const gallerySlotOptions = useMemo(() => ({ label: "Gallery", icon: LayoutGrid, priority: 0 }), []);
@@ -27,7 +33,14 @@ function DeckDetailsGallerySlotRegistration() {
 }
 
 export function DeckDetailsView() {
-  const { deck, isLoading, isOwner } = useDeckDetails();
+  const { deckId, deck, isLoading, isOwner } = useDeckDetails();
+  const { isAuthenticated } = useConvexAuth();
+  const pendingInvite = useQuery(
+    api.deckShares.getPendingInvitePreview,
+    !isLoading && !deck && isAuthenticated && deckId
+      ? { deckId: deckId as Id<"decks"> }
+      : "skip",
+  );
 
   const statsSlotOptions = useMemo(() => ({ label: "Stats", icon: BarChart3, priority: 1 }), []);
   const simulatorSlotOptions = useMemo(
@@ -43,15 +56,24 @@ export function DeckDetailsView() {
 
   return (
     <DeckDetailsTopBarProvider>
-      {isLoading || !deck ? (
+      {isLoading || (!deck && pendingInvite === undefined) ? (
         <div className="flex h-full items-center justify-center">
           <div className="flex flex-col items-center gap-4">
             <Loader2 className="h-8 w-8 animate-spin text-primary drop-shadow-[0_0_10px_var(--primary)]" />
             <span className="text-sm font-mono uppercase tracking-widest text-muted-foreground">Loading Deck Data</span>
           </div>
         </div>
+      ) : !deck && pendingInvite && deckId ? (
+        <DeckInvitePendingGate deckId={deckId} deckName={pendingInvite.deckName} />
+      ) : !deck ? (
+        <div className="flex h-full items-center justify-center p-4">
+          <p className="max-w-sm text-center text-sm text-muted-foreground">
+            This deck could not be found, or you do not have permission to view it.
+          </p>
+        </div>
       ) : (
         <div className="space-y-6">
+          <TeamEditableWriteConflictBanner />
           {isOwner && <DeckDetailsGallerySlotRegistration />}
           <div className="hidden md:block">
             <DeckDetailsDesktopHeader />
@@ -63,6 +85,7 @@ export function DeckDetailsView() {
               <div className="relative flex flex-col lg:flex-row gap-6">
                 <div className="flex flex-col gap-3 shrink-0 w-full lg:w-48 lg:self-start lg:sticky lg:top-6">
                   <DeckDetailsHeroPanel />
+                  <DeckDetailsSharePanel />
                   <DeckDetailsSectionTabs />
                   <DeckDetailsViewModeToggle />
                 </div>

@@ -5,14 +5,24 @@ import {
   useContext,
   useMemo,
   useCallback,
+  useEffect,
+  useRef,
+  useState,
   ReactNode,
 } from "react";
 import { useQuery, useMutation } from "convex/react";
+import { toast } from "sonner";
 import { api } from "../../convex/_generated/api";
 import { Id, Doc } from "../../convex/_generated/dataModel";
 import { useUIState } from "./UIStateProvider";
 import { useCardIndex } from "@/lib/universus/card-data-provider";
 import { canAddCardToSection, canMoveCardToSection } from "@/lib/deck";
+import {
+  type DeckVisibility,
+  deckRevisionNumber,
+  isDeckWriteConflictError,
+  isTeamEditableDeck,
+} from "@/lib/deck/visibility";
 
 type Deck = Doc<"decks">;
 type DeckSection = "main" | "side" | "reference";
@@ -20,7 +30,7 @@ type DeckSection = "main" | "side" | "reference";
 type DeckUpdate = {
   name?: string;
   description?: string;
-  isPublic?: boolean;
+  visibility?: DeckVisibility;
   imageCardId?: Id<"cards"> | null;
   startingCharacterId?: Id<"cards"> | null;
   selectedIdentity?: string | null;
@@ -44,6 +54,8 @@ interface ActiveDeckContextValue {
   moveCard: (cardId: Id<"cards">, fromSection: DeckSection, toSection: DeckSection, quantity?: number) => void;
   updateDeck: (updates: DeckUpdate) => void;
   setActiveDeck: (deckId: string | null) => void;
+  teamEditableWriteConflict: boolean;
+  dismissTeamEditableWriteConflict: () => void;
 }
 
 const ActiveDeckContext = createContext<ActiveDeckContextValue>({
@@ -64,6 +76,8 @@ const ActiveDeckContext = createContext<ActiveDeckContextValue>({
   moveCard: () => {},
   updateDeck: () => {},
   setActiveDeck: () => {},
+  teamEditableWriteConflict: false,
+  dismissTeamEditableWriteConflict: () => {},
 });
 
 interface ActiveDeckProviderProps {
@@ -87,6 +101,17 @@ export function ActiveDeckProvider({ children }: ActiveDeckProviderProps) {
 
   const isLoading = activeDeckId !== undefined && activeDeck === undefined;
   const hasActiveDeck = !!activeDeck;
+  const expectedRevisionRef = useRef(0);
+  const [teamEditableWriteConflict, setTeamEditableWriteConflict] = useState(false);
+  const dismissTeamEditableWriteConflict = useCallback(() => {
+    setTeamEditableWriteConflict(false);
+  }, []);
+
+  useEffect(() => {
+    if (activeDeck) {
+      expectedRevisionRef.current = deckRevisionNumber(activeDeck);
+    }
+  }, [activeDeck?._id, activeDeck?.revision]);
 
   const mainCounts = useMemo(() => activeDeck?.mainQuantities ?? {}, [activeDeck?.mainQuantities]);
   const sideCounts = useMemo(() => activeDeck?.sideQuantities ?? {}, [activeDeck?.sideQuantities]);
@@ -184,45 +209,81 @@ export function ActiveDeckProvider({ children }: ActiveDeckProviderProps) {
   const addCard = useCallback(
     (cardId: Id<"cards">, section: DeckSection = "main", quantity?: number) => {
       if (!activeDeckId) return;
+      if (!activeDeck) return;
       if (!canAddToSection(cardId, section, quantity)) return;
-      addCardMutation({
+      const payload: Parameters<typeof addCardMutation>[0] = {
         deckId: activeDeckId as Id<"decks">,
         cardId,
         section,
         quantity,
-      });
+        ...(isTeamEditableDeck(activeDeck) ? { expectedRevision: expectedRevisionRef.current } : {}),
+      };
+      void addCardMutation(payload)
+        .then((r) => {
+          expectedRevisionRef.current = r.revision;
+        })
+        .catch((e) => {
+          if (isDeckWriteConflictError(e)) {
+            setTeamEditableWriteConflict(true);
+            toast.error("This deck was updated elsewhere. The latest version is shown.");
+          }
+        });
     },
-    [activeDeckId, addCardMutation, canAddToSection]
+    [activeDeckId, activeDeck, addCardMutation, canAddToSection]
   );
 
   const removeCard = useCallback(
     (cardId: Id<"cards">, section?: DeckSection, quantity?: number) => {
       if (!activeDeckId) return;
+      if (!activeDeck) return;
       const resolvedSection = section ?? getCardSection(cardId.toString());
       if (!resolvedSection) return;
-      removeCardMutation({
+      const payload: Parameters<typeof removeCardMutation>[0] = {
         deckId: activeDeckId as Id<"decks">,
         cardId,
         section: resolvedSection,
         quantity,
-      });
+        ...(isTeamEditableDeck(activeDeck) ? { expectedRevision: expectedRevisionRef.current } : {}),
+      };
+      void removeCardMutation(payload)
+        .then((r) => {
+          expectedRevisionRef.current = r.revision;
+        })
+        .catch((e) => {
+          if (isDeckWriteConflictError(e)) {
+            setTeamEditableWriteConflict(true);
+            toast.error("This deck was updated elsewhere. The latest version is shown.");
+          }
+        });
     },
-    [activeDeckId, removeCardMutation, getCardSection]
+    [activeDeckId, activeDeck, removeCardMutation, getCardSection]
   );
 
   const moveCard = useCallback(
     (cardId: Id<"cards">, fromSection: DeckSection, toSection: DeckSection, quantity?: number) => {
       if (!activeDeckId) return;
+      if (!activeDeck) return;
       if (!canMoveToSection(cardId, fromSection, toSection, quantity)) return;
-      moveCardMutation({
+      const payload: Parameters<typeof moveCardMutation>[0] = {
         deckId: activeDeckId as Id<"decks">,
         cardId,
         fromSection,
         toSection,
         quantity,
-      });
+        ...(isTeamEditableDeck(activeDeck) ? { expectedRevision: expectedRevisionRef.current } : {}),
+      };
+      void moveCardMutation(payload)
+        .then((r) => {
+          expectedRevisionRef.current = r.revision;
+        })
+        .catch((e) => {
+          if (isDeckWriteConflictError(e)) {
+            setTeamEditableWriteConflict(true);
+            toast.error("This deck was updated elsewhere. The latest version is shown.");
+          }
+        });
     },
-    [activeDeckId, moveCardMutation, canMoveToSection]
+    [activeDeckId, activeDeck, moveCardMutation, canMoveToSection]
   );
 
   const updateDeck = useCallback(
@@ -255,6 +316,8 @@ export function ActiveDeckProvider({ children }: ActiveDeckProviderProps) {
       moveCard,
       updateDeck,
       setActiveDeck,
+      teamEditableWriteConflict,
+      dismissTeamEditableWriteConflict,
     }),
     [
       activeDeck,
@@ -274,6 +337,8 @@ export function ActiveDeckProvider({ children }: ActiveDeckProviderProps) {
       moveCard,
       updateDeck,
       setActiveDeck,
+      teamEditableWriteConflict,
+      dismissTeamEditableWriteConflict,
     ]
   );
 

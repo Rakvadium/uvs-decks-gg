@@ -7,6 +7,7 @@ import type { CachedCard } from "@/lib/universus/card-store";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { useProfanityDisplayText } from "@/lib/moderation/use-profanity-display-text";
 import { TierListPreviewGrid } from "../preview-grid";
 import { getTierListScopeLabel } from "../utils";
 
@@ -31,6 +32,14 @@ export function TierListBrowserCard({
   cardMap,
   href,
 }: TierListBrowserCardProps) {
+  const { display, viewerUserId } = useProfanityDisplayText();
+  const isOwnList =
+    viewerUserId != null && tierList.userId === viewerUserId;
+  const showTitle = display(tierList.title, isOwnList);
+  const showDescription = tierList.description
+    ? display(tierList.description, isOwnList)
+    : null;
+
   const previewCards = useMemo(
     () =>
       tierList.previewCardIds
@@ -43,7 +52,7 @@ export function TierListBrowserCard({
   return (
     <Link
       href={href}
-      aria-label={`Open tier list: ${tierList.title}`}
+      aria-label={`Open tier list: ${showTitle}`}
       className={cn(
         "block h-full rounded-lg outline-none",
         "focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
@@ -65,12 +74,12 @@ export function TierListBrowserCard({
           </div>
 
           <div className="space-y-1">
-            <CardTitle className="line-clamp-2 text-lg leading-snug">{tierList.title}</CardTitle>
+            <CardTitle className="line-clamp-2 text-lg leading-snug">{showTitle}</CardTitle>
             <CardDescription>{authorLabel}</CardDescription>
           </div>
 
-          {tierList.description ? (
-            <p className="line-clamp-2 text-sm text-muted-foreground">{tierList.description}</p>
+          {showDescription ? (
+            <p className="line-clamp-2 text-sm text-muted-foreground">{showDescription}</p>
           ) : null}
         </CardHeader>
 

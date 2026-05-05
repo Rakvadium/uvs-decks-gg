@@ -1,6 +1,6 @@
 import type { Doc } from "../../../../../convex/_generated/dataModel";
 
-export type DecksEmptyMode = "search" | "my-decks" | "public";
+export type DecksEmptyMode = "search" | "my-decks" | "public" | "tournament";
 
 export interface DecksEmptyStateProps {
   mode: DecksEmptyMode;

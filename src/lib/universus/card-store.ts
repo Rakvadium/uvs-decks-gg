@@ -2,6 +2,12 @@ import type { Doc } from "../../../convex/_generated/dataModel";
 
 export type CachedCard = Doc<"cards">;
 
+export const CARD_CACHE_SCHEMA_VERSION = 2;
+
+export function isGalleryCatalogCard(card: Pick<CachedCard, "isFrontFace" | "isVariant">): boolean {
+  return card.isFrontFace !== false && card.isVariant !== true;
+}
+
 export const KEYWORD_LIST = [
   "Ally",
   "Breaker",
@@ -52,6 +58,7 @@ export interface CardCacheMetadata {
   updatedAt: number;
   cardCount: number;
   lastSyncAt: number;
+  schemaVersion?: number;
 }
 
 const DB_NAME = "universus-cards";
@@ -187,7 +194,10 @@ export interface CardIndex {
   bySetName: Map<string, CachedCard[]>;
 }
 
-export function buildCardIndex(cards: CachedCard[]): CardIndex {
+export function buildCardIndex(
+  galleryCards: CachedCard[],
+  companionCards: CachedCard[] = []
+): CardIndex {
   const index: CardIndex = {
     byId: new Map(),
     byName: new Map(),
@@ -197,7 +207,7 @@ export function buildCardIndex(cards: CachedCard[]): CardIndex {
     bySetName: new Map(),
   };
 
-  for (const card of cards) {
+  for (const card of galleryCards) {
     index.byId.set(card._id, card);
 
     const nameLower = card.name.toLowerCase();
@@ -233,6 +243,10 @@ export function buildCardIndex(cards: CachedCard[]): CardIndex {
       }
       index.bySetName.get(card.setName)!.push(card);
     }
+  }
+
+  for (const card of companionCards) {
+    index.byId.set(card._id, card);
   }
 
   return index;

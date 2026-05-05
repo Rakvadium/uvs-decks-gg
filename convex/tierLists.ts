@@ -10,9 +10,10 @@ import {
   tierListCommentValidator,
   tierListItemValidator,
   tierListValidator,
+  publicUserFromDocument,
   userValidator,
 } from "./validators";
-import { requireAuth } from "./utils/validation";
+import { requireAuth, requireUserCanPostContent } from "./utils/validation";
 import {
   COMMUNITY_TIER_RANKING,
   buildCanonicalRankedTiers,
@@ -21,6 +22,8 @@ import {
   resolveRankingScopeKey,
   type CommunityTierRankingScope,
 } from "../shared/app-config";
+import { moderateCommentLocal } from "./lib/moderation/localCommentHeuristic";
+import { isPublishTextModerationEnabled } from "./lib/moderation/textPublish";
 import {
   normalizeTierListPoolScopes,
   TIER_LIST_POOL_ALL_TYPES,
@@ -56,12 +59,6 @@ const tierListDetailValidator = v.object({
   likedByViewer: v.boolean(),
   canEdit: v.boolean(),
 });
-
-const FLAGGED_COMMENT_PATTERNS = [
-  /\b(?:fuck|fucking|shit|bitch|asshole)\b/i,
-  /\b(?:kill yourself|kys)\b/i,
-  /\b(?:discord\.gg|t\.me\/|bit\.ly\/|tinyurl\.com\/)\b/i,
-];
 
 function sanitizeText(value: string | undefined, maxLength: number) {
   if (!value) return undefined;
@@ -189,31 +186,6 @@ function normalizeItems(
   return normalized;
 }
 
-function moderateComment(content: string) {
-  const urlCount = (content.match(/https?:\/\//gi) ?? []).length;
-  const repeatedCharacter = /(.)\1{7,}/.test(content);
-  const repeatedPunctuation = /[!?]{5,}/.test(content);
-  const uppercaseTokens = content
-    .split(/\s+/)
-    .filter((token) => token.length >= 5 && token === token.toUpperCase()).length;
-
-  if (urlCount > 1) {
-    return { status: "flagged" as const, moderationReason: "Too many links in one comment" };
-  }
-
-  if (repeatedCharacter || repeatedPunctuation || uppercaseTokens >= 4) {
-    return { status: "pending" as const, moderationReason: "Comment looks spammy and needs review" };
-  }
-
-  for (const pattern of FLAGGED_COMMENT_PATTERNS) {
-    if (pattern.test(content)) {
-      return { status: "flagged" as const, moderationReason: "Comment contains language that needs review" };
-    }
-  }
-
-  return { status: "approved" as const, moderationReason: undefined };
-}
-
 async function getLikedState(
   ctx: QueryCtx | MutationCtx,
   userId: Id<"users"> | null,
@@ -247,11 +219,12 @@ export const listPublicFeed = query({
 
     const feed: Array<{
       tierList: Doc<"tierLists">;
-      author: Doc<"users"> | null;
+      author: ReturnType<typeof publicUserFromDocument> | null;
       likedByViewer: boolean;
     }> = [];
     for (const tierList of tierLists) {
-      const author = await ctx.db.get(tierList.userId);
+      const authorDoc = await ctx.db.get(tierList.userId);
+      const author = authorDoc ? publicUserFromDocument(authorDoc) : null;
       const likedByViewer = await getLikedState(ctx, viewerId, tierList._id);
       feed.push({
         tierList,
@@ -348,19 +321,26 @@ export const getDetail = query({
 
     const commentsWithAuthors: Array<{
       comment: Doc<"tierListComments">;
-      author: Doc<"users"> | null;
+      author: ReturnType<typeof publicUserFromDocument> | null;
     }> = [];
     for (const comment of comments) {
-      const commentAuthor = await ctx.db.get(comment.userId);
+      const commentAuthorDoc = await ctx.db.get(comment.userId);
+      const commentAuthor = commentAuthorDoc
+        ? publicUserFromDocument(commentAuthorDoc)
+        : null;
       commentsWithAuthors.push({
         comment,
         author: commentAuthor,
       });
     }
 
+    const authorPublic = author
+      ? publicUserFromDocument(author)
+      : null;
+
     return {
       tierList,
-      author,
+      author: authorPublic,
       items,
       comments: commentsWithAuthors,
       likedByViewer,
@@ -393,6 +373,7 @@ export const save = mutation({
   }),
   handler: async (ctx, args) => {
     const userId = await requireAuth(ctx);
+    await requireUserCanPostContent(ctx, userId);
     const normalizedTitle = sanitizeText(args.title, 80) ?? "Untitled Tier List";
     const normalizedDescription = sanitizeText(args.description, 280);
     const poolScopesFromRequest =
@@ -432,6 +413,7 @@ export const save = mutation({
     let previousCommentCount = 0;
     let previousLikeCount = 0;
     let previousScopeRefs: RankingScopeRef[] = [];
+    let previousExisting: Doc<"tierLists"> | null = null;
 
     if (tierListId) {
       const existing = await ctx.db.get(tierListId);
@@ -441,6 +423,7 @@ export const save = mutation({
       if (existing.userId !== userId) {
         throw new Error("Not authorized");
       }
+      previousExisting = existing;
       previousCommentCount = existing.commentCount;
       previousLikeCount = existing.likeCount;
       previousScopeRefs = getEligibleRankingScopeRefs(existing);
@@ -462,11 +445,16 @@ export const save = mutation({
         likeCount: 0,
         commentCount: 0,
         updatedAt,
+        listModerationStatus: "approved",
         ...(normalizedDescription ? { description: normalizedDescription } : {}),
         ...(featuredCardId ? { featuredCardId } : {}),
       });
     } else {
       const existingTierListId = tierListId;
+      const pe = previousExisting;
+      if (!pe) {
+        throw new Error("Tier list not found");
+      }
       await ctx.db.replace(existingTierListId, {
         userId,
         title: normalizedTitle,
@@ -482,6 +470,7 @@ export const save = mutation({
         likeCount: previousLikeCount,
         commentCount: previousCommentCount,
         updatedAt,
+        listModerationStatus: pe.listModerationStatus ?? "approved",
         ...(normalizedDescription ? { description: normalizedDescription } : {}),
         ...(featuredCardId ? { featuredCardId } : {}),
       });
@@ -529,6 +518,7 @@ export const toggleLike = mutation({
   }),
   handler: async (ctx, args) => {
     const userId = await requireAuth(ctx);
+    await requireUserCanPostContent(ctx, userId);
     const tierList = await ctx.db.get(args.tierListId);
 
     if (!tierList) {
@@ -573,6 +563,46 @@ export const toggleLike = mutation({
   },
 });
 
+async function handleAddTierListComment(
+  ctx: MutationCtx,
+  args: { tierListId: Id<"tierLists">; content: string }
+): Promise<{
+  status: "approved" | "pending" | "flagged" | "rejected";
+  moderationReason?: string;
+}> {
+  const userId = await requireAuth(ctx);
+  await requireUserCanPostContent(ctx, userId);
+  const tierList = await ctx.db.get(args.tierListId);
+
+  if (!tierList) {
+    throw new Error("Tier list not found");
+  }
+
+  if (!tierList.isPublic && tierList.userId !== userId) {
+    throw new Error("Not authorized");
+  }
+
+  const content = sanitizeText(args.content, 500);
+  if (!content) {
+    throw new Error("Comment cannot be empty");
+  }
+
+  if (tierList.isPublic && isPublishTextModerationEnabled()) {
+    throw new Error(
+      "Comments on public tier lists use api.publishTierListComment.submitTierListComment when publish-time text moderation is enabled in Convex."
+    );
+  }
+
+  const moderation = moderateCommentLocal(content);
+  return await ctx.runMutation(internal.tierListCommentInternal.insertTierListComment, {
+    tierListId: args.tierListId,
+    userId,
+    content,
+    status: moderation.status,
+    ...(moderation.moderationReason ? { moderationReason: moderation.moderationReason } : {}),
+  });
+}
+
 export const addComment = mutation({
   args: {
     tierListId: v.id("tierLists"),
@@ -582,44 +612,7 @@ export const addComment = mutation({
     status: tierListCommentStatusValidator,
     moderationReason: v.optional(v.string()),
   }),
-  handler: async (ctx, args) => {
-    const userId = await requireAuth(ctx);
-    const tierList = await ctx.db.get(args.tierListId);
-
-    if (!tierList) {
-      throw new Error("Tier list not found");
-    }
-
-    if (!tierList.isPublic && tierList.userId !== userId) {
-      throw new Error("Not authorized");
-    }
-
-    const content = sanitizeText(args.content, 500);
-    if (!content) {
-      throw new Error("Comment cannot be empty");
-    }
-
-    const moderation = moderateComment(content);
-    const now = Date.now();
-
-    await ctx.db.insert("tierListComments", {
-      tierListId: args.tierListId,
-      userId,
-      content,
-      status: moderation.status,
-      createdAt: now,
-      updatedAt: now,
-      ...(moderation.moderationReason ? { moderationReason: moderation.moderationReason } : {}),
-    });
-
-    if (moderation.status === "approved") {
-      await ctx.db.patch(args.tierListId, {
-        commentCount: tierList.commentCount + 1,
-      });
-    }
-
-    return moderation;
-  },
+  handler: handleAddTierListComment,
 });
 
 export const remove = mutation({
@@ -629,6 +622,7 @@ export const remove = mutation({
   returns: v.null(),
   handler: async (ctx, args) => {
     const userId = await requireAuth(ctx);
+    await requireUserCanPostContent(ctx, userId);
     const tierList = await ctx.db.get(args.tierListId);
 
     if (!tierList) {

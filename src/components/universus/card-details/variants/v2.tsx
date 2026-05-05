@@ -5,10 +5,12 @@ import { Hexagon, RotateCcw, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DialogClose } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
+import { canAddCardToDeck, useDeckEditor } from "@/lib/deck";
 import { usePrefersReducedMotion } from "@/lib/reduced-motion";
 import {
   CardDetailsContentProvider,
 } from "../content-context";
+import { DeckSectionControls } from "../deck-section-controls";
 import {
   CardDetailsReadoutPanel,
   CardDetailsReadoutSurface,
@@ -29,10 +31,12 @@ export function CardDetailsV2({
   const hasBackFace = Boolean(backCard);
   const transitionClass = prefersReducedMotion ? "duration-0" : "duration-300 ease-out";
   const heroSizes = "(max-width: 768px) min(92vw, 340px), 340px";
+  const { hasDeck } = useDeckEditor();
+  const showDeckControlsBar = hasDeck && canAddCardToDeck(card);
 
   return (
     <CardDetailsContentProvider card={displayCard}>
-      <div className="flex min-h-0 w-full flex-1 flex-col gap-4 p-3 max-md:!pointer-events-none md:max-h-[min(85vh,calc(100dvh-2rem))] md:flex-row md:items-stretch md:gap-5 md:overflow-hidden md:pb-3 md:pl-3 md:!pointer-events-auto md:pr-14 md:pt-12">
+      <div className="flex min-h-0 w-full flex-1 flex-col gap-4 p-3 max-md:!pointer-events-none md:max-h-[min(85vh,calc(100dvh-2rem))] md:flex-row md:items-stretch md:gap-5 md:overflow-hidden md:pb-3 md:pl-3 md:!pointer-events-auto md:pt-12">
         <div
           className={cn(
             "flex w-full shrink-0 flex-col items-center justify-center max-md:!pointer-events-auto",
@@ -129,7 +133,7 @@ export function CardDetailsV2({
                     <button
                       type="button"
                       onClick={onToggleFlip}
-                      className="absolute bottom-0 right-0 z-10 flex items-center gap-2 rounded-none rounded-tl-(--radius-2xl) rounded-br-(--radius-2xl) border border-primary/35 bg-card/95 px-3 py-2 text-muted-foreground shadow-none backdrop-blur-sm transition-all hover:border-primary/50 hover:text-primary md:bottom-auto md:left-0 md:right-auto md:top-0"
+                      className="absolute bottom-0 right-0 z-10 flex items-center gap-2 rounded-none rounded-tl-(--radius-2xl) rounded-br-(--radius-2xl) border border-primary/25 bg-card/95 px-3 py-2 text-muted-foreground shadow-none backdrop-blur-sm transition-all hover:border-primary/40 hover:text-primary md:bottom-auto md:left-0 md:right-auto md:top-0"
                     >
                       <RotateCcw
                         className={cn(
@@ -158,21 +162,31 @@ export function CardDetailsV2({
           </div>
         </div>
 
-        <div className="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-xl border border-primary/25 bg-card/95 shadow-[0_0_2px_var(--primary)/35,0_0_10px_var(--primary)/42,0_0_22px_var(--primary)/12] backdrop-blur-md max-md:!pointer-events-auto">
-          <DialogClose asChild>
-            <Button
-              type="button"
-              variant="outline"
-              size="icon"
-              className="pointer-events-auto absolute top-0 right-0 z-30 h-9 w-9 rounded-none rounded-tr-xl rounded-bl-xl border-primary/35 bg-card/95 shadow-none backdrop-blur-sm md:hidden"
-              aria-label="Close"
+        <div className="relative flex min-h-0 min-w-0 flex-1 flex-col max-md:!pointer-events-auto">
+          <div className="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-xl border border-primary/25 bg-card/95 shadow-[0_0_2px_var(--primary)/35,0_0_10px_var(--primary)/42,0_0_22px_var(--primary)/12] backdrop-blur-md">
+            <DialogClose asChild>
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                className="pointer-events-auto absolute top-0 right-0 z-30 h-9 w-9 rounded-none rounded-tr-xl rounded-bl-xl !border-primary/25 bg-card/95 shadow-none backdrop-blur-sm hover:!border-primary/40 hover:shadow-none"
+                aria-label="Close"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </DialogClose>
+            <CardDetailsReadoutSurface
+              className="min-h-0 flex-1"
+              scrollableClassName={showDeckControlsBar ? "pb-16" : undefined}
             >
-              <X className="h-4 w-4" />
-            </Button>
-          </DialogClose>
-          <CardDetailsReadoutSurface className="min-h-0 flex-1">
-            <CardDetailsReadoutPanel />
-          </CardDetailsReadoutSurface>
+              <CardDetailsReadoutPanel />
+            </CardDetailsReadoutSurface>
+            <DeckSectionControls
+              key={card._id}
+              card={card}
+              layout="detailsBar"
+            />
+          </div>
         </div>
       </div>
     </CardDetailsContentProvider>

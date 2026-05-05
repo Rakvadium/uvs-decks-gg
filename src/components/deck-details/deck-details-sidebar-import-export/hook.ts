@@ -7,6 +7,7 @@ import { formatUniversusCardType } from "@/config/universus";
 import { useCardIdMap } from "@/hooks/useCardIdMap";
 import { useCardData } from "@/lib/universus/card-data-provider";
 import { useDeckDetailsOptional } from "@/providers/DeckDetailsProvider";
+import { deckRevisionNumber, isDeckWriteConflictError, isTeamEditableDeck } from "@/lib/deck/visibility";
 import {
   SIDEBAR_SIDEBOARD_LIMIT,
   UVS_MAIN_TYPE_ORDER,
@@ -150,9 +151,10 @@ export function useImportExportSidebarModel() {
       }
 
       const deckId = deck._id as Id<"decks">;
-      const operations: Promise<unknown>[] = [];
+      let rev = deckRevisionNumber(deck);
+      const requireRev = isTeamEditableDeck(deck);
 
-      const applyDiff = (
+      const applyDiff = async (
         section: "main" | "side" | "reference",
         current: Record<string, number>,
         next: Record<string, number>
@@ -160,37 +162,35 @@ export function useImportExportSidebarModel() {
         for (const [cardId, currentQuantity] of Object.entries(current)) {
           const nextQuantity = next[cardId] ?? 0;
           if (currentQuantity > nextQuantity) {
-            operations.push(
-              removeCardMutation({
-                deckId,
-                cardId: cardId as Id<"cards">,
-                section,
-                quantity: currentQuantity - nextQuantity,
-              })
-            );
+            const r = await removeCardMutation({
+              deckId,
+              cardId: cardId as Id<"cards">,
+              section,
+              quantity: currentQuantity - nextQuantity,
+              ...(requireRev ? { expectedRevision: rev } : {}),
+            });
+            rev = r.revision;
           }
         }
 
         for (const [cardId, nextQuantity] of Object.entries(next)) {
           const currentQuantity = current[cardId] ?? 0;
           if (nextQuantity > currentQuantity) {
-            operations.push(
-              addCardMutation({
-                deckId,
-                cardId: cardId as Id<"cards">,
-                section,
-                quantity: nextQuantity - currentQuantity,
-              })
-            );
+            const r = await addCardMutation({
+              deckId,
+              cardId: cardId as Id<"cards">,
+              section,
+              quantity: nextQuantity - currentQuantity,
+              ...(requireRev ? { expectedRevision: rev } : {}),
+            });
+            rev = r.revision;
           }
         }
       };
 
-      applyDiff("main", deck.mainQuantities, targetMain);
-      applyDiff("side", deck.sideQuantities, targetSide);
-      applyDiff("reference", deck.referenceQuantities, {});
-
-      await Promise.all(operations);
+      await applyDiff("main", deck.mainQuantities, targetMain);
+      await applyDiff("side", deck.sideQuantities, targetSide);
+      await applyDiff("reference", deck.referenceQuantities, {});
 
       if (importedCharacterId) {
         await updateDeckMutation({
@@ -212,8 +212,12 @@ export function useImportExportSidebarModel() {
       if (importedSideCount > SIDEBAR_SIDEBOARD_LIMIT) {
         toast.warning("Sideboard has more than 10 cards. A validation warning is shown on deck details.");
       }
-    } catch {
-      toast.error("Import failed. Check the input format and try again.");
+    } catch (e) {
+      if (isDeckWriteConflictError(e)) {
+        toast.error("This deck was updated while importing. Try again with the latest list.");
+      } else {
+        toast.error("Import failed. Check the input format and try again.");
+      }
     } finally {
       setIsImporting(false);
     }

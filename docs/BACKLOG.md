@@ -20,46 +20,143 @@ Statuses: `Open` | `In progress` | `Blocked` | `Done`
 
 ## Active items
 
-**Open:** Card catalog sync and Convex query hygiene — **CAT-001–CAT-008** (section below). Work top-down unless a row is marked optional/spike.
+**Archived (all Done):** Card catalog **CAT-001–CAT-008**, right sidebar **RSC-001–RSC-008**, teams **TM-001–TM-012**, content safety **MC-001–MC-007** — see [archive/backlog-completed.md](./archive/backlog-completed.md#archived-backlog-active-2026-04-22). **Admin area IA-1–USR-14** (same session) — [archive/backlog-completed.md#admin-area-epic-2026-04-22](./archive/backlog-completed.md#admin-area-epic-2026-04-22).
 
-**Also open:** Right sidebar and shell performance — **RSC-001–RSC-008**.
+### Admin area — sets, cards, formats, content, users
 
-### Card catalog sync and Convex query hygiene
+**Goal:** Replace underwhelming read-only admin lists with a **maintainable** IA: set-scoped cards and import, **Formats & legality** editing, **Community YouTube** curation, honest **release** workflow, and **user management** (bans, roles, audit). Backend already exposes many admin mutations (`convex/admin.ts`: sets, cards, formats, `releaseCards`); UI today is mostly tables in `src/app/(app)/admin/`*. `cardLegality` / `setLegality` exist in schema and are read in `convex/formats.ts` but need admin mutations + UI. YouTube curations live in `communityYoutubeCurations` (`convex/communityYoutube.ts`) and need admin-facing APIs.
 
-**Goal:** Keep the **local IndexedDB + in-memory filter** gallery model (fast UX at ~5k+ primary cards) while **minimizing sync bytes, round-trips, and full-table Convex reads**. Align bulk export with what the UI actually uses; eliminate or quarantine `collect()`-scale queries from hot paths (especially admin).
+**References:** `src/app/(app)/admin/admin-dashboard-client.tsx`, `sets-page-client.tsx`, `cards-page-client.tsx`, `layout.tsx` (`AdminSidebarContent`), `convex/admin.ts`, `convex/sets.ts`, `convex/formats.ts`, `convex/communityYoutube.ts`, `convex/schema.ts` (`users`, `cardLegality`, `setLegality`).
 
-**References:** `src/lib/universus/use-universus-cards.ts` (`fetchFromConvex`, progress), `src/lib/universus/card-store.ts`, `convex/cards.ts` (`listReleasedPaginated`, `listAllCardsChunked`, `list`, `getRarities`, `getTypes`, `getSets`, `listCharacters`, `listReleased`), `src/app/(app)/admin/cards/cards-page-client.tsx`. Convex rules: indexed queries, pagination over `collect()` for large tables.
+**Suggested sequence:** IA + Sets hub + set-scoped card list → card CRUD + set import → release UX → legality API + formats UI → format editor → YouTube content admin → user management schema + enforcement + UI.
 
-
-| ID      | Status | Area            | Summary                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| ------- | ------ | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| CAT-001 | Open   | Convex + client | **Bulk sync only gallery catalog rows:** Change the query used for full card cache sync (today `listReleasedPaginated` in `fetchFromConvex`) so each page returns only rows matching `isGalleryCatalogCard` / same rule as `filterCards` (`isFrontFace !== false`, `isVariant !== true`), mirroring `listAllCardsChunked` filtering. Remap `imageUrl` to public R2 URLs as today. **Acceptance:** fresh sync no longer stores backs/variants in IDB; gallery + deck resolution still find backs via `backCardId` / `getBackCard` as today; bump cache metadata or document one-time `clearCardCache` if old blobs incompatible.                                                                                                       |
-| CAT-002 | Open   | Client          | **Tune sync chunk size and invocation count:** In `fetchFromConvex`, pick a `limit` (and document rationale) that balances **fewer `convex.query` round-trips** vs **payload size / browser parse cost** (try 1000 → measure; stay within Convex practical limits for `cardValidator` doc size). **Acceptance:** comment or small doc note with measured row count and approximate JSON size per chunk; no unnecessary extra loops.                                                                                                                                                                                                                                                                                                   |
-| CAT-003 | Open   | Client          | **Accurate sync progress:** Replace `loadProgress` math that divides by hard-coded `3000` in `use-universus-cards.ts` with a real total — e.g. `serverVersionData.cardCount` from `getCardDataVersion`, or `totalEstimate` from an existing query (`listAllCardsChunked` / aligned API). **Acceptance:** progress reaches 100% when the last page is written; works when the catalog grows well past three thousand rows.                                                                                                                                                                                                                                                                                                             |
-| CAT-004 | Open   | Client          | **Remove fragile global `sortCards` cache:** The module-level `lastSortCache` in `use-universus-cards.ts` only tracks one sort and can confuse future callers. **Acceptance:** sorting relies on `useMemo` (e.g. `GalleryFiltersProvider` pipeline) or explicit memo at each call site; behavior and sort order unchanged; grep shows no stale reliance on global cache.                                                                                                                                                                                                                                                                                                                                                              |
-| CAT-005 | Open   | Client / perf   | **Optional spike — main-thread budget:** If profiling shows filter/sort jank with large catalogs, prototype **Web Worker** offload for `filterCards` + `sortCards`, or a **client search index** for name/text/all modes. **Acceptance:** spike doc in `docs/implementation/notes/` with verdict, bundle cost, and whether to merge; no merge required to close if spike says “not needed yet” with profiler evidence.                                                                                                                                                                                                                                                                                                                |
-| CAT-006 | Open   | Infra           | **Optional — versioned static catalog:** Publish a **gzip JSON** (or similar) full catalog to R2/CDN keyed by `cardDataVersion`; client downloads blob when version changes; Convex holds version metadata only. **Acceptance:** design note (security, cache headers, fallback to Convex sync); implementation can be a follow-up row if split.                                                                                                                                                                                                                                                                                                                                                                                      |
-| CAT-007 | Open   | Convex + admin  | **Eliminate hot full-table scans on `cards`:** Audit `convex/cards.ts` for `ctx.db.query("cards").collect()` and equivalent unbounded reads: `list` (branch when `search` empty), `listReleased`, `getRarities`, `getTypes`, `getSets`, `listCharacters` without search, etc. **Acceptance:** each replaced with **pagination**, **indexed narrow queries**, **search indexes**, or **precomputed aggregates** (e.g. small `cardFacetSnapshot` table updated on ingest); **must fix** `src/app/(app)/admin/cards/cards-page-client.tsx` which calls `useQuery(api.cards.list, { limit: 100 })` with empty search — today that hits the `collect()` path per subscription tick. Add tests or manual checklist for admin list + facets. |
-| CAT-008 | Open   | Gallery / UX    | **Large `filteredCards` in context / dialog:** `GalleryFiltersProvider` and `CardDetailsDialog` hold the full filtered array for navigation. **Acceptance:** document peak memory tradeoff in `docs/card-data-hooks.md` (or sibling); if needed, implement **lazy navigation** (e.g. pass sorted filtered ids + `index.byId`, or cap dialog “nearby” slice) so pathological 10k+ result sets do not clone huge arrays into dialog props — scope behind measurement.                                                                                                                                                                                                                                                                   |
+#### Information architecture & navigation
 
 
-### Right sidebar & contextual shell performance
+| ID   | Status | Area  | Summary                                                                                                                                                                                                                                  |
+| ---- | ------ | ----- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| IA-1 | Done   | Admin | **Admin IA v2:** Primary areas **Sets**, **Formats** (formats & legality), **Content**; **Cards** and **Import** are **set-scoped** (from set detail), not global dumps.                                                                 |
+| IA-2 | Done   | Admin | **URL structure:** e.g. `/admin/sets`, `/admin/sets/[code]`, `/admin/sets/[code]/cards`, `/admin/sets/[code]/import`, `/admin/formats`, `/admin/formats/[key]`, `/admin/content/youtube`; deep links preserve filters where possible.    |
+| IA-3 | Done   | Admin | **Sidebar + breadcrumbs:** Extend `AdminSidebarContent`: **Formats**, **Content**, **Users**; reorder (e.g. Sets → Formats → Content → Users); demote standalone Cards/Import if set-scoped. Breadcrumbs: Admin → Sets → {name} → Cards. |
+| IA-4 | Done   | Admin | **Dashboard home:** Counts, **pending release** indicator (REL), shortcuts to last-edited set, link to Content — replace only three large tiles.                                                                                         |
+| IA-5 | Done   | Admin | **Consistent page shell:** Reuse `AdminPageHeader` (title, description, primary actions, sticky sub-nav per section).                                                                                                                    |
 
-**Goal:** The desktop **right sidebar** (icon rail + expanded contextual panel for gallery deck/decks, etc.) should **open, close, and resize** without jank; **shell state** should not force unrelated routes to re-render; **gallery ↔ sidebar** interactions (including DnD) should not stack layout work. Work top-down: fix layout animation and context fan-out first, then DnD edge cases, then optional UX polish (resizable, preload).
 
-**References:** Performance analysis 2026-04-16 — `RightSidebarExpandedPanel` (`m.div` width animation), `ShellSlotProvider` coarse context, `GalleryFiltersProvider` sidebar coupling, `TcgDndProvider` `activeDropZone` updates, `useRegisterSlot` effect deps; [shadcn Resizable](https://ui.shadcn.com/docs/components/radix/resizable) as optional follow-up.
+#### Sets
 
 
-| ID      | Status | Area       | Summary                                                                                                                                                                                                                                                                                                                  |
-| ------- | ------ | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| RSC-001 | Open   | Shell / UX | **Panel open/close without layout animation:** Replace Framer `animate={{ width }}` on `RightSidebarExpandedPanel` with a compositor-friendly approach (e.g. `transform` slide + fixed track, `clip-path`, or instant toggle). Avoid per-frame width layout thrash against the gallery virtualizer and main flex column. |
-| RSC-002 | Open   | Shell      | **Narrow `ShellSlot` subscriptions:** Split or select from shell slot state so consumers that only need `activeSidebarActionId` (e.g. `GalleryFiltersProvider`) do not re-render when `sidebarWidth` changes or the `slots` `Map` reference updates for unrelated reasons.                                               |
-| RSC-003 | Open   | Gallery    | **Decouple gallery density from sidebar toggle:** Reduce simultaneous churn when opening the right sidebar (e.g. defer or CSS-driven `cardsPerRow` / container queries so virtualized grid column count does not flip in the same window as the panel width transition).                                                 |
-| RSC-004 | Open   | DnD        | **Stable drop-zone targeting at boundaries:** Add hysteresis, short debounce, or consecutive-frame agreement before committing `activeDropZone` changes so grazing the gallery/sidebar edge does not queue rapid `setState` while the main thread is busy with layout.                                                   |
-| RSC-005 | Open   | DnD        | **Narrow droppable re-renders:** Evolve `useTcgDroppable` so hover/`isOver` styling does not require merging full `useTcgDnd()` on every `activeDropZone` tick (e.g. per-zone external store, ref-driven class on the marked node, or context split beyond DND-003’s draggable path).                                    |
-| RSC-006 | Open   | Shell      | **Stable slot registration:** Harden `useRegisterSlot` so `Component` (and similar) in the `useEffect` dependency list cannot thrash register/unregister when callers pass unstable references; prefer refs or explicit registration payloads.                                                                           |
-| RSC-007 | Open   | Shell / UX | **Evaluate resizable panel primitive:** Spike [shadcn Resizable](https://ui.shadcn.com/docs/components/radix/resizable) / `react-resizable-panels` for the right sidebar width (vs. custom `useRightSidebarResize`) only if it simplifies hit targets and reduces resize jank; keep calm/expressive tokens.              |
-| RSC-008 | Open   | Bundle     | **Preload right sidebar chunk:** On routes that expose right-sidebar slots (e.g. gallery), `import()` prefetch or `router.prefetch`-style warmup so the first icon-rail open does not pay dynamic-import latency on top of layout work.                                                                                  |
+| ID    | Status | Area              | Summary                                                                                                                                                                       |
+| ----- | ------ | ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| SET-1 | Done   | Admin             | **Sets list UX:** Virtualized or paginated table; default sort (`setNumber` desc or `releasedAt`); columns code, name, #, card count, released/future, rotating, open action. |
+| SET-2 | Done   | Admin             | **Filtering & search:** Text search (code/name); toggles Released/Future/Rotating; optional `releasedAt` range.                                                               |
+| SET-3 | Done   | Convex + Admin    | **Add set:** Form → `api.admin.createSet`; unique `code`; optional `setNumber`, `releasedAt`, `iconUrl`, `isFuture`, `isRotating`, `legality`, `spotlightIP`.                 |
+| SET-4 | Done   | Convex + Admin    | **Edit set:** Sheet or page → `api.admin.updateSet`; **code immutable** in UI.                                                                                                |
+| SET-5 | Done   | Admin             | **No delete in UI:** Omit `deleteSet`; optional server policy for API-only deletes.                                                                                           |
+| SET-6 | Done   | Admin             | **Set detail hub:** Row click → hub: summary, Cards, Import for set, Legality entry, Release CTA when applicable.                                                             |
+| SET-7 | Done   | Convex + Admin    | **Card count accuracy:** Maintain `cardCount` on CRUD/import or derive + reconcile; show mismatch warning.                                                                    |
+| SET-8 | Done   | Convex (optional) | **Audit metadata:** `updatedAt` / `updatedBy` on sets if traceability required.                                                                                               |
+
+
+#### Cards (within a set)
+
+
+| ID    | Status | Area             | Summary                                                                                                                                                                                                               |
+| ----- | ------ | ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| CRD-1 | Done   | Admin            | **Set-scoped listing:** Route under selected set; query cards by `setCode` (indexed).                                                                                                                                 |
+| CRD-2 | Done   | Client           | **Infinite scroll (40/page):** Reuse `useInfiniteSlice` pattern from gallery (`src/components/gallery/main-content/content.tsx`); `pageSize` 40.                                                                      |
+| CRD-3 | Done   | Client           | **Cached local data:** Same idea as gallery — `useUniversusCards` / card store or admin-only slice: load set’s cards into IDB/memory, filter/sort/scroll locally; invalidate on `cardDataVersion` or after mutations. |
+| CRD-4 | Done   | Admin            | **Admin filters:** Search name/text, type, rarity, collector #, front/variant toggles; sort by collector #, name.                                                                                                     |
+| CRD-5 | Done   | Convex + Admin   | **Add card:** Form → `api.admin.createCard`; default `setCode` / `setName` from parent set.                                                                                                                           |
+| CRD-6 | Done   | Convex + Admin   | **Edit card:** → `api.admin.updateCard`; keep search fields consistent when name/text/keywords change.                                                                                                                |
+| CRD-7 | Done   | Convex + Admin   | **Delete card:** Confirm → `api.admin.deleteCard`; warn on back-face / variant links.                                                                                                                                 |
+| CRD-8 | Done   | Admin            | **Bulk import for set:** Set-context import; prefill `setCode` / `setName`; use existing import/batch actions; per-row errors, dry-run, progress.                                                                     |
+| CRD-9 | Done   | Admin (optional) | **Images / R2:** Document or automate upload if cards use R2 URLs.                                                                                                                                                    |
+
+
+#### Release workflow
+
+
+| ID    | Status | Area              | Summary                                                                                                                                                                     |
+| ----- | ------ | ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| REL-1 | Done   | Convex + Admin    | **Define “unreleased” in UI:** `releaseCards` bumps global `cardDataVersion`; fix misleading `listUnreleasedCards` (currently all cards) or add real draft/changelog model. |
+| REL-2 | Done   | Admin             | **Release UX:** Show current version, card count, confirm; toast new version after `releaseCards`.                                                                          |
+| REL-3 | Done   | Convex (optional) | **Scoped release:** Only bump when a given set’s cards changed (needs versioning/changelog design).                                                                         |
+
+
+#### Formats
+
+
+| ID    | Status | Area           | Summary                                                                                                          |
+| ----- | ------ | -------------- | ---------------------------------------------------------------------------------------------------------------- |
+| FMT-1 | Done   | Admin          | **Formats list:** Table from `api.formats.list`; link to detail.                                                 |
+| FMT-2 | Done   | Convex + Admin | **Create/edit format:** UI for `api.admin.createFormat` / `updateFormat`; single `isDefault` behavior preserved. |
+| FMT-3 | Done   | Admin          | **Delete format:** Confirm; check orphaned legality rows / deck impact or soft-delete only.                      |
+
+
+#### Legality (sets & cards / banlists)
+
+
+| ID    | Status | Area             | Summary                                                                                                                                      |
+| ----- | ------ | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| LEG-1 | Done   | Convex           | **Set legality CRUD:** Admin mutations upsert `setLegality` by `(formatKey, setCode)` — `isLegal`, `rotatesOutAt`; list by format.           |
+| LEG-2 | Done   | Convex           | **Card legality CRUD:** Admin mutations upsert `cardLegality` — `status`, `copyLimitOverride`, `effectiveDate`; optional bulk from CSV/JSON. |
+| LEG-3 | Done   | Admin            | **UI — sets tab:** Matrix or table: sets × legal toggle + rotation date for selected format.                                                 |
+| LEG-4 | Done   | Admin            | **UI — cards tab:** Search card → set status; filter banned/restricted; jump from card admin row.                                            |
+| LEG-5 | Done   | Admin            | **Effective dates:** UI for `effectiveDate`; document interaction with `isSetLegal` / `rotatesOutAt` vs `Date.now()`.                        |
+| LEG-6 | Done   | Admin (optional) | **Import/export banlist:** Per-format JSON backup and restore.                                                                               |
+
+
+#### Content (Community YouTube)
+
+
+| ID    | Status | Area   | Summary                                                                                                                                    |
+| ----- | ------ | ------ | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| CNT-1 | Done   | Convex | **Admin API for curations:** `requireAdmin` mutations: list ordered, add (URL → id), update label/accent/sortOrder, delete, reorder batch. |
+| CNT-2 | Done   | Convex | **Public read:** Query for community page returning curated ids + metadata; keep metadata cache refresh.                                   |
+| CNT-3 | Done   | Admin  | **Content UI:** Drag reorder; inline label/accent; preview via existing YouTube metadata flow; duplicate id validation.                    |
+| CNT-4 | Done   | Ops    | **Defaults vs production:** `ensureDefaultCurations` must not overwrite manual curations on deploy.                                        |
+
+
+#### Global import & safety
+
+
+| ID    | Status | Area  | Summary                                                                                     |
+| ----- | ------ | ----- | ------------------------------------------------------------------------------------------- |
+| IMP-1 | Done   | Admin | **Global import:** Deprecate or relocate `/admin/import`; prefer set-scoped import (CRD-8). |
+| IMP-2 | Done   | Admin | **Guardrails:** Gate or remove `clearAllCards`; audit destructive actions.                  |
+| IMP-3 | Done   | Admin | **Ingestion jobs UI:** Surface `ingestionJobs` status when using `bulkImportCards`.         |
+
+
+#### Cross-cutting (admin UX & quality)
+
+
+| ID   | Status | Area             | Summary                                                                  |
+| ---- | ------ | ---------------- | ------------------------------------------------------------------------ |
+| QX-1 | Done   | Admin            | **Loading / empty / error:** Skeletons, retry, Convex error toasts.      |
+| QX-2 | Done   | Admin            | **A11y:** Table focus, dialog traps, release announcements.              |
+| QX-3 | Done   | Admin (optional) | **Mobile admin:** Usable layouts for emergency fixes.                    |
+| QX-4 | Done   | QA               | **E2E smoke:** Admin login → create set → add card → release (test env). |
+
+
+#### User management
+
+
+| ID     | Status | Area              | Summary                                                                                                                                                                               |
+| ------ | ------ | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| USR-1  | Done   | Admin             | **Users area:** Nav **Users**; `/admin/users` — searchable, paginated directory (username, email, role, status).                                                                      |
+| USR-2  | Done   | Admin             | **User detail:** Sheet or `/admin/users/[id]` — profile, identifiers (read-only where needed), linked content counts when cheap.                                                      |
+| USR-3  | Done   | Convex            | **Account status model:** Schema (or `userModeration` table): e.g. `accountStatus` active/suspended/banned, `statusReason`, `statusSetAt`, `statusSetBy`, optional `statusExpiresAt`. |
+| USR-4  | Done   | Convex            | **Enforce bans:** Shared guard after auth (e.g. `requireActiveUser` / `assertUserNotBanned`); define what banned users may still do.                                                  |
+| USR-5  | Done   | Convex + Admin    | **Ban/suspend:** Admin mutations — set status, reason, optional expiry; unban; confirm; block banning self / last admin (USR-9).                                                      |
+| USR-6  | Done   | Convex (optional) | **Write-only restriction:** Login allowed but no posts (decks/comments) vs full ban.                                                                                                  |
+| USR-7  | Done   | Convex + Admin    | **Roles:** UI to set `role` (e.g. Admin); align with `requireAdmin`; prevent demoting sole admin.                                                                                     |
+| USR-8  | Done   | Admin (optional)  | **Impersonation:** Time-bound view-as-user + audit; default out of scope unless explicitly required.                                                                                  |
+| USR-9  | Done   | Policy            | **Admin safety:** Minimum one Admin; no self-demotion; optional rules for long bans.                                                                                                  |
+| USR-10 | Done   | Convex            | **Moderation audit log:** Append-only actor, target, action, payload, timestamp; visible in admin.                                                                                    |
+| USR-11 | Done   | Admin             | **UGC hooks:** From user detail — links to pending tier-list comments (`tierLists` moderation fields); bulk approve/reject.                                                           |
+| USR-12 | Done   | Admin             | **Search & filters:** By status, role, verified email, anonymous; optional CSV export.                                                                                                |
+| USR-13 | Done   | Auth              | **Sessions:** Bans apply on next request; invalidate sessions if auth stack supports it.                                                                                              |
+| USR-14 | Done   | Admin             | **Messaging:** Optional `userFacingMessage` vs internal `statusReason` for restricted-account UI.                                                                                     |
 
 
 ---

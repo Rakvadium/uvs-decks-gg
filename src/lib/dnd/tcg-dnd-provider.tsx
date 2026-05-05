@@ -45,11 +45,8 @@ type TcgDndActionsContextValue = Pick<
 
 type TcgDndDragStateContextValue = Pick<TcgDndContextValue, "dragItem" | "isDragging">;
 
-type TcgDndActiveDropZoneContextValue = Pick<TcgDndContextValue, "activeDropZone">;
-
 const TcgDndActionsContext = React.createContext<TcgDndActionsContextValue | null>(null);
 const TcgDndDragStateContext = React.createContext<TcgDndDragStateContextValue | null>(null);
-const TcgDndActiveDropZoneContext = React.createContext<TcgDndActiveDropZoneContextValue | null>(null);
 
 type WindowWithDndDebug = Window & { __TCG_DND_DEBUG__?: boolean };
 
@@ -72,6 +69,33 @@ function dndLog(...args: unknown[]) {
   console.log("[tcg-dnd]", ...args);
 }
 
+let activeDropZoneSnapshot: string | null = null;
+const activeDropZoneListeners = new Set<() => void>();
+
+function subscribeActiveDropZone(onStoreChange: () => void) {
+  activeDropZoneListeners.add(onStoreChange);
+  return () => {
+    activeDropZoneListeners.delete(onStoreChange);
+  };
+}
+
+function getActiveDropZoneSnapshot(): string | null {
+  return activeDropZoneSnapshot;
+}
+
+function emitActiveDropZoneChange() {
+  activeDropZoneListeners.forEach((listener) => listener());
+}
+
+function commitActiveDropZone(next: string | null) {
+  if (Object.is(activeDropZoneSnapshot, next)) return;
+  activeDropZoneSnapshot = next;
+  if (isDndDebugEnabled()) {
+    dndLog("activeDropZone.commit", { next });
+  }
+  emitActiveDropZoneChange();
+}
+
 function resolveImageUrl(imageUrl: string | undefined, imageBaseUrl: string | undefined): string | undefined {
   if (!imageUrl) return undefined;
   if (imageUrl.startsWith("http://") || imageUrl.startsWith("https://")) return imageUrl;
@@ -81,6 +105,8 @@ function resolveImageUrl(imageUrl: string | undefined, imageBaseUrl: string | un
 
 const DRAG_OVERLAY_WIDTH = 144;
 const DRAG_OVERLAY_HEIGHT = 201;
+
+const ACTIVE_DROP_ZONE_STABLE_FRAMES = 2;
 
 function getPointerFromMoveEvent(evt: Event): { x: number; y: number } | null {
   if (typeof TouchEvent !== "undefined" && evt instanceof TouchEvent) {
@@ -119,7 +145,7 @@ function resolveRegisteredDropZoneIdAtClientPoint(
   return id;
 }
 
-function useTcgDndDragState(): TcgDndDragStateContextValue {
+export function useTcgDndDragState(): TcgDndDragStateContextValue {
   const ctx = React.useContext(TcgDndDragStateContext);
   if (!ctx) {
     throw new Error("useTcgDndDragState must be used within a TcgDndProvider");
@@ -267,34 +293,41 @@ function DragOverlayImage({
 
 export function TcgDndProvider({ children }: { children: React.ReactNode }) {
   const [dragItem, setDragItem] = React.useState<DragItem | null>(null);
-  const [activeDropZone, setActiveDropZone] = React.useState<string | null>(null);
   const dropZonesRef = React.useRef<Map<string, DropZoneConfig>>(new Map());
   const dragItemRef = React.useRef<DragItem | null>(null);
-  const activeDropZoneRef = React.useRef<string | null>(null);
+  const resolvedDropTargetRef = React.useRef<string | null>(null);
+  const activeDropZoneCommittedRef = React.useRef<string | null>(null);
+  const steadyDropZoneCandidateRef = React.useRef<string | null>(null);
+  const steadyDropZoneFrameCountRef = React.useRef(0);
 
   React.useEffect(() => {
     dragItemRef.current = dragItem;
   }, [dragItem]);
 
-  React.useEffect(() => {
-    activeDropZoneRef.current = activeDropZone;
-  }, [activeDropZone]);
-
-  const startDrag = React.useCallback((item: DragItem) => {
-    if (!UNIVERSUS_CARD_DND_ENABLED) return;
-    dndLog("startDrag", {
-      type: item.type,
-      cardId: item.card?._id,
-      sourceId: item.sourceId,
-      activeDropZone: activeDropZoneRef.current,
-    });
-    dragItemRef.current = item;
-    setDragItem(item);
+  const resetDropZoneStabilizer = React.useCallback(() => {
+    steadyDropZoneCandidateRef.current = null;
+    steadyDropZoneFrameCountRef.current = 0;
   }, []);
+
+  const startDrag = React.useCallback(
+    (item: DragItem) => {
+      if (!UNIVERSUS_CARD_DND_ENABLED) return;
+      resetDropZoneStabilizer();
+      dndLog("startDrag", {
+        type: item.type,
+        cardId: item.card?._id,
+        sourceId: item.sourceId,
+        resolvedDropTarget: resolvedDropTargetRef.current,
+      });
+      dragItemRef.current = item;
+      setDragItem(item);
+    },
+    [resetDropZoneStabilizer]
+  );
 
   const endDrag = React.useCallback((dropZoneId?: string | null) => {
     const currentDragItem = dragItemRef.current;
-    const currentActiveDropZone = activeDropZoneRef.current;
+    const currentActiveDropZone = resolvedDropTargetRef.current;
     const resolvedDropZoneId = dropZoneId === undefined ? currentActiveDropZone : dropZoneId;
 
     dndLog("endDrag", {
@@ -325,11 +358,13 @@ export function TcgDndProvider({ children }: { children: React.ReactNode }) {
       }
     }
 
+    resetDropZoneStabilizer();
     dragItemRef.current = null;
-    activeDropZoneRef.current = null;
+    resolvedDropTargetRef.current = null;
+    activeDropZoneCommittedRef.current = null;
+    commitActiveDropZone(null);
     setDragItem(null);
-    setActiveDropZone(null);
-  }, []);
+  }, [resetDropZoneStabilizer]);
 
   const registerDropZone = React.useCallback((config: DropZoneConfig) => {
     dndLog("registerDropZone", {
@@ -345,10 +380,15 @@ export function TcgDndProvider({ children }: { children: React.ReactNode }) {
     dropZonesRef.current.delete(id);
   }, []);
 
-  const setActiveDropZoneSafe = React.useCallback((id: string | null) => {
-    activeDropZoneRef.current = id;
-    setActiveDropZone(id);
-  }, []);
+  const setActiveDropZoneSafe = React.useCallback(
+    (id: string | null) => {
+      resetDropZoneStabilizer();
+      resolvedDropTargetRef.current = id;
+      activeDropZoneCommittedRef.current = id;
+      commitActiveDropZone(id);
+    },
+    [resetDropZoneStabilizer]
+  );
 
   React.useEffect(() => {
     if (!dragItem) return;
@@ -362,9 +402,28 @@ export function TcgDndProvider({ children }: { children: React.ReactNode }) {
       const p = lastPointerRef.current;
       if (!item || !p) return;
       const next = resolveRegisteredDropZoneIdAtClientPoint(p.x, p.y, item, dropZonesRef.current);
-      if (next !== activeDropZoneRef.current) {
-        setActiveDropZoneSafe(next);
+      resolvedDropTargetRef.current = next;
+
+      const committed = activeDropZoneCommittedRef.current;
+      if (next === committed) {
+        resetDropZoneStabilizer();
+        return;
       }
+
+      if (next !== steadyDropZoneCandidateRef.current) {
+        steadyDropZoneCandidateRef.current = next;
+        steadyDropZoneFrameCountRef.current = 1;
+        return;
+      }
+
+      steadyDropZoneFrameCountRef.current += 1;
+      if (steadyDropZoneFrameCountRef.current < ACTIVE_DROP_ZONE_STABLE_FRAMES) {
+        return;
+      }
+
+      resetDropZoneStabilizer();
+      activeDropZoneCommittedRef.current = next;
+      commitActiveDropZone(next);
     };
 
     const scheduleHitTest = () => {
@@ -387,23 +446,13 @@ export function TcgDndProvider({ children }: { children: React.ReactNode }) {
       window.removeEventListener("pointermove", handleMove);
       window.removeEventListener("mousemove", handleMove);
       window.removeEventListener("touchmove", handleMove);
+      resetDropZoneStabilizer();
       if (hitTestRafId !== null) {
         window.cancelAnimationFrame(hitTestRafId);
         hitTestRafId = null;
       }
     };
-  }, [dragItem, setActiveDropZoneSafe]);
-
-  React.useEffect(() => {
-    if (!isDndDebugEnabled()) return;
-    dndLog("state", {
-      isDragging: dragItem !== null,
-      activeDropZone,
-      dragItemType: dragItem?.type,
-      dragCardId: dragItem?.card?._id,
-      dragSourceId: dragItem?.sourceId,
-    });
-  }, [dragItem, activeDropZone]);
+  }, [dragItem, resetDropZoneStabilizer]);
 
   const actionsValue = React.useMemo(
     () => ({
@@ -424,18 +473,11 @@ export function TcgDndProvider({ children }: { children: React.ReactNode }) {
     [dragItem]
   );
 
-  const activeDropZoneValue = React.useMemo(
-    () => ({ activeDropZone }),
-    [activeDropZone]
-  );
-
   return (
     <TcgDndActionsContext.Provider value={actionsValue}>
       <TcgDndDragStateContext.Provider value={dragStateValue}>
-        <TcgDndActiveDropZoneContext.Provider value={activeDropZoneValue}>
-          {children}
-          <DragOverlay />
-        </TcgDndActiveDropZoneContext.Provider>
+        {children}
+        <DragOverlay />
       </TcgDndDragStateContext.Provider>
     </TcgDndActionsContext.Provider>
   );
@@ -449,19 +491,31 @@ export function useTcgDndActions(): TcgDndActionsContextValue {
   return ctx;
 }
 
+export function useTcgActiveDropZoneIsOver(zoneId: string): boolean {
+  return React.useSyncExternalStore(
+    subscribeActiveDropZone,
+    () => getActiveDropZoneSnapshot() === zoneId,
+    () => false
+  );
+}
+
 export function useTcgDnd(): TcgDndContextValue {
   const actions = React.useContext(TcgDndActionsContext);
   const dragState = React.useContext(TcgDndDragStateContext);
-  const activeZone = React.useContext(TcgDndActiveDropZoneContext);
-  if (!actions || !dragState || !activeZone) {
+  const activeDropZone = React.useSyncExternalStore(
+    subscribeActiveDropZone,
+    getActiveDropZoneSnapshot,
+    () => null
+  );
+  if (!actions || !dragState) {
     throw new Error("useTcgDnd must be used within a TcgDndProvider");
   }
   return React.useMemo(
     () => ({
       ...actions,
       ...dragState,
-      ...activeZone,
+      activeDropZone,
     }),
-    [actions, dragState, activeZone]
+    [actions, dragState, activeDropZone]
   );
 }

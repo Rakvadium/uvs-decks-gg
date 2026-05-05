@@ -3,6 +3,7 @@
 import { useCallback, useMemo } from "react";
 import { Doc, Id } from "../../../convex/_generated/dataModel";
 import { useActiveDeck } from "@/providers/ActiveDeckProvider";
+import type { DeckVisibility } from "@/lib/deck/visibility";
 import { useSiloedDeckOptional } from "./siloed-deck-context";
 
 type Deck = Doc<"decks">;
@@ -11,7 +12,7 @@ type DeckSection = "main" | "side" | "reference";
 type DeckUpdate = {
   name?: string;
   description?: string;
-  isPublic?: boolean;
+  visibility?: DeckVisibility;
   imageCardId?: Id<"cards"> | null;
   startingCharacterId?: Id<"cards"> | null;
   selectedIdentity?: string | null;
@@ -35,6 +36,8 @@ interface DeckEditorContextValue {
   moveCard: (cardId: Id<"cards">, fromSection: DeckSection, toSection: DeckSection, quantity?: number) => void;
   updateDeck: (updates: DeckUpdate) => void;
   mode: "active" | "siloed";
+  teamEditableWriteConflict: boolean;
+  dismissTeamEditableWriteConflict: () => void;
 }
 
 function repeat(times: number, action: () => void) {
@@ -70,6 +73,8 @@ export function useDeckEditor(): DeckEditorContextValue {
     moveCard: active.moveCard,
     updateDeck: active.updateDeck,
     mode: "active",
+    teamEditableWriteConflict: active.teamEditableWriteConflict,
+    dismissTeamEditableWriteConflict: active.dismissTeamEditableWriteConflict,
   }), [
     active.activeDeck,
     active.activeDeckId,
@@ -87,6 +92,8 @@ export function useDeckEditor(): DeckEditorContextValue {
     active.removeCard,
     active.moveCard,
     active.updateDeck,
+    active.teamEditableWriteConflict,
+    active.dismissTeamEditableWriteConflict,
   ]);
 
   const getSiloedCardCount = useCallback(
@@ -152,6 +159,8 @@ export function useDeckEditor(): DeckEditorContextValue {
     moveCard: moveSiloedCard,
     updateDeck: updateSiloedDeck,
     mode: "siloed",
+    teamEditableWriteConflict: siloed?.teamEditableWriteConflict ?? false,
+    dismissTeamEditableWriteConflict: siloed?.dismissTeamEditableWriteConflict ?? (() => {}),
   }), [
     siloed,
     getSiloedCardCount,

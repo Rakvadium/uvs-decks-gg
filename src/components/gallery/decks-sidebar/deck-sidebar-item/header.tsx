@@ -1,13 +1,32 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Globe, Hexagon, Lock } from "lucide-react";
+import { Globe, Hexagon, Link2, Lock, Trophy, UserPlus, Users } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useIsMobile } from "@/hooks/useIsMobile";
+import { deckVisibilityLabel, normalizeDeckVisibility } from "@/lib/deck/visibility";
+import { useProfanityDisplayText } from "@/lib/moderation/use-profanity-display-text";
 import { useDeckSidebarItemContext } from "./context";
 
 export function DeckSidebarItemHeader() {
   const isMobile = useIsMobile();
-  const { deck, deckImageName, deckImageUrl, isActive } = useDeckSidebarItemContext();
+  const { deck, coverCardName, deckImageUrl, isActive } = useDeckSidebarItemContext();
+  const { display, viewerUserId } = useProfanityDisplayText();
+  const isOwnDeck = viewerUserId != null && deck.userId === viewerUserId;
+  const showName = display(deck.name, isOwnDeck);
+  const imageAlt = coverCardName ?? showName;
+  const visibility = normalizeDeckVisibility(deck);
+  const VisIcon =
+    visibility === "private"
+      ? Lock
+      : visibility === "share"
+        ? UserPlus
+        : visibility === "unlisted"
+          ? Link2
+          : visibility === "team"
+            ? Users
+            : visibility === "tournament"
+              ? Trophy
+              : Globe;
 
   return (
     <div className="flex items-start gap-3">
@@ -16,7 +35,7 @@ export function DeckSidebarItemHeader() {
           {deckImageUrl ? (
             <Image
               src={deckImageUrl}
-              alt={deckImageName}
+              alt={imageAlt}
               fill
               sizes="40px"
               className="object-cover object-top"
@@ -34,9 +53,9 @@ export function DeckSidebarItemHeader() {
           <Link
             href={`/decks/${deck._id}`}
             className="truncate font-display text-sm font-bold uppercase tracking-wide transition-colors hover:text-primary"
-            title={deck.name}
+            title={showName}
           >
-            {deck.name}
+            {showName}
           </Link>
           {isActive ? (
             <Badge
@@ -50,8 +69,8 @@ export function DeckSidebarItemHeader() {
 
         <div className="flex flex-wrap items-center gap-2 text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
           <span className="inline-flex items-center gap-1">
-            {deck.isPublic ? <Globe className="h-3 w-3 text-primary" /> : <Lock className="h-3 w-3" />}
-            {deck.isPublic ? "Public" : "Private"}
+            <VisIcon className={visibility === "public" || visibility === "tournament" ? "h-3 w-3 text-primary" : "h-3 w-3"} />
+            {deckVisibilityLabel(visibility)}
           </span>
           {deck.format ? <span className="text-primary/80">{deck.format}</span> : null}
         </div>

@@ -24,9 +24,11 @@ import { Input } from "@/components/ui/input";
 import { PageHeading } from "@/components/ui/typography-headings";
 import { COMMUNITY_TIER_RANKING, getRankingScopeLabel } from "../../../../../shared/app-config";
 import { ArrowLeft, ChevronDown, Edit3, Globe, Loader2, Lock, Save, Trash2, X } from "lucide-react";
+import { useProfanityDisplayText } from "@/lib/moderation/use-profanity-display-text";
 import { useOptionalCommunityTierListDetailContext } from "./context";
 
 export function CommunityTierListDetailTopBar() {
+  const { display } = useProfanityDisplayText();
   const context = useOptionalCommunityTierListDetailContext();
 
   if (!context) {
@@ -191,6 +193,8 @@ export function CommunityTierListDetailTopBar() {
     </AlertDialog>
   ) : null;
 
+  const viewTitle = canEdit ? title : display(title, false);
+
   const cancelButton = isEditingMeta ? (
     <Button
       variant="ghost"
@@ -221,8 +225,11 @@ export function CommunityTierListDetailTopBar() {
               placeholder="Tier list name..."
             />
           ) : (
-            <PageHeading className="truncate font-display text-sm font-bold uppercase tracking-[0.2em]" title={title}>
-              {title}
+            <PageHeading
+              className="truncate font-display text-sm font-bold uppercase tracking-[0.2em]"
+              title={viewTitle}
+            >
+              {viewTitle}
             </PageHeading>
           )}
         </div>

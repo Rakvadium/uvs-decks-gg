@@ -113,9 +113,11 @@ function CompactStatsBand({ columns }: { columns: StatColumn[] }) {
 export function CardDetailsReadoutSurface({
   children,
   className,
+  scrollableClassName,
 }: {
   children: React.ReactNode;
   className?: string;
+  scrollableClassName?: string;
 }) {
   return (
     <div
@@ -135,7 +137,12 @@ export function CardDetailsReadoutSurface({
           backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
         }}
       />
-      <div className="relative z-10 min-h-0 flex-1 overflow-y-auto overscroll-contain">
+      <div
+        className={cn(
+          "relative z-10 min-h-0 flex-1 overflow-y-auto overscroll-contain",
+          scrollableClassName
+        )}
+      >
         {children}
       </div>
     </div>
@@ -218,9 +225,9 @@ export function CardDetailsReadoutPanel() {
   }
 
   return (
-    <div className="relative z-[1] px-5 py-5 max-md:pr-12 md:px-8 md:py-6 md:pr-8 lg:px-9 lg:py-7">
+    <div className="relative z-[1] px-5 py-5 pr-12 md:px-8 md:py-6 md:pr-12 lg:px-9 lg:pr-12 lg:py-7">
       <header className="mb-6 md:mb-7">
-        <h1 className="max-w-[22ch] text-[clamp(1.35rem,3.35vw,2.2rem)] font-extrabold leading-[1.05] tracking-[-0.04em] text-foreground">
+        <h1 className="min-w-0 text-[clamp(1.35rem,3.35vw,2.2rem)] font-extrabold leading-[1.05] tracking-[-0.04em] text-foreground">
           {card.name}
         </h1>
         <div className="mt-3 flex flex-wrap items-center gap-2.5">

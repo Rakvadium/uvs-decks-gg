@@ -1,14 +1,10 @@
-import { ChevronDown, Edit3, Globe, Loader2, Lock, Save, X } from "lucide-react";
+import { Edit3, Loader2, Save, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import { DeckVisibilityBadgeMenu } from "@/components/deck-details/deck-visibility-badge-menu";
 import { cn } from "@/lib/utils";
+import type { DeckVisibility } from "@/lib/deck/visibility";
 import { useDeckDetailsTopBarContext } from "./context";
 
 interface DeckDetailsTopBarTitleSectionProps {
@@ -21,37 +17,22 @@ export function DeckDetailsTopBarTitleSection({ compact = false }: DeckDetailsTo
     isEditing,
     editName,
     setEditName,
-    editIsPublic,
-    setEditIsPublic,
+    editVisibility,
+    setEditVisibility,
     cancelEditing,
     isSaving,
     saveEdits,
     startEditing,
     isOwner,
+    isAdmin,
   } = useDeckDetailsTopBarContext();
 
   if (!deck) return null;
 
-  const displayIsPublic = isEditing ? editIsPublic : deck.isPublic;
-
-  const handlePublicitySelect = (value: boolean) => {
+  const handleVisibilitySelect = (value: DeckVisibility) => {
     if (!isEditing) startEditing();
-    setEditIsPublic(value);
+    setEditVisibility(value);
   };
-
-  const publicityBadge = (
-    <Badge
-      variant={displayIsPublic ? "default" : "outline"}
-      className={cn(
-        "hidden h-8 shrink-0 items-center gap-1.5 px-2.5 text-[9px] sm:inline-flex",
-        isOwner && "cursor-pointer"
-      )}
-    >
-      {displayIsPublic ? <Globe className="h-3 w-3" /> : <Lock className="h-3 w-3" />}
-      {displayIsPublic ? "Public" : "Private"}
-      {isOwner ? <ChevronDown className="h-3 w-3 opacity-70" /> : null}
-    </Badge>
-  );
 
   return (
     <div className="flex min-w-0 flex-1 items-center gap-2">
@@ -97,30 +78,17 @@ export function DeckDetailsTopBarTitleSection({ compact = false }: DeckDetailsTo
         )
       ) : null}
 
-      {isOwner ? (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button
-              type="button"
-              className="inline-flex shrink-0 appearance-none border-0 bg-transparent p-0 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
-            >
-              {publicityBadge}
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start">
-            <DropdownMenuItem onClick={() => handlePublicitySelect(false)}>
-              <Lock className="h-4 w-4" />
-              Private
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => handlePublicitySelect(true)}>
-              <Globe className="h-4 w-4" />
-              Public
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      ) : (
-        publicityBadge
-      )}
+      <span className="hidden sm:contents">
+        <DeckVisibilityBadgeMenu
+          deck={deck}
+          isOwner={isOwner}
+          isEditing={isEditing}
+          editVisibility={editVisibility}
+          onSelect={handleVisibilitySelect}
+          compact
+          canSetTournamentVisibility={isAdmin}
+        />
+      </span>
 
       {isOwner && isEditing ? (
         <Button

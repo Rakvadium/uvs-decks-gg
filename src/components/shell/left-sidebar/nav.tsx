@@ -9,6 +9,21 @@ import { useLeftSidebarContext } from "./context";
 export function LeftSidebarNav() {
   const { collapsed, isOnAdminPage, navItems, pathname, prefersReducedMotion } = useLeftSidebarContext();
 
+  const adminBackLink = (
+    <Link
+      href="/"
+      className={cn(
+        "rounded-md py-2 text-xs font-mono uppercase tracking-wider text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground",
+        collapsed ? "flex justify-center px-2" : "px-3"
+      )}
+    >
+      <span className={cn("inline-flex items-center gap-2", collapsed && "justify-center")}>
+        <Home className="h-3.5 w-3.5 shrink-0" />
+        {!collapsed ? "Back to App" : null}
+      </span>
+    </Link>
+  );
+
   return (
     <nav className="flex flex-1 flex-col gap-1 p-2">
       {!isOnAdminPage
@@ -79,12 +94,16 @@ export function LeftSidebarNav() {
       <div className="flex-1" />
 
       {isOnAdminPage ? (
-        <Link href="/" className={cn("rounded-md px-3 py-2 text-xs font-mono uppercase tracking-wider text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground", collapsed && "text-center") }>
-          <span className="inline-flex items-center gap-2">
-            <Home className="h-3.5 w-3.5" />
-            {!collapsed ? "Back to App" : "Home"}
-          </span>
-        </Link>
+        collapsed ? (
+          <Tooltip>
+            <TooltipTrigger asChild>{adminBackLink}</TooltipTrigger>
+            <TooltipContent side="right" className="font-mono text-xs uppercase tracking-wider">
+              Back to App
+            </TooltipContent>
+          </Tooltip>
+        ) : (
+          adminBackLink
+        )
       ) : null}
     </nav>
   );

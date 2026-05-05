@@ -169,16 +169,23 @@ export const validateDeck = query({
       legalityMap.set(entry.cardId.toString(), entry);
     }
 
+    const now = Date.now();
     for (const cardIdStr of Object.keys(combinedCounts)) {
       const legality = legalityMap.get(cardIdStr);
-      if (legality?.status === "banned") {
+      if (
+        legality?.status === "banned" &&
+        (legality.effectiveDate === undefined || legality.effectiveDate <= now)
+      ) {
         const card = cardMap.get(cardIdStr);
         errors.push({
           code: "BANNED_CARD",
           message: `${card?.name ?? "Unknown card"} is banned in this format`,
           cardId: card?._id,
         });
-      } else if (legality?.status === "restricted") {
+      } else if (
+        legality?.status === "restricted" &&
+        (legality.effectiveDate === undefined || legality.effectiveDate <= now)
+      ) {
         const card = cardMap.get(cardIdStr);
         const count = combinedCounts[cardIdStr];
         const restrictedLimit = legality.copyLimitOverride ?? 1;
@@ -246,7 +253,7 @@ export const getDeckValidationSummary = query({
     }
 
     let errorCount = 0;
-    let warningCount = 0;
+    const warningCount = 0;
 
     const mainCount = Object.values(deck.mainQuantities).reduce((sum, count) => sum + count, 0);
     if (mainCount < format.minDeckSize) errorCount++;

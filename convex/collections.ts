@@ -1,7 +1,7 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
 import { cardValidator, collectionEntryValidator } from "./validators";
-import { requireAuth } from "./utils/validation";
+import { requireAuth, requireUserCanPostContent } from "./utils/validation";
 
 export const listByUser = query({
   args: {
@@ -90,6 +90,7 @@ export const addToCollection = mutation({
   returns: v.id("collections"),
   handler: async (ctx, args) => {
     const userId = await requireAuth(ctx);
+    await requireUserCanPostContent(ctx, userId);
 
     const card = await ctx.db.get(args.cardId);
     if (!card) throw new Error("Card not found");
@@ -129,6 +130,7 @@ export const updateQuantity = mutation({
   returns: v.null(),
   handler: async (ctx, args) => {
     const userId = await requireAuth(ctx);
+    await requireUserCanPostContent(ctx, userId);
 
     const entry = await ctx.db.get(args.collectionId);
     if (!entry) throw new Error("Collection entry not found");
@@ -150,6 +152,7 @@ export const removeFromCollection = mutation({
   returns: v.null(),
   handler: async (ctx, args) => {
     const userId = await requireAuth(ctx);
+    await requireUserCanPostContent(ctx, userId);
 
     const entry = await ctx.db.get(args.collectionId);
     if (!entry) throw new Error("Collection entry not found");

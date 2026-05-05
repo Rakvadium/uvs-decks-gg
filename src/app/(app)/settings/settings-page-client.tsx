@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useOptimistic, useTransition, useCallback } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import { useRouter } from "next/navigation";
@@ -10,6 +10,7 @@ import { usePrefersReducedMotion } from "@/lib/reduced-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Card,
@@ -38,6 +39,7 @@ import {
   Shield,
   Calendar,
   Sparkles,
+  Filter,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -63,6 +65,37 @@ export default function SettingsPageClient() {
   const router = useRouter();
   const user = useQuery(api.user.currentUser);
   const updateProfile = useMutation(api.user.updateProfile);
+  const setProfanityFilterEnabled = useMutation(api.user.setProfanityFilterEnabled);
+  const [, startProfanityFilterTransition] = useTransition();
+  const [profanityFilterOptimistic, setProfanityFilterOptimistic] = useOptimistic(
+    user?.profanityFilterEnabled ?? true,
+    (_state, next: boolean) => next,
+  );
+  const onProfanityFilterChange = useCallback(
+    (next: boolean) => {
+      if (!user) return;
+      const before = user.profanityFilterEnabled;
+      startProfanityFilterTransition(() => {
+        setProfanityFilterOptimistic(next);
+      });
+      void (async () => {
+        try {
+          await setProfanityFilterEnabled({ enabled: next });
+          toast.success(
+            next
+              ? "You’ll see filtered text in community content where supported"
+              : "You’ll see unfiltered text where the app supports it",
+          );
+        } catch {
+          startProfanityFilterTransition(() => {
+            setProfanityFilterOptimistic(before);
+          });
+          toast.error("Couldn’t update language filter");
+        }
+      })();
+    },
+    [user, setProfanityFilterEnabled, setProfanityFilterOptimistic, startProfanityFilterTransition],
+  );
   const { isDark, toggleTheme } = useTheme();
   const { colorScheme, setColorScheme, chromePreference, setChromePreference } = useColorScheme();
 
@@ -264,6 +297,43 @@ export default function SettingsPageClient() {
                     )}
                     Save Changes
                   </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </m.div>
+
+          <m.div
+            initial={prefersReducedMotion ? false : { opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: prefersReducedMotion ? 0 : 0.15, duration: prefersReducedMotion ? 0 : 0.3 }}
+          >
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Filter className="h-5 w-5 text-primary" />
+                  Community content
+                </CardTitle>
+                <CardDescription>
+                  How text from others is shown in feeds, lists, and social surfaces
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-start justify-between gap-4">
+                  <div className="space-y-1 min-w-0">
+                    <Label htmlFor="profanity-filter" className="text-base">
+                      Filter strong language in community content
+                    </Label>
+                    <p className="text-sm text-muted-foreground">
+                      Affects <span className="font-medium text-foreground">display</span> on your device: you see masked or softened wording where the app supports it.{" "}
+                      <span className="font-medium text-foreground">Publishing</span> public or team-visible text is handled separately and may add server checks later.
+                    </p>
+                  </div>
+                  <Switch
+                    id="profanity-filter"
+                    className="shrink-0 mt-0.5"
+                    checked={profanityFilterOptimistic}
+                    onCheckedChange={onProfanityFilterChange}
+                  />
                 </div>
               </CardContent>
             </Card>

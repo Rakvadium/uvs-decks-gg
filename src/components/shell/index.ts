@@ -6,6 +6,10 @@ export { SidebarFooter } from "./sidebar-footer";
 export {
   ShellSlotProvider,
   useShellSlot,
+  useShellSlotActions,
+  useShellSlotActiveSidebarActionId,
+  useShellSlotSidebarWidth,
+  useShellSlotSlots,
   useRegisterSlot,
   SlotRenderer,
 } from "./shell-slot-provider";

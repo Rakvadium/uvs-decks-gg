@@ -34,6 +34,7 @@ export function useDeckSidebarItemModel(deck: DeckData) {
     referenceCount,
     deckImageUrl,
     deckImageName,
+    coverCardName: imageCard?.name ?? null,
     handleSetActive,
   };
 }

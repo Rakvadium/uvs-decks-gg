@@ -1,6 +1,13 @@
 import { defineSchema, defineTable } from "convex/server";
 import { authTables } from "@convex-dev/auth/server";
 import { v } from "convex/values";
+import {
+  deckBuilderUiStateV1Validator,
+  deckTeamCollaborationValidator,
+  deckVisibilityValidator,
+  teamMemberStatusValidator,
+  teamRoleValidator,
+} from "./validators";
 
 export default defineSchema({
   ...authTables,
@@ -11,6 +18,14 @@ export default defineSchema({
     cardCount: v.number(),
   }),
 
+  cardFacetSnapshot: defineTable({
+    key: v.literal("default"),
+    rarities: v.array(v.string()),
+    types: v.array(v.string()),
+    setCodes: v.array(v.string()),
+    updatedAt: v.number(),
+  }).index("by_key", ["key"]),
+
   users: defineTable({
     username: v.optional(v.string()),
     email: v.optional(v.string()),
@@ -18,9 +33,32 @@ export default defineSchema({
     image: v.optional(v.string()),
     isAnonymous: v.optional(v.boolean()),
     role: v.optional(v.string()),
+    profanityFilterEnabled: v.optional(v.boolean()),
+    accountStatus: v.optional(
+      v.union(
+        v.literal("active"),
+        v.literal("suspended"),
+        v.literal("banned"),
+        v.literal("write_restricted")
+      )
+    ),
+    statusReason: v.optional(v.string()),
+    statusSetAt: v.optional(v.number()),
+    statusSetBy: v.optional(v.id("users")),
+    statusExpiresAt: v.optional(v.number()),
+    userFacingMessage: v.optional(v.string()),
+    adminSearchText: v.optional(v.string()),
+    hasVerifiedEmail: v.optional(v.boolean()),
   })
     .index("by_email", ["email"])
-    .index("by_username", ["username"]),
+    .index("by_username", ["username"])
+    .index("by_accountStatus", ["accountStatus"])
+    .index("by_role", ["role"])
+    .index("by_hasVerifiedEmail", ["hasVerifiedEmail"])
+    .searchIndex("search_admin_users", {
+      searchField: "adminSearchText",
+      filterFields: ["accountStatus", "role", "isAnonymous", "hasVerifiedEmail"],
+    }),
 
   sets: defineTable({
     code: v.string(),
@@ -33,6 +71,8 @@ export default defineSchema({
     isRotating: v.optional(v.boolean()),
     isFuture: v.optional(v.boolean()),
     spotlightIP: v.optional(v.string()),
+    updatedAt: v.optional(v.number()),
+    updatedBy: v.optional(v.id("users")),
   })
     .index("by_code", ["code"])
     .index("by_setNumber", ["setNumber"])
@@ -68,6 +108,7 @@ export default defineSchema({
     searchText: v.optional(v.string()),
     searchAll: v.optional(v.string()),
     copyLimit: v.optional(v.number()),
+    contentRevisionAt: v.optional(v.number()),
     setCode: v.optional(v.string()),
     setName: v.optional(v.string()),
     setNumber: v.optional(v.number()),
@@ -109,6 +150,9 @@ export default defineSchema({
     userId: v.id("users"),
     name: v.string(),
     description: v.optional(v.string()),
+    visibility: v.optional(deckVisibilityValidator),
+    teamId: v.optional(v.id("teams")),
+    teamCollaboration: v.optional(deckTeamCollaborationValidator),
     isPublic: v.boolean(),
     format: v.optional(v.string()),
     subFormat: v.optional(v.string()),
@@ -130,9 +174,144 @@ export default defineSchema({
       })),
       unassignedCardIds: v.array(v.string()),
     }))),
+    revision: v.optional(v.number()),
   })
     .index("by_user", ["userId"])
-    .index("by_isPublic", ["isPublic"]),
+    .index("by_isPublic", ["isPublic"])
+    .index("by_visibility", ["visibility"])
+    .index("by_teamId", ["teamId"])
+    .index("by_format", ["format"]),
+
+  deckShares: defineTable({
+    deckId: v.id("decks"),
+    userId: v.id("users"),
+    status: v.union(v.literal("pending"), v.literal("accepted")),
+    invitedBy: v.id("users"),
+    createdAt: v.number(),
+  })
+    .index("by_deck", ["deckId"])
+    .index("by_deck_and_user", ["deckId", "userId"])
+    .index("by_user_and_status", ["userId", "status"]),
+
+  mediaAssets: defineTable({
+    kind: v.union(v.literal("team_logo"), v.literal("profile_avatar")),
+    teamId: v.optional(v.id("teams")),
+    userId: v.optional(v.id("users")),
+    storageId: v.id("_storage"),
+    uploadedByUserId: v.id("users"),
+    status: v.union(
+      v.literal("pending"),
+      v.literal("approved"),
+      v.literal("rejected"),
+      v.literal("needs_review"),
+    ),
+    moderationProvider: v.optional(v.string()),
+    moderationResult: v.optional(v.any()),
+    createdAt: v.number(),
+    resolvedAt: v.optional(v.number()),
+    reviewedAt: v.optional(v.number()),
+    reviewerUserId: v.optional(v.id("users")),
+  })
+    .index("by_status", ["status"])
+    .index("by_teamId", ["teamId"])
+    .index("by_teamId_and_kind", ["teamId", "kind"])
+    .index("by_kind_and_status", ["kind", "status"]),
+
+  teams: defineTable({
+    name: v.string(),
+    slug: v.optional(v.string()),
+    captainUserId: v.id("users"),
+    description: v.optional(v.string()),
+    imageStorageId: v.optional(v.id("_storage")),
+    logoAssetId: v.optional(v.id("mediaAssets")),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_slug", ["slug"])
+    .index("by_captainUserId", ["captainUserId"]),
+
+  teamMembers: defineTable({
+    teamId: v.id("teams"),
+    userId: v.id("users"),
+    role: teamRoleValidator,
+    joinedAt: v.number(),
+    status: teamMemberStatusValidator,
+  })
+    .index("by_teamId_and_userId", ["teamId", "userId"])
+    .index("by_userId", ["userId"])
+    .index("by_teamId", ["teamId"]),
+
+  teamInvites: defineTable({
+    teamId: v.id("teams"),
+    email: v.optional(v.string()),
+    invitedUserId: v.optional(v.id("users")),
+    tokenHash: v.string(),
+    role: teamRoleValidator,
+    invitedByUserId: v.id("users"),
+    createdAt: v.number(),
+    expiresAt: v.number(),
+    acceptedAt: v.optional(v.number()),
+  })
+    .index("by_teamId", ["teamId"])
+    .index("by_tokenHash", ["tokenHash"])
+    .index("by_email_and_teamId", ["email", "teamId"]),
+
+  teamAnnouncements: defineTable({
+    teamId: v.id("teams"),
+    authorUserId: v.id("users"),
+    title: v.string(),
+    body: v.string(),
+    pinned: v.boolean(),
+    createdAt: v.number(),
+  }).index("by_teamId_and_createdAt", ["teamId", "createdAt"]),
+
+  teamChatMessages: defineTable({
+    teamId: v.id("teams"),
+    authorUserId: v.id("users"),
+    body: v.string(),
+    createdAt: v.number(),
+    textModerationProvider: v.optional(v.string()),
+    textModerationResult: v.optional(v.any()),
+  })
+    .index("by_teamId_and_createdAt", ["teamId", "createdAt"])
+    .index("by_authorUserId", ["authorUserId"]),
+
+  teamEvents: defineTable({
+    teamId: v.id("teams"),
+    title: v.string(),
+    description: v.optional(v.string()),
+    startsAt: v.number(),
+    endsAt: v.optional(v.number()),
+    createdByUserId: v.id("users"),
+    createdAt: v.number(),
+  }).index("by_teamId_and_startsAt", ["teamId", "startsAt"]),
+
+  deckBuilderSessions: defineTable({
+    deckId: v.id("decks"),
+    teamId: v.id("teams"),
+    updatedAt: v.number(),
+    uiState: deckBuilderUiStateV1Validator,
+    deckRevision: v.optional(v.number()),
+  }).index("by_deckId", ["deckId"]),
+
+  deckPresence: defineTable({
+    deckId: v.id("decks"),
+    userId: v.id("users"),
+    sessionId: v.string(),
+    color: v.string(),
+    label: v.string(),
+    cursor: v.object({
+      x: v.number(),
+      y: v.number(),
+      viewportW: v.number(),
+      viewportH: v.number(),
+      normX: v.number(),
+      normY: v.number(),
+    }),
+    lastSeenAt: v.number(),
+  })
+    .index("by_deckId", ["deckId"])
+    .index("by_deckId_and_userId_and_sessionId", ["deckId", "userId", "sessionId"]),
 
   tierLists: defineTable({
     userId: v.id("users"),
@@ -167,11 +346,19 @@ export default defineSchema({
     commentCount: v.number(),
     featuredCardId: v.optional(v.id("cards")),
     updatedAt: v.number(),
+    listModerationStatus: v.optional(
+      v.union(
+        v.literal("pending"),
+        v.literal("approved"),
+        v.literal("rejected")
+      )
+    ),
   })
     .index("by_user_and_updatedAt", ["userId", "updatedAt"])
     .index("by_isPublic_and_updatedAt", ["isPublic", "updatedAt"])
     .index("by_isPublic_and_rankingScope_and_updatedAt", ["isPublic", "rankingScope", "updatedAt"])
-    .index("by_isPublic_and_rankingScope_and_scopeKey_and_updatedAt", ["isPublic", "rankingScope", "rankingScopeKey", "updatedAt"]),
+    .index("by_isPublic_and_rankingScope_and_scopeKey_and_updatedAt", ["isPublic", "rankingScope", "rankingScopeKey", "updatedAt"])
+    .index("by_userId_and_listModerationStatus", ["userId", "listModerationStatus"]),
 
   tierListItems: defineTable({
     tierListId: v.id("tierLists"),
@@ -289,6 +476,8 @@ export default defineSchema({
       v.literal("rejected")
     ),
     moderationReason: v.optional(v.string()),
+    textModerationProvider: v.optional(v.string()),
+    textModerationResult: v.optional(v.any()),
     createdAt: v.number(),
     updatedAt: v.number(),
   })
@@ -331,6 +520,22 @@ export default defineSchema({
     .index("by_user", ["userId"])
     .index("by_status", ["status"]),
 
+  adminAuditLog: defineTable({
+    userId: v.id("users"),
+    action: v.string(),
+    at: v.number(),
+    detail: v.optional(v.string()),
+  }).index("by_user", ["userId"]),
+
+  moderationAuditLog: defineTable({
+    actorId: v.id("users"),
+    targetUserId: v.optional(v.id("users")),
+    action: v.string(),
+    payload: v.optional(v.string()),
+  })
+    .index("by_targetUser", ["targetUserId"])
+    .index("by_actor", ["actorId"]),
+
   formats: defineTable({
     key: v.string(),
     name: v.string(),
@@ -361,14 +566,17 @@ export default defineSchema({
     effectiveDate: v.optional(v.number()),
   })
     .index("by_format", ["formatKey"])
-    .index("by_card", ["cardId"]),
+    .index("by_card", ["cardId"])
+    .index("by_format_card", ["formatKey", "cardId"]),
 
   setLegality: defineTable({
     formatKey: v.string(),
     setCode: v.string(),
     isLegal: v.boolean(),
     rotatesOutAt: v.optional(v.number()),
-  }).index("by_format", ["formatKey"]),
+  })
+    .index("by_format", ["formatKey"])
+    .index("by_format_set", ["formatKey", "setCode"]),
 
   communityYoutubeCurations: defineTable({
     youtubeVideoId: v.string(),
@@ -393,5 +601,9 @@ export default defineSchema({
   youtubeFeedRefreshSettings: defineTable({
     key: v.string(),
     lastRefreshAttemptAt: v.number(),
+  }).index("by_key", ["key"]),
+
+  communityYoutubeCurationInitState: defineTable({
+    key: v.string(),
   }).index("by_key", ["key"]),
 });

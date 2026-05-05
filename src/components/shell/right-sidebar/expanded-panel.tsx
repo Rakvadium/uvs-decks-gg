@@ -1,12 +1,14 @@
 import * as m from "framer-motion/m";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { usePrefersReducedMotion } from "@/lib/reduced-motion";
 import { cn } from "@/lib/utils";
 import { SectionHeading } from "@/components/ui/typography-headings";
 import { useRightSidebarContext } from "./context";
 
 export function RightSidebarExpandedPanel() {
   const {
+    activeActionId,
     activeSlot,
     ActiveComponent,
     ActiveFooter,
@@ -16,23 +18,32 @@ export function RightSidebarExpandedPanel() {
     panelWidth,
     setActiveSidebarAction,
   } = useRightSidebarContext();
-  const width = isExpanded ? panelWidth : 0;
+  const prefersReducedMotion = usePrefersReducedMotion();
+  const openTransition =
+    prefersReducedMotion || isResizing
+      ? { duration: 0 }
+      : { duration: 0.22, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] };
 
   return (
-    <m.div
-      initial={false}
-      animate={{ width }}
-      transition={isResizing ? { duration: 0 } : { duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+    <div
       className={cn(
         "render-stable relative flex h-full flex-col overflow-hidden bg-background",
-        width > 0 && "border-l border-sidebar-border/50"
+        isExpanded && panelWidth > 0 && "border-l border-sidebar-border/50"
       )}
+      style={{ width: isExpanded ? panelWidth : 0, overflow: "hidden" }}
     >
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-secondary/5" />
       <div className="absolute left-0 right-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
 
       {isExpanded ? (
-        <>
+        <m.div
+          key={activeActionId ?? "panel"}
+          className="flex h-full min-h-0 w-full min-w-0 flex-col"
+          style={{ minWidth: panelWidth }}
+          initial={prefersReducedMotion ? { x: 0 } : { x: "100%" }}
+          animate={{ x: 0 }}
+          transition={openTransition}
+        >
           <div className="relative z-10 flex shrink-0 items-center justify-between border-b border-border/30 px-4 py-3">
             <div className="min-w-0 flex-1">
               {ActiveHeader ? (
@@ -58,8 +69,8 @@ export function RightSidebarExpandedPanel() {
               <ActiveFooter />
             </div>
           ) : null}
-        </>
+        </m.div>
       ) : null}
-    </m.div>
+    </div>
   );
 }

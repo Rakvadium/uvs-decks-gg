@@ -5,6 +5,7 @@ import { useMobileShell } from "./mobile-shell-context"
 import { useConvexAuth, useQuery } from "convex/react"
 import { api } from "../../../convex/_generated/api"
 import { cn } from "@/lib/utils"
+import { ShellTeamNav } from "@/components/shell/shell-team-nav"
 import { LayoutGrid, Layers, Library } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
@@ -66,18 +67,22 @@ export function MobileBottomNav() {
           )
         })}
 
-        <button
-          onClick={() => setProfileSheetOpen(true)}
-          className="relative flex flex-1 flex-col items-center justify-center gap-1.5 py-2 text-muted-foreground hover:text-foreground transition-all duration-200"
-        >
-          <Avatar className="h-6 w-6 border border-primary/30 shadow-[0_0_2px_var(--primary)/60,0_0_6px_var(--primary)/35]">
-            {user?.image && <AvatarImage src={user.image} alt={user.username || "User"} />}
-            <AvatarFallback className="bg-primary/20 text-primary text-xs font-mono font-bold">
-              {user?.username?.charAt(0).toUpperCase() || "?"}
-            </AvatarFallback>
-          </Avatar>
-          <span className="text-[10px] font-mono uppercase tracking-widest">Profile</span>
-        </button>
+        <div className="flex flex-1 flex-col items-center justify-center gap-0.5 py-0.5">
+          <ShellTeamNav variant="mobile-column" />
+          <button
+            type="button"
+            onClick={() => setProfileSheetOpen(true)}
+            className="relative flex flex-col items-center justify-center gap-1.5 py-0.5 text-muted-foreground transition-all duration-200 hover:text-foreground"
+          >
+            <Avatar className="h-6 w-6 border border-primary/30 shadow-[0_0_2px_var(--primary)/60,0_0_6px_var(--primary)/35]">
+              {user?.image && <AvatarImage src={user.image} alt={user.username || "User"} />}
+              <AvatarFallback className="bg-primary/20 text-primary text-xs font-mono font-bold">
+                {user?.username?.charAt(0).toUpperCase() || "?"}
+              </AvatarFallback>
+            </Avatar>
+            <span className="text-[10px] font-mono uppercase tracking-widest">Profile</span>
+          </button>
+        </div>
       </div>
     </nav>
   )

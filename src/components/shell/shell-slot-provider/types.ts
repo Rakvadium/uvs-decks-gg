@@ -44,3 +44,10 @@ export interface ShellSlotContextValue {
   state: ShellSlotState;
   actions: ShellSlotActions;
 }
+
+export interface ShellSlotModel {
+  slots: Map<SlotArea, SlotRegistration[]>;
+  activeSidebarActionId: string | null;
+  sidebarWidth: number;
+  actions: ShellSlotActions;
+}

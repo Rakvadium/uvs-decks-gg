@@ -24,6 +24,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { COMMUNITY_TIER_RANKING, getRankingScopeLabel } from "../../../../../shared/app-config";
 import { ArrowLeft, ChevronDown, Edit3, Globe, Loader2, Lock, Save, Trash2, X } from "lucide-react";
+import { useProfanityDisplayText } from "@/lib/moderation/use-profanity-display-text";
 import { useCommunityTierListDetailContext } from "./context";
 
 export function CommunityTierListDetailDesktopHeader() {
@@ -48,6 +49,7 @@ export function CommunityTierListDetailDesktopHeader() {
     cancelPendingRankingScopeChange,
     confirmPendingRankingScopeChange,
   } = useCommunityTierListDetailContext();
+  const { display } = useProfanityDisplayText();
 
   if (detail === undefined || !detail) {
     return null;
@@ -167,6 +169,8 @@ export function CommunityTierListDetailDesktopHeader() {
     </AlertDialog>
   ) : null;
 
+  const viewTitle = canEdit ? title : display(title, false);
+
   const titleNode = isEditingMeta ? (
     <Input
       value={title}
@@ -175,7 +179,7 @@ export function CommunityTierListDetailDesktopHeader() {
       placeholder="Tier list name"
     />
   ) : (
-    <h1 className="text-xl font-semibold tracking-tight text-foreground md:text-2xl">{title}</h1>
+    <h1 className="text-xl font-semibold tracking-tight text-foreground md:text-2xl">{viewTitle}</h1>
   );
 
   const toolbar = (

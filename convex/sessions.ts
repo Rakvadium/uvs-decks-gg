@@ -1,6 +1,7 @@
 import { query, mutation } from "./_generated/server";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { v } from "convex/values";
+import { canViewDeck } from "./lib/deckAccess";
 import { chromePreferenceValidator, colorSchemeValidator, sessionValidator, themePreferenceValidator } from "./validators";
 
 export const getSession = query({
@@ -50,7 +51,11 @@ export const setActiveDeck = mutation({
 
         if (args.deckId) {
             const deck = await ctx.db.get(args.deckId);
-            if (!deck || deck.userId !== userId) {
+            if (!deck) {
+                return null;
+            }
+            const allowed = await canViewDeck(ctx, deck, args.deckId);
+            if (!allowed) {
                 return null;
             }
         }
