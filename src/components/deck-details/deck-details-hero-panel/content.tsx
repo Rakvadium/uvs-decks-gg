@@ -10,7 +10,7 @@ import { DeckDetailsHeroSymbolSelector } from "./symbol-selector";
 
 function DeckDetailsHeroPanelEmptyState() {
   return (
-    <div className="relative h-48 w-full shrink-0 overflow-hidden rounded-xl border border-border/50 bg-gradient-to-br from-primary/10 via-card to-secondary/10 lg:h-64 lg:w-48" />
+    <div className="relative aspect-[5/7] w-full max-w-[260px] mx-auto shrink-0 overflow-hidden rounded-xl border border-border/50 bg-gradient-to-br from-primary/10 via-card to-secondary/10 lg:aspect-auto lg:h-64 lg:w-48 lg:mx-0" />
   );
 }
 
@@ -30,7 +30,7 @@ function DeckDetailsHeroPanelContent() {
 
   return (
     <>
-      <div className="relative h-48 w-full shrink-0 overflow-hidden rounded-xl border border-primary/20 bg-card shadow-[0_0_0_1px_var(--primary)/15,0_0_8px_var(--primary)/30] lg:h-64 lg:w-48">
+      <div className="relative aspect-[5/7] w-full max-w-[260px] mx-auto shrink-0 overflow-hidden rounded-xl border border-primary/20 bg-card shadow-[0_0_0_1px_var(--primary)/15,0_0_8px_var(--primary)/30] lg:aspect-auto lg:h-64 lg:w-48 lg:mx-0">
         {isOwner ? (
           <>
             <DeckDetailsHeroCharacterImagePicker />

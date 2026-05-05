@@ -33,7 +33,7 @@ export function DeckDetailsHeroCharacterImagePicker() {
             src={displayImage}
             alt={deck.name}
             fill
-            sizes="(max-width: 1023px) 100vw, 192px"
+            sizes="(max-width: 1023px) 260px, 192px"
             className="object-cover object-top"
             priority
           />

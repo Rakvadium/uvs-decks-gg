@@ -40,8 +40,7 @@ export function MobileActionsSheetProvider({ children }: { children: ReactNode }
 
   const closeSheet = useCallback(() => {
     setActionsSheetOpen(false);
-    setActiveSidebarAction(null);
-  }, [setActionsSheetOpen, setActiveSidebarAction]);
+  }, [setActionsSheetOpen]);
 
   const openSheet = useCallback(() => {
     setActionsSheetOpen(true);

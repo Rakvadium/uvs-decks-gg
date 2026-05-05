@@ -27,23 +27,25 @@ export function CommunityTierListDetailView() {
   }
 
   return (
-    <div className="relative space-y-6">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.08),transparent_28%),radial-gradient(circle_at_80%_10%,rgba(20,184,166,0.10),transparent_24%)]" />
-
-      <div className="relative z-10 hidden md:block">
-        <CommunityTierListDetailDesktopHeader />
-      </div>
-
+    <div className="relative">
       <CardNavigationProvider cards={selectedCards} getBackCard={getBackCard}>
         <div className="relative z-10 flex min-h-full flex-col">
-          <div
-            className={cn(
-              "flex-1",
-              canEdit ? (isPresentationMode ? "pb-[10rem] md:pb-[12rem]" : "pb-[27rem] md:pb-[23rem]") : "pb-8"
-            )}
-          >
-            <CommunityTierListDetailBoard />
-            <CommunityTierListDetailCommentsSection />
+          <div className="relative space-y-6 px-3 pt-3 md:px-6 md:pt-6 flex-1 flex flex-col">
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.08),transparent_28%),radial-gradient(circle_at_80%_10%,rgba(20,184,166,0.10),transparent_24%)]" />
+
+            <div className="relative z-10 hidden md:block">
+              <CommunityTierListDetailDesktopHeader />
+            </div>
+
+            <div
+              className={cn(
+                "relative z-10 flex-1",
+                canEdit ? (isPresentationMode ? "pb-[10rem] md:pb-[12rem]" : "pb-[27rem] md:pb-[23rem]") : "pb-8"
+              )}
+            >
+              <CommunityTierListDetailBoard />
+              <CommunityTierListDetailCommentsSection />
+            </div>
           </div>
 
           <CommunityTierListDetailPoolPanel />

@@ -9,7 +9,6 @@ import { useCardData } from "@/lib/universus/card-data-provider";
 import { filterCards } from "@/lib/universus/use-universus-cards";
 import { useCardIdMap } from "@/hooks/useCardIdMap";
 import { useInfiniteSlice } from "@/hooks/useInfiniteSlice";
-import { Button } from "@/components/ui/button";
 import { CardGridItem } from "@/components/universus/card-grid-item";
 import { CardNavigationProvider } from "@/components/universus/card-details/navigation-context";
 import { getSymbolPath } from "@/components/universus/symbol-icon/utils";
@@ -27,8 +26,8 @@ interface DeckCharacterPickerDialogProps {
 
 function CharacterPickerSkeleton() {
   return (
-    <div className="grid grid-cols-4 gap-3 sm:grid-cols-6 lg:grid-cols-8">
-      {Array.from({ length: 24 }).map((_, index) => (
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+      {Array.from({ length: 12 }).map((_, index) => (
         <div key={index} className="space-y-2">
           <Skeleton className="aspect-[2.5/3.5] w-full rounded-lg" />
         </div>
@@ -108,11 +107,13 @@ export function DeckCharacterPickerDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent size="md" className="flex flex-col gap-0 overflow-hidden p-0">
-        <DialogHeader className="sticky top-0 z-50 shrink-0 flex flex-col gap-4 border-b border-border/50 bg-card px-6 py-4">
-          <DialogTitle className="text-xl">Change Starting Character</DialogTitle>
-          <div className="flex min-w-0 items-center justify-between">
-
-            <div className="relative w-[25rem] shrink-0">
+        <DialogHeader className="sticky top-0 z-50 shrink-0 flex flex-col gap-3 border-b border-border/50 bg-card px-4 py-4 sm:gap-4 sm:px-6">
+          <DialogTitle className="text-lg sm:text-xl">Change Starting Character</DialogTitle>
+          <DialogDescription className="sr-only">
+            Search and filter starting characters by name or symbol.
+          </DialogDescription>
+          <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div className="relative w-full shrink-0 sm:w-[25rem]">
               <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 value={search}
@@ -121,7 +122,7 @@ export function DeckCharacterPickerDialog({
                 className="pl-9"
               />
             </div>
-            <div className="flex shrink-0 flex-wrap items-center gap-1 rounded-lg border border-border/50 bg-card/30 p-2 backdrop-blur-sm">
+            <div className="flex shrink-0 flex-wrap items-center justify-start gap-1 rounded-lg border border-border/50 bg-card/30 p-1.5 backdrop-blur-sm sm:justify-center sm:p-2">
               {UNIVERSUS_FILTER_SYMBOLS.map((symbol) => {
                 const isSelected = selectedSymbol === symbol;
                 const path = getSymbolPath(symbol);
@@ -134,7 +135,7 @@ export function DeckCharacterPickerDialog({
                     aria-pressed={isSelected}
                     title={UNIVERSUS_SYMBOL_DISPLAY[symbol]}
                     className={cn(
-                      "relative h-7 w-7 overflow-hidden rounded-full border border-border/60 bg-background p-0 transition-colors hover:bg-muted",
+                      "relative h-8 w-8 overflow-hidden rounded-full border border-border/60 bg-background p-0 transition-colors hover:bg-muted sm:h-7 sm:w-7",
                       "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
                       isSelected && "ring-2 ring-primary ring-offset-1 ring-offset-background"
                     )}
@@ -148,11 +149,10 @@ export function DeckCharacterPickerDialog({
                 );
               })}
             </div>
-        
           </div>
         </DialogHeader>
 
-        <div className="relative z-0 flex-1 overflow-y-auto px-6 py-5">
+        <div className="relative z-0 flex-1 overflow-y-auto px-4 py-4 sm:px-6 sm:py-5">
           {isLoading ? <CharacterPickerSkeleton /> : null}
 
           {!isLoading && visibleCharacters.length === 0 ? (
@@ -162,7 +162,7 @@ export function DeckCharacterPickerDialog({
           ) : null}
 
           {!isLoading && visibleCharacters.length > 0 ? (
-            <div className="grid grid-cols-4 gap-3 sm:grid-cols-6 lg:grid-cols-5">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
               <CardNavigationProvider cards={visibleCharacters} getBackCard={getBackCard}>
                 {visibleCharacters.map((character) => {
                   const isSelected = selectedCharacterId === character._id;

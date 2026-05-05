@@ -209,14 +209,16 @@ export function useDeckCardsSectionModel() {
   }, []);
 
   const onHoverListCard = useCallback((card: CachedCard, rect: DOMRect) => {
+    if (isMobile) return;
     setHoveredCard(card);
     setHoveredRect(rect);
-  }, []);
+  }, [isMobile]);
 
   const onClearListCardHover = useCallback(() => {
+    if (isMobile) return;
     setHoveredCard(null);
     setHoveredRect(null);
-  }, []);
+  }, [isMobile]);
 
   return {
     deck,

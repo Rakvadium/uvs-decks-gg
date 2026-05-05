@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useState, useMemo, useEffect } from "react";
+import { ReactNode, useState, useMemo, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
 import { AuthGuard } from "@/components/auth-guard";
 import {
@@ -35,6 +35,7 @@ import Link from "next/link";
 import { TcgDndProvider } from "@/lib/dnd";
 import { SiloedDeckProvider } from "@/lib/deck";
 import { cn } from "@/lib/utils";
+import { useMobileBottomOverlayClearance } from "@/hooks/useMobileBottomOverlayClearance";
 import { GalleryFiltersProvider } from "@/providers/GalleryFiltersProvider";
 import { DecksProvider } from "@/providers/DecksProvider";
 import { CommunityTierListsPageProvider } from "@/components/community/tier-lists/page-view/context";
@@ -208,6 +209,8 @@ function AdminSidebarSlotRegistration() {
 function ShellLayoutInner({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const params = useParams();
+  const mobileBottomChromeRef = useRef<HTMLDivElement>(null);
+  const mobileBottomClearancePx = useMobileBottomOverlayClearance(mobileBottomChromeRef);
   const [leftSidebarCollapsed, setLeftSidebarCollapsed] = useState(() => {
     if (typeof window === "undefined") return false;
     const stored = window.localStorage.getItem(LEFT_SIDEBAR_KEY);
@@ -287,15 +290,30 @@ function ShellLayoutInner({ children }: { children: ReactNode }) {
       <div className="flex md:hidden h-[100dvh] w-full flex-col bg-background relative">
         <MobileHeader />
         <main
-          className="max-md:scroll-pb-[var(--mobile-bottom-overlay-clearance)] min-h-0 flex flex-1 flex-col overflow-y-auto bg-background"
-          style={{ backgroundImage: "var(--chrome-page-bg)" }}
+          className={cn(
+            "max-md:min-h-0 flex flex-1 flex-col overflow-y-auto bg-background",
+            mobileBottomClearancePx === null && "max-md:scroll-pb-[var(--mobile-bottom-overlay-clearance)]"
+          )}
+          style={{
+            backgroundImage: "var(--chrome-page-bg)",
+            ...(mobileBottomClearancePx !== null ? { scrollPaddingBottom: mobileBottomClearancePx } : {}),
+          }}
         >
           <AccountStatusBanner />
-          <div className="flex min-h-0 w-full flex-1 flex-col pb-[var(--mobile-bottom-overlay-clearance)]">
+          <div
+            className={cn(
+              "flex min-h-0 w-full flex-1 flex-col",
+              mobileBottomClearancePx === null && "pb-[var(--mobile-bottom-overlay-clearance)]"
+            )}
+            style={mobileBottomClearancePx !== null ? { paddingBottom: mobileBottomClearancePx } : undefined}
+          >
             {children}
           </div>
         </main>
-        <div className="pointer-events-none fixed inset-x-0 bottom-0 z-40 bg-transparent ">
+        <div
+          ref={mobileBottomChromeRef}
+          className="pointer-events-none fixed inset-x-0 bottom-0 z-40 bg-transparent"
+        >
           <div className="relative pointer-events-auto overflow-visible">
             <MobileActionsSheet>
               <MobileTopBar pageType={pageType} />

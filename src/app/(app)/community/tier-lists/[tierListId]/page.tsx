@@ -52,7 +52,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default function CommunityTierListDetailPage() {
   return (
-    <div className="min-h-0 min-w-0 flex-1 overflow-y-auto overflow-x-hidden p-3 md:h-full md:p-6">
+    <div className="min-h-0 min-w-0 flex-1 overflow-y-auto overflow-x-hidden md:h-full">
       <CommunityTierListDetailView />
     </div>
   );

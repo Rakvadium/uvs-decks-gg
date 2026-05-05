@@ -52,7 +52,6 @@ export function DeckDetailsView() {
   useRegisterSlot("right-sidebar", "deck-stats", StatsSidebar, statsSlotOptions);
   useRegisterSlot("right-sidebar", "deck-simulator", HandSimulatorSidebar, simulatorSlotOptions);
   useRegisterSlot("right-sidebar", "deck-import-export", ImportExportSidebar, importExportSlotOptions);
-  useRegisterSlot("top-bar", "deck-details-header", DeckDetailsTopBar);
 
   return (
     <DeckDetailsTopBarProvider>
@@ -72,22 +71,27 @@ export function DeckDetailsView() {
           </p>
         </div>
       ) : (
-        <div className="space-y-6">
+        <div className="space-y-4 md:space-y-6">
           <TeamEditableWriteConflictBanner />
           {isOwner && <DeckDetailsGallerySlotRegistration />}
           <div className="hidden md:block">
             <DeckDetailsDesktopHeader />
           </div>
+          <div className="md:hidden rounded-xl border border-border/50 bg-card/40 px-3 py-2.5 backdrop-blur-sm">
+            <DeckDetailsTopBar />
+          </div>
           <div className="relative">
             <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-secondary/5 to-accent/5 rounded-xl blur-xl" />
 
             <DeckCardsSectionProvider>
-              <div className="relative flex flex-col lg:flex-row gap-6">
+              <div className="relative flex flex-col lg:flex-row gap-4 lg:gap-6">
                 <div className="flex flex-col gap-3 shrink-0 w-full lg:w-48 lg:self-start lg:sticky lg:top-6">
                   <DeckDetailsHeroPanel />
                   <DeckDetailsSharePanel />
                   <DeckDetailsSectionTabs />
-                  <DeckDetailsViewModeToggle />
+                  <div className="hidden md:block">
+                    <DeckDetailsViewModeToggle />
+                  </div>
                 </div>
 
                 <div className="flex-1 min-w-0">

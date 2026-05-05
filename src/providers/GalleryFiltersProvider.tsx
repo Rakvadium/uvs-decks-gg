@@ -89,7 +89,10 @@ export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
   const { formats } = useCardReferenceData();
   const [search, setSearch] = useState("");
   const [searchMode, setSearchMode] = useState<SearchMode>("all");
-  const isSidebarOpen = useMemo(() => Boolean(activeSidebarActionId), [activeSidebarActionId]);
+  const isSidebarOpen = useMemo(
+    () => Boolean(activeSidebarActionId) && !isMobile,
+    [activeSidebarActionId, isMobile]
+  );
   const [densityLayoutSidebarOpen, setDensityLayoutSidebarOpen] = useState(isSidebarOpen);
 
   useEffect(() => {

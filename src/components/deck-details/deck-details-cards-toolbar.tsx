@@ -12,7 +12,7 @@ export function DeckCardsToolbar() {
   return (
     <div className="pb-1 flex justify-end">
       <Select value={model.selectedListSortValue} onValueChange={model.onSelectSort}>
-        <SelectTrigger className="h-7 w-[180px] text-[11px]">
+        <SelectTrigger className="h-8 w-full max-w-[220px] text-[11px] md:h-7 md:w-[180px]">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>

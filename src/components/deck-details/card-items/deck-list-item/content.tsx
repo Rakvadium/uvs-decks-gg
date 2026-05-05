@@ -25,9 +25,11 @@ function DeckListItemContent() {
     <>
       <div
         className={cn(
-          "group flex min-h-[56px] w-full items-center gap-2.5 rounded-xl border border-border/50 bg-card/50 px-2.5 py-1.5 text-foreground",
-          "shadow-[0_0_14px_-12px_var(--primary)]",
-          "transition-colors hover:border-primary/40 hover:bg-card/70",
+          "group relative flex w-full max-w-full cursor-pointer overflow-hidden text-foreground transition",
+          "min-h-9 items-stretch rounded-sm border border-border/30 bg-card/20",
+          "hover:border-primary/30 hover:bg-primary/6",
+          "md:min-h-[56px] md:items-center md:gap-2.5 md:rounded-xl md:border-border/50 md:bg-card/50 md:px-2.5 md:py-1.5",
+          "md:shadow-[0_0_14px_-12px_var(--primary)] md:hover:border-primary/40 md:hover:bg-card/70",
           zoneTintClass
         )}
         onClick={openDialog}
@@ -39,8 +41,10 @@ function DeckListItemContent() {
         tabIndex={0}
       >
         <DeckListItemThumbnail />
-        <DeckListItemDetails />
-        <DeckListItemActions />
+        <div className="flex min-w-0 flex-1 items-center gap-1 px-2 py-1 md:p-0 md:gap-2.5">
+          <DeckListItemDetails />
+          <DeckListItemActions />
+        </div>
       </div>
 
       <CardDetailsDialog card={card} backCard={backCard} open={isDialogOpen} onOpenChange={setIsDialogOpen} />

@@ -3,16 +3,18 @@ import { formatUniversusCardType } from "@/config/universus";
 import { useDeckListItemContext } from "./context";
 
 export function DeckListItemDetails() {
-  const { card, isAttackType, quantity, sortKey } = useDeckListItemContext();
+  const { card, isAttackType, isOwner, quantity, sortKey } = useDeckListItemContext();
 
   return (
     <div className="min-w-0 flex-1 space-y-1">
       <div className="min-w-0 flex items-center gap-2">
-        <p className="truncate text-sm font-semibold leading-tight">{card.name}</p>
-        <span className="shrink-0 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">x{quantity}</span>
+        <p className="truncate text-xs font-medium leading-tight md:text-sm md:font-semibold">{card.name}</p>
+        {!isOwner ? (
+          <span className="shrink-0 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">x{quantity}</span>
+        ) : null}
       </div>
 
-      <div className="flex flex-wrap items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+      <div className="hidden md:flex flex-wrap items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
         {card.type ? (
           <Badge variant="cyber" className="h-5 border-primary/40 bg-card/40 px-2 backdrop-blur-none">
             {formatUniversusCardType(card.type) ?? card.type}
