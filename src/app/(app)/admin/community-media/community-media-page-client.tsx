@@ -69,18 +69,13 @@ function accentSelectValue(accentClass: string | undefined): string {
 }
 
 export default function CommunityMediaPageClient() {
-  const rows = useQuery(api.communityYoutube.listCurationsAdmin);
-  const addCuration = useMutation(api.communityYoutube.addCommunityYoutubeCuration);
-  const updateCuration = useMutation(
-    api.communityYoutube.updateCommunityYoutubeCuration
-  );
-  const deleteCuration = useMutation(
-    api.communityYoutube.deleteCommunityYoutubeCuration
-  );
-  const reorder = useMutation(api.communityYoutube.reorderCommunityYoutubeCurations);
-  const refreshMetadata = useAction(
-    api.communityYoutube.adminRefreshYoutubeFeedMetadata
-  );
+  const list = useQuery(api.communityYoutube.listYoutubeCurationsForAdmin, {});
+  const rows = list?.items;
+  const addCuration = useMutation(api.communityYoutube.addYoutubeCuration);
+  const updateCuration = useMutation(api.communityYoutube.updateYoutubeCuration);
+  const deleteCuration = useMutation(api.communityYoutube.deleteYoutubeCuration);
+  const reorder = useMutation(api.communityYoutube.reorderYoutubeCurations);
+  const refreshMetadata = useAction(api.communityYoutube.requestClientRefresh);
 
   const [addUrl, setAddUrl] = useState("");
   const [addLabel, setAddLabel] = useState("");
@@ -100,7 +95,10 @@ export default function CommunityMediaPageClient() {
 
   const [refreshing, setRefreshing] = useState(false);
 
-  const orderedIds = useMemo(() => rows?.map((r) => r._id) ?? [], [rows]);
+  const orderedIds = useMemo(
+    () => rows?.map((r) => r.curationId) ?? [],
+    [rows]
+  );
 
   const resolveAccentForSave = (preset: string, custom: string) => {
     if (preset === "__custom__") {
@@ -113,9 +111,9 @@ export default function CommunityMediaPageClient() {
   };
 
   const openEdit = (row: NonNullable<typeof rows>[number]) => {
-    setEditId(row._id);
+    setEditId(row.curationId);
     setEditUrl(row.youtubeVideoId);
-    setEditLabel(row.label ?? "");
+    setEditLabel(row.editorialLabel ?? "");
     const sel = accentSelectValue(row.accentClass);
     if (sel === "__custom__") {
       setEditAccent("__custom__");
@@ -135,11 +133,15 @@ export default function CommunityMediaPageClient() {
     setAdding(true);
     try {
       const accent = resolveAccentForSave(addAccent, addCustomAccent);
-      await addCuration({
-        youtubeVideoIdOrUrl: addUrl.trim(),
-        label: addLabel.trim() || undefined,
-        accentClass: accent,
-      });
+      const curationId = await addCuration({ urlOrId: addUrl.trim() });
+      if (addLabel.trim() || accent !== undefined) {
+        await updateCuration({
+          curationId,
+          label: addLabel.trim() || undefined,
+          accentClass: accent,
+        });
+      }
+      void refreshMetadata({});
       setAddUrl("");
       setAddLabel("");
       setAddAccent(ACCENT_NONE);
@@ -153,7 +155,7 @@ export default function CommunityMediaPageClient() {
   };
 
   const handleSaveEdit = async () => {
-    if (!editId || !editUrl.trim()) {
+    if (!editId) {
       return;
     }
     setSavingEdit(true);
@@ -161,9 +163,8 @@ export default function CommunityMediaPageClient() {
       const accent = resolveAccentForSave(editAccent, editCustomAccent);
       await updateCuration({
         curationId: editId,
-        youtubeVideoIdOrUrl: editUrl.trim(),
-        label: editLabel.trim() === "" ? null : editLabel.trim(),
-        accentClass: accent === undefined ? null : accent,
+        label: editLabel.trim() === "" ? "" : editLabel.trim(),
+        accentClass: accent ?? "",
       });
       setEditOpen(false);
       setEditId(null);
@@ -200,7 +201,7 @@ export default function CommunityMediaPageClient() {
     next[index] = next[j];
     next[j] = t;
     try {
-      await reorder({ orderedIds: next });
+      await reorder({ orderedCurationIds: next });
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Could not reorder");
     }
@@ -213,11 +214,15 @@ export default function CommunityMediaPageClient() {
       if (res.ok) {
         toast.success("Metadata refreshed");
       } else {
-        toast.error(
+        const msg =
           res.reason === "missing_api_key"
             ? "Set YOUTUBE_DATA_API_KEY on the Convex deployment"
-            : res.reason ?? "Refresh failed"
-        );
+            : res.reason === "rate_limited"
+              ? "Rate limited; try again in a few minutes"
+              : res.reason === "no_curations"
+                ? "No videos to refresh"
+                : (res.reason ?? "Refresh failed");
+        toast.error(msg);
       }
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Refresh failed");
@@ -278,7 +283,7 @@ export default function CommunityMediaPageClient() {
                 </TableRow>
               ) : (
                 rows.map((row, i) => (
-                  <TableRow key={row._id}>
+                  <TableRow key={row.curationId}>
                     <TableCell>
                       <div className="flex items-center gap-1">
                         <Button
@@ -322,7 +327,7 @@ export default function CommunityMediaPageClient() {
                       </div>
                     </TableCell>
                     <TableCell className="text-sm">
-                      {row.label ?? "—"}
+                      {row.editorialLabel ?? "—"}
                     </TableCell>
                     <TableCell>
                       <code className="text-xs break-all max-w-[200px] block">
@@ -347,7 +352,7 @@ export default function CommunityMediaPageClient() {
                           size="icon"
                           className="h-8 w-8 text-destructive hover:text-destructive"
                           aria-label="Remove"
-                          onClick={() => void handleDelete(row._id)}
+                          onClick={() => void handleDelete(row.curationId)}
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
@@ -428,11 +433,12 @@ export default function CommunityMediaPageClient() {
           </DialogHeader>
           <DialogBody className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="edit-url">YouTube URL or video ID</Label>
+              <Label htmlFor="edit-url">Video ID</Label>
               <Input
                 id="edit-url"
+                readOnly
+                className="bg-muted/50 font-mono text-xs"
                 value={editUrl}
-                onChange={(e) => setEditUrl(e.target.value)}
               />
             </div>
             <div className="space-y-2">

@@ -602,10 +602,11 @@ export const addYoutubeCuration = mutation({
     for (const c of all) {
       if (c.sortOrder > maxOrder) maxOrder = c.sortOrder;
     }
-    await ctx.db.insert("communityYoutubeCurations", {
+    const curationId = await ctx.db.insert("communityYoutubeCurations", {
       youtubeVideoId: videoId,
       sortOrder: maxOrder + 1,
     });
+    return curationId;
   },
 });
 
