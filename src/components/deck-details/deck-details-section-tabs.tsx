@@ -3,7 +3,11 @@
 import { AlertTriangle } from "lucide-react";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { SegmentedControl } from "@/components/ui/segmented-control";
-import { DECK_SECTION_CONFIG as SECTION_CONFIG, type DeckSection } from "@/lib/deck/display-config";
+import {
+  DECK_SECTION_CONFIG as SECTION_CONFIG,
+  DECK_SECTION_MOBILE_TAB_LABELS as MOBILE_TAB_LABELS,
+  type DeckSection,
+} from "@/lib/deck/display-config";
 import { useDeckCardsSectionContext } from "./deck-details-cards-section-context";
 
 export function DeckDetailsSectionTabs() {
@@ -16,6 +20,7 @@ export function DeckDetailsSectionTabs() {
     <SegmentedControl
       orientation={isMobile ? "horizontal" : "vertical"}
       size="sm"
+      stretch={isMobile}
       className="w-full bg-muted/30"
       value={model.activeSection}
       onValueChange={(value) => model.setActiveSection(value as DeckSection)}
@@ -25,7 +30,11 @@ export function DeckDetailsSectionTabs() {
 
         return {
           value: section,
-          label: <span className="flex-1 text-left">{config.label}</span>,
+          label: (
+            <span className="flex-1 text-left">
+              {isMobile ? MOBILE_TAB_LABELS[section] : config.label}
+            </span>
+          ),
           icon: config.icon,
           trailingIcon: showSideWarning ? <AlertTriangle className="h-3 w-3 shrink-0 text-destructive" /> : undefined,
           badge: model.counts[section],

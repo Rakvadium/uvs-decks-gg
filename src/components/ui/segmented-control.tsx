@@ -21,6 +21,7 @@ interface SegmentedControlProps {
   onValueChange?: (value: string) => void;
   orientation?: SegmentedControlOrientation;
   size?: SegmentedControlSize;
+  stretch?: boolean;
   className?: string;
   itemClassName?: string;
 }
@@ -47,16 +48,20 @@ export function SegmentedControl({
   onValueChange,
   orientation = "horizontal",
   size = "md",
+  stretch = false,
   className,
   itemClassName,
 }: SegmentedControlProps) {
   const sizeStyles = SIZE_STYLES[size];
+  const fillRow = orientation === "horizontal" && stretch;
 
   return (
     <div
       className={cn(
-        "tab-container inline-flex overflow-hidden rounded-sm border border-border/50 bg-muted/50 backdrop-blur-sm",
-        orientation === "vertical" ? "tab-container-vertical w-full flex-col" : "items-stretch justify-center",
+        "tab-container overflow-hidden rounded-sm border border-border/50 bg-muted/50 backdrop-blur-sm",
+        orientation === "vertical"
+          ? "tab-container-vertical flex w-full flex-col"
+          : cn("items-stretch", fillRow ? "flex w-full" : "inline-flex justify-center"),
         sizeStyles.container,
         className
       )}
@@ -76,7 +81,11 @@ export function SegmentedControl({
               "inline-flex items-center justify-center gap-2 border border-transparent font-mono uppercase tracking-wider transition-colors duration-150",
               orientation === "vertical"
                 ? cn("w-full justify-start border-b border-border/50", isLast && "border-b-0")
-                : cn("border-r border-border/50", isLast && "border-r-0"),
+                : cn(
+                    "border-r border-border/50",
+                    isLast && "border-r-0",
+                    fillRow && "min-w-0 flex-1"
+                  ),
               "disabled:pointer-events-none disabled:opacity-50",
               sizeStyles.item,
               isActive

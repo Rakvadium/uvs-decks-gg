@@ -107,6 +107,7 @@ interface DeckVisibilityBadgeMenuProps {
   compact?: boolean;
   canSetTournamentVisibility?: boolean;
   canSetTeamVisibility?: boolean;
+  readOnly?: boolean;
 }
 
 export function DeckVisibilityBadgeMenu({
@@ -120,6 +121,7 @@ export function DeckVisibilityBadgeMenu({
   compact = false,
   canSetTournamentVisibility = false,
   canSetTeamVisibility = false,
+  readOnly = false,
 }: DeckVisibilityBadgeMenuProps) {
   const displayVisibility = isEditing ? editVisibility : normalizeDeckVisibility(deck);
   const displayTeamSharing = isEditing
@@ -142,16 +144,16 @@ export function DeckVisibilityBadgeMenu({
         compact
           ? "h-8 shrink-0 items-center gap-1.5 px-2.5 text-[9px] sm:inline-flex"
           : "h-8 shrink-0 items-center gap-1.5 px-2.5 text-[9px] inline-flex",
-        isOwner && "cursor-pointer",
+        isOwner && !readOnly && "cursor-pointer",
       )}
     >
       {badgeGlyph}
       {badgeLabel}
-      {isOwner ? <ChevronDown className="h-3 w-3 opacity-70" /> : null}
+      {isOwner && !readOnly ? <ChevronDown className="h-3 w-3 opacity-70" /> : null}
     </Badge>
   );
 
-  if (!isOwner) {
+  if (!isOwner || readOnly) {
     return publicityBadge;
   }
 

@@ -107,7 +107,7 @@ export function DeckCharacterPickerDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent size="md" className="flex flex-col gap-0 overflow-hidden p-0">
-        <DialogHeader className="sticky top-0 z-50 shrink-0 flex flex-col gap-3 border-b border-border/50 bg-card px-4 py-4 sm:gap-4 sm:px-6">
+        <DialogHeader className="sticky top-0 z-30 shrink-0 flex flex-col gap-3 border-b border-border/50 bg-card px-4 py-4 sm:gap-4 sm:px-6">
           <DialogTitle className="text-lg sm:text-xl">Change Starting Character</DialogTitle>
           <DialogDescription className="sr-only">
             Search and filter starting characters by name or symbol.

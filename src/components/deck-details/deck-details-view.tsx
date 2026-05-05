@@ -24,6 +24,7 @@ import {
 import { DeckCardsSectionProvider } from "./deck-details-cards-section-context";
 import { DeckDetailsSectionTabs } from "./deck-details-section-tabs";
 import { DeckDetailsViewModeToggle } from "./deck-details-view-mode-toggle";
+import { DeckDetailsEditDialog } from "./deck-details-edit-dialog";
 import { TeamEditableWriteConflictBanner } from "@/components/deck/team-editable-write-conflict-banner";
 
 function DeckDetailsGallerySlotRegistration() {
@@ -71,16 +72,17 @@ export function DeckDetailsView() {
           </p>
         </div>
       ) : (
-        <div className="space-y-4 md:space-y-6">
-          <TeamEditableWriteConflictBanner />
+        <div className="flex flex-col max-md:gap-0 md:gap-6">
+          <TeamEditableWriteConflictBanner className="max-md:mb-4" />
+          <DeckDetailsEditDialog />
           {isOwner && <DeckDetailsGallerySlotRegistration />}
           <div className="hidden md:block">
             <DeckDetailsDesktopHeader />
           </div>
-          <div className="md:hidden rounded-xl border border-border/50 bg-card/40 px-3 py-2.5 backdrop-blur-sm">
+          <div className="sticky top-0 z-30 -mx-3 border-b border-border/50 bg-background/90 px-3 py-2.5 backdrop-blur-md supports-[backdrop-filter]:bg-background/75 md:hidden">
             <DeckDetailsTopBar />
           </div>
-          <div className="relative">
+          <div className="relative max-md:mt-4 md:mt-0">
             <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-secondary/5 to-accent/5 rounded-xl blur-xl" />
 
             <DeckCardsSectionProvider>

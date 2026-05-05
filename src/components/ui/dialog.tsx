@@ -136,12 +136,23 @@ function DialogContent({
         <div
           className={cn(
             "relative z-10 flex min-h-0 flex-1 flex-col overflow-y-auto",
-            isPlain && "md:overflow-hidden",
-            hasFooter &&
-              (footerMobileOnly ? "pb-20 md:pb-0" : "pb-24 md:pb-0")
+            isPlain && "md:overflow-hidden"
           )}
         >
-          {children}
+          <div
+            className={cn(
+              "flex min-h-0 flex-1 flex-col pt-4 pl-4 pr-14 md:px-6 md:pt-6 md:pr-14",
+              hasFooter
+                ? cn(
+                    "pb-2",
+                    footerMobileOnly ? "max-md:pb-20" : "max-md:pb-24",
+                    "md:pb-3"
+                  )
+                : "pb-6 md:pb-6"
+            )}
+          >
+            {children}
+          </div>
           {hasFooter && (
             <div
               data-slot="dialog-footer-slot"
@@ -150,9 +161,9 @@ function DialogContent({
                 footerMobileOnly
                   ? "pointer-events-none fixed inset-x-0 bottom-0 z-20 flex justify-end bg-transparent p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] md:hidden"
                   : cn(
-                      "flex-col-reverse gap-2 border-t border-border/30 pt-4 sm:flex-row sm:justify-end",
+                      "flex-col-reverse gap-2 border-t border-border/30 px-4 pt-5 sm:flex-row sm:justify-end md:px-6 md:pt-5 md:pb-6",
                       "max-md:fixed max-md:bottom-0 max-md:left-0 max-md:right-0 max-md:z-20 max-md:bg-card/95 max-md:backdrop-blur-lg max-md:p-4 max-md:pb-[max(1rem,env(safe-area-inset-bottom))]",
-                      "md:relative md:z-10 md:border-0 md:px-6 md:pt-4 md:pb-4"
+                      "md:relative md:z-10"
                     )
               )}
             >
@@ -163,7 +174,7 @@ function DialogContent({
         {showCloseButton && (
           <DialogPrimitive.Close
             data-slot="dialog-close"
-            className="pointer-events-auto hidden md:flex absolute top-4 right-4 z-20 h-8 w-8 rounded-md items-center justify-center opacity-70 transition-all hover:opacity-100 hover:bg-primary/10 hover:text-primary focus:ring-2 focus:ring-primary/30 focus:outline-hidden disabled:pointer-events-none border border-transparent hover:border-primary/30"
+            className="pointer-events-auto flex absolute top-4 right-4 z-[100] h-8 w-8 rounded-md items-center justify-center opacity-70 transition-all hover:opacity-100 hover:bg-primary/10 hover:text-primary focus:ring-2 focus:ring-primary/30 focus:outline-hidden disabled:pointer-events-none border border-transparent hover:border-primary/30"
           >
             <XIcon className="h-4 w-4" />
             <span className="sr-only">Close</span>
@@ -205,9 +216,9 @@ function DialogFooter({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="dialog-footer"
       className={cn(
-        "flex w-full shrink-0 flex-col-reverse gap-2 border-t border-border/30 sm:flex-row sm:justify-end",
-        "max-md:fixed max-md:bottom-0 max-md:left-0 max-md:right-0 max-md:z-20 max-md:bg-card/95 max-md:backdrop-blur-lg max-md:px-4 max-md:pt-4 max-md:pb-[max(1rem,env(safe-area-inset-bottom))]",
-        "md:relative md:z-10 md:px-6 md:pb-6 md:pt-4",
+        "flex w-full shrink-0 flex-col-reverse gap-2 border-t border-border/30 pt-5 sm:flex-row sm:justify-end md:pb-5",
+        "max-md:fixed max-md:bottom-0 max-md:left-0 max-md:right-0 max-md:z-20 max-md:border-0 max-md:bg-card/95 max-md:backdrop-blur-lg max-md:px-4 max-md:pt-4 max-md:pb-[max(1rem,env(safe-area-inset-bottom))]",
+        "md:relative md:z-10",
         className
       )}
       {...props}

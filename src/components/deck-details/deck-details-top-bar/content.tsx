@@ -1,16 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Edit3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { DeckDetailsTopBarProvider, useDeckDetailsTopBarContext } from "./context";
-import { DeckDetailsTopBarEditActions } from "./edit-actions";
+import { useDeckDetailsTopBarContext } from "./context";
 import { DeckDetailsTopBarLoadingState } from "./loading-state";
 import { DeckDetailsTopBarTitleSection } from "./title-section";
 import { DeckDetailsTopBarViewActions } from "./view-actions";
 
 export function DeckDetailsTopBarInner() {
-  const { deck, isEditing, isLoading } = useDeckDetailsTopBarContext();
+  const { deck, isLoading, isOwner, startEditing } = useDeckDetailsTopBarContext();
 
   if (isLoading || !deck) {
     return <DeckDetailsTopBarLoadingState />;
@@ -27,16 +26,27 @@ export function DeckDetailsTopBarInner() {
       <DeckDetailsTopBarTitleSection compact />
 
       <div className="ml-auto flex shrink-0 items-center gap-2">
-        {isEditing ? <DeckDetailsTopBarEditActions compact /> : <DeckDetailsTopBarViewActions compact />}
+        {isOwner ? (
+          <>
+            <DeckDetailsTopBarViewActions compact />
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-8 w-8"
+              aria-label="Edit deck details"
+              onClick={() => startEditing()}
+            >
+              <Edit3 className="h-4 w-4" />
+            </Button>
+          </>
+        ) : (
+          <DeckDetailsTopBarViewActions compact />
+        )}
       </div>
     </div>
   );
 }
 
 export function DeckDetailsTopBar() {
-  return (
-    <DeckDetailsTopBarProvider>
-      <DeckDetailsTopBarInner />
-    </DeckDetailsTopBarProvider>
-  );
+  return <DeckDetailsTopBarInner />;
 }

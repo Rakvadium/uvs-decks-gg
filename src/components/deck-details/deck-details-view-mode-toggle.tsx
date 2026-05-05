@@ -16,6 +16,7 @@ export function DeckDetailsViewModeToggle() {
   return (
     <SegmentedControl
       size="sm"
+      stretch
       className="w-full bg-muted/30"
       value={viewMode}
       onValueChange={(value) => setViewMode(value as DeckViewMode)}

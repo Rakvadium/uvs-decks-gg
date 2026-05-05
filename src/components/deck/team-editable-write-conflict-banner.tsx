@@ -5,8 +5,13 @@ import { useDeckEditor } from "@/lib/deck";
 import { isTeamEditableDeck } from "@/lib/deck/visibility";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
-export function TeamEditableWriteConflictBanner() {
+export function TeamEditableWriteConflictBanner({
+  className,
+}: {
+  className?: string;
+}) {
   const {
     deck,
     teamEditableWriteConflict,
@@ -16,7 +21,7 @@ export function TeamEditableWriteConflictBanner() {
     return null;
   }
   return (
-    <Alert className="border-amber-500/40 bg-amber-500/5 pr-10">
+    <Alert className={cn("border-amber-500/40 bg-amber-500/5 pr-10", className)}>
       <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-500" />
       <AlertTitle className="text-amber-950 dark:text-amber-100">Deck was updated elsewhere</AlertTitle>
       <AlertDescription className="text-amber-900/90 dark:text-amber-200/90">

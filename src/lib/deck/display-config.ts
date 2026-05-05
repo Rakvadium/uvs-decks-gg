@@ -25,4 +25,10 @@ export const DECK_SECTION_CONFIG = {
   reference: { label: "Reference", icon: Bookmark, color: "accent" },
 } as const;
 
+export const DECK_SECTION_MOBILE_TAB_LABELS = {
+  main: "Main",
+  side: "Side",
+  reference: "Ref",
+} satisfies Record<DeckSection, string>;
+
 export const DECK_SECTION_KEYS: DeckSection[] = ["main", "side", "reference"];
