@@ -1,9 +1,10 @@
 import { cn } from "@/lib/utils";
+import { ShellTeamNav } from "@/components/shell/shell-team-nav";
 import { buildMainNavItems } from "../main-nav-build";
 import { useMobileProfileSheetContext } from "./context";
 
 export function MobileProfileNavigationSection() {
-  const { pathname, handleNavClick } = useMobileProfileSheetContext();
+  const { pathname, handleNavClick, closeSheet } = useMobileProfileSheetContext();
   const navItems = buildMainNavItems();
 
   return (
@@ -28,6 +29,7 @@ export function MobileProfileNavigationSection() {
             </button>
           );
         })}
+        <ShellTeamNav variant="profile-sheet" onAfterNavigate={closeSheet} />
       </div>
     </div>
   );

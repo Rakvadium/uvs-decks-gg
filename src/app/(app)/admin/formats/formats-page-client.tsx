@@ -39,7 +39,7 @@ export default function AdminFormatsPageClient() {
   }
 
   return (
-    <div className="flex h-full flex-col overflow-y-auto">
+    <div className="flex min-h-0 flex-1 flex-col overflow-y-auto md:h-full">
       <AdminPageHeader
         title="Formats"
         description="Play formats, deck size rules, and sub-formats. Open a row to edit or add a new format."

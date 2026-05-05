@@ -5,7 +5,7 @@ import { FormatFormContent } from "@/features/admin-format/format-form-content";
 
 export default function NewFormatPageClient() {
   return (
-    <div className="flex h-full flex-col overflow-y-auto">
+    <div className="flex min-h-0 flex-1 flex-col overflow-y-auto md:h-full">
       <AdminPageHeader
         title="New format"
         description="Create a play format. Keys are stable; use a short slug (e.g. standard, custom-league)."

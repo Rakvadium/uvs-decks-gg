@@ -31,7 +31,7 @@ export function LeftSidebarGuestThemeToggle() {
             variant="outline"
             size="icon"
             className={cn(
-              "h-10 w-10 shrink-0 border-border/70 bg-background",
+              "h-10 w-10 shrink-0 border-border/70 bg-background text-sidebar-foreground/70 hover:text-sidebar-foreground [&_svg]:text-sidebar-foreground/70 hover:[&_svg]:text-sidebar-foreground",
             )}
             aria-label={
               resolvedTheme === "dark"
@@ -72,6 +72,7 @@ export function LeftSidebarGuestThemeToggle() {
           className={cn(
             "h-9 flex-1 gap-1 px-1 font-mono text-[10px] uppercase tracking-wider",
             theme === v && "shadow-sm",
+            theme !== v && "text-sidebar-foreground/70 hover:text-sidebar-foreground",
           )}
           onClick={() => setTheme(v)}
           title={v === "system" ? "Match system appearance" : `${label} mode`}

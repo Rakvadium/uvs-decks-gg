@@ -18,7 +18,7 @@ export default function AdminSetCardsPageClient() {
 
   if (!code) {
     return (
-      <div className="flex h-full flex-col overflow-y-auto">
+      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto md:h-full">
         <p className="text-muted-foreground">Missing set code.</p>
         <Link href="/admin/sets" className="mt-4 text-primary hover:underline">
           Back to sets
@@ -37,7 +37,7 @@ export default function AdminSetCardsPageClient() {
 
   if (set === null) {
     return (
-      <div className="flex h-full flex-col overflow-y-auto">
+      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto md:h-full">
         <p className="text-muted-foreground">
           No set found for code <span className="font-mono">{code}</span>.
         </p>

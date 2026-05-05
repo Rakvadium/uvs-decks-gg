@@ -7,7 +7,7 @@ import { SectionHeading } from "@/components/ui/typography-headings";
 
 export default function CollectionPageClient() {
   return (
-    <div className="flex h-full flex-col overflow-y-auto p-6">
+    <div className="flex min-h-0 flex-1 flex-col overflow-y-auto p-6 md:h-full">
       <div className="space-y-6">
         <AppPageHeader
           title="My Collection"

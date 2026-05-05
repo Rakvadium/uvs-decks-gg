@@ -13,8 +13,9 @@ type ShellTeamNavSidebarProps = {
   variant: "sidebar";
 };
 
-type ShellTeamNavMobileColumnProps = {
-  variant: "mobile-column";
+type ShellTeamNavProfileSheetProps = {
+  variant: "profile-sheet";
+  onAfterNavigate?: () => void;
 };
 
 function useTeamNavTarget() {
@@ -52,12 +53,14 @@ function TeamMark({
   hasTeam,
   className,
   imgClassName,
+  markIsActive,
 }: {
   displayUrl: string | null | undefined;
   logoPending: boolean;
   hasTeam: boolean;
   className?: string;
   imgClassName?: string;
+  markIsActive?: boolean;
 }) {
   return (
     <div
@@ -72,50 +75,19 @@ function TeamMark({
       ) : displayUrl ? (
         <img src={displayUrl} alt="" className={cn("h-full w-full object-cover", imgClassName)} />
       ) : (
-        <Flag className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
+        <Flag
+          className={cn(
+            "h-4 w-4 shrink-0",
+            markIsActive ? "text-primary" : "text-muted-foreground"
+          )}
+          aria-hidden
+        />
       )}
     </div>
   );
 }
 
-function TeamMarkMobile({
-  displayUrl,
-  logoPending,
-  isActive,
-}: {
-  displayUrl: string | null | undefined;
-  logoPending: boolean;
-  isActive: boolean;
-}) {
-  if (logoPending) {
-    return <div className="h-8 w-8 shrink-0 animate-pulse rounded-full bg-muted/50" />;
-  }
-  if (displayUrl) {
-    return (
-      <img
-        src={displayUrl}
-        alt=""
-        className={cn(
-          "h-8 w-8 shrink-0 rounded-full object-cover transition-all duration-200",
-          isActive
-            ? "border border-secondary/55 shadow-[0_0_4px_color-mix(in_oklch,var(--secondary)_40%,transparent)]"
-            : "border border-border/60"
-        )}
-      />
-    );
-  }
-  return (
-    <Flag
-      className={cn(
-        "h-8 w-8 shrink-0 transition-all duration-200",
-        isActive ? "text-primary drop-shadow-[0_0_4px_var(--primary)]" : "text-muted-foreground"
-      )}
-      aria-hidden
-    />
-  );
-}
-
-export function ShellTeamNav(props: ShellTeamNavSidebarProps | ShellTeamNavMobileColumnProps) {
+export function ShellTeamNav(props: ShellTeamNavSidebarProps | ShellTeamNavProfileSheetProps) {
   const { teamHref, displayUrl, hasTeam, logoPending, firstTeam } = useTeamNavTarget();
   const teamBasePath = hasTeam && firstTeam ? `/teams/${firstTeam._id}` : "";
   const isActive = useTeamNavActive(teamBasePath, hasTeam);
@@ -131,12 +103,13 @@ export function ShellTeamNav(props: ShellTeamNavSidebarProps | ShellTeamNavMobil
     );
   }
   return (
-    <ShellTeamNavMobileInner
+    <ShellTeamNavProfileSheetInner
       teamHref={teamHref}
       displayUrl={displayUrl}
       hasTeam={hasTeam}
       logoPending={logoPending}
       isActive={isActive}
+      onAfterNavigate={props.onAfterNavigate}
     />
   );
 }
@@ -171,6 +144,7 @@ function ShellTeamNavSidebarInner({
         displayUrl={hasTeam ? displayUrl : null}
         logoPending={hasTeam && logoPending}
         hasTeam={hasTeam}
+        markIsActive={isActive}
         className="h-8 w-8 rounded-full"
         imgClassName=""
       />
@@ -193,43 +167,40 @@ function ShellTeamNavSidebarInner({
   return <div className="render-stable" style={prefersReducedMotion ? undefined : { animationDelay: "250ms" }}>{link}</div>;
 }
 
-function ShellTeamNavMobileInner({
+function ShellTeamNavProfileSheetInner({
   teamHref,
   displayUrl,
   hasTeam,
   logoPending,
   isActive,
+  onAfterNavigate,
 }: {
   teamHref: string;
   displayUrl: string | null | undefined;
   hasTeam: boolean;
   logoPending: boolean;
   isActive: boolean;
+  onAfterNavigate?: () => void;
 }) {
+  const label = "Teams";
   return (
     <Link
       href={teamHref}
+      onClick={() => onAfterNavigate?.()}
       className={cn(
-        "relative flex w-full flex-1 flex-col items-center justify-center gap-1.5 py-2 transition-all duration-200",
-        isActive ? "text-primary" : "text-muted-foreground hover:text-foreground"
+        "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+        isActive ? "bg-secondary/15 text-primary" : "text-foreground hover:bg-muted"
       )}
     >
-      {isActive ? (
-        <div className="absolute inset-x-2 top-0 h-0.5 bg-secondary shadow-[0_0_3px_color-mix(in_oklch,var(--secondary)_50%,transparent),0_0_12px_color-mix(in_oklch,var(--secondary)_32%,transparent)]" />
-      ) : null}
-      <TeamMarkMobile
+      <TeamMark
         displayUrl={hasTeam ? displayUrl : null}
         logoPending={hasTeam && logoPending}
-        isActive={isActive}
+        hasTeam={hasTeam}
+        markIsActive={isActive}
+        className="h-5 w-5 rounded-full"
+        imgClassName=""
       />
-      <span
-        className={cn(
-          "text-[10px] font-mono uppercase tracking-widest",
-          isActive && "font-semibold"
-        )}
-      >
-        Teams
-      </span>
+      <span>{label}</span>
     </Link>
   );
 }

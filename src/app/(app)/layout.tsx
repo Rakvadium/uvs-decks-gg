@@ -287,11 +287,11 @@ function ShellLayoutInner({ children }: { children: ReactNode }) {
       <div className="flex md:hidden h-[100dvh] w-full flex-col bg-background relative">
         <MobileHeader />
         <main
-          className="min-h-0 flex-1 flex flex-col overflow-y-auto bg-background"
+          className="max-md:scroll-pb-[var(--mobile-bottom-overlay-clearance)] min-h-0 flex flex-1 flex-col overflow-y-auto bg-background"
           style={{ backgroundImage: "var(--chrome-page-bg)" }}
         >
           <AccountStatusBanner />
-          <div className="min-h-full flex-1 pb-[calc(env(safe-area-inset-bottom)+11rem)]">
+          <div className="flex min-h-0 w-full flex-1 flex-col pb-[var(--mobile-bottom-overlay-clearance)]">
             {children}
           </div>
         </main>

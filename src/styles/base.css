@@ -7,6 +7,7 @@
     Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   --font-display: var(--font-geist-sans);
   --font-serif: var(--font-geist-sans);
+  --mobile-bottom-overlay-clearance: calc(env(safe-area-inset-bottom, 0px) + 11rem);
 }
 
 @theme inline {

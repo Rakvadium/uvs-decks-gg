@@ -289,7 +289,7 @@ export default function SettingsPageClient() {
   });
 
   return (
-    <div className="h-full overflow-y-auto">
+    <div className="min-h-0 flex-1 overflow-y-auto md:h-full">
       <div className="mx-auto max-w-3xl px-6 py-8">
         <m.div
           initial={prefersReducedMotion ? false : { opacity: 0, y: -20 }}

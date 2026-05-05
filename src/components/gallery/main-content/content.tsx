@@ -50,8 +50,13 @@ function GalleryMainContentBody() {
 
   return (
     <div className="relative z-10 flex min-h-0 flex-1 flex-col">
-      <div className="relative z-30 hidden shrink-0 border-b border-border/40 bg-background shadow-[0_1px_0_rgba(0,0,0,0.04)] md:block">
-        <div className="w-full px-4 py-3 md:px-6">
+      <div className="relative z-30 hidden shrink-0 border-b border-primary/40 bg-primary/15 shadow-[0_1px_0_color-mix(in_oklch,var(--primary)_12%,transparent)] md:block dark:border-sidebar-border/50 dark:bg-sidebar dark:shadow-none">
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-primary/10 via-transparent to-primary/5 dark:hidden" />
+        <div
+          className="pointer-events-none absolute inset-0 hidden dark:block"
+          style={{ background: "var(--chrome-shell-sidebar-wash)" }}
+        />
+        <div className="relative w-full px-4 py-3 md:px-6">
           <GalleryTopBarFilters />
         </div>
       </div>

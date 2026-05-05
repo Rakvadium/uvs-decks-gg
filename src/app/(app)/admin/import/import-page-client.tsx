@@ -165,7 +165,7 @@ export default function AdminImportPageClient({
   const titleSuffix = setName ? ` — ${setName}` : ` — ${setCode}`;
 
   return (
-    <div className="flex h-full flex-col overflow-y-auto">
+    <div className="flex min-h-0 flex-1 flex-col overflow-y-auto md:h-full">
       <AdminPageHeader
         backHref={`/admin/sets/${encodeURIComponent(setCode)}${searchSuffix}`}
         backLabel="Set overview"

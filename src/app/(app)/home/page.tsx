@@ -146,7 +146,7 @@ function HomePage() {
   const collectionIcon = showPersonalStats ? Library : AlertTriangle;
 
   return (
-    <div className="relative flex h-full flex-col overflow-y-auto" style={{ transform: "translateZ(0)" }}>
+    <div className="relative flex min-h-0 flex-1 flex-col overflow-y-auto md:h-full" style={{ transform: "translateZ(0)" }}>
       <div className="absolute inset-0 overflow-hidden pointer-events-none" style={{ opacity: "var(--chrome-page-hero-wash-opacity)" as unknown as number }}>
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
         <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-secondary/5 rounded-full blur-3xl" />

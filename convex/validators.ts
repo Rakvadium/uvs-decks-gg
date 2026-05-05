@@ -88,6 +88,7 @@ export const userValidator = v.object({
   isAnonymous: v.optional(v.boolean()),
   role: v.optional(v.string()),
   profanityFilterEnabled: v.boolean(),
+  hasVerifiedEmail: v.optional(v.boolean()),
 });
 
 export const currentUserSelfValidator = v.object({
@@ -100,6 +101,7 @@ export const currentUserSelfValidator = v.object({
   isAnonymous: v.optional(v.boolean()),
   role: v.optional(v.string()),
   profanityFilterEnabled: v.boolean(),
+  hasVerifiedEmail: v.optional(v.boolean()),
   accountStatus: v.optional(
     v.union(
       v.literal("active"),
@@ -114,8 +116,16 @@ export const currentUserSelfValidator = v.object({
 
 export function publicUserFromDocument(doc: Doc<"users">) {
   return {
-    ...doc,
+    _id: doc._id,
+    _creationTime: doc._creationTime,
+    username: doc.username,
+    email: doc.email,
+    emailVerificationTime: doc.emailVerificationTime,
+    image: doc.image,
+    isAnonymous: doc.isAnonymous,
+    role: doc.role,
     profanityFilterEnabled: doc.profanityFilterEnabled !== false,
+    hasVerifiedEmail: doc.hasVerifiedEmail,
   };
 }
 

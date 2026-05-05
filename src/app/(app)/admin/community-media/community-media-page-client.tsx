@@ -232,7 +232,7 @@ export default function CommunityMediaPageClient() {
   };
 
   return (
-    <div className="flex h-full flex-col overflow-y-auto p-6">
+    <div className="flex min-h-0 flex-1 flex-col overflow-y-auto p-6 md:h-full">
       <div className="mx-auto w-full max-w-5xl space-y-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>

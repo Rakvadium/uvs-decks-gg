@@ -18,7 +18,7 @@ export function AdminImportLegacyGate() {
   const [code, setCode] = useState("");
 
   return (
-    <div className="flex h-full flex-col overflow-y-auto">
+    <div className="flex min-h-0 flex-1 flex-col overflow-y-auto md:h-full">
       <AdminPageHeader
         title="Global import (legacy URL)"
         description="Bookmarking /admin/import?legacy=1 keeps this helper. Use set-scoped import for normal work."
