@@ -5,6 +5,7 @@ import { useMobileShell } from "./mobile-shell-context"
 import { useConvexAuth, useQuery } from "convex/react"
 import { api } from "../../../convex/_generated/api"
 import { cn } from "@/lib/utils"
+import { ShellFeedbackNav } from "@/components/shell/shell-feedback-nav"
 import { ShellTeamNav } from "@/components/shell/shell-team-nav"
 import { LayoutGrid, Layers, Library } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -51,7 +52,7 @@ export function MobileBottomNav() {
               )}
             >
               {isActive && (
-                <div className="absolute inset-x-2 top-0 h-0.5 bg-primary shadow-[0_0_2px_var(--primary),0_0_6px_var(--primary)/45]" />
+                <div className="absolute inset-x-2 top-0 h-0.5 bg-secondary shadow-[0_0_3px_color-mix(in_oklch,var(--secondary)_50%,transparent),0_0_12px_color-mix(in_oklch,var(--secondary)_32%,transparent)]" />
               )}
               <Icon className={cn(
                 "h-5 w-5 transition-all duration-200",
@@ -67,12 +68,13 @@ export function MobileBottomNav() {
           )
         })}
 
-        <div className="flex flex-1 flex-col items-center justify-center gap-0.5 py-0.5">
+        <div className="flex min-h-0 flex-1 flex-col items-stretch justify-center">
+          <ShellFeedbackNav variant="mobile-column" />
           <ShellTeamNav variant="mobile-column" />
           <button
             type="button"
             onClick={() => setProfileSheetOpen(true)}
-            className="relative flex flex-col items-center justify-center gap-1.5 py-0.5 text-muted-foreground transition-all duration-200 hover:text-foreground"
+            className="relative flex flex-1 flex-col items-center justify-center gap-1.5 py-2 text-muted-foreground transition-all duration-200 hover:text-foreground"
           >
             <Avatar className="h-6 w-6 border border-primary/30 shadow-[0_0_2px_var(--primary)/60,0_0_6px_var(--primary)/35]">
               {user?.image && <AvatarImage src={user.image} alt={user.username || "User"} />}

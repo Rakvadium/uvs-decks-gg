@@ -2,6 +2,8 @@ import type { Doc } from "../../../convex/_generated/dataModel";
 
 export type DeckVisibility = NonNullable<Doc<"decks">["visibility"]>;
 
+export type DeckTeamSharing = "team_viewable" | "team_editable";
+
 export function normalizeDeckVisibility(deck: Doc<"decks">): DeckVisibility {
   if (deck.visibility) return deck.visibility;
   return deck.isPublic ? "public" : "private";
@@ -47,4 +49,33 @@ export function deckVisibilityLabel(visibility: DeckVisibility): string {
     case "team":
       return "Team";
   }
+}
+
+export function deckTeamSharingFromDeck(deck: Doc<"decks">): DeckTeamSharing {
+  if (normalizeDeckVisibility(deck) !== "team") {
+    return "team_viewable";
+  }
+  return deck.teamCollaboration === "team_editable" ? "team_editable" : "team_viewable";
+}
+
+export function deckTeamSharingLabel(mode: DeckTeamSharing): string {
+  return mode === "team_editable" ? "Team edit" : "Team view";
+}
+
+export function deckVisibilityDisplayLabel(deck: Doc<"decks">): string {
+  const v = normalizeDeckVisibility(deck);
+  if (v !== "team") {
+    return deckVisibilityLabel(v);
+  }
+  return deckTeamSharingLabel(deckTeamSharingFromDeck(deck));
+}
+
+export function draftVisibilityDisplayLabel(
+  visibility: DeckVisibility,
+  teamSharing: DeckTeamSharing,
+): string {
+  if (visibility !== "team") {
+    return deckVisibilityLabel(visibility);
+  }
+  return deckTeamSharingLabel(teamSharing);
 }

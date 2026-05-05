@@ -1,9 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Globe, Hexagon, Link2, Lock, Trophy, UserPlus, Users } from "lucide-react";
+import { Eye, Globe, Hexagon, Link2, Lock, Pencil, Trophy, UserPlus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useIsMobile } from "@/hooks/useIsMobile";
-import { deckVisibilityLabel, normalizeDeckVisibility } from "@/lib/deck/visibility";
+import {
+  deckTeamSharingFromDeck,
+  deckVisibilityDisplayLabel,
+  normalizeDeckVisibility,
+} from "@/lib/deck/visibility";
 import { useProfanityDisplayText } from "@/lib/moderation/use-profanity-display-text";
 import { useDeckSidebarItemContext } from "./context";
 
@@ -23,7 +27,9 @@ export function DeckSidebarItemHeader() {
         : visibility === "unlisted"
           ? Link2
           : visibility === "team"
-            ? Users
+            ? deckTeamSharingFromDeck(deck) === "team_editable"
+              ? Pencil
+              : Eye
             : visibility === "tournament"
               ? Trophy
               : Globe;
@@ -70,7 +76,7 @@ export function DeckSidebarItemHeader() {
         <div className="flex flex-wrap items-center gap-2 text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
           <span className="inline-flex items-center gap-1">
             <VisIcon className={visibility === "public" || visibility === "tournament" ? "h-3 w-3 text-primary" : "h-3 w-3"} />
-            {deckVisibilityLabel(visibility)}
+            {deckVisibilityDisplayLabel(deck)}
           </span>
           {deck.format ? <span className="text-primary/80">{deck.format}</span> : null}
         </div>

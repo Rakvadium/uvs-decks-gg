@@ -30,7 +30,7 @@ export function GalleryViewModeFields({
   const currentMode = isMobile && state.viewMode === "details" ? "list" : state.viewMode;
 
   return (
-    <div className={cn("space-y-3", layout === "panel" && "rounded-lg border border-border/40 bg-muted/20 p-3")}>
+    <div className={cn("space-y-3", layout === "panel" && "rounded-lg border border-[color:var(--control-dual-border)] bg-muted/20 p-3")}>
       <span className="font-mono text-xs uppercase tracking-widest text-muted-foreground">View Mode</span>
 
       <div className="flex gap-1">
@@ -45,8 +45,8 @@ export function GalleryViewModeFields({
               className={cn(
                 "flex flex-1 flex-col items-center gap-1 rounded-md border p-2 transition-all",
                 currentMode === mode
-                  ? "border-primary/30 bg-primary/15 text-primary"
-                  : "border-transparent hover:bg-muted"
+                  ? "border-[color:var(--control-dual-border-strong)] bg-[color:var(--control-dual-surface-hover)] text-primary shadow-[0_0_14px_-6px_color-mix(in_oklch,var(--secondary)_30%,transparent)] [&_svg]:text-secondary/90"
+                  : "border-transparent hover:border-[color:var(--control-dual-border)] hover:bg-muted"
               )}
             >
               <Icon className="h-4 w-4" />
@@ -60,7 +60,7 @@ export function GalleryViewModeFields({
         <div className="space-y-2 border-t border-border/30 pt-2">
           <div className="flex items-center justify-between">
             <span className="font-mono text-xs text-muted-foreground">Cards per row</span>
-            <span className="font-mono text-xs text-primary">{state.cardsPerRow}</span>
+            <span className="font-mono text-xs text-[color:var(--control-dual-mix)]">{state.cardsPerRow}</span>
           </div>
           {isMobile ? (
             <div className="grid grid-cols-2 gap-1.5">
@@ -72,8 +72,8 @@ export function GalleryViewModeFields({
                   className={cn(
                     "rounded-md border px-2 py-1 text-xs font-mono uppercase tracking-wider transition-colors",
                     state.cardsPerRow === value
-                      ? "border-primary/40 bg-primary/15 text-primary"
-                      : "border-border/60 text-muted-foreground hover:bg-muted"
+                      ? "border-[color:var(--control-dual-border-strong)] bg-[color:var(--control-dual-surface-hover)] text-primary"
+                      : "border-[color:var(--control-dual-border)] text-muted-foreground hover:bg-muted hover:border-[color:var(--control-dual-border-strong)]"
                   )}
                 >
                   {value}
@@ -120,8 +120,8 @@ export function GalleryViewModePopover({ triggerStyle = "icon" }: { triggerStyle
             className={cn(
               "flex items-center justify-center rounded-md transition-colors",
               isMobile
-                ? "h-9 w-9 border border-primary/40 bg-background/50 text-muted-foreground shadow-[var(--chrome-search-field-shadow)] hover:border-primary/50 hover:bg-primary/10 hover:text-primary"
-                : "h-9 w-9 border border-primary/40 bg-background/50 text-muted-foreground shadow-[var(--chrome-search-field-shadow)] hover:border-primary/50 hover:bg-muted hover:text-foreground"
+                ? "h-9 w-9 border border-[color:var(--control-dual-border)] bg-background/50 text-muted-foreground shadow-[var(--chrome-search-field-shadow)] hover:border-[color:var(--control-dual-border-strong)] hover:bg-[color:var(--control-dual-surface-hover)] hover:text-foreground"
+                : "h-9 w-9 border border-[color:var(--control-dual-border)] bg-background/50 text-muted-foreground shadow-[var(--chrome-search-field-shadow)] hover:border-[color:var(--control-dual-border-strong)] hover:bg-muted hover:text-foreground"
             )}
             aria-label="Change view mode"
           >
@@ -129,7 +129,10 @@ export function GalleryViewModePopover({ triggerStyle = "icon" }: { triggerStyle
           </button>
         )}
       </PopoverTrigger>
-      <PopoverContent className="z-[200] w-48 p-3" align="end">
+      <PopoverContent
+        className="z-[200] w-48 border-[color:var(--control-dual-border)] p-3 shadow-[var(--chrome-popover-shadow),var(--popover-dual-glow)]"
+        align="end"
+      >
         <GalleryViewModeFields layout="popover" />
       </PopoverContent>
     </Popover>

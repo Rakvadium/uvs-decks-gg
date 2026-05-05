@@ -1,5 +1,6 @@
 import { Search, SlidersHorizontal, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useAvailableGallerySidebarContext } from "./context";
@@ -59,14 +60,16 @@ export function DeckDetailsGallerySidebarBottomBar({ position = "bottom" }: Deck
         </button>
 
         {meta.activeFilterCount > 0 ? (
-          <button
+          <Button
             type="button"
+            variant="destructiveOutline"
+            size="icon-sm"
+            className="size-9 shrink-0 rounded-md bg-background/60"
             onClick={actions.clearAllFilters}
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-primary/30 bg-background/60 text-primary transition-colors hover:border-primary/60 hover:bg-primary/15"
             aria-label="Clear all filters"
           >
-            <X className="h-4 w-4" />
-          </button>
+            <X className="h-4 w-4 shrink-0" />
+          </Button>
         ) : null}
       </div>
     </div>

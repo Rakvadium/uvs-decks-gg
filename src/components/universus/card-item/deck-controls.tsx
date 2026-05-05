@@ -2,6 +2,7 @@
 
 import { Minus, Plus } from "lucide-react";
 import { useChromeMode } from "@/providers/ColorSchemeProvider";
+import { chromeHasNeonChrome } from "@/lib/theme/chrome-behavior";
 import { cn } from "@/lib/utils";
 
 interface CardDeckControlsProps {
@@ -24,7 +25,7 @@ export function CardDeckControls({
   forceSolidSurface = false,
 }: CardDeckControlsProps) {
   const chromeMode = useChromeMode();
-  const frosted = !forceSolidSurface && chromeMode === "expressive";
+  const frosted = !forceSolidSurface && chromeHasNeonChrome(chromeMode);
   const showButtons = isHovered;
   const showCount = showQuantity ? deckCount > 0 || showButtons : showButtons;
 

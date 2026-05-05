@@ -1,11 +1,13 @@
-import { mutation } from "../_generated/server";
+import { mutation, query } from "../_generated/server";
+import { getAuthUserId } from "@convex-dev/auth/server";
 import { v } from "convex/values";
 import type { Doc, Id } from "../_generated/dataModel";
 import type { MutationCtx } from "../_generated/server";
 import { teamRoleValidator } from "../validators";
 import { requireAuth } from "../utils/validation";
 import {
-  assertUserHasNoActiveTeamMembership,
+  collectTeamsForUser,
+  exitAllTeamsForUserSwitching,
   getEffectiveTeamRole,
   requireCapability,
   type TeamRole,
@@ -13,8 +15,10 @@ import {
 
 const DEFAULT_INVITE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
-function normalizeEmail(email: string): string {
-  return email.trim().toLowerCase();
+async function loadTeamOrThrow(ctx: MutationCtx, teamId: Id<"teams">): Promise<Doc<"teams">> {
+  const team = await ctx.db.get(teamId);
+  if (!team) throw new Error("Team not found");
+  return team;
 }
 
 function generateInviteToken(): string {
@@ -26,46 +30,7 @@ function generateInviteToken(): string {
 async function hashInviteToken(token: string): Promise<string> {
   const data = new TextEncoder().encode(token);
   const digest = await crypto.subtle.digest("SHA-256", data);
-  return Array.from(new Uint8Array(digest), (b) =>
-    b.toString(16).padStart(2, "0"),
-  ).join("");
-}
-
-async function loadTeamOrThrow(
-  ctx: MutationCtx,
-  teamId: Id<"teams">,
-): Promise<Doc<"teams">> {
-  const team = await ctx.db.get(teamId);
-  if (!team) throw new Error("Team not found");
-  return team;
-}
-
-async function assertNotAlreadyActiveMember(
-  ctx: MutationCtx,
-  team: Doc<"teams">,
-  userId: Id<"users">,
-): Promise<void> {
-  const role = await getEffectiveTeamRole(ctx, team, userId);
-  if (role !== null) throw new Error("Already a member");
-}
-
-async function assertEmailNotActiveMember(
-  ctx: MutationCtx,
-  team: Doc<"teams">,
-  normalizedEmail: string,
-): Promise<void> {
-  const members = await ctx.db
-    .query("teamMembers")
-    .withIndex("by_teamId", (q) => q.eq("teamId", team._id))
-    .filter((q) => q.eq(q.field("status"), "active"))
-    .collect();
-  for (const m of members) {
-    const u = await ctx.db.get(m.userId);
-    const em = u?.email;
-    if (em && normalizeEmail(em) === normalizedEmail) {
-      throw new Error("User is already a member");
-    }
-  }
+  return Array.from(new Uint8Array(digest), (b) => b.toString(16).padStart(2, "0")).join("");
 }
 
 function parseInviteRole(role: TeamRole | undefined): TeamRole {
@@ -74,11 +39,83 @@ function parseInviteRole(role: TeamRole | undefined): TeamRole {
   return r;
 }
 
+const inviteLookupReturns = v.union(
+  v.null(),
+  v.object({
+    inviteId: v.id("teamInvites"),
+    teamId: v.id("teams"),
+    teamName: v.string(),
+    expiresAt: v.number(),
+    status: v.union(v.literal("pending"), v.literal("accepted"), v.literal("declined")),
+    viewer: v.union(
+      v.object({ signedIn: v.literal(false) }),
+      v.object({
+        signedIn: v.literal(true),
+        alreadyMemberOfInvitedTeam: v.boolean(),
+        needsLeaveCurrentTeamConfirmation: v.boolean(),
+        currentTeamName: v.optional(v.string()),
+      }),
+    ),
+  }),
+);
+
+export const getInviteDetails = query({
+  args: { token: v.string() },
+  returns: inviteLookupReturns,
+  handler: async (ctx, args) => {
+    const trimmed = args.token.trim();
+    if (trimmed.length < 16) return null;
+    const tokenHash = await hashInviteToken(trimmed);
+    const inv = await ctx.db
+      .query("teamInvites")
+      .withIndex("by_tokenHash", (q) => q.eq("tokenHash", tokenHash))
+      .unique();
+    if (!inv) return null;
+    const team = await ctx.db.get(inv.teamId);
+    if (!team) return null;
+    let status: "pending" | "accepted" | "declined" = "pending";
+    if (inv.acceptedAt !== undefined) status = "accepted";
+    else if (inv.declinedAt !== undefined) status = "declined";
+
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      return {
+        inviteId: inv._id,
+        teamId: inv.teamId,
+        teamName: team.name,
+        expiresAt: inv.expiresAt,
+        status,
+        viewer: { signedIn: false as const },
+      };
+    }
+
+    const roleHere = await getEffectiveTeamRole(ctx, team, userId);
+    const alreadyMemberOfInvitedTeam = roleHere !== null;
+
+    const myTeams = await collectTeamsForUser(ctx, userId);
+    const others = myTeams.filter((t) => t._id !== inv.teamId);
+    const needsLeaveCurrentTeamConfirmation =
+      !alreadyMemberOfInvitedTeam && others.length > 0;
+
+    return {
+      inviteId: inv._id,
+      teamId: inv.teamId,
+      teamName: team.name,
+      expiresAt: inv.expiresAt,
+      status,
+      viewer: {
+        signedIn: true as const,
+        alreadyMemberOfInvitedTeam,
+        needsLeaveCurrentTeamConfirmation,
+        currentTeamName: others[0]?.name,
+      },
+    };
+  },
+});
+
 export const createInvite = mutation({
   args: {
     teamId: v.id("teams"),
-    email: v.optional(v.string()),
-    invitedUserId: v.optional(v.id("users")),
     role: v.optional(teamRoleValidator),
     expiresAt: v.optional(v.number()),
   },
@@ -86,17 +123,7 @@ export const createInvite = mutation({
   handler: async (ctx, args) => {
     const actorId = await requireAuth(ctx);
     await requireCapability(ctx, args.teamId, "invite_members");
-    const team = await loadTeamOrThrow(ctx, args.teamId);
-
-    const rawEmail = args.email?.trim();
-    const hasEmail = rawEmail !== undefined && rawEmail.length > 0;
-    const hasUser = args.invitedUserId !== undefined;
-    if (!hasEmail && !hasUser) {
-      throw new Error("email or invitedUserId required");
-    }
-    if (hasEmail && hasUser) {
-      throw new Error("Provide only one of email or invitedUserId");
-    }
+    await loadTeamOrThrow(ctx, args.teamId);
 
     const inviteRole = parseInviteRole(args.role);
     const now = Date.now();
@@ -104,52 +131,11 @@ export const createInvite = mutation({
       args.expiresAt !== undefined ? args.expiresAt : now + DEFAULT_INVITE_TTL_MS;
     if (expiresAt <= now) throw new Error("expiresAt must be in the future");
 
-    if (hasUser) {
-      const uid = args.invitedUserId!;
-      if (uid === actorId) throw new Error("Cannot invite yourself");
-      const target = await ctx.db.get(uid);
-      if (!target) throw new Error("User not found");
-      await assertNotAlreadyActiveMember(ctx, team, uid);
-      await assertUserHasNoActiveTeamMembership(ctx, uid);
-
-      const pending = await ctx.db
-        .query("teamInvites")
-        .withIndex("by_teamId", (q) => q.eq("teamId", args.teamId))
-        .collect();
-      for (const inv of pending) {
-        if (
-          inv.acceptedAt === undefined &&
-          inv.expiresAt > now &&
-          inv.invitedUserId === uid
-        ) {
-          throw new Error("An invite is already pending for this user");
-        }
-      }
-    } else {
-      const normalized = normalizeEmail(rawEmail!);
-      if (!normalized.includes("@")) throw new Error("Invalid email");
-      await assertEmailNotActiveMember(ctx, team, normalized);
-
-      const existingForEmail = await ctx.db
-        .query("teamInvites")
-        .withIndex("by_email_and_teamId", (q) =>
-          q.eq("email", normalized).eq("teamId", args.teamId),
-        )
-        .collect();
-      for (const inv of existingForEmail) {
-        if (inv.acceptedAt === undefined && inv.expiresAt > now) {
-          throw new Error("An invite is already pending for this email");
-        }
-      }
-    }
-
     const token = generateInviteToken();
     const tokenHash = await hashInviteToken(token);
 
     await ctx.db.insert("teamInvites", {
       teamId: args.teamId,
-      email: hasEmail ? normalizeEmail(rawEmail!) : undefined,
-      invitedUserId: hasUser ? args.invitedUserId : undefined,
       tokenHash,
       role: inviteRole,
       invitedByUserId: actorId,
@@ -176,8 +162,33 @@ export const revokeInvite = mutation({
   },
 });
 
-export const acceptInvite = mutation({
+export const declineInvite = mutation({
   args: { token: v.string() },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    await requireAuth(ctx);
+    const token = args.token.trim();
+    if (token.length < 16) throw new Error("Invalid invite");
+    const tokenHash = await hashInviteToken(token);
+    const invite = await ctx.db
+      .query("teamInvites")
+      .withIndex("by_tokenHash", (q) => q.eq("tokenHash", tokenHash))
+      .unique();
+    if (!invite) throw new Error("Invalid or expired invite");
+    if (invite.acceptedAt !== undefined) throw new Error("Invite already accepted");
+    if (invite.declinedAt !== undefined) throw new Error("Invite already declined");
+    const now = Date.now();
+    if (invite.expiresAt <= now) throw new Error("Invite has expired");
+    await ctx.db.patch(invite._id, { declinedAt: now });
+    return null;
+  },
+});
+
+export const acceptInvite = mutation({
+  args: {
+    token: v.string(),
+    leaveCurrentTeamConfirmed: v.optional(v.boolean()),
+  },
   returns: v.object({ teamId: v.id("teams") }),
   handler: async (ctx, args) => {
     const userId = await requireAuth(ctx);
@@ -192,26 +203,21 @@ export const acceptInvite = mutation({
 
     if (!invite) throw new Error("Invalid or expired invite");
     if (invite.acceptedAt !== undefined) throw new Error("Invite already accepted");
+    if (invite.declinedAt !== undefined) throw new Error("Invite was declined");
     const now = Date.now();
     if (invite.expiresAt <= now) throw new Error("Invite has expired");
 
     const team = await loadTeamOrThrow(ctx, invite.teamId);
-    const user = await ctx.db.get(userId);
-    if (!user) throw new Error("User not found");
+    const existingRoleHere = await getEffectiveTeamRole(ctx, team, userId);
+    if (existingRoleHere !== null) throw new Error("Already a member");
 
-    let matches = false;
-    if (invite.invitedUserId !== undefined && invite.invitedUserId === userId) {
-      matches = true;
+    const myTeams = await collectTeamsForUser(ctx, userId);
+    const others = myTeams.filter((t) => t._id !== invite.teamId);
+    if (others.length > 0 && args.leaveCurrentTeamConfirmed !== true) {
+      throw new Error("LEAVE_CURRENT_TEAM_CONFIRMATION_REQUIRED");
     }
-    if (invite.email !== undefined && user.email !== undefined) {
-      if (normalizeEmail(user.email) === invite.email) matches = true;
-    }
-    if (!matches) throw new Error("This invite is for a different account");
 
-    const existingRole = await getEffectiveTeamRole(ctx, team, userId);
-    if (existingRole !== null) throw new Error("Already a member");
-
-    await assertUserHasNoActiveTeamMembership(ctx, userId);
+    await exitAllTeamsForUserSwitching(ctx, userId);
 
     const existingRow = await ctx.db
       .query("teamMembers")

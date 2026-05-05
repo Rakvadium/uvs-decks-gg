@@ -1,4 +1,4 @@
-[data-color-scheme="calm-storm"] {
+[data-color-theme="calm-storm"] {
   --background: oklch(0.985 0 0);
   --foreground: oklch(0.141 0.005 285.823);
   --card: oklch(0.9716 0.0066 286.2756);
@@ -31,10 +31,9 @@
   --sidebar-accent-foreground: oklch(0.293 0.066 243.157);
   --sidebar-border: oklch(0.901 0.058 230.902);
   --sidebar-ring: oklch(0.828 0.111 230.318);
-  --radius: 0.5rem;
 }
 
-[data-color-scheme="calm-storm"].dark {
+[data-color-theme="calm-storm"].dark {
   --background: oklch(0.141 0.005 285.823);
   --foreground: oklch(0.977 0.013 236.62);
   --card: oklch(0.1964 0.0419 217.4279);
@@ -67,5 +66,4 @@
   --sidebar-accent-foreground: oklch(0.901 0.058 230.902);
   --sidebar-border: oklch(0.37 0.013 285.805);
   --sidebar-ring: oklch(0.828 0.111 230.318);
-  --radius: 0.5rem;
 }

@@ -1,13 +1,13 @@
 "use client";
 
 import { createContext, useContext, useState, useMemo, ReactNode, useCallback, useEffect } from "react";
-import { useQuery, useMutation } from "convex/react";
+import { useConvexAuth, useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { Id } from "../../convex/_generated/dataModel";
 import { useRouter } from "next/navigation";
 import { useSiloedDeckOptional } from "@/lib/deck";
-import type { DeckVisibility } from "@/lib/deck/visibility";
-import { normalizeDeckVisibility } from "@/lib/deck/visibility";
+import type { DeckTeamSharing, DeckVisibility } from "@/lib/deck/visibility";
+import { deckTeamSharingFromDeck, normalizeDeckVisibility } from "@/lib/deck/visibility";
 import { useActiveDeck } from "./ActiveDeckProvider";
 
 type DeckSection = "main" | "side" | "reference";
@@ -15,6 +15,8 @@ type DeckDetailsUpdate = {
   name?: string;
   description?: string;
   visibility?: DeckVisibility;
+  teamId?: Id<"teams"> | null;
+  teamCollaboration?: DeckTeamSharing;
   imageCardId?: Id<"cards"> | null;
   startingCharacterId?: Id<"cards"> | null;
   selectedIdentity?: string | null;
@@ -39,6 +41,9 @@ interface DeckDetailsContextValue {
   setEditFormat: (value: string) => void;
   editVisibility: DeckVisibility;
   setEditVisibility: (value: DeckVisibility) => void;
+  editTeamCollaboration: DeckTeamSharing;
+  setEditTeamCollaboration: (value: DeckTeamSharing) => void;
+  canSetTeamVisibility: boolean;
   isSaving: boolean;
   saveEdits: () => Promise<void>;
   updateDeck: (updates: DeckDetailsUpdate) => Promise<void>;
@@ -67,19 +72,28 @@ export function DeckDetailsProvider({ children, deckId }: DeckDetailsProviderPro
   const [editDescription, setEditDescription] = useState("");
   const [editFormat, setEditFormat] = useState("");
   const [editVisibility, setEditVisibility] = useState<DeckVisibility>("private");
+  const [editTeamCollaboration, setEditTeamCollaboration] =
+    useState<DeckTeamSharing>("team_viewable");
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const router = useRouter();
 
+  const { isAuthenticated } = useConvexAuth();
   const { activeDeckId, setActiveDeck } = useActiveDeck();
   const siloedDeck = useSiloedDeckOptional();
   const typedDeckId = deckId as Id<"decks">;
   const currentUser = useQuery(api.user.currentUser);
+  const myTeam = useQuery(api.teams.permissions.getMyTeam, isAuthenticated ? {} : "skip");
   const queriedDeck = useQuery(api.decks.getById, siloedDeck ? "skip" : { deckId: typedDeckId });
   const deck = siloedDeck?.deck ?? queriedDeck;
   const isDeckLoading = siloedDeck ? siloedDeck.isLoading : queriedDeck === undefined;
   const isOwner = Boolean(deck && currentUser && deck.userId === currentUser._id);
   const isAdmin = currentUser?.role === "Admin";
+  const canSetTeamVisibility = Boolean(
+    isOwner &&
+      ((myTeam !== undefined && myTeam !== null) ||
+        (deck != null && normalizeDeckVisibility(deck) === "team")),
+  );
   const updateDeckMutation = useMutation(api.decks.update);
   const deleteDeckMutation = useMutation(api.decks.deleteDeck);
 
@@ -109,6 +123,7 @@ export function DeckDetailsProvider({ children, deckId }: DeckDetailsProviderPro
     setEditDescription(deck.description || "");
     setEditFormat(deck.format || "");
     setEditVisibility(normalizeDeckVisibility(deck));
+    setEditTeamCollaboration(deckTeamSharingFromDeck(deck));
     setIsEditing(true);
   }, [deck]);
 
@@ -118,6 +133,7 @@ export function DeckDetailsProvider({ children, deckId }: DeckDetailsProviderPro
       setEditDescription(deck.description || "");
       setEditFormat(deck.format || "");
       setEditVisibility(normalizeDeckVisibility(deck));
+      setEditTeamCollaboration(deckTeamSharingFromDeck(deck));
     }
     setIsEditing(false);
   }, [deck]);
@@ -131,6 +147,14 @@ export function DeckDetailsProvider({ children, deckId }: DeckDetailsProviderPro
         description: editDescription.trim() || undefined,
         visibility: editVisibility,
       };
+      if (editVisibility === "team") {
+        const resolvedTeamId = deck.teamId ?? myTeam?._id;
+        if (!resolvedTeamId) {
+          return;
+        }
+        updates.teamId = resolvedTeamId;
+        updates.teamCollaboration = editTeamCollaboration;
+      }
       if (siloedDeck) {
         await siloedDeck.updateDeck(updates);
       } else {
@@ -143,7 +167,16 @@ export function DeckDetailsProvider({ children, deckId }: DeckDetailsProviderPro
     } finally {
       setIsSaving(false);
     }
-  }, [deck, editName, editDescription, editVisibility, siloedDeck, updateDeckMutation]);
+  }, [
+    deck,
+    editName,
+    editDescription,
+    editVisibility,
+    editTeamCollaboration,
+    myTeam,
+    siloedDeck,
+    updateDeckMutation,
+  ]);
 
   const updateDeckDetails = useCallback(async (updates: DeckDetailsUpdate) => {
     if (!deck) return;
@@ -173,6 +206,7 @@ export function DeckDetailsProvider({ children, deckId }: DeckDetailsProviderPro
     setEditDescription(deck.description || "");
     setEditFormat(deck.format || "");
     setEditVisibility(normalizeDeckVisibility(deck));
+    setEditTeamCollaboration(deckTeamSharingFromDeck(deck));
   }, [deck, isEditing]);
 
   const value = useMemo((): DeckDetailsContextValue => ({
@@ -194,6 +228,9 @@ export function DeckDetailsProvider({ children, deckId }: DeckDetailsProviderPro
     setEditFormat,
     editVisibility,
     setEditVisibility,
+    editTeamCollaboration,
+    setEditTeamCollaboration,
+    canSetTeamVisibility,
     isSaving,
     saveEdits,
     updateDeck: updateDeckDetails,
@@ -219,6 +256,8 @@ export function DeckDetailsProvider({ children, deckId }: DeckDetailsProviderPro
     editDescription,
     editFormat,
     editVisibility,
+    editTeamCollaboration,
+    canSetTeamVisibility,
     isSaving,
     saveEdits,
     updateDeckDetails,

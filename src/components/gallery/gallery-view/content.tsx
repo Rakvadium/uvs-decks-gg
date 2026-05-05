@@ -1,11 +1,15 @@
 "use client";
 
 import { GalleryMainContent } from "../gallery-main-content";
-import { useGalleryView } from "./hook";
+import { GalleryRightSidebarSlots } from "./sidebar-slots";
 
 export function GalleryView() {
-  useGalleryView();
-  return <GalleryMainContent />;
+  return (
+    <>
+      <GalleryRightSidebarSlots />
+      <GalleryMainContent />
+    </>
+  );
 }
 
 export { GalleryView as UniversusGalleryView };

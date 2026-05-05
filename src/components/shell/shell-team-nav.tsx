@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useConvexAuth, useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
-import { UsersRound } from "lucide-react";
+import { Flag } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useLeftSidebarContext } from "./left-sidebar/context";
@@ -52,22 +52,17 @@ function TeamMark({
   hasTeam,
   className,
   imgClassName,
-  tone = "sidebar",
 }: {
   displayUrl: string | null | undefined;
   logoPending: boolean;
   hasTeam: boolean;
   className?: string;
   imgClassName?: string;
-  tone?: "sidebar" | "neutral";
 }) {
   return (
     <div
       className={cn(
-        "flex shrink-0 items-center justify-center overflow-hidden rounded-lg border",
-        tone === "sidebar"
-          ? "border-sidebar-border/60 bg-sidebar-accent/30"
-          : "border-border/50 bg-muted/30",
+        "flex shrink-0 items-center justify-center overflow-hidden rounded-lg border border-sidebar-border/60 bg-sidebar-accent/30",
         hasTeam && displayUrl ? "border-primary/25" : "border-border/60",
         className
       )}
@@ -77,9 +72,46 @@ function TeamMark({
       ) : displayUrl ? (
         <img src={displayUrl} alt="" className={cn("h-full w-full object-cover", imgClassName)} />
       ) : (
-        <UsersRound className="h-1/2 w-1/2 min-h-[0.75rem] min-w-[0.75rem] text-muted-foreground" aria-hidden />
+        <Flag className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
       )}
     </div>
+  );
+}
+
+function TeamMarkMobile({
+  displayUrl,
+  logoPending,
+  isActive,
+}: {
+  displayUrl: string | null | undefined;
+  logoPending: boolean;
+  isActive: boolean;
+}) {
+  if (logoPending) {
+    return <div className="h-8 w-8 shrink-0 animate-pulse rounded-full bg-muted/50" />;
+  }
+  if (displayUrl) {
+    return (
+      <img
+        src={displayUrl}
+        alt=""
+        className={cn(
+          "h-8 w-8 shrink-0 rounded-full object-cover transition-all duration-200",
+          isActive
+            ? "border border-secondary/55 shadow-[0_0_4px_color-mix(in_oklch,var(--secondary)_40%,transparent)]"
+            : "border border-border/60"
+        )}
+      />
+    );
+  }
+  return (
+    <Flag
+      className={cn(
+        "h-8 w-8 shrink-0 transition-all duration-200",
+        isActive ? "text-primary drop-shadow-[0_0_4px_var(--primary)]" : "text-muted-foreground"
+      )}
+      aria-hidden
+    />
   );
 }
 
@@ -128,10 +160,10 @@ function ShellTeamNavSidebarInner({
     <Link
       href={teamHref}
       className={cn(
-        "render-stable relative flex w-full items-center gap-3 rounded-md border px-3 py-2 text-sm font-medium transition-all duration-200",
-        collapsed && "w-full justify-center px-2 py-2",
+        "render-stable relative flex w-full items-center gap-3 rounded-md border px-3 py-2.5 text-sm font-medium transition-all duration-200",
+        collapsed && "w-full justify-center px-2 py-2.5",
         isActive
-          ? "border-primary/30 bg-primary/15 text-primary shadow-[var(--chrome-shell-nav-active-shadow)]"
+          ? "border-secondary/40 bg-secondary/15 text-primary shadow-[var(--chrome-shell-nav-active-shadow)]"
           : "border-transparent text-sidebar-foreground/70 hover:border-sidebar-border/50 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
       )}
     >
@@ -139,14 +171,13 @@ function ShellTeamNavSidebarInner({
         displayUrl={hasTeam ? displayUrl : null}
         logoPending={hasTeam && logoPending}
         hasTeam={hasTeam}
-        className={cn("h-7 w-7", collapsed && "h-8 w-8")}
+        className="h-8 w-8 rounded-full"
         imgClassName=""
-        tone="sidebar"
       />
       {!collapsed ? (
         <span className="whitespace-nowrap font-mono text-xs uppercase tracking-wider">{label}</span>
       ) : null}
-      {isActive ? <div className="pointer-events-none absolute inset-0 rounded-md border border-primary/20" /> : null}
+      {isActive ? <div className="pointer-events-none absolute inset-0 rounded-md border border-secondary/30" /> : null}
     </Link>
   );
   if (collapsed) {
@@ -178,22 +209,27 @@ function ShellTeamNavMobileInner({
   return (
     <Link
       href={teamHref}
-      aria-label="Teams"
       className={cn(
-        "flex h-6 w-6 shrink-0 items-center justify-center overflow-hidden rounded-full border transition-all duration-200",
-        isActive
-          ? "border-primary/50 shadow-[0_0_0_1px_hsl(var(--primary)/0.25)]"
-          : "border-border/60 text-muted-foreground hover:border-primary/30 hover:text-foreground"
+        "relative flex w-full flex-1 flex-col items-center justify-center gap-1.5 py-2 transition-all duration-200",
+        isActive ? "text-primary" : "text-muted-foreground hover:text-foreground"
       )}
     >
-      <TeamMark
+      {isActive ? (
+        <div className="absolute inset-x-2 top-0 h-0.5 bg-secondary shadow-[0_0_3px_color-mix(in_oklch,var(--secondary)_50%,transparent),0_0_12px_color-mix(in_oklch,var(--secondary)_32%,transparent)]" />
+      ) : null}
+      <TeamMarkMobile
         displayUrl={hasTeam ? displayUrl : null}
         logoPending={hasTeam && logoPending}
-        hasTeam={hasTeam}
-        className="h-full w-full rounded-full border-0 bg-transparent"
-        imgClassName="rounded-full"
-        tone="neutral"
+        isActive={isActive}
       />
+      <span
+        className={cn(
+          "text-[10px] font-mono uppercase tracking-widest",
+          isActive && "font-semibold"
+        )}
+      >
+        Teams
+      </span>
     </Link>
   );
 }

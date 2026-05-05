@@ -32,7 +32,12 @@ export default function RootLayout({
 }>) {
   return (
     <ConvexAuthNextjsServerProvider>
-    <html lang="en" suppressHydrationWarning>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      data-color-theme="default"
+      data-chrome="calm"
+    >
       <body className="subpixel-antialiased">
         <Providers>{children}</Providers>
       </body>

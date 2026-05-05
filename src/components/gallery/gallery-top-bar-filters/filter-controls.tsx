@@ -43,7 +43,7 @@ export function GalleryTopBarEndActions({ placement }: { placement: GalleryTopBa
       ) : (
         <button
           type="button"
-          className="relative flex h-9 w-9 items-center justify-center rounded-md border border-primary/30 bg-background/60 text-muted-foreground transition-colors hover:border-primary/60 hover:bg-primary/10 hover:text-primary"
+          className="relative flex h-9 w-9 items-center justify-center rounded-md border border-[color:var(--control-dual-border)] bg-background/60 text-muted-foreground transition-colors hover:border-[color:var(--control-dual-border-strong)] hover:bg-[color:var(--control-dual-surface-hover)] hover:text-primary"
           aria-label="Open filter panel"
           onClick={() => setFilterPanelOpen(true)}
         >
@@ -73,11 +73,9 @@ export function GalleryFilterControls() {
           {meta.activeFilterCount > 0 ? (
             <Button
               type="button"
-              variant="outline"
+              variant="destructiveOutline"
               size="icon-sm"
-              className={cn(
-                "size-9 shrink-0 border-destructive/50 text-destructive hover:border-destructive hover:bg-destructive/10 hover:text-destructive focus-visible:border-destructive focus-visible:ring-destructive/30"
-              )}
+              className="size-9 shrink-0 rounded-md bg-background/60"
               aria-label="Clear all filters"
               onClick={actions.clearAllFilters}
             >

@@ -1,6 +1,6 @@
 import Image from "next/image";
-import { Globe, Hexagon, Layers, Link2, Lock, Trophy, UserPlus, Users } from "lucide-react";
-import { normalizeDeckVisibility } from "@/lib/deck/visibility";
+import { Eye, Globe, Hexagon, Layers, Link2, Lock, Pencil, Trophy, UserPlus } from "lucide-react";
+import { deckTeamSharingFromDeck, normalizeDeckVisibility } from "@/lib/deck/visibility";
 import { useProfanityDisplayText } from "@/lib/moderation/use-profanity-display-text";
 import { useDeckGridItemContext } from "./context";
 
@@ -56,7 +56,11 @@ export function DeckGridItemMediaPanel() {
           </div>
         ) : visibility === "team" ? (
           <div className="rounded border border-border/50 bg-muted/60 p-1.5 backdrop-blur-sm">
-            <Users className="h-3 w-3 text-muted-foreground" />
+            {deckTeamSharingFromDeck(deck) === "team_editable" ? (
+              <Pencil className="h-3 w-3 text-muted-foreground" />
+            ) : (
+              <Eye className="h-3 w-3 text-muted-foreground" />
+            )}
           </div>
         ) : visibility === "tournament" ? (
           <div className="rounded border border-primary/40 bg-primary/30 p-1.5 backdrop-blur-sm">

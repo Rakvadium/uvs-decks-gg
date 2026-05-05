@@ -2,6 +2,11 @@ import { defineSchema, defineTable } from "convex/server";
 import { authTables } from "@convex-dev/auth/server";
 import { v } from "convex/values";
 import {
+  chromePreferenceValidator,
+  chromeVariantValidator,
+  colorSchemeValidator,
+  colorSourceValidator,
+  userFeedbackKindValidator,
   deckBuilderUiStateV1Validator,
   deckTeamCollaborationValidator,
   deckVisibilityValidator,
@@ -251,6 +256,7 @@ export default defineSchema({
     createdAt: v.number(),
     expiresAt: v.number(),
     acceptedAt: v.optional(v.number()),
+    declinedAt: v.optional(v.number()),
   })
     .index("by_teamId", ["teamId"])
     .index("by_tokenHash", ["tokenHash"])
@@ -418,24 +424,10 @@ export default defineSchema({
     userId: v.id("users"),
     activeDeckId: v.optional(v.id("decks")),
     theme: v.optional(v.union(v.literal("light"), v.literal("dark"), v.literal("system"))),
-    colorScheme: v.optional(
-      v.union(
-        v.literal("default"),
-        v.literal("calm-storm"),
-        v.literal("cyberpunk"),
-        v.literal("bubblegum"),
-        v.literal("caffeine"),
-        v.literal("darkmatter"),
-        v.literal("holoterminal")
-      )
-    ),
-    chromePreference: v.optional(
-      v.union(
-        v.literal("auto"),
-        v.literal("calm"),
-        v.literal("expressive")
-      )
-    ),
+    chrome: v.optional(chromeVariantValidator),
+    colorSource: v.optional(colorSourceValidator),
+    colorScheme: colorSchemeValidator,
+    chromePreference: chromePreferenceValidator,
     galleryFilters: v.optional(v.any()),
     rightSidebarAction: v.optional(v.string()),
     lastActiveAt: v.number(),
@@ -606,4 +598,12 @@ export default defineSchema({
   communityYoutubeCurationInitState: defineTable({
     key: v.string(),
   }).index("by_key", ["key"]),
+
+  userFeedback: defineTable({
+    kind: userFeedbackKindValidator,
+    pagePath: v.string(),
+    message: v.string(),
+    isAnonymous: v.boolean(),
+    userId: v.optional(v.id("users")),
+  }),
 });

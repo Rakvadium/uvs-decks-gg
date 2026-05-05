@@ -3,11 +3,12 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
 export const galleryToolbarControlClassName = cn(
-  "h-9 rounded-md border border-primary/40 bg-background/50 text-sm font-sans font-normal normal-case tracking-normal",
+  "h-9 rounded-md border border-[color:var(--control-dual-border)] bg-background/50 text-sm font-sans font-normal normal-case tracking-normal",
   "shadow-[var(--chrome-search-field-shadow)] transition-all duration-200 outline-none",
-  "hover:border-primary/50",
-  "focus-visible:border-primary focus-visible:shadow-[var(--chrome-search-field-shadow-focus)]",
-  "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+  "hover:border-[color:var(--control-dual-border-strong)] hover:bg-[color-mix(in_oklch,var(--primary)_5%,var(--secondary)_4%,var(--background)_91%)]",
+  "focus-visible:border-[color:var(--control-dual-border-strong)] focus-visible:shadow-[var(--chrome-search-field-shadow-focus)]",
+  "focus-visible:ring-2 focus-visible:ring-[color:color-mix(in_oklch,var(--primary)_26%,var(--secondary)_26%,transparent)] focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+  "[&_svg:not([class*='text-'])]:text-secondary/85"
 );
 
 interface GallerySearchFieldProps {
@@ -47,7 +48,7 @@ export function GallerySearchField({
         <Search
           className={cn(
             "pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2",
-            isQuiet ? "text-muted-foreground" : "text-primary/70"
+            isQuiet ? "text-muted-foreground" : "text-[color:var(--control-dual-mix)]"
           )}
         />
       )}
@@ -62,7 +63,7 @@ export function GallerySearchField({
                 "flex h-7 w-7 shrink-0 items-center justify-center rounded-md transition-colors",
                 isQuiet
                   ? "text-muted-foreground hover:bg-muted hover:text-foreground"
-                  : "text-primary/70 hover:bg-primary/10 hover:text-primary"
+                  : "text-[color:var(--control-dual-mix)] hover:bg-[color:var(--control-dual-surface-hover)] hover:text-primary"
               )}
               aria-label="Clear search"
             >
@@ -79,7 +80,7 @@ export function GallerySearchField({
           "h-9 bg-background/50 text-sm",
           isQuiet
             ? "border-border/60"
-            : "border-primary/40 shadow-[var(--chrome-search-field-shadow)] focus-visible:border-primary focus-visible:shadow-[var(--chrome-search-field-shadow-focus)]",
+            : "border-[color:var(--control-dual-border)] shadow-[var(--chrome-search-field-shadow)] focus-visible:border-[color:var(--control-dual-border-strong)] focus-visible:shadow-[var(--chrome-search-field-shadow-focus),0_0_0_3px_color-mix(in_oklch,var(--secondary)_18%,transparent)]",
           !leadingSlot && "pl-9",
           inputClassName,
           hasTrailing && "pr-10"

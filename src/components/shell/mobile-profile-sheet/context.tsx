@@ -7,7 +7,7 @@ import { useConvexAuth, useQuery } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import type { Doc } from "../../../../convex/_generated/dataModel";
 import { useAuthDialog } from "@/components/auth/auth-dialog";
-import { useColorScheme, useTheme, type ColorScheme } from "@/lib/theme";
+import { useColorScheme, useTheme } from "@/lib/theme";
 import { useMobileShell } from "../mobile-shell-context";
 
 interface MobileProfileSheetContextValue {
@@ -16,8 +16,9 @@ interface MobileProfileSheetContextValue {
   isAuthenticated: boolean;
   isLoading: boolean;
   isDark: boolean;
-  colorScheme: ColorScheme;
-  setColorScheme: (scheme: ColorScheme) => void;
+  colorPreset: ReturnType<typeof useColorScheme>["colorPreset"];
+  isCustomAppearance: boolean;
+  applyColorPreset: ReturnType<typeof useColorScheme>["setAppearancePreset"];
   isAdmin: boolean;
   isOnAdminPage: boolean;
   isProfileSheetOpen: boolean;
@@ -39,7 +40,11 @@ export function MobileProfileSheetProvider({ children }: { children: ReactNode }
   const authActions = useAuthActions();
   const { isAuthenticated, isLoading } = useConvexAuth();
   const { isDark, toggleTheme } = useTheme();
-  const { colorScheme, setColorScheme } = useColorScheme();
+  const {
+    colorPreset,
+    isCustomAppearance,
+    setAppearancePreset,
+  } = useColorScheme();
   const { openAuthDialog } = useAuthDialog();
   const { isProfileSheetOpen, setProfileSheetOpen } = useMobileShell();
 
@@ -89,8 +94,9 @@ export function MobileProfileSheetProvider({ children }: { children: ReactNode }
       isAuthenticated,
       isLoading,
       isDark,
-      colorScheme,
-      setColorScheme,
+      colorPreset,
+      isCustomAppearance,
+      applyColorPreset: setAppearancePreset,
       isAdmin,
       isOnAdminPage,
       isProfileSheetOpen,
@@ -109,8 +115,9 @@ export function MobileProfileSheetProvider({ children }: { children: ReactNode }
       isAuthenticated,
       isLoading,
       isDark,
-      colorScheme,
-      setColorScheme,
+      colorPreset,
+      isCustomAppearance,
+      setAppearancePreset,
       isAdmin,
       isOnAdminPage,
       isProfileSheetOpen,

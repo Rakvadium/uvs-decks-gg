@@ -140,9 +140,9 @@ export function CommunityTierListDetailDesktopHeader() {
     <AlertDialog>
       <AlertDialogTrigger asChild>
         <Button
-          variant="outline"
+          variant="destructiveOutline"
           size="sm"
-          className="h-9 gap-1.5 border-destructive/40 text-destructive hover:bg-destructive/10 hover:text-destructive"
+          className="h-9 gap-1.5"
         >
           <Trash2 className="h-4 w-4" />
           Delete

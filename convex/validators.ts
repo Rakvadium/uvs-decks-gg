@@ -310,7 +310,7 @@ export const galleryFiltersValidator = v.object({
 });
 
 export const themePreferenceValidator = v.optional(
-  v.union(v.literal("light"), v.literal("dark"), v.literal("system"))
+  v.union(v.literal("light"), v.literal("dark"), v.literal("system")),
 );
 
 export const colorSchemeValidator = v.optional(
@@ -319,14 +319,68 @@ export const colorSchemeValidator = v.optional(
     v.literal("calm-storm"),
     v.literal("cyberpunk"),
     v.literal("bubblegum"),
+    v.literal("cotton-candy"),
     v.literal("caffeine"),
     v.literal("darkmatter"),
-    v.literal("holoterminal")
-  )
+    v.literal("holoterminal"),
+  ),
 );
 
 export const chromePreferenceValidator = v.optional(
-  v.union(v.literal("auto"), v.literal("calm"), v.literal("expressive"))
+  v.union(v.literal("auto"), v.literal("calm"), v.literal("expressive")),
+);
+
+export const chromeVariantValidator = v.union(
+  v.literal("calm"),
+  v.literal("expressive"),
+  v.literal("holoterminal"),
+  v.literal("bubblegum"),
+  v.literal("darkmatter"),
+);
+
+export const colorPresetValidator = v.union(
+  v.literal("default"),
+  v.literal("calm-storm"),
+  v.literal("cyberpunk"),
+  v.literal("cotton-candy"),
+  v.literal("caffeine"),
+  v.literal("aurora"),
+  v.literal("sorbet"),
+  v.literal("singularity"),
+);
+
+export const appearancePrimarySecondaryValidator = v.object({
+  primary: v.string(),
+  secondary: v.string(),
+});
+
+export const appearanceModePairValidator = v.object({
+  light: appearancePrimarySecondaryValidator,
+  dark: appearancePrimarySecondaryValidator,
+});
+
+export const appearanceCustomValidator = v.object({
+  fallback: appearanceModePairValidator,
+  byChrome: v.optional(
+    v.object({
+      calm: v.optional(appearanceModePairValidator),
+      expressive: v.optional(appearanceModePairValidator),
+      holoterminal: v.optional(appearanceModePairValidator),
+      bubblegum: v.optional(appearanceModePairValidator),
+      darkmatter: v.optional(appearanceModePairValidator),
+    }),
+  ),
+});
+
+export const colorSourceValidator = v.union(
+  v.object({
+    kind: v.literal("preset"),
+    preset: colorPresetValidator,
+  }),
+  v.object({
+    kind: v.literal("custom"),
+    custom: appearanceCustomValidator,
+  }),
 );
 
 export const sessionValidator = v.object({
@@ -335,6 +389,8 @@ export const sessionValidator = v.object({
   userId: v.id("users"),
   activeDeckId: v.optional(v.id("decks")),
   theme: themePreferenceValidator,
+  chrome: v.optional(chromeVariantValidator),
+  colorSource: v.optional(colorSourceValidator),
   colorScheme: colorSchemeValidator,
   chromePreference: chromePreferenceValidator,
   galleryFilters: v.optional(galleryFiltersValidator),
@@ -511,6 +567,7 @@ export const teamInviteValidator = v.object({
   createdAt: v.number(),
   expiresAt: v.number(),
   acceptedAt: v.optional(v.number()),
+  declinedAt: v.optional(v.number()),
 });
 
 export const teamAnnouncementValidator = v.object({
@@ -546,3 +603,11 @@ export const teamEventValidator = v.object({
   createdByUserId: v.id("users"),
   createdAt: v.number(),
 });
+
+export const userFeedbackKindValidator = v.union(
+  v.literal("general"),
+  v.literal("feature_idea"),
+  v.literal("bug"),
+  v.literal("enhancement"),
+  v.literal("other"),
+);

@@ -42,9 +42,9 @@ function DropdownMenuContent({
         data-slot="dropdown-menu-content"
         sideOffset={sideOffset}
         className={cn(
-          "z-[300] max-h-(--radix-dropdown-menu-content-available-height) min-w-[8rem] origin-(--radix-dropdown-menu-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-lg border p-1.5",
-          "bg-popover/95 text-popover-foreground backdrop-blur-lg [border-color:var(--chrome-popover-border)]",
-          "shadow-[var(--chrome-popover-shadow)]",
+          "z-[300] max-h-(--radix-dropdown-menu-content-available-height) min-w-[8rem] origin-(--radix-dropdown-menu-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-lg border border-[color:var(--control-dual-border)] p-1.5",
+          "bg-popover/95 text-popover-foreground backdrop-blur-lg",
+          "shadow-[var(--chrome-popover-shadow),var(--popover-dual-glow)]",
           "data-[state=open]:animate-in data-[state=closed]:animate-out",
           "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
           "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
@@ -81,7 +81,7 @@ function DropdownMenuItem({
       data-variant={variant}
       className={cn(
         "relative flex cursor-default items-center gap-2 rounded-md px-3 py-2 text-sm outline-hidden select-none transition-colors",
-        "hover:bg-primary/10 hover:text-primary focus:bg-primary/10 focus:text-primary",
+        "hover:bg-[color:var(--control-option-hover-bg)] hover:text-foreground focus:bg-[color:var(--control-option-hover-bg)] focus:text-foreground",
         "data-[variant=destructive]:text-destructive data-[variant=destructive]:hover:bg-destructive/10 data-[variant=destructive]:focus:bg-destructive/10",
         "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
         "data-[inset]:pl-8",
@@ -105,7 +105,7 @@ function DropdownMenuCheckboxItem({
       data-slot="dropdown-menu-checkbox-item"
       className={cn(
         "relative flex cursor-default items-center gap-2 rounded-md py-2 pr-3 pl-8 text-sm outline-hidden select-none transition-colors",
-        "hover:bg-primary/10 hover:text-primary focus:bg-primary/10 focus:text-primary",
+        "hover:bg-[color:var(--control-option-hover-bg)] hover:text-foreground focus:bg-[color:var(--control-option-hover-bg)] focus:text-foreground",
         "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
         "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className
@@ -115,7 +115,7 @@ function DropdownMenuCheckboxItem({
     >
       <span className="pointer-events-none absolute left-2 flex size-4 items-center justify-center">
         <DropdownMenuPrimitive.ItemIndicator>
-          <CheckIcon className="size-4 text-primary drop-shadow-[0_0_4px_var(--primary)]" />
+          <CheckIcon className="size-4 text-primary drop-shadow-[0_0_6px_color-mix(in_oklch,var(--secondary)_45%,transparent)]" />
         </DropdownMenuPrimitive.ItemIndicator>
       </span>
       {children}
@@ -144,7 +144,7 @@ function DropdownMenuRadioItem({
       data-slot="dropdown-menu-radio-item"
       className={cn(
         "relative flex cursor-default items-center gap-2 rounded-md py-2 pr-3 pl-8 text-sm outline-hidden select-none transition-colors",
-        "hover:bg-primary/10 hover:text-primary focus:bg-primary/10 focus:text-primary",
+        "hover:bg-[color:var(--control-option-hover-bg)] hover:text-foreground focus:bg-[color:var(--control-option-hover-bg)] focus:text-foreground",
         "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
         "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className
@@ -153,7 +153,7 @@ function DropdownMenuRadioItem({
     >
       <span className="pointer-events-none absolute left-2 flex size-4 items-center justify-center">
         <DropdownMenuPrimitive.ItemIndicator>
-          <CircleIcon className="size-2 fill-primary text-primary drop-shadow-[0_0_4px_var(--primary)]" />
+          <CircleIcon className="size-2 fill-[color:color-mix(in_oklch,var(--secondary)_55%,var(--primary)_45%)] text-primary drop-shadow-[0_0_5px_color-mix(in_oklch,var(--secondary)_40%,transparent)]" />
         </DropdownMenuPrimitive.ItemIndicator>
       </span>
       {children}
@@ -230,8 +230,8 @@ function DropdownMenuSubTrigger({
       data-inset={inset}
       className={cn(
         "flex cursor-default items-center gap-2 rounded-md px-3 py-2 text-sm outline-hidden select-none transition-colors",
-        "hover:bg-primary/10 hover:text-primary focus:bg-primary/10 focus:text-primary",
-        "data-[state=open]:bg-primary/10 data-[state=open]:text-primary",
+        "hover:bg-[color:var(--control-option-hover-bg)] hover:text-foreground focus:bg-[color:var(--control-option-hover-bg)] focus:text-foreground",
+        "data-[state=open]:bg-[color:var(--control-option-hover-bg)] data-[state=open]:text-foreground",
         "data-[inset]:pl-8",
         "[&_svg:not([class*='text-'])]:text-muted-foreground",
         "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
@@ -254,9 +254,9 @@ function DropdownMenuSubContent({
       <DropdownMenuPrimitive.SubContent
         data-slot="dropdown-menu-sub-content"
         className={cn(
-          "z-[300] min-w-[8rem] origin-(--radix-dropdown-menu-content-transform-origin) overflow-hidden rounded-lg border p-1.5",
-          "bg-popover text-popover-foreground [border-color:var(--chrome-popover-border)]",
-          "shadow-[var(--chrome-popover-shadow)]",
+          "z-[300] min-w-[8rem] origin-(--radix-dropdown-menu-content-transform-origin) overflow-hidden rounded-lg border border-[color:var(--control-dual-border)] p-1.5",
+          "bg-popover text-popover-foreground",
+          "shadow-[var(--chrome-popover-shadow),var(--popover-dual-glow)]",
           "data-[state=open]:animate-in data-[state=closed]:animate-out",
           "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
           "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",

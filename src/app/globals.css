@@ -6,7 +6,19 @@
 @import "../styles/themes/default.css";
 @import "../styles/themes/calm-storm.css";
 @import "../styles/themes/cyberpunk.css";
-@import "../styles/themes/bubblegum.css";
+@import "../styles/themes/cotton-candy.css";
 @import "../styles/themes/caffeine.css";
-@import "../styles/themes/darkmatter.css";
-@import "../styles/themes/holoterminal.css";
+@import "../styles/themes/aurora.css";
+@import "../styles/themes/sorbet.css";
+@import "../styles/themes/singularity.css";
+
+html {
+  --control-dual-mix: color-mix(in oklch, var(--primary) 50%, var(--secondary) 50%);
+  --control-dual-border: color-mix(in oklch, var(--control-dual-mix) 62%, var(--border) 38%);
+  --control-dual-border-strong: color-mix(in oklch, var(--control-dual-mix) 76%, var(--border) 24%);
+  --control-dual-ring: color-mix(in oklch, var(--primary) 44%, var(--secondary) 56%);
+  --control-dual-surface-hover: color-mix(in oklch, var(--primary) 10%, var(--secondary) 8%, transparent);
+  --control-option-hover-bg: color-mix(in oklch, var(--primary) 14%, var(--secondary) 11%, transparent);
+  --popover-dual-glow: 0 18px 48px -18px color-mix(in oklch, var(--secondary) 28%, transparent),
+    0 0 42px -18px color-mix(in oklch, var(--primary) 22%, transparent);
+}

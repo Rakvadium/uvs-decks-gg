@@ -26,9 +26,8 @@ export function DeckDetailsTopBarDeleteAction({ compact = false }: DeckDetailsTo
     <AlertDialog>
       <AlertDialogTrigger asChild>
         <Button
-          variant="outline"
-          size={compact ? "icon" : "sm"}
-          className="h-8 border-destructive/30 text-destructive hover:bg-destructive/10"
+          variant="destructiveOutline"
+          size={compact ? "icon-sm" : "sm"}
           aria-label="Delete deck"
         >
           <Trash2 className="h-4 w-4" />

@@ -10,6 +10,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { useChromeMode } from "@/lib/theme";
+import { chromeUsesScanlines } from "@/lib/theme/chrome-behavior";
 import { CommunitySectionHeader } from "../../shared/section-header";
 import { SectionHeading } from "@/components/ui/typography-headings";
 import { useCommunityMediaFeedModel } from "./hook";
@@ -56,7 +57,7 @@ function MediaFeedSkeleton() {
 
 export function CommunityMediaFeedSection() {
   const chrome = useChromeMode();
-  const scanlineClass = chrome === "expressive" ? "scanlines" : "";
+  const scanlineClass = chromeUsesScanlines(chrome) ? "scanlines" : "";
   const { feed } = useCommunityMediaFeedModel();
 
   const featuredId =

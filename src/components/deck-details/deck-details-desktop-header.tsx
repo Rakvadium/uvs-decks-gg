@@ -8,8 +8,7 @@ import { Button } from "@/components/ui/button";
 import { DeckVisibilityBadgeMenu } from "@/components/deck-details/deck-visibility-badge-menu";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { cn } from "@/lib/utils";
-import type { DeckVisibility } from "@/lib/deck/visibility";
+import type { DeckTeamSharing, DeckVisibility } from "@/lib/deck/visibility";
 import { useDeckDetailsTopBarContext } from "./deck-details-top-bar/context";
 import { DeckDetailsTopBarDeleteAction } from "./deck-details-top-bar/delete-action";
 import { DeckDetailsTopBarViewActions } from "./deck-details-top-bar/view-actions";
@@ -25,12 +24,15 @@ export function DeckDetailsDesktopHeader() {
     setEditDescription,
     editVisibility,
     setEditVisibility,
+    editTeamCollaboration,
+    setEditTeamCollaboration,
     cancelEditing,
     isSaving,
     saveEdits,
     startEditing,
     isOwner,
     isAdmin,
+    canSetTeamVisibility,
   } = useDeckDetailsTopBarContext();
 
   if (isLoading || !deck) {
@@ -40,6 +42,12 @@ export function DeckDetailsDesktopHeader() {
   const handleVisibilitySelect = (value: DeckVisibility) => {
     if (!isEditing) startEditing();
     setEditVisibility(value);
+  };
+
+  const handleTeamSharingSelect = (mode: DeckTeamSharing) => {
+    if (!isEditing) startEditing();
+    setEditVisibility("team");
+    setEditTeamCollaboration(mode);
   };
 
   const titleNode = isEditing ? (
@@ -87,8 +95,11 @@ export function DeckDetailsDesktopHeader() {
         isOwner={isOwner}
         isEditing={isEditing}
         editVisibility={editVisibility}
+        editTeamCollaboration={editTeamCollaboration}
         onSelect={handleVisibilitySelect}
+        onSelectTeamSharing={handleTeamSharingSelect}
         canSetTournamentVisibility={isAdmin}
+        canSetTeamVisibility={canSetTeamVisibility}
       />
     </div>
   );

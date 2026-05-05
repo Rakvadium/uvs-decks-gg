@@ -3,6 +3,15 @@ import { internalQuery, query, mutation } from "../_generated/server";
 import { v } from "convex/values";
 import type { Doc, Id } from "../_generated/dataModel";
 import type { QueryCtx, MutationCtx } from "../_generated/server";
+
+const SWITCH_SUCCESSOR_RANK: Record<TeamRole, number> = {
+  captain: 100,
+  co_captain: 0,
+  architect: 1,
+  analyst: 2,
+  scout: 3,
+  pilot: 4,
+};
 import { requireAuth } from "../utils/validation";
 import { teamValidator } from "../validators";
 
@@ -169,7 +178,7 @@ export async function assertUserHasNoActiveTeamMembership(ctx: MutationCtx, user
   }
 }
 
-async function collectTeamsForUser(ctx: QueryCtx, userId: Id<"users">): Promise<Doc<"teams">[]> {
+export async function collectTeamsForUser(ctx: QueryCtx, userId: Id<"users">): Promise<Doc<"teams">[]> {
   const fromCaptain = await ctx.db
     .query("teams")
     .withIndex("by_captainUserId", (q) => q.eq("captainUserId", userId))
@@ -322,6 +331,118 @@ export const updateSettings = mutation({
   },
 });
 
+export async function deleteTeamCascade(ctx: MutationCtx, teamId: Id<"teams">) {
+  const invites = await ctx.db
+    .query("teamInvites")
+    .withIndex("by_teamId", (q) => q.eq("teamId", teamId))
+    .collect();
+  for (const inv of invites) {
+    await ctx.db.delete(inv._id);
+  }
+  const members = await ctx.db
+    .query("teamMembers")
+    .withIndex("by_teamId", (q) => q.eq("teamId", teamId))
+    .collect();
+  for (const m of members) {
+    await ctx.db.delete(m._id);
+  }
+  const announcements = await ctx.db
+    .query("teamAnnouncements")
+    .withIndex("by_teamId_and_createdAt", (q) => q.eq("teamId", teamId))
+    .collect();
+  for (const row of announcements) {
+    await ctx.db.delete(row._id);
+  }
+  const chatMessages = await ctx.db
+    .query("teamChatMessages")
+    .withIndex("by_teamId_and_createdAt", (q) => q.eq("teamId", teamId))
+    .collect();
+  for (const row of chatMessages) {
+    await ctx.db.delete(row._id);
+  }
+  const teamEvents = await ctx.db
+    .query("teamEvents")
+    .withIndex("by_teamId_and_startsAt", (q) => q.eq("teamId", teamId))
+    .collect();
+  for (const row of teamEvents) {
+    await ctx.db.delete(row._id);
+  }
+  const mediaRows = await ctx.db
+    .query("mediaAssets")
+    .withIndex("by_teamId", (q) => q.eq("teamId", teamId))
+    .collect();
+  for (const row of mediaRows) {
+    await ctx.storage.delete(row.storageId);
+    await ctx.db.delete(row._id);
+  }
+  await ctx.db.delete(teamId);
+}
+
+export async function exitSingleTeamMembership(
+  ctx: MutationCtx,
+  teamId: Id<"teams">,
+  userId: Id<"users">,
+) {
+  const team = await ctx.db.get(teamId);
+  if (!team) return;
+
+  const row = await ctx.db
+    .query("teamMembers")
+    .withIndex("by_teamId_and_userId", (q) => q.eq("teamId", teamId).eq("userId", userId))
+    .unique();
+
+  const activeOthers = await ctx.db
+    .query("teamMembers")
+    .withIndex("by_teamId", (q) => q.eq("teamId", teamId))
+    .filter((q) =>
+      q.and(q.eq(q.field("status"), "active"), q.neq(q.field("userId"), userId)),
+    )
+    .collect();
+
+  const isCaptain = team.captainUserId === userId;
+
+  if (isCaptain && activeOthers.length === 0) {
+    await deleteTeamCascade(ctx, teamId);
+    return;
+  }
+
+  if (isCaptain && activeOthers.length > 0) {
+    activeOthers.sort((a, b) => {
+      const pr = SWITCH_SUCCESSOR_RANK[a.role] - SWITCH_SUCCESSOR_RANK[b.role];
+      if (pr !== 0) return pr;
+      return a.joinedAt - b.joinedAt;
+    });
+    const successor = activeOthers[0]!;
+    await ctx.db.patch(teamId, {
+      captainUserId: successor.userId,
+      updatedAt: Date.now(),
+    });
+    await ctx.db.patch(successor._id, { role: "captain" });
+  }
+
+  if (row && row.status === "active") {
+    await ctx.db.patch(row._id, { status: "removed" });
+  }
+}
+
+export async function exitAllTeamsForUserSwitching(ctx: MutationCtx, userId: Id<"users">) {
+  const teamIds = new Set<Id<"teams">>();
+  const captainTeams = await ctx.db
+    .query("teams")
+    .withIndex("by_captainUserId", (q) => q.eq("captainUserId", userId))
+    .collect();
+  for (const t of captainTeams) teamIds.add(t._id);
+  const memberships = await ctx.db
+    .query("teamMembers")
+    .withIndex("by_userId", (q) => q.eq("userId", userId))
+    .filter((q) => q.eq(q.field("status"), "active"))
+    .collect();
+  for (const m of memberships) teamIds.add(m.teamId);
+  for (const tid of teamIds) {
+    await exitSingleTeamMembership(ctx, tid, userId);
+  }
+}
+
 export const dissolve = mutation({
   args: {
     teamId: v.id("teams"),
@@ -329,51 +450,7 @@ export const dissolve = mutation({
   returns: v.null(),
   handler: async (ctx, args) => {
     await requireCaptain(ctx, args.teamId);
-    const teamId = args.teamId;
-    const invites = await ctx.db
-      .query("teamInvites")
-      .withIndex("by_teamId", (q) => q.eq("teamId", teamId))
-      .collect();
-    for (const inv of invites) {
-      await ctx.db.delete(inv._id);
-    }
-    const members = await ctx.db
-      .query("teamMembers")
-      .withIndex("by_teamId", (q) => q.eq("teamId", teamId))
-      .collect();
-    for (const m of members) {
-      await ctx.db.delete(m._id);
-    }
-    const announcements = await ctx.db
-      .query("teamAnnouncements")
-      .withIndex("by_teamId_and_createdAt", (q) => q.eq("teamId", teamId))
-      .collect();
-    for (const row of announcements) {
-      await ctx.db.delete(row._id);
-    }
-    const chatMessages = await ctx.db
-      .query("teamChatMessages")
-      .withIndex("by_teamId_and_createdAt", (q) => q.eq("teamId", teamId))
-      .collect();
-    for (const row of chatMessages) {
-      await ctx.db.delete(row._id);
-    }
-    const teamEvents = await ctx.db
-      .query("teamEvents")
-      .withIndex("by_teamId_and_startsAt", (q) => q.eq("teamId", teamId))
-      .collect();
-    for (const row of teamEvents) {
-      await ctx.db.delete(row._id);
-    }
-    const mediaRows = await ctx.db
-      .query("mediaAssets")
-      .withIndex("by_teamId", (q) => q.eq("teamId", teamId))
-      .collect();
-    for (const row of mediaRows) {
-      await ctx.storage.delete(row.storageId);
-      await ctx.db.delete(row._id);
-    }
-    await ctx.db.delete(teamId);
+    await deleteTeamCascade(ctx, args.teamId);
     return null;
   },
 });

@@ -115,7 +115,7 @@ export function CardDetailsDialog({
         size="lg"
         presentation="plain"
         showCloseButton={false}
-        className="max-h-[90vh] overflow-hidden p-0 md:pb-0 md:w-[65vw] md:min-w-[65vw] md:max-w-[65vw]"
+        className="max-h-[90vh] overflow-hidden p-0 md:pb-0 md:w-[65vw] md:min-w-[65vw] md:max-w-[65vw] lg:w-[min(78vw,1180px)] lg:min-w-[min(78vw,1180px)] lg:max-w-[min(78vw,1180px)] xl:w-[min(82vw,1280px)] xl:min-w-[min(82vw,1280px)] xl:max-w-[min(82vw,1280px)]"
         onPointerDownOutside={(e) => {
           const target = e.target as HTMLElement;
           if (target.closest("[data-card-dialog-nav]")) {

@@ -12,7 +12,7 @@ export function LeftSidebarGuestSignInButton() {
       <TooltipTrigger asChild>
         <Button
           variant="outline"
-          onClick={openAuthDialog}
+          onClick={() => openAuthDialog()}
           className={cn(
             "w-full border-primary/30 hover:border-primary/60 hover:bg-primary/10 hover:text-primary",
             collapsed ? "h-10 w-10 p-0" : "h-12 justify-start gap-3 px-3"

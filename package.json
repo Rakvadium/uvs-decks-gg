@@ -48,6 +48,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "convex": "^1.31.0",
+    "culori": "^4.0.2",
     "framer-motion": "^12.23.26",
     "idb-keyval": "^6.2.2",
     "lucide-react": "^0.560.0",
@@ -65,6 +66,7 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/bun": "latest",
+    "@types/culori": "^4.0.1",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

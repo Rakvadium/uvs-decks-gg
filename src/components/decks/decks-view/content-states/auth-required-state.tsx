@@ -12,7 +12,7 @@ export function DecksAuthRequiredState() {
           <Lock className="h-10 w-10 text-primary/50" />
         </div>
         <p className="font-mono text-muted-foreground uppercase tracking-wider">Sign in to view your decks</p>
-        <Button variant="default" className="mt-4" onClick={openAuthDialog}>
+        <Button variant="default" className="mt-4" onClick={() => openAuthDialog()}>
           Sign In
         </Button>
       </div>

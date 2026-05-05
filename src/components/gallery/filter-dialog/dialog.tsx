@@ -7,6 +7,7 @@ import {
   DialogContent,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { GalleryTopBarFiltersProvider } from "@/components/gallery/gallery-top-bar-filters/context";
 import { useGalleryFiltersOptional } from "@/providers/GalleryFiltersProvider";
 import { GalleryFilterDialogBody } from "./body";
 import { GalleryFilterDialogProvider } from "./context";
@@ -54,7 +55,9 @@ export function GalleryFilterDialog({
         <DialogTitle className="sr-only">Filter Cards</DialogTitle>
 
         <GalleryFilterDialogProvider filtersContext={filtersContext}>
-          <GalleryFilterDialogLayout />
+          <GalleryTopBarFiltersProvider>
+            <GalleryFilterDialogLayout />
+          </GalleryTopBarFiltersProvider>
         </GalleryFilterDialogProvider>
       </DialogContent>
     </Dialog>

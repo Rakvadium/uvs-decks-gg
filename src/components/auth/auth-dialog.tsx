@@ -17,7 +17,7 @@ import { ResetPasswordFormDialog } from "./reset-password-dialog";
 
 interface AuthDialogContextValue {
   isOpen: boolean;
-  openAuthDialog: () => void;
+  openAuthDialog: (flow?: AuthDialogFlow) => void;
   closeAuthDialog: () => void;
 }
 
@@ -37,10 +37,16 @@ interface AuthDialogProviderProps {
 
 export function AuthDialogProvider({ children }: AuthDialogProviderProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [authFormKey, setAuthFormKey] = useState(0);
+  const [entryFlow, setEntryFlow] = useState<AuthDialogFlow>("signIn");
   const router = useRouter();
   const pathname = usePathname();
 
-  const openAuthDialog = useCallback(() => setIsOpen(true), []);
+  const openAuthDialog = useCallback((flow: AuthDialogFlow = "signIn") => {
+    setEntryFlow(flow);
+    setAuthFormKey((k) => k + 1);
+    setIsOpen(true);
+  }, []);
   const closeAuthDialog = useCallback(() => setIsOpen(false), []);
 
   const handleSuccess = useCallback(() => {
@@ -69,7 +75,7 @@ export function AuthDialogProvider({ children }: AuthDialogProviderProps) {
             </VisuallyHidden>
 
             <div className="min-h-0 flex-1 overflow-y-auto px-6 pt-6">
-              <AuthFormWithClose onSuccess={handleSuccess} />
+              <AuthFormWithClose key={authFormKey} initialFlow={entryFlow} onSuccess={handleSuccess} />
             </div>
           </div>
         </DialogContent>
@@ -78,8 +84,14 @@ export function AuthDialogProvider({ children }: AuthDialogProviderProps) {
   );
 }
 
-function AuthFormWithClose({ onSuccess }: { onSuccess: () => void }) {
-  const [flow, setFlow] = useState<AuthDialogFlow>("signIn");
+function AuthFormWithClose({
+  initialFlow,
+  onSuccess,
+}: {
+  initialFlow: AuthDialogFlow;
+  onSuccess: () => void;
+}) {
+  const [flow, setFlow] = useState<AuthDialogFlow>(initialFlow);
 
   return (
     <>

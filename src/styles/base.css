@@ -57,7 +57,7 @@
 }
 
 @layer chrome-calm {
-  :root[data-chrome="calm"] {
+  :root:is([data-chrome="calm"], [data-chrome="bubblegum"], [data-chrome="darkmatter"]) {
     --font-display: var(--font-sans);
 
     --chrome-focus-ring-width: 2px;
@@ -191,11 +191,95 @@
 
     --chrome-card-detail-image-shadow: 0 4px 12px -4px oklch(0 0 0 / 0.15);
     --chrome-card-detail-stat-bar-glow: none;
+
+    --radius: 0.625rem;
+    --shadow-2xs: 0 1px 2px 0 oklch(0 0 0 / 0.05);
+    --shadow-xs: 0 1px 3px 0 oklch(0 0 0 / 0.08);
+    --shadow-sm: 0 1px 3px 0 oklch(0 0 0 / 0.1), 0 1px 2px -1px oklch(0 0 0 / 0.1);
+    --shadow: 0 4px 6px -1px oklch(0 0 0 / 0.1), 0 2px 4px -2px oklch(0 0 0 / 0.1);
+    --shadow-md: 0 6px 12px -2px oklch(0 0 0 / 0.12), 0 3px 6px -2px oklch(0 0 0 / 0.08);
+    --shadow-lg: 0 12px 20px -4px oklch(0 0 0 / 0.14), 0 6px 10px -4px oklch(0 0 0 / 0.1);
+    --shadow-xl: 0 20px 28px -6px oklch(0 0 0 / 0.16), 0 10px 16px -6px oklch(0 0 0 / 0.1);
+    --shadow-2xl: 0 28px 40px -8px oklch(0 0 0 / 0.2);
+    --tracking-normal: 0em;
+    --spacing: 0.25rem;
+  }
+
+  :root:is([data-chrome="calm"], [data-chrome="bubblegum"], [data-chrome="darkmatter"]) body {
+    letter-spacing: var(--tracking-normal);
+  }
+}
+
+@layer chrome-shape-bubblegum {
+  :root[data-chrome="bubblegum"] {
+    --radius: 0.4rem;
+    --shadow-2xs: 3px 3px 0 0 color-mix(in srgb, var(--primary) 45%, transparent);
+    --shadow-xs: 3px 3px 0 0 color-mix(in srgb, var(--primary) 55%, transparent);
+    --shadow-sm: 3px 3px 0 0 color-mix(in srgb, var(--primary) 100%, transparent),
+      3px 1px 2px -1px color-mix(in srgb, var(--primary) 80%, transparent);
+    --shadow:
+      3px 3px 0 0 color-mix(in srgb, var(--primary) 100%, transparent),
+      3px 1px 2px -1px color-mix(in srgb, var(--primary) 80%, transparent);
+    --shadow-md:
+      3px 3px 0 0 color-mix(in srgb, var(--primary) 100%, transparent),
+      3px 2px 4px -1px color-mix(in srgb, var(--primary) 80%, transparent);
+    --shadow-lg:
+      3px 3px 0 0 color-mix(in srgb, var(--primary) 100%, transparent),
+      3px 4px 6px -1px color-mix(in srgb, var(--primary) 85%, transparent);
+    --shadow-xl:
+      3px 3px 0 0 color-mix(in srgb, var(--primary) 100%, transparent),
+      3px 8px 10px -1px color-mix(in srgb, var(--primary) 85%, transparent);
+    --shadow-2xl: 3px 3px 0 0 color-mix(in srgb, var(--primary) 100%, transparent);
+
+    --chrome-focus-shadow: 3px 3px 0 0 color-mix(in srgb, var(--primary) 45%, transparent);
+
+    --chrome-button-shadow-default: var(--shadow-xs);
+    --chrome-button-shadow-default-hover: var(--shadow-sm);
+    --chrome-button-shadow-destructive: 3px 3px 0 0 oklch(0 0 0 / 0.14);
+    --chrome-button-shadow-destructive-hover: 3px 4px 0 0 oklch(0 0 0 / 0.18);
+    --chrome-button-shadow-outline-hover: 3px 3px 0 0 color-mix(in srgb, var(--primary) 40%, transparent);
+    --chrome-button-shadow-secondary-hover: 3px 3px 0 0 color-mix(in srgb, var(--secondary) 45%, transparent);
+
+    --chrome-badge-default-shadow: var(--shadow-2xs);
+    --chrome-badge-default-shadow-hover: var(--shadow-xs);
+    --chrome-badge-secondary-shadow: var(--shadow-2xs);
+    --chrome-badge-secondary-shadow-hover: var(--shadow-xs);
+    --chrome-badge-destructive-shadow: var(--chrome-button-shadow-destructive);
+    --chrome-badge-destructive-shadow-hover: var(--chrome-button-shadow-destructive-hover);
+
+    --chrome-search-field-shadow: var(--shadow-2xs);
+    --chrome-search-field-shadow-focus: var(--shadow-xs);
+
+    --chrome-tooltip-shadow: var(--shadow-sm);
+    --chrome-popover-shadow: var(--shadow-md);
+    --chrome-sheet-shadow: 0 -8px 0 0 color-mix(in srgb, var(--primary) 25%, transparent);
+
+    --chrome-card-shadow: var(--shadow-xs);
+    --chrome-card-shadow-hover: var(--shadow-sm);
+
+    --chrome-shell-nav-active-shadow: var(--shadow-2xs);
+    --chrome-shell-brand-shadow: var(--shadow-xs);
+    --chrome-shell-brand-shadow-hover: var(--shadow-sm);
+    --chrome-shell-rail-active-shadow: var(--shadow-2xs);
+  }
+}
+
+@layer chrome-shape-darkmatter {
+  :root[data-chrome="darkmatter"] {
+    --radius: 0.75rem;
+    --shadow-2xs: 0px 1px 4px 0px hsl(0 0% 0% / 0.03);
+    --shadow-xs: 0px 1px 4px 0px hsl(0 0% 0% / 0.03);
+    --shadow-sm: 0px 1px 4px 0px hsl(0 0% 0% / 0.05), 0px 1px 2px -1px hsl(0 0% 0% / 0.05);
+    --shadow: var(--shadow-sm);
+    --shadow-md: 0px 1px 4px 0px hsl(0 0% 0% / 0.05), 0px 2px 4px -1px hsl(0 0% 0% / 0.05);
+    --shadow-lg: 0px 1px 4px 0px hsl(0 0% 0% / 0.05), 0px 4px 6px -1px hsl(0 0% 0% / 0.05);
+    --shadow-xl: 0px 1px 4px 0px hsl(0 0% 0% / 0.05), 0px 8px 10px -1px hsl(0 0% 0% / 0.05);
+    --shadow-2xl: 0px 1px 4px 0px hsl(0 0% 0% / 0.13);
   }
 }
 
 @layer chrome-expressive {
-  :root[data-chrome="expressive"] {
+  :root:is([data-chrome="expressive"], [data-chrome="holoterminal"]) {
     --chrome-focus-ring-width: 2px;
     --chrome-focus-ring-color: var(--primary);
     --chrome-focus-shadow: 0 0 0 2px var(--primary), 0 0 12px oklch(from var(--primary) l c h / 0.4);
@@ -270,10 +354,10 @@
 
     --chrome-shell-sidebar-wash: linear-gradient(to bottom, oklch(from var(--primary) l c h / 0.05) 0%, transparent 50%, oklch(from var(--secondary) l c h / 0.05) 100%);
     --chrome-shell-icon-drop-shadow: drop-shadow(0 0 3px var(--primary));
-    --chrome-shell-nav-active-shadow: 0 0 2px oklch(from var(--primary) l c h / 0.5), 0 0 6px oklch(from var(--primary) l c h / 0.3);
+    --chrome-shell-nav-active-shadow: 0 0 2px oklch(from var(--secondary) l c h / 0.55), 0 0 10px oklch(from var(--secondary) l c h / 0.38);
     --chrome-shell-brand-shadow: 0 0 2px oklch(from var(--primary) l c h / 0.5), 0 0 5px oklch(from var(--primary) l c h / 0.4);
     --chrome-shell-brand-shadow-hover: 0 0 3px var(--primary), 0 0 8px oklch(from var(--primary) l c h / 0.6);
-    --chrome-shell-rail-active-shadow: 0 0 2px oklch(from var(--primary) l c h / 0.6), 0 0 6px oklch(from var(--primary) l c h / 0.4);
+    --chrome-shell-rail-active-shadow: 0 0 2px oklch(from var(--secondary) l c h / 0.6), 0 0 10px oklch(from var(--secondary) l c h / 0.42);
     --chrome-shell-rail-resize-shadow: 0 0 3px var(--primary), 0 0 8px oklch(from var(--primary) l c h / 0.6);
     --chrome-shell-rail-resize-shadow-hover: 0 0 2px var(--primary), 0 0 6px oklch(from var(--primary) l c h / 0.5);
     --chrome-shell-deck-label-drop-shadow: drop-shadow(0 0 8px var(--primary));
@@ -322,6 +406,50 @@
 
     --chrome-card-detail-image-shadow: 0 0 0 1px color-mix(in oklch, var(--primary) 30%, transparent), 0 4px 20px -4px color-mix(in oklch, var(--primary) 25%, transparent), 0 0 40px -8px color-mix(in oklch, var(--primary) 15%, transparent);
     --chrome-card-detail-stat-bar-glow: 0 0 6px currentColor;
+
+    --radius: 0.625rem;
+    --shadow-2xs: 0 1px 2px 0 color-mix(in oklch, var(--primary) 12%, oklch(0 0 0 / 0.04));
+    --shadow-xs: 0 2px 4px -1px color-mix(in oklch, var(--primary) 18%, oklch(0 0 0 / 0.06));
+    --shadow-sm: 0 2px 6px -1px color-mix(in oklch, var(--primary) 22%, transparent), 0 1px 3px oklch(0 0 0 / 0.08);
+    --shadow: 0 4px 14px -2px color-mix(in oklch, var(--primary) 18%, transparent), 0 2px 6px oklch(0 0 0 / 0.06);
+    --shadow-md: 0 8px 20px -4px color-mix(in oklch, var(--primary) 20%, transparent), 0 4px 10px oklch(0 0 0 / 0.08);
+    --shadow-lg: 0 14px 32px -6px color-mix(in oklch, var(--primary) 22%, transparent), 0 8px 18px oklch(0 0 0 / 0.1);
+    --shadow-xl: 0 22px 48px -8px color-mix(in oklch, var(--primary) 24%, transparent), 0 12px 28px oklch(0 0 0 / 0.12);
+    --shadow-2xl: 0 28px 64px -12px color-mix(in oklch, var(--primary) 28%, transparent), 0 16px 36px oklch(0 0 0 / 0.14);
+    --tracking-normal: 0em;
+    --spacing: 0.25rem;
+  }
+
+  :root:is([data-chrome="expressive"], [data-chrome="holoterminal"]) body {
+    letter-spacing: var(--tracking-normal);
+  }
+}
+
+@layer chrome-holoterminal-shape {
+  :root[data-chrome="holoterminal"] {
+    --radius: 0.375rem;
+    --shadow-2xs: 0 0 2px 0 color-mix(in oklch, var(--primary) 15%, transparent);
+    --shadow-xs: 0 0 4px 0 color-mix(in oklch, var(--primary) 20%, transparent);
+    --shadow-sm: 0 0 8px -2px color-mix(in oklch, var(--primary) 25%, transparent),
+      0 0 4px -2px color-mix(in oklch, var(--secondary) 15%, transparent);
+    --shadow: 0 0 15px -3px color-mix(in oklch, var(--primary) 30%, transparent),
+      0 0 6px -4px color-mix(in oklch, var(--secondary) 20%, transparent);
+    --shadow-md: 0 0 20px -4px color-mix(in oklch, var(--primary) 35%, transparent),
+      0 0 10px -4px color-mix(in oklch, var(--secondary) 25%, transparent);
+    --shadow-lg: 0 0 30px -5px color-mix(in oklch, var(--primary) 40%, transparent),
+      0 0 15px -5px color-mix(in oklch, var(--secondary) 30%, transparent);
+    --shadow-xl: 0 0 40px -6px color-mix(in oklch, var(--primary) 45%, transparent),
+      0 0 25px -6px color-mix(in oklch, var(--secondary) 35%, transparent);
+    --shadow-2xl: 0 0 60px -8px color-mix(in oklch, var(--primary) 50%, transparent),
+      0 0 35px -8px color-mix(in oklch, var(--secondary) 40%, transparent);
+    --tracking-normal: 0.02em;
+    --scanline-opacity: 0.015;
+    --grid-opacity: 0.02;
+  }
+
+  :root.dark[data-chrome="holoterminal"] {
+    --scanline-opacity: 0.03;
+    --grid-opacity: 0.04;
   }
 }
 
@@ -371,37 +499,37 @@
     font-family: var(--font-display);
   }
   
-  :root:is([data-chrome="expressive"], [data-fx="on"]) .text-glow-cyan {
+  :root:is([data-chrome="expressive"], [data-chrome="holoterminal"], [data-fx="on"]) .text-glow-cyan {
     text-shadow: 0 0 10px var(--glow-cyan, oklch(0.78 0.18 195)),
                  0 0 20px var(--glow-cyan, oklch(0.78 0.18 195) / 0.5),
                  0 0 40px var(--glow-cyan, oklch(0.78 0.18 195) / 0.3);
   }
 
-  :root:is([data-chrome="expressive"], [data-fx="on"]) .text-glow-magenta {
+  :root:is([data-chrome="expressive"], [data-chrome="holoterminal"], [data-fx="on"]) .text-glow-magenta {
     text-shadow: 0 0 10px var(--glow-magenta, oklch(0.65 0.22 310)),
                  0 0 20px var(--glow-magenta, oklch(0.65 0.22 310) / 0.5),
                  0 0 40px var(--glow-magenta, oklch(0.65 0.22 310) / 0.3);
   }
 
-  :root:is([data-chrome="expressive"], [data-fx="on"]) .text-glow-violet {
+  :root:is([data-chrome="expressive"], [data-chrome="holoterminal"], [data-fx="on"]) .text-glow-violet {
     text-shadow: 0 0 10px var(--glow-violet, oklch(0.68 0.19 280)),
                  0 0 20px var(--glow-violet, oklch(0.68 0.19 280) / 0.5),
                  0 0 40px var(--glow-violet, oklch(0.68 0.19 280) / 0.3);
   }
 
-  :root:is([data-chrome="expressive"], [data-fx="on"]) .box-glow-cyan {
+  :root:is([data-chrome="expressive"], [data-chrome="holoterminal"], [data-fx="on"]) .box-glow-cyan {
     box-shadow: 0 0 10px var(--glow-cyan, oklch(0.78 0.18 195) / 0.4),
                 0 0 20px var(--glow-cyan, oklch(0.78 0.18 195) / 0.2),
                 inset 0 0 15px var(--glow-cyan, oklch(0.78 0.18 195) / 0.1);
   }
 
-  :root:is([data-chrome="expressive"], [data-fx="on"]) .box-glow-magenta {
+  :root:is([data-chrome="expressive"], [data-chrome="holoterminal"], [data-fx="on"]) .box-glow-magenta {
     box-shadow: 0 0 10px var(--glow-magenta, oklch(0.65 0.22 310) / 0.4),
                 0 0 20px var(--glow-magenta, oklch(0.65 0.22 310) / 0.2),
                 inset 0 0 15px var(--glow-magenta, oklch(0.65 0.22 310) / 0.1);
   }
 
-  :root:is([data-chrome="expressive"], [data-fx="on"]) .box-glow-violet {
+  :root:is([data-chrome="expressive"], [data-chrome="holoterminal"], [data-fx="on"]) .box-glow-violet {
     box-shadow: 0 0 10px var(--glow-violet, oklch(0.68 0.19 280) / 0.4),
                 0 0 20px var(--glow-violet, oklch(0.68 0.19 280) / 0.2),
                 inset 0 0 15px var(--glow-violet, oklch(0.68 0.19 280) / 0.1);
@@ -411,7 +539,7 @@
     position: relative;
   }
 
-  :root:is([data-chrome="expressive"], [data-fx="on"]) .border-glow::before {
+  :root:is([data-chrome="expressive"], [data-chrome="holoterminal"], [data-fx="on"]) .border-glow::before {
     content: "";
     position: absolute;
     inset: -1px;
@@ -435,7 +563,7 @@
     overflow: hidden;
   }
 
-  :root:is([data-chrome="expressive"], [data-fx="on"]) .scanlines::after {
+  :root:is([data-chrome="expressive"], [data-chrome="holoterminal"], [data-fx="on"]) .scanlines::after {
     content: "";
     position: absolute;
     inset: 0;
@@ -461,7 +589,7 @@
     background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0v15M30 45v15M0 30h15M45 30h60M30 30h0' stroke='%2300d4ff' stroke-opacity='0.08' stroke-width='1' fill='none'/%3E%3Ccircle cx='30' cy='30' r='3' fill='%2300d4ff' fill-opacity='0.06'/%3E%3C/svg%3E");
   }
   
-  :root:is([data-chrome="expressive"], [data-fx="on"]) .holo-shimmer {
+  :root:is([data-chrome="expressive"], [data-chrome="holoterminal"], [data-fx="on"]) .holo-shimmer {
     background: linear-gradient(
       135deg,
       transparent 20%,

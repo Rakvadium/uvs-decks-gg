@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DeckVisibilityBadgeMenu } from "@/components/deck-details/deck-visibility-badge-menu";
 import { cn } from "@/lib/utils";
-import type { DeckVisibility } from "@/lib/deck/visibility";
+import type { DeckTeamSharing, DeckVisibility } from "@/lib/deck/visibility";
 import { useDeckDetailsTopBarContext } from "./context";
 
 interface DeckDetailsTopBarTitleSectionProps {
@@ -19,12 +19,15 @@ export function DeckDetailsTopBarTitleSection({ compact = false }: DeckDetailsTo
     setEditName,
     editVisibility,
     setEditVisibility,
+    editTeamCollaboration,
+    setEditTeamCollaboration,
     cancelEditing,
     isSaving,
     saveEdits,
     startEditing,
     isOwner,
     isAdmin,
+    canSetTeamVisibility,
   } = useDeckDetailsTopBarContext();
 
   if (!deck) return null;
@@ -32,6 +35,12 @@ export function DeckDetailsTopBarTitleSection({ compact = false }: DeckDetailsTo
   const handleVisibilitySelect = (value: DeckVisibility) => {
     if (!isEditing) startEditing();
     setEditVisibility(value);
+  };
+
+  const handleTeamSharingSelect = (mode: DeckTeamSharing) => {
+    if (!isEditing) startEditing();
+    setEditVisibility("team");
+    setEditTeamCollaboration(mode);
   };
 
   return (
@@ -84,9 +93,12 @@ export function DeckDetailsTopBarTitleSection({ compact = false }: DeckDetailsTo
           isOwner={isOwner}
           isEditing={isEditing}
           editVisibility={editVisibility}
+          editTeamCollaboration={editTeamCollaboration}
           onSelect={handleVisibilitySelect}
+          onSelectTeamSharing={handleTeamSharingSelect}
           compact
           canSetTournamentVisibility={isAdmin}
+          canSetTeamVisibility={canSetTeamVisibility}
         />
       </span>
 

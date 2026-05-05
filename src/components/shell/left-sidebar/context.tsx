@@ -19,8 +19,9 @@ interface LeftSidebarContextValue {
   isAuthenticated: boolean;
   isDark: boolean;
   toggleTheme: () => void;
-  colorScheme: ReturnType<typeof useColorScheme>["colorScheme"];
-  setColorScheme: ReturnType<typeof useColorScheme>["setColorScheme"];
+  colorPreset: ReturnType<typeof useColorScheme>["colorPreset"];
+  isCustomAppearance: boolean;
+  applyColorPreset: ReturnType<typeof useColorScheme>["setAppearancePreset"];
   openAuthDialog: () => void;
   user: ReturnType<typeof useQuery<typeof api.user.currentUser>>;
   isAdmin: boolean;
@@ -44,7 +45,11 @@ export function LeftSidebarProvider({ collapsed, onToggle, children }: LeftSideb
   const authActions = useAuthActions();
   const { isAuthenticated, isLoading } = useConvexAuth();
   const { isDark, toggleTheme } = useTheme();
-  const { colorScheme, setColorScheme } = useColorScheme();
+  const {
+    colorPreset,
+    isCustomAppearance,
+    setAppearancePreset,
+  } = useColorScheme();
   const { openAuthDialog } = useAuthDialog();
   const prefersReducedMotion = usePrefersReducedMotion();
   const user = useQuery(api.user.currentUser, isAuthenticated ? {} : "skip");
@@ -77,8 +82,9 @@ export function LeftSidebarProvider({ collapsed, onToggle, children }: LeftSideb
       isAuthenticated,
       isDark,
       toggleTheme,
-      colorScheme,
-      setColorScheme,
+      colorPreset,
+      isCustomAppearance,
+      applyColorPreset: setAppearancePreset,
       openAuthDialog,
       user,
       isAdmin,
@@ -96,8 +102,9 @@ export function LeftSidebarProvider({ collapsed, onToggle, children }: LeftSideb
       isAuthenticated,
       isDark,
       toggleTheme,
-      colorScheme,
-      setColorScheme,
+      colorPreset,
+      isCustomAppearance,
+      setAppearancePreset,
       openAuthDialog,
       user,
       isAdmin,

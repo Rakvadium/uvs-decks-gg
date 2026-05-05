@@ -13,18 +13,47 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import type { DeckVisibility } from "@/lib/deck/visibility";
-import { deckVisibilityLabel, normalizeDeckVisibility } from "@/lib/deck/visibility";
+import type { DeckTeamSharing, DeckVisibility } from "@/lib/deck/visibility";
+import {
+  deckTeamSharingLabel,
+  deckVisibilityLabel,
+  normalizeDeckVisibility,
+} from "@/lib/deck/visibility";
 import { useDeckDetails } from "@/providers/DeckDetailsProvider";
 
-const VISIBILITY_OPTIONS: DeckVisibility[] = [
+type VisibilityRow = Exclude<DeckVisibility, "team"> | "team_view" | "team_edit";
+
+const BASE_VISIBILITY_ORDER: Exclude<DeckVisibility, "team" | "tournament">[] = [
   "private",
   "share",
   "unlisted",
   "public",
-  "tournament",
-  "team",
 ];
+
+function visibilityRowValue(visibility: DeckVisibility, teamSharing: DeckTeamSharing): VisibilityRow {
+  if (visibility === "team") {
+    return teamSharing === "team_editable" ? "team_edit" : "team_view";
+  }
+  return visibility;
+}
+
+function applyVisibilityRow(
+  row: VisibilityRow,
+): { visibility: DeckVisibility; teamCollaboration?: DeckTeamSharing } {
+  if (row === "team_view") {
+    return { visibility: "team", teamCollaboration: "team_viewable" };
+  }
+  if (row === "team_edit") {
+    return { visibility: "team", teamCollaboration: "team_editable" };
+  }
+  return { visibility: row };
+}
+
+function rowLabel(row: VisibilityRow): string {
+  if (row === "team_view") return deckTeamSharingLabel("team_viewable");
+  if (row === "team_edit") return deckTeamSharingLabel("team_editable");
+  return deckVisibilityLabel(row);
+}
 
 export function DeckDetailsMetaPanel() {
   const {
@@ -35,25 +64,42 @@ export function DeckDetailsMetaPanel() {
     startEditing,
     editDescription,
     editVisibility,
+    editTeamCollaboration,
+    setEditTeamCollaboration,
     editName,
     setEditDescription,
     setEditVisibility,
     setEditName,
+    canSetTeamVisibility,
   } = useDeckDetails();
 
-  if (!deck) return null;
+  const selectVisibilityOptions = useMemo((): VisibilityRow[] => {
+    const rows: VisibilityRow[] = [...BASE_VISIBILITY_ORDER];
+    if (isAdmin || editVisibility === "tournament") {
+      rows.push("tournament");
+    }
+    if (canSetTeamVisibility || editVisibility === "team") {
+      rows.push("team_view", "team_edit");
+    }
+    return rows;
+  }, [isAdmin, editVisibility, canSetTeamVisibility]);
 
-  const selectVisibilityOptions = useMemo(
-    () =>
-      VISIBILITY_OPTIONS.filter(
-        (v) => v !== "tournament" || isAdmin || editVisibility === "tournament",
-      ).filter((v) => v !== "team" || editVisibility === "team"),
-    [isAdmin, editVisibility],
-  );
+  if (!deck) return null;
 
   const handleVisibilitySelect = (value: DeckVisibility) => {
     if (!isEditing) startEditing();
     setEditVisibility(value);
+  };
+
+  const selectRowValue = visibilityRowValue(editVisibility, editTeamCollaboration);
+
+  const handleVisibilityRowChange = (row: VisibilityRow) => {
+    if (!isEditing) startEditing();
+    const parsed = applyVisibilityRow(row);
+    setEditVisibility(parsed.visibility);
+    if (parsed.teamCollaboration !== undefined) {
+      setEditTeamCollaboration(parsed.teamCollaboration);
+    }
   };
 
   return (
@@ -92,14 +138,17 @@ export function DeckDetailsMetaPanel() {
               <Label htmlFor="deck-visibility-mobile" className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
                 Visibility
               </Label>
-              <Select value={editVisibility} onValueChange={(v) => setEditVisibility(v as DeckVisibility)}>
+              <Select
+                value={selectRowValue}
+                onValueChange={(v) => handleVisibilityRowChange(v as VisibilityRow)}
+              >
                 <SelectTrigger id="deck-visibility-mobile" className="h-9 w-full" size="sm">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   {selectVisibilityOptions.map((opt) => (
                     <SelectItem key={opt} value={opt}>
-                      {deckVisibilityLabel(opt)}
+                      {rowLabel(opt)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -118,9 +167,15 @@ export function DeckDetailsMetaPanel() {
                   isOwner={isOwner}
                   isEditing={false}
                   editVisibility={normalizeDeckVisibility(deck)}
+                  editTeamCollaboration={editTeamCollaboration}
                   onSelect={handleVisibilitySelect}
+                  onSelectTeamSharing={(mode) => {
+                    handleVisibilitySelect("team");
+                    setEditTeamCollaboration(mode);
+                  }}
                   compact
                   canSetTournamentVisibility={isAdmin}
+                  canSetTeamVisibility={canSetTeamVisibility}
                 />
                 {deck.format ? (
                   <Badge variant="cyber" className="text-[10px]">

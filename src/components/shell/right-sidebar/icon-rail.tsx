@@ -60,7 +60,7 @@ export function RightSidebarIconRail() {
                   className={cn(
                     "h-9 w-9 border border-transparent transition-all duration-200",
                     isActive
-                      ? "border-primary/30 bg-primary/15 text-primary shadow-[var(--chrome-shell-rail-active-shadow)]"
+                      ? "border-secondary/40 bg-secondary/15 text-primary shadow-[var(--chrome-shell-rail-active-shadow)]"
                       : "hover:border-primary/20 hover:bg-primary/10 hover:text-primary"
                   )}
                   onClick={() => setActiveSidebarAction(isActive ? null : slot.id)}

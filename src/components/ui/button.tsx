@@ -12,8 +12,10 @@ const buttonVariants = cva(
         default: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary/50",
         destructive:
           "bg-destructive text-white hover:bg-destructive/90 shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive/50",
+        destructiveOutline:
+          "border border-red-600/65 bg-transparent text-red-700 shadow-none hover:bg-red-500/[0.12] hover:border-red-600 hover:text-red-950 dark:border-red-500/55 dark:text-red-400 dark:hover:bg-red-500/14 dark:hover:border-red-400 dark:hover:text-red-300 [&_svg]:text-current focus-visible:border-red-600 focus-visible:ring-red-500/35 dark:focus-visible:border-red-400 dark:focus-visible:ring-red-400/35",
         outline:
-          "border border-primary/30 bg-transparent text-primary hover:bg-primary/10 hover:border-primary/60 hover:shadow-[var(--chrome-button-shadow-outline-hover)]",
+          "border border-[color:var(--control-dual-border)] bg-transparent text-primary hover:bg-[color:var(--control-dual-surface-hover)] hover:border-[color:var(--control-dual-border-strong)] hover:text-primary hover:shadow-[var(--chrome-button-shadow-outline-hover)] [&_svg]:text-secondary/90",
         secondary:
           "bg-secondary/80 text-secondary-foreground hover:bg-secondary border border-secondary/50 hover:shadow-[var(--chrome-button-shadow-secondary-hover)]",
         ghost:

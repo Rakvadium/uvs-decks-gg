@@ -1,17 +1,22 @@
 "use client";
 
-import { ChevronDown, Globe, Link2, Lock, Trophy, UserPlus, Users } from "lucide-react";
+import { ChevronDown, Eye, Globe, Link2, Lock, Pencil, Trophy, UserPlus } from "lucide-react";
+import { createElement } from "react";
 import type { LucideIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import {
+  type DeckTeamSharing,
   type DeckVisibility,
+  deckTeamSharingFromDeck,
+  deckTeamSharingLabel,
   deckVisibilityLabel,
   normalizeDeckVisibility,
 } from "@/lib/deck/visibility";
@@ -53,11 +58,25 @@ const OPTIONS: Array<{
     hint: "Anyone can view; listed under Tournament and Public.",
     Icon: Trophy,
   },
+];
+
+const TEAM_SHARING_OPTIONS: Array<{
+  mode: DeckTeamSharing;
+  label: string;
+  hint: string;
+  Icon: LucideIcon;
+}> = [
   {
-    value: "team",
-    label: "Team",
-    hint: "Visible to the selected team’s members with deck access.",
-    Icon: Users,
+    mode: "team_viewable",
+    label: "Team view",
+    hint: "Team members with deck access can view; only you edit.",
+    Icon: Eye,
+  },
+  {
+    mode: "team_editable",
+    label: "Team edit",
+    hint: "Team members who can create team decks can edit together.",
+    Icon: Pencil,
   },
 ];
 
@@ -66,10 +85,15 @@ function visibilityBadgeVariant(visibility: DeckVisibility): "default" | "outlin
   return "outline";
 }
 
-function VisibilityIcon({ visibility, className }: { visibility: DeckVisibility; className?: string }) {
+function badgeIconForDisplay(
+  visibility: DeckVisibility,
+  teamSharing: DeckTeamSharing,
+): LucideIcon {
+  if (visibility === "team") {
+    return teamSharing === "team_editable" ? Pencil : Eye;
+  }
   const opt = OPTIONS.find((o) => o.value === visibility);
-  const Icon = opt?.Icon ?? Lock;
-  return <Icon className={className} />;
+  return opt?.Icon ?? Lock;
 }
 
 interface DeckVisibilityBadgeMenuProps {
@@ -77,9 +101,12 @@ interface DeckVisibilityBadgeMenuProps {
   isOwner: boolean;
   isEditing: boolean;
   editVisibility: DeckVisibility;
+  editTeamCollaboration: DeckTeamSharing;
   onSelect: (value: DeckVisibility) => void;
+  onSelectTeamSharing?: (mode: DeckTeamSharing) => void;
   compact?: boolean;
   canSetTournamentVisibility?: boolean;
+  canSetTeamVisibility?: boolean;
 }
 
 export function DeckVisibilityBadgeMenu({
@@ -87,14 +114,26 @@ export function DeckVisibilityBadgeMenu({
   isOwner,
   isEditing,
   editVisibility,
+  editTeamCollaboration,
   onSelect,
+  onSelectTeamSharing,
   compact = false,
   canSetTournamentVisibility = false,
+  canSetTeamVisibility = false,
 }: DeckVisibilityBadgeMenuProps) {
   const displayVisibility = isEditing ? editVisibility : normalizeDeckVisibility(deck);
-  const menuOptions = (
-    canSetTournamentVisibility ? OPTIONS : OPTIONS.filter((o) => o.value !== "tournament")
-  ).filter((o) => o.value !== "team");
+  const displayTeamSharing = isEditing
+    ? editTeamCollaboration
+    : deckTeamSharingFromDeck(deck);
+  const badgeGlyph = createElement(badgeIconForDisplay(displayVisibility, displayTeamSharing), {
+    className: "h-3 w-3",
+  });
+  const badgeLabel =
+    displayVisibility === "team"
+      ? deckTeamSharingLabel(displayTeamSharing)
+      : deckVisibilityLabel(displayVisibility);
+
+  const menuOptions = canSetTournamentVisibility ? OPTIONS : OPTIONS.filter((o) => o.value !== "tournament");
 
   const publicityBadge = (
     <Badge
@@ -103,11 +142,11 @@ export function DeckVisibilityBadgeMenu({
         compact
           ? "h-8 shrink-0 items-center gap-1.5 px-2.5 text-[9px] sm:inline-flex"
           : "h-8 shrink-0 items-center gap-1.5 px-2.5 text-[9px] inline-flex",
-        isOwner && "cursor-pointer"
+        isOwner && "cursor-pointer",
       )}
     >
-      <VisibilityIcon visibility={displayVisibility} className="h-3 w-3" />
-      {deckVisibilityLabel(displayVisibility)}
+      {badgeGlyph}
+      {badgeLabel}
       {isOwner ? <ChevronDown className="h-3 w-3 opacity-70" /> : null}
     </Badge>
   );
@@ -127,15 +166,41 @@ export function DeckVisibilityBadgeMenu({
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="max-w-[min(100vw-2rem,22rem)]">
-        {menuOptions.map(({ value, label, hint, Icon }) => (
-          <DropdownMenuItem key={value} className="flex flex-col items-start gap-0.5 py-2" onClick={() => onSelect(value)}>
+        {menuOptions.map(({ value, label, hint, Icon: MenuIcon }) => (
+          <DropdownMenuItem
+            key={value}
+            className="flex flex-col items-start gap-0.5 py-2"
+            onClick={() => onSelect(value)}
+          >
             <span className="flex w-full items-center gap-2 font-medium">
-              <Icon className="h-4 w-4 shrink-0" />
+              <MenuIcon className="h-4 w-4 shrink-0" />
               {label}
             </span>
-            <span className="w-full pl-6 text-[10px] font-normal leading-snug text-muted-foreground">{hint}</span>
+            <span className="w-full pl-6 text-[10px] font-normal leading-snug text-muted-foreground">
+              {hint}
+            </span>
           </DropdownMenuItem>
         ))}
+        {canSetTeamVisibility && onSelectTeamSharing ? (
+          <>
+            <DropdownMenuSeparator />
+            {TEAM_SHARING_OPTIONS.map(({ mode, label, hint, Icon: MenuIcon }) => (
+              <DropdownMenuItem
+                key={mode}
+                className="flex flex-col items-start gap-0.5 py-2"
+                onClick={() => onSelectTeamSharing(mode)}
+              >
+                <span className="flex w-full items-center gap-2 font-medium">
+                  <MenuIcon className="h-4 w-4 shrink-0" />
+                  {label}
+                </span>
+                <span className="w-full pl-6 text-[10px] font-normal leading-snug text-muted-foreground">
+                  {hint}
+                </span>
+              </DropdownMenuItem>
+            ))}
+          </>
+        ) : null}
       </DropdownMenuContent>
     </DropdownMenu>
   );

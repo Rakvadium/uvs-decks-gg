@@ -24,10 +24,10 @@ export function GalleryFilterDialogHeader() {
         <div className="shrink-0">
           {hasActiveFilters ? (
             <Button
-              variant="outline"
+              variant="destructiveOutline"
               size="sm"
               onClick={actions.clearAllFilters}
-              className="hidden gap-2 border-destructive/30 text-destructive hover:border-destructive hover:bg-destructive/10 md:flex"
+              className="hidden gap-2 md:flex"
             >
               <X className="h-3.5 w-3.5" />
               <span className="text-xs font-mono uppercase tracking-wider">Clear All</span>

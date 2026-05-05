@@ -197,7 +197,7 @@ function HomePage() {
             <div className="flex flex-wrap items-center gap-3 text-xs font-mono uppercase tracking-widest text-muted-foreground/70">
               <span>{authDetail}</span>
               {showAuthCta && (
-                <Button variant="outline" size="sm" onClick={openAuthDialog}>
+                <Button variant="outline" size="sm" onClick={() => openAuthDialog()}>
                   Authenticate
                 </Button>
               )}
@@ -307,7 +307,7 @@ function HomePage() {
                       </Button>
                     ) : null}
                     {showAuthCta && (
-                      <Button variant="outline" onClick={openAuthDialog}>
+                      <Button variant="outline" onClick={() => openAuthDialog()}>
                         Authenticate
                       </Button>
                     )}

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useChromeMode } from "@/lib/theme";
+import { chromeHasNeonChrome } from "@/lib/theme/chrome-behavior";
 import { KEYWORD_ABILITY_MAP, TIMING_COLORS } from "./constants";
 
 interface KeywordBadgeProps {
@@ -48,7 +49,9 @@ export function KeywordBadge({ keyword }: KeywordBadgeProps) {
         className="max-w-xs border-l-2 bg-background/80 backdrop-blur-md"
         style={{
           borderLeftColor: color,
-          boxShadow: chromeMode === "expressive" ? `0 0 20px ${color}20` : undefined,
+          boxShadow: chromeHasNeonChrome(chromeMode)
+            ? `0 0 20px ${color}20`
+            : undefined,
         }}
         onPointerDownOutside={() => setTooltipOpen(false)}
       >

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { BookOpen, Layers, Newspaper, Package, Users } from "lucide-react";
+import { BookOpen, Layers, MessageSquare, Newspaper, Package, Users } from "lucide-react";
 import { useQuery } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import { AdminPageHeader, CatalogReleaseDialog, IngestionJobsPanel } from "@/components/admin";
@@ -91,7 +91,7 @@ export function AdminDashboardClient() {
         </Card>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
         <Link href="/admin/sets">
           <div className="rounded-lg border bg-card p-6 transition-colors h-full hover:bg-accent">
             <div className="flex items-center gap-4">
@@ -146,6 +146,20 @@ export function AdminDashboardClient() {
                 <h2 className="text-lg font-semibold">Users</h2>
                 <p className="text-sm text-muted-foreground">
                   User administration (coming soon)
+                </p>
+              </div>
+            </div>
+          </div>
+        </Link>
+
+        <Link href="/admin/feedback">
+          <div className="rounded-lg border bg-card p-6 transition-colors h-full hover:bg-accent">
+            <div className="flex items-center gap-4">
+              <MessageSquare className="h-8 w-8 shrink-0 text-primary" />
+              <div>
+                <h2 className="text-lg font-semibold">User feedback</h2>
+                <p className="text-sm text-muted-foreground">
+                  Inbox from the site feedback form
                 </p>
               </div>
             </div>

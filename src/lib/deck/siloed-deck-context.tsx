@@ -17,6 +17,7 @@ import { Id, Doc } from "../../../convex/_generated/dataModel";
 import { useCardIndex } from "@/lib/universus/card-data-provider";
 import { canAddCardToSection, canMoveCardToSection } from "./card-eligibility";
 import {
+  type DeckTeamSharing,
   type DeckVisibility,
   deckRevisionNumber,
   isDeckWriteConflictError,
@@ -29,6 +30,8 @@ type DeckUpdate = {
   name?: string;
   description?: string;
   visibility?: DeckVisibility;
+  teamId?: Id<"teams"> | null;
+  teamCollaboration?: DeckTeamSharing;
   imageCardId?: Id<"cards"> | null;
   startingCharacterId?: Id<"cards"> | null;
   selectedIdentity?: string | null;

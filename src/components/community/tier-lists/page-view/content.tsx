@@ -58,7 +58,7 @@ export function CommunityTierListsPageView() {
                 <p className="max-w-lg text-sm text-muted-foreground">
                   Sign in to keep private tier lists, manage your published ones, and jump straight into editing.
                 </p>
-                <Button onClick={openAuthDialog}>Sign in to view your lists</Button>
+                <Button onClick={() => openAuthDialog()}>Sign in to view your lists</Button>
               </CardContent>
             </Card>
           ) : isLoadingActiveTab ? (

@@ -3,6 +3,7 @@
 import { RotateCcw } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useChromeMode } from "@/providers/ColorSchemeProvider";
+import { chromeHasNeonChrome } from "@/lib/theme/chrome-behavior";
 import { cn } from "@/lib/utils";
 
 interface CardFlipButtonProps {
@@ -23,7 +24,7 @@ export function CardFlipButton({
   forceSolidSurface = false,
 }: CardFlipButtonProps) {
   const chromeMode = useChromeMode();
-  const frosted = !forceSolidSurface && chromeMode === "expressive";
+  const frosted = !forceSolidSurface && chromeHasNeonChrome(chromeMode);
 
   return (
     <Tooltip>

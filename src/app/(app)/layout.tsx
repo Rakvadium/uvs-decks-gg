@@ -29,6 +29,7 @@ import {
   BookOpen,
   Newspaper,
   Users,
+  MessageSquare,
 } from "lucide-react";
 import Link from "next/link";
 import { TcgDndProvider } from "@/lib/dnd";
@@ -39,6 +40,7 @@ import { DecksProvider } from "@/providers/DecksProvider";
 import { CommunityTierListsPageProvider } from "@/components/community/tier-lists/page-view/context";
 import { CommunityTierListDetailProvider } from "@/components/community/tier-lists/detail-view/context";
 import { AccountStatusBanner } from "@/components/shell/account-status-banner";
+import { FeedbackDialogProvider } from "@/components/shell/feedback-dialog-provider";
 
 const LeftSidebar = dynamic(
   () => import("@/components/shell").then((module) => module.LeftSidebar),
@@ -97,6 +99,7 @@ function AdminSidebarContent() {
     pathname.startsWith("/admin/moderation") ||
     pathname.startsWith("/admin/ui-matrix");
   const usersActive = pathname.startsWith("/admin/users");
+  const feedbackActive = pathname.startsWith("/admin/feedback");
 
   return (
     <div className="space-y-4">
@@ -175,6 +178,13 @@ function AdminSidebarContent() {
           >
             <Users className="h-4 w-4" />
             Users
+          </Link>
+          <Link
+            href="/admin/feedback"
+            className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm hover:bg-muted ${feedbackActive ? "bg-muted font-medium" : ""}`}
+          >
+            <MessageSquare className="h-4 w-4" />
+            User feedback
           </Link>
         </div>
       </div>
@@ -354,7 +364,9 @@ export default function AppLayout({ children }: { children: ReactNode }) {
         <ActiveDeckProvider>
           <TcgDndProvider>
             <ShellSlotProvider>
-              <ShellLayout>{children}</ShellLayout>
+              <FeedbackDialogProvider>
+                <ShellLayout>{children}</ShellLayout>
+              </FeedbackDialogProvider>
             </ShellSlotProvider>
           </TcgDndProvider>
         </ActiveDeckProvider>

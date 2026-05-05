@@ -4,10 +4,18 @@ import { useState, useEffect, useOptimistic, useTransition, useCallback } from "
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import { useRouter } from "next/navigation";
-import { useTheme, useColorScheme, COLOR_SCHEMES, type ChromePreference } from "@/lib/theme";
+import { useColorScheme, COLOR_SCHEMES, CHROME_OPTIONS } from "@/lib/theme";
+import type {
+  AppearanceModePair,
+  ChromeVariant,
+  ColorPresetChoice,
+  ThemePreference,
+} from "@/lib/theme/appearance-types";
+import { DEFAULT_CUSTOM_BRAND } from "@/lib/theme/appearance-types";
 import * as m from "framer-motion/m";
 import { usePrefersReducedMotion } from "@/lib/reduced-motion";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -20,6 +28,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -31,6 +44,7 @@ import {
   Palette,
   Moon,
   Sun,
+  Monitor,
   ArrowLeft,
   Check,
   Loader2,
@@ -40,6 +54,7 @@ import {
   Calendar,
   Sparkles,
   Filter,
+  ChevronDown,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -59,6 +74,106 @@ const AVATAR_SYMBOLS = [
   { id: "void", name: "Void", path: "/universus/symbols/void.png" },
   { id: "all", name: "All", path: "/universus/symbols/all.png" },
 ] as const;
+
+const MODE_OPTIONS: readonly {
+  value: ThemePreference;
+  label: string;
+  icon: typeof Sun;
+}[] = [
+  { value: "light", label: "Light", icon: Sun },
+  { value: "dark", label: "Dark", icon: Moon },
+  { value: "system", label: "System", icon: Monitor },
+];
+
+function pickerHex(hex: string) {
+  const m = /^#([0-9a-fA-F]{6})/.exec(hex.trim());
+  return m ? `#${m[1]}` : "#000000";
+}
+
+function ModePairPickers({
+  title,
+  pair,
+  onChange,
+  dense,
+}: {
+  title?: string;
+  pair: AppearanceModePair;
+  onChange: (next: AppearanceModePair) => void;
+  dense?: boolean;
+}) {
+  const bump = (
+    side: keyof AppearanceModePair,
+    key: "primary" | "secondary",
+    value: string,
+  ) =>
+    onChange({
+      ...pair,
+      [side]: { ...pair[side], [key]: pickerHex(value) },
+    });
+
+  return (
+    <div
+      className={cn(
+        "rounded-lg border border-border p-4 space-y-3",
+        dense && "border-0 p-0",
+      )}
+    >
+      {title ? <p className="text-sm font-medium">{title}</p> : null}
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="space-y-2">
+          <p className="text-xs uppercase tracking-wide text-muted-foreground">Light</p>
+          <ColorSwatchRow
+            label="Primary"
+            value={pair.light.primary}
+            onChange={(next) => bump("light", "primary", next)}
+          />
+          <ColorSwatchRow
+            label="Secondary"
+            value={pair.light.secondary}
+            onChange={(next) => bump("light", "secondary", next)}
+          />
+        </div>
+        <div className="space-y-2">
+          <p className="text-xs uppercase tracking-wide text-muted-foreground">Dark</p>
+          <ColorSwatchRow
+            label="Primary"
+            value={pair.dark.primary}
+            onChange={(next) => bump("dark", "primary", next)}
+          />
+          <ColorSwatchRow
+            label="Secondary"
+            value={pair.dark.secondary}
+            onChange={(next) => bump("dark", "secondary", next)}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ColorSwatchRow({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  onChange: (hex: string) => void;
+}) {
+  const safePick = pickerHex(value);
+  return (
+    <div className="flex items-center gap-2">
+      <Label className="w-24 shrink-0 text-xs font-normal text-muted-foreground">{label}</Label>
+      <input
+        aria-label={`${label} color`}
+        type="color"
+        className="h-9 w-12 cursor-pointer rounded border border-input bg-background"
+        value={safePick}
+        onChange={(e) => onChange(e.target.value)}
+      />
+    </div>
+  );
+}
 
 export default function SettingsPageClient() {
   const prefersReducedMotion = usePrefersReducedMotion();
@@ -96,8 +211,18 @@ export default function SettingsPageClient() {
     },
     [user, setProfanityFilterEnabled, setProfanityFilterOptimistic, startProfanityFilterTransition],
   );
-  const { isDark, toggleTheme } = useTheme();
-  const { colorScheme, setColorScheme, chromePreference, setChromePreference } = useColorScheme();
+  const {
+    theme,
+    setTheme,
+    resolvedTheme,
+    colorSource,
+    isCustomAppearance,
+    setAppearancePreset,
+    setAppearanceCustom,
+    touchAppearanceCustom,
+    chrome,
+    setChrome,
+  } = useColorScheme();
 
   const [username, setUsername] = useState("");
   const [imageUrl, setImageUrl] = useState("");
@@ -124,6 +249,14 @@ export default function SettingsPageClient() {
       router.push("/");
     }
   }, [user, router]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (window.location.hash !== "#appearance") return;
+    queueMicrotask(() => {
+      document.getElementById("appearance")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }, []);
 
   const handleSaveProfile = async () => {
     setIsSaving(true);
@@ -344,124 +477,234 @@ export default function SettingsPageClient() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: prefersReducedMotion ? 0 : 0.2, duration: prefersReducedMotion ? 0 : 0.3 }}
           >
-            <Card>
+            <Card id="appearance" className="scroll-mt-28">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Palette className="h-5 w-5 text-primary" />
                   Appearance
                 </CardTitle>
                 <CardDescription>
-                  Customize how the app looks and feels
+                  Mode affects light or dark palettes. Colors and chrome are chosen independently.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-1">
-                    <Label className="flex items-center gap-2">
-                      {isDark ? (
-                        <Moon className="h-4 w-4 text-muted-foreground" />
-                      ) : (
-                        <Sun className="h-4 w-4 text-muted-foreground" />
-                      )}
-                      Dark Mode
-                    </Label>
-                    <p className="text-sm text-muted-foreground">
-                      Switch between light and dark themes
-                    </p>
+                <div className="space-y-3">
+                  <Label>Appearance mode</Label>
+                  <div className="flex flex-wrap gap-2">
+                    {MODE_OPTIONS.map(({ value: modeValue, label, icon: Icon }) => (
+                      <Button
+                        key={modeValue}
+                        type="button"
+                        variant={theme === modeValue ? "default" : "outline"}
+                        size="sm"
+                        className="gap-2"
+                        onClick={() => setTheme(modeValue)}
+                      >
+                        <Icon className="h-4 w-4" />
+                        {label}
+                      </Button>
+                    ))}
                   </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={toggleTheme}
-                    className="gap-2"
-                  >
-                    {isDark ? (
-                      <>
-                        <Sun className="h-4 w-4" />
-                        Light
-                      </>
-                    ) : (
-                      <>
-                        <Moon className="h-4 w-4" />
-                        Dark
-                      </>
-                    )}
-                  </Button>
+                  <p className="text-sm text-muted-foreground">
+                    Now showing{" "}
+                    <span className="font-medium text-foreground">
+                      {resolvedTheme === "dark" ? "dark" : "light"}
+                    </span>
+                    {theme === "system" ? ", following your device." : "."}
+                  </p>
                 </div>
 
                 <div className="space-y-3 border-t pt-4">
                   <Label className="flex items-center gap-2">
                     <Palette className="h-4 w-4 text-muted-foreground" />
-                    Color Theme
+                    Color palette
                   </Label>
-                  <Select value={colorScheme} onValueChange={(value) => setColorScheme(value as typeof colorScheme)}>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select a theme" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {COLOR_SCHEMES.map((scheme) => (
-                        <SelectItem key={scheme.value} value={scheme.value}>
-                          {scheme.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3 border-t pt-4 sm:grid-cols-3">
-                  {COLOR_SCHEMES.map((scheme) => (
+                  <p className="text-sm text-muted-foreground">
+                    Presets adjust semantic colors only. Switching palette does not change chrome or mode.
+                  </p>
+                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                    {COLOR_SCHEMES.map((scheme) => {
+                      const active =
+                        colorSource.kind === "preset" &&
+                        colorSource.preset === (scheme.value as ColorPresetChoice);
+                      return (
+                        <button
+                          key={scheme.value}
+                          type="button"
+                          onClick={() =>
+                            void setAppearancePreset(scheme.value as ColorPresetChoice)
+                          }
+                          className={cn(
+                            "group relative rounded-xl border-2 p-3 text-left transition-all hover:border-primary/50",
+                            active
+                              ? "border-primary bg-primary/5"
+                              : "border-muted hover:bg-muted/50",
+                          )}
+                        >
+                          <div className="flex items-center gap-2">
+                            <div
+                              className={cn(
+                                "h-4 w-4 rounded-full ring-2 ring-offset-2 ring-offset-background transition-all",
+                                active
+                                  ? "bg-primary ring-primary"
+                                  : "bg-muted ring-transparent group-hover:ring-muted",
+                              )}
+                            />
+                            <span className="text-sm font-medium">{scheme.label}</span>
+                          </div>
+                        </button>
+                      );
+                    })}
                     <button
-                      key={scheme.value}
-                      onClick={() => setColorScheme(scheme.value as typeof colorScheme)}
+                      type="button"
+                      onClick={() =>
+                        void setAppearanceCustom(
+                          colorSource.kind === "custom"
+                            ? colorSource.custom
+                            : { fallback: DEFAULT_CUSTOM_BRAND },
+                        )
+                      }
                       className={cn(
-                        "group relative rounded-xl border-2 p-3 text-left transition-all hover:border-primary/50",
-                        colorScheme === scheme.value
+                        "group relative rounded-xl border-2 p-3 text-left transition-all hover:border-primary/50 sm:col-span-1 col-span-2",
+                        isCustomAppearance
                           ? "border-primary bg-primary/5"
-                          : "border-muted hover:bg-muted/50"
+                          : "border-muted hover:bg-muted/50",
                       )}
                     >
                       <div className="flex items-center gap-2">
                         <div
                           className={cn(
                             "h-4 w-4 rounded-full ring-2 ring-offset-2 ring-offset-background transition-all",
-                            colorScheme === scheme.value
+                            isCustomAppearance
                               ? "bg-primary ring-primary"
-                              : "bg-muted ring-transparent group-hover:ring-muted"
+                              : "bg-muted ring-transparent group-hover:ring-muted",
                           )}
                         />
-                        <span className="text-sm font-medium">{scheme.label}</span>
+                        <span className="text-sm font-medium">Custom</span>
                       </div>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        Choose primary and secondary for light and dark.
+                      </p>
                     </button>
-                  ))}
+                  </div>
                 </div>
+
+                {colorSource.kind === "custom" ? (
+                  <div className="space-y-4 border-t pt-4">
+                    <ModePairPickers
+                      title="Shared palette"
+                      pair={colorSource.custom.fallback}
+                      onChange={(next) =>
+                        touchAppearanceCustom((draft) => ({ ...draft, fallback: next }))
+                      }
+                    />
+                    <Collapsible>
+                      <CollapsibleTrigger className="flex w-full items-center gap-2 rounded-lg border border-border px-3 py-2 text-left text-sm font-medium hover:bg-muted/60 [&[data-state=open]_svg:first-child]:rotate-180">
+                        <ChevronDown className="h-4 w-4 shrink-0 transition-transform" />
+                        Per-chrome color overrides
+                        <Badge variant="secondary" className="ml-auto text-[10px] uppercase">
+                          Advanced
+                        </Badge>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className="space-y-3 pt-3">
+                        <p className="text-sm text-muted-foreground">
+                          Optional palettes when a specific chrome is active. Clearing a row falls back to the shared palette.
+                        </p>
+                        <div className="space-y-4">
+                          {CHROME_OPTIONS.map((opt) => {
+                            const customDraft = colorSource.custom;
+                            const pairForChrome =
+                              customDraft.byChrome?.[opt.id] ?? customDraft.fallback;
+                            const hasOverride = Boolean(customDraft.byChrome?.[opt.id]);
+
+                            return (
+                              <div
+                                key={opt.id}
+                                className="rounded-xl border border-border bg-muted/20 p-3 space-y-2"
+                              >
+                                <div className="flex flex-wrap items-start justify-between gap-2">
+                                  <div className="min-w-0 space-y-0.5">
+                                    <div className="flex flex-wrap items-center gap-2">
+                                      <p className="text-sm font-medium">{opt.label}</p>
+                                      {hasOverride ? (
+                                        <Badge variant="outline" className="text-[10px] uppercase">
+                                          Override
+                                        </Badge>
+                                      ) : (
+                                        <span className="text-[10px] uppercase text-muted-foreground">
+                                          inherits shared palette
+                                        </span>
+                                      )}
+                                    </div>
+                                    <p className="text-xs text-muted-foreground">{opt.description}</p>
+                                  </div>
+                                  {hasOverride ? (
+                                    <Button
+                                      type="button"
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() =>
+                                        touchAppearanceCustom((draft) => {
+                                          if (!draft.byChrome?.[opt.id]) return draft;
+                                          const rest = { ...draft.byChrome };
+                                          delete rest[opt.id];
+                                          return {
+                                            ...draft,
+                                            byChrome:
+                                              Object.keys(rest).length > 0 ? rest : undefined,
+                                          };
+                                        })
+                                      }
+                                    >
+                                      Clear
+                                    </Button>
+                                  ) : null}
+                                </div>
+                                <ModePairPickers
+                                  dense
+                                  pair={pairForChrome}
+                                  onChange={(next) =>
+                                    touchAppearanceCustom((draft) => ({
+                                      ...draft,
+                                      byChrome: { ...draft.byChrome, [opt.id]: next },
+                                    }))
+                                  }
+                                />
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </CollapsibleContent>
+                    </Collapsible>
+                  </div>
+                ) : null}
 
                 <div className="space-y-3 border-t pt-4">
                   <Label className="flex items-center gap-2">
                     <Sparkles className="h-4 w-4 text-muted-foreground" />
                     Chrome
                   </Label>
-                  <div className="space-y-2 text-sm text-muted-foreground">
-                    <p>
-                      <span className="font-medium text-foreground">Calm</span> uses flat surfaces, neutral elevation, and sans headings.
-                      <span className="font-medium text-foreground"> Expressive</span> keeps glow, display typography, and stronger depth.
-                    </p>
-                    <p>
-                      <span className="font-medium text-foreground">Auto</span> picks chrome from your color scheme: Holoterminal and most palettes stay expressive; Default and Calm Storm use calm. Choose Calm or Expressive here to override.
-                    </p>
-                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Chrome adjusts shape, typography, shadows, and motion accents. It does not pick your hues.
+                  </p>
                   <Select
-                    value={chromePreference}
-                    onValueChange={(value) => setChromePreference(value as ChromePreference)}
+                    value={chrome}
+                    onValueChange={(value) => void setChrome(value as ChromeVariant)}
                   >
                     <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select chrome mode" />
+                      <SelectValue placeholder="Select chrome" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="auto">Auto (from color scheme)</SelectItem>
-                      <SelectItem value="calm">Calm</SelectItem>
-                      <SelectItem value="expressive">Expressive</SelectItem>
+                      {CHROME_OPTIONS.map((opt) => (
+                        <SelectItem key={opt.id} value={opt.id}>
+                          {opt.label}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
+                  <p className="text-sm text-muted-foreground">
+                    {CHROME_OPTIONS.find((opt) => opt.id === chrome)?.description}
+                  </p>
                 </div>
               </CardContent>
             </Card>

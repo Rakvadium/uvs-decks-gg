@@ -69,7 +69,6 @@ export function TeamHubMembersContent({ teamId }: TeamHubMembersContentProps) {
   const [pendingId, setPendingId] = useState<Id<"users"> | null>(null);
   const [inviteOpen, setInviteOpen] = useState(false);
   const [inviteStep, setInviteStep] = useState<"form" | "link">("form");
-  const [inviteEmail, setInviteEmail] = useState("");
   const [inviteRole, setInviteRole] = useState<(typeof ASSIGNABLE_ORDER)[number]>("pilot");
   const [inviteToken, setInviteToken] = useState<string | null>(null);
   const [inviteBusy, setInviteBusy] = useState(false);
@@ -78,7 +77,6 @@ export function TeamHubMembersContent({ teamId }: TeamHubMembersContentProps) {
   useEffect(() => {
     if (inviteOpen) return;
     setInviteStep("form");
-    setInviteEmail("");
     setInviteRole("pilot");
     setInviteToken(null);
     setCopied(false);
@@ -104,16 +102,10 @@ export function TeamHubMembersContent({ teamId }: TeamHubMembersContentProps) {
   );
 
   const onCreateInvite = useCallback(async () => {
-    const email = inviteEmail.trim();
-    if (!email.includes("@")) {
-      toast.error("Enter a valid email address");
-      return;
-    }
     setInviteBusy(true);
     try {
       const { token } = await createInvite({
         teamId: id,
-        email,
         role: inviteRole,
       });
       setInviteToken(token);
@@ -124,7 +116,7 @@ export function TeamHubMembersContent({ teamId }: TeamHubMembersContentProps) {
     } finally {
       setInviteBusy(false);
     }
-  }, [createInvite, id, inviteEmail, inviteRole]);
+  }, [createInvite, id, inviteRole]);
 
   const inviteUrl =
     typeof window !== "undefined" && inviteToken ? `${window.location.origin}/teams/invite/${inviteToken}` : "";
@@ -189,24 +181,11 @@ export function TeamHubMembersContent({ teamId }: TeamHubMembersContentProps) {
               <DialogHeader className="px-6 pt-6">
                 <DialogTitle>Invite member</DialogTitle>
                 <DialogDescription>
-                  We&apos;ll create a link for this email. They must sign in with a matching account to accept. Each
-                  person can only be on one team at a time.
+                  Create a one-time link for a single teammate. After they accept or decline on the invite page, the
+                  link stops working. Anyone with the link before then can use their account to respond.
                 </DialogDescription>
               </DialogHeader>
               <DialogBody className="space-y-4 px-6">
-                <div className="space-y-2">
-                  <Label htmlFor="invite-email" className="text-xs font-mono uppercase tracking-wider">
-                    Email
-                  </Label>
-                  <Input
-                    id="invite-email"
-                    type="email"
-                    autoComplete="email"
-                    value={inviteEmail}
-                    onChange={(e) => setInviteEmail(e.target.value)}
-                    placeholder="player@example.com"
-                  />
-                </div>
                 <div className="space-y-2">
                   <Label htmlFor="invite-role" className="text-xs font-mono uppercase tracking-wider">
                     Role when they join
@@ -233,7 +212,7 @@ export function TeamHubMembersContent({ teamId }: TeamHubMembersContentProps) {
                 </DialogClose>
                 <Button
                   type="button"
-                  disabled={inviteBusy || !inviteEmail.trim()}
+                  disabled={inviteBusy}
                   onClick={() => void onCreateInvite()}
                 >
                   Create invite link
@@ -245,7 +224,7 @@ export function TeamHubMembersContent({ teamId }: TeamHubMembersContentProps) {
               <DialogHeader className="px-6 pt-6">
                 <DialogTitle>Share this link</DialogTitle>
                 <DialogDescription>
-                  Send it to {inviteEmail.trim() || "your invitee"}. It expires in seven days.
+                  Send it only to the person you intend to add. The link expires after seven days if unused.
                 </DialogDescription>
               </DialogHeader>
               <DialogBody className="space-y-3 px-6">

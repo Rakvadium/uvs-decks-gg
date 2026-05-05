@@ -29,7 +29,7 @@ const quickFilterValueChipClassName =
   "inline-flex max-w-[5.5rem] shrink-0 items-center truncate rounded-sm px-1.5 py-px text-[9px] font-bold font-mono uppercase tracking-[0.1em]";
 
 const quickFilterPopoverClass =
-  "z-[200] border-border/50 p-3 shadow-lg outline-hidden data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95";
+  "z-[200] border border-[color:var(--control-dual-border)] bg-popover/95 p-3 shadow-[var(--chrome-popover-shadow),var(--popover-dual-glow)] backdrop-blur-lg outline-hidden data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95";
 
 type QuickFilterTriggerProps = {
   label: string;
@@ -185,7 +185,7 @@ const QuickFilterTrigger = forwardRef<HTMLButtonElement, QuickFilterTriggerProps
             : "max-w-[10rem]",
           endAdornment && !split && "w-max max-w-[min(96vw,48rem)]",
           endAdornment && split && "w-max min-w-0 max-w-[min(96vw,48rem)] flex-1",
-          !split && count > 0 && "border-primary/45 ring-1 ring-primary/20",
+          !split && count > 0 && "border-[color:var(--control-dual-border-strong)] shadow-[var(--chrome-search-field-shadow),0_0_16px_-5px_color-mix(in_oklch,var(--secondary)_32%,transparent)] ring-1 ring-[color:color-mix(in_oklch,var(--primary)_22%,transparent)]",
           className
         )}
         {...props}
@@ -196,7 +196,7 @@ const QuickFilterTrigger = forwardRef<HTMLButtonElement, QuickFilterTriggerProps
             {count}
           </Badge>
         ) : null}
-        <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />
+        <ChevronDown className="h-4 w-4 shrink-0 text-secondary/80 opacity-90" />
         {endAdornment ? (
           <span className="flex min-w-0 max-w-[min(26rem,72vw)] shrink flex-wrap items-center gap-x-1 gap-y-0.5 border-l border-border/50 pl-2">
             {endAdornment}
@@ -217,7 +217,7 @@ function QuickFilterClearControl({
   return (
     <button
       type="button"
-      className="inline-flex h-9 w-8 shrink-0 items-center justify-center rounded-none rounded-r-md border-0 border-l border-border/50 bg-transparent text-muted-foreground shadow-none transition-colors hover:bg-muted/50 hover:text-foreground focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+      className="inline-flex h-9 w-8 shrink-0 items-center justify-center rounded-none rounded-r-md border-0 border-l border-l-[color:var(--control-dual-border)] bg-transparent text-muted-foreground shadow-none transition-colors hover:bg-muted/50 hover:text-foreground focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--control-dual-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       aria-label={ariaLabel}
       onPointerDown={(e) => {
         e.preventDefault();
@@ -252,7 +252,7 @@ function QuickFilterTriggerWrap({
       className={cn(
         "inline-flex min-w-0 items-stretch",
         showClear &&
-          "h-9 max-w-[min(96vw,48rem)] overflow-hidden rounded-md border border-primary/40 bg-background/50 shadow-[var(--chrome-search-field-shadow)] ring-1 ring-primary/20"
+          "h-9 max-w-[min(96vw,48rem)] overflow-hidden rounded-md border border-[color:var(--control-dual-border)] bg-background/50 shadow-[var(--chrome-search-field-shadow),0_0_18px_-6px_color-mix(in_oklch,var(--secondary)_28%,transparent)] ring-1 ring-[color:color-mix(in_oklch,var(--primary)_20%,transparent)]"
       )}
     >
       {children}
@@ -566,10 +566,9 @@ export function GalleryQuickFiltersRow() {
       </div>
       <Button
         type="button"
-        variant="outline"
+        variant="destructiveOutline"
         className={cn(
-          galleryToolbarControlClassName,
-          "shrink-0 gap-1.5 border-destructive/50 px-4 text-destructive hover:border-destructive hover:bg-destructive/10 hover:text-destructive hover:shadow-[var(--chrome-search-field-shadow)] focus-visible:border-destructive focus-visible:ring-destructive/30"
+          "h-9 shrink-0 gap-1.5 rounded-md bg-background/50 px-4 text-sm font-sans font-normal normal-case tracking-normal transition-all duration-200"
         )}
         onClick={actions.clearAllFilters}
       >
