@@ -1,4 +1,4 @@
-import { query, mutation } from "./_generated/server";
+import { query, mutation, internalQuery } from "./_generated/server";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { v } from "convex/values";
 import { buildAdminSearchText } from "./lib/accountStatus";
@@ -35,6 +35,15 @@ export const getById = query({
   handler: async (ctx, args) => {
     const user = await ctx.db.get(args.userId);
     return user ? publicUserFromDocument(user) : null;
+  },
+});
+
+export const isAdminForUserId = internalQuery({
+  args: { userId: v.id("users") },
+  returns: v.boolean(),
+  handler: async (ctx, args) => {
+    const user = await ctx.db.get(args.userId);
+    return user !== null && user.role === "Admin";
   },
 });
 
