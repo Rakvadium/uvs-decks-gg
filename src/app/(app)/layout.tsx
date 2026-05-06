@@ -296,7 +296,11 @@ function ShellLayoutInner({ children }: { children: ReactNode }) {
           )}
           style={{
             backgroundImage: "var(--chrome-page-bg)",
-            ...(mobileBottomClearancePx !== null ? { scrollPaddingBottom: mobileBottomClearancePx } : {}),
+            ...(mobileBottomClearancePx !== null
+              ? {
+                  scrollPaddingBottom: `max(${mobileBottomClearancePx}px, var(--mobile-bottom-overlay-clearance))`,
+                }
+              : {}),
           }}
         >
           <AccountStatusBanner />
@@ -305,7 +309,13 @@ function ShellLayoutInner({ children }: { children: ReactNode }) {
               "flex min-h-0 w-full flex-1 flex-col",
               mobileBottomClearancePx === null && "pb-[var(--mobile-bottom-overlay-clearance)]"
             )}
-            style={mobileBottomClearancePx !== null ? { paddingBottom: mobileBottomClearancePx } : undefined}
+            style={
+              mobileBottomClearancePx !== null
+                ? {
+                    paddingBottom: `max(${mobileBottomClearancePx}px, var(--mobile-bottom-overlay-clearance))`,
+                  }
+                : undefined
+            }
           >
             {children}
           </div>

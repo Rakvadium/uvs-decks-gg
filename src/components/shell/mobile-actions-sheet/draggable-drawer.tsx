@@ -358,13 +358,7 @@ export function MobileActionsDraggableDrawer({ children }: MobileActionsDraggabl
         <div className="min-h-0 flex flex-1 flex-col overflow-hidden">
           <div ref={actionPanelRef} className="min-h-0 overflow-hidden" style={{ height: actionPanelHeight }}>
             <div className="flex h-full min-h-0 flex-col overflow-hidden">
-              <MobileActionsSheetHeader
-                className="touch-none"
-                onPointerDown={beginDrag}
-                onPointerMove={updateDrag}
-                onPointerUp={endDrag}
-                onPointerCancel={cancelDrag}
-              />
+              <MobileActionsSheetHeader className="touch-none" />
               <MobileActionsSheetContent />
             </div>
           </div>

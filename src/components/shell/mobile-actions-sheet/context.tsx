@@ -60,7 +60,8 @@ export function MobileActionsSheetProvider({ children }: { children: ReactNode }
 
   const handleBack = useCallback(() => {
     setActiveSidebarAction(null);
-  }, [setActiveSidebarAction]);
+    openSheet();
+  }, [setActiveSidebarAction, openSheet]);
 
   const selectSlot = useCallback(
     (id: string) => {
