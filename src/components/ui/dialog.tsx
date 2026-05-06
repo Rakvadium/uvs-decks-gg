@@ -142,14 +142,21 @@ function DialogContent({
         >
           <div
             className={cn(
-              "flex min-h-0 flex-1 flex-col pt-4 pl-4 pr-14 md:px-6 md:pt-6 md:pr-14",
+              "flex min-h-0 flex-1 flex-col",
+              showCloseButton
+                ? "pt-4 pl-4 pr-14 md:px-6 md:pt-6 md:pr-14"
+                : isPlain
+                  ? "max-md:p-0 md:px-6 md:pt-6 md:pb-6"
+                  : "pt-4 px-4 md:px-6 md:pt-6",
               hasFooter
                 ? cn(
                     "pb-2",
                     footerMobileOnly ? "max-md:pb-20" : "max-md:pb-24",
                     "md:pb-3"
                   )
-                : "pb-6 md:pb-6"
+                : showCloseButton || !isPlain
+                  ? "pb-6 md:pb-6"
+                  : ""
             )}
           >
             {children}
