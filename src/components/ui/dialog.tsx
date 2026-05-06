@@ -123,7 +123,8 @@ function DialogContent({
             "max-md:!pointer-events-none md:pointer-events-auto md:inset-auto md:top-[50%] md:left-[50%] md:h-auto md:max-h-[85vh] md:translate-x-[-50%] md:translate-y-[-50%] md:overflow-hidden md:rounded-none md:border-0",
           "md:data-[state=closed]:zoom-out-95 md:data-[state=open]:zoom-in-95",
           dialogSizeStyles[size],
-          className
+          className,
+          "max-md:min-w-0 max-md:!max-w-none"
         )}
         {...props}
       >
