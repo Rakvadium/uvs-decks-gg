@@ -77,8 +77,9 @@ export interface SymbolsPickerPanelProps {
   standardSymbols: string[];
   attunedSymbols: string[];
   symbolMatchAll: boolean;
+  includeInfinityResults: boolean;
   onToggleSymbol: (symbol: string) => void;
-  onInfinityChange: (checked: boolean) => void;
+  onIncludeInfinityResultsChange: (include: boolean) => void;
   onSymbolMatchAllChange: (checked: boolean) => void;
   plain?: boolean;
 }
@@ -88,8 +89,9 @@ export function SymbolsPickerPanel({
   standardSymbols,
   attunedSymbols,
   symbolMatchAll,
+  includeInfinityResults,
   onToggleSymbol,
-  onInfinityChange,
+  onIncludeInfinityResultsChange,
   onSymbolMatchAllChange,
   plain = false,
 }: SymbolsPickerPanelProps) {
@@ -103,8 +105,8 @@ export function SymbolsPickerPanel({
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-2">
           <Switch
-            checked={selectedSymbols.includes("infinity")}
-            onCheckedChange={onInfinityChange}
+            checked={includeInfinityResults}
+            onCheckedChange={onIncludeInfinityResultsChange}
           />
           <Label className="cursor-pointer text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
             Infinity

@@ -381,8 +381,17 @@ function TypeQuickFilter() {
 // }
 
 function SymbolsQuickFilter() {
-  const { filters, meta, actions, toggleStringFilter, setBooleanFilter } =
-    useGalleryFilterDialogContext();
+  const {
+    filters,
+    state,
+    meta,
+    actions,
+    toggleStringFilter,
+    setBooleanFilter,
+    setIncludeInfinityResults,
+  } = useGalleryFilterDialogContext();
+  const rawSymbols = state.filters.symbols;
+  const includeInfinityResults = filters.includeInfinity !== false;
   const selectedSymbols = filters.symbols ?? [];
   const allSymbols = meta.uniqueValues?.symbols ?? [];
   const standardSymbols = allSymbols.filter(
@@ -390,23 +399,19 @@ function SymbolsQuickFilter() {
   );
   const attunedSymbols = allSymbols.filter((symbol) => symbol.startsWith("attuned:"));
 
-  const onInfinityChange = (checked: boolean) => {
-    const hasInfinity = selectedSymbols.includes("infinity");
-    if ((checked && !hasInfinity) || (!checked && hasInfinity)) {
-      toggleStringFilter("symbols", "infinity");
-    }
-  };
-
-  const count = selectedSymbols.length;
+  const count =
+    (rawSymbols?.length ?? 0) + (state.filters.includeInfinity === false ? 1 : 0);
   const endAdornment =
-    selectedSymbols.length > 0 ? <QuickFilterSymbolAdornment symbols={selectedSymbols} /> : undefined;
+    rawSymbols !== undefined && rawSymbols.length > 0 ? (
+      <QuickFilterSymbolAdornment symbols={selectedSymbols} />
+    ) : undefined;
 
   return (
     <Popover modal={false}>
       <QuickFilterTriggerWrap
         count={count}
         clearAriaLabel="Clear symbols filter"
-        onClear={() => actions.removeFilterKeys(["symbols", "symbolMatchAll"])}
+        onClear={() => actions.removeFilterKeys(["symbols", "symbolMatchAll", "includeInfinity"])}
       >
         <PopoverTrigger asChild>
           <QuickFilterTrigger
@@ -427,8 +432,9 @@ function SymbolsQuickFilter() {
           standardSymbols={standardSymbols}
           attunedSymbols={attunedSymbols}
           symbolMatchAll={filters.symbolMatchAll ?? false}
+          includeInfinityResults={includeInfinityResults}
           onToggleSymbol={(symbol) => toggleStringFilter("symbols", symbol)}
-          onInfinityChange={onInfinityChange}
+          onIncludeInfinityResultsChange={setIncludeInfinityResults}
           onSymbolMatchAllChange={(checked) => setBooleanFilter("symbolMatchAll", checked)}
           plain
         />

@@ -137,7 +137,7 @@ export function AdminUsersPageClient() {
               placeholder="Search username, email, id…"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="sm:max-w-xs"
+              className="w-full max-w-[30rem] min-w-[300px]"
             />
             <Select
               value={accountStatus}

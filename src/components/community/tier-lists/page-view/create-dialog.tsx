@@ -54,6 +54,7 @@ export function CommunityTierListsPageCreateDialog() {
     <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
       <DialogContent
         size="md"
+        contentPadding="none"
         className="overflow-hidden p-0"
         showCloseButton={false}
         footer={
@@ -77,8 +78,8 @@ export function CommunityTierListsPageCreateDialog() {
             <div className="absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
           </div>
 
-          <div className="relative min-h-0 flex-1 overflow-y-auto p-6">
-            <DialogHeader className="border-border/20 pb-4">
+          <div className="relative min-h-0 flex-1 overflow-y-auto px-6">
+            <DialogHeader className="border-border/20 pb-4 pt-6">
               <DialogTitle className="text-xl">Create New Tier List</DialogTitle>
               <DialogDescription>
                 Choose whether this list is just for fun or should count toward a community ranking. New lists start private.

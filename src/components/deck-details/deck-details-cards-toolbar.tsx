@@ -1,28 +1,28 @@
 "use client";
 
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { LIST_SORT_SELECT_OPTIONS } from "./deck-list-utils";
 import { useDeckCardsSectionContext } from "./deck-details-cards-section-context";
+import { DeckListSortSelect } from "./deck-list-sort-select";
+import { DeckDetailsViewModeToggle } from "./deck-details-view-mode-toggle";
 
 export function DeckCardsToolbar() {
   const model = useDeckCardsSectionContext();
 
-  if (model.viewMode !== "list") return null;
+  if (model.viewMode === "list") {
+    return (
+      <div className="pb-1 flex flex-row items-center justify-between gap-2 md:hidden">
+        <div className="shrink-0">
+          <DeckDetailsViewModeToggle variant="toolbar" />
+        </div>
+        <div className="min-w-0 shrink-0">
+          <DeckListSortSelect triggerClassName="h-8 max-h-8 w-full max-w-[220px] px-3 py-1.5 text-[11px] leading-none" />
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="pb-1 flex justify-end">
-      <Select value={model.selectedListSortValue} onValueChange={model.onSelectSort}>
-        <SelectTrigger className="h-8 w-full max-w-[220px] text-[11px] md:h-7 md:w-[180px]">
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          {LIST_SORT_SELECT_OPTIONS.map((option) => (
-            <SelectItem key={option.value} value={option.value} className="text-[11px]">
-              {option.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+    <div className="pb-1 flex justify-start md:hidden">
+      <DeckDetailsViewModeToggle variant="toolbar" />
     </div>
   );
 }

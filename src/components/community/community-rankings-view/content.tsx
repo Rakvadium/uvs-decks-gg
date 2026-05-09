@@ -13,15 +13,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { SegmentedControl } from "@/components/ui/segmented-control";
 import { cn } from "@/lib/utils";
 import { CardImageDisplay } from "@/components/universus/card-grid-item/image-display";
 import type { Id } from "../../../../convex/_generated/dataModel";
 import { COMMUNITY_TIER_RANKING } from "../../../../shared/app-config";
 import { useOptionalCommunityTierListsPageContext } from "@/components/community/tier-lists/page-view/context";
 import { useCommunityRankingsModel } from "./hook";
-import type { CommunityRankingsViewProps, ScopeType } from "./types";
+import type { CommunityRankingsViewProps } from "./types";
 
 const TIER_PREVIEW_CARD_LIMIT = 10;
 
@@ -29,12 +27,9 @@ export function CommunityRankingsView({ embedded = false }: CommunityRankingsVie
   const tierListsPage = useOptionalCommunityTierListsPageContext();
   const {
     scopeType,
-    setScopeType,
     selectedSetScopeKey,
-    setSelectedSetScopeKey,
     leaderboard,
     cardMap,
-    scopeItems,
     setScopes,
   } = useCommunityRankingsModel();
 
@@ -44,33 +39,6 @@ export function CommunityRankingsView({ embedded = false }: CommunityRankingsVie
     cardIds: Id<"cards">[];
     scopeLabel: string;
   } | null>(null);
-
-  const scopeControls = (
-    <div className="flex w-full flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
-      <SegmentedControl
-        value={scopeType}
-        onValueChange={(value) => setScopeType(value as ScopeType)}
-        items={scopeItems}
-        size="sm"
-        className="w-fit max-w-full"
-      />
-
-      {scopeType === "set_scope" ? (
-        <Select value={selectedSetScopeKey} onValueChange={setSelectedSetScopeKey}>
-          <SelectTrigger className="w-full sm:w-[min(100%,18rem)]">
-            <SelectValue placeholder="Choose a set scope" />
-          </SelectTrigger>
-          <SelectContent>
-            {(setScopes ?? []).map((scope) => (
-              <SelectItem key={scope.scopeKey} value={scope.scopeKey}>
-                {scope.scopeLabel}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      ) : null}
-    </div>
-  );
 
   const scopeSubtitle =
     leaderboard?.scopeLabel ??
@@ -85,8 +53,6 @@ export function CommunityRankingsView({ embedded = false }: CommunityRankingsVie
       ) : null}
 
       <div className={cn("relative z-10 flex min-h-full flex-col gap-4", embedded ? "py-2" : "p-4 md:p-6")}>
-        {scopeControls}
-
         <Card
           className={cn(
             "bg-card/75",
@@ -209,10 +175,10 @@ export function CommunityRankingsView({ embedded = false }: CommunityRankingsVie
       </div>
 
       <Dialog open={dialogTier !== null} onOpenChange={(open) => !open && setDialogTier(null)}>
-        <DialogContent size="xl" className="gap-0">
+        <DialogContent size="xl" contentPadding="none" className="gap-0">
           {dialogTier ? (
             <>
-              <DialogHeader className="px-6 pt-6">
+              <DialogHeader className="px-6">
                 <DialogTitle style={{ color: dialogTier.color }}>{dialogTier.label} tier</DialogTitle>
                 <DialogDescription>
                   {dialogTier.cardIds.length} cards in this community tier band for {dialogTier.scopeLabel}.

@@ -389,10 +389,14 @@ export function filterCards(
   const sets = filters.set;
   const hasSetFilter = Boolean(sets?.length);
 
-  const symbolFilters = filters.symbols;
+  const symbolFiltersRaw = filters.symbols?.filter((s) => s.toLowerCase() !== "infinity");
+  const symbolFilters =
+    symbolFiltersRaw && symbolFiltersRaw.length > 0 ? symbolFiltersRaw : undefined;
   const hasSymbolFilter = Boolean(symbolFilters?.length);
+  const includeInfinityResults = filters.includeInfinity !== false;
   const symbolMatchAll = filters.symbolMatchAll === true;
-  const isAttunedFilter = hasSymbolFilter && symbolFilters!.some((s) => s.toLowerCase().startsWith("attuned"));
+  const isAttunedFilter =
+    hasSymbolFilter && symbolFilters!.some((s) => s.toLowerCase().startsWith("attuned"));
 
   const keywordFilters = filters.keywords;
   const hasKeywordFilter = Boolean(keywordFilters?.length);
@@ -456,17 +460,34 @@ export function filterCards(
       if (!card.setCode || !sets!.includes(card.setCode)) continue;
     }
 
-    if (hasSymbolFilter) {
-      if (!card.symbols) continue;
-      let cardSymbols = card.symbols.split("|").map((s) => s.trim().toLowerCase());
-      if (symbolMatchAll) {
-        if (!symbolFilters!.every((s) => cardSymbols.includes(s.toLowerCase()))) continue;
-      } else {
-        const isAttuned = cardSymbols.some((s) => s.toLowerCase().startsWith("attuned"));
-        if (isAttuned && !isAttunedFilter) {
-          cardSymbols = cardSymbols.map((s) => s.replace("attuned:", "").toLowerCase());
+    if (hasSymbolFilter || !includeInfinityResults) {
+      if (!card.symbols) {
+        if (hasSymbolFilter) continue;
+        continue;
+      }
+
+      const cardSymbols = card.symbols.split("|").map((s) => s.trim().toLowerCase());
+      const cardHasInfinity = cardSymbols.includes("infinity");
+
+      if (!includeInfinityResults && cardHasInfinity) continue;
+
+      if (hasSymbolFilter) {
+        let matchesSelection: boolean;
+        if (symbolMatchAll) {
+          matchesSelection = symbolFilters!.every((s) => cardSymbols.includes(s.toLowerCase()));
+        } else {
+          let tokens = cardSymbols;
+          const isAttuned = cardSymbols.some((s) => s.toLowerCase().startsWith("attuned"));
+          if (isAttuned && !isAttunedFilter) {
+            tokens = cardSymbols.map((s) => s.replace("attuned:", "").toLowerCase());
+          }
+          matchesSelection = symbolFilters!.some((s) => tokens.includes(s.toLowerCase()));
         }
-        if (!symbolFilters!.some((s) => cardSymbols.includes(s.toLowerCase()))) continue;
+        if (includeInfinityResults) {
+          if (!matchesSelection && !cardHasInfinity) continue;
+        } else {
+          if (!matchesSelection) continue;
+        }
       }
     }
 

@@ -26,7 +26,7 @@ function GalleryTopBarFiltersContent() {
 
   if (isMobile) {
     return (
-      <div className="flex w-full flex-col gap-4">
+      <div className="flex w-full flex-col gap-2.5">
         <div className="flex w-full items-center justify-center">
           <div className="flex w-full max-w-3xl items-center gap-2">
             <div className="min-w-0 flex-1">

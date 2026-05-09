@@ -84,7 +84,7 @@ export function TeamHubShellContent({ teamId, children }: TeamHubShellContentPro
             className="rounded-none border-x-0"
             innerClassName="!px-0"
             title={branding}
-            tabs={tabsScrollWrap}
+            tabs={<TeamHubSectionNav teamId={teamId} />}
           />
         </div>
 

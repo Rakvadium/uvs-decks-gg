@@ -438,7 +438,7 @@ export default function SetAdminCards({
 
   const cardFormDialog = (
     <Dialog open={sheetOpen} onOpenChange={setSheetOpen}>
-      <DialogContent className="max-h-[min(90vh,800px)] overflow-y-auto sm:max-w-lg p-0">
+      <DialogContent contentPadding="none" className="max-h-[min(90vh,800px)] overflow-y-auto sm:max-w-lg p-0">
         <DialogHeader className="px-4 pt-6 md:px-6">
           <DialogTitle>{editing ? "Edit card" : "Add card"}</DialogTitle>
         </DialogHeader>

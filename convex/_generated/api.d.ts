@@ -16,6 +16,7 @@ import type * as auth from "../auth.js";
 import type * as cardFacets from "../cardFacets.js";
 import type * as cards from "../cards.js";
 import type * as collections from "../collections.js";
+import type * as communityLive from "../communityLive.js";
 import type * as communityRankings from "../communityRankings.js";
 import type * as communityYoutube from "../communityYoutube.js";
 import type * as crons from "../crons.js";
@@ -82,6 +83,7 @@ declare const fullApi: ApiFromModules<{
   cardFacets: typeof cardFacets;
   cards: typeof cards;
   collections: typeof collections;
+  communityLive: typeof communityLive;
   communityRankings: typeof communityRankings;
   communityYoutube: typeof communityYoutube;
   crons: typeof crons;

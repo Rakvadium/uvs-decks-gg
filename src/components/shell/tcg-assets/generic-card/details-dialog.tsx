@@ -30,6 +30,7 @@ export function GenericCardDetailsDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
+        contentPadding="none"
         className="overflow-hidden p-0 md:min-w-[65vw] md:max-h-[90vh]"
         showCloseButton={false}
         footer={

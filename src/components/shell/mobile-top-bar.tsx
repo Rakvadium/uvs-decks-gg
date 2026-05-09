@@ -4,19 +4,21 @@ import { PageType } from "@/app/(app)/layout"
 import { DecksMobileTopBar } from "@/components/decks/decks-view/mobile-top-bar"
 import { GalleryTopBarFilters } from "@/components/gallery/gallery-top-bar-filters"
 import { SlotRenderer, useShellSlotSlots } from "./shell-slot-provider"
+import { useDecksOptional } from "@/providers/DecksProvider"
 
 interface MobileTopBarProps {
   pageType?: PageType | null
 }
 
-const mobileTopBarClassName = "relative shrink-0 bg-background pt-3"
+const mobileTopBarClassName = "relative shrink-0 bg-background border-b border-border/35"
 
 const galleryMobileTopBarClassName =
-  "relative shrink-0 border-b border-primary/40 bg-primary/15 pt-3 shadow-[0_1px_0_color-mix(in_oklch,var(--primary)_12%,transparent)] dark:border-sidebar-border/50 dark:bg-sidebar dark:shadow-none"
+  "relative shrink-0 border-b border-primary/40 bg-primary/15 pt-0 shadow-[0_1px_0_color-mix(in_oklch,var(--primary)_12%,transparent)] dark:border-sidebar-border/50 dark:bg-sidebar dark:shadow-none"
 
 export function MobileTopBar({ pageType }: MobileTopBarProps) {
   const slots = useShellSlotSlots()
   const hasTopBarSlots = (slots.get("top-bar")?.length ?? 0) > 0
+  const decksContext = useDecksOptional()
 
   if (pageType === "gallery") {
     return (
@@ -26,7 +28,7 @@ export function MobileTopBar({ pageType }: MobileTopBarProps) {
           className="pointer-events-none absolute inset-0 hidden dark:block"
           style={{ background: "var(--chrome-shell-sidebar-wash)" }}
         />
-        <div className="relative px-4 py-3">
+        <div className="relative px-4 py-1.5">
           <GalleryTopBarFilters />
         </div>
       </div>
@@ -34,9 +36,12 @@ export function MobileTopBar({ pageType }: MobileTopBarProps) {
   }
 
   if (pageType === "decks") {
+    if (!decksContext) {
+      return null
+    }
     return (
       <div className={mobileTopBarClassName}>
-        <div className="relative px-4 py-3">
+        <div className="relative px-4 py-1.5">
           <DecksMobileTopBar />
         </div>
       </div>
@@ -50,7 +55,7 @@ export function MobileTopBar({ pageType }: MobileTopBarProps) {
   if (pageType === "community" && hasTopBarSlots) {
     return (
       <div className={mobileTopBarClassName}>
-        <div className="relative px-4 py-3">
+        <div className="relative px-4 py-1.5">
           <SlotRenderer area="top-bar" />
         </div>
       </div>

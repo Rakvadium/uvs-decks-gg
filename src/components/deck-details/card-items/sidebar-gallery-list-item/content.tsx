@@ -46,8 +46,8 @@ function SidebarGalleryListItemContent() {
           if (!canOpenDialog()) return;
           handleKeyDownOpen(event);
         }}
-        onMouseEnter={() => onHoverCard(card)}
-        onMouseMove={() => onHoverCard(card)}
+        onMouseEnter={(event) => onHoverCard(card, event.currentTarget.getBoundingClientRect())}
+        onMouseMove={(event) => onHoverCard(card, event.currentTarget.getBoundingClientRect())}
         onMouseLeave={onClearHover}
         role="button"
         tabIndex={0}

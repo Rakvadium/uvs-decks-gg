@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -12,18 +13,20 @@ import { useGalleryFiltersOptional } from "@/providers/GalleryFiltersProvider";
 import { GalleryFilterDialogBody } from "./body";
 import { GalleryFilterDialogProvider } from "./context";
 import { GalleryFilterDialogHeader } from "./header";
+import { GalleryFilterNestedPopoverPortalProvider } from "./nested-popover-portal-context";
 
 interface GalleryFilterDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-function GalleryFilterDialogLayout() {
+function GalleryFilterDialogLayout({
+  nestedPopoverPortalContainerRef,
+}: {
+  nestedPopoverPortalContainerRef: (node: HTMLDivElement | null) => void;
+}) {
   return (
-    <div className="relative flex h-full min-h-0 flex-col">
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5" />
-      <div className="absolute left-0 right-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
-
+    <div ref={nestedPopoverPortalContainerRef} className="relative flex h-full min-h-0 flex-col">
       <GalleryFilterDialogHeader />
       <GalleryFilterDialogBody />
     </div>
@@ -35,6 +38,8 @@ export function GalleryFilterDialog({
   onOpenChange,
 }: GalleryFilterDialogProps) {
   const filtersContext = useGalleryFiltersOptional();
+  const [nestedPopoverPortalContainer, setNestedPopoverPortalContainer] =
+    useState<HTMLElement | null>(null);
 
   if (!filtersContext) return null;
 
@@ -42,6 +47,7 @@ export function GalleryFilterDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         size="lg"
+        contentPadding="none"
         className="overflow-hidden p-0 md:max-h-[85vh] md:pb-0"
         showCloseButton={false}
         footer={
@@ -56,7 +62,11 @@ export function GalleryFilterDialog({
 
         <GalleryFilterDialogProvider filtersContext={filtersContext}>
           <GalleryTopBarFiltersProvider>
-            <GalleryFilterDialogLayout />
+            <GalleryFilterNestedPopoverPortalProvider container={nestedPopoverPortalContainer}>
+              <GalleryFilterDialogLayout
+                nestedPopoverPortalContainerRef={setNestedPopoverPortalContainer}
+              />
+            </GalleryFilterNestedPopoverPortalProvider>
           </GalleryTopBarFiltersProvider>
         </GalleryFilterDialogProvider>
       </DialogContent>

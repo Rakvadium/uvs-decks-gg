@@ -1,12 +1,11 @@
 "use client";
 
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ComponentPropsWithoutRef, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
+import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { MobileActionsSheetContent } from "./content";
+import { MobileActionsSheetActionPanel } from "./content";
 import { useMobileActionsSheetContext } from "./context";
-import { MobileActionsSheetHeader } from "./header";
 
-const HANDLE_OVERLAP = 16;
 const DEFAULT_HEIGHT = 600;
 const MAX_HEIGHT_RATIO = 0.82;
 
@@ -16,6 +15,11 @@ function getMaxDrawerHeight() {
   }
 
   return Math.max(DEFAULT_HEIGHT, Math.floor(window.innerHeight * MAX_HEIGHT_RATIO));
+}
+
+function isMobileDeckDatabaseListPath(rawPathname: string): boolean {
+  const path = rawPathname.split("?")[0] ?? "";
+  return /^\/decks\/?$/.test(path);
 }
 
 type DragState = {
@@ -30,7 +34,11 @@ function isInteractiveTarget(target: EventTarget | null) {
     return false;
   }
 
-  return Boolean(target.closest("button, a, input, select, textarea, [role='button']"));
+  return Boolean(
+    target.closest(
+      'button, a, input, select, textarea, [role="button"], [role="textbox"], [contenteditable="true"]'
+    )
+  );
 }
 
 interface MobileActionsHandleProps extends ComponentPropsWithoutRef<"button"> {
@@ -40,14 +48,15 @@ interface MobileActionsHandleProps extends ComponentPropsWithoutRef<"button"> {
 
 export function MobileActionsHandle({ className, decorative = false, ...props }: MobileActionsHandleProps) {
   const baseClassName = cn(
-    "group relative z-20 flex h-4 w-20 items-center justify-center bg-transparent",
+    "group relative z-20 flex items-center justify-center bg-transparent",
+    decorative ? "h-3 min-h-3 w-16" : "h-4 w-20",
     className
   );
 
   if (decorative) {
     return (
       <div aria-hidden className={baseClassName}>
-        <span className="relative block h-2 w-24 rounded-full bg-primary">
+        <span className="relative block h-1 w-16 shrink-0 rounded-full bg-primary">
           <span className="absolute inset-0 mx-auto w-px rounded-full bg-primary" />
         </span>
       </div>
@@ -68,6 +77,7 @@ interface MobileActionsDraggableDrawerProps {
 }
 
 export function MobileActionsDraggableDrawer({ children }: MobileActionsDraggableDrawerProps) {
+  const pathname = usePathname();
   const { activeSlot, closeSheet, isActionsSheetOpen, openSheet, sidebarSlots } = useMobileActionsSheetContext();
   const [maxHeight, setMaxHeight] = useState(getMaxDrawerHeight);
   const [bottomStackHeight, setBottomStackHeight] = useState(0);
@@ -84,6 +94,7 @@ export function MobileActionsDraggableDrawer({ children }: MobileActionsDraggabl
   const dragAppliedHeightRef = useRef(drawerHeight);
   const pendingDragHeightRef = useRef<number | null>(null);
   const dragRafRef = useRef<number | null>(null);
+  const grabberStripRef = useRef<HTMLDivElement | null>(null);
 
   const minHeight = bottomStackHeight;
   const actionPanelHeight = Math.max(0, drawerHeight - minHeight);
@@ -114,20 +125,26 @@ export function MobileActionsDraggableDrawer({ children }: MobileActionsDraggabl
   }, [minHeight]);
 
   useLayoutEffect(() => {
-    const element = bottomStackRef.current;
+    const bottomEl = bottomStackRef.current;
+    const grabEl = grabberStripRef.current;
 
-    if (!element) {
+    if (!bottomEl) {
       return;
     }
 
     const updateHeight = () => {
-      setBottomStackHeight(element.getBoundingClientRect().height);
+      const bottom = bottomEl.getBoundingClientRect().height;
+      const grab = grabEl?.getBoundingClientRect().height ?? 0;
+      setBottomStackHeight(bottom + grab);
     };
 
     updateHeight();
 
     const observer = new ResizeObserver(updateHeight);
-    observer.observe(element);
+    observer.observe(bottomEl);
+    if (grabEl) {
+      observer.observe(grabEl);
+    }
 
     return () => observer.disconnect();
   }, [children]);
@@ -171,7 +188,7 @@ export function MobileActionsDraggableDrawer({ children }: MobileActionsDraggabl
     const panel = drawerPanelRef.current;
     const actionPanel = actionPanelRef.current;
     if (shell) {
-      shell.style.height = `${height + HANDLE_OVERLAP}px`;
+      shell.style.height = `${height}px`;
     }
     if (panel) {
       panel.style.height = `${height}px`;
@@ -205,7 +222,9 @@ export function MobileActionsDraggableDrawer({ children }: MobileActionsDraggabl
     }
   }, []);
 
-  if (sidebarSlots.length === 0) {
+  const useDrawerChrome = sidebarSlots.length > 0 && !isMobileDeckDatabaseListPath(pathname);
+
+  if (!useDrawerChrome) {
     return (
       <div className="pointer-events-auto relative mx-0 overflow-visible">
         <div ref={bottomStackRef} className="shrink-0">
@@ -327,7 +346,7 @@ export function MobileActionsDraggableDrawer({ children }: MobileActionsDraggabl
     <div
       ref={drawerShellRef}
       className="pointer-events-auto relative mx-0 overflow-visible"
-      style={{ height: drawerHeight + HANDLE_OVERLAP }}
+      style={{ height: drawerHeight }}
     >
       {isCloseTapShieldActive ? (
         <div
@@ -340,30 +359,34 @@ export function MobileActionsDraggableDrawer({ children }: MobileActionsDraggabl
       ) : null}
       <div
         ref={drawerPanelRef}
-        className="absolute inset-x-0 bottom-0 flex flex-col overflow-hidden rounded-t-[8px] border-x border-t [border-color:var(--chrome-sheet-border)] bg-background/96 shadow-[var(--chrome-sheet-shadow)] backdrop-blur-md"
+        className="absolute inset-x-0 bottom-0 flex flex-col overflow-hidden rounded-t-[8px] border-x border-t [border-color:var(--chrome-sheet-border)] shadow-[var(--chrome-sheet-shadow)]"
         style={{ height: drawerHeight }}
       >
-        <div
-          className="absolute inset-x-0 top-0 z-20 flex h-10  touch-none justify-center"
-          onPointerDown={beginDrag}
-          onPointerMove={updateDrag}
-          onPointerUp={endDrag}
-          onPointerCancel={cancelDrag}
-        >
-
-          <MobileActionsHandle decorative className="pointer-events-none absolute left-1/2 top-0 z-30 -translate-x-1/2 -translate-y-1/2" />
-        </div>
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-14 rounded-t-4 bg-gradient-to-b from-white/[0.06] via-primary/[0.025] to-transparent" />
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
-        <div className="min-h-0 flex flex-1 flex-col overflow-hidden">
-          <div ref={actionPanelRef} className="min-h-0 overflow-hidden" style={{ height: actionPanelHeight }}>
-            <div className="flex h-full min-h-0 flex-col overflow-hidden">
-              <MobileActionsSheetHeader className="touch-none" />
-              <MobileActionsSheetContent />
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-[1] h-14 rounded-t-4 bg-gradient-to-b from-white/[0.06] via-primary/[0.025] to-transparent" />
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-[1] h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
+        <div className="relative z-0 flex min-h-0 flex-1 flex-col overflow-hidden">
+          <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-background/96 backdrop-blur-md">
+            <div
+              ref={grabberStripRef}
+              className="flex shrink-0 touch-none justify-center px-4 pb-0.5 pt-1"
+              onPointerDown={beginDrag}
+              onPointerMove={updateDrag}
+              onPointerUp={endDrag}
+              onPointerCancel={cancelDrag}
+            >
+              <MobileActionsHandle decorative />
+            </div>
+            <div ref={actionPanelRef} className="min-h-0 overflow-hidden" style={{ height: actionPanelHeight }}>
+              <MobileActionsSheetActionPanel
+                onHeaderPointerDown={beginDrag}
+                onHeaderPointerMove={updateDrag}
+                onHeaderPointerUp={endDrag}
+                onHeaderPointerCancel={cancelDrag}
+              />
             </div>
           </div>
-          <div ref={bottomStackRef} className="shrink-0 pt-2">
-            {children}
+          <div ref={bottomStackRef} className="shrink-0">
+            <div className="bg-background/96 backdrop-blur-md">{children}</div>
           </div>
         </div>
       </div>

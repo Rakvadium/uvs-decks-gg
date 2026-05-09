@@ -97,16 +97,14 @@ export function SetSection({ plain = false }: { plain?: boolean } = {}) {
   return (
     <div className="space-y-2">
       <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Set</span>
-      <div className="rounded-lg border border-border/50 bg-card/30 p-2.5 backdrop-blur-sm">
-        <SearchableMultiSelect
-          options={options}
-          selectedValues={selectedSets}
-          onToggle={(setCode) => toggleStringFilter("set", setCode)}
-          triggerLabel="Select sets"
-          searchPlaceholder="Search sets..."
-          emptyMessage="No sets match"
-        />
-      </div>
+      <SearchableMultiSelect
+        options={options}
+        selectedValues={selectedSets}
+        onToggle={(setCode) => toggleStringFilter("set", setCode)}
+        triggerLabel="Select sets"
+        searchPlaceholder="Search sets..."
+        emptyMessage="No sets match"
+      />
     </div>
   );
 }

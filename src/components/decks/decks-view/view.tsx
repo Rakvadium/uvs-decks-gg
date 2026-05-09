@@ -4,7 +4,7 @@ import { AppPageHeader } from "@/components/shell/app-page-header";
 import { DeckCreateDialog } from "./create-dialog";
 import { DecksViewContent } from "./content";
 import { DecksViewHeading } from "./heading";
-import { DecksPagePrimaryAction, DecksPageSearchAndTabs } from "./top-bar";
+import { DecksPagePrimaryAction, DecksPageSearch, DecksPageTabs } from "./top-bar";
 
 export function DecksView() {
   return (
@@ -17,7 +17,8 @@ export function DecksView() {
         <AppPageHeader
           title="Deck Database"
           description="Build, browse, and manage decks."
-          toolbar={<DecksPageSearchAndTabs />}
+          tabs={<DecksPageTabs />}
+          toolbar={<DecksPageSearch />}
           actions={<DecksPagePrimaryAction />}
         />
       </div>

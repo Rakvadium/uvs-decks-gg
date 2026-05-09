@@ -1,20 +1,22 @@
 import Image from "next/image";
 import { Hexagon } from "lucide-react";
-import { useDeckListItemContext } from "./context";
+import { useDeckDetailsListCardRowContext } from "./context";
 
-export function DeckListItemThumbnail() {
+export function DeckDetailsListCardRowThumbnail() {
   const {
     card: { imageUrl, name },
-  } = useDeckListItemContext();
+    dragPreviewImageRef,
+  } = useDeckDetailsListCardRowContext();
 
   return (
-    <div className="relative w-10 shrink-0 self-stretch overflow-hidden border-r border-border/40 bg-muted/50 md:h-10 md:w-7 md:self-auto md:rounded-md md:border md:border-border/30">
+    <div className="relative w-10 shrink-0 self-stretch overflow-hidden border-r border-border/40 bg-muted/50">
       {imageUrl ? (
         <Image
+          ref={dragPreviewImageRef}
           src={imageUrl}
           alt={name}
           fill
-          sizes="(max-width: 767px) 40px, 28px"
+          sizes="40px"
           className="object-cover object-top"
           draggable={false}
         />

@@ -98,9 +98,9 @@ export function CommunityTierListDetailPoolDialog() {
         }
       }}
     >
-      <DialogContent size="lg" className="overflow-hidden p-0">
-        <div className="relative min-h-0 flex-1 overflow-y-auto p-6">
-          <DialogHeader className="pb-4">
+      <DialogContent size="lg" contentPadding="none" className="overflow-hidden p-0">
+        <div className="relative min-h-0 flex-1 overflow-y-auto px-6">
+          <DialogHeader className="pb-4 pt-6">
             <DialogTitle>Choose the Cards to Evaluate</DialogTitle>
             <DialogDescription>
               Pick a set, then a card type from that set. Add multiple rows to combine scopes (for example several

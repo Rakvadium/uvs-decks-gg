@@ -5,19 +5,19 @@ import { useMobileShell } from "./mobile-shell-context"
 import { useConvexAuth, useQuery } from "convex/react"
 import { api } from "../../../convex/_generated/api"
 import { cn } from "@/lib/utils"
-import { LayoutGrid, Layers, Library } from "lucide-react"
+import { LayoutGrid, Layers, Users, type LucideIcon } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 interface NavItem {
   path: string
   label: string
-  icon: typeof LayoutGrid
+  icon: LucideIcon
 }
 
 const navItems: NavItem[] = [
   { path: "gallery", label: "Cards", icon: LayoutGrid },
   { path: "decks", label: "Decks", icon: Layers },
-  { path: "collection", label: "Collection", icon: Library },
+  { path: "community", label: "Community", icon: Users },
 ]
 
 export function MobileBottomNav() {
@@ -32,7 +32,7 @@ export function MobileBottomNav() {
   }
 
   return (
-    <nav className="relative shrink-0 bg-background pt-2 pb-[env(safe-area-inset-bottom)]">
+    <nav className="relative shrink-0 bg-background pb-[env(safe-area-inset-bottom)]">
       <div className="flex h-16 items-center justify-around px-2">
         {navItems.map((item) => {
           const isActive = pathname.includes(`/${item.path}`)

@@ -599,6 +599,27 @@ export default defineSchema({
     key: v.string(),
   }).index("by_key", ["key"]),
 
+  communityLiveStatusCache: defineTable({
+    key: v.literal("singleton"),
+    checkedAt: v.number(),
+    youtubeLive: v.optional(
+      v.object({
+        videoId: v.string(),
+        title: v.string(),
+        thumbnailUrl: v.optional(v.string()),
+        channelTitle: v.optional(v.string()),
+      })
+    ),
+    twitchLive: v.optional(
+      v.object({
+        login: v.string(),
+        title: v.string(),
+        thumbnailUrl: v.optional(v.string()),
+        viewerCount: v.optional(v.number()),
+      })
+    ),
+  }).index("by_key", ["key"]),
+
   userFeedback: defineTable({
     kind: userFeedbackKindValidator,
     pagePath: v.string(),

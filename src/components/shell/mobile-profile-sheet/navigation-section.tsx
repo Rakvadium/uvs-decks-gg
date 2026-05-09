@@ -1,11 +1,11 @@
 import { cn } from "@/lib/utils";
 import { ShellTeamNav } from "@/components/shell/shell-team-nav";
-import { buildMainNavItems } from "../main-nav-build";
+import { buildMainNavItemsMobileOrder } from "../main-nav-build";
 import { useMobileProfileSheetContext } from "./context";
 
 export function MobileProfileNavigationSection() {
   const { pathname, handleNavClick, closeSheet } = useMobileProfileSheetContext();
-  const navItems = buildMainNavItems();
+  const navItems = buildMainNavItemsMobileOrder();
 
   return (
     <div className="p-4">

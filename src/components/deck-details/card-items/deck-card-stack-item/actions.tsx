@@ -19,7 +19,18 @@ export function DeckCardStackItemActions({ card, quantity, isHovered }: DeckCard
   const { addCard, removeCard } = useDeckEditor();
   const sectionCounts = useDeckSectionCounts();
 
-  if (!deckDetails?.isOwner) return null;
+  if (deckDetails?.isOwner !== true) {
+    return (
+      <CardDeckControls
+        deckCount={quantity}
+        isHovered={false}
+        canAdd={false}
+        forceSolidSurface
+        onAdd={(e) => e.stopPropagation()}
+        onRemove={(e) => e.stopPropagation()}
+      />
+    );
+  }
 
   const canAdd = canAddCardToSection({
     card,

@@ -175,10 +175,10 @@ export function TeamHubMembersContent({ teamId }: TeamHubMembersContentProps) {
       </div>
 
       <Dialog open={inviteOpen} onOpenChange={setInviteOpen}>
-        <DialogContent size="md" className="p-0" footer={null} showCloseButton>
+        <DialogContent size="md" contentPadding="none" className="p-0" footer={null} showCloseButton>
           {inviteStep === "form" ? (
             <>
-              <DialogHeader className="px-6 pt-6">
+              <DialogHeader className="px-6">
                 <DialogTitle>Invite member</DialogTitle>
                 <DialogDescription>
                   Create a one-time link for a single teammate. After they accept or decline on the invite page, the
@@ -221,7 +221,7 @@ export function TeamHubMembersContent({ teamId }: TeamHubMembersContentProps) {
             </>
           ) : (
             <>
-              <DialogHeader className="px-6 pt-6">
+              <DialogHeader className="px-6">
                 <DialogTitle>Share this link</DialogTitle>
                 <DialogDescription>
                   Send it only to the person you intend to add. The link expires after seven days if unused.

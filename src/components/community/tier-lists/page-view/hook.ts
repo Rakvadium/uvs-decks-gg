@@ -1,6 +1,6 @@
 "use client";
 
-import { startTransition, useDeferredValue, useEffect, useMemo, useState } from "react";
+import { startTransition, useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useConvexAuth, useMutation, useQuery } from "convex/react";
 import { BarChart3, FolderOpen, Globe } from "lucide-react";
@@ -145,6 +145,28 @@ export function useCommunityTierListsPageModel() {
 
     setIsCreateOpen(true);
   };
+
+  const openCreateIntentRef = useRef(false);
+  useEffect(() => {
+    if (searchParams.get("openCreate") !== "1") {
+      openCreateIntentRef.current = false;
+      return;
+    }
+    if (openCreateIntentRef.current) return;
+    openCreateIntentRef.current = true;
+    if (!isAuthenticated) {
+      openAuthDialog();
+    } else {
+      setIsCreateOpen(true);
+    }
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("openCreate");
+    const nextQuery = params.toString();
+    const nextHref = nextQuery ? `${pathname}?${nextQuery}` : pathname;
+    startTransition(() => {
+      router.replace(nextHref, { scroll: false });
+    });
+  }, [isAuthenticated, openAuthDialog, pathname, router, searchParams]);
 
   const handleCreate = async () => {
     if (!isAuthenticated) {

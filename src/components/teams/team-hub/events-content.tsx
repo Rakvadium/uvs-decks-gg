@@ -143,8 +143,8 @@ export function TeamHubEventsContent({ teamId }: TeamHubEventsContentProps) {
       </div>
 
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>
-        <DialogContent size="md" className="p-0" footer={null} showCloseButton>
-          <DialogHeader className="px-6 pt-6">
+        <DialogContent size="md" contentPadding="none" className="p-0" footer={null} showCloseButton>
+          <DialogHeader className="px-6">
             <DialogTitle>Create Calendar Item</DialogTitle>
             <DialogDescription>Add a time-bound entry for the team calendar. Title is required.</DialogDescription>
           </DialogHeader>

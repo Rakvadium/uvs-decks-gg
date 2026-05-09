@@ -4,6 +4,7 @@ import { Hexagon } from "lucide-react"
 import Link from "next/link"
 import { Kicker } from "@/components/ui/typography-headings"
 import { ShellFeedbackNav } from "@/components/shell/shell-feedback-nav"
+import { ShellUniversusNav } from "@/components/shell/shell-universus-nav"
 
 export function MobileHeader() {
   return (
@@ -25,7 +26,10 @@ export function MobileHeader() {
         </Kicker>
       </Link>
 
-      <ShellFeedbackNav variant="mobile-header" />
+      <div className="relative z-10 flex shrink-0 items-center gap-1.5">
+        <ShellUniversusNav variant="mobile-header" />
+        <ShellFeedbackNav variant="mobile-header" />
+      </div>
     </header>
   )
 }

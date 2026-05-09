@@ -123,8 +123,8 @@ export function TeamHubAnnouncementsContent({ teamId }: TeamHubAnnouncementsCont
       </div>
 
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>
-        <DialogContent size="md" className="p-0" footer={null} showCloseButton>
-          <DialogHeader className="px-6 pt-6">
+        <DialogContent size="md" contentPadding="none" className="p-0" footer={null} showCloseButton>
+          <DialogHeader className="px-6">
             <DialogTitle>Create Announcement</DialogTitle>
             <DialogDescription>Visible to everyone on the team. Title and body are required.</DialogDescription>
           </DialogHeader>

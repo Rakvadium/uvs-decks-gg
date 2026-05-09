@@ -107,6 +107,17 @@ function getStorageKey(key: string): string {
   return `${STORAGE_KEY_PREFIX}:${key}`;
 }
 
+function normalizePersistedGalleryFilters(raw: CardFilters | undefined): CardFilters | undefined {
+  if (!raw) return undefined;
+  if (!raw.symbols?.length) return raw;
+  const stripped = raw.symbols.filter((s) => s.toLowerCase() !== "infinity");
+  if (stripped.length === raw.symbols.length) return raw;
+  const next: CardFilters = { ...raw };
+  if (stripped.length === 0) delete next.symbols;
+  else next.symbols = stripped;
+  return next;
+}
+
 function loadPersistedUIState(): UIState {
   if (typeof window === "undefined") {
     return {};
@@ -114,7 +125,8 @@ function loadPersistedUIState(): UIState {
   try {
     const activeDeckId = localStorage.getItem(getStorageKey("activeDeckId")) ?? undefined;
     const filtersRaw = localStorage.getItem(getStorageKey("galleryFilters"));
-    const galleryFilters = filtersRaw ? JSON.parse(filtersRaw) : undefined;
+    const galleryFilters =
+      filtersRaw !== null ? normalizePersistedGalleryFilters(JSON.parse(filtersRaw)) : undefined;
     const galleryViewMode = (localStorage.getItem(getStorageKey("galleryViewMode")) as GalleryViewMode) ?? undefined;
     const galleryCardsPerRowRaw = localStorage.getItem(getStorageKey("galleryCardsPerRow"));
     const galleryCardsPerRow = galleryCardsPerRowRaw ? parseInt(galleryCardsPerRowRaw, 10) : undefined;

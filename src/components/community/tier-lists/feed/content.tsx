@@ -7,7 +7,7 @@ import { CommunitySectionHeader } from "@/components/community/shared/section-he
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { TierListFeedCard } from "./card";
+import { TierListBrowserCard } from "../page-view/browser-card";
 import { useCommunityTierListFeed } from "./hook";
 import { TierListFeedSkeleton } from "./skeleton";
 
@@ -49,13 +49,14 @@ export function TierListFeed({
       {isLoading ? (
         <TierListFeedSkeleton compact={compact} />
       ) : feed && feed.length > 0 ? (
-        <div className={compact ? "grid gap-4 md:grid-cols-2 xl:grid-cols-3" : "grid gap-4 lg:grid-cols-2"}>
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {feed.map((entry) => (
-            <TierListFeedCard
+            <TierListBrowserCard
               key={entry.tierList._id}
-              compact={compact}
+              tierList={entry.tierList}
+              authorLabel={entry.author?.username ?? entry.author?.email ?? "Unknown duelist"}
               cardMap={cardMap}
-              {...entry}
+              href={`/community/tier-lists/${entry.tierList._id}`}
             />
           ))}
         </div>

@@ -182,7 +182,7 @@ export function CommunityTierListDetailDesktopHeader() {
     <h1 className="text-xl font-semibold tracking-tight text-foreground md:text-2xl">{viewTitle}</h1>
   );
 
-  const toolbar = (
+  const subRow = (
     <div className="flex flex-wrap items-center gap-2">
       <Button variant="ghost" size="sm" className="gap-2" asChild>
         <Link href="/community/tier-lists">
@@ -217,7 +217,13 @@ export function CommunityTierListDetailDesktopHeader() {
 
   return (
     <>
-      <AppPageHeader title={titleNode} description={description} toolbar={toolbar} actions={actions} />
+      <AppPageHeader
+        title={titleNode}
+        description={description}
+        tabs={subRow}
+        actions={actions}
+        secondaryRowFirst
+      />
       <AlertDialog open={shouldConfirmRankedScopeReset} onOpenChange={(open) => !open && cancelPendingRankingScopeChange()}>
         <AlertDialogContent>
           <AlertDialogHeader>

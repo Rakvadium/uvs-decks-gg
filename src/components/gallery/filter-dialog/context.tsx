@@ -27,6 +27,7 @@ interface GalleryFilterDialogContextValue {
   toggleStringFilter: (key: StringArrayFilterKey, value: string) => void;
   setStatFilter: (key: StatFilterKey, value: StatFilterValue | undefined) => void;
   setBooleanFilter: (key: "symbolMatchAll" | "keywordMatchAll", checked: boolean) => void;
+  setIncludeInfinityResults: (include: boolean) => void;
 }
 
 const GalleryFilterDialogContext = createContext<GalleryFilterDialogContextValue | null>(
@@ -85,7 +86,10 @@ export function GalleryFilterDialogProvider({
         ? currentValues.filter((currentValue) => currentValue !== value)
         : [...currentValues, value];
 
-      actions.updateFilter(key, (nextValues.length > 0 ? nextValues : undefined) as CardFilters[typeof key]);
+      actions.updateFilter(
+        key,
+        (nextValues.length > 0 ? nextValues : undefined) as CardFilters[typeof key]
+      );
     },
     [actions, filters]
   );
@@ -100,6 +104,13 @@ export function GalleryFilterDialogProvider({
   const setBooleanFilter = useCallback(
     (key: "symbolMatchAll" | "keywordMatchAll", checked: boolean) => {
       actions.updateFilter(key, checked ? true : undefined);
+    },
+    [actions]
+  );
+
+  const setIncludeInfinityResults = useCallback(
+    (include: boolean) => {
+      actions.updateFilter("includeInfinity", include ? undefined : false);
     },
     [actions]
   );
@@ -120,6 +131,7 @@ export function GalleryFilterDialogProvider({
       toggleStringFilter,
       setStatFilter,
       setBooleanFilter,
+      setIncludeInfinityResults,
     }),
     [
       state,
@@ -133,6 +145,7 @@ export function GalleryFilterDialogProvider({
       toggleStringFilter,
       setStatFilter,
       setBooleanFilter,
+      setIncludeInfinityResults,
     ]
   );
 

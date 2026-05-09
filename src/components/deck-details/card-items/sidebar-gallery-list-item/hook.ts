@@ -4,7 +4,8 @@ import { useTcgDraggable } from "@/lib/dnd";
 import { useCardDetailsDialogTrigger, useDeckSectionCounts, useDragClickGuard } from "../hooks";
 import type { SidebarGalleryListItemProps } from "./types";
 
-export function useSidebarGalleryListItemModel({ card, backCard, onHoverCard, onClearHover }: SidebarGalleryListItemProps) {
+export function useSidebarGalleryListItemModel(props: SidebarGalleryListItemProps) {
+  const { card, backCard, onHoverCard, onClearHover } = props;
   const { addCard, getCardCount, removeCard } = useDeckEditor();
   const sectionCounts = useDeckSectionCounts();
   const { isDialogOpen, setIsDialogOpen, openDialog, handleKeyDownOpen } = useCardDetailsDialogTrigger();
@@ -18,6 +19,11 @@ export function useSidebarGalleryListItemModel({ card, backCard, onHoverCard, on
 
   const { canOpenDialog } = useDragClickGuard(isDragging);
 
+  const handleOpen = useCallback(() => {
+    if (!canOpenDialog()) return;
+    openDialog();
+  }, [canOpenDialog, openDialog]);
+
   const quantity = getCardCount(card._id);
   const canAddToMain = canAddCardToSection({
     card,
@@ -26,19 +32,16 @@ export function useSidebarGalleryListItemModel({ card, backCard, onHoverCard, on
     counts: sectionCounts,
   });
 
-  const handleOpen = useCallback(() => {
-    if (!canOpenDialog()) return;
-    openDialog();
-  }, [canOpenDialog, openDialog]);
-
   return {
     card,
     backCard,
     quantity,
     canAddToMain,
+    addCard,
+    removeCard,
     isDragging,
-    dragPreviewImageRef,
     dragHandleProps,
+    dragPreviewImageRef,
     canOpenDialog,
     isDialogOpen,
     setIsDialogOpen,
@@ -46,8 +49,6 @@ export function useSidebarGalleryListItemModel({ card, backCard, onHoverCard, on
     handleKeyDownOpen,
     onHoverCard,
     onClearHover,
-    addCard,
-    removeCard,
   };
 }
 

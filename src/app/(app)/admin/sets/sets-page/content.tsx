@@ -59,7 +59,7 @@ export default function AdminSetsPageContent() {
               placeholder="Search code or name…"
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              className="max-w-md"
+              className="max-w-[30rem] min-w-[300px]"
             />
             <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
               <div className="flex items-center gap-2">

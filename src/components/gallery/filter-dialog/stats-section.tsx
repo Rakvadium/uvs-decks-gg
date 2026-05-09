@@ -52,34 +52,32 @@ export function StatsSection({ plain = false }: { plain?: boolean } = {}) {
     "flex flex-col gap-4 rounded-md border border-border/50 bg-background/50 p-2.5";
 
   const grid = (
-    <div className="grid grid-cols-2 items-start gap-4">
-      <div className={statsGroupShell}>
+    <div className="grid grid-cols-1 items-start gap-4 md:grid-cols-2">
+      <div className={cn(statsGroupShell, "md:row-span-2 w-full min-w-0")}>
         <span className={statsSectionLabelClass}>General</span>
         <div className="space-y-1.5">
-          <StatInput label="Difficulty" filterKey="difficulty" />
-          <StatInput label="Control" filterKey="control" />
-          <StatInput label="Health" filterKey="health" />
-          <StatInput label="Hand Size" filterKey="handSize" />
-          <StatInput label="Stamina" filterKey="stamina" />
+          <StatInput label="Difficulty" filterKey="difficulty" labelPosition="end" />
+          <StatInput label="Control" filterKey="control" labelPosition="end" />
+          <StatInput label="Health" filterKey="health" labelPosition="end" />
+          <StatInput label="Hand Size" filterKey="handSize" labelPosition="end" />
+          <StatInput label="Stamina" filterKey="stamina" labelPosition="end" />
         </div>
       </div>
 
-      <div className="flex flex-col gap-4">
-        <div className={statsGroupShell}>
-          <span className={statsSectionLabelClass}>Block</span>
-          <div className="space-y-1.5">
-            <ZoneSelector filterKey="blockZone" hideZoneLabel={plain} />
-            <StatInput label="Modifier" filterKey="blockModifier" labelPosition="end" />
-          </div>
+      <div className={cn(statsGroupShell, "w-full min-w-0")}>
+        <span className={statsSectionLabelClass}>Block</span>
+        <div className="space-y-1.5">
+          <ZoneSelector filterKey="blockZone" hideZoneLabel={plain} />
+          <StatInput label="Modifier" filterKey="blockModifier" labelPosition="end" />
         </div>
+      </div>
 
-        <div className={statsGroupShell}>
-          <span className={statsSectionLabelClass}>Attack</span>
-          <div className="space-y-1.5">
-            <ZoneSelector filterKey="attackZone" hideZoneLabel={plain} />
-            <StatInput label="Speed" filterKey="speed" labelPosition="end" />
-            <StatInput label="Damage" filterKey="damage" labelPosition="end" />
-          </div>
+      <div className={cn(statsGroupShell, "w-full min-w-0")}>
+        <span className={statsSectionLabelClass}>Attack</span>
+        <div className="space-y-1.5">
+          <ZoneSelector filterKey="attackZone" hideZoneLabel={plain} />
+          <StatInput label="Speed" filterKey="speed" labelPosition="end" />
+          <StatInput label="Damage" filterKey="damage" labelPosition="end" />
         </div>
       </div>
     </div>
@@ -92,7 +90,7 @@ export function StatsSection({ plain = false }: { plain?: boolean } = {}) {
   return (
     <div className="space-y-2">
       <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Stats</span>
-      <div className="space-y-3 rounded-lg border border-border/50 bg-card/30 p-3 backdrop-blur-sm">
+      <div className="md:rounded-lg md:border md:border-border/50 md:bg-card/30 md:p-3 md:backdrop-blur-sm">
         {grid}
       </div>
     </div>

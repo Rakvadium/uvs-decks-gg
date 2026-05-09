@@ -91,6 +91,7 @@ function DialogContent({
   footerMobileOnly = false,
   showCloseButton = true,
   size = "default",
+  contentPadding = "default",
   presentation = "default",
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
@@ -99,9 +100,31 @@ function DialogContent({
   footer?: React.ReactNode
   footerMobileOnly?: boolean
   presentation?: "default" | "plain"
+  contentPadding?: "default" | "none"
 }) {
   const hasFooter = footer != null
   const isPlain = presentation === "plain"
+  const fullBleedContent = contentPadding === "none"
+  const mainInset = fullBleedContent
+    ? cn(showCloseButton && "pt-4 pr-14 md:pt-6 md:pr-14")
+    : showCloseButton
+      ? "pt-4 pl-4 pr-14 md:px-6 md:pt-6 md:pr-14"
+      : isPlain
+        ? "max-md:p-0 md:px-6 md:pt-6 md:pb-6"
+        : "pt-4 px-4 md:px-6 md:pt-6"
+  const mainBottom = hasFooter
+    ? cn(
+        "pb-2",
+        footerMobileOnly ? "max-md:pb-20" : "max-md:pb-24",
+        "md:pb-3"
+      )
+    : fullBleedContent
+      ? isPlain && !showCloseButton
+        ? ""
+        : "pb-6 md:pb-6"
+      : showCloseButton || !isPlain
+        ? "pb-6 md:pb-6"
+        : ""
   return (
     <DialogPortal data-slot="dialog-portal">
       <DialogOverlay />
@@ -140,25 +163,7 @@ function DialogContent({
             isPlain && "md:overflow-hidden"
           )}
         >
-          <div
-            className={cn(
-              "flex min-h-0 flex-1 flex-col",
-              showCloseButton
-                ? "pt-4 pl-4 pr-14 md:px-6 md:pt-6 md:pr-14"
-                : isPlain
-                  ? "max-md:p-0 md:px-6 md:pt-6 md:pb-6"
-                  : "pt-4 px-4 md:px-6 md:pt-6",
-              hasFooter
-                ? cn(
-                    "pb-2",
-                    footerMobileOnly ? "max-md:pb-20" : "max-md:pb-24",
-                    "md:pb-3"
-                  )
-                : showCloseButton || !isPlain
-                  ? "pb-6 md:pb-6"
-                  : ""
-            )}
-          >
+          <div className={cn("flex min-h-0 flex-1 flex-col", mainInset, mainBottom)}>
             {children}
           </div>
           {hasFooter && (

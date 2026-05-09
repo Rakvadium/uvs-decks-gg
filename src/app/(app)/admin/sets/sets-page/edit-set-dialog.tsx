@@ -131,7 +131,7 @@ export function EditSetDialog({ row, onOpenChange }: EditSetDialogProps) {
         }
       }}
     >
-      <DialogContent className="max-h-[min(90vh,720px)] overflow-y-auto sm:max-w-lg p-0">
+      <DialogContent className="max-h-[min(90vh,720px)] overflow-y-auto sm:max-w-lg p-0" contentPadding="none">
         <DialogHeader className="px-4 pt-6 md:px-6">
           <DialogTitle>Edit set</DialogTitle>
         </DialogHeader>

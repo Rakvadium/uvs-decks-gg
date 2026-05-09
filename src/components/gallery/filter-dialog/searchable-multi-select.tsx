@@ -3,6 +3,7 @@ import { Check, ChevronDown, Search, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { useGalleryFilterNestedPopoverPortalContainer } from "./nested-popover-portal-context";
 
 export interface SearchableMultiSelectOption {
   value: string;
@@ -27,6 +28,7 @@ export function SearchableMultiSelect({
   searchPlaceholder,
   emptyMessage,
 }: SearchableMultiSelectProps) {
+  const nestedPopoverPortalContainer = useGalleryFilterNestedPopoverPortalContainer();
   const [search, setSearch] = useState("");
   const selectedSet = useMemo(() => new Set(selectedValues), [selectedValues]);
 
@@ -65,7 +67,11 @@ export function SearchableMultiSelect({
             <ChevronDown className="h-3.5 w-3.5 opacity-70" />
           </button>
         </PopoverTrigger>
-        <PopoverContent className="w-[min(22rem,calc(100vw-2rem))] p-0" align="start">
+        <PopoverContent
+          container={nestedPopoverPortalContainer}
+          className="w-[min(22rem,calc(100vw-2rem))] p-0"
+          align="start"
+        >
           <div className="border-b border-border/50 p-2.5">
             <div className="relative">
               <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
@@ -88,7 +94,7 @@ export function SearchableMultiSelect({
             </div>
           </div>
 
-          <div className="max-h-64 overflow-y-auto p-2">
+          <div className="max-h-64 touch-pan-y overflow-y-auto overscroll-contain p-2 [-webkit-overflow-scrolling:touch]">
             {filteredOptions.length > 0 ? (
               <div className="space-y-1">
                 {filteredOptions.map((option) => {

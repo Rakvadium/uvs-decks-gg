@@ -92,8 +92,8 @@ export function TeamLogoCropDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent size="lg" className="p-0" footer={null} showCloseButton>
-        <DialogHeader className="px-6 pt-6">
+      <DialogContent size="lg" contentPadding="none" className="p-0" footer={null} showCloseButton>
+        <DialogHeader className="px-6">
           <DialogTitle>Position team logo</DialogTitle>
           <DialogDescription>
             Drag to move and zoom to frame the square that will be shown as your team avatar everywhere.

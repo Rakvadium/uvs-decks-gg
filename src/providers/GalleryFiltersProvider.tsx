@@ -227,12 +227,13 @@ export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
     if (filters.type?.length) count++;
     if (filters.rarity?.length) count++;
     if (filters.set?.length) count++;
-    if (filters.symbols?.length) count++;
+    if (galleryFilters.symbols !== undefined && galleryFilters.symbols.length > 0) count++;
+    if (galleryFilters.includeInfinity === false) count++;
     if (filters.keywords?.length) count++;
     if (filters.difficultyMin !== undefined || filters.difficultyMax !== undefined) count++;
     if (filters.controlMin !== undefined || filters.controlMax !== undefined) count++;
     return count;
-  }, [filters, galleryFilters.format, defaultFormat]);
+  }, [filters, galleryFilters, defaultFormat]);
 
   const updateFilter = useCallback(
     <K extends keyof CardFilters>(key: K, value: CardFilters[K]) => {

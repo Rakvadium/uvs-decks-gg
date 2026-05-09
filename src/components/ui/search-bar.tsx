@@ -215,6 +215,7 @@ export function SearchBar({
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogContent
             size="xl"
+            contentPadding="none"
             className={cn("overflow-hidden p-0", dialogClassName)}
             showCloseButton={false}
             footer={
@@ -234,7 +235,7 @@ export function SearchBar({
             }
           >
             <div className="relative flex h-full min-h-0 flex-col">
-              <DialogHeader className="shrink-0 px-6 pb-4 pt-6">
+              <DialogHeader className="shrink-0 border-b border-border/50 px-6 pb-4 pt-6">
                 <DialogTitle>{advancedFiltersTitle}</DialogTitle>
               </DialogHeader>
 

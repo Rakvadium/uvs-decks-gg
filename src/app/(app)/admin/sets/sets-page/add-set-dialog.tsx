@@ -122,7 +122,7 @@ export function AddSetDialog({ open, onOpenChange }: AddSetDialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto p-0">
+      <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto p-0" contentPadding="none">
         <DialogHeader className="px-4 pt-6 md:px-6">
           <DialogTitle>Add set</DialogTitle>
         </DialogHeader>

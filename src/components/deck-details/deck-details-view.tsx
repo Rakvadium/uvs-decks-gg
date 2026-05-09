@@ -23,6 +23,7 @@ import {
 } from "./deck-details-sidebars";
 import { DeckCardsSectionProvider } from "./deck-details-cards-section-context";
 import { DeckDetailsSectionTabs } from "./deck-details-section-tabs";
+import { DeckDetailsDesktopListSort } from "./deck-list-sort-select";
 import { DeckDetailsViewModeToggle } from "./deck-details-view-mode-toggle";
 import { DeckDetailsEditDialog } from "./deck-details-edit-dialog";
 import { TeamEditableWriteConflictBanner } from "@/components/deck/team-editable-write-conflict-banner";
@@ -91,8 +92,9 @@ export function DeckDetailsView() {
                   <DeckDetailsHeroPanel />
                   <DeckDetailsSharePanel />
                   <DeckDetailsSectionTabs />
-                  <div className="hidden md:block">
+                  <div className="hidden md:flex md:flex-col md:gap-2">
                     <DeckDetailsViewModeToggle />
+                    <DeckDetailsDesktopListSort />
                   </div>
                 </div>
 

@@ -30,6 +30,7 @@ export function CardDetailsDialog({ card, backCard, open, onOpenChange }: CardDe
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         size="lg"
+        contentPadding="none"
         className="overflow-hidden p-0 md:max-h-[90vh]"
         showCloseButton={false}
         footer={

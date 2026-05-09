@@ -4,6 +4,7 @@ import { AppPageHeader } from "@/components/shell/app-page-header";
 import { Surface } from "@/components/ui/card";
 import { CommunityMediaFeedSection } from "../sections/media-feed-section";
 import { CommunityTierListsSection } from "../sections/tier-lists-section";
+import { CommunityRightSidebarSlots } from "../community-right-sidebar/slots";
 
 const sectionClassName =
   "rounded-[28px] border-border/60 bg-card/70 p-5 py-5 backdrop-blur md:p-6";
@@ -11,6 +12,7 @@ const sectionClassName =
 export function CommunityView() {
   return (
     <div className="space-y-6 pb-8">
+      <CommunityRightSidebarSlots />
       <AppPageHeader
         title="Community"
         description="UniVersus content, tier lists, and highlights in one place."

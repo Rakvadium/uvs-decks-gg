@@ -26,6 +26,7 @@ export function DeckCreateDialog() {
     <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
       <DialogContent
         size="sm"
+        contentPadding="none"
         className="overflow-hidden p-0"
         showCloseButton={false}
         footer={
@@ -47,8 +48,8 @@ export function DeckCreateDialog() {
         }
       >
         <div className="relative flex h-full min-h-0 flex-col">
-          <div className="min-h-0 flex-1 overflow-y-auto p-6">
-            <DialogHeader>
+          <div className="min-h-0 flex-1 overflow-y-auto px-6">
+            <DialogHeader className="pt-6">
               <DialogTitle>Create New Deck</DialogTitle>
               <DialogDescription>Name it now, refine it later.</DialogDescription>
             </DialogHeader>

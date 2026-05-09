@@ -1,5 +1,10 @@
-import { FileText, LayoutGrid, List } from "lucide-react";
+import { ChevronDown, FileText, LayoutGrid, List } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import {
   Popover,
   PopoverContent,
@@ -29,10 +34,8 @@ export function GalleryViewModeFields({
     : (["card", "list", "details"] as const);
   const currentMode = isMobile && state.viewMode === "details" ? "list" : state.viewMode;
 
-  return (
-    <div className={cn("space-y-3", layout === "panel" && "rounded-lg border border-[color:var(--control-dual-border)] bg-muted/20 p-3")}>
-      <span className="font-mono text-xs uppercase tracking-widest text-muted-foreground">View Mode</span>
-
+  const modeAndDensity = (
+    <>
       <div className="flex gap-1">
         {availableModes.map((mode) => {
           const Icon = VIEW_MODE_ICONS[mode];
@@ -91,6 +94,37 @@ export function GalleryViewModeFields({
           )}
         </div>
       ) : null}
+    </>
+  );
+
+  if (layout === "panel") {
+    return (
+      <Collapsible
+        defaultOpen={false}
+        className="rounded-lg border border-[color:var(--control-dual-border)] bg-muted/20"
+      >
+        <CollapsibleTrigger
+          type="button"
+          className={cn(
+            "flex w-full items-center justify-between gap-2 p-3 text-left outline-none",
+            "hover:bg-muted/50 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+            "[&[data-state=open]_svg]:rotate-180"
+          )}
+        >
+          <span className="font-mono text-xs uppercase tracking-widest text-muted-foreground">View Mode</span>
+          <ChevronDown className="size-4 shrink-0 text-muted-foreground transition-transform duration-200" aria-hidden />
+        </CollapsibleTrigger>
+        <CollapsibleContent>
+          <div className="space-y-3 px-3 pb-3">{modeAndDensity}</div>
+        </CollapsibleContent>
+      </Collapsible>
+    );
+  }
+
+  return (
+    <div className="space-y-3">
+      <span className="font-mono text-xs uppercase tracking-widest text-muted-foreground">View Mode</span>
+      {modeAndDensity}
     </div>
   );
 }

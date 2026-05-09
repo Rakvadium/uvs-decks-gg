@@ -52,7 +52,7 @@ export function KeywordsSection() {
         </div>
       </div>
 
-      <div className="space-y-2 rounded-lg border border-border/50 bg-card/30 p-2.5 backdrop-blur-sm">
+      <div className="space-y-2">
         <SearchableMultiSelect
           options={keywordOptions}
           selectedValues={selectedKeywords}

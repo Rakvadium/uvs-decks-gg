@@ -2,7 +2,7 @@ import { useGalleryFilterDialogContext } from "./context";
 import { SymbolsPickerPanel } from "./symbols-picker-panel";
 
 export function SymbolsSection() {
-  const { filters, meta, setBooleanFilter, toggleStringFilter } =
+  const { filters, meta, setBooleanFilter, toggleStringFilter, setIncludeInfinityResults } =
     useGalleryFilterDialogContext();
 
   const selectedSymbols = filters.symbols ?? [];
@@ -20,13 +20,9 @@ export function SymbolsSection() {
         standardSymbols={standardSymbols}
         attunedSymbols={attunedSymbols}
         symbolMatchAll={filters.symbolMatchAll ?? false}
+        includeInfinityResults={filters.includeInfinity !== false}
         onToggleSymbol={(symbol) => toggleStringFilter("symbols", symbol)}
-        onInfinityChange={(checked) => {
-          const hasInfinity = selectedSymbols.includes("infinity");
-          if ((checked && !hasInfinity) || (!checked && hasInfinity)) {
-            toggleStringFilter("symbols", "infinity");
-          }
-        }}
+        onIncludeInfinityResultsChange={setIncludeInfinityResults}
         onSymbolMatchAllChange={(checked) => setBooleanFilter("symbolMatchAll", checked)}
       />
     </div>

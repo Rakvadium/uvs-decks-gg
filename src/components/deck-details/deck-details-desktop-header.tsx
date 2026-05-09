@@ -38,7 +38,7 @@ export function DeckDetailsDesktopHeader() {
     </p>
   );
 
-  const toolbar = (
+  const subRow = (
     <div className="flex flex-wrap items-center gap-2">
       <Button variant="ghost" size="sm" className="gap-2" asChild>
         <Link href="/decks">
@@ -81,8 +81,9 @@ export function DeckDetailsDesktopHeader() {
     <AppPageHeader
       title={titleNode}
       description={descriptionNode}
-      toolbar={toolbar}
+      tabs={subRow}
       actions={actions}
+      secondaryRowFirst
     />
   );
 }

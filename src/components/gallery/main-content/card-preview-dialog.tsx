@@ -187,7 +187,11 @@ export function CardPreviewDialog({ open, onOpenChange }: CardPreviewDialogProps
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="flex max-h-[90vh] w-full max-w-3xl flex-col gap-0 overflow-hidden p-0">
+      <DialogContent
+        contentPadding="none"
+        className="flex max-h-[90vh] w-full max-w-3xl flex-col gap-0 overflow-hidden p-0"
+        showCloseButton={false}
+      >
         <DialogHeader className="shrink-0 border-b border-border/50 px-6 py-4">
           <div className="flex items-center justify-between">
             <div>

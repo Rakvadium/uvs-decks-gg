@@ -1,19 +1,10 @@
 "use client";
 
-import { Check, Search, SlidersHorizontal } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
+import { SegmentedControl } from "@/components/ui/segmented-control";
 import { useDecksOptional } from "@/providers/DecksProvider";
-import { TABS } from "./constants";
+import { DECK_VISIBILITY_MOBILE_TAB_LABELS, TABS } from "./constants";
 
 export function DecksMobileTopBar() {
   const context = useDecksOptional();
@@ -22,12 +13,34 @@ export function DecksMobileTopBar() {
   const {
     state,
     actions,
-    catalog: { deckCounts },
+    catalog: { deckCounts, isAuthenticated },
   } = context;
 
+  const visibleTabs = TABS.filter((tab) => (tab.id === "my-decks" ? isAuthenticated : true));
+
   return (
-    <div className="flex w-full items-center gap-2">
-      <div className="relative min-w-0 flex-1">
+    <div className="flex w-full min-w-0 flex-col gap-2">
+      <SegmentedControl
+        orientation="horizontal"
+        size="sm"
+        stretch
+        className="w-full bg-muted/30"
+        value={state.activeTab}
+        onValueChange={(value) => actions.setActiveTab(value as typeof state.activeTab)}
+        items={visibleTabs.map((tab) => {
+          const Icon = tab.icon;
+          return {
+            value: tab.id,
+            label: (
+              <span className="flex-1 text-left">{DECK_VISIBILITY_MOBILE_TAB_LABELS[tab.id]}</span>
+            ),
+            icon: Icon,
+            badge: deckCounts[tab.id],
+          };
+        })}
+      />
+
+      <div className="relative min-w-0 w-full flex-1">
         <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-primary/70" />
         <Input
           placeholder="Search decks..."
@@ -38,57 +51,6 @@ export function DecksMobileTopBar() {
           spellCheck={false}
         />
       </div>
-
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            type="button"
-            variant="outline"
-            size="icon"
-            className="h-9 w-9 shrink-0 border-primary/40 bg-background/60 shadow-[0_0_10px_-4px_var(--primary)]"
-            aria-label="Filter deck visibility"
-          >
-            <SlidersHorizontal className="h-4 w-4" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent
-          align="end"
-          sideOffset={8}
-          className="w-56 border-primary/30 bg-background/95 backdrop-blur-lg"
-        >
-          <DropdownMenuLabel className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-            Deck Visibility
-          </DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          {TABS.map((tab) => {
-            const Icon = tab.icon;
-            const isActive = state.activeTab === tab.id;
-            const count = deckCounts[tab.id];
-
-            return (
-              <DropdownMenuItem
-                key={tab.id}
-                onSelect={() => actions.setActiveTab(tab.id)}
-                className="gap-2 font-mono text-xs uppercase tracking-wide"
-              >
-                <Check className={cn("h-3.5 w-3.5", isActive ? "text-primary opacity-100" : "opacity-0")} />
-                <Icon className={cn("h-3.5 w-3.5", isActive ? "text-primary" : "text-muted-foreground")} />
-                <span className="flex-1">{tab.label}</span>
-                {count > 0 ? (
-                  <span
-                    className={cn(
-                      "rounded border px-1.5 py-0.5 text-[10px]",
-                      isActive ? "border-primary/40 bg-primary/15 text-primary" : "border-border/60 text-muted-foreground"
-                    )}
-                  >
-                    {count}
-                  </span>
-                ) : null}
-              </DropdownMenuItem>
-            );
-          })}
-        </DropdownMenuContent>
-      </DropdownMenu>
     </div>
   );
 }
