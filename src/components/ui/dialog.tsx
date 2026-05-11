@@ -160,10 +160,17 @@ function DialogContent({
         <div
           className={cn(
             "relative z-10 flex min-h-0 flex-1 flex-col overflow-y-auto",
-            isPlain && "md:overflow-hidden"
+            isPlain && "max-md:pointer-events-auto md:overflow-hidden"
           )}
         >
-          <div className={cn("flex min-h-0 flex-1 flex-col", mainInset, mainBottom)}>
+          <div
+            className={cn(
+              "flex min-h-0 flex-col",
+              isPlain ? "max-md:h-auto max-md:flex-none md:flex-1" : "flex-1",
+              mainInset,
+              mainBottom
+            )}
+          >
             {children}
           </div>
           {hasFooter && (

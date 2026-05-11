@@ -23,6 +23,44 @@ import {
 } from "../readout-panel";
 import type { CardDetailsVariantProps } from "./types";
 
+function CardDetailsPrintingsBlock({
+  className,
+  card,
+  isAdmin,
+  onSelectPrinting,
+  onOpenVariant,
+}: {
+  className?: string;
+  card: CardDetailsVariantProps["card"];
+  isAdmin: boolean;
+  onSelectPrinting?: CardDetailsVariantProps["onSelectPrinting"];
+  onOpenVariant: () => void;
+}) {
+  return (
+    <div
+      className={cn(
+        "mx-auto flex w-full max-w-[340px] flex-col items-stretch gap-2 px-1",
+        className
+      )}
+    >
+      <OraclePrintingsCarousel
+        oracleId={card.oracleId}
+        selectedCardId={card._id}
+        onSelectPrinting={(c) => onSelectPrinting?.(c)}
+        className="max-w-none"
+      />
+      {isAdmin ? (
+        <div className="flex justify-center">
+          <CardVariantSaveTrigger
+            disabled={!card.oracleId?.trim()}
+            onClick={onOpenVariant}
+          />
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 export function CardDetailsV2({
   card,
   backCard,
@@ -50,7 +88,7 @@ export function CardDetailsV2({
 
   return (
     <CardDetailsContentProvider card={displayCard}>
-      <div className="flex min-h-0 w-full flex-1 flex-col gap-4 p-3 max-md:!pointer-events-none md:max-h-[min(85vh,calc(100dvh-2rem))] md:flex-row md:items-start md:gap-5 md:overflow-hidden md:pb-3 md:pl-3 md:!pointer-events-auto md:pt-12">
+      <div className="flex w-full max-md:h-auto max-md:flex-none flex-col gap-4 p-3 max-md:!pointer-events-none md:max-h-[min(85vh,calc(100dvh-2rem))] md:min-h-0 md:flex-1 md:flex-row md:items-start md:gap-5 md:overflow-hidden md:pb-3 md:pl-3 md:!pointer-events-auto md:pt-12">
         <div
           className={cn(
             "flex w-full shrink-0 flex-col items-center justify-center max-md:!pointer-events-auto",
@@ -173,36 +211,17 @@ export function CardDetailsV2({
                 {mobileNavigationNext}
               </div>
             </div>
-            <div className="mx-auto mt-3 flex w-full max-w-[340px] flex-col items-stretch gap-2 px-1">
-              <OraclePrintingsCarousel
-                oracleId={card.oracleId}
-                selectedCardId={card._id}
-                onSelectPrinting={(c) => onSelectPrinting?.(c)}
-                className="max-w-none"
-              />
-              {isAdmin ? (
-                <>
-                  <div className="flex justify-center">
-                    <CardVariantSaveTrigger
-                      disabled={!card.oracleId?.trim()}
-                      onClick={() => setVariantOpen(true)}
-                    />
-                  </div>
-                  {card.oracleId?.trim() ? (
-                    <CardVariantSaveDialog
-                      templateCard={card}
-                      open={variantOpen}
-                      onOpenChange={setVariantOpen}
-                      onCreated={(c) => onVariantCreated?.(c)}
-                    />
-                  ) : null}
-                </>
-              ) : null}
-            </div>
+            <CardDetailsPrintingsBlock
+              className="mt-3"
+              card={card}
+              isAdmin={Boolean(isAdmin)}
+              onSelectPrinting={onSelectPrinting}
+              onOpenVariant={() => setVariantOpen(true)}
+            />
           </div>
         </div>
 
-        <div className="relative flex min-w-0 flex-1 flex-col max-md:!pointer-events-auto">
+        <div className="relative flex min-w-0 max-md:flex-none flex-col max-md:!pointer-events-auto md:flex-1">
           <div className="relative flex min-w-0 flex-col overflow-hidden rounded-xl border border-primary/25 bg-card/95 shadow-[0_0_2px_var(--primary)/35,0_0_10px_var(--primary)/42,0_0_22px_var(--primary)/12] backdrop-blur-md">
             <DialogClose asChild>
               <Button
@@ -219,7 +238,7 @@ export function CardDetailsV2({
               className="min-w-0 flex-none"
               scrollableClassName={cn(
                 needsBottomChrome ? "pb-16" : undefined,
-                "max-h-[min(72vh,calc(100dvh-12rem))] flex-none"
+                "max-md:flex-none max-md:max-h-none max-md:overflow-y-visible md:max-h-[min(72vh,calc(100dvh-12rem))] md:flex-none"
               )}
             >
               <CardDetailsReadoutPanel />
@@ -236,6 +255,15 @@ export function CardDetailsV2({
             />
           </div>
         </div>
+
+        {isAdmin && card.oracleId?.trim() ? (
+          <CardVariantSaveDialog
+            templateCard={card}
+            open={variantOpen}
+            onOpenChange={setVariantOpen}
+            onCreated={(c) => onVariantCreated?.(c)}
+          />
+        ) : null}
       </div>
     </CardDetailsContentProvider>
   );
