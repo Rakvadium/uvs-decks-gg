@@ -11,26 +11,13 @@ import { v } from "convex/values";
 import { cardValidator } from "./validators";
 import { api } from "./_generated/api";
 import { runCatalogAggregateRefresh } from "./cardFacets";
+import { toPublicCardImageUrl } from "./publicCardUrls";
 
 const LIST_CATALOG_PAGE = 200;
 const LIST_CATALOG_MAX_ROUNDS = 50;
 const LIST_SORT_MAX_GALLERY = 5000;
 const SET_NAME_INDEX_MAX = 20_000;
 const LIST_ORACLE_VARIANT_MAX = 200;
-
-const PUBLIC_R2_BASE_URL = "https://pub-53d81abf7a7f442a90c9383c1e7bdc60.r2.dev";
-
-function toPublicCardImageUrl(imageUrl?: string) {
-  if (!imageUrl) {
-    return undefined;
-  }
-
-  if (imageUrl.startsWith("http")) {
-    return imageUrl;
-  }
-
-  return `${PUBLIC_R2_BASE_URL}/cards/${imageUrl}`;
-}
 
 function matchesCharacterSearch(name: string, searchName: string | undefined, search: string | undefined) {
   if (!search) {
@@ -581,7 +568,24 @@ export const getCardVariants = query({
       .query("cards")
       .withIndex("by_oracleId", (q) => q.eq("oracleId", args.oracleId))
       .take(LIST_ORACLE_VARIANT_MAX);
-    return cards.filter((card) => card.isFrontFace !== false);
+    const filtered = cards.filter((card) => card.isFrontFace !== false);
+    const withUrls = filtered.map((card) => {
+      const imageUrl = toPublicCardImageUrl(card.imageUrl);
+      return imageUrl !== card.imageUrl ? { ...card, imageUrl } : card;
+    });
+    withUrls.sort((a, b) => {
+      const av = a.isVariant === true ? 1 : 0;
+      const bv = b.isVariant === true ? 1 : 0;
+      if (av !== bv) {
+        return av - bv;
+      }
+      const sc = (a.setCode ?? "").localeCompare(b.setCode ?? "");
+      if (sc !== 0) {
+        return sc;
+      }
+      return (a.collectorNumber ?? "").localeCompare(b.collectorNumber ?? "", undefined, { numeric: true });
+    });
+    return withUrls;
   },
 });
 
@@ -591,7 +595,12 @@ export const getById = query({
   },
   returns: v.union(cardValidator, v.null()),
   handler: async (ctx, args) => {
-    return await ctx.db.get(args.cardId);
+    const card = await ctx.db.get(args.cardId);
+    if (!card) {
+      return null;
+    }
+    const imageUrl = toPublicCardImageUrl(card.imageUrl);
+    return imageUrl !== card.imageUrl ? { ...card, imageUrl } : card;
   },
 });
 

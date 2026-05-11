@@ -22,6 +22,7 @@ import {
   syncSetCardCountByCode,
   syncSetCardCountsByCodes,
 } from "./setCardCountSync";
+import { toPublicCardImageUrl } from "./publicCardUrls";
 
 const ADMIN_SET_LIST_MAX = 25_000;
 
@@ -699,6 +700,205 @@ export const updateCard = mutation({
       await syncSetCardCountsByCodes(ctx, codes);
     }
     return null;
+  },
+});
+
+type CardReplaceBody = Omit<Doc<"cards">, "_id" | "_creationTime">;
+
+function mergeCardReplaceBodyFromAdminJson(
+  parsed: Record<string, unknown>,
+  existing: Doc<"cards">
+): CardReplaceBody {
+  const has = (key: string) => Object.prototype.hasOwnProperty.call(parsed, key);
+
+  const name = has("name")
+    ? (() => {
+        const v = parsed.name;
+        if (typeof v !== "string" || !v.trim()) {
+          throw new Error('Field "name" must be a non-empty string');
+        }
+        return v;
+      })()
+    : existing.name;
+
+  const optString = (key: keyof CardReplaceBody): string | undefined => {
+    if (!has(key)) return existing[key] as string | undefined;
+    const v = parsed[key as string];
+    if (v === null || v === undefined) return undefined;
+    if (typeof v !== "string") {
+      throw new Error(`Field "${String(key)}" must be a string`);
+    }
+    return v;
+  };
+
+  const optNumber = (key: keyof CardReplaceBody): number | undefined => {
+    if (!has(key)) return existing[key] as number | undefined;
+    const v = parsed[key as string];
+    if (v === null || v === undefined) return undefined;
+    if (typeof v !== "number" || !Number.isFinite(v)) {
+      throw new Error(`Field "${String(key)}" must be a finite number`);
+    }
+    return v;
+  };
+
+  const optBool = (key: keyof CardReplaceBody): boolean | undefined => {
+    if (!has(key)) return existing[key] as boolean | undefined;
+    const v = parsed[key as string];
+    if (v === null || v === undefined) return undefined;
+    if (typeof v !== "boolean") {
+      throw new Error(`Field "${String(key)}" must be a boolean`);
+    }
+    return v;
+  };
+
+  const optCardId = (key: "backCardId" | "frontCardId"): Id<"cards"> | undefined => {
+    if (!has(key)) return existing[key];
+    const v = parsed[key];
+    if (v === null || v === undefined || v === "") return undefined;
+    if (typeof v !== "string") {
+      throw new Error(`Field "${key}" must be a card id string`);
+    }
+    return v as Id<"cards">;
+  };
+
+  const row: CardReplaceBody = {
+    name,
+    oracleId: optString("oracleId"),
+    imageUrl: optString("imageUrl"),
+    backCardId: optCardId("backCardId"),
+    frontCardId: optCardId("frontCardId"),
+    isFrontFace: optBool("isFrontFace"),
+    isVariant: optBool("isVariant"),
+    number: optNumber("number"),
+    collectorNumber: optString("collectorNumber"),
+    rarity: optString("rarity"),
+    type: optString("type"),
+    difficulty: optNumber("difficulty"),
+    control: optNumber("control"),
+    speed: optNumber("speed"),
+    damage: optNumber("damage"),
+    blockModifier: optNumber("blockModifier"),
+    handSize: optNumber("handSize"),
+    health: optNumber("health"),
+    stamina: optNumber("stamina"),
+    attackZone: optString("attackZone"),
+    blockZone: optString("blockZone"),
+    text: optString("text"),
+    keywords: optString("keywords"),
+    symbols: optString("symbols"),
+    searchName: optString("searchName"),
+    searchText: optString("searchText"),
+    searchAll: optString("searchAll"),
+    copyLimit: optNumber("copyLimit"),
+    setCode: optString("setCode"),
+    setName: optString("setName"),
+    setNumber: optNumber("setNumber"),
+    legality: optString("legality"),
+  };
+
+  const derived = deriveCardSearchFields({
+    name: row.name,
+    searchName: row.searchName,
+    keywords: row.keywords,
+    text: row.text,
+    setName: row.setName,
+    type: row.type,
+    rarity: row.rarity,
+  });
+  row.searchName = derived.searchName;
+  row.searchText = derived.searchText;
+  row.searchAll = derived.searchAll;
+
+  return row;
+}
+
+export const updateCardFromJson = mutation({
+  args: {
+    cardId: v.id("cards"),
+    json: v.string(),
+  },
+  returns: cardValidator,
+  handler: async (ctx, args) => {
+    await requireAdmin(ctx);
+    const existing = await ctx.db.get(args.cardId);
+    if (!existing) {
+      throw new Error("Card not found");
+    }
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(args.json);
+    } catch {
+      throw new Error("Invalid JSON");
+    }
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+      throw new Error("Card data must be a JSON object");
+    }
+    const obj = parsed as Record<string, unknown>;
+    if (obj._id !== undefined && String(obj._id) !== args.cardId) {
+      throw new Error('Field "_id" in JSON must match the card being edited');
+    }
+    const row = mergeCardReplaceBodyFromAdminJson(obj, existing);
+    await ctx.db.replace(args.cardId, {
+      ...row,
+      contentRevisionAt: Date.now(),
+    });
+    const codes = [existing.setCode, row.setCode].filter((c): c is string => Boolean(c));
+    await syncSetCardCountsByCodes(ctx, [...new Set(codes)]);
+    const updated = await ctx.db.get(args.cardId);
+    if (!updated) {
+      throw new Error("Card missing after update");
+    }
+    return updated;
+  },
+});
+
+export const createCardVariantFromJson = mutation({
+  args: {
+    templateCardId: v.id("cards"),
+    json: v.string(),
+  },
+  returns: cardValidator,
+  handler: async (ctx, args) => {
+    await requireAdmin(ctx);
+    const template = await ctx.db.get(args.templateCardId);
+    if (!template) {
+      throw new Error("Template card not found");
+    }
+    if (!template.oracleId?.trim()) {
+      throw new Error("Template card must have an oracleId to create a linked variant");
+    }
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(args.json);
+    } catch {
+      throw new Error("Invalid JSON");
+    }
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+      throw new Error("Card data must be a JSON object");
+    }
+    const obj = parsed as Record<string, unknown>;
+    if (obj._id !== undefined) {
+      throw new Error('Remove "_id" from JSON — a new card document will be created');
+    }
+    if (obj._creationTime !== undefined) {
+      throw new Error('Remove "_creationTime" from JSON');
+    }
+    const row = mergeCardReplaceBodyFromAdminJson(obj, template);
+    if (row.oracleId !== template.oracleId) {
+      throw new Error("oracleId must match the template card so printings stay linked");
+    }
+    const newId = await ctx.db.insert("cards", {
+      ...row,
+      contentRevisionAt: Date.now(),
+    });
+    const codes = [template.setCode, row.setCode].filter((c): c is string => Boolean(c));
+    await syncSetCardCountsByCodes(ctx, [...new Set(codes)]);
+    const created = await ctx.db.get(newId);
+    if (!created) {
+      throw new Error("Card missing after insert");
+    }
+    const imageUrl = toPublicCardImageUrl(created.imageUrl);
+    return imageUrl !== created.imageUrl ? { ...created, imageUrl } : created;
   },
 });
 

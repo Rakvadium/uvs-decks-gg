@@ -1,15 +1,21 @@
 "use client";
 
 import Image from "next/image";
+import { useState } from "react";
+import { useConvexAuth, useQuery } from "convex/react";
 import { Hexagon, RotateCcw, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DialogClose } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { canAddCardToDeck, useDeckEditor } from "@/lib/deck";
 import { usePrefersReducedMotion } from "@/lib/reduced-motion";
+import { api } from "../../../../../convex/_generated/api";
 import {
   CardDetailsContentProvider,
 } from "../content-context";
+import { CardDetailsAdminJsonControls } from "../card-details-admin-json-controls";
+import { CardVariantSaveDialog, CardVariantSaveTrigger } from "../card-variant-save-dialog";
+import { OraclePrintingsCarousel } from "../oracle-printings-carousel";
 import { DeckSectionControls } from "../deck-section-controls";
 import {
   CardDetailsReadoutPanel,
@@ -26,17 +32,25 @@ export function CardDetailsV2({
   onToggleFlip,
   mobileNavigationPrevious,
   mobileNavigationNext,
+  onAdminCardSaved,
+  onSelectPrinting,
+  onVariantCreated,
 }: CardDetailsVariantProps) {
   const prefersReducedMotion = usePrefersReducedMotion();
+  const { isAuthenticated } = useConvexAuth();
+  const currentUser = useQuery(api.user.currentUser, isAuthenticated ? {} : "skip");
+  const isAdmin = currentUser?.role === "Admin";
+  const [variantOpen, setVariantOpen] = useState(false);
   const hasBackFace = Boolean(backCard);
   const transitionClass = prefersReducedMotion ? "duration-0" : "duration-300 ease-out";
   const heroSizes = "(max-width: 768px) min(92vw, 340px), 340px";
   const { hasDeck } = useDeckEditor();
   const showDeckControlsBar = hasDeck && canAddCardToDeck(card);
+  const needsBottomChrome = showDeckControlsBar || Boolean(isAdmin);
 
   return (
     <CardDetailsContentProvider card={displayCard}>
-      <div className="flex min-h-0 w-full flex-1 flex-col gap-4 p-3 max-md:!pointer-events-none md:max-h-[min(85vh,calc(100dvh-2rem))] md:flex-row md:items-stretch md:gap-5 md:overflow-hidden md:pb-3 md:pl-3 md:!pointer-events-auto md:pt-12">
+      <div className="flex min-h-0 w-full flex-1 flex-col gap-4 p-3 max-md:!pointer-events-none md:max-h-[min(85vh,calc(100dvh-2rem))] md:flex-row md:items-start md:gap-5 md:overflow-hidden md:pb-3 md:pl-3 md:!pointer-events-auto md:pt-12">
         <div
           className={cn(
             "flex w-full shrink-0 flex-col items-center justify-center max-md:!pointer-events-auto",
@@ -159,11 +173,37 @@ export function CardDetailsV2({
                 {mobileNavigationNext}
               </div>
             </div>
+            <div className="mx-auto mt-3 flex w-full max-w-[340px] flex-col items-stretch gap-2 px-1">
+              <OraclePrintingsCarousel
+                oracleId={card.oracleId}
+                selectedCardId={card._id}
+                onSelectPrinting={(c) => onSelectPrinting?.(c)}
+                className="max-w-none"
+              />
+              {isAdmin ? (
+                <>
+                  <div className="flex justify-center">
+                    <CardVariantSaveTrigger
+                      disabled={!card.oracleId?.trim()}
+                      onClick={() => setVariantOpen(true)}
+                    />
+                  </div>
+                  {card.oracleId?.trim() ? (
+                    <CardVariantSaveDialog
+                      templateCard={card}
+                      open={variantOpen}
+                      onOpenChange={setVariantOpen}
+                      onCreated={(c) => onVariantCreated?.(c)}
+                    />
+                  ) : null}
+                </>
+              ) : null}
+            </div>
           </div>
         </div>
 
-        <div className="relative flex min-h-0 min-w-0 flex-1 flex-col max-md:!pointer-events-auto">
-          <div className="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-xl border border-primary/25 bg-card/95 shadow-[0_0_2px_var(--primary)/35,0_0_10px_var(--primary)/42,0_0_22px_var(--primary)/12] backdrop-blur-md">
+        <div className="relative flex min-w-0 flex-1 flex-col max-md:!pointer-events-auto">
+          <div className="relative flex min-w-0 flex-col overflow-hidden rounded-xl border border-primary/25 bg-card/95 shadow-[0_0_2px_var(--primary)/35,0_0_10px_var(--primary)/42,0_0_22px_var(--primary)/12] backdrop-blur-md">
             <DialogClose asChild>
               <Button
                 type="button"
@@ -176,8 +216,11 @@ export function CardDetailsV2({
               </Button>
             </DialogClose>
             <CardDetailsReadoutSurface
-              className="min-h-0 flex-1"
-              scrollableClassName={showDeckControlsBar ? "pb-16" : undefined}
+              className="min-w-0 flex-none"
+              scrollableClassName={cn(
+                needsBottomChrome ? "pb-16" : undefined,
+                "max-h-[min(72vh,calc(100dvh-12rem))] flex-none"
+              )}
             >
               <CardDetailsReadoutPanel />
             </CardDetailsReadoutSurface>
@@ -185,6 +228,11 @@ export function CardDetailsV2({
               key={card._id}
               card={card}
               layout="detailsBar"
+            />
+            <CardDetailsAdminJsonControls
+              card={displayCard}
+              enabled={Boolean(isAdmin)}
+              onSaved={onAdminCardSaved}
             />
           </div>
         </div>

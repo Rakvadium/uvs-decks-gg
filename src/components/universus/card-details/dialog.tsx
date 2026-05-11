@@ -3,7 +3,9 @@
 import { lazy, Suspense, useCallback, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useQuery } from "convex/react";
 import type { CachedCard } from "@/lib/universus/card-store";
+import { api } from "../../../../convex/_generated/api";
 import {
   Dialog,
   DialogContent,
@@ -45,7 +47,18 @@ export function CardDetailsDialog({
 }: CardDetailsDialogProps) {
   const [isFlipped, setIsFlipped] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(-1);
-  // Sync current index when card changes or dialog opens
+  const [printingSelection, setPrintingSelection] = useState<CachedCard | null>(null);
+  const [adminCardPatches, setAdminCardPatches] = useState<Record<string, CachedCard>>({});
+
+  useEffect(() => {
+    if (!open) {
+      setAdminCardPatches({});
+      setPrintingSelection(null);
+    }
+  }, [open]);
+  useEffect(() => {
+    setPrintingSelection(null);
+  }, [currentIndex, card?._id]);
   useEffect(() => {
     if (!open || !card || !cards?.length) {
       setCurrentIndex(-1);
@@ -55,20 +68,15 @@ export function CardDetailsDialog({
     setCurrentIndex(idx);
   }, [open, card, cards]);
 
-  // Reset flip when navigating
   useEffect(() => {
     setIsFlipped(false);
-  }, [currentIndex]);
+  }, [currentIndex, printingSelection?._id]);
 
-  const currentCard = cards && currentIndex >= 0 ? cards[currentIndex] : card;
-  const currentBackCard =
-    cards && currentIndex >= 0 && getBackCard
-      ? getBackCard(cards[currentIndex]) ?? undefined
-      : backCard;
-
-  const canGoPrev = cards && currentIndex > 0;
-  const canGoNext = cards && currentIndex >= 0 && currentIndex < cards.length - 1;
-  const hasNavigation = cards && cards.length > 1 && currentIndex >= 0;
+  const galleryRowCard = cards && currentIndex >= 0 ? cards[currentIndex] : card;
+  const baseCurrentCard = printingSelection ?? galleryRowCard;
+  const canGoPrev = Boolean(cards && currentIndex > 0);
+  const canGoNext = Boolean(cards && currentIndex >= 0 && currentIndex < cards.length - 1);
+  const hasNavigation = Boolean(cards && cards.length > 1 && currentIndex >= 0);
 
   const goToPrev = useCallback(() => {
     if (!canGoPrev) return;
@@ -80,7 +88,6 @@ export function CardDetailsDialog({
     setCurrentIndex((i) => i + 1);
   }, [canGoNext]);
 
-  // Keyboard navigation
   useEffect(() => {
     if (!open || !hasNavigation) return;
 
@@ -98,7 +105,29 @@ export function CardDetailsDialog({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [open, hasNavigation, goToPrev, goToNext]);
 
-  if (!currentCard) return null;
+  const printingBackId = printingSelection?.backCardId;
+  const convexBackCard = useQuery(
+    api.cards.getById,
+    open && printingBackId ? { cardId: printingBackId } : "skip"
+  );
+
+  if (!baseCurrentCard) return null;
+
+  const currentCard = adminCardPatches[baseCurrentCard._id] ?? baseCurrentCard;
+  const galleryBack =
+    cards && currentIndex >= 0 && getBackCard
+      ? getBackCard(cards[currentIndex]) ?? undefined
+      : backCard;
+  const baseBackCard = printingSelection
+    ? printingSelection.backCardId
+      ? convexBackCard === null || convexBackCard === undefined
+        ? undefined
+        : convexBackCard
+      : undefined
+    : galleryBack;
+  const currentBackCard = baseBackCard
+    ? (adminCardPatches[baseBackCard._id] ?? baseBackCard)
+    : undefined;
 
   const displayCard = isFlipped && currentBackCard ? currentBackCard : currentCard;
   const navigationButtonClassName = (enabled: boolean) =>
@@ -160,6 +189,11 @@ export function CardDetailsDialog({
                   </button>
                 ) : null
               }
+              onAdminCardSaved={(saved) =>
+                setAdminCardPatches((prev) => ({ ...prev, [saved._id]: saved }))
+              }
+              onSelectPrinting={(c) => setPrintingSelection(c)}
+              onVariantCreated={(c) => setPrintingSelection(c)}
             />
           </Suspense>
         ) : null}

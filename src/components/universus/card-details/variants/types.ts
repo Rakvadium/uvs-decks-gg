@@ -10,4 +10,7 @@ export interface CardDetailsVariantProps {
   onToggleFlip: () => void;
   mobileNavigationPrevious?: ReactNode;
   mobileNavigationNext?: ReactNode;
+  onAdminCardSaved?: (card: CachedCard) => void;
+  onSelectPrinting?: (card: CachedCard) => void;
+  onVariantCreated?: (card: CachedCard) => void;
 }

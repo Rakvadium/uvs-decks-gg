@@ -41,6 +41,7 @@ import type * as migrations_migrateDeckTeamFields from "../migrations/migrateDec
 import type * as migrations_migrateDeckVisibility from "../migrations/migrateDeckVisibility.js";
 import type * as migrations_migrateSetLegality from "../migrations/migrateSetLegality.js";
 import type * as migrations_migrateTeamsCore from "../migrations/migrateTeamsCore.js";
+import type * as publicCardUrls from "../publicCardUrls.js";
 import type * as publishTeamChatMessage from "../publishTeamChatMessage.js";
 import type * as publishTierListComment from "../publishTierListComment.js";
 import type * as r2 from "../r2.js";
@@ -108,6 +109,7 @@ declare const fullApi: ApiFromModules<{
   "migrations/migrateDeckVisibility": typeof migrations_migrateDeckVisibility;
   "migrations/migrateSetLegality": typeof migrations_migrateSetLegality;
   "migrations/migrateTeamsCore": typeof migrations_migrateTeamsCore;
+  publicCardUrls: typeof publicCardUrls;
   publishTeamChatMessage: typeof publishTeamChatMessage;
   publishTierListComment: typeof publishTierListComment;
   r2: typeof r2;
