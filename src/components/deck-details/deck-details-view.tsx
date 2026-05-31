@@ -7,6 +7,8 @@ import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
 import { DeckInvitePendingGate } from "@/components/deck-details/deck-invite-pending-gate";
 import { DeckDetailsSharePanel } from "@/components/deck-details/deck-details-share-panel";
+import { DeckDetailsPrivateLinkPanel } from "@/components/deck-details/deck-details-private-link-panel";
+import { DeckDetailsReadOnlyBanner } from "@/components/deck-details/deck-details-read-only-banner";
 import { useDeckDetails } from "@/providers/DeckDetailsProvider";
 import { useRegisterSlot } from "@/components/shell/shell-slot-provider";
 import { DeckDetailsDesktopHeader } from "./deck-details-desktop-header";
@@ -75,6 +77,7 @@ export function DeckDetailsView() {
       ) : (
         <div className="flex flex-col max-md:gap-0 md:gap-6">
           <TeamEditableWriteConflictBanner className="max-md:mb-4" />
+          <DeckDetailsReadOnlyBanner />
           <DeckDetailsEditDialog />
           {isOwner && <DeckDetailsGallerySlotRegistration />}
           <div className="hidden md:block">
@@ -90,6 +93,7 @@ export function DeckDetailsView() {
               <div className="relative flex flex-col lg:flex-row gap-4 lg:gap-6">
                 <div className="flex flex-col gap-3 shrink-0 w-full lg:w-48 lg:self-start lg:sticky lg:top-6">
                   <DeckDetailsHeroPanel />
+                  <DeckDetailsPrivateLinkPanel />
                   <DeckDetailsSharePanel />
                   <DeckDetailsSectionTabs />
                   <div className="hidden md:flex md:flex-col md:gap-2">

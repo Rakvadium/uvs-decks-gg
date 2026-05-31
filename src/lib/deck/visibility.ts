@@ -5,7 +5,10 @@ export type DeckVisibility = NonNullable<Doc<"decks">["visibility"]>;
 export type DeckTeamSharing = "team_viewable" | "team_editable";
 
 export function normalizeDeckVisibility(deck: Doc<"decks">): DeckVisibility {
-  if (deck.visibility) return deck.visibility;
+  if (deck.visibility) {
+    if (deck.visibility === "unlisted") return "private";
+    return deck.visibility;
+  }
   return deck.isPublic ? "public" : "private";
 }
 
@@ -41,7 +44,7 @@ export function deckVisibilityLabel(visibility: DeckVisibility): string {
     case "share":
       return "Share";
     case "unlisted":
-      return "Unlisted";
+      return "Private";
     case "public":
       return "Public";
     case "tournament":

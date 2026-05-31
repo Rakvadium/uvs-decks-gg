@@ -2,6 +2,7 @@ import { Download, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useImportExportSidebarContext } from "./context";
+import { useDeckDetailsOptional } from "@/providers/DeckDetailsProvider";
 
 const IMPORT_PLACEHOLDER = `[b]Character[/b]
 1 Character Name
@@ -10,6 +11,7 @@ const IMPORT_PLACEHOLDER = `[b]Character[/b]
 ...`;
 
 export function ImportExportSidebarImportSection() {
+  const deckDetails = useDeckDetailsOptional();
   const {
     deck,
     importText,
@@ -18,6 +20,8 @@ export function ImportExportSidebarImportSection() {
     lastImportMessage,
     handleImport,
   } = useImportExportSidebarContext();
+
+  if (!deckDetails?.isOwner) return null;
 
   return (
     <div className="space-y-2">

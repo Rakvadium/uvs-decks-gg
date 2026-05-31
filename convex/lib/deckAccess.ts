@@ -13,7 +13,10 @@ export type DeckVisibility =
   | "team";
 
 export function normalizeDeckVisibility(deck: Doc<"decks">): DeckVisibility {
-  if (deck.visibility) return deck.visibility;
+  if (deck.visibility) {
+    if (deck.visibility === "unlisted") return "private";
+    return deck.visibility;
+  }
   return deck.isPublic ? "public" : "private";
 }
 
@@ -57,7 +60,7 @@ export async function canViewDeck(
   const visibility = normalizeDeckVisibility(deck);
   const viewer = await getAuthUserId(ctx);
   if (visibility === "private") {
-    return viewer !== null && viewer === deck.userId;
+    return true;
   }
   if (visibility === "team") {
     if (!deck.teamId) {
