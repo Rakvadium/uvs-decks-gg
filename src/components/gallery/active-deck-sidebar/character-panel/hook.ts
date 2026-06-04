@@ -1,5 +1,4 @@
 import { useMemo, useState } from "react";
-import { formatUniversusCardType } from "@/config/universus";
 import { useCardIdMap } from "@/hooks/useCardIdMap";
 import { useCardData } from "@/lib/universus/card-data-provider";
 import { useActiveDeck } from "@/providers/ActiveDeckProvider";
@@ -36,28 +35,19 @@ export function useActiveDeckCharacterPanelModel() {
     ];
   }, [startingCharacterSymbols]);
 
-  const characterOptions = useMemo(
-    () =>
-      allCards
-        .filter((card) => formatUniversusCardType(card.type) === "Character")
-        .filter((card) => card.isFrontFace !== false)
-        .sort((a, b) => a.name.localeCompare(b.name)),
-    [allCards]
-  );
-
   const handleSelectCharacter = async (cardId: Id<"cards">) => {
     await updateDeck({ startingCharacterId: cardId });
-    setCharacterOpen(false);
-  };
-
-  const handleViewCharacterDetails = () => {
-    setCharacterOpen(false);
-    setCharacterDetailsOpen(true);
   };
 
   const handleSelectSymbol = (symbol: string) => {
     updateDeck({ selectedIdentity: symbol });
     setSymbolOpen(false);
+  };
+
+  const handleImageClick = () => {
+    if (startingCharacter) {
+      setCharacterDetailsOpen(true);
+    }
   };
 
   return {
@@ -72,10 +62,9 @@ export function useActiveDeckCharacterPanelModel() {
     startingCharacterBack,
     selectedSymbol,
     characterSymbols,
-    characterOptions,
     handleSelectCharacter,
-    handleViewCharacterDetails,
     handleSelectSymbol,
+    handleImageClick,
   };
 }
 

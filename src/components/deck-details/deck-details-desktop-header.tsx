@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { ArrowLeft, Edit3 } from "lucide-react";
 import { AppPageHeader } from "@/components/shell/app-page-header";
-import { Badge } from "@/components/ui/badge";
+import { DeckFormatLegalityBadge } from "@/components/deck-details/deck-format-legality-badge";
 import { Button } from "@/components/ui/button";
 import { DeckVisibilityBadgeMenu } from "@/components/deck-details/deck-visibility-badge-menu";
 import { normalizeDeckVisibility, deckTeamSharingFromDeck } from "@/lib/deck/visibility";
@@ -46,12 +46,13 @@ export function DeckDetailsDesktopHeader() {
           All decks
         </Link>
       </Button>
-      {deck.format ? (
-        <Badge variant="cyber" className="h-8 items-center text-[9px]">
-          {deck.format}
-          {deck.subFormat ? ` / ${deck.subFormat}` : ""}
-        </Badge>
-      ) : null}
+      <DeckFormatLegalityBadge
+        deckId={deck._id}
+        formatKey={deck.format}
+        subFormat={deck.subFormat}
+        compact
+        className="items-center"
+      />
       <DeckVisibilityBadgeMenu
         deck={deck}
         isOwner={isOwner}

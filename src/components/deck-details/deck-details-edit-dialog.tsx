@@ -1,7 +1,9 @@
 "use client";
 
 import { Loader2 } from "lucide-react";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
+import { useQuery } from "convex/react";
+import { api } from "../../../convex/_generated/api";
 import {
   Dialog,
   DialogBody,
@@ -28,6 +30,13 @@ import {
 } from "@/lib/deck/visibility";
 import { useDeckDetailsTopBarContext } from "./deck-details-top-bar/context";
 import { DeckDetailsTopBarDeleteAction } from "./deck-details-top-bar/delete-action";
+
+const FORMAT_NONE = "__format_none__";
+const SUBFORMAT_NONE = "__subformat_none__";
+
+function sortFormats<T extends { name: string }>(list: T[]): T[] {
+  return [...list].sort((a, b) => a.name.localeCompare(b.name));
+}
 
 type VisibilityRow = Exclude<DeckVisibility, "team"> | "team_view" | "team_edit";
 
@@ -77,13 +86,42 @@ export function DeckDetailsEditDialog() {
     setEditVisibility,
     editTeamCollaboration,
     setEditTeamCollaboration,
+    editFormat,
+    setEditFormat,
+    editSubFormat,
+    setEditSubFormat,
     saveEdits,
     isSaving,
     isAdmin,
     canSetTeamVisibility,
   } = useDeckDetailsTopBarContext();
 
+  const formats = useQuery(api.formats.list);
+
   const dialogOpen = Boolean(isOwner && isEditing);
+
+  const sortedFormats = useMemo(() => sortFormats(formats ?? []), [formats]);
+
+  const selectedFormatDoc = useMemo(
+    () => sortedFormats.find((f) => f.key === editFormat),
+    [sortedFormats, editFormat],
+  );
+
+  const handleFormatChange = useCallback(
+    (value: string) => {
+      const next = value === FORMAT_NONE ? "" : value;
+      setEditFormat(next);
+      if (!next) {
+        setEditSubFormat("");
+        return;
+      }
+      const doc = formats?.find((f) => f.key === next);
+      if (!doc?.subFormats?.some((s) => s.key === editSubFormat)) {
+        setEditSubFormat("");
+      }
+    },
+    [formats, editSubFormat, setEditFormat, setEditSubFormat],
+  );
 
   const selectVisibilityOptions = useMemo((): VisibilityRow[] => {
     const rows: VisibilityRow[] = [...BASE_VISIBILITY_ORDER];
@@ -143,7 +181,9 @@ export function DeckDetailsEditDialog() {
       >
         <DialogHeader>
           <DialogTitle>Edit deck details</DialogTitle>
-          <DialogDescription>Change the name, description, and who can view this deck.</DialogDescription>
+          <DialogDescription>
+            Change the name, description, play format, visibility, and who can view this deck.
+          </DialogDescription>
         </DialogHeader>
         <DialogBody className="space-y-4">
           <div className="space-y-1.5">
@@ -167,6 +207,47 @@ export function DeckDetailsEditDialog() {
               placeholder="Add a short description"
             />
           </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="deck-edit-format">Format</Label>
+            <Select
+              value={editFormat.trim() ? editFormat : FORMAT_NONE}
+              onValueChange={handleFormatChange}
+              disabled={formats === undefined}
+            >
+              <SelectTrigger id="deck-edit-format" className="h-10 w-full" size="default">
+                <SelectValue placeholder={formats === undefined ? "Loading…" : "Select format"} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={FORMAT_NONE}>None</SelectItem>
+                {sortedFormats.map((f) => (
+                  <SelectItem key={f._id} value={f.key}>
+                    {f.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          {selectedFormatDoc?.subFormats && selectedFormatDoc.subFormats.length > 0 ? (
+            <div className="space-y-1.5">
+              <Label htmlFor="deck-edit-subformat">Sub-format</Label>
+              <Select
+                value={editSubFormat.trim() ? editSubFormat : SUBFORMAT_NONE}
+                onValueChange={(v) => setEditSubFormat(v === SUBFORMAT_NONE ? "" : v)}
+              >
+                <SelectTrigger id="deck-edit-subformat" className="h-10 w-full" size="default">
+                  <SelectValue placeholder="Optional" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={SUBFORMAT_NONE}>None</SelectItem>
+                  {selectedFormatDoc.subFormats.map((s) => (
+                    <SelectItem key={s.key} value={s.key}>
+                      {s.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          ) : null}
           <div className="space-y-1.5">
             <Label htmlFor="deck-edit-visibility">Visibility</Label>
             <Select value={selectRowValue} onValueChange={(v) => handleVisibilityRowChange(v as VisibilityRow)}>

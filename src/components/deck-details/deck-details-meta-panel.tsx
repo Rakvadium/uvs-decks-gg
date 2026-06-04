@@ -1,7 +1,7 @@
 "use client";
 
+import { DeckFormatLegalityBadge } from "@/components/deck-details/deck-format-legality-badge";
 import { DeckVisibilityBadgeMenu } from "@/components/deck-details/deck-visibility-badge-menu";
-import { Badge } from "@/components/ui/badge";
 import type { DeckTeamSharing, DeckVisibility } from "@/lib/deck/visibility";
 import { normalizeDeckVisibility, deckTeamSharingFromDeck } from "@/lib/deck/visibility";
 import { useDeckDetails } from "@/providers/DeckDetailsProvider";
@@ -40,12 +40,12 @@ export function DeckDetailsMetaPanel() {
               canSetTournamentVisibility={isAdmin}
               canSetTeamVisibility={canSetTeamVisibility}
             />
-            {deck.format ? (
-              <Badge variant="cyber" className="text-[10px]">
-                {deck.format}
-                {deck.subFormat ? ` / ${deck.subFormat}` : ""}
-              </Badge>
-            ) : null}
+            <DeckFormatLegalityBadge
+              deckId={deck._id}
+              formatKey={deck.format}
+              subFormat={deck.subFormat}
+              className="text-[10px]"
+            />
           </div>
         </div>
 

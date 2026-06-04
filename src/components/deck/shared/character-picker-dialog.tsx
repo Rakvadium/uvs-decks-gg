@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Id } from "../../../../convex/_generated/dataModel";
 import Image from "next/image";
-import { Loader2, Search } from "lucide-react";
+import { Loader2, Search, XIcon } from "lucide-react";
 import { UNIVERSUS_FILTER_SYMBOLS, UNIVERSUS_SYMBOL_DISPLAY, formatUniversusCardType, type UniversusSymbol } from "@/config/universus";
 import { useCardData } from "@/lib/universus/card-data-provider";
 import { filterCards } from "@/lib/universus/use-universus-cards";
@@ -12,7 +12,7 @@ import { useInfiniteSlice } from "@/hooks/useInfiniteSlice";
 import { CardGridItem } from "@/components/universus/card-grid-item";
 import { CardNavigationProvider } from "@/components/universus/card-details/navigation-context";
 import { getSymbolPath } from "@/components/universus/symbol-icon/utils";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
@@ -26,7 +26,7 @@ interface DeckCharacterPickerDialogProps {
 
 function CharacterPickerSkeleton() {
   return (
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+    <div className="grid min-w-0 grid-cols-2 gap-2 sm:grid-cols-2 sm:gap-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
       {Array.from({ length: 12 }).map((_, index) => (
         <div key={index} className="space-y-2">
           <Skeleton className="aspect-[2.5/3.5] w-full rounded-lg" />
@@ -46,8 +46,17 @@ export function DeckCharacterPickerDialog({
   const cardIdMap = useCardIdMap(cards);
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [selectedSymbol, setSelectedSymbol] = useState<UniversusSymbol | null>(null);
+  const [selectedSymbols, setSelectedSymbols] = useState<UniversusSymbol[]>([]);
   const [isSelectingId, setIsSelectingId] = useState<Id<"cards"> | null>(null);
+
+  const toggleSymbolFilter = useCallback((symbol: UniversusSymbol) => {
+    setSelectedSymbols((prev) => {
+      const next = new Set(prev);
+      if (next.has(symbol)) next.delete(symbol);
+      else next.add(symbol);
+      return [...next].sort((a, b) => a.localeCompare(b));
+    });
+  }, []);
 
   useEffect(() => {
     const timeout = window.setTimeout(() => {
@@ -64,7 +73,8 @@ export function DeckCharacterPickerDialog({
     const filtered = filterCards(characterOnly, {
       search: debouncedSearch || undefined,
       searchMode: "name",
-      symbols: selectedSymbol ? [selectedSymbol] : undefined,
+      symbols: selectedSymbols.length > 0 ? selectedSymbols : undefined,
+      symbolMatchAll: selectedSymbols.length > 1 ? true : undefined,
     });
     return filtered.sort((a, b) => {
       const setNumA = a.setNumber ?? 0;
@@ -72,7 +82,7 @@ export function DeckCharacterPickerDialog({
       if (setNumB !== setNumA) return setNumB - setNumA;
       return (a.number ?? 0) - (b.number ?? 0);
     });
-  }, [cards, debouncedSearch, selectedSymbol]);
+  }, [cards, debouncedSearch, selectedSymbols]);
 
   const {
     visibleItems: visibleCharacters,
@@ -81,7 +91,7 @@ export function DeckCharacterPickerDialog({
   } = useInfiniteSlice({
     items: characterCards,
     pageSize: 20,
-    resetKey: `${debouncedSearch}-${selectedSymbol ?? "any"}`,
+    resetKey: `${debouncedSearch}-${selectedSymbols.join(",")}`,
   });
 
   const getBackCard = useCallback(
@@ -106,32 +116,45 @@ export function DeckCharacterPickerDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent size="md" contentPadding="none" className="flex flex-col gap-0 overflow-hidden p-0">
-        <DialogHeader className="sticky top-0 z-30 shrink-0 flex flex-col gap-3 border-b border-border/50 bg-card px-6 py-4 sm:gap-4">
-          <DialogTitle className="text-lg sm:text-xl">Change Starting Character</DialogTitle>
+      <DialogContent
+        size="lg"
+        contentPadding="none"
+        symmetricInset
+        showCloseButton={false}
+        className={cn(
+          "flex max-h-[100dvh] flex-col gap-0 overflow-hidden overscroll-contain p-0",
+          "md:max-h-[min(85dvh,52rem)] md:overflow-hidden md:overscroll-contain",
+          "md:min-w-0 md:w-[min(96vw,72rem)] md:max-w-[min(96vw,72rem)]"
+        )}
+      >
+        <DialogHeader className="sticky top-0 z-30 shrink-0 gap-3 border-b border-border/50 bg-card pb-3 text-left sm:text-left sm:gap-4 sm:pb-4 -mx-4 -mt-4 px-4 pt-4 md:-mx-6 md:-mt-6 md:px-6 md:pt-6">
+          <div className="flex items-center gap-2">
+            <DialogTitle className="min-w-0 flex-1 pr-2 text-lg leading-tight sm:text-xl">
+              Change Starting Character
+            </DialogTitle>
+            <DialogClose
+              type="button"
+              className="pointer-events-auto flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-transparent opacity-70 transition-all hover:border-primary/30 hover:bg-primary/10 hover:text-primary hover:opacity-100 focus:outline-hidden focus:ring-2 focus:ring-primary/30 disabled:pointer-events-none"
+            >
+              <XIcon className="h-4 w-4" />
+              <span className="sr-only">Close</span>
+            </DialogClose>
+          </div>
           <DialogDescription className="sr-only">
-            Search and filter starting characters by name or symbol.
+            Search characters by name. Select one or more symbols to show only characters that include every selected
+            symbol.
           </DialogDescription>
-          <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <div className="relative w-full shrink-0 sm:w-[25rem]">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-                placeholder="Search characters..."
-                className="pl-9"
-              />
-            </div>
-            <div className="flex shrink-0 flex-wrap items-center justify-start gap-1 rounded-lg border border-border/50 bg-card/30 p-1.5 backdrop-blur-sm sm:justify-center sm:p-2">
+          <div className="flex min-w-0 flex-col items-start gap-2 lg:flex-row lg:items-start lg:justify-between">
+            <div className="flex w-fit max-w-full shrink-0 flex-wrap items-center justify-start gap-1 rounded-lg border border-border/50 bg-card/30 p-1.5 backdrop-blur-sm xl:p-2">
               {UNIVERSUS_FILTER_SYMBOLS.map((symbol) => {
-                const isSelected = selectedSymbol === symbol;
+                const isSelected = selectedSymbols.includes(symbol);
                 const path = getSymbolPath(symbol);
 
                 return (
                   <button
                     key={symbol}
                     type="button"
-                    onClick={() => setSelectedSymbol((current) => (current === symbol ? null : symbol))}
+                    onClick={() => toggleSymbolFilter(symbol)}
                     aria-pressed={isSelected}
                     title={UNIVERSUS_SYMBOL_DISPLAY[symbol]}
                     className={cn(
@@ -149,20 +172,29 @@ export function DeckCharacterPickerDialog({
                 );
               })}
             </div>
+            <div className="relative min-w-0 w-full shrink-0 lg:max-w-md xl:max-w-[25rem]">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder="Search characters..."
+                className="min-w-0 pl-9"
+              />
+            </div>
           </div>
         </DialogHeader>
 
-        <div className="relative z-0 flex-1 overflow-y-auto px-6 py-4 sm:py-5">
+        <div className="relative z-0 min-h-0 flex-1 overflow-x-hidden px-0 py-4 sm:py-5">
           {isLoading ? <CharacterPickerSkeleton /> : null}
 
           {!isLoading && visibleCharacters.length === 0 ? (
-            <div className="flex min-h-64 items-center justify-center rounded-xl border border-dashed border-border/50 bg-card/30 px-6 text-center text-sm text-muted-foreground">
+            <div className="flex min-h-48 min-w-0 items-center justify-center rounded-xl border border-dashed border-border/50 bg-card/30 px-0 text-center text-sm text-muted-foreground sm:min-h-64">
               No characters match the current search and symbol filters.
             </div>
           ) : null}
 
           {!isLoading && visibleCharacters.length > 0 ? (
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+            <div className="grid min-w-0 grid-cols-2 gap-2 sm:grid-cols-2 sm:gap-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
               <CardNavigationProvider cards={visibleCharacters} getBackCard={getBackCard}>
                 {visibleCharacters.map((character) => {
                   const isSelected = selectedCharacterId === character._id;

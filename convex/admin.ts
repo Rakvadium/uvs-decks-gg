@@ -476,6 +476,13 @@ export const deleteFormat = mutation({
         `Cannot delete format: ${deckRows.length} deck(s) use this format. Change or clear their format first.`
       );
     }
+    const errataRows = await ctx.db
+      .query("formatErrata")
+      .withIndex("by_format_and_sortOrder", (q) => q.eq("formatKey", k))
+      .collect();
+    for (const row of errataRows) {
+      await ctx.db.delete(row._id);
+    }
     if (format.isDefault) {
       const others = (await ctx.db.query("formats").collect()).filter(
         (f) => f._id !== args.formatId
@@ -505,10 +512,10 @@ export const seedFormats = mutation({
         isDefault: true,
         minDeckSize: 60,
         maxDeckSize: undefined,
-        sideboardRule: "optional",
+        sideboardRule: "exact:10",
         defaultCopyLimit: 4,
         requiresStartingCharacter: true,
-        requiresIdentity: false,
+        requiresIdentity: true,
       },
       {
         key: "heroic",
@@ -546,6 +553,15 @@ export const seedFormats = mutation({
         .unique();
 
       if (existing) {
+        if (format.key === "standard") {
+          await ctx.db.patch(existing._id, {
+            sideboardRule: format.sideboardRule,
+            requiresIdentity: format.requiresIdentity,
+            minDeckSize: format.minDeckSize,
+            defaultCopyLimit: format.defaultCopyLimit,
+            requiresStartingCharacter: format.requiresStartingCharacter,
+          });
+        }
         skipped++;
         continue;
       }

@@ -192,6 +192,8 @@ export const update = mutation({
     imageCardId: v.optional(v.union(v.id("cards"), v.null())),
     startingCharacterId: v.optional(v.union(v.id("cards"), v.null())),
     selectedIdentity: v.optional(v.union(v.string(), v.null())),
+    format: v.optional(v.union(v.string(), v.null())),
+    subFormat: v.optional(v.union(v.string(), v.null())),
   },
   returns: v.null(),
   handler: async (ctx, args) => {
@@ -256,6 +258,16 @@ export const update = mutation({
       if (value !== undefined) {
         if (key === "teamId" && value === null) {
           filteredUpdates.teamId = undefined;
+        } else if (
+          (key === "format" ||
+            key === "subFormat" ||
+            key === "description" ||
+            key === "selectedIdentity") &&
+          value === null
+        ) {
+          filteredUpdates[key] = undefined;
+        } else if ((key === "imageCardId" || key === "startingCharacterId") && value === null) {
+          filteredUpdates[key] = undefined;
         } else {
           filteredUpdates[key] = value;
         }

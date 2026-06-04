@@ -105,10 +105,12 @@ function CardDataProviderInner({ children }: CardDataProviderProps) {
     [
       formatsData.formats,
       formatsData.setLegalities,
+      formatsData.cardLegalities,
       formatsData.isLoading,
       formatsData.error,
       formatsData.getFormatByKey,
       formatsData.isSetLegalInFormat,
+      formatsData.isCardBannedInFormat,
       formatsData.isHydrated,
     ]
   );
@@ -145,6 +147,9 @@ function CardDataProviderInner({ children }: CardDataProviderProps) {
         passesFormatLegality: formatKey
           ? (setCode) => !setCode || isSetLegalInFormat(setCode, formatKey)
           : undefined,
+        isCardBannedInFormat: formatKey
+          ? (cardId) => stableFormatsData.isCardBannedInFormat(formatKey, cardId)
+          : undefined,
       });
     };
 
@@ -171,7 +176,7 @@ function CardDataProviderInner({ children }: CardDataProviderProps) {
       getPaginatedCards,
       getFilteredAndSortedCards,
     };
-  }, [cardData, isSetLegalInFormat]);
+  }, [cardData, isSetLegalInFormat, stableFormatsData]);
 
   return (
     <CardReferenceContext.Provider value={referenceValue}>

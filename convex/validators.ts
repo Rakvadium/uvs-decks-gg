@@ -452,6 +452,16 @@ export const setLegalityValidator = v.object({
   rotatesOutAt: v.optional(v.number()),
 });
 
+export const formatErrataValidator = v.object({
+  _id: v.id("formatErrata"),
+  _creationTime: v.number(),
+  formatKey: v.string(),
+  title: v.string(),
+  body: v.string(),
+  url: v.optional(v.string()),
+  sortOrder: v.number(),
+});
+
 export const setDocValidator = v.object({
   _id: v.id("sets"),
   _creationTime: v.number(),

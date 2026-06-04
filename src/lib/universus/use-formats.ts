@@ -7,14 +7,17 @@ import type { Doc } from "../../../convex/_generated/dataModel";
 
 export type CachedFormat = Doc<"formats">;
 export type SetLegality = Doc<"setLegality">;
+export type CardLegalityRow = Doc<"cardLegality">;
 
 export interface UseFormatsResult {
   formats: CachedFormat[];
   setLegalities: Map<string, SetLegality[]>;
+  cardLegalities: Map<string, CardLegalityRow[]>;
   isLoading: boolean;
   error: Error | null;
   getFormatByKey: (key: string) => CachedFormat | undefined;
   isSetLegalInFormat: (setCode: string, formatKey: string) => boolean;
+  isCardBannedInFormat: (formatKey: string, cardId: string) => boolean;
   isHydrated: boolean;
 }
 
@@ -29,6 +32,7 @@ function useIsClient() {
 export function useFormats(): UseFormatsResult {
   const [formats, setFormats] = useState<CachedFormat[]>([]);
   const [setLegalities, setSetLegalities] = useState<Map<string, SetLegality[]>>(new Map());
+  const [cardLegalities, setCardLegalities] = useState<Map<string, CardLegalityRow[]>>(new Map());
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   
@@ -41,13 +45,21 @@ export function useFormats(): UseFormatsResult {
       setFormats(result);
       
       const legalitiesMap = new Map<string, SetLegality[]>();
+      const cardLegalitiesMap = new Map<string, CardLegalityRow[]>();
       for (const format of result) {
-        const legalities = await convex.query(api.formats.getSetLegalityByFormat, {
-          formatKey: format.key,
-        });
+        const [legalities, cardLegRows] = await Promise.all([
+          convex.query(api.formats.getSetLegalityByFormat, {
+            formatKey: format.key,
+          }),
+          convex.query(api.formats.getCardLegalityByFormat, {
+            formatKey: format.key,
+          }),
+        ]);
         legalitiesMap.set(format.key, legalities);
+        cardLegalitiesMap.set(format.key, cardLegRows);
       }
       setSetLegalities(legalitiesMap);
+      setCardLegalities(cardLegalitiesMap);
       
       setIsLoading(false);
     } catch (err) {
@@ -76,6 +88,16 @@ export function useFormats(): UseFormatsResult {
     return entry.isLegal;
   }, [setLegalities]);
 
+  const isCardBannedInFormat = useCallback((formatKey: string, cardId: string): boolean => {
+    const rows = cardLegalities.get(formatKey);
+    if (!rows) return false;
+    const entry = rows.find((r) => r.cardId === cardId);
+    if (!entry || entry.status !== "banned") return false;
+    const now = Date.now();
+    if (entry.effectiveDate !== undefined && entry.effectiveDate > now) return false;
+    return true;
+  }, [cardLegalities]);
+
   useEffect(() => {
     if (!isHydrated) return;
     fetchFormats();
@@ -84,10 +106,12 @@ export function useFormats(): UseFormatsResult {
   return {
     formats,
     setLegalities,
+    cardLegalities,
     isLoading,
     error,
     getFormatByKey,
     isSetLegalInFormat,
+    isCardBannedInFormat,
     isHydrated,
   };
 }
