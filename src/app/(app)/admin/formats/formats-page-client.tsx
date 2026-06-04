@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useQuery } from "convex/react";
+import { useCallback, useState } from "react";
+import { useMutation, useQuery } from "convex/react";
 import { api } from "../../../../../convex/_generated/api";
 import {
   Table,
@@ -15,11 +16,26 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { AdminPageHeader } from "@/components/admin";
-import { Plus } from "lucide-react";
+import { Database, Plus } from "lucide-react";
+import { toast } from "sonner";
 
 export default function AdminFormatsPageClient() {
   const router = useRouter();
   const formats = useQuery(api.formats.list);
+  const seedFormats = useMutation(api.admin.seedFormats);
+  const [isSeeding, setIsSeeding] = useState(false);
+
+  const handleSeedFormats = useCallback(async () => {
+    setIsSeeding(true);
+    try {
+      const result = await seedFormats({});
+      toast.success(`Created ${result.created} format(s). Skipped ${result.skipped} (already present; Standard is re-synced when skipped).`);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Seed failed");
+    } finally {
+      setIsSeeding(false);
+    }
+  }, [seedFormats]);
 
   const rows = formats
     ? [...formats].sort((a, b) => {
@@ -46,21 +62,46 @@ export default function AdminFormatsPageClient() {
         count={formats.length}
         countLabel="formats"
         actions={
-          <Button asChild size="sm" className="gap-1.5">
-            <Link href="/admin/formats/new">
-              <Plus className="h-4 w-4" />
-              New format
-            </Link>
-          </Button>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="gap-1.5"
+              disabled={isSeeding}
+              onClick={() => void handleSeedFormats()}
+            >
+              <Database className="h-4 w-4" />
+              Seed formats
+            </Button>
+            <Button asChild size="sm" className="gap-1.5">
+              <Link href="/admin/formats/new">
+                <Plus className="h-4 w-4" />
+                New format
+              </Link>
+            </Button>
+          </div>
         }
       />
 
       {formats.length === 0 ? (
         <div className="rounded-lg border border-dashed p-8 text-center">
           <p className="text-muted-foreground">No formats yet.</p>
-          <Button asChild className="mt-4" variant="secondary">
-            <Link href="/admin/formats/new">Create a format</Link>
-          </Button>
+          <div className="mt-4 flex flex-wrap justify-center gap-2">
+            <Button
+              type="button"
+              variant="secondary"
+              className="gap-1.5"
+              disabled={isSeeding}
+              onClick={() => void handleSeedFormats()}
+            >
+              <Database className="h-4 w-4" />
+              Seed default formats
+            </Button>
+            <Button asChild variant="secondary">
+              <Link href="/admin/formats/new">Create a format</Link>
+            </Button>
+          </div>
         </div>
       ) : (
         <div className="rounded-lg border">

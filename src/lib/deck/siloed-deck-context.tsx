@@ -35,6 +35,8 @@ type DeckUpdate = {
   imageCardId?: Id<"cards"> | null;
   startingCharacterId?: Id<"cards"> | null;
   selectedIdentity?: string | null;
+  format?: string | null;
+  subFormat?: string | null;
 };
 
 interface SiloedDeckContextValue {

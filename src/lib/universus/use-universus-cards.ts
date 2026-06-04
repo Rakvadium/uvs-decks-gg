@@ -30,6 +30,7 @@ export interface CardSortOptions {
 
 export type FilterCardsFormatOptions = {
   passesFormatLegality?: (setCode: string | undefined) => boolean;
+  isCardBannedInFormat?: (cardId: string) => boolean;
 };
 
 export interface UseUniversusCardsResult {
@@ -374,6 +375,7 @@ export function filterCards(
   formatOpts?: FilterCardsFormatOptions
 ): CachedCard[] {
   const passesFormatLegality = formatOpts?.passesFormatLegality;
+  const isCardBannedInFormat = formatOpts?.isCardBannedInFormat;
 
   const searchTrimmed = filters.search?.trim();
   const hasSearch = Boolean(searchTrimmed);
@@ -447,6 +449,8 @@ export function filterCards(
     }
 
     if (passesFormatLegality && !passesFormatLegality(card.setCode)) continue;
+
+    if (isCardBannedInFormat && isCardBannedInFormat(card._id)) continue;
 
     if (hasTypeFilter) {
       if (!card.type || !types!.includes(card.type)) continue;

@@ -88,10 +88,10 @@ export function CardDetailsV2({
 
   return (
     <CardDetailsContentProvider card={displayCard}>
-      <div className="flex w-full max-md:h-auto max-md:flex-none flex-col gap-4 p-3 max-md:!pointer-events-none md:max-h-[min(85vh,calc(100dvh-2rem))] md:min-h-0 md:flex-1 md:flex-row md:items-start md:gap-5 md:overflow-hidden md:pb-3 md:pl-3 md:!pointer-events-auto md:pt-12">
+      <div className="flex w-full max-md:h-auto max-md:flex-none flex-col gap-4 p-3 max-md:!pointer-events-none md:h-[min(85vh,calc(100dvh-2rem))] md:max-h-[min(85vh,calc(100dvh-2rem))] md:min-h-0 md:flex-1 md:flex-row md:items-stretch md:gap-5 md:overflow-hidden md:pb-3 md:pl-3 md:!pointer-events-auto md:pt-12">
         <div
           className={cn(
-            "flex w-full shrink-0 flex-col items-center justify-center max-md:!pointer-events-auto",
+            "flex w-full shrink-0 flex-col items-center justify-center max-md:!pointer-events-auto md:h-full md:min-h-0",
             "lg:sticky lg:top-0 lg:w-[400px] lg:max-w-[400px] lg:self-start"
           )}
         >
@@ -221,8 +221,8 @@ export function CardDetailsV2({
           </div>
         </div>
 
-        <div className="relative flex min-w-0 max-md:flex-none flex-col max-md:!pointer-events-auto md:flex-1">
-          <div className="relative flex min-w-0 flex-col overflow-hidden rounded-xl border border-primary/25 bg-card/95 shadow-[0_0_2px_var(--primary)/35,0_0_10px_var(--primary)/42,0_0_22px_var(--primary)/12] backdrop-blur-md">
+        <div className="relative flex min-w-0 max-md:flex-none flex-col max-md:!pointer-events-auto md:min-h-0 md:flex-1">
+          <div className="relative flex min-w-0 flex-col overflow-hidden rounded-xl border border-primary/25 bg-card/95 shadow-[0_0_2px_var(--primary)/35,0_0_10px_var(--primary)/42,0_0_22px_var(--primary)/12] backdrop-blur-md md:h-full md:max-h-full md:min-h-0 md:flex-1">
             <DialogClose asChild>
               <Button
                 type="button"
@@ -235,10 +235,10 @@ export function CardDetailsV2({
               </Button>
             </DialogClose>
             <CardDetailsReadoutSurface
-              className="min-w-0 flex-none"
+              className="min-h-0 min-w-0 flex-1"
               scrollableClassName={cn(
                 needsBottomChrome ? "pb-16" : undefined,
-                "max-md:flex-none max-md:max-h-none max-md:overflow-y-visible md:max-h-[min(72vh,calc(100dvh-12rem))] md:flex-none"
+                "max-md:flex-none max-md:max-h-none max-md:overflow-y-visible"
               )}
             >
               <CardDetailsReadoutPanel />

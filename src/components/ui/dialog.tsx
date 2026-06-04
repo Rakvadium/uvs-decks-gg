@@ -93,6 +93,7 @@ function DialogContent({
   size = "default",
   contentPadding = "default",
   presentation = "default",
+  symmetricInset = false,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
   showCloseButton?: boolean
@@ -101,12 +102,15 @@ function DialogContent({
   footerMobileOnly?: boolean
   presentation?: "default" | "plain"
   contentPadding?: "default" | "none"
+  symmetricInset?: boolean
 }) {
   const hasFooter = footer != null
   const isPlain = presentation === "plain"
   const fullBleedContent = contentPadding === "none"
   const mainInset = fullBleedContent
-    ? cn(showCloseButton && "pt-4 pr-14 md:pt-6 md:pr-14")
+    ? symmetricInset
+      ? "pt-4 px-4 pb-6 md:pt-6 md:px-6 md:pb-6"
+      : cn(showCloseButton && "pt-4 pl-4 pr-14 md:pt-6 md:pl-6 md:pr-14")
     : showCloseButton
       ? "pt-4 pl-4 pr-14 md:px-6 md:pt-6 md:pr-14"
       : isPlain

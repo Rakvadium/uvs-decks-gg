@@ -20,6 +20,8 @@ type DeckDetailsUpdate = {
   imageCardId?: Id<"cards"> | null;
   startingCharacterId?: Id<"cards"> | null;
   selectedIdentity?: string | null;
+  format?: string | null;
+  subFormat?: string | null;
 };
 
 interface DeckDetailsContextValue {
@@ -39,6 +41,8 @@ interface DeckDetailsContextValue {
   setEditDescription: (value: string) => void;
   editFormat: string;
   setEditFormat: (value: string) => void;
+  editSubFormat: string;
+  setEditSubFormat: (value: string) => void;
   editVisibility: DeckVisibility;
   setEditVisibility: (value: DeckVisibility) => void;
   editTeamCollaboration: DeckTeamSharing;
@@ -71,6 +75,7 @@ export function DeckDetailsProvider({ children, deckId }: DeckDetailsProviderPro
   const [editName, setEditName] = useState("");
   const [editDescription, setEditDescription] = useState("");
   const [editFormat, setEditFormat] = useState("");
+  const [editSubFormat, setEditSubFormat] = useState("");
   const [editVisibility, setEditVisibility] = useState<DeckVisibility>("private");
   const [editTeamCollaboration, setEditTeamCollaboration] =
     useState<DeckTeamSharing>("team_viewable");
@@ -122,6 +127,7 @@ export function DeckDetailsProvider({ children, deckId }: DeckDetailsProviderPro
     setEditName(deck.name);
     setEditDescription(deck.description || "");
     setEditFormat(deck.format || "");
+    setEditSubFormat(deck.subFormat || "");
     setEditVisibility(normalizeDeckVisibility(deck));
     setEditTeamCollaboration(deckTeamSharingFromDeck(deck));
     setIsEditing(true);
@@ -132,6 +138,7 @@ export function DeckDetailsProvider({ children, deckId }: DeckDetailsProviderPro
       setEditName(deck.name);
       setEditDescription(deck.description || "");
       setEditFormat(deck.format || "");
+      setEditSubFormat(deck.subFormat || "");
       setEditVisibility(normalizeDeckVisibility(deck));
       setEditTeamCollaboration(deckTeamSharingFromDeck(deck));
     }
@@ -147,6 +154,10 @@ export function DeckDetailsProvider({ children, deckId }: DeckDetailsProviderPro
         description: editDescription.trim() || undefined,
         visibility: editVisibility,
       };
+      const formatTrim = editFormat.trim();
+      const subTrim = editSubFormat.trim();
+      updates.format = formatTrim ? formatTrim : null;
+      updates.subFormat = formatTrim && subTrim ? subTrim : null;
       if (editVisibility === "team") {
         const resolvedTeamId = deck.teamId ?? myTeam?._id;
         if (!resolvedTeamId) {
@@ -171,6 +182,8 @@ export function DeckDetailsProvider({ children, deckId }: DeckDetailsProviderPro
     deck,
     editName,
     editDescription,
+    editFormat,
+    editSubFormat,
     editVisibility,
     editTeamCollaboration,
     myTeam,
@@ -205,6 +218,7 @@ export function DeckDetailsProvider({ children, deckId }: DeckDetailsProviderPro
     setEditName(deck.name);
     setEditDescription(deck.description || "");
     setEditFormat(deck.format || "");
+    setEditSubFormat(deck.subFormat || "");
     setEditVisibility(normalizeDeckVisibility(deck));
     setEditTeamCollaboration(deckTeamSharingFromDeck(deck));
   }, [deck, isEditing]);
@@ -226,6 +240,8 @@ export function DeckDetailsProvider({ children, deckId }: DeckDetailsProviderPro
     setEditDescription,
     editFormat,
     setEditFormat,
+    editSubFormat,
+    setEditSubFormat,
     editVisibility,
     setEditVisibility,
     editTeamCollaboration,
@@ -255,6 +271,7 @@ export function DeckDetailsProvider({ children, deckId }: DeckDetailsProviderPro
     editName,
     editDescription,
     editFormat,
+    editSubFormat,
     editVisibility,
     editTeamCollaboration,
     canSetTeamVisibility,

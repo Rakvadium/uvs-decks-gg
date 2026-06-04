@@ -31,6 +31,7 @@ import type * as http from "../http.js";
 import type * as lib_accountStatus from "../lib/accountStatus.js";
 import type * as lib_appearanceMigration from "../lib/appearanceMigration.js";
 import type * as lib_deckAccess from "../lib/deckAccess.js";
+import type * as lib_deckFormatRules from "../lib/deckFormatRules.js";
 import type * as lib_moderation_localCommentHeuristic from "../lib/moderation/localCommentHeuristic.js";
 import type * as lib_moderation_providers from "../lib/moderation/providers.js";
 import type * as lib_moderation_textPublish from "../lib/moderation/textPublish.js";
@@ -99,6 +100,7 @@ declare const fullApi: ApiFromModules<{
   "lib/accountStatus": typeof lib_accountStatus;
   "lib/appearanceMigration": typeof lib_appearanceMigration;
   "lib/deckAccess": typeof lib_deckAccess;
+  "lib/deckFormatRules": typeof lib_deckFormatRules;
   "lib/moderation/localCommentHeuristic": typeof lib_moderation_localCommentHeuristic;
   "lib/moderation/providers": typeof lib_moderation_providers;
   "lib/moderation/textPublish": typeof lib_moderation_textPublish;

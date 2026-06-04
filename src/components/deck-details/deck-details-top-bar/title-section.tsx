@@ -1,4 +1,4 @@
-import { Badge } from "@/components/ui/badge";
+import { DeckFormatLegalityBadge } from "@/components/deck-details/deck-format-legality-badge";
 import { DeckVisibilityBadgeMenu } from "@/components/deck-details/deck-visibility-badge-menu";
 import type { DeckTeamSharing, DeckVisibility } from "@/lib/deck/visibility";
 import { normalizeDeckVisibility, deckTeamSharingFromDeck } from "@/lib/deck/visibility";
@@ -44,12 +44,13 @@ export function DeckDetailsTopBarTitleSection({ compact = false }: DeckDetailsTo
         />
       </span>
 
-      {deck.format ? (
-        <Badge variant="cyber" className="hidden h-8 shrink-0 items-center text-[9px] md:inline-flex">
-          {deck.format}
-          {deck.subFormat ? ` / ${deck.subFormat}` : ""}
-        </Badge>
-      ) : null}
+      <DeckFormatLegalityBadge
+        deckId={deck._id}
+        formatKey={deck.format}
+        subFormat={deck.subFormat}
+        compact
+        className="inline-flex shrink-0 items-center"
+      />
     </div>
   );
 }

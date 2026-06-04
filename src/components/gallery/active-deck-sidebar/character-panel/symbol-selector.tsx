@@ -22,14 +22,17 @@ export function ActiveDeckCharacterSymbolSelector() {
           type="button"
           aria-label="Change symbol"
           className={cn(
-            "absolute -bottom-1 -right-1 z-10 flex h-9 w-9 items-center justify-center rounded-md border border-border/50 bg-background/80",
-            "transition-all hover:border-primary/50 hover:bg-primary/5 hover:shadow-[0_0_12px_-6px_var(--primary)]"
+            "absolute bottom-0 left-0 z-20 flex h-9 w-9 items-center justify-center",
+            "rounded-bl-lg rounded-tr-lg rounded-tl-none rounded-br-none",
+            "bg-background/80 backdrop-blur-sm",
+            "border-r border-t border-border/40",
+            "transition-all hover:bg-primary/10 hover:border-primary/40"
           )}
         >
           <SymbolIcon symbol={selectedSymbol ?? characterSymbols[0]} size="lg" />
         </button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-2" align="end">
+      <PopoverContent className="w-auto p-2" align="start">
         <div className="flex items-center gap-2">
           {characterSymbols.map((symbol) => (
             <SymbolBadge

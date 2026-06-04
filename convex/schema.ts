@@ -570,6 +570,14 @@ export default defineSchema({
     .index("by_format", ["formatKey"])
     .index("by_format_set", ["formatKey", "setCode"]),
 
+  formatErrata: defineTable({
+    formatKey: v.string(),
+    title: v.string(),
+    body: v.string(),
+    url: v.optional(v.string()),
+    sortOrder: v.number(),
+  }).index("by_format_and_sortOrder", ["formatKey", "sortOrder"]),
+
   communityYoutubeCurations: defineTable({
     youtubeVideoId: v.string(),
     label: v.optional(v.string()),
