@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Eye, Globe, Hexagon, Link2, Lock, Pencil, Trophy, UserPlus } from "lucide-react";
+import { Eye, Globe, Hexagon, Link2, Pencil, Trophy, UserPlus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import {
@@ -21,12 +21,10 @@ export function DeckSidebarItemHeader() {
   const visibility = normalizeDeckVisibility(deck);
   const VisIcon =
     visibility === "private"
-      ? Lock
+      ? Link2
       : visibility === "share"
         ? UserPlus
-        : visibility === "unlisted"
-          ? Link2
-          : visibility === "team"
+        : visibility === "team"
             ? deckTeamSharingFromDeck(deck) === "team_editable"
               ? Pencil
               : Eye

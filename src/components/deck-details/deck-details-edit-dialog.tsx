@@ -40,10 +40,9 @@ function sortFormats<T extends { name: string }>(list: T[]): T[] {
 
 type VisibilityRow = Exclude<DeckVisibility, "team"> | "team_view" | "team_edit";
 
-const BASE_VISIBILITY_ORDER: Exclude<DeckVisibility, "team" | "tournament">[] = [
+const BASE_VISIBILITY_ORDER: Exclude<DeckVisibility, "team" | "tournament" | "unlisted">[] = [
   "private",
   "share",
-  "unlisted",
   "public",
 ];
 

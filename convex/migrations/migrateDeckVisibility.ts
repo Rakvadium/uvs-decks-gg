@@ -12,6 +12,11 @@ export const backfillDeckVisibility = mutation({
     let updated = 0;
     let skipped = 0;
     for (const deck of decks) {
+      if (deck.visibility === "unlisted") {
+        await ctx.db.patch(deck._id, { visibility: "private" });
+        updated++;
+        continue;
+      }
       if (deck.visibility !== undefined) {
         skipped++;
         continue;

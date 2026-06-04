@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDown, Eye, Globe, Link2, Lock, Pencil, Trophy, UserPlus } from "lucide-react";
+import { ChevronDown, Eye, Globe, Link2, Pencil, Trophy, UserPlus } from "lucide-react";
 import { createElement } from "react";
 import type { LucideIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -31,20 +31,14 @@ const OPTIONS: Array<{
   {
     value: "private",
     label: "Private",
-    hint: "Only you can open this deck.",
-    Icon: Lock,
+    hint: "Anyone with the link can view in read-only mode; only you can edit.",
+    Icon: Link2,
   },
   {
     value: "share",
     label: "Share",
     hint: "Invite specific accounts; only they and you can view.",
     Icon: UserPlus,
-  },
-  {
-    value: "unlisted",
-    label: "Unlisted",
-    hint: "Anyone with the link can view; hidden from public lists.",
-    Icon: Link2,
   },
   {
     value: "public",
@@ -93,7 +87,7 @@ function badgeIconForDisplay(
     return teamSharing === "team_editable" ? Pencil : Eye;
   }
   const opt = OPTIONS.find((o) => o.value === visibility);
-  return opt?.Icon ?? Lock;
+  return opt?.Icon ?? Link2;
 }
 
 interface DeckVisibilityBadgeMenuProps {
