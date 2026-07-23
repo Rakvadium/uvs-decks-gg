@@ -17,7 +17,10 @@ import {
   CatalogReleaseDialog,
 } from "@/components/admin";
 import { createSymbolReferenceImageUrl } from "@/lib/universus/vision-reference-images";
-import { analyzeCardRegions } from "@/lib/universus/vision-card-regions";
+import {
+  analyzeCardRegions,
+  type CardRegionAnalysis,
+} from "@/lib/universus/vision-card-regions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -382,7 +385,7 @@ export default function AdminCardDraftReview({
       try {
         const [symbolReferenceImageUrl, regions] = await Promise.all([
           createSymbolReferenceImageUrl(),
-          analyzeCardRegions(draft.imageUrl).catch(() => ({})),
+          analyzeCardRegions(draft.imageUrl).catch((): CardRegionAnalysis => ({})),
         ]);
         const extracted = await extractCardFromImage({
           imageUrl: draft.imageUrl,
@@ -529,7 +532,9 @@ export default function AdminCardDraftReview({
       try {
         let regions = regionCache.get(item.imageUrl);
         if (!regions) {
-          regions = await analyzeCardRegions(item.imageUrl).catch(() => ({}));
+          regions = await analyzeCardRegions(item.imageUrl).catch(
+            (): CardRegionAnalysis => ({})
+          );
           regionCache.set(item.imageUrl, regions);
         }
         const extracted = await extractCardFromImage({

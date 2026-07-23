@@ -42,7 +42,10 @@ import { toast } from "sonner";
 import { toastConvexError } from "@/lib/convex-error-toast";
 import { parseZoneDisplay } from "@/components/universus/card-details/parsers";
 import { createSymbolReferenceImageUrl } from "@/lib/universus/vision-reference-images";
-import { analyzeCardRegions } from "@/lib/universus/vision-card-regions";
+import {
+  analyzeCardRegions,
+  type CardRegionAnalysis,
+} from "@/lib/universus/vision-card-regions";
 import { cn } from "@/lib/utils";
 import { Sparkles, Upload, X } from "lucide-react";
 
@@ -562,7 +565,7 @@ export function CardFormDialog({
     try {
       const [symbolReferenceImageUrl, regions] = await Promise.all([
         createSymbolReferenceImageUrl(),
-        analyzeCardRegions(source).catch(() => ({})),
+        analyzeCardRegions(source).catch((): CardRegionAnalysis => ({})),
       ]);
       const extracted = await extractCardFromImage({
         imageUrl: source,

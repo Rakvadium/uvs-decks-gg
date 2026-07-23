@@ -22,7 +22,7 @@ function normalizeAuthEmail(email: unknown): string {
 }
 
 const passwordProvider = Password({
-  profile(params) {
+  profile(params): { email: string } | { email: string; username: string } {
     const email = normalizeAuthEmail(params.email);
     if (params.flow === "signUp") {
       const username =
