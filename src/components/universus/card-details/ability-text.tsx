@@ -1,4 +1,5 @@
 import { TIMING_COLORS } from "./constants";
+import { InlineSymbolText } from "./inline-symbol-text";
 
 interface AbilityTextProps {
   text: string;
@@ -24,7 +25,7 @@ export function AbilityText({ text, showHeading = true }: AbilityTextProps) {
         if (colonIndex === -1) {
           return (
             <p key={index} className="text-sm leading-relaxed text-foreground/80">
-              {segment}
+              <InlineSymbolText text={segment} />
             </p>
           );
         }
@@ -36,7 +37,7 @@ export function AbilityText({ text, showHeading = true }: AbilityTextProps) {
         if (!abilityMatch) {
           return (
             <p key={index} className="text-sm leading-relaxed text-foreground/80">
-              {segment}
+              <InlineSymbolText text={segment} />
             </p>
           );
         }
@@ -57,10 +58,17 @@ export function AbilityText({ text, showHeading = true }: AbilityTextProps) {
                 boxShadow: `0 0 10px ${abilityColor}40`,
               }}
             >
-              {highlightedPart}
+              <InlineSymbolText text={highlightedPart} />
             </span>
-            {remainingBeforeColon}
-            {afterColon ? `: ${afterColon}` : remainingBeforeColon ? ":" : null}
+            <InlineSymbolText text={remainingBeforeColon} />
+            {afterColon ? (
+              <>
+                {": "}
+                <InlineSymbolText text={afterColon} />
+              </>
+            ) : remainingBeforeColon ? (
+              ":"
+            ) : null}
           </p>
         );
       })}

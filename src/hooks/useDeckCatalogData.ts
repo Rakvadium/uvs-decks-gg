@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import { useConvexAuth, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
-import type { Doc } from "../../convex/_generated/dataModel";
+import type { DeckListItem } from "@/components/decks/deck-grid-item/types";
 
 export type DeckTab = "my-decks" | "public" | "tournament";
 
@@ -38,7 +38,7 @@ export function useDeckCatalogData(searchQuery: string, activeTab: DeckTab) {
     [myDecksAll?.length, publicDecksAll?.length, tournamentDecksAll?.length]
   );
 
-  const currentDecks: Doc<"decks">[] = useMemo(() => {
+  const currentDecks: DeckListItem[] = useMemo(() => {
     if (activeTab === "my-decks") return myDecks ?? [];
     if (activeTab === "public") return publicDecks ?? [];
     if (activeTab === "tournament") return tournamentDecks ?? [];

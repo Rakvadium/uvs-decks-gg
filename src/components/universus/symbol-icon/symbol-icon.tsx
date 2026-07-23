@@ -15,7 +15,7 @@ export function SymbolIcon({ symbol, size = "sm", className, showLabel = false }
   }
 
   const isAttuned = symbol.toLowerCase().startsWith("attuned");
-  const displayName = isAttuned ? symbol.replace(/^attuned[:-]/i, "").trim() : symbol;
+  const displayName = isAttuned ? symbol.replace(/^attuned[:-]?/i, "").trim() : symbol;
 
   return (
     <span className={cn("inline-flex items-center gap-1", className)}>

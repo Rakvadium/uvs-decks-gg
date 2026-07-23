@@ -40,5 +40,11 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 /data/
-/scripts/
+/scripts/*
+!/scripts/calibrate-card-ocr.ts
+!/scripts/seed-card-drafts.ts
+!/scripts/ocr-calibration/
+/scripts/ocr-calibration/*
+!/scripts/ocr-calibration/fixtures.json
+/scripts/ocr-calibration/output/
 /screenshots/

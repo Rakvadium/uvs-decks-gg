@@ -4,30 +4,50 @@ import { ConvexError } from "convex/values";
 import { z } from "zod";
 import { ResendOTPPasswordReset } from "./ResendOTPPasswordReset";
 
-const ProfileSchema = z.object({
+const SignUpProfileSchema = z.object({
   email: z.string().email("Invalid email format"),
-  password: z.string().min(1, "Password is required"),
   username: z.string().min(1, "Username is required").max(20, "Username too long"),
 });
 
-export default Password({
+function normalizeAuthEmail(email: unknown): string {
+  if (typeof email !== "string") {
+    throw new ConvexError("Invalid email format");
+  }
+  const normalized = email.trim().toLowerCase();
+  const parsed = z.string().email("Invalid email format").safeParse(normalized);
+  if (!parsed.success) {
+    throw new ConvexError("Invalid email format");
+  }
+  return parsed.data;
+}
+
+const passwordProvider = Password({
   profile(params) {
-    const parsed = ProfileSchema.safeParse(params);
-    if (!parsed.success) {
-      throw new ConvexError(parsed.error.format());
+    const email = normalizeAuthEmail(params.email);
+    if (params.flow === "signUp") {
+      const username =
+        typeof params.username === "string" ? params.username.trim() : params.username;
+      const parsed = SignUpProfileSchema.safeParse({ email, username });
+      if (!parsed.success) {
+        throw new ConvexError(parsed.error.format());
+      }
+      return {
+        email: parsed.data.email,
+        username: parsed.data.username,
+      };
     }
-    return {
-      email: parsed.data.email,
-      username: parsed.data.username,
-    };
+    return { email };
   },
   validatePasswordRequirements: (password: string) => {
     if (password.length < 8 || !/\d/.test(password)) {
       throw new ConvexError("Password must be at least 8 characters with a number");
     }
   },
+  reset: ResendOTPPasswordReset,
 });
 
+export default passwordProvider;
+
 export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
-  providers: [Password({ reset: ResendOTPPasswordReset })],
+  providers: [passwordProvider],
 });

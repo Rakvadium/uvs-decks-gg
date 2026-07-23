@@ -4,6 +4,8 @@ import { v } from "convex/values";
 import {
   chromePreferenceValidator,
   chromeVariantValidator,
+  cardDraftEditableValidator,
+  cardDraftStatusValidator,
   colorSchemeValidator,
   colorSourceValidator,
   userFeedbackKindValidator,
@@ -114,6 +116,8 @@ export default defineSchema({
     searchAll: v.optional(v.string()),
     copyLimit: v.optional(v.number()),
     contentRevisionAt: v.optional(v.number()),
+    revealedAt: v.optional(v.number()),
+    isRevealHidden: v.optional(v.boolean()),
     setCode: v.optional(v.string()),
     setName: v.optional(v.string()),
     setNumber: v.optional(v.number()),
@@ -150,6 +154,28 @@ export default defineSchema({
       searchField: "searchName",
       filterFields: ["setCode", "type", "rarity"],
     }),
+
+  cardDrafts: defineTable({
+    setCode: v.string(),
+    setName: v.string(),
+    collectorNumber: v.optional(v.string()),
+    sortIndex: v.number(),
+    fileName: v.string(),
+    status: cardDraftStatusValidator,
+    imageStorageId: v.id("_storage"),
+    ocrRawText: v.optional(v.string()),
+    draft: cardDraftEditableValidator,
+    parseWarnings: v.optional(v.array(v.string())),
+    detectedType: v.optional(v.string()),
+    approvedCardId: v.optional(v.id("cards")),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+    reviewedBy: v.optional(v.id("users")),
+    approvalError: v.optional(v.string()),
+  })
+    .index("by_setCode_and_status_and_sortIndex", ["setCode", "status", "sortIndex"])
+    .index("by_setCode_and_status", ["setCode", "status"])
+    .index("by_status_and_updatedAt", ["status", "updatedAt"]),
 
   decks: defineTable({
     userId: v.id("users"),

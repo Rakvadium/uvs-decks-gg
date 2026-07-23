@@ -18,6 +18,8 @@ export function AdminSetSectionTabs({
   const base = `/admin/sets/${enc}`;
   const tab = pathname.includes("/import")
     ? "import"
+    : pathname.includes("/review")
+      ? "review"
     : pathname.includes("/cards")
       ? "cards"
       : "overview";
@@ -34,6 +36,10 @@ export function AdminSetSectionTabs({
           router.push(`${base}/cards${searchSuffix}`);
           return;
         }
+        if (v === "review") {
+          router.push(`${base}/review${searchSuffix}`);
+          return;
+        }
         if (v === "import") {
           router.push(`${base}/import${searchSuffix}`);
         }
@@ -42,6 +48,7 @@ export function AdminSetSectionTabs({
       <TabsList className="h-auto w-full min-w-0 flex-wrap justify-start gap-0 sm:w-fit">
         <TabsTrigger value="overview">Overview</TabsTrigger>
         <TabsTrigger value="cards">Cards</TabsTrigger>
+        <TabsTrigger value="review">Review</TabsTrigger>
         <TabsTrigger value="import">Import</TabsTrigger>
       </TabsList>
     </Tabs>

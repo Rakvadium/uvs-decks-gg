@@ -1,10 +1,20 @@
 import { ATTUNED_SYMBOL_MAP, SYMBOL_BASE_PATH, SYMBOL_MAP } from "./constants";
 
 export function getSymbolPath(symbol: string): string | null {
-  const normalizedSymbol = symbol.toLowerCase().trim();
+  const normalizedSymbol = symbol
+    .toLowerCase()
+    .trim()
+    .replace(/^\{|\}$/g, "")
+    .replace(/[\s_]+/g, "");
 
   if (normalizedSymbol.startsWith("attuned:") || normalizedSymbol.startsWith("attuned-")) {
     const baseSymbol = normalizedSymbol.replace(/^attuned[:-]/, "");
+    const filename = ATTUNED_SYMBOL_MAP[baseSymbol];
+    return filename ? `${SYMBOL_BASE_PATH}/${filename}` : null;
+  }
+
+  if (normalizedSymbol.startsWith("attuned")) {
+    const baseSymbol = normalizedSymbol.replace(/^attuned/, "");
     const filename = ATTUNED_SYMBOL_MAP[baseSymbol];
     return filename ? `${SYMBOL_BASE_PATH}/${filename}` : null;
   }

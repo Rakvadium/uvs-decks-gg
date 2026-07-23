@@ -44,8 +44,32 @@ function matchesCharacterSymbol(symbols: string | undefined, symbol: string | un
     .includes(symbol.toLowerCase());
 }
 
-function isGalleryCatalogCard(card: { isFrontFace?: boolean; isVariant?: boolean }) {
-  return card.isFrontFace !== false && card.isVariant !== true;
+async function getCatalogReleaseCutoff(ctx: QueryCtx): Promise<number | null> {
+  const versionDoc = await ctx.db.query("cardDataVersion").first();
+  return versionDoc?.updatedAt ?? null;
+}
+
+function isReleasedCard(
+  card: { _creationTime: number; contentRevisionAt?: number; isRevealHidden?: boolean },
+  cutoff: number | null
+) {
+  return (
+    card.isRevealHidden !== true &&
+    (cutoff === null || (card.contentRevisionAt ?? card._creationTime) <= cutoff)
+  );
+}
+
+function isGalleryCatalogCard(
+  card: {
+    _creationTime: number;
+    contentRevisionAt?: number;
+    isRevealHidden?: boolean;
+    isFrontFace?: boolean;
+    isVariant?: boolean;
+  },
+  cutoff: number | null
+) {
+  return card.isFrontFace !== false && card.isVariant !== true && isReleasedCard(card, cutoff);
 }
 
 function matchesListFilterFields(
@@ -70,8 +94,8 @@ function matchesListFilterFields(
   return true;
 }
 
-function isListGalleryRow(card: Doc<"cards">) {
-  return card.isFrontFace !== false && card.isVariant !== true;
+function isListGalleryRow(card: Doc<"cards">, cutoff: number | null) {
+  return card.isFrontFace !== false && card.isVariant !== true && isReleasedCard(card, cutoff);
 }
 
 async function listCatalogCardsNoSearch(
@@ -86,6 +110,7 @@ async function listCatalogCardsNoSearch(
   },
 ): Promise<Doc<"cards">[]> {
   const limit = Math.max(1, args.limit);
+  const cutoff = await getCatalogReleaseCutoff(ctx);
   if (args.sortField) {
     const pool: Doc<"cards">[] = [];
     let cursor: string | null = null;
@@ -97,7 +122,7 @@ async function listCatalogCardsNoSearch(
         .query("cards")
         .paginate({ numItems: LIST_CATALOG_PAGE, cursor });
       for (const card of result.page) {
-        if (!isListGalleryRow(card) || !matchesListFilterFields(card, args)) {
+        if (!isListGalleryRow(card, cutoff) || !matchesListFilterFields(card, args)) {
           continue;
         }
         pool.push(card);
@@ -137,7 +162,7 @@ async function listCatalogCardsNoSearch(
       .query("cards")
       .paginate({ numItems: LIST_CATALOG_PAGE, cursor });
     for (const card of result.page) {
-      if (!isListGalleryRow(card) || !matchesListFilterFields(card, args)) {
+      if (!isListGalleryRow(card, cutoff) || !matchesListFilterFields(card, args)) {
         continue;
       }
       out.push(card);
@@ -163,6 +188,7 @@ export const list = query({
   },
   returns: v.array(cardValidator),
   handler: async (ctx, args) => {
+    const cutoff = await getCatalogReleaseCutoff(ctx);
     if (args.search && args.search.trim().length > 0) {
       let cards = await ctx.db
         .query("cards")
@@ -187,7 +213,7 @@ export const list = query({
         );
       }
 
-      return cards.filter((card) => card.isFrontFace !== false && card.isVariant !== true);
+      return cards.filter((card) => isGalleryCatalogCard(card, cutoff));
     }
 
     return await listCatalogCardsNoSearch(ctx, {
@@ -208,6 +234,7 @@ export const listReleased = query({
   returns: v.array(cardValidator),
   handler: async (ctx, args) => {
     const cap = Math.min(args.limit ?? 10_000, 25_000);
+    const cutoff = await getCatalogReleaseCutoff(ctx);
     const out: Doc<"cards">[] = [];
     let cursor: string | null = null;
     let isDone = false;
@@ -217,7 +244,7 @@ export const listReleased = query({
         .query("cards")
         .paginate({ numItems: pageSize, cursor });
       for (const card of result.page) {
-        if (card.isFrontFace === false) {
+        if (card.isFrontFace === false || !isReleasedCard(card, cutoff)) {
           continue;
         }
         out.push(card);
@@ -244,11 +271,12 @@ export const listReleasedPaginated = query({
   }),
   handler: async (ctx, args) => {
     const limit = args.limit ?? 1000;
+    const cutoff = await getCatalogReleaseCutoff(ctx);
     const result = await ctx.db
       .query("cards")
       .paginate({ numItems: limit, cursor: args.cursor ?? null });
 
-    const cardsWithUrls = result.page.filter(isGalleryCatalogCard).map((card) => {
+    const cardsWithUrls = result.page.filter((card) => isGalleryCatalogCard(card, cutoff)).map((card) => {
       const imageUrl = toPublicCardImageUrl(card.imageUrl);
       return imageUrl !== card.imageUrl ? { ...card, imageUrl } : card;
     });
@@ -267,6 +295,7 @@ export const batchGetCardsByIds = query({
   },
   returns: v.array(cardValidator),
   handler: async (ctx, args) => {
+    const cutoff = await getCatalogReleaseCutoff(ctx);
     const seen = new Set<string>();
     const out: Doc<"cards">[] = [];
     for (const id of args.ids) {
@@ -274,7 +303,7 @@ export const batchGetCardsByIds = query({
       if (seen.has(key)) continue;
       seen.add(key);
       const card = await ctx.db.get(id);
-      if (!card) continue;
+      if (!card || !isReleasedCard(card, cutoff)) continue;
       const imageUrl = toPublicCardImageUrl(card.imageUrl);
       out.push(imageUrl !== card.imageUrl ? { ...card, imageUrl } : card);
     }
@@ -299,6 +328,7 @@ export const galleryIndexedSearchSpike = query({
   returns: v.array(cardValidator),
   handler: async (ctx, args) => {
     const limit = Math.min(Math.max(args.limit ?? 50, 1), 200);
+    const cutoff = await getCatalogReleaseCutoff(ctx);
     const prefixArg = args.namePrefixInSet;
     const trimmedPrefix = prefixArg?.prefix.trim() ?? "";
 
@@ -310,7 +340,7 @@ export const galleryIndexedSearchSpike = query({
           q.eq("setCode", prefixArg.setCode).gte("name", trimmedPrefix).lt("name", upper)
         )
         .take(limit * 2);
-      return rows.filter(isGalleryCatalogCard).slice(0, limit);
+      return rows.filter((card) => isGalleryCatalogCard(card, cutoff)).slice(0, limit);
     }
 
     const text = args.searchText?.trim() ?? "";
@@ -331,7 +361,7 @@ export const galleryIndexedSearchSpike = query({
           return chain;
         })
         .take(limit * 2);
-      return rows.filter(isGalleryCatalogCard).slice(0, limit);
+      return rows.filter((card) => isGalleryCatalogCard(card, cutoff)).slice(0, limit);
     }
 
     if (args.setCode && args.setCode.length > 0) {
@@ -339,7 +369,7 @@ export const galleryIndexedSearchSpike = query({
         .query("cards")
         .withIndex("by_setCode_and_collectorNumber", (q) => q.eq("setCode", args.setCode!))
         .take(limit * 2);
-      let out = rows.filter(isGalleryCatalogCard);
+      let out = rows.filter((card) => isGalleryCatalogCard(card, cutoff));
       if (args.type) {
         out = out.filter((c) => c.type === args.type);
       }
@@ -363,6 +393,7 @@ export const searchCards = query({
   },
   returns: v.array(cardValidator),
   handler: async (ctx, args) => {
+    const cutoff = await getCatalogReleaseCutoff(ctx);
     const tierConfig = {
       name: "search_tier1_name" as const,
       keywords: "search_tier2_keywords" as const,
@@ -378,15 +409,16 @@ export const searchCards = query({
     const fieldName = fieldConfig[args.searchTier];
 
     if (args.searchTier === "name") {
-      return await ctx.db
+      const rows = await ctx.db
         .query("cards")
         .withSearchIndex(indexName, (q) => {
           return q.search(fieldName, args.query);
         })
         .take(args.limit ?? 50);
+      return rows.filter((card) => isReleasedCard(card, cutoff));
     }
 
-    return await ctx.db
+    const rows = await ctx.db
       .query("cards")
       .withSearchIndex(indexName, (q) => {
         let search = q.search(fieldName, args.query);
@@ -395,6 +427,7 @@ export const searchCards = query({
         return search;
       })
       .take(args.limit ?? 50);
+    return rows.filter((card) => isReleasedCard(card, cutoff));
   },
 });
 
@@ -402,9 +435,12 @@ export const getBackCard = query({
   args: { cardId: v.id("cards") },
   returns: v.union(cardValidator, v.null()),
   handler: async (ctx, args) => {
+    const cutoff = await getCatalogReleaseCutoff(ctx);
     const card = await ctx.db.get(args.cardId);
-    if (!card?.backCardId) return null;
-    return await ctx.db.get(card.backCardId);
+    if (!card?.backCardId || !isReleasedCard(card, cutoff)) return null;
+    const back = await ctx.db.get(card.backCardId);
+    if (!back || !isReleasedCard(back, cutoff)) return null;
+    return back;
   },
 });
 
@@ -412,9 +448,12 @@ export const getFrontCard = query({
   args: { cardId: v.id("cards") },
   returns: v.union(cardValidator, v.null()),
   handler: async (ctx, args) => {
+    const cutoff = await getCatalogReleaseCutoff(ctx);
     const card = await ctx.db.get(args.cardId);
-    if (!card?.frontCardId) return null;
-    return await ctx.db.get(card.frontCardId);
+    if (!card?.frontCardId || !isReleasedCard(card, cutoff)) return null;
+    const front = await ctx.db.get(card.frontCardId);
+    if (!front || !isReleasedCard(front, cutoff)) return null;
+    return front;
   },
 });
 
@@ -435,6 +474,7 @@ export const listPaginated = query({
   handler: async (ctx, args) => {
     const numItems = Math.min(args.paginationOpts.numItems, 50);
     const paginationOpts = { ...args.paginationOpts, numItems };
+    const cutoff = await getCatalogReleaseCutoff(ctx);
 
     const sortCards = (cards: typeof result.page) => {
       return cards.sort((a, b) => {
@@ -457,7 +497,7 @@ export const listPaginated = query({
         )
         .take(500);
 
-      let filtered = allResults.filter((card) => card.isFrontFace !== false && card.isVariant !== true);
+      let filtered = allResults.filter((card) => isGalleryCatalogCard(card, cutoff));
       if (args.rarity && args.rarity.length > 0) {
         filtered = filtered.filter(
           (card) => card.rarity && args.rarity!.includes(card.rarity)
@@ -505,7 +545,7 @@ export const listPaginated = query({
         )
       );
 
-      let filtered = allCardsArrays.flat().filter((card) => card.isFrontFace !== false && card.isVariant !== true);
+      let filtered = allCardsArrays.flat().filter((card) => isGalleryCatalogCard(card, cutoff));
 
       if (args.rarity && args.rarity.length > 0) {
         filtered = filtered.filter(
@@ -538,7 +578,7 @@ export const listPaginated = query({
       .query("cards")
       .paginate(paginationOpts);
 
-    let page = result.page.filter((card) => card.isFrontFace !== false && card.isVariant !== true);
+    let page = result.page.filter((card) => isGalleryCatalogCard(card, cutoff));
     if (args.rarity && args.rarity.length > 0) {
       page = page.filter(
         (card) => card.rarity && args.rarity!.includes(card.rarity)
@@ -564,11 +604,12 @@ export const getCardVariants = query({
   },
   returns: v.array(cardValidator),
   handler: async (ctx, args) => {
+    const cutoff = await getCatalogReleaseCutoff(ctx);
     const cards = await ctx.db
       .query("cards")
       .withIndex("by_oracleId", (q) => q.eq("oracleId", args.oracleId))
       .take(LIST_ORACLE_VARIANT_MAX);
-    const filtered = cards.filter((card) => card.isFrontFace !== false);
+    const filtered = cards.filter((card) => card.isFrontFace !== false && isReleasedCard(card, cutoff));
     const withUrls = filtered.map((card) => {
       const imageUrl = toPublicCardImageUrl(card.imageUrl);
       return imageUrl !== card.imageUrl ? { ...card, imageUrl } : card;
@@ -595,8 +636,9 @@ export const getById = query({
   },
   returns: v.union(cardValidator, v.null()),
   handler: async (ctx, args) => {
+    const cutoff = await getCatalogReleaseCutoff(ctx);
     const card = await ctx.db.get(args.cardId);
-    if (!card) {
+    if (!card || !isReleasedCard(card, cutoff)) {
       return null;
     }
     const imageUrl = toPublicCardImageUrl(card.imageUrl);
@@ -649,6 +691,7 @@ export const listBySet = query({
   returns: v.array(cardValidator),
   handler: async (ctx, args) => {
     const limit = args.limit ?? 200;
+    const cutoff = await getCatalogReleaseCutoff(ctx);
 
     if (args.search && args.search.trim().length > 0) {
       const searchResults = await ctx.db
@@ -659,7 +702,7 @@ export const listBySet = query({
         .take(500);
 
       return searchResults
-        .filter((card) => card.setCode === args.setCode && card.isFrontFace !== false && card.isVariant !== true)
+        .filter((card) => card.setCode === args.setCode && isGalleryCatalogCard(card, cutoff))
         .slice(0, limit);
     }
 
@@ -670,7 +713,7 @@ export const listBySet = query({
       )
       .take(limit);
 
-    return cards.filter((card) => card.isFrontFace !== false && card.isVariant !== true);
+    return cards.filter((card) => isGalleryCatalogCard(card, cutoff));
   },
 });
 
@@ -680,10 +723,14 @@ export const getByIds = query({
   },
   returns: v.array(cardValidator),
   handler: async (ctx, args) => {
+    const cutoff = await getCatalogReleaseCutoff(ctx);
     const cards = await Promise.all(
       args.cardIds.map((id) => ctx.db.get(id))
     );
-    return cards.filter((card): card is NonNullable<typeof card> => card !== null);
+    return cards.filter(
+      (card): card is NonNullable<typeof card> =>
+        card !== null && isReleasedCard(card, cutoff)
+    );
   },
 });
 
@@ -697,6 +744,7 @@ export const listCharacters = query({
   handler: async (ctx, args) => {
     const cardType = args.characterType ?? "Character";
     const charLimit = Math.min(args.limit ?? 2_000, 10_000);
+    const cutoff = await getCatalogReleaseCutoff(ctx);
 
     if (args.search && args.search.trim().length > 0) {
       const cards = await ctx.db
@@ -710,7 +758,8 @@ export const listCharacters = query({
         (card) =>
           card.type === cardType &&
           card.isFrontFace !== false &&
-          card.isVariant !== true,
+          card.isVariant !== true &&
+          isReleasedCard(card, cutoff),
       );
     }
 
@@ -724,7 +773,7 @@ export const listCharacters = query({
         .withIndex("by_type_and_name", (q) => q.eq("type", cardType))
         .paginate({ numItems: page, cursor });
       for (const card of result.page) {
-        if (card.isFrontFace === false) {
+        if (card.isFrontFace === false || !isReleasedCard(card, cutoff)) {
           continue;
         }
         out.push(card);
@@ -754,6 +803,7 @@ export const listCharactersPaginated = query({
     const numItems = Math.min(Math.max(args.paginationOpts.numItems, 1), 20);
     const search = args.search?.trim() || undefined;
     const symbol = args.symbol?.trim().toLowerCase() || undefined;
+    const cutoff = await getCatalogReleaseCutoff(ctx);
     const page: Array<{
       _id: Id<"cards">;
       _creationTime: number;
@@ -807,7 +857,11 @@ export const listCharactersPaginated = query({
       isDone = result.isDone;
 
       for (const card of result.page) {
-        if (card.isFrontFace === false || card.isVariant === true) {
+        if (
+          card.isFrontFace === false ||
+          card.isVariant === true ||
+          !isReleasedCard(card, cutoff)
+        ) {
           continue;
         }
 
@@ -872,13 +926,14 @@ export const listAllCardsChunked = query({
   }),
   handler: async (ctx, args) => {
     const chunkSize = args.chunkSize ?? 500;
+    const cutoff = await getCatalogReleaseCutoff(ctx);
     
     const result = await ctx.db
       .query("cards")
       .paginate({ numItems: chunkSize, cursor: args.cursor ?? null });
     
     const filteredCards = result.page.filter(
-      (card) => card.isFrontFace !== false && card.isVariant !== true
+      (card) => isGalleryCatalogCard(card, cutoff)
     );
     
     const versionDoc = await ctx.db.query("cardDataVersion").first();
@@ -905,13 +960,14 @@ export const getInitialCards = query({
   }),
   handler: async (ctx, args) => {
     const limit = args.limit ?? 100;
+    const cutoff = await getCatalogReleaseCutoff(ctx);
     
     const result = await ctx.db
       .query("cards")
       .paginate({ numItems: limit, cursor: null });
     
     const filteredCards = result.page.filter(
-      (card) => card.isFrontFace !== false && card.isVariant !== true
+      (card) => isGalleryCatalogCard(card, cutoff)
     );
     
     const versionDoc = await ctx.db.query("cardDataVersion").first();

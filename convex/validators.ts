@@ -76,6 +76,8 @@ export const cardValidator = v.object({
   copyLimit: v.optional(v.number()),
   legality: v.optional(v.string()),
   contentRevisionAt: v.optional(v.number()),
+  revealedAt: v.optional(v.number()),
+  isRevealHidden: v.optional(v.boolean()),
 });
 
 export const userValidator = v.object({
@@ -164,6 +166,7 @@ export const deckValidator = v.object({
   teamId: v.optional(v.id("teams")),
   teamCollaboration: v.optional(deckTeamCollaborationValidator),
   revision: v.optional(v.number()),
+  ownerUsername: v.optional(v.string()),
 });
 
 export const deckCardMutationResultValidator = v.object({
@@ -510,6 +513,93 @@ export const cardInputValidator = v.object({
   searchText: v.optional(v.string()),
   searchAll: v.optional(v.string()),
   copyLimit: v.optional(v.number()),
+  legality: v.optional(v.string()),
+  revealedAt: v.optional(v.number()),
+  isRevealHidden: v.optional(v.boolean()),
+});
+
+export const cardDraftStatusValidator = v.union(
+  v.literal("pending"),
+  v.literal("approved"),
+  v.literal("skipped")
+);
+
+export const cardDraftEditableValidator = v.object({
+  oracleId: v.optional(v.string()),
+  name: v.optional(v.string()),
+  imageUrl: v.optional(v.string()),
+  backCardId: v.optional(v.id("cards")),
+  frontCardId: v.optional(v.id("cards")),
+  isFrontFace: v.optional(v.boolean()),
+  isVariant: v.optional(v.boolean()),
+  setCode: v.optional(v.string()),
+  setName: v.optional(v.string()),
+  setNumber: v.optional(v.number()),
+  collectorNumber: v.optional(v.string()),
+  rarity: v.optional(v.string()),
+  type: v.optional(v.string()),
+  difficulty: v.optional(v.number()),
+  control: v.optional(v.number()),
+  speed: v.optional(v.number()),
+  damage: v.optional(v.number()),
+  blockModifier: v.optional(v.number()),
+  handSize: v.optional(v.number()),
+  health: v.optional(v.number()),
+  stamina: v.optional(v.number()),
+  attackZone: v.optional(v.string()),
+  blockZone: v.optional(v.string()),
+  text: v.optional(v.string()),
+  keywords: v.optional(v.string()),
+  symbols: v.optional(v.string()),
+  searchName: v.optional(v.string()),
+  searchText: v.optional(v.string()),
+  searchAll: v.optional(v.string()),
+  copyLimit: v.optional(v.number()),
+  revealedAt: v.optional(v.number()),
+  isRevealHidden: v.optional(v.boolean()),
+});
+
+export const cardDraftValidator = v.object({
+  _id: v.id("cardDrafts"),
+  _creationTime: v.number(),
+  setCode: v.string(),
+  setName: v.string(),
+  collectorNumber: v.optional(v.string()),
+  sortIndex: v.number(),
+  fileName: v.string(),
+  status: cardDraftStatusValidator,
+  imageStorageId: v.id("_storage"),
+  ocrRawText: v.optional(v.string()),
+  draft: cardDraftEditableValidator,
+  parseWarnings: v.optional(v.array(v.string())),
+  detectedType: v.optional(v.string()),
+  approvedCardId: v.optional(v.id("cards")),
+  createdAt: v.number(),
+  updatedAt: v.number(),
+  reviewedBy: v.optional(v.id("users")),
+  approvalError: v.optional(v.string()),
+});
+
+export const cardDraftReviewRowValidator = v.object({
+  _id: v.id("cardDrafts"),
+  _creationTime: v.number(),
+  setCode: v.string(),
+  setName: v.string(),
+  collectorNumber: v.optional(v.string()),
+  sortIndex: v.number(),
+  fileName: v.string(),
+  status: cardDraftStatusValidator,
+  imageStorageId: v.id("_storage"),
+  imageUrl: v.union(v.string(), v.null()),
+  ocrRawText: v.optional(v.string()),
+  draft: cardDraftEditableValidator,
+  parseWarnings: v.optional(v.array(v.string())),
+  detectedType: v.optional(v.string()),
+  approvedCardId: v.optional(v.id("cards")),
+  createdAt: v.number(),
+  updatedAt: v.number(),
+  reviewedBy: v.optional(v.id("users")),
+  approvalError: v.optional(v.string()),
 });
 
 export const ingestionJobValidator = v.object({

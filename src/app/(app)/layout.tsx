@@ -31,6 +31,7 @@ import {
   Newspaper,
   Users,
   MessageSquare,
+  ClipboardCheck,
 } from "lucide-react";
 import Link from "next/link";
 import { TcgDndProvider } from "@/lib/dnd";
@@ -84,6 +85,9 @@ function AdminSidebarContent() {
   const setCardsHref = setCode
     ? `/admin/sets/${encodeURIComponent(setCode)}/cards`
     : null;
+  const setReviewHref = setCode
+    ? `/admin/sets/${encodeURIComponent(setCode)}/review`
+    : null;
   const setImportHref = setCode
     ? `/admin/sets/${encodeURIComponent(setCode)}/import`
     : null;
@@ -113,7 +117,7 @@ function AdminSidebarContent() {
         </Link>
       </div>
 
-      {showSetNav && setOverviewHref && setCardsHref && setImportHref ? (
+      {showSetNav && setOverviewHref && setCardsHref && setReviewHref && setImportHref ? (
         <div className="rounded-md border bg-muted/30 p-2 space-y-1">
           <Link
             href="/admin/sets"
@@ -136,6 +140,13 @@ function AdminSidebarContent() {
           >
             <CreditCard className="h-4 w-4" />
             Cards
+          </Link>
+          <Link
+            href={setReviewHref}
+            className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm hover:bg-muted ${pathname === setReviewHref ? "bg-muted font-medium" : ""}`}
+          >
+            <ClipboardCheck className="h-4 w-4" />
+            Review
           </Link>
           <Link
             href={setImportHref}

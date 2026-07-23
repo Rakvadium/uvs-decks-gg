@@ -23,29 +23,12 @@ import {
   syncSetCardCountsByCodes,
 } from "./setCardCountSync";
 import { toPublicCardImageUrl } from "./publicCardUrls";
+import {
+  createCardWithDerivedFields,
+  deriveCardSearchFields,
+} from "./lib/cardCreate";
 
 const ADMIN_SET_LIST_MAX = 25_000;
-
-function deriveCardSearchFields(card: {
-  name: string;
-  searchName?: string;
-  keywords?: string;
-  text?: string;
-  setName?: string;
-  type?: string;
-  rarity?: string;
-}) {
-  const searchName = card.searchName ?? card.name;
-  const searchText = [card.name, card.keywords ?? "", card.text ?? ""].join(" ");
-  const searchAll = [
-    searchName,
-    searchText,
-    card.setName ?? "",
-    card.type ?? "",
-    card.rarity ?? "",
-  ].join(" ");
-  return { searchName, searchText, searchAll };
-}
 
 export const listCardsBySetCode = query({
   args: {
@@ -581,27 +564,7 @@ export const createCard = mutation({
   returns: v.id("cards"),
   handler: async (ctx, args) => {
     await requireAdmin(ctx);
-
-    const { searchName, searchText, searchAll } = deriveCardSearchFields({
-      name: args.card.name,
-      searchName: args.card.searchName,
-      keywords: args.card.keywords,
-      text: args.card.text,
-      setName: args.card.setName,
-      type: args.card.type,
-      rarity: args.card.rarity,
-    });
-
-    const now = Date.now();
-    const id = await ctx.db.insert("cards", {
-      ...args.card,
-      searchName,
-      searchText,
-      searchAll,
-      contentRevisionAt: now,
-    });
-    await syncSetCardCountByCode(ctx, args.card.setCode);
-    return id;
+    return await createCardWithDerivedFields(ctx, args.card);
   },
 });
 
@@ -610,6 +573,7 @@ export const updateCard = mutation({
     cardId: v.id("cards"),
     updates: v.object({
       name: v.optional(v.string()),
+      oracleId: v.optional(v.string()),
       imageUrl: v.optional(v.string()),
       backCardId: v.optional(v.id("cards")),
       frontCardId: v.optional(v.id("cards")),
@@ -638,6 +602,8 @@ export const updateCard = mutation({
       searchText: v.optional(v.string()),
       searchAll: v.optional(v.string()),
       copyLimit: v.optional(v.number()),
+      revealedAt: v.optional(v.number()),
+      isRevealHidden: v.optional(v.boolean()),
     }),
   },
   returns: v.null(),
@@ -715,6 +681,46 @@ export const updateCard = mutation({
       }
       await syncSetCardCountsByCodes(ctx, codes);
     }
+    return null;
+  },
+});
+
+export const revealCard = mutation({
+  args: {
+    cardId: v.id("cards"),
+  },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    await requireAdmin(ctx);
+    const card = await ctx.db.get(args.cardId);
+    if (!card) {
+      throw new Error("Card not found");
+    }
+    await ctx.db.patch(args.cardId, {
+      isRevealHidden: false,
+      revealedAt: Date.now(),
+      contentRevisionAt: Date.now(),
+    });
+    return null;
+  },
+});
+
+export const hideCardReveal = mutation({
+  args: {
+    cardId: v.id("cards"),
+  },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    await requireAdmin(ctx);
+    const card = await ctx.db.get(args.cardId);
+    if (!card) {
+      throw new Error("Card not found");
+    }
+    await ctx.db.patch(args.cardId, {
+      isRevealHidden: true,
+      revealedAt: undefined,
+      contentRevisionAt: Date.now(),
+    });
     return null;
   },
 });
@@ -1818,6 +1824,64 @@ export const linkCardFaces = mutation({
     }
 
     return { linked, failed };
+  },
+});
+
+export const linkCardFacesById = mutation({
+  args: {
+    frontId: v.id("cards"),
+    backId: v.optional(v.id("cards")),
+  },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    await requireAdmin(ctx);
+
+    const front = await ctx.db.get(args.frontId);
+    if (!front) {
+      throw new Error("Front card not found");
+    }
+
+    const touch = Date.now();
+
+    if (front.backCardId && front.backCardId !== args.backId) {
+      const previousBack = await ctx.db.get(front.backCardId);
+      if (previousBack) {
+        await ctx.db.patch(previousBack._id, {
+          frontCardId: undefined,
+          contentRevisionAt: touch,
+        });
+      }
+    }
+
+    if (!args.backId) {
+      await ctx.db.patch(front._id, {
+        backCardId: undefined,
+        isFrontFace: true,
+        contentRevisionAt: touch,
+      });
+      return null;
+    }
+
+    if (args.backId === args.frontId) {
+      throw new Error("A card cannot be its own back face");
+    }
+
+    const back = await ctx.db.get(args.backId);
+    if (!back) {
+      throw new Error("Back card not found");
+    }
+
+    await ctx.db.patch(front._id, {
+      backCardId: back._id,
+      isFrontFace: true,
+      contentRevisionAt: touch,
+    });
+    await ctx.db.patch(back._id, {
+      frontCardId: front._id,
+      isFrontFace: false,
+      contentRevisionAt: touch,
+    });
+    return null;
   },
 });
 

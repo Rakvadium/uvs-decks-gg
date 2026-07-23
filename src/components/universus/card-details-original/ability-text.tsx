@@ -1,4 +1,5 @@
 import { TIMING_COLORS } from "./constants";
+import { InlineSymbolText } from "../card-details/inline-symbol-text";
 
 interface AbilityTextProps {
   text: string;
@@ -18,7 +19,7 @@ export function AbilityText({ text }: AbilityTextProps) {
         if (colonIndex === -1) {
           return (
             <p key={index} className="text-sm leading-relaxed">
-              {segment}
+              <InlineSymbolText text={segment} />
             </p>
           );
         }
@@ -30,7 +31,7 @@ export function AbilityText({ text }: AbilityTextProps) {
         if (!abilityMatch) {
           return (
             <p key={index} className="text-sm leading-relaxed">
-              {segment}
+              <InlineSymbolText text={segment} />
             </p>
           );
         }
@@ -53,10 +54,10 @@ export function AbilityText({ text }: AbilityTextProps) {
                 color: abilityColor,
               }}
             >
-              {highlightedPart}
+              <InlineSymbolText text={highlightedPart} />
             </span>
-            {remainingBeforeColon}
-            {afterColon}
+            <InlineSymbolText text={remainingBeforeColon} />
+            <InlineSymbolText text={afterColon} />
           </p>
         );
       })}

@@ -1,4 +1,4 @@
-import type { Doc } from "../../../../../convex/_generated/dataModel";
+import type { DeckListItem } from "../../deck-grid-item/types";
 
 export type DecksEmptyMode = "search" | "my-decks" | "public" | "tournament";
 
@@ -8,7 +8,7 @@ export interface DecksEmptyStateProps {
 }
 
 export interface DecksGridProps {
-  decks: Doc<"decks">[];
+  decks: DeckListItem[];
   showAuthor: boolean;
 }
 

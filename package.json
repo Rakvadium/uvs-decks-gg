@@ -12,8 +12,10 @@
     "import:universus:all": "bun scripts/import-universus.ts --all",
     "bulk-upload": "bun scripts/bulk-upload.ts",
     "bulk-upload:help": "bun scripts/bulk-upload.ts --help",
+    "seed-card-drafts": "bun scripts/seed-card-drafts.ts",
     "upload-cards": "bun scripts/upload-cards.ts",
-    "clear-cards": "bun scripts/clear-cards.ts"
+    "clear-cards": "bun scripts/clear-cards.ts",
+    "watch:uvs-releases": "bun scripts/watch-uvs-releases.ts"
   },
   "dependencies": {
     "@auth/core": "0.37.0",
@@ -61,6 +63,7 @@
     "sharp": "^0.34.5",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.4.0",
+    "tesseract.js": "^7.0.0",
     "zod": "^4.1.13"
   },
   "devDependencies": {

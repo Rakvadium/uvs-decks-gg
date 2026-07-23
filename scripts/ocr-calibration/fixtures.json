@@ -1,0 +1,32 @@
+[
+  {
+    "label": "character-sample",
+    "type": "Character",
+    "imagePath": "",
+    "expected": {
+      "name": "",
+      "type": "Character",
+      "text": ""
+    }
+  },
+  {
+    "label": "attack-sample",
+    "type": "Attack",
+    "imagePath": "",
+    "expected": {
+      "name": "",
+      "type": "Attack",
+      "text": ""
+    }
+  },
+  {
+    "label": "foundation-sample",
+    "type": "Foundation",
+    "imagePath": "",
+    "expected": {
+      "name": "",
+      "type": "Foundation",
+      "text": ""
+    }
+  }
+]

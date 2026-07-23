@@ -23,9 +23,8 @@ export function useDeckGridItemModel({ deck, showAuthor = false, coverImagePrior
     () => ({
       main: countSectionCards(deck.mainQuantities),
       side: countSectionCards(deck.sideQuantities),
-      reference: countSectionCards(deck.referenceQuantities),
     }),
-    [deck.mainQuantities, deck.sideQuantities, deck.referenceQuantities]
+    [deck.mainQuantities, deck.sideQuantities]
   );
 
   return {

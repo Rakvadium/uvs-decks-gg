@@ -42,7 +42,7 @@ function SymbolButton({
   );
 }
 
-function SymbolGrid({
+export function SymbolGrid({
   symbols,
   selectedSymbols,
   shape,

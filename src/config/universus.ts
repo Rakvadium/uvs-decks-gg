@@ -21,6 +21,7 @@ export type UniversusCardType =
   | "Action"
   | "Asset"
   | "Foundation"
+  | "Arena"
   | "Backup"
   | "Token";
 
@@ -143,18 +144,18 @@ export interface UniversusRawCard {
 }
 
 export type UniversusAttunedSymbol = 
-  | "attuned-air"
-  | "attuned-all"
-  | "attuned-chaos"
-  | "attuned-death"
-  | "attuned-earth"
-  | "attuned-evil"
-  | "attuned-fire"
-  | "attuned-good"
-  | "attuned-life"
-  | "attuned-order"
-  | "attuned-void"
-  | "attuned-water";
+  | "attuned:air"
+  | "attuned:all"
+  | "attuned:chaos"
+  | "attuned:death"
+  | "attuned:earth"
+  | "attuned:evil"
+  | "attuned:fire"
+  | "attuned:good"
+  | "attuned:life"
+  | "attuned:order"
+  | "attuned:void"
+  | "attuned:water";
 
 export interface FormatDefinition {
   key: string;
@@ -182,6 +183,7 @@ export const UNIVERSUS_CARD_TYPES: UniversusCardType[] = [
   "Action",
   "Asset",
   "Foundation",
+  "Arena",
   "Backup",
   "Token",
 ];
@@ -220,18 +222,18 @@ export const UNIVERSUS_FILTER_SYMBOLS: UniversusSymbol[] = [
 ];
 
 export const UNIVERSUS_ATTUNED_SYMBOLS: UniversusAttunedSymbol[] = [
-  "attuned-air",
-  "attuned-all",
-  "attuned-chaos",
-  "attuned-death",
-  "attuned-earth",
-  "attuned-evil",
-  "attuned-fire",
-  "attuned-good",
-  "attuned-life",
-  "attuned-order",
-  "attuned-void",
-  "attuned-water",
+  "attuned:air",
+  "attuned:all",
+  "attuned:chaos",
+  "attuned:death",
+  "attuned:earth",
+  "attuned:evil",
+  "attuned:fire",
+  "attuned:good",
+  "attuned:life",
+  "attuned:order",
+  "attuned:void",
+  "attuned:water",
 ];
 
 export const UNIVERSUS_KEYWORD_ABILITIES: KeywordDefinition[] = [
@@ -474,6 +476,7 @@ export const UNIVERSUS_TYPE_ICONS: Record<UniversusCardType, string> = {
   Action: "clapperboard",
   Asset: "package",
   Foundation: "landmark",
+  Arena: "landmark",
   Backup: "shield",
   Token: "square",
 };

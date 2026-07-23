@@ -18,6 +18,7 @@ import {
   syncListingIsPublic,
 } from "./lib/deckAccess";
 import { requireCapability } from "./teams/permissions";
+import { attachOwnerUsernames } from "./lib/deckList";
 
 export const listByUser = query({
   args: {
@@ -70,10 +71,11 @@ export const listPublic = query({
       );
     }
 
-    return decks.filter((d) => {
+    const visible = decks.filter((d) => {
       const vis = normalizeDeckVisibility(d);
       return vis === "public" || vis === "tournament";
     });
+    return await attachOwnerUsernames(ctx, visible);
   },
 });
 
@@ -97,7 +99,7 @@ export const listTournament = query({
       );
     }
 
-    return decks;
+    return await attachOwnerUsernames(ctx, decks);
   },
 });
 

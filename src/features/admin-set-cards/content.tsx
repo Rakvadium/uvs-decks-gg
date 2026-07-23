@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useState, type ReactNode } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { useMutation, useQuery } from "convex/react";
-import type { Doc, Id } from "../../../convex/_generated/dataModel";
+import type { Doc } from "../../../convex/_generated/dataModel";
 import { api } from "../../../convex/_generated/api";
 import {
   AdminPageHeader,
@@ -23,14 +23,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
-  Dialog,
-  DialogBody,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -48,6 +40,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useAdminSetCardsModel, type AdminSetCardsSort } from "./hook";
+import { CardFormDialog } from "./card-form";
 import { LoadMoreIndicator } from "@/components/gallery/main-content/load-more-indicator";
 import { toast } from "sonner";
 import { toastConvexError } from "@/lib/convex-error-toast";
@@ -67,12 +60,6 @@ type SetAdminCardsProps = {
   variant?: "standalone" | "embedded";
 };
 
-function parseOptionalId(raw: string): Id<"cards"> | undefined {
-  const t = raw.trim();
-  if (!t) return undefined;
-  return t as Id<"cards">;
-}
-
 export default function SetAdminCards({
   setCode,
   setName,
@@ -82,6 +69,7 @@ export default function SetAdminCards({
 }: SetAdminCardsProps) {
   const listQuery = searchSuffix;
   const {
+    sourceCards,
     visibleItems,
     hasMore,
     loadMoreRef,
@@ -110,123 +98,57 @@ export default function SetAdminCards({
     infiniteScrollRoot: variant === "embedded" ? "viewport" : "self",
   });
 
-  const createCard = useMutation(api.admin.createCard);
-  const updateCard = useMutation(api.admin.updateCard);
   const deleteCard = useMutation(api.admin.deleteCard);
+  const revealCard = useMutation(api.admin.revealCard);
+  const hideCardReveal = useMutation(api.admin.hideCardReveal);
   const formats = useQuery(api.formats.list);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [editing, setEditing] = useState<Doc<"cards"> | null>(null);
+  const [createBackParent, setCreateBackParent] = useState<Doc<"cards"> | null>(
+    null
+  );
   const [deleteTarget, setDeleteTarget] = useState<Doc<"cards"> | null>(null);
+  const [formBusy, setFormBusy] = useState(false);
 
   const deleteWarnings = useQuery(
     api.admin.getCardDeleteWarnings,
     deleteTarget ? { cardId: deleteTarget._id } : "skip"
   );
 
-  const [formName, setFormName] = useState("");
-  const [formType, setFormType] = useState("");
-  const [formRarity, setFormRarity] = useState("");
-  const [formCollector, setFormCollector] = useState("");
-  const [formImage, setFormImage] = useState("");
-  const [formText, setFormText] = useState("");
-  const [formKeywords, setFormKeywords] = useState("");
-  const [formIsFront, setFormIsFront] = useState(true);
-  const [formIsVariant, setFormIsVariant] = useState(false);
-  const [formCopyLimit, setFormCopyLimit] = useState("");
-  const [formBackId, setFormBackId] = useState("");
-  const [formFrontId, setFormFrontId] = useState("");
-  const [formBusy, setFormBusy] = useState(false);
+  const pickerCards = useMemo(
+    () =>
+      sourceCards.map((c) => ({
+        _id: c._id,
+        name: c.name,
+        collectorNumber: c.collectorNumber,
+        isFrontFace: c.isFrontFace,
+      })),
+    [sourceCards]
+  );
 
   const openCreate = () => {
     setEditing(null);
-    setFormName("");
-    setFormType("");
-    setFormRarity("");
-    setFormCollector("");
-    setFormImage("");
-    setFormText("");
-    setFormKeywords("");
-    setFormIsFront(true);
-    setFormIsVariant(false);
-    setFormCopyLimit("");
-    setFormBackId("");
-    setFormFrontId("");
+    setCreateBackParent(null);
     setSheetOpen(true);
   };
 
   const openEdit = (c: Doc<"cards">) => {
     setEditing(c);
-    setFormName(c.name);
-    setFormType(c.type ?? "");
-    setFormRarity(c.rarity ?? "");
-    setFormCollector(c.collectorNumber ?? "");
-    setFormImage(c.imageUrl ?? "");
-    setFormText(c.text ?? "");
-    setFormKeywords(c.keywords ?? "");
-    setFormIsFront(c.isFrontFace !== false);
-    setFormIsVariant(c.isVariant === true);
-    setFormCopyLimit(c.copyLimit !== undefined ? String(c.copyLimit) : "");
-    setFormBackId(c.backCardId ?? "");
-    setFormFrontId(c.frontCardId ?? "");
+    setCreateBackParent(null);
     setSheetOpen(true);
   };
 
-  const handleSave = async () => {
-    if (!formName.trim()) {
-      return;
+  const handleDialogOpenChange = (next: boolean) => {
+    setSheetOpen(next);
+    if (!next) {
+      setCreateBackParent(null);
     }
-    setFormBusy(true);
-    try {
-      const copyLimit =
-        formCopyLimit.trim() === "" ? undefined : parseInt(formCopyLimit, 10);
-      if (editing) {
-        await updateCard({
-          cardId: editing._id,
-          updates: {
-            name: formName.trim(),
-            type: formType.trim() || undefined,
-            rarity: formRarity.trim() || undefined,
-            collectorNumber: formCollector.trim() || undefined,
-            imageUrl: formImage.trim() || undefined,
-            text: formText.trim() || undefined,
-            keywords: formKeywords.trim() || undefined,
-            isFrontFace: formIsFront,
-            isVariant: formIsVariant,
-            copyLimit: Number.isFinite(copyLimit) ? copyLimit : undefined,
-            backCardId: parseOptionalId(formBackId),
-            frontCardId: parseOptionalId(formFrontId),
-            setCode,
-            setName,
-          },
-        });
-      } else {
-        await createCard({
-          card: {
-            name: formName.trim(),
-            setCode,
-            setName,
-            type: formType.trim() || undefined,
-            rarity: formRarity.trim() || undefined,
-            collectorNumber: formCollector.trim() || undefined,
-            imageUrl: formImage.trim() || undefined,
-            text: formText.trim() || undefined,
-            keywords: formKeywords.trim() || undefined,
-            isFrontFace: formIsFront,
-            isVariant: formIsVariant,
-            copyLimit: Number.isFinite(copyLimit) ? copyLimit : undefined,
-            backCardId: parseOptionalId(formBackId),
-            frontCardId: parseOptionalId(formFrontId),
-          },
-        });
-      }
-      setSheetOpen(false);
-      bumpLocalCache();
-      toast.success(editing ? "Card updated" : "Card created");
-    } catch (e) {
-      toastConvexError(e, "Could not save card");
-    } finally {
-      setFormBusy(false);
-    }
+  };
+
+  const handleRequestCreateBackFace = (front: Doc<"cards">) => {
+    setEditing(null);
+    setCreateBackParent(front);
+    setSheetOpen(true);
   };
 
   const handleConfirmDelete = async () => {
@@ -241,6 +163,32 @@ export default function SetAdminCards({
       toast.success("Card deleted");
     } catch (e) {
       toastConvexError(e, "Could not delete card");
+    } finally {
+      setFormBusy(false);
+    }
+  };
+
+  const handleRevealCard = async (card: Doc<"cards">) => {
+    setFormBusy(true);
+    try {
+      await revealCard({ cardId: card._id });
+      bumpLocalCache();
+      toast.success("Card revealed");
+    } catch (e) {
+      toastConvexError(e, "Could not reveal card");
+    } finally {
+      setFormBusy(false);
+    }
+  };
+
+  const handleHideCardReveal = async (card: Doc<"cards">) => {
+    setFormBusy(true);
+    try {
+      await hideCardReveal({ cardId: card._id });
+      bumpLocalCache();
+      toast.success("Card hidden from public reveal");
+    } catch (e) {
+      toastConvexError(e, "Could not hide card");
     } finally {
       setFormBusy(false);
     }
@@ -367,7 +315,8 @@ export default function SetAdminCards({
                     <TableHead>Type</TableHead>
                     <TableHead>Rarity</TableHead>
                     <TableHead className="w-[120px]">Face / variant</TableHead>
-                    <TableHead className="w-[220px] text-right">Actions</TableHead>
+                    <TableHead className="w-[140px]">Reveal</TableHead>
+                    <TableHead className="w-[280px] text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -381,8 +330,42 @@ export default function SetAdminCards({
                         {card.isFrontFace === false ? "back" : "front"}
                         {card.isVariant ? " · var" : ""}
                       </TableCell>
+                      <TableCell className="text-xs">
+                        {card.isRevealHidden === true ? (
+                          <span className="rounded border border-amber-500/40 bg-amber-500/10 px-2 py-1 font-mono uppercase tracking-wide text-amber-700 dark:text-amber-300">
+                            Unrevealed
+                          </span>
+                        ) : card.revealedAt ? (
+                          <span className="text-muted-foreground">
+                            {new Date(card.revealedAt).toLocaleDateString()}
+                          </span>
+                        ) : (
+                          <span className="text-muted-foreground">Visible</span>
+                        )}
+                      </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-1 flex-wrap">
+                          {card.isRevealHidden === true ? (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              disabled={formBusy}
+                              onClick={() => void handleRevealCard(card)}
+                            >
+                              Reveal
+                            </Button>
+                          ) : (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              disabled={formBusy}
+                              onClick={() => void handleHideCardReveal(card)}
+                            >
+                              Hide
+                            </Button>
+                          )}
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <Button
@@ -437,87 +420,20 @@ export default function SetAdminCards({
   );
 
   const cardFormDialog = (
-    <Dialog open={sheetOpen} onOpenChange={setSheetOpen}>
-      <DialogContent contentPadding="none" className="max-h-[min(90vh,800px)] overflow-y-auto sm:max-w-lg p-0">
-        <DialogHeader className="px-4 pt-6 md:px-6">
-          <DialogTitle>{editing ? "Edit card" : "Add card"}</DialogTitle>
-        </DialogHeader>
-        <DialogBody className="grid gap-4 px-4 md:px-6">
-            <div className="space-y-2">
-              <Label htmlFor="f-name">Name</Label>
-              <Input id="f-name" value={formName} onChange={(e) => setFormName(e.target.value)} />
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-2">
-                <Label htmlFor="f-type">Type</Label>
-                <Input id="f-type" value={formType} onChange={(e) => setFormType(e.target.value)} />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="f-rarity">Rarity</Label>
-                <Input id="f-rarity" value={formRarity} onChange={(e) => setFormRarity(e.target.value)} />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="f-coll">Collector #</Label>
-              <Input id="f-coll" value={formCollector} onChange={(e) => setFormCollector(e.target.value)} />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="f-img">Image (path or URL)</Label>
-              <Input id="f-img" value={formImage} onChange={(e) => setFormImage(e.target.value)} />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="f-text">Rules text</Label>
-              <Input id="f-text" value={formText} onChange={(e) => setFormText(e.target.value)} />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="f-kw">Keywords</Label>
-              <Input id="f-kw" value={formKeywords} onChange={(e) => setFormKeywords(e.target.value)} />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="f-cl">Copy limit</Label>
-              <Input id="f-cl" value={formCopyLimit} onChange={(e) => setFormCopyLimit(e.target.value)} />
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-2">
-                <Label htmlFor="f-back">Back card id</Label>
-                <Input id="f-back" value={formBackId} onChange={(e) => setFormBackId(e.target.value)} />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="f-front">Front card id</Label>
-                <Input id="f-front" value={formFrontId} onChange={(e) => setFormFrontId(e.target.value)} />
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <Checkbox
-                id="f-frontface"
-                checked={formIsFront}
-                onCheckedChange={(v) => setFormIsFront(v === true)}
-              />
-              <Label htmlFor="f-frontface" className="font-normal">
-                Front face
-              </Label>
-            </div>
-            <div className="flex items-center gap-2">
-              <Checkbox
-                id="f-var"
-                checked={formIsVariant}
-                onCheckedChange={(v) => setFormIsVariant(v === true)}
-              />
-              <Label htmlFor="f-var" className="font-normal">
-                Variant
-              </Label>
-            </div>
-        </DialogBody>
-        <DialogFooter className="gap-2 sm:gap-0">
-          <Button type="button" variant="outline" onClick={() => setSheetOpen(false)}>
-            Cancel
-          </Button>
-          <Button type="button" onClick={() => void handleSave()} disabled={formBusy}>
-            Save
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+    <CardFormDialog
+      open={sheetOpen}
+      onOpenChange={handleDialogOpenChange}
+      editing={editing}
+      setCode={setCode}
+      setName={setName}
+      pickerCards={pickerCards}
+      linkAsBackOf={createBackParent?._id ?? null}
+      presetBackFace={createBackParent != null}
+      typeOptions={typeOptions}
+      rarityOptions={rarityOptions}
+      onSaved={bumpLocalCache}
+      onRequestCreateBackFace={handleRequestCreateBackFace}
+    />
   );
 
   const deleteDialog = (
@@ -563,6 +479,11 @@ export default function SetAdminCards({
   if (variant === "embedded") {
     return (
       <div id="admin-set-cards" className="space-y-4">
+        <div className="flex justify-end">
+          <Button type="button" variant="secondary" onClick={openCreate}>
+            Add card
+          </Button>
+        </div>
         {filtersAndTable}
         {cardFormDialog}
         {deleteDialog}

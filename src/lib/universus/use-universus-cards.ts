@@ -483,7 +483,7 @@ export function filterCards(
           let tokens = cardSymbols;
           const isAttuned = cardSymbols.some((s) => s.toLowerCase().startsWith("attuned"));
           if (isAttuned && !isAttunedFilter) {
-            tokens = cardSymbols.map((s) => s.replace("attuned:", "").toLowerCase());
+            tokens = cardSymbols.map((s) => s.replace(/^attuned[:-]?/, "").toLowerCase());
           }
           matchesSelection = symbolFilters!.some((s) => tokens.includes(s.toLowerCase()));
         }

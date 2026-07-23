@@ -5,7 +5,7 @@ import { ChevronRight } from "lucide-react";
 type AdminSetBreadcrumbsProps = {
   setCode: string;
   setName: string;
-  tail: "cards" | "import" | null;
+  tail: "cards" | "review" | "import" | null;
 };
 
 function CrumbSeparator() {
@@ -55,7 +55,7 @@ export function AdminSetBreadcrumbs({
           </BreadcrumbItem>
           <BreadcrumbItem>
             <span className="text-foreground font-medium">
-              {tail === "cards" ? "Cards" : "Import"}
+              {tail === "cards" ? "Cards" : tail === "review" ? "Review" : "Import"}
             </span>
           </BreadcrumbItem>
         </>

@@ -9,32 +9,25 @@ export async function runCatalogAggregateRefresh(
   const types = new Set<string>();
   const setCodes = new Set<string>();
   let galleryCount = 0;
-  let cursor: string | null = null;
-  let isDone = false;
-  const pageSize = 500;
-  while (!isDone) {
-    const result = await ctx.db
-      .query("cards")
-      .paginate({ numItems: pageSize, cursor });
-    for (const card of result.page) {
-      if (card.isFrontFace === false) {
-        continue;
-      }
-      if (card.rarity) {
-        rarities.add(card.rarity);
-      }
-      if (card.type) {
-        types.add(card.type);
-      }
-      if (card.setCode) {
-        setCodes.add(card.setCode);
-      }
-      if (card.isVariant !== true) {
-        galleryCount += 1;
-      }
+  for await (const card of ctx.db.query("cards")) {
+    if (card.isFrontFace === false) {
+      continue;
     }
-    isDone = result.isDone;
-    cursor = result.isDone ? null : result.continueCursor;
+    if (card.isRevealHidden === true) {
+      continue;
+    }
+    if (card.rarity) {
+      rarities.add(card.rarity);
+    }
+    if (card.type) {
+      types.add(card.type);
+    }
+    if (card.setCode) {
+      setCodes.add(card.setCode);
+    }
+    if (card.isVariant !== true) {
+      galleryCount += 1;
+    }
   }
   const now = Date.now();
   const row = await ctx.db
