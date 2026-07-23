@@ -39,7 +39,7 @@ export function CardDetailsGeneralStatsSection() {
             <div className="flex flex-col">
               <span className="text-lg font-display font-bold text-secondary">{card.stamina}</span>
               <span className="text-[10px] font-mono uppercase tracking-widest opacity-70 text-secondary">
-                Vitality
+                Stamina
               </span>
             </div>
           </div>

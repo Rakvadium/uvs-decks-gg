@@ -167,7 +167,7 @@ export function CardDetailsReadoutPanel() {
     generalRows.push({ key: "Health", value: String(card.health) });
   }
   if (card.stamina !== undefined) {
-    generalRows.push({ key: "Vitality", value: String(card.stamina) });
+    generalRows.push({ key: "Stamina", value: String(card.stamina) });
   }
 
   const blockRows: StatRow[] = [];
