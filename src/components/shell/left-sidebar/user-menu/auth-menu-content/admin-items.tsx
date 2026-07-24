@@ -1,7 +1,6 @@
 import { Home, Shield } from "lucide-react";
 import { DropdownMenuItem, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { useLeftSidebarContext } from "../../context";
-import { MENU_ITEM_CLASS } from "./constants";
 
 export function LeftSidebarAdminItems() {
   const { isAdmin, isOnAdminPage, navigateTo } = useLeftSidebarContext();
@@ -12,16 +11,16 @@ export function LeftSidebarAdminItems() {
 
   return (
     <>
-      <DropdownMenuSeparator className="bg-border/50" />
+      <DropdownMenuSeparator />
       {isOnAdminPage ? (
-        <DropdownMenuItem onClick={() => navigateTo("/")} className={MENU_ITEM_CLASS}>
-          <Home className="mr-2 h-4 w-4" />
-          Back to App
+        <DropdownMenuItem onClick={() => navigateTo("/")}>
+          <Home />
+          Back to app
         </DropdownMenuItem>
       ) : (
-        <DropdownMenuItem onClick={() => navigateTo("/admin")} className={MENU_ITEM_CLASS}>
-          <Shield className="mr-2 h-4 w-4" />
-          Admin Panel
+        <DropdownMenuItem onClick={() => navigateTo("/admin")}>
+          <Shield />
+          Admin panel
         </DropdownMenuItem>
       )}
     </>

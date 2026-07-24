@@ -2,6 +2,7 @@ import { R2 } from "@convex-dev/r2";
 import { components } from "./_generated/api";
 import { query } from "./_generated/server";
 import { v } from "convex/values";
+import { assertAllowedR2ObjectKey } from "./lib/r2Keys";
 
 export const r2 = new R2(components.r2);
 
@@ -11,6 +12,7 @@ export const getImageUrl = query({
   handler: async (ctx, args) => {
     if (!args.key) return null;
     try {
+      assertAllowedR2ObjectKey(args.key);
       return await r2.getUrl(args.key, { expiresIn: 86400 });
     } catch (error) {
       console.error(`R2 getUrl error for key "${args.key}":`, error);
@@ -28,6 +30,7 @@ export const getImageUrls = query({
       args.keys.map(async (key) => {
         if (key) {
           try {
+            assertAllowedR2ObjectKey(key);
             urls[key] = await r2.getUrl(key, { expiresIn: 86400 });
           } catch (error) {
             console.error(`R2 getUrl error for key "${key}":`, error);

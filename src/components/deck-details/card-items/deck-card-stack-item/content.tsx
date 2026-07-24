@@ -45,11 +45,11 @@ export function DeckCardStackItem(props: DeckCardStackItemProps) {
               <div
                 key={layer}
                 aria-hidden="true"
-                className="pointer-events-none absolute inset-0 rounded-lg border border-border/60 bg-muted/60"
+                className="pointer-events-none absolute inset-0 rounded-lg border border-border/50 bg-muted/60"
                 style={{
                   transform: `translate(${layer * stackOffset}px, ${layer * stackOffset}px)`,
                   opacity: Math.max(0.4, 0.85 - layer * 0.12),
-                  boxShadow: "1px 1px 0 0 hsl(var(--border) / 0.4)",
+                  boxShadow: "1px 1px 0 0 color-mix(in oklch, var(--border) 40%, transparent)",
                 }}
               />
             ))}

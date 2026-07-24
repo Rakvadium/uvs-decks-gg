@@ -22,6 +22,7 @@ function GalleryAuthenticatedSidebarSlots() {
     () => ({
       label: activeDeckLabel,
       icon: ActiveDeckIcon,
+      iconFit: "media" as const,
       header: ActiveDeckHeader,
       footer: ActiveDeckFooter,
     }),

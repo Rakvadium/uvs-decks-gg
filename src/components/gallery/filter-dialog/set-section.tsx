@@ -58,16 +58,19 @@ export function SetSection({ plain = false }: { plain?: boolean } = {}) {
 
             return (
               <div
-                key={setOption.name}
+                key={setOption.code}
                 className={cn(
-                  "flex cursor-pointer items-center gap-1.5 rounded-md border px-2 py-1 transition-all",
+                  "flex cursor-pointer items-center gap-1.5 rounded-md border px-2 py-1 transition-colors",
                   isSelected
                     ? "border-primary/30 bg-primary/15 shadow-[var(--chrome-filter-tile-shadow-selected)]"
                     : "border-transparent hover:bg-muted/50"
                 )}
                 onClick={() => toggleStringFilter("set", setOption.code)}
               >
-                <Checkbox checked={isSelected} className="pointer-events-none h-3 w-3" />
+                <Checkbox
+                  checked={isSelected}
+                  className="pointer-events-none size-3.5 [&_svg]:size-2.5"
+                />
                 <span className="truncate text-[11px]">{setOption.name}</span>
               </div>
             );

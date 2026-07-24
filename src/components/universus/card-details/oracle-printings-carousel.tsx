@@ -67,7 +67,7 @@ export function OraclePrintingsCarousel({
                   >
                     <div
                       className={cn(
-                        "relative aspect-[2.5/3.5] w-full overflow-hidden rounded-lg border-2 bg-muted/30 transition-colors",
+                        "relative aspect-[2.5/3.5] w-full overflow-hidden rounded-lg border-2 bg-muted/20 transition-colors",
                         selected ? "border-primary" : "border-border/50 hover:border-primary/40"
                       )}
                     >
@@ -82,7 +82,7 @@ export function OraclePrintingsCarousel({
                       ) : null}
                     </div>
                     {c.isVariant === true ? (
-                      <span className="text-center text-[8px] font-mono uppercase tracking-wider text-amber-500/90">
+                      <span className="text-center text-[10px] font-mono uppercase tracking-wider text-amber-500/90">
                         Alt
                       </span>
                     ) : null}

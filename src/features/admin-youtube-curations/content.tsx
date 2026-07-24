@@ -114,7 +114,7 @@ function SortableCurationRow({
       ref={setNodeRef}
       style={style}
       className={cn(
-        "flex flex-col gap-4 rounded-xl border border-border/60 bg-card p-4 sm:flex-row sm:items-stretch",
+        "flex flex-col gap-4 rounded-xl border border-border/50 bg-card p-4 sm:flex-row sm:items-stretch",
         isDragging && "z-20 opacity-90 shadow-lg ring-2 ring-primary/30"
       )}
     >
@@ -291,7 +291,7 @@ export default function AdminYoutubeCurationContent() {
       />
 
       <div className="mx-auto w-full max-w-5xl space-y-8 py-2">
-        <div className="rounded-lg border border-border/60 bg-muted/30 p-4">
+        <div className="rounded-lg border border-border/50 bg-muted/20 p-4">
           <p className="text-sm font-medium mb-3">Add a video</p>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
             <div className="flex-1 space-y-1.5">

@@ -52,7 +52,7 @@ export function DeckDetailsSharePanel() {
   };
 
   return (
-    <div className="space-y-3 rounded-lg border border-border/60 bg-background/50 p-3">
+    <div className="space-y-3 rounded-lg border border-border/50 bg-background/50 p-3">
       <div className="space-y-1">
         <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">Share with</p>
         <p className="text-xs text-muted-foreground">

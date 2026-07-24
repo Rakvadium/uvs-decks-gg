@@ -1,6 +1,16 @@
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+import {
+  SHELL_CHROME_JUNCTION_EDGE_LEFT,
+  SHELL_SIDEBAR_SURFACE_STYLE,
+  SHELL_RAIL_ITEM_ACTIVE,
+  SHELL_RAIL_ITEM_IDLE,
+  SHELL_RAIL_ITEM_SIZE_CLASS,
+  SHELL_RAIL_STACK_CLASS,
+  SHELL_RAIL_TOP_PADDING_CLASS,
+  SHELL_RAIL_WIDTH,
+} from "../shell-chrome";
 import { useRightSidebarContext } from "./context";
 
 export function RightSidebarIconRail() {
@@ -14,7 +24,11 @@ export function RightSidebarIconRail() {
   } = useRightSidebarContext();
 
   return (
-    <div className="relative flex h-full w-12 shrink-0 flex-col items-center gap-1 border-l border-sidebar-border/50 bg-sidebar pb-3 pt-3">
+    <div
+      className="relative flex h-full shrink-0 flex-col items-center text-sidebar-foreground"
+      style={{ width: SHELL_RAIL_WIDTH, ...SHELL_SIDEBAR_SURFACE_STYLE }}
+    >
+      <div className={SHELL_CHROME_JUNCTION_EDGE_LEFT} />
       {isExpanded ? (
         <div
           className={cn(
@@ -26,30 +40,29 @@ export function RightSidebarIconRail() {
         >
           <div
             className={cn(
-              "relative h-16 w-1 rounded-full transition-all duration-150",
+              "relative h-16 w-1 rounded-full transition-[border-color,box-shadow,background-color,opacity,transform] duration-150",
               isResizing
-                ? "bg-primary shadow-[var(--chrome-shell-rail-resize-shadow)]"
-                : "bg-border/40 group-hover:bg-primary/70 group-hover:shadow-[var(--chrome-shell-rail-resize-shadow-hover)]"
+                ? "bg-accent shadow-[var(--chrome-shell-rail-resize-shadow)]"
+                : "bg-sidebar-border group-hover:bg-accent/80 group-hover:shadow-[var(--chrome-shell-rail-resize-shadow-hover)]"
             )}
           >
             <div
               className={cn(
                 "absolute inset-0 mx-auto w-px rounded-full",
-                isResizing ? "bg-primary-foreground/30" : "bg-transparent group-hover:bg-primary-foreground/20"
+                isResizing ? "bg-accent-foreground/30" : "bg-transparent group-hover:bg-accent-foreground/20"
               )}
             />
           </div>
-          <div className={cn("absolute inset-y-0 -inset-x-1", isResizing && "bg-primary/5")} />
+          <div className={cn("absolute inset-y-0 -inset-x-1", isResizing && "bg-accent/5")} />
         </div>
       ) : null}
 
-      <div className="pointer-events-none absolute inset-0" style={{ background: "var(--chrome-shell-sidebar-wash)" }} />
-
-      <div className="relative z-10 flex flex-col items-center gap-1.5">
+      <div className={cn("relative z-10", SHELL_RAIL_STACK_CLASS, SHELL_RAIL_TOP_PADDING_CLASS)}>
         {sidebarSlots.map((slot) => {
           const Icon = slot.icon;
           const label = slot.label ?? slot.id;
           const isActive = activeActionId === slot.id;
+          const isMediaIcon = slot.iconFit === "media";
 
           return (
             <Tooltip key={slot.id}>
@@ -58,19 +71,22 @@ export function RightSidebarIconRail() {
                   variant="ghost"
                   size="icon"
                   className={cn(
-                    "h-9 w-9 border border-transparent transition-all duration-200",
-                    isActive
-                      ? "border-secondary/40 bg-secondary/15 text-primary shadow-[var(--chrome-shell-rail-active-shadow)]"
-                      : "hover:border-primary/20 hover:bg-primary/10 hover:text-primary"
+                    "relative rounded-sm border transition-[color,background-color,border-color,box-shadow] duration-200",
+                    SHELL_RAIL_ITEM_SIZE_CLASS,
+                    isMediaIcon && "overflow-hidden p-0",
+                    isActive ? SHELL_RAIL_ITEM_ACTIVE : SHELL_RAIL_ITEM_IDLE
                   )}
                   onClick={() => setActiveSidebarAction(isActive ? null : slot.id)}
+                  aria-label={label}
+                  aria-pressed={isActive}
                 >
                   {Icon ? (
-                    <span className="flex h-full w-full items-center justify-center">
-                      <Icon
-                        className={cn("h-full w-full rounded-md", isActive && "[filter:var(--chrome-shell-icon-drop-shadow)]")}
-                      />
-                    </span>
+                    <Icon
+                      className={cn(
+                        isMediaIcon ? "size-full" : "size-5",
+                        isActive && "[filter:var(--chrome-shell-icon-drop-shadow)]"
+                      )}
+                    />
                   ) : (
                     <span className="text-xs font-mono font-semibold">{label.slice(0, 1)}</span>
                   )}

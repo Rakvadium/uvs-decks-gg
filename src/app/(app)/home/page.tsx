@@ -1,7 +1,7 @@
 "use client";
 
 import { memo, useEffect, useState } from "react";
-import { Library, Layers, LayoutGrid, ArrowRight, Hexagon, Users, Zap, Database, Activity, Terminal, ChevronRight, Lock, AlertTriangle } from "lucide-react";
+import { Layers, LayoutGrid, ArrowRight, Hexagon, Users, Zap, Database, Activity, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "convex/react";
@@ -15,7 +15,7 @@ import { useAuthDialog } from "@/components/auth/auth-dialog";
 function StatCard({ label, value, icon: Icon, delay = 0, animate = true }: { label: string; value: string | number; icon: typeof Database; delay?: number; animate?: boolean }) {
   const prefersReducedMotion = usePrefersReducedMotion();
   const motionEnabled = animate && !prefersReducedMotion;
-  
+
   return (
     <m.div
       initial={motionEnabled ? { opacity: 0, y: 20 } : false}
@@ -23,23 +23,23 @@ function StatCard({ label, value, icon: Icon, delay = 0, animate = true }: { lab
       transition={{ duration: 0.5, delay }}
       className="relative group"
     >
-      <div className="relative flex items-center gap-4 p-4 rounded-lg border border-border/50 bg-card/80 shadow-[var(--chrome-elevation-low)] hover:shadow-[var(--chrome-elevation-mid)] hover:border-[var(--chrome-card-border-hover)] transition-all duration-150">
-        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 border border-primary/30">
+      <div className="relative flex items-center gap-4 rounded-lg border border-border/50 bg-card/80 p-4 shadow-[var(--chrome-elevation-low)] transition-[border-color,box-shadow] duration-150 hover:border-[var(--chrome-card-border-hover)] hover:shadow-[var(--chrome-elevation-mid)]">
+        <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-primary/30 bg-primary/10">
           <Icon className="h-5 w-5 text-primary" />
         </div>
         <div>
-          <p className="text-2xl font-display font-bold text-foreground">{value}</p>
-          <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">{label}</p>
+          <p className="font-display text-2xl font-bold tabular-nums text-foreground">{value}</p>
+          <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground">{label}</p>
         </div>
       </div>
     </m.div>
   );
 }
 
-function NavCard({ href, icon: Icon, title, description, accentColor = "primary", delay = 0, animate = true }: { 
-  href: string; 
-  icon: typeof LayoutGrid; 
-  title: string; 
+function NavCard({ href, icon: Icon, title, description, accentColor = "primary", delay = 0, animate = true }: {
+  href: string;
+  icon: typeof LayoutGrid;
+  title: string;
   description: string;
   accentColor?: "primary" | "secondary" | "accent";
   delay?: number;
@@ -57,55 +57,38 @@ function NavCard({ href, icon: Icon, title, description, accentColor = "primary"
     secondary: "text-secondary",
     accent: "text-accent",
   };
-  
+
   return (
     <m.div
       initial={motionEnabled ? { opacity: 0, y: 30 } : false}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, delay }}
     >
-      <Link href={href} className="block group">
-        <div className={`relative overflow-hidden rounded-xl border bg-gradient-to-br p-6 transition-all duration-150 ${colorClasses[accentColor]}`}>
-          <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-current to-transparent opacity-30" />
-          <div className="absolute -top-20 -right-20 w-40 h-40 bg-gradient-to-br from-current to-transparent opacity-10 rounded-full blur-3xl group-hover:opacity-20 transition-opacity duration-150" />
-          
+      <Link href={href} className="group block">
+        <div className={`relative overflow-hidden rounded-xl border bg-gradient-to-br p-6 transition-[border-color,box-shadow] duration-150 ${colorClasses[accentColor]}`}>
+          <div className="absolute left-0 top-0 h-px w-full bg-gradient-to-r from-transparent via-current to-transparent opacity-30" />
+          <div className="absolute -right-20 -top-20 h-40 w-40 rounded-full bg-gradient-to-br from-current to-transparent opacity-10 blur-3xl transition-opacity duration-150 group-hover:opacity-20" />
+
           <div className="relative z-10 flex flex-col gap-4">
             <div className="flex items-start justify-between">
-              <div className={`flex h-14 w-14 items-center justify-center rounded-xl bg-background/50 border border-current/20 backdrop-blur-sm ${iconClasses[accentColor]}`} style={{ filter: "var(--chrome-page-nav-card-icon-drop-shadow)" }}>
+              <div className={`flex h-14 w-14 items-center justify-center rounded-xl border border-current/20 bg-background/50 backdrop-blur-sm ${iconClasses[accentColor]}`} style={{ filter: "var(--chrome-page-nav-card-icon-drop-shadow)" }}>
                 <Icon className="h-7 w-7" />
               </div>
-              <ArrowRight className="h-5 w-5 text-muted-foreground opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-150" />
+              <ArrowRight className="h-5 w-5 -translate-x-2 text-muted-foreground opacity-0 transition-[opacity,transform] duration-150 group-hover:translate-x-0 group-hover:opacity-100" />
             </div>
-            
+
             <div className="space-y-2">
-              <h3 className="text-lg font-display font-semibold uppercase tracking-wider">{title}</h3>
-              <p className="text-sm font-mono text-muted-foreground leading-relaxed">{description}</p>
+              <h3 className="font-display text-lg font-semibold uppercase tracking-wider text-pretty">{title}</h3>
+              <p className="font-mono text-sm leading-relaxed text-muted-foreground">{description}</p>
             </div>
-            
-            <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-muted-foreground/60 group-hover:text-foreground/60 transition-colors">
-              <span>Access</span>
+
+            <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-muted-foreground transition-colors group-hover:text-foreground">
+              <span>Open</span>
               <ChevronRight className="h-3 w-3" />
             </div>
           </div>
         </div>
       </Link>
-    </m.div>
-  );
-}
-
-function TerminalLine({ children, prefix = "$", delay = 0, animate = true }: { children: React.ReactNode; prefix?: string; delay?: number; animate?: boolean }) {
-  const prefersReducedMotion = usePrefersReducedMotion();
-  const motionEnabled = animate && !prefersReducedMotion;
-  
-  return (
-    <m.div
-      initial={motionEnabled ? { opacity: 0, x: -10 } : false}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.3, delay }}
-      className="flex items-center gap-2 font-mono text-sm"
-    >
-      <span className="text-primary">{prefix}</span>
-      <span className="text-muted-foreground">{children}</span>
     </m.div>
   );
 }
@@ -125,36 +108,24 @@ function HomePage() {
 
   const totalCards = catalogTotalCards;
   const totalDecks = decks?.length ?? 0;
-  const username = user?.username ?? "Operator";
+  const username = user?.username ?? "Player";
   const introAnimations = !prefersReducedMotion && isFirstPaint;
-  const authLabel = isLoading ? "Linking Session" : isAuthenticated ? "Session Verified" : "Access Denied";
-  const authDetail = isLoading
-    ? "Establishing encrypted handshake..."
-    : isAuthenticated
-      ? `Access granted · ${username}`
-      : "ERR-401 // Access denied. Insert credentials to sync decks + collection.";
-  const authBadge = isAuthenticated ? "Authenticated" : "Denied";
-  const greetingLead = isAuthenticated ? "Welcome back," : "Guest Access";
   const showAuthCta = !isLoading && !isAuthenticated;
-  const authTone = isAuthenticated ? "text-primary" : "text-destructive";
   const showPersonalStats = !isLoading && isAuthenticated;
-  const decksLabel = showPersonalStats ? "Decks in Vault" : "Vault Locked";
-  const decksValue = showPersonalStats ? totalDecks : "—";
-  const decksIcon = showPersonalStats ? Layers : Lock;
-  const collectionLabel = showPersonalStats ? "Collection" : "Collection Locked";
-  const collectionValue = showPersonalStats ? "0" : "—";
-  const collectionIcon = showPersonalStats ? Library : AlertTriangle;
+  const cardsLabel = new Intl.NumberFormat().format(totalCards);
+  const greetingLead = isAuthenticated ? "Welcome back," : "Build Better Decks";
+  const greetingName = isAuthenticated ? username : "UniVersus";
 
   return (
     <div className="relative flex min-h-0 flex-1 flex-col overflow-y-auto md:h-full" style={{ transform: "translateZ(0)" }}>
-      <div className="absolute inset-0 overflow-hidden pointer-events-none" style={{ opacity: "var(--chrome-page-hero-wash-opacity)" as unknown as number }}>
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-secondary/5 rounded-full blur-3xl" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-r from-primary/3 via-transparent to-secondary/3 rounded-full blur-3xl" />
+      <div className="pointer-events-none absolute inset-0 overflow-hidden" style={{ opacity: "var(--chrome-page-hero-wash-opacity)" as unknown as number }}>
+        <div className="absolute left-1/4 top-0 h-96 w-96 rounded-full bg-primary/5 blur-3xl" />
+        <div className="absolute bottom-0 right-1/4 h-96 w-96 rounded-full bg-secondary/5 blur-3xl" />
+        <div className="absolute left-1/2 top-1/2 h-[800px] w-[800px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-r from-primary/3 via-transparent to-secondary/3 blur-3xl" />
       </div>
 
-      <div className="relative z-10 p-6 md:p-8 lg:p-10 space-y-10">
-        <m.div 
+      <div className="relative z-10 space-y-10 p-6 md:p-8 lg:p-10">
+        <m.div
           initial={introAnimations ? { opacity: 0, y: -20 } : false}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
@@ -162,54 +133,60 @@ function HomePage() {
         >
           <div className="flex flex-wrap items-center gap-3">
             <div className="flex h-3 w-3 rounded-full bg-green-500" style={{ boxShadow: "var(--chrome-page-status-dot-shadow)", animation: "var(--chrome-decks-heading-dot-animation)" }} />
-            <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground">System Online</span>
-            <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground/60">Auth: {authBadge}</span>
+            <span className="font-mono text-xs uppercase tracking-widest text-muted-foreground">UVSDECKS.GG</span>
+            <span className="font-mono text-xs uppercase tracking-widest text-muted-foreground/60">
+              {isLoading ? "Checking session…" : isAuthenticated ? "Signed in" : "Browsing as guest"}
+            </span>
           </div>
-          
+
           <div className="space-y-3">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold tracking-tight">
+            <h1 className="font-display text-4xl font-bold tracking-tight text-pretty md:text-5xl lg:text-6xl">
               <span className="text-foreground">{greetingLead}</span>
               <br />
               <span className="text-primary" style={{ filter: "var(--chrome-page-heading-drop-shadow)" }}>
-                {isAuthenticated ? username : "Guest Operator"}
+                {greetingName}
               </span>
             </h1>
-            <p className="text-lg md:text-xl font-mono text-muted-foreground max-w-2xl">
-              UniVersus TCG Operations Console · Secure deck intelligence and card indexing
+            <p className="max-w-2xl font-mono text-lg text-muted-foreground md:text-xl">
+              Browse the card gallery, build competitive decks, and explore community tier lists.
             </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-4 pt-2">
             <div className="flex items-center gap-2">
               <Activity className="h-4 w-4 text-green-500" />
-              <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
-                {cardsLoading ? "Syncing..." : "Database Synced"}
+              <span className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
+                {cardsLoading ? "Loading catalog…" : "Catalog ready"}
               </span>
             </div>
             <div className="h-4 w-px bg-border" />
             <div className="flex items-center gap-2">
-              <Zap className={`h-4 w-4 ${authTone}`} />
-              <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
-                {authLabel}
+              <Zap className={`h-4 w-4 ${isAuthenticated ? "text-primary" : "text-muted-foreground"}`} />
+              <span className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
+                {isLoading ? "Linking session…" : isAuthenticated ? `Signed in as ${username}` : "Sign in to save decks"}
               </span>
             </div>
-            <div className="h-4 w-px bg-border" />
-            <div className="flex flex-wrap items-center gap-3 text-xs font-mono uppercase tracking-widest text-muted-foreground/70">
-              <span>{authDetail}</span>
-              {showAuthCta && (
+            {showAuthCta ? (
+              <>
+                <div className="h-4 w-px bg-border" />
                 <Button variant="outline" size="sm" onClick={() => openAuthDialog()}>
-                  Authenticate
+                  Sign In
                 </Button>
-              )}
-            </div>
+              </>
+            ) : null}
           </div>
         </m.div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <StatCard label="Cards in DB" value={totalCards.toLocaleString()} icon={Database} delay={0.1} animate={introAnimations} />
-          <StatCard label={decksLabel} value={decksValue} icon={decksIcon} delay={0.2} animate={introAnimations} />
-          <StatCard label={collectionLabel} value={collectionValue} icon={collectionIcon} delay={0.3} animate={introAnimations} />
-          <StatCard label="Community" value="Live" icon={Users} delay={0.4} animate={introAnimations} />
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
+          <StatCard label="Cards Indexed" value={cardsLabel} icon={Database} delay={0.1} animate={introAnimations} />
+          <StatCard
+            label={showPersonalStats ? "Your Decks" : "Your Decks"}
+            value={showPersonalStats ? totalDecks : "—"}
+            icon={Layers}
+            delay={0.2}
+            animate={introAnimations}
+          />
+          <StatCard label="Community" value="Live" icon={Users} delay={0.3} animate={introAnimations} />
         </div>
 
         <div className="grid gap-6 md:grid-cols-3">
@@ -217,7 +194,7 @@ function HomePage() {
             href="/gallery"
             icon={LayoutGrid}
             title="Card Gallery"
-            description="Browse the complete database of UniVersus cards. Search, filter, and explore."
+            description="Browse the complete UniVersus card database. Search, filter, and explore."
             accentColor="primary"
             delay={0.2}
             animate={introAnimations}
@@ -226,17 +203,17 @@ function HomePage() {
             href="/decks"
             icon={Layers}
             title="Deck Builder"
-            description="Create, edit, and optimize your competitive decks with advanced tools."
+            description="Create, edit, and refine decks with main, side, and reference zones."
             accentColor="secondary"
             delay={0.3}
             animate={introAnimations}
           />
           <NavCard
-            href="/collection"
-            icon={Library}
-            title="Collection"
-            description="Track your physical and digital card collection. Monitor your progress."
-            accentColor="accent"
+            href="/community"
+            icon={Users}
+            title="Community"
+            description="Explore tier lists, rankings, and what the meta is playing."
+            accentColor="primary"
             delay={0.4}
             animate={introAnimations}
           />
@@ -248,72 +225,38 @@ function HomePage() {
           transition={{ duration: 0.6, delay: 0.5 }}
           className="relative overflow-hidden rounded-xl border border-border/50 bg-card/80 shadow-[var(--chrome-elevation-low)]"
         >
-          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" style={{ opacity: "var(--chrome-page-hero-wash-opacity)" as unknown as number }} />
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5 pointer-events-none" style={{ opacity: "var(--chrome-page-hero-wash-opacity)" as unknown as number }} />
-          <div className="relative z-10 p-6 md:p-8 space-y-6">
-            <div className="flex items-center gap-3">
-              <Terminal className="h-5 w-5 text-primary" />
-              <h2 className="font-display font-semibold uppercase tracking-widest text-sm">Signal Relay Console</h2>
+          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" style={{ opacity: "var(--chrome-page-hero-wash-opacity)" as unknown as number }} />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5" style={{ opacity: "var(--chrome-page-hero-wash-opacity)" as unknown as number }} />
+          <div className="relative z-10 space-y-4 p-6 md:p-8">
+            <div className="space-y-1">
+              <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground">Next Step</p>
+              <h2 className="font-display text-lg uppercase tracking-widest text-pretty">
+                {showPersonalStats ? "Keep Building" : "Start Exploring"}
+              </h2>
+              <p className="max-w-2xl font-mono text-sm text-muted-foreground">
+                {showPersonalStats
+                  ? `You have ${totalDecks} deck${totalDecks === 1 ? "" : "s"} saved. Jump back into the gallery or open community rankings.`
+                  : "You can browse cards and public decks without an account. Sign in when you are ready to save your own lists."}
+              </p>
             </div>
-            
-            <div className="grid gap-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
-              <div className="space-y-3 p-4 rounded-lg bg-background/50 border border-border/30">
-                {showPersonalStats ? (
-                  <>
-                    <TerminalLine delay={0.6} animate={introAnimations}>uvs-auth --status</TerminalLine>
-                    <TerminalLine prefix=">" delay={0.7} animate={introAnimations}>{authLabel}</TerminalLine>
-                    <TerminalLine delay={0.8} animate={introAnimations}>uvs-db --sync</TerminalLine>
-                    <TerminalLine prefix=">" delay={0.9} animate={introAnimations}>
-                      {cardsLoading ? "Synchronization in progress" : `${totalCards.toLocaleString()} cards indexed`}
-                    </TerminalLine>
-                    <TerminalLine delay={1.0} animate={introAnimations}>uvs-decks --count</TerminalLine>
-                    <TerminalLine prefix=">" delay={1.1} animate={introAnimations}>
-                      {totalDecks} deck{totalDecks === 1 ? "" : "s"} in vault
-                    </TerminalLine>
-                  </>
-                ) : (
-                  <>
-                    <TerminalLine delay={0.6} animate={introAnimations}>uvs-auth --status</TerminalLine>
-                    <TerminalLine prefix=">" delay={0.7} animate={introAnimations}>ERR-401 ACCESS DENIED</TerminalLine>
-                    <TerminalLine delay={0.8} animate={introAnimations}>hint: uvs-auth --login</TerminalLine>
-                    <TerminalLine prefix=">" delay={0.9} animate={introAnimations}>Credentials required for vault access</TerminalLine>
-                    <TerminalLine delay={1.0} animate={introAnimations}>uvs-collection --scan</TerminalLine>
-                    <TerminalLine prefix=">" delay={1.1} animate={introAnimations}>LOCKED UNTIL AUTH</TerminalLine>
-                  </>
-                )}
-              </div>
-
-              <div className="relative overflow-hidden rounded-lg border border-border/30 bg-background/40 p-4">
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-secondary/10 pointer-events-none" style={{ opacity: "var(--chrome-page-hero-wash-opacity)" as unknown as number }} />
-                <div className="relative z-10 space-y-4">
-                  <div className="space-y-1">
-                    <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Community Relay</p>
-                    <h3 className="font-display text-lg uppercase tracking-widest">
-                      {showPersonalStats ? "Live Signal" : "Access Denied"}
-                    </h3>
-                    <p className="text-sm font-mono text-muted-foreground">
-                      {showPersonalStats
-                        ? "Tap into the meta stream. Share builds, scan tech, and track events."
-                        : "This relay is sealed. Authenticate to unlock community intel."}
-                    </p>
-                  </div>
-                  <div className="flex flex-wrap gap-3">
-                    {showPersonalStats ? (
-                      <Button variant="default" asChild>
-                        <Link href="/community">
-                          <Users className="mr-2 h-4 w-4" />
-                          Open Community
-                        </Link>
-                      </Button>
-                    ) : null}
-                    {showAuthCta && (
-                      <Button variant="outline" onClick={() => openAuthDialog()}>
-                        Authenticate
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              </div>
+            <div className="flex flex-wrap gap-3">
+              <Button variant="default" asChild>
+                <Link href="/gallery">
+                  <LayoutGrid className="mr-2 h-4 w-4" />
+                  Open Gallery
+                </Link>
+              </Button>
+              <Button variant="outline" asChild>
+                <Link href="/community">
+                  <Users className="mr-2 h-4 w-4" />
+                  Open Community
+                </Link>
+              </Button>
+              {showAuthCta ? (
+                <Button variant="outline" onClick={() => openAuthDialog()}>
+                  Sign In
+                </Button>
+              ) : null}
             </div>
           </div>
         </m.div>
@@ -322,10 +265,10 @@ function HomePage() {
           initial={introAnimations ? { opacity: 0 } : false}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.8 }}
-          className="flex items-center justify-center gap-4 py-8 text-xs font-mono text-muted-foreground/40"
+          className="flex items-center justify-center gap-4 py-8 font-mono text-xs text-muted-foreground"
         >
           <Hexagon className="h-4 w-4" />
-          <span className="uppercase tracking-[0.3em]">UVSDECKS.GG Terminal v1.0</span>
+          <span className="uppercase tracking-[0.3em]">UVSDECKS.GG</span>
           <Hexagon className="h-4 w-4" />
         </m.div>
       </div>

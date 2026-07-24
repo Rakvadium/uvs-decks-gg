@@ -1,7 +1,13 @@
-import { mutation } from "../_generated/server";
+import { internalMutation } from "../_generated/server";
 import { v } from "convex/values";
+import type { Doc, Id } from "../_generated/dataModel";
 
-export const migrateDecksToSectionSchema = mutation({
+type LegacyDeckFields = {
+  cardIds?: Id<"cards">[];
+  cardQuantities?: Record<string, number>;
+};
+
+export const migrateDecksToSectionSchema = internalMutation({
   args: {},
   returns: v.object({
     migratedCount: v.number(),
@@ -9,17 +15,18 @@ export const migrateDecksToSectionSchema = mutation({
   }),
   handler: async (ctx) => {
     const allDecks = await ctx.db.query("decks").collect();
-    
+
     let migratedCount = 0;
     let alreadyMigratedCount = 0;
 
     for (const deck of allDecks) {
-      const hasOldSchema = (deck as any).cardIds !== undefined;
+      const legacy = deck as Doc<"decks"> & LegacyDeckFields;
+      const hasOldSchema = legacy.cardIds !== undefined;
       const hasNewSchema = deck.mainCardIds !== undefined;
 
       if (hasOldSchema && !hasNewSchema) {
-        const oldCardIds = (deck as any).cardIds ?? [];
-        const oldQuantities = (deck as any).cardQuantities ?? {};
+        const oldCardIds = legacy.cardIds ?? [];
+        const oldQuantities = legacy.cardQuantities ?? {};
 
         await ctx.db.patch(deck._id, {
           mainCardIds: oldCardIds,

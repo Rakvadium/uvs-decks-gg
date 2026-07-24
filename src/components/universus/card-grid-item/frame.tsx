@@ -20,10 +20,10 @@ export function CardGridItemFrame({ children }: { children: ReactNode }) {
   return (
     <div
       className={cn(
-        "group relative aspect-[2.5/3.5] cursor-pointer [perspective:1000px]",
-        prefersReducedMotion ? "transition-none" : "transition-[transform,opacity] duration-150",
+        "group relative aspect-[2.5/3.5] cursor-pointer [contain:layout_paint]",
+        prefersReducedMotion ? "transition-none" : "transition-opacity duration-150",
         isDragging
-          ? "z-20 scale-[0.98] opacity-60"
+          ? "z-20 opacity-60"
           : isHovered && !prefersReducedMotion && "z-10"
       )}
       style={{
@@ -44,8 +44,8 @@ export function CardGridItemFrame({ children }: { children: ReactNode }) {
     >
       <div
         className={cn(
-          "absolute -inset-px rounded-2xl blur-[2px] transition-opacity duration-150",
-          isDragging ? "opacity-0" : isHovered ? "opacity-70" : "opacity-20"
+          "pointer-events-none absolute -inset-px z-0 rounded-2xl transition-opacity duration-150",
+          isDragging ? "opacity-0" : isHovered ? "opacity-70" : "opacity-25"
         )}
         style={{
           background: "var(--chrome-card-frame-halo)",

@@ -13,7 +13,7 @@ function DeckSidebarItemContent() {
   return (
     <div
       className={cn(
-        "space-y-2 rounded-lg border border-border/50 bg-card/40 p-3 transition-colors",
+        "space-y-2 rounded-lg border border-border/50 bg-card/50 p-3 transition-colors",
         isActive && "border-primary/40 bg-primary/5 shadow-[0_0_20px_-12px_var(--primary)]"
       )}
     >

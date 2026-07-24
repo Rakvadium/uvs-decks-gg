@@ -24,7 +24,7 @@ export function CreatorProgramToolkitSection() {
           return (
             <div
               key={tool.title}
-              className="group relative overflow-hidden rounded-xl border border-border/60 bg-card/60 p-4"
+              className="group relative overflow-hidden rounded-xl border border-border/50 bg-card/80 p-4"
             >
               <div className={cn("absolute inset-0 bg-gradient-to-br opacity-40", tool.accent)} />
               <div className="relative space-y-3">
@@ -32,7 +32,7 @@ export function CreatorProgramToolkitSection() {
                   <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
                     {tool.kicker}
                   </span>
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-border/60 bg-background/70">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-border/50 bg-background/80">
                     <Icon className="h-4 w-4 text-primary" />
                   </div>
                 </div>

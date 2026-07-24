@@ -8,4 +8,6 @@ export interface CardGridItemProps {
   dragSourceId?: string;
   showDeckActions?: boolean;
   imagePriority?: boolean;
+  imageSizes?: string;
+  imageQuality?: number;
 }

@@ -23,7 +23,7 @@ export function DeckDetailsViewModeToggle({ variant = "sidebar" }: DeckDetailsVi
     <SegmentedControl
       size="sm"
       stretch={!isToolbar}
-      className={cn("bg-muted/30", isToolbar ? "h-8 max-h-8 items-stretch md:h-7 md:max-h-7" : "w-full")}
+      className={cn("bg-muted/20", isToolbar ? "h-8 max-h-8 items-stretch md:h-7 md:max-h-7" : "w-full")}
       itemClassName={
         isToolbar
           ? "inline-flex h-full max-h-full min-h-0 shrink-0 items-center justify-center gap-1.5 px-2.5 py-0 leading-none sm:gap-2 [&_svg]:h-3.5 [&_svg]:w-3.5 [&_svg]:shrink-0"

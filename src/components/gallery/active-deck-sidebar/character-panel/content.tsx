@@ -16,7 +16,7 @@ function ActiveDeckCharacterPanelContent() {
 
   return (
     <>
-      <div className="overflow-hidden rounded-lg border border-border/50 bg-card/40">
+      <div className="overflow-hidden rounded-lg border border-border/50 bg-card/50">
         <div className="flex items-stretch justify-between">
           <div className="min-w-0 flex flex-1 items-stretch">
             <div className="relative">

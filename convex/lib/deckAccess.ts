@@ -14,7 +14,6 @@ export type DeckVisibility =
 
 export function normalizeDeckVisibility(deck: Doc<"decks">): DeckVisibility {
   if (deck.visibility) {
-    if (deck.visibility === "unlisted") return "private";
     return deck.visibility;
   }
   return deck.isPublic ? "public" : "private";
@@ -52,6 +51,20 @@ export function assertTeamEditableCardWriteRevision(
 
 type DeckViewCtx = QueryCtx | MutationCtx;
 
+export function canViewPrivateOrUnlistedDeck(
+  visibility: DeckVisibility,
+  ownerId: Id<"users">,
+  viewerId: Id<"users"> | null,
+): boolean | null {
+  if (visibility === "private") {
+    return viewerId !== null && viewerId === ownerId;
+  }
+  if (visibility === "unlisted") {
+    return true;
+  }
+  return null;
+}
+
 export async function canViewDeck(
   ctx: DeckViewCtx,
   deck: Doc<"decks">,
@@ -59,8 +72,13 @@ export async function canViewDeck(
 ): Promise<boolean> {
   const visibility = normalizeDeckVisibility(deck);
   const viewer = await getAuthUserId(ctx);
-  if (visibility === "private") {
-    return true;
+  const privateOrUnlisted = canViewPrivateOrUnlistedDeck(
+    visibility,
+    deck.userId,
+    viewer,
+  );
+  if (privateOrUnlisted !== null) {
+    return privateOrUnlisted;
   }
   if (visibility === "team") {
     if (!deck.teamId) {

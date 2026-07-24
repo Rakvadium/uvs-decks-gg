@@ -8,21 +8,34 @@ import {
   useCallback,
   useState,
   useDeferredValue,
+  useRef,
   startTransition,
   ReactNode,
 } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { useCardCatalog, useCardReferenceData } from "@/lib/universus/card-data-provider";
 import { sortCards } from "@/lib/universus/use-universus-cards";
 import type { CachedCard } from "@/lib/universus/card-store";
 import { useIsMobile } from "@/hooks/useIsMobile";
+import { useLocationSearchParams } from "@/hooks/useLocationSearchParams";
 import { usePrefersReducedMotion } from "@/lib/reduced-motion";
 import { useUIState, type CardFilters, type GalleryViewMode } from "@/providers/UIStateProvider";
 import { useShellSlotActiveSidebarActionId } from "@/components/shell/shell-slot-provider";
+import {
+  fromGalleryViewMode,
+  galleryUrlHasState,
+  parseGalleryUrlState,
+  stripSearchFields,
+  toGalleryViewMode,
+  writeGalleryUrlState,
+  type GallerySearchMode,
+  type GalleryUiViewMode,
+} from "@/lib/gallery/url-state";
 
 const DENSITY_LAYOUT_SIDEBAR_SYNC_MS = 220;
 
-type SearchMode = "name" | "text" | "all";
-type ViewMode = "card" | "list" | "details";
+type SearchMode = GallerySearchMode;
+type ViewMode = GalleryUiViewMode;
 
 interface GalleryFiltersState {
   search: string;
@@ -52,6 +65,7 @@ interface GalleryFiltersMeta {
   formats: Array<{ key: string; name: string }>;
   defaultFormatKey: string;
   activeFilterCount: number;
+  hasClearableFilters: boolean;
   isLoading: boolean;
   isCatalogDataLoading: boolean;
   isCatalogIndexReady: boolean;
@@ -69,8 +83,24 @@ interface GalleryFiltersContextValue {
 
 const GalleryFiltersContext = createContext<GalleryFiltersContextValue | null>(null);
 
+function isGalleryPath(pathname: string) {
+  return pathname === "/gallery" || pathname.startsWith("/gallery/");
+}
+
 export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
-  const { uiState, setGalleryFilters, setGalleryViewMode, setGalleryCardsPerRow } = useUIState();
+  const router = useRouter();
+  const pathname = usePathname();
+  const { params: searchParams, replaceParams } = useLocationSearchParams();
+  const syncUrl = isGalleryPath(pathname);
+  const skipUrlReadRef = useRef(false);
+  const {
+    uiState,
+    setGalleryFilters,
+    setGalleryViewMode,
+    setGalleryCardsPerRow,
+    setGallerySortField,
+    setGallerySortDirection,
+  } = useUIState();
   const activeSidebarActionId = useShellSlotActiveSidebarActionId();
   const prefersReducedMotion = usePrefersReducedMotion();
   const isMobile = useIsMobile();
@@ -87,8 +117,8 @@ export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
     totalCards: catalogTotalCards,
   } = useCardCatalog();
   const { formats } = useCardReferenceData();
-  const [search, setSearch] = useState("");
-  const [searchMode, setSearchMode] = useState<SearchMode>("all");
+  const [search, setSearchState] = useState("");
+  const [searchMode, setSearchModeState] = useState<SearchMode>("all");
   const isSidebarOpen = useMemo(
     () => Boolean(activeSidebarActionId) && !isMobile,
     [activeSidebarActionId, isMobile]
@@ -107,10 +137,7 @@ export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
   }, [isSidebarOpen, prefersReducedMotion]);
 
   const viewMode: ViewMode = useMemo(() => {
-    const storedMode = uiState.galleryViewMode;
-    if (storedMode === "grid") return "card";
-    if (storedMode === "list" || storedMode === "details") return storedMode;
-    return "card";
+    return fromGalleryViewMode(uiState.galleryViewMode);
   }, [uiState.galleryViewMode]);
   const cardsPerRow = useMemo(() => {
     const minCardsPerRow = isMobile ? 1 : 3;
@@ -136,12 +163,104 @@ export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
     isMobile,
   ]);
 
+  const galleryFilters = useMemo(() => uiState.galleryFilters ?? {}, [uiState.galleryFilters]);
+  const defaultFormat = formats.find((format) => format.isDefault)?.key ?? "standard";
+  const effectiveFormat = galleryFilters.format ?? defaultFormat;
+  const sortField = uiState.gallerySortField ?? "default";
+  const sortDirection = (uiState.gallerySortDirection ?? "asc") as "asc" | "desc";
+
+  const replaceGalleryUrl = useCallback(
+    (next: {
+      search: string;
+      searchMode: SearchMode;
+      filters: CardFilters;
+      viewMode: ViewMode;
+      sortField: string;
+      sortDirection: "asc" | "desc";
+    }) => {
+      if (!syncUrl) return;
+      if (typeof window === "undefined") return;
+      const payload = {
+        ...next,
+        filters: stripSearchFields(next.filters),
+        defaultFormatKey: defaultFormat,
+      };
+      const liveParams = new URLSearchParams(window.location.search);
+      const nextGalleryQuery = writeGalleryUrlState(new URLSearchParams(), payload).toString();
+      const currentParsed = parseGalleryUrlState(liveParams);
+      const currentGalleryQuery = writeGalleryUrlState(new URLSearchParams(), {
+        search: currentParsed.search ?? "",
+        searchMode: currentParsed.searchMode ?? "all",
+        filters: currentParsed.filters ?? {},
+        viewMode: currentParsed.viewMode ?? "card",
+        sortField: currentParsed.sortField ?? "default",
+        sortDirection: currentParsed.sortDirection ?? "asc",
+        defaultFormatKey: defaultFormat,
+      }).toString();
+      if (nextGalleryQuery === currentGalleryQuery) return;
+
+      const written = writeGalleryUrlState(liveParams, payload);
+      const nextQuery = written.toString();
+      skipUrlReadRef.current = true;
+      const nextHref = nextQuery ? `${pathname}?${nextQuery}` : pathname;
+      window.history.replaceState(window.history.state, "", nextHref);
+      replaceParams(written);
+      startTransition(() => {
+        router.replace(nextHref, { scroll: false });
+      });
+    },
+    [syncUrl, defaultFormat, pathname, router, replaceParams]
+  );
+
+  useEffect(() => {
+    if (!syncUrl) return;
+    if (skipUrlReadRef.current) {
+      skipUrlReadRef.current = false;
+      return;
+    }
+    if (!galleryUrlHasState(searchParams)) {
+      setSearchState("");
+      setSearchModeState("all");
+      return;
+    }
+    const parsed = parseGalleryUrlState(searchParams);
+    setSearchState(parsed.search ?? "");
+    setSearchModeState(parsed.searchMode ?? "all");
+    if (parsed.filters) setGalleryFilters(stripSearchFields(parsed.filters));
+    if (parsed.viewMode) setGalleryViewMode(toGalleryViewMode(parsed.viewMode));
+    if (parsed.sortField) setGallerySortField(parsed.sortField);
+    if (parsed.sortDirection) setGallerySortDirection(parsed.sortDirection);
+  }, [
+    syncUrl,
+    searchParams,
+    setGalleryFilters,
+    setGalleryViewMode,
+    setGallerySortField,
+    setGallerySortDirection,
+  ]);
+
   const handleSetViewMode = useCallback(
     (mode: ViewMode) => {
-      const mapped: GalleryViewMode = mode === "card" ? "grid" : mode;
+      const mapped: GalleryViewMode = toGalleryViewMode(mode);
       setGalleryViewMode(mapped);
+      replaceGalleryUrl({
+        search,
+        searchMode,
+        filters: galleryFilters,
+        viewMode: mode,
+        sortField,
+        sortDirection,
+      });
     },
-    [setGalleryViewMode]
+    [
+      setGalleryViewMode,
+      replaceGalleryUrl,
+      search,
+      searchMode,
+      galleryFilters,
+      sortField,
+      sortDirection,
+    ]
   );
 
   const handleSetCardsPerRow = useCallback(
@@ -160,10 +279,6 @@ export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
     }
   }, [isMobile, viewMode, handleSetViewMode]);
 
-  const galleryFilters = useMemo(() => uiState.galleryFilters ?? {}, [uiState.galleryFilters]);
-  const defaultFormat = formats.find((format) => format.isDefault)?.key ?? "standard";
-  const effectiveFormat = galleryFilters.format ?? defaultFormat;
-
   const filters = useMemo(
     () => ({
       ...galleryFilters,
@@ -176,10 +291,10 @@ export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
 
   const sortOptions = useMemo(
     () => ({
-      field: uiState.gallerySortField ?? "default",
-      direction: (uiState.gallerySortDirection ?? "asc") as "asc" | "desc",
+      field: sortField,
+      direction: sortDirection,
     }),
-    [uiState.gallerySortField, uiState.gallerySortDirection]
+    [sortField, sortDirection]
   );
 
   const deferredSearch = useDeferredValue(search);
@@ -235,6 +350,38 @@ export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
     return count;
   }, [filters, galleryFilters, defaultFormat]);
 
+  const hasClearableFilters = activeFilterCount > 0 || search.trim().length > 0;
+
+  const setSearch = useCallback(
+    (nextSearch: string) => {
+      setSearchState(nextSearch);
+      replaceGalleryUrl({
+        search: nextSearch,
+        searchMode,
+        filters: galleryFilters,
+        viewMode,
+        sortField,
+        sortDirection,
+      });
+    },
+    [replaceGalleryUrl, searchMode, galleryFilters, viewMode, sortField, sortDirection]
+  );
+
+  const setSearchMode = useCallback(
+    (mode: SearchMode) => {
+      setSearchModeState(mode);
+      replaceGalleryUrl({
+        search,
+        searchMode: mode,
+        filters: galleryFilters,
+        viewMode,
+        sortField,
+        sortDirection,
+      });
+    },
+    [replaceGalleryUrl, search, galleryFilters, viewMode, sortField, sortDirection]
+  );
+
   const updateFilter = useCallback(
     <K extends keyof CardFilters>(key: K, value: CardFilters[K]) => {
       startTransition(() => {
@@ -245,16 +392,49 @@ export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
           nextFilters[key] = value;
         }
         setGalleryFilters(nextFilters);
+        replaceGalleryUrl({
+          search,
+          searchMode,
+          filters: nextFilters,
+          viewMode,
+          sortField,
+          sortDirection,
+        });
       });
     },
-    [galleryFilters, setGalleryFilters]
+    [
+      galleryFilters,
+      setGalleryFilters,
+      replaceGalleryUrl,
+      search,
+      searchMode,
+      viewMode,
+      sortField,
+      sortDirection,
+    ]
   );
 
   const clearAllFilters = useCallback(() => {
     startTransition(() => {
+      setSearchState("");
+      setSearchModeState("all");
       setGalleryFilters({});
+      replaceGalleryUrl({
+        search: "",
+        searchMode: "all",
+        filters: {},
+        viewMode,
+        sortField,
+        sortDirection,
+      });
     });
-  }, [setGalleryFilters]);
+  }, [
+    setGalleryFilters,
+    replaceGalleryUrl,
+    viewMode,
+    sortField,
+    sortDirection,
+  ]);
 
   const removeFilterKeys = useCallback(
     (keys: (keyof CardFilters)[]) => {
@@ -264,9 +444,26 @@ export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
           delete nextFilters[key];
         }
         setGalleryFilters(nextFilters);
+        replaceGalleryUrl({
+          search,
+          searchMode,
+          filters: nextFilters,
+          viewMode,
+          sortField,
+          sortDirection,
+        });
       });
     },
-    [galleryFilters, setGalleryFilters]
+    [
+      galleryFilters,
+      setGalleryFilters,
+      replaceGalleryUrl,
+      search,
+      searchMode,
+      viewMode,
+      sortField,
+      sortDirection,
+    ]
   );
 
   const value = useMemo(
@@ -297,6 +494,7 @@ export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
         formats: formatsForSelect,
         defaultFormatKey: defaultFormat,
         activeFilterCount,
+        hasClearableFilters,
         isLoading,
         isCatalogDataLoading,
         isCatalogIndexReady,
@@ -313,6 +511,8 @@ export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
       effectiveFormat,
       viewMode,
       cardsPerRow,
+      setSearch,
+      setSearchMode,
       updateFilter,
       removeFilterKeys,
       clearAllFilters,
@@ -325,6 +525,7 @@ export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
       formatsForSelect,
       defaultFormat,
       activeFilterCount,
+      hasClearableFilters,
       isLoading,
       isCatalogDataLoading,
       isCatalogIndexReady,

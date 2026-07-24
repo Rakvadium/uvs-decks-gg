@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { CommunityRankingsView } from "@/components/community/community-rankings-view";
-import { AppPageHeader } from "@/components/shell/app-page-header";
 import { useRegisterSlot } from "@/components/shell/shell-slot-provider";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -15,8 +14,6 @@ import { CommunityTierListsPageHeading } from "./heading";
 import { CommunityTierListsPageLoadingState } from "./loading-state";
 import {
   CommunityTierListsPagePrimaryAction,
-  CommunityTierListsPageSearch,
-  CommunityTierListsPageTabs,
   CommunityTierListsPageTopBar,
 } from "./top-bar";
 
@@ -36,34 +33,22 @@ export function CommunityTierListsPageView() {
 
   return (
     <div className="space-y-6">
-      <div className="space-y-3 md:space-y-4">
+      <div className="md:hidden space-y-3">
         <Button variant="ghost" size="sm" className="-ml-2 h-8 w-fit gap-2 px-2" asChild>
           <Link href="/community">
             <ArrowLeft className="h-4 w-4 shrink-0" />
             Back to community
           </Link>
         </Button>
-        <div className="md:hidden space-y-3">
-          <CommunityTierListsPageHeading />
-          <CommunityTierListsPagePrimaryAction className="w-full justify-center" label="New Tier List" />
-        </div>
-
-        <div className="hidden md:block">
-          <AppPageHeader
-            title="Tier lists"
-            description="Browse public lists, manage yours, and explore community rankings."
-            tabs={<CommunityTierListsPageTabs />}
-            toolbar={activeTab !== "rankings" ? <CommunityTierListsPageSearch /> : undefined}
-            actions={<CommunityTierListsPagePrimaryAction />}
-          />
-        </div>
+        <CommunityTierListsPageHeading />
+        <CommunityTierListsPagePrimaryAction className="w-full justify-center" label="New Tier List" />
       </div>
 
       <div className="flex-1 pt-2 md:pt-0">
         {activeTab === "rankings" ? (
           <CommunityRankingsView embedded />
         ) : activeTab === "mine" && !isAuthenticated ? (
-          <Card className="border-dashed border-border/60 bg-card/65">
+          <Card className="border-dashed border-border/50 bg-card/80">
             <CardContent className="flex flex-col items-center gap-4 py-14 text-center">
               <p className="max-w-lg text-sm text-muted-foreground">
                 Sign in to keep private tier lists, manage your published ones, and jump straight into editing.

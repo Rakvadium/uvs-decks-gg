@@ -9,7 +9,7 @@ export function CardDeckCountBadge() {
   return (
     <div
       className={cn(
-        "absolute right-1.5 top-1.5 z-10 transition-all duration-200",
+        "absolute right-1.5 top-1.5 z-10 transition-colors duration-200",
         isHovered ? "scale-100 opacity-100" : "scale-95 opacity-85"
       )}
     >

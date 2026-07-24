@@ -19,7 +19,7 @@ import { YoutubeEmbed } from "./youtube-embed";
 function MediaFeedSkeleton() {
   return (
     <div className="grid gap-4 xl:grid-cols-[minmax(0,1.4fr)_minmax(300px,0.6fr)]">
-      <Card className="overflow-hidden border-border/60 bg-background/50 shadow-none">
+      <Card className="overflow-hidden border-border/50 bg-background/50 shadow-none">
         <CardContent className="p-0">
           <Skeleton className="aspect-video w-full rounded-none" />
           <div className="space-y-5 p-6 md:p-7">
@@ -38,7 +38,7 @@ function MediaFeedSkeleton() {
           </div>
         </CardContent>
       </Card>
-      <div className="flex flex-col rounded-lg border border-border/60 bg-background/50">
+      <div className="flex flex-col rounded-lg border border-border/50 bg-background/50">
         {[0, 1, 2].map((key) => (
           <div key={key} className="flex items-center gap-3 border-b border-border/30 px-3 py-2 last:border-b-0">
             <div className="w-28 shrink-0">
@@ -101,7 +101,7 @@ export function CommunityMediaFeedSection() {
             </Button>
           }
         />
-        <Card className="border-border/60 bg-background/50 shadow-none">
+        <Card className="border-border/50 bg-background/50 shadow-none">
           <CardContent className="flex flex-col items-center gap-2 py-12 text-center">
             <p className="text-sm text-muted-foreground">
               The video queue is not available yet. Check back soon.
@@ -165,7 +165,7 @@ export function CommunityMediaFeedSection() {
       ) : null}
 
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1.4fr)_minmax(300px,0.6fr)]">
-        <Card className="overflow-hidden border-border/60 bg-background/50 shadow-none">
+        <Card className="overflow-hidden border-border/50 bg-background/50 shadow-none">
           <CardContent className="p-0">
             {activeVideo.rowStatus === "error" ? (
               <div className="relative flex aspect-video min-h-[200px] flex-col items-center justify-center gap-3 bg-gradient-to-br from-background via-background to-card px-6 text-center">
@@ -210,10 +210,10 @@ export function CommunityMediaFeedSection() {
               <div className="pointer-events-none absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
 
               <div className="relative z-[1] flex flex-wrap items-center justify-between gap-3">
-                <Badge variant="secondary" className="border border-border/50 bg-background/70 text-[10px] uppercase tracking-[0.22em]">
+                <Badge variant="secondary" className="border border-border/50 bg-background/80 text-[10px] uppercase tracking-[0.18em]">
                   {activeVideo.youtubeVideoId === featuredVideo.youtubeVideoId ? "Featured drop" : "Now playing"}
                 </Badge>
-                <div className="text-[10px] font-mono uppercase tracking-[0.22em] text-muted-foreground">
+                <div className="text-[10px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
                   {activeVideo.rowStatus === "ok" ? (
                     <>
                       {activeVideo.durationLabel} / {activeVideo.viewCountLabel} views
@@ -229,11 +229,11 @@ export function CommunityMediaFeedSection() {
               <div className="relative z-[1] max-w-2xl space-y-3">
                 <div className="flex flex-wrap items-center gap-2">
                   {activeVideo.editorialLabel ? (
-                    <Badge variant="outline" className="bg-background/70">
+                    <Badge variant="outline" className="bg-background/80">
                       {activeVideo.editorialLabel}
                     </Badge>
                   ) : null}
-                  <Badge variant="outline" className="bg-background/70">
+                  <Badge variant="outline" className="bg-background/80">
                     {activeVideo.rowStatus === "ok"
                       ? activeVideo.channelTitle
                       : activeVideo.rowStatus === "pending"
@@ -275,7 +275,7 @@ export function CommunityMediaFeedSection() {
           </CardContent>
         </Card>
 
-        <div className="flex flex-col rounded-lg border border-border/60 bg-background/50">
+        <div className="flex flex-col rounded-lg border border-border/50 bg-background/50">
           {feed.items.map((video, index) => {
             const isActive = video.youtubeVideoId === resolvedActiveId;
             return (
@@ -344,13 +344,13 @@ export function CommunityMediaFeedSection() {
                     </span>
                     {video.rowStatus === "ok" ? (
                       <>
-                        <span className="shrink-0 text-muted-foreground/40">·</span>
+                        <span className="shrink-0 text-muted-foreground">·</span>
                         <span className="shrink-0">{video.viewCountLabel} views</span>
                       </>
                     ) : null}
                   </div>
                   {video.editorialLabel ? (
-                    <Badge variant="secondary" className="w-fit bg-primary/10 px-1.5 py-0 text-[9px] uppercase leading-4 tracking-[0.12em] text-primary">
+                    <Badge variant="secondary" className="w-fit bg-primary/10 px-1.5 py-0 text-[10px] uppercase leading-4 tracking-[0.12em] text-primary">
                       {video.editorialLabel}
                     </Badge>
                   ) : null}

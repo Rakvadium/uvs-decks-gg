@@ -25,17 +25,17 @@ export function DeckDetailsPrivateLinkPanel() {
     }
   }, [deckUrl]);
 
-  if (!deck || !isOwner || normalizeDeckVisibility(deck) !== "private") return null;
+  if (!deck || !isOwner || normalizeDeckVisibility(deck) !== "unlisted") return null;
 
   return (
-    <div className="space-y-2 rounded-lg border border-border/60 bg-background/50 p-3">
+    <div className="space-y-2 rounded-lg border border-border/50 bg-background/50 p-3">
       <div className="space-y-1">
         <p className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
           <Link2 className="h-3 w-3" />
           Share link
         </p>
         <p className="text-xs text-muted-foreground">
-          Anyone with this link can view the deck in read-only mode.
+          Anyone with this link can view the deck in read-only mode. It is not listed publicly.
         </p>
       </div>
       <Button type="button" variant="outline" size="sm" className="h-9 w-full" onClick={() => void onCopyLink()}>

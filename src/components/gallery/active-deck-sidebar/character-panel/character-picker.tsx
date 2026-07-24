@@ -19,8 +19,8 @@ export function ActiveDeckCharacterPicker() {
     <>
       <div
         className={cn(
-          "relative h-full min-h-[108px] w-[86px] overflow-hidden rounded-none border-0 border-r border-border/40 bg-muted/40",
-          "transition-all hover:border-r-primary/40 hover:shadow-[0_0_14px_-8px_var(--primary)]",
+          "relative h-full min-h-[108px] w-[86px] overflow-hidden rounded-none border-0 border-r border-border/40 bg-muted/50",
+          "transition-colors hover:border-r-primary/40 hover:shadow-[0_0_14px_-8px_var(--primary)]",
           !startingCharacter && "opacity-80"
         )}
       >
@@ -64,7 +64,7 @@ export function ActiveDeckCharacterPicker() {
                 "rounded-tr-lg rounded-bl-lg rounded-tl-none rounded-br-none",
                 "bg-background/80 backdrop-blur-sm",
                 "border-l border-b border-border/40",
-                "transition-all hover:bg-primary/10 hover:border-primary/40"
+                "transition-colors hover:bg-primary/10 hover:border-primary/40"
               )}
             >
               <UserRoundPen className="h-3.5 w-3.5 text-muted-foreground" />

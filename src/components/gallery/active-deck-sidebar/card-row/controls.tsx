@@ -26,7 +26,7 @@ export function ActiveDeckCardRowControls() {
 
   return (
     <div
-      className="pointer-events-none absolute right-2 top-1/2 flex -translate-y-1/2 items-center gap-1 opacity-0 transition-opacity duration-150 group-hover:pointer-events-auto group-hover:opacity-100"
+      className="pointer-events-none absolute right-2 top-1/2 flex -translate-y-1/2 items-center gap-1 opacity-0 transition-opacity duration-150 group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100 max-md:pointer-events-auto max-md:opacity-100"
       onClick={(e) => e.stopPropagation()}
     >
       <Button
@@ -35,6 +35,7 @@ export function ActiveDeckCardRowControls() {
         className="h-7 w-7"
         onClick={() => removeCard(card._id, sectionKey)}
         disabled={count <= 0}
+        aria-label={`Remove one ${card.name}`}
       >
         <Minus className="h-3.5 w-3.5" />
       </Button>
@@ -49,13 +50,20 @@ export function ActiveDeckCardRowControls() {
         className="h-7 w-7"
         onClick={() => addCard(card._id, sectionKey)}
         disabled={!canAddToDeck}
+        aria-label={`Add one ${card.name}`}
       >
         <Plus className="h-3.5 w-3.5" />
       </Button>
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon-sm" className="h-7 w-7" data-no-drag>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            className="h-7 w-7"
+            data-no-drag
+            aria-label={`More actions for ${card.name}`}
+          >
             <MoreVertical className="h-3.5 w-3.5" />
           </Button>
         </DropdownMenuTrigger>

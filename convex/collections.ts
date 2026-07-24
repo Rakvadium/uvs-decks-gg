@@ -1,7 +1,16 @@
-import { query, mutation } from "./_generated/server";
+import { query, mutation, type QueryCtx } from "./_generated/server";
 import { v } from "convex/values";
+import type { Id } from "./_generated/dataModel";
 import { cardValidator, collectionEntryValidator } from "./validators";
 import { requireAuth, requireUserCanPostContent } from "./utils/validation";
+
+async function requireCollectionOwner(ctx: QueryCtx, userId: Id<"users">) {
+  const viewer = await requireAuth(ctx);
+  if (viewer !== userId) {
+    throw new Error("Not authorized");
+  }
+  return viewer;
+}
 
 export const listByUser = query({
   args: {
@@ -23,6 +32,8 @@ export const listByUser = query({
     })
   ),
   handler: async (ctx, args) => {
+    await requireCollectionOwner(ctx, args.userId);
+
     const entries = await ctx.db
       .query("collections")
       .withIndex("by_user", (q) => q.eq("userId", args.userId))
@@ -71,6 +82,7 @@ export const getByUserAndCard = query({
   },
   returns: v.union(collectionEntryValidator, v.null()),
   handler: async (ctx, args) => {
+    await requireCollectionOwner(ctx, args.userId);
     return await ctx.db
       .query("collections")
       .withIndex("by_user_and_card", (q) =>
@@ -174,6 +186,8 @@ export const getCollectionStats = query({
     bySet: v.record(v.string(), v.number()),
   }),
   handler: async (ctx, args) => {
+    await requireCollectionOwner(ctx, args.userId);
+
     const entries = await ctx.db
       .query("collections")
       .withIndex("by_user", (q) => q.eq("userId", args.userId))

@@ -134,7 +134,7 @@ export function DeckCharacterPickerDialog({
             </DialogTitle>
             <DialogClose
               type="button"
-              className="pointer-events-auto flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-transparent opacity-70 transition-all hover:border-primary/30 hover:bg-primary/10 hover:text-primary hover:opacity-100 focus:outline-hidden focus:ring-2 focus:ring-primary/30 disabled:pointer-events-none"
+              className="pointer-events-auto flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-transparent opacity-70 transition-colors hover:border-primary/30 hover:bg-primary/10 hover:text-primary hover:opacity-100 focus:outline-hidden focus:ring-2 focus:ring-primary/30 disabled:pointer-events-none"
             >
               <XIcon className="h-4 w-4" />
               <span className="sr-only">Close</span>
@@ -158,7 +158,7 @@ export function DeckCharacterPickerDialog({
                     aria-pressed={isSelected}
                     title={UNIVERSUS_SYMBOL_DISPLAY[symbol]}
                     className={cn(
-                      "relative h-8 w-8 overflow-hidden rounded-full border border-border/60 bg-background p-0 transition-colors hover:bg-muted sm:h-7 sm:w-7",
+                      "relative h-8 w-8 overflow-hidden rounded-full border border-border/50 bg-background p-0 transition-colors hover:bg-muted sm:h-7 sm:w-7",
                       "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
                       isSelected && "ring-2 ring-primary ring-offset-1 ring-offset-background"
                     )}
@@ -212,7 +212,7 @@ export function DeckCharacterPickerDialog({
                         <div className="pointer-events-none absolute inset-0 rounded-xl ring-2 ring-primary ring-offset-2 ring-offset-background" />
                       ) : null}
                       {isSelecting ? (
-                        <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-background/60">
+                        <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-background/50">
                           <Loader2 className="h-6 w-6 animate-spin text-primary" />
                         </div>
                       ) : null}

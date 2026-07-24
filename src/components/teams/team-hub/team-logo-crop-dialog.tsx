@@ -102,7 +102,7 @@ export function TeamLogoCropDialog({
         <DialogBody className="space-y-4 px-6">
           {imageSrc ? (
             <>
-              <div className="relative h-[min(55vh,360px)] w-full overflow-hidden rounded-lg border border-border/60 bg-muted">
+              <div className="relative h-[min(55vh,360px)] w-full overflow-hidden rounded-lg border border-border/50 bg-muted">
                 <Cropper
                   key={imageSrc}
                   image={imageSrc}

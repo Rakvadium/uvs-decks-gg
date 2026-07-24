@@ -1,0 +1,84 @@
+name: Agent task
+description: Executable work item for backlog-worker (Goal, Done when, Context).
+title: "[agent] "
+labels: ["agent-ready"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Write this so an agent can execute without a meeting. After submit, add labels:
+        `size/S` (or M/L) and one `area/*` (see docs/agent-issue-queue.md).
+  - type: textarea
+    id: goal
+    attributes:
+      label: Goal
+      description: One sentence outcome.
+      placeholder: Right sidebar panel closes with the same width transition as the left sidebar.
+    validations:
+      required: true
+  - type: textarea
+    id: done-when
+    attributes:
+      label: Done when
+      description: Observable acceptance checks. Use a checklist.
+      value: |
+        - [ ] 
+        - [ ] `bun run lint` and `bun run build` pass
+        - [ ] If UI changed: before/after snapshots + ui-ux-adversary (no must-fix)
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Routes, files, docs, neighbors. Link playbook/docs instead of pasting them.
+      placeholder: |
+        - Routes: /gallery
+        - Neighbors: src/components/shell/left-sidebar/frame.tsx
+        - Docs: docs/agent-workflow-playbook.md
+    validations:
+      required: true
+  - type: textarea
+    id: out-of-scope
+    attributes:
+      label: Out of scope
+      description: What the agent must not touch or invent.
+      placeholder: No floating-header changes. No drive-by restyles.
+    validations:
+      required: false
+  - type: dropdown
+    id: size
+    attributes:
+      label: Size
+      description: Prefer size/S for auto-claim. Also add the matching GitHub label after create.
+      options:
+        - size/S — one focused change, clear Done when
+        - size/M — a few files, still one PR
+        - size/L — needs human breakdown first (do not auto-claim)
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: Also add the matching area/* GitHub label after create.
+      options:
+        - area/ui
+        - area/convex
+        - area/admin
+        - area/shell
+        - area/docs
+        - area/other
+    validations:
+      required: true
+  - type: checkboxes
+    id: agent-ready-confirm
+    attributes:
+      label: Agent-ready checklist
+      options:
+        - label: Done when is testable without product invention
+          required: true
+        - label: Placement/IA is unambiguous (or marked needs-human instead of agent-ready)
+          required: true
+        - label: I will add size/* and area/* labels after creating this issue
+          required: true

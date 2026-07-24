@@ -58,7 +58,7 @@ export function TierListBrowserCard({
         "focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
       )}
     >
-      <Card className="h-full cursor-pointer border-border/60 bg-card/75 shadow-[0_18px_50px_-38px_rgba(0,0,0,0.8)] transition-colors hover:border-primary/25">
+      <Card className="h-full cursor-pointer border-border/50 bg-card/80 shadow-[var(--chrome-elevation-mid)] transition-colors hover:border-primary/25">
         <CardHeader className="space-y-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex flex-wrap items-center gap-2">
@@ -89,7 +89,7 @@ export function TierListBrowserCard({
             <span>{tierList.itemCount} cards</span>
             <span>{tierList.tierCount} tiers</span>
             {tierList.selectedSetCodes.slice(0, 2).map((setCode) => (
-              <Badge key={setCode} variant="outline" className="text-[9px]">
+              <Badge key={setCode} variant="outline" className="text-[10px]">
                 {setCode}
               </Badge>
             ))}

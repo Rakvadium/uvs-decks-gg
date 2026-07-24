@@ -29,7 +29,7 @@ export function CommunityDeckSpotlightsSection() {
       </div>
 
       {isLoadingDecks ? (
-        <div className="flex items-center justify-center rounded-xl border border-dashed border-border/60 bg-card/40 py-12">
+        <div className="flex items-center justify-center rounded-xl border border-dashed border-border/50 bg-card/50 py-12">
           <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
         </div>
       ) : deckSpotlights.length === 0 ? (
@@ -48,7 +48,7 @@ export function CommunityDeckSpotlightsSection() {
               <Card className="h-full cursor-pointer transition-colors hover:bg-accent/40">
                 <CardHeader className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <Badge tone="entity" className="text-[9px]">
+                    <Badge tone="entity" className="text-[10px]">
                       Spotlight
                     </Badge>
                     <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">

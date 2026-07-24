@@ -2,7 +2,7 @@
 
 This document captures the architecture pattern used during the refactor pass so future features follow the same structure.
 
-**Documentation hub:** [README.md](./README.md) · **How this fits the repo:** [ARCHITECTURE_PLAN.md](./ARCHITECTURE_PLAN.md) · **File-size targets:** [CODE_SIZE_POLICY.md](./CODE_SIZE_POLICY.md) · **Coding agents:** [agent-onboarding.md](./agent-onboarding.md)
+**Documentation hub:** [README.md](./README.md) · **Coding agents:** [agent-onboarding.md](./agent-onboarding.md)
 
 ## Goals
 

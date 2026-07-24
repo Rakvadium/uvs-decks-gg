@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { KEYWORD_ABILITY_MAP, TIMING_COLORS } from "./constants";
 
 const keywordChipClassName =
-  "inline-flex items-center rounded-sm border px-2 py-0.5 text-[10px] font-bold font-mono uppercase tracking-[0.12em]";
+  "inline-flex items-center rounded-sm border px-2.5 py-1 text-xs font-bold font-mono uppercase tracking-[0.12em]";
 
 interface KeywordBadgeProps {
   keyword: string;
@@ -18,7 +18,7 @@ export function KeywordBadge({ keyword }: KeywordBadgeProps) {
   if (!abilityDef || !abilityDef.timing) {
     return (
       <span
-        className={cn(keywordChipClassName, "border-border/40 bg-muted/10 text-foreground/90")}
+        className={cn(keywordChipClassName, "border-border/40 bg-muted/20 text-foreground/90")}
       >
         {keyword}
       </span>
@@ -32,7 +32,7 @@ export function KeywordBadge({ keyword }: KeywordBadgeProps) {
       <TooltipTrigger asChild>
         <button
           type="button"
-          className={cn(keywordChipClassName, "cursor-pointer transition-all hover:scale-105")}
+          className={cn(keywordChipClassName, "cursor-pointer transition-transform hover:scale-105")}
           style={{
             backgroundColor: `${color}20`,
             color,
@@ -45,7 +45,7 @@ export function KeywordBadge({ keyword }: KeywordBadgeProps) {
       </TooltipTrigger>
       <TooltipContent
         side="top"
-        className="max-w-xs bg-background/90 backdrop-blur-md"
+        className="max-w-xs bg-background/95 backdrop-blur-md"
         style={{
           borderColor: `${color}40`,
         }}

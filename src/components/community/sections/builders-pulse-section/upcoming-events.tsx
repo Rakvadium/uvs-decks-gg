@@ -7,7 +7,7 @@ export function CommunityUpcomingEvents() {
     <div id="community-events" className="space-y-3">
       <div className="flex items-center justify-between font-mono text-xs uppercase tracking-widest text-muted-foreground">
         <span>Upcoming</span>
-        <Badge variant="outline" className="text-[9px]">
+        <Badge variant="outline" className="text-[10px]">
           Events
         </Badge>
       </div>
@@ -18,10 +18,10 @@ export function CommunityUpcomingEvents() {
         return (
           <div
             key={event.label}
-            className="flex items-center justify-between rounded-lg border border-border/60 bg-background/60 px-3 py-2"
+            className="flex items-center justify-between rounded-lg border border-border/50 bg-background/50 px-3 py-2"
           >
             <div className="flex items-center gap-2">
-              <div className="flex h-7 w-7 items-center justify-center rounded-md border border-border/60 bg-card/60">
+              <div className="flex h-7 w-7 items-center justify-center rounded-md border border-border/50 bg-card/80">
                 <Icon className="h-3.5 w-3.5 text-secondary" />
               </div>
               <div>

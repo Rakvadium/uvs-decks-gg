@@ -383,7 +383,7 @@ export function UniversusMediaDock() {
         <div
           ref={panelRef}
           className={cn(
-            "fixed z-[500] flex min-h-0 min-w-0 flex-col overflow-hidden rounded-xl border border-border/60 bg-background/98 shadow-2xl backdrop-blur-xl",
+            "fixed z-[500] flex min-h-0 min-w-0 flex-col overflow-hidden rounded-xl border border-border/50 bg-background/95 shadow-2xl backdrop-blur-xl",
             !dockPosition && "bottom-[5.5rem] right-3 md:bottom-6 md:right-4"
           )}
           style={panelBoxStyle}
@@ -400,7 +400,7 @@ export function UniversusMediaDock() {
                 Mini player
               </span>
               {liveRows.length > 0 ? (
-                <Badge variant="destructive" className="h-5 px-1.5 text-[9px]">
+                <Badge variant="destructive" className="h-5 px-1.5 text-[10px]">
                   Live
                 </Badge>
               ) : null}
@@ -424,7 +424,7 @@ export function UniversusMediaDock() {
 
           <div className="shrink-0 border-b border-border/30">
             {playback === null ? (
-              <div className="flex aspect-video flex-col items-center justify-center gap-2 bg-muted/40 px-4 text-center">
+              <div className="flex aspect-video flex-col items-center justify-center gap-2 bg-muted/50 px-4 text-center">
                 <Radio className="h-8 w-8 text-muted-foreground" />
                 <p className="text-xs text-muted-foreground">Choose something from the queue</p>
               </div>
@@ -483,7 +483,7 @@ export function UniversusMediaDock() {
                   <>
                     {liveRows.length > 0 ? (
                       <div className="mb-3 space-y-1.5">
-                        <p className="px-1 font-mono text-[9px] uppercase tracking-widest text-red-400/90">Live now</p>
+                        <p className="px-1 font-mono text-[10px] uppercase tracking-widest text-red-400/90">Live now</p>
                         {liveRows.map((row) => {
                           const active = playbackEquals(playback, row.playback);
                           return (
@@ -504,7 +504,7 @@ export function UniversusMediaDock() {
                                     <Play className="h-4 w-4 text-red-400" />
                                   </div>
                                 )}
-                                <span className="absolute bottom-0.5 left-0.5 rounded bg-red-600 px-1 font-mono text-[8px] font-bold text-white">
+                                <span className="absolute bottom-0.5 left-0.5 rounded bg-red-600 px-1 font-mono text-[10px] font-bold text-white">
                                   LIVE
                                 </span>
                               </div>
@@ -528,7 +528,7 @@ export function UniversusMediaDock() {
                     {feed.feedKind !== "empty" && feed.items.length > 0 ? (
                       <>
                         {liveRows.length > 0 ? (
-                          <p className="mb-1.5 px-1 font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
+                          <p className="mb-1.5 px-1 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
                             Curated
                           </p>
                         ) : null}

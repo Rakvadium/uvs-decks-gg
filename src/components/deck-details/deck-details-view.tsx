@@ -1,17 +1,21 @@
 "use client";
 
 import { useMemo } from "react";
+import Link from "next/link";
 import { useConvexAuth, useQuery } from "convex/react";
 import { BarChart3, Download, LayoutGrid, Loader2, Shuffle } from "lucide-react";
 import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
+import { Button } from "@/components/ui/button";
 import { DeckInvitePendingGate } from "@/components/deck-details/deck-invite-pending-gate";
 import { DeckDetailsSharePanel } from "@/components/deck-details/deck-details-share-panel";
 import { DeckDetailsPrivateLinkPanel } from "@/components/deck-details/deck-details-private-link-panel";
 import { DeckDetailsReadOnlyBanner } from "@/components/deck-details/deck-details-read-only-banner";
 import { useDeckDetails } from "@/providers/DeckDetailsProvider";
 import { useRegisterSlot } from "@/components/shell/shell-slot-provider";
-import { DeckDetailsDesktopHeader } from "./deck-details-desktop-header";
+import { FloatingPageLayout } from "@/components/shell/floating-page-bar";
+import { DeckDetailsFloatingTopBar } from "./deck-details-floating-top-bar";
+import { DeckDetailsMetaTags } from "./deck-details-meta-tags";
 import { DeckDetailsTopBar } from "./deck-details-top-bar";
 import { DeckDetailsTopBarProvider } from "./deck-details-top-bar/context";
 import { DeckCardsSection } from "./deck-details-cards-section";
@@ -69,46 +73,52 @@ export function DeckDetailsView() {
       ) : !deck && pendingInvite && deckId ? (
         <DeckInvitePendingGate deckId={deckId} deckName={pendingInvite.deckName} />
       ) : !deck ? (
-        <div className="flex h-full items-center justify-center p-4">
+        <div className="flex h-full flex-col items-center justify-center gap-4 p-4">
           <p className="max-w-sm text-center text-sm text-muted-foreground">
             This deck could not be found, or you do not have permission to view it.
           </p>
+          <Button variant="outline" asChild>
+            <Link href="/decks">Back to Decks</Link>
+          </Button>
         </div>
       ) : (
-        <div className="flex flex-col max-md:gap-0 md:gap-6">
-          <TeamEditableWriteConflictBanner className="max-md:mb-4" />
-          <DeckDetailsReadOnlyBanner />
-          <DeckDetailsEditDialog />
-          {isOwner && <DeckDetailsGallerySlotRegistration />}
-          <div className="hidden md:block">
-            <DeckDetailsDesktopHeader />
-          </div>
-          <div className="sticky top-0 z-30 -mx-3 border-b border-border/50 bg-background/90 px-3 py-2.5 backdrop-blur-md supports-[backdrop-filter]:bg-background/75 md:hidden">
-            <DeckDetailsTopBar />
-          </div>
-          <div className="relative max-md:mt-4 md:mt-0">
-            <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-secondary/5 to-accent/5 rounded-xl blur-xl" />
+        <FloatingPageLayout
+          bar={<DeckDetailsFloatingTopBar />}
+          contentClassName="px-3 pb-3 pt-0 md:px-6 md:pb-6"
+        >
+          <div className="flex flex-col max-md:gap-0 md:gap-6">
+            <TeamEditableWriteConflictBanner className="max-md:mb-4" />
+            <DeckDetailsReadOnlyBanner />
+            <DeckDetailsEditDialog />
+            {isOwner && <DeckDetailsGallerySlotRegistration />}
+            <div className="sticky top-0 z-30 -mx-3 border-b border-border/50 bg-background/95 px-3 py-2.5 backdrop-blur-md supports-[backdrop-filter]:bg-background/80 md:hidden">
+              <DeckDetailsTopBar />
+            </div>
+            <div className="relative max-md:mt-4 md:mt-0">
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-secondary/5 to-accent/5 rounded-xl blur-xl" />
 
-            <DeckCardsSectionProvider>
-              <div className="relative flex flex-col lg:flex-row gap-4 lg:gap-6">
-                <div className="flex flex-col gap-3 shrink-0 w-full lg:w-48 lg:self-start lg:sticky lg:top-6">
-                  <DeckDetailsHeroPanel />
-                  <DeckDetailsPrivateLinkPanel />
-                  <DeckDetailsSharePanel />
-                  <DeckDetailsSectionTabs />
-                  <div className="hidden md:flex md:flex-col md:gap-2">
-                    <DeckDetailsViewModeToggle />
-                    <DeckDetailsDesktopListSort />
+              <DeckCardsSectionProvider>
+                <div className="relative flex flex-col lg:flex-row gap-4 lg:gap-6">
+                  <div className="flex flex-col gap-3 shrink-0 w-full lg:w-48 lg:self-start lg:sticky lg:top-6">
+                    <DeckDetailsHeroPanel />
+                    <DeckDetailsMetaTags className="hidden md:block" />
+                    <DeckDetailsPrivateLinkPanel />
+                    <DeckDetailsSharePanel />
+                    <DeckDetailsSectionTabs />
+                    <div className="hidden md:flex md:flex-col md:gap-2">
+                      <DeckDetailsViewModeToggle />
+                      <DeckDetailsDesktopListSort />
+                    </div>
+                  </div>
+
+                  <div className="flex-1 min-w-0">
+                    <DeckCardsSection />
                   </div>
                 </div>
-
-                <div className="flex-1 min-w-0">
-                  <DeckCardsSection />
-                </div>
-              </div>
-            </DeckCardsSectionProvider>
+              </DeckCardsSectionProvider>
+            </div>
           </div>
-        </div>
+        </FloatingPageLayout>
       )}
     </DeckDetailsTopBarProvider>
   );

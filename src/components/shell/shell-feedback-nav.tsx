@@ -9,6 +9,11 @@ import {
 } from "@/components/ui/tooltip";
 import { useFeedbackDialogControl } from "./feedback-dialog-provider";
 import { useLeftSidebarContext } from "./left-sidebar/context";
+import {
+  SHELL_NAV_ITEM_BASE,
+  SHELL_NAV_ITEM_IDLE,
+  SHELL_RAIL_ITEM_COLLAPSED_CLASS,
+} from "./shell-chrome";
 
 type ShellFeedbackNavSidebarProps = {
   variant: "sidebar";
@@ -27,8 +32,9 @@ function ShellFeedbackNavSidebarInner() {
       type="button"
       onClick={openFeedbackDialog}
       className={cn(
-        "render-stable relative flex w-full items-center gap-3 rounded-md border border-transparent px-3 py-2.5 text-sm font-medium text-sidebar-foreground/70 transition-all duration-200 hover:border-sidebar-border/50 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground",
-        collapsed && "w-full justify-center px-2 py-2.5"
+        SHELL_NAV_ITEM_BASE,
+        SHELL_NAV_ITEM_IDLE,
+        collapsed ? SHELL_RAIL_ITEM_COLLAPSED_CLASS : "w-full"
       )}
     >
       <MessageSquare className="h-4 w-4 shrink-0" />
@@ -54,7 +60,6 @@ function ShellFeedbackNavSidebarInner() {
   }
   return (
     <div
-      className="render-stable"
       style={prefersReducedMotion ? undefined : { animationDelay: "200ms" }}
     >
       {control}
@@ -69,7 +74,7 @@ function ShellFeedbackNavMobileHeaderInner() {
       type="button"
       onClick={openFeedbackDialog}
       aria-label="Feedback"
-      className="relative z-10 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-sidebar-border/60 bg-sidebar-accent/20 text-sidebar-foreground/80 transition-colors hover:bg-sidebar-accent/40 hover:text-sidebar-foreground"
+      className="relative z-10 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-sidebar-border bg-sidebar-accent text-sidebar-foreground transition-colors hover:border-accent/35 hover:bg-accent/10 hover:text-accent"
     >
       <MessageSquare className="h-4 w-4" aria-hidden />
     </button>

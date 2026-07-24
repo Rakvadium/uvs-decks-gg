@@ -21,6 +21,7 @@ interface GalleryTopBarFiltersContextValue {
   };
   meta: {
     activeFilterCount: number;
+    hasClearableFilters: boolean;
   };
   isFilterPanelOpen: boolean;
   setFilterPanelOpen: (open: boolean) => void;
@@ -51,6 +52,7 @@ export function GalleryTopBarFiltersProvider({ children }: { children: ReactNode
       },
       meta: {
         activeFilterCount: filtersContext.meta.activeFilterCount,
+        hasClearableFilters: filtersContext.meta.hasClearableFilters,
       },
       isFilterPanelOpen,
       setFilterPanelOpen,

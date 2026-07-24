@@ -92,7 +92,7 @@ export function CardDetailsAdminJsonControls({
           <DialogPrimitive.Overlay
             className={cn(
               "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
-              "fixed inset-0 z-[250] bg-background/70 backdrop-blur-sm"
+              "fixed inset-0 z-[400] bg-background/80 backdrop-blur-sm"
             )}
           />
           <DialogPrimitive.Content
@@ -101,7 +101,7 @@ export function CardDetailsAdminJsonControls({
             className={cn(
               "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
               "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
-              "fixed top-[50%] left-[50%] z-[251] flex max-h-[min(85dvh,720px)] w-[calc(100vw-1.5rem)] max-w-3xl",
+              "fixed top-[50%] left-[50%] z-[410] flex max-h-[min(85dvh,720px)] w-[calc(100vw-1.5rem)] max-w-3xl",
               "-translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-xl duration-200",
               "border border-primary/25 bg-card/95 shadow-[0_0_2px_var(--primary)/35,0_0_12px_var(--primary)/22] backdrop-blur-md",
               "p-0 outline-none"

@@ -9,8 +9,8 @@ export function DeckDetailsReadOnlyBanner() {
   if (!deck || isOwner) return null;
 
   return (
-    <div className="flex items-center gap-2 rounded-lg border border-border/60 bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
-      <Eye className="h-3.5 w-3.5 shrink-0" />
+    <div className="flex items-center gap-2 rounded-lg border border-border/50 bg-muted/60 px-3 py-2 text-xs text-foreground/80">
+      <Eye className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
       <span>You&apos;re viewing this deck in read-only mode.</span>
     </div>
   );

@@ -19,7 +19,7 @@ export function DeckDetailsGalleryViewModePopover() {
         <button
           type="button"
           className={cn(
-            "flex h-9 w-9 items-center justify-center rounded-md border border-primary/30 bg-background/60 text-muted-foreground transition-colors",
+            "flex h-9 w-9 items-center justify-center rounded-md border border-primary/30 bg-background/50 text-muted-foreground transition-colors",
             "hover:border-primary/60 hover:bg-primary/10 hover:text-primary"
           )}
           aria-label="Change view mode"
@@ -41,7 +41,7 @@ export function DeckDetailsGalleryViewModePopover() {
                   type="button"
                   onClick={() => setViewMode(mode)}
                   className={cn(
-                    "flex flex-1 flex-col items-center gap-1 rounded-md border p-2 transition-all",
+                    "flex flex-1 flex-col items-center gap-1 rounded-md border p-2 transition-colors",
                     viewMode === mode
                       ? "border-primary/30 bg-primary/15 text-primary"
                       : "border-transparent hover:bg-muted"

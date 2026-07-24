@@ -1,5 +1,10 @@
 "use client";
 
+import {
+  getCardTypeChipColor,
+  getZoneColor,
+  UNIVERSUS_COLORS,
+} from "@/config/universus";
 import { cn } from "@/lib/utils";
 import { SymbolIcon } from "../symbol-icon";
 import { AbilityText } from "./ability-text";
@@ -7,12 +12,12 @@ import { useCardDetailsContent } from "./content-context";
 import { KeywordBadge } from "./keyword-badge";
 
 const ACCENT = {
-  general: "#7dd3fc",
-  block: "#fb7185",
-  attack: "#fbbf24",
+  general: UNIVERSUS_COLORS.ACTION,
+  block: UNIVERSUS_COLORS.BACKUP,
+  attack: UNIVERSUS_COLORS.ATTACK,
 } as const;
 
-type StatRow = { key: string; value: string };
+type StatRow = { key: string; value: string; color?: string };
 
 type StatColumn = { title: string; accent: string; rows: StatRow[] };
 
@@ -79,7 +84,7 @@ function CompactStatsBand({ columns }: { columns: StatColumn[] }) {
               }}
             />
             <h2
-              className="text-[8px] font-mono font-semibold uppercase tracking-[0.22em] text-muted-foreground/75 sm:text-[9px] sm:tracking-[0.3em]"
+              className="text-xs font-mono font-semibold uppercase tracking-[0.18em] text-muted-foreground/75"
               style={{ color: col.accent }}
             >
               {col.title}
@@ -91,12 +96,12 @@ function CompactStatsBand({ columns }: { columns: StatColumn[] }) {
                   key={row.key}
                   className="flex min-w-0 flex-col items-start gap-0.5 sm:flex-row sm:items-baseline sm:gap-x-1.5 sm:gap-y-0 md:gap-x-2"
                 >
-                  <dt className="order-2 m-0 max-w-full text-[7px] font-semibold uppercase leading-tight tracking-[0.05em] text-muted-foreground/70 sm:order-1 sm:shrink-0 sm:text-[9px] sm:tracking-[0.08em]">
+                  <dt className="order-2 m-0 max-w-full text-xs font-semibold uppercase leading-tight tracking-[0.05em] text-muted-foreground/70 sm:order-1 sm:shrink-0 sm:tracking-[0.08em]">
                     {row.key}
                   </dt>
                   <dd
-                    className="order-1 m-0 min-w-0 font-display text-xs font-extrabold tabular-nums leading-none tracking-[-0.02em] sm:order-2 sm:text-sm md:text-base"
-                    style={{ color: col.accent }}
+                    className="order-1 m-0 min-w-0 font-display text-sm font-extrabold tabular-nums leading-none tracking-[-0.02em] sm:order-2 sm:text-base md:text-lg"
+                    style={{ color: row.color ?? col.accent }}
                   >
                     {row.value}
                   </dd>
@@ -175,6 +180,7 @@ export function CardDetailsReadoutPanel() {
     blockRows.push({
       key: "Zone",
       value: card.blockZone.toUpperCase(),
+      color: getZoneColor(card.blockZone),
     });
   }
   if (card.blockModifier !== undefined) {
@@ -189,6 +195,7 @@ export function CardDetailsReadoutPanel() {
     attackRows.push({
       key: "Zone",
       value: card.attackZone.toUpperCase(),
+      color: getZoneColor(card.attackZone),
     });
   }
   if (card.damage !== undefined) {
@@ -224,22 +231,34 @@ export function CardDetailsReadoutPanel() {
     });
   }
 
+  const typeColor = card.type ? getCardTypeChipColor(card.type) : undefined;
+
   return (
     <div className="relative z-[1] px-5 py-5 pr-12 md:px-8 md:py-6 md:pr-12 lg:px-9 lg:pr-12 lg:py-7">
       <header className="mb-6 md:mb-7">
-        <h1 className="min-w-0 text-[clamp(1.35rem,3.35vw,2.2rem)] font-extrabold leading-[1.05] tracking-[-0.04em] text-foreground">
+        <h1 className="min-w-0 text-[clamp(1.5rem,3.75vw,2.5rem)] font-extrabold leading-[1.05] tracking-[-0.04em] text-foreground">
           {card.name}
         </h1>
         <div className="mt-3 flex flex-wrap items-center gap-2.5">
-          {card.type && (
-            <span className="inline-flex items-center rounded-full border border-primary/35 bg-primary/[0.12] px-3 py-1 text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-primary">
+          {card.type && typeColor ? (
+            <span
+              className="inline-flex items-center rounded-full border px-3 py-1 text-xs font-mono font-bold uppercase tracking-[0.18em] text-white"
+              style={{
+                backgroundColor: typeColor,
+                borderColor:
+                  typeColor === UNIVERSUS_COLORS.TOKEN ||
+                  typeColor === UNIVERSUS_COLORS.ARENA
+                    ? "rgba(255,255,255,0.35)"
+                    : typeColor,
+              }}
+            >
               {card.type}
             </span>
-          )}
+          ) : null}
           {symbols.length > 0 && (
-            <div className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-background/35 px-2.5 py-1 backdrop-blur-md">
+            <div className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-background/30 px-2.5 py-1 backdrop-blur-md">
               {symbols.map((s) => (
-                <SymbolIcon key={s} symbol={s} size="md" />
+                <SymbolIcon key={s} symbol={s} size="lg" />
               ))}
             </div>
           )}
@@ -255,7 +274,7 @@ export function CardDetailsReadoutPanel() {
       {hasKeywords && (
         <section className="mb-6 md:mb-7" aria-label="Keywords">
           <div className="mb-2 flex items-center gap-3">
-            <p className="shrink-0 font-mono text-[10px] font-semibold uppercase tracking-[0.38em] text-muted-foreground/50">
+            <p className="shrink-0 font-mono text-xs font-semibold uppercase tracking-[0.38em] text-muted-foreground/50">
               Keywords
             </p>
             <span className="h-px flex-1 bg-gradient-to-r from-border/60 via-border/25 to-transparent" />
@@ -280,7 +299,7 @@ export function CardDetailsReadoutPanel() {
       {card.text && (
         <section aria-label="Card text">
           <div className="mb-2 flex items-center gap-3">
-            <p className="shrink-0 font-mono text-[10px] font-semibold uppercase tracking-[0.38em] text-muted-foreground/50">
+            <p className="shrink-0 font-mono text-xs font-semibold uppercase tracking-[0.38em] text-muted-foreground/50">
               Abilities
             </p>
             <span className="h-px flex-1 bg-gradient-to-r from-border/60 via-border/25 to-transparent" />

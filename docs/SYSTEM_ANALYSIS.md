@@ -43,7 +43,7 @@ flowchart LR
 
 - **Data:** `convex/schema.ts` defines tables including users (beyond auth tables), sets, cards (with search indexes), a singleton **`cardFacetSnapshot`** (rarities, types, set codes) rebuilt on admin release/import/clear, decks, collections, tier lists and items, community ranking snapshots, sessions, subscriptions, and engagement tables (likes, views, comments) as implemented. **Moderated binary uploads** use the `mediaAssets` table (`kind`: `team_logo` \| `profile_avatar`; `status` flows `pending` → `approved` \| `rejected` \| `needs_review`). Team logos: `api.mediaAssets.generateTeamLogoUploadUrl` / `submitTeamLogoUpload` → `internal.mediaAssetActions.runTeamLogoModeration` → `internal.mediaAssets.finalizeTeamLogoModeration`; `teams.logoAssetId` is set only when an asset is approved. Client-visible image URLs for that path come from `api.teams.logo.getTeamLogoPresentation`, which resolves `storage.getUrl` only for an **approved** asset on `logoAssetId` (not for pending or rejected rows). See [content-moderation-and-language-filter.md](./content-moderation-and-language-filter.md) §3.2.
 - **API surface:** TypeScript modules under `convex/` expose queries, mutations, and actions consumed via generated `api`.
-- **Auth:** `@convex-dev/auth` extends the schema with auth tables; app-specific `users` table stores profile and role fields used by the product.
+- **Auth:** `@convex-dev/auth` extends the schema with auth tables; app-specific `users` table stores profile and role fields used by the product. Local browser agents can obtain a normal password session via dev-only `/agent-login` (see [agent-onboarding.md](./agent-onboarding.md) §5).
 
 ## Integrations
 
@@ -71,8 +71,7 @@ flowchart LR
 
 ## See also
 
-- [ARCHITECTURE_PLAN.md](./ARCHITECTURE_PLAN.md)
-- [TECH_STACK_DETAILS.md](./TECH_STACK_DETAILS.md)
+- [PRODUCT_VISION.md](./PRODUCT_VISION.md)
 - [theme-and-chrome.md](./theme-and-chrome.md)
-- [smoke-checklist.md](./smoke-checklist.md)
+- [card-data-hooks.md](./card-data-hooks.md)
 

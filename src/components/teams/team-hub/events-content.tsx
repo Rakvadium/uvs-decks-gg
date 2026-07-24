@@ -1,6 +1,7 @@
 "use client";
 
 import { useMutation, useQuery } from "convex/react";
+import { Plus } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { api } from "../../../../convex/_generated/api";
@@ -20,6 +21,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useTeamHub } from "./hook";
+import { useRegisterTeamHubPrimaryAction } from "./primary-action-context";
 
 function formatRange(starts: number, ends: number | undefined) {
   const a = new Date(starts);
@@ -104,6 +106,9 @@ export function TeamHubEventsContent({ teamId }: TeamHubEventsContentProps) {
     }
   }, [caps?.canManageEvents, create, description, ends, id, starts, title]);
 
+  const openCreate = useCallback(() => setCreateOpen(true), []);
+  useRegisterTeamHubPrimaryAction(caps?.canManageEvents === true, "Create Calendar Item", openCreate, Plus);
+
   if (teamGone) {
     return null;
   }
@@ -134,8 +139,8 @@ export function TeamHubEventsContent({ teamId }: TeamHubEventsContentProps) {
         {caps.canManageEvents ? (
           <Button
             type="button"
-            className="h-9 shrink-0 font-mono text-xs uppercase tracking-wider sm:mt-0.5"
-            onClick={() => setCreateOpen(true)}
+            className="h-9 shrink-0 font-mono text-xs uppercase tracking-wider sm:mt-0.5 md:hidden"
+            onClick={openCreate}
           >
             Create Calendar Item
           </Button>
@@ -220,7 +225,7 @@ export function TeamHubEventsContent({ teamId }: TeamHubEventsContentProps) {
               return (
                 <li
                   key={e._id}
-                  className="flex flex-col gap-1 rounded-lg border border-border/60 bg-background/60 px-4 py-3 sm:flex-row sm:items-start sm:justify-between"
+                  className="flex flex-col gap-1 rounded-lg border border-border/50 bg-background/50 px-4 py-3 sm:flex-row sm:items-start sm:justify-between"
                 >
                   <div className="min-w-0">
                     <p className="font-medium text-foreground">{e.title}</p>

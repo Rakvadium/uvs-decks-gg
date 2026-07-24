@@ -132,10 +132,10 @@ export function CardDetailsDialog({
   const displayCard = isFlipped && currentBackCard ? currentBackCard : currentCard;
   const navigationButtonClassName = (enabled: boolean) =>
     cn(
-      "flex h-10 w-10 items-center justify-center rounded-full border transition-all",
+      "flex h-10 w-10 items-center justify-center rounded-full border transition-colors",
       enabled
-        ? "bg-card/90 text-primary shadow-[var(--chrome-dialog-nav-shadow-enabled)] border-[var(--chrome-dialog-nav-border-enabled)] hover:bg-primary/20 hover:border-primary/50"
-        : "bg-card/50 text-muted-foreground/30 border-border/20 cursor-not-allowed"
+        ? "bg-card/95 text-primary shadow-[var(--chrome-dialog-nav-shadow-enabled)] border-[var(--chrome-dialog-nav-border-enabled)] hover:bg-primary/20 hover:border-primary/50"
+        : "bg-card/50 text-muted-foreground/30 border-border/30 cursor-not-allowed"
     );
 
   return (

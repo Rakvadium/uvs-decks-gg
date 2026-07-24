@@ -28,7 +28,7 @@ export function DeckSidebarItemCounts() {
 
       <span
         className={cn(
-          "ml-auto rounded border px-2 py-0.5 text-[9px] font-mono uppercase tracking-wider",
+          "ml-auto rounded border px-2 py-0.5 text-[10px] font-mono uppercase tracking-wider",
           mainCount >= 60
             ? "border-green-500/30 bg-green-500/10 text-green-500"
             : "border-orange-500/30 bg-orange-500/10 text-orange-500"

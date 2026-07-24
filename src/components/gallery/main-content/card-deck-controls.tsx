@@ -14,24 +14,24 @@ function CardDeckControlsBase({ card, onClick, compact = false }: CardDeckContro
 
   if (!hasDeck) return null;
 
-  const iconClassName = compact ? "h-3.5 w-3.5" : "h-4 w-4";
+  const iconClassName = compact ? "h-3.5 w-3.5 stroke-[2.5]" : "h-4 w-4 stroke-[2.5]";
   const countClassName = compact
-    ? "w-8 text-center font-mono text-xs font-bold text-primary"
-    : "w-8 text-center font-mono font-bold text-primary";
+    ? "w-8 text-center font-mono text-xs font-bold tabular-nums text-foreground"
+    : "w-8 text-center font-mono font-bold tabular-nums text-foreground";
 
   return (
     <div className="flex items-center gap-1" data-no-drag>
       <Button
-        variant="outline"
+        variant="destructiveOutline"
         size="icon-sm"
         onClick={(event) => {
           onClick?.(event);
           removeFromDeck();
         }}
         disabled={deckCount === 0}
-        className="border-destructive/30 hover:border-destructive hover:bg-destructive/10"
+        className="disabled:opacity-60"
       >
-        <Minus className={`${iconClassName} text-destructive`} />
+        <Minus className={iconClassName} />
       </Button>
       <span className={countClassName}>{deckCount}</span>
       <Button
@@ -42,9 +42,9 @@ function CardDeckControlsBase({ card, onClick, compact = false }: CardDeckContro
           addToDeck();
         }}
         disabled={!canAddToDeck}
-        className="border-primary/30 hover:border-primary hover:bg-primary/10"
+        className="border-primary/55 bg-primary/10 text-primary hover:border-primary hover:bg-primary/20 disabled:opacity-60"
       >
-        <Plus className={`${iconClassName} text-primary`} />
+        <Plus className={iconClassName} />
       </Button>
     </div>
   );

@@ -27,7 +27,7 @@ type CreateTeamButtonProps = {
   variant?: ComponentProps<typeof Button>["variant"];
 };
 
-export function CreateTeamButton({ className, size = "sm", variant = "outline" }: CreateTeamButtonProps) {
+export function CreateTeamButton({ className, size = "sm", variant = "default" }: CreateTeamButtonProps) {
   const [open, setOpen] = useState(false);
   const { isAuthenticated } = useConvexAuth();
   const { openAuthDialog } = useAuthDialog();
@@ -137,7 +137,7 @@ function CreateTeamFormDialog({ open, onOpenChange }: CreateTeamFormDialogProps)
           </div>
 
           <div className="relative min-h-0 flex-1 overflow-y-auto px-6">
-            <DialogHeader className="border-border/20 pb-4 pt-6">
+            <DialogHeader className="border-border/30 pb-4 pt-6">
               <div className="flex items-start gap-3">
                 <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-primary/30 bg-primary/10 shadow-[0_0_2px_var(--primary)/40,0_0_6px_var(--primary)/40]">
                   <UsersRound className="h-5 w-5 text-primary" />
@@ -163,7 +163,7 @@ function CreateTeamFormDialog({ open, onOpenChange }: CreateTeamFormDialogProps)
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Team name…"
-                    className="h-12 border-border/60 bg-background/40 pl-10 text-base focus-visible:ring-primary/25"
+                    className="h-12 bg-background/50 pl-10 text-base focus-visible:ring-primary/25"
                     autoComplete="off"
                     onKeyDown={(e) => {
                       if (e.key === "Enter") {
@@ -184,7 +184,7 @@ function CreateTeamFormDialog({ open, onOpenChange }: CreateTeamFormDialogProps)
                     value={slug}
                     onChange={(e) => setSlug(e.target.value)}
                     placeholder="my-team"
-                    className="h-12 border-border/60 bg-background/40 pl-10 font-mono text-sm focus-visible:ring-primary/25"
+                    className="h-12 bg-background/50 pl-10 font-mono text-sm focus-visible:ring-primary/25"
                     autoComplete="off"
                   />
                 </div>
@@ -198,7 +198,7 @@ function CreateTeamFormDialog({ open, onOpenChange }: CreateTeamFormDialogProps)
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="What is this team for?"
                   rows={3}
-                  className="mt-2 min-h-[4.5rem] resize-y border-border/60 bg-background/40 focus-visible:ring-primary/25"
+                  className="mt-2 min-h-[4.5rem] resize-y bg-background/50 focus-visible:ring-primary/25"
                 />
                 <p className="mt-2 text-xs text-muted-foreground/70">
                   Tip: A short blurb helps members know what the team is for. You can change this later in the

@@ -37,14 +37,14 @@ export function CardDetailsListItem({ card, onOpenCardDetails, imagePriority = f
   return (
     <>
       <div
-        className={cn("rounded-xl border border-border/40 bg-card/30 p-4 transition-all md:p-6", isDragging && "opacity-70")}
+        className={cn("rounded-xl border border-border/40 bg-card/30 p-4 transition-colors md:p-6", isDragging && "opacity-70")}
       >
         <div className="grid gap-6 lg:grid-cols-[260px_1fr]">
           <div className="space-y-4">
             <div className="relative mx-auto w-full max-w-[260px] lg:mx-0">
               <div
                 className={cn(
-                  "relative aspect-[2.5/3.5] w-full overflow-hidden rounded-2xl border border-border/50 bg-muted/40",
+                  "relative aspect-[2.5/3.5] w-full overflow-hidden rounded-2xl border border-border/50 bg-muted/50",
                   "shadow-[var(--chrome-card-image-glow-rest)]"
                 )}
                 style={{
@@ -61,7 +61,8 @@ export function CardDetailsListItem({ card, onOpenCardDetails, imagePriority = f
                     src={displayCard.imageUrl}
                     alt={displayCard.name}
                     fill
-                    sizes="(max-width: 1024px) min(90vw, 260px), 260px"
+                    sizes="(max-width: 1024px) min(90vw, 320px), 320px"
+                    quality={95}
                     className="object-cover"
                     priority={imagePriority}
                     loading={imagePriority ? undefined : "lazy"}

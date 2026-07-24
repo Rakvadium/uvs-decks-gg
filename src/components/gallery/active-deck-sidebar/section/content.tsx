@@ -12,7 +12,7 @@ function ActiveDeckSectionContent() {
   return (
     <div
       className={cn(
-        "space-y-2 rounded-lg border border-border/50 bg-card/40 p-3 transition-colors",
+        "space-y-2 rounded-lg border border-border/50 bg-card/50 p-3 transition-colors",
         canDrop && "border-primary/40 bg-primary/5",
         isOver && "bg-primary/10"
       )}

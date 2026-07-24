@@ -25,14 +25,19 @@ export function MobileActionsSlotGrid() {
               key={slot.id}
               onClick={() => selectSlot(slot.id)}
               className={cn(
-                "group flex w-full items-center gap-3 rounded-xl border border-border/60 bg-card/50 p-3 text-card-foreground transition-all",
+                "group flex w-full items-center gap-3 rounded-xl border border-border/50 bg-card/50 p-3 text-card-foreground transition-colors",
                 "hover:border-primary/40 hover:bg-primary/10"
               )}
             >
               <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg border border-primary/30 bg-primary/10 text-primary shadow-[0_0_14px_-8px_var(--primary)]">
                 {Icon ? (
                   <span className="flex h-full w-full items-center justify-center">
-                    <Icon className={cn("h-full w-full", slot.id === "active-deck" ? "" : "p-1.5")} />
+                    <Icon
+                      className={cn(
+                        "h-full w-full",
+                        slot.iconFit === "media" ? "rounded-[inherit]" : "p-1.5"
+                      )}
+                    />
                   </span>
                 ) : (
                   <span className="flex h-full w-full items-center justify-center text-lg font-semibold">

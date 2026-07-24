@@ -78,11 +78,20 @@ export const inviteUser = mutation({
       throw new Error("Deck is not in share mode");
     }
 
-    const needle = args.username.trim().toLowerCase();
-    if (!needle) throw new Error("Username required");
+    const trimmed = args.username.trim();
+    if (!trimmed) throw new Error("Username required");
 
-    const users = await ctx.db.query("users").collect();
-    const invitee = users.find((u) => u.username?.toLowerCase() === needle);
+    const candidates = Array.from(
+      new Set([trimmed, trimmed.toLowerCase()]),
+    );
+    let invitee = null;
+    for (const username of candidates) {
+      invitee = await ctx.db
+        .query("users")
+        .withIndex("by_username", (q) => q.eq("username", username))
+        .unique();
+      if (invitee) break;
+    }
     if (!invitee) throw new Error("User not found");
     if (invitee._id === userId) throw new Error("Cannot invite yourself");
     if (invitee._id === deck.userId) throw new Error("Invalid invite");

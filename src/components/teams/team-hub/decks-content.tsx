@@ -105,7 +105,7 @@ export function TeamHubDecksContent({ teamId }: TeamHubDecksContentProps) {
           ) : null}
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-lg border border-border/60">
+        <div className="overflow-x-auto rounded-lg border border-border/50">
           <Table>
             <TableHeader>
               <TableRow className="hover:bg-transparent">

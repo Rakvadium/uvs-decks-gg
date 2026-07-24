@@ -1,7 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+} from "react";
 import { useAction, useMutation, useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
@@ -43,7 +51,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { SymbolGrid } from "@/components/gallery/filter-dialog/symbols-picker-panel";
 import { parseZoneDisplay } from "@/components/universus/card-details/parsers";
-import { cn } from "@/lib/utils";
 import { CheckCircle2, Circle, Loader2, MoreHorizontal, XCircle } from "lucide-react";
 import { toast } from "sonner";
 import { toastConvexError } from "@/lib/convex-error-toast";
@@ -1218,10 +1225,14 @@ function Field({ label, children }: { label: string; children: ReactNode }) {
   );
 }
 
-function zoneToneClassName(value: string) {
+function zoneToneStyle(value: string): CSSProperties | undefined {
   const [zone] = parseZoneDisplay(value);
   if (!zone) return undefined;
-  return cn(zone.bgColor, zone.borderColor, zone.textColor);
+  return {
+    color: zone.color,
+    borderColor: `${zone.color}4D`,
+    backgroundColor: `${zone.color}1A`,
+  };
 }
 
 function ZoneSelect({
@@ -1233,7 +1244,7 @@ function ZoneSelect({
 }) {
   return (
     <Select value={value || "__none__"} onValueChange={(next) => onChange(next === "__none__" ? "" : next)}>
-      <SelectTrigger className={cn("w-full", zoneToneClassName(value))}>
+      <SelectTrigger className="w-full" style={zoneToneStyle(value)}>
         <SelectValue placeholder="Zone" />
       </SelectTrigger>
       <SelectContent>
@@ -1241,7 +1252,7 @@ function ZoneSelect({
         {UNIVERSUS_ZONES.map((zone) => {
           const [display] = parseZoneDisplay(zone);
           return (
-            <SelectItem key={zone} value={zone} className={zoneToneClassName(zone)}>
+            <SelectItem key={zone} value={zone} style={zoneToneStyle(zone)}>
               {display?.label ?? zone}
             </SelectItem>
           );

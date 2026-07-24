@@ -4,6 +4,61 @@ const toOklch = converter("oklch");
 
 export type AppearanceMode = "light" | "dark";
 
+type Oklch = {
+  mode: "oklch";
+  l: number;
+  c?: number;
+  h?: number;
+};
+
+function fmt(c: Oklch) {
+  return `oklch(${c.l.toFixed(4)} ${(c.c ?? 0).toFixed(4)} ${(c.h ?? 0).toFixed(2)})`;
+}
+
+function shiftL(c: Oklch, dl: number): Oklch {
+  return {
+    ...c,
+    l: Math.min(0.995, Math.max(0, c.l + dl)),
+    mode: "oklch",
+  };
+}
+
+function contrastAgainst(candidate: Oklch, surface: Oklch) {
+  return wcagContrast(fmt(candidate), fmt(surface));
+}
+
+function pickSignalColor(preferred: Oklch, surface: Oklch, minRatio = 3): Oklch {
+  if (contrastAgainst(preferred, surface) >= minRatio) {
+    return preferred;
+  }
+
+  const surfaceL = surface.l;
+  const step = surfaceL >= 0.55 ? -0.04 : 0.04;
+  let candidate = preferred;
+  for (let i = 0; i < 18; i += 1) {
+    candidate = shiftL(candidate, step);
+    if (contrastAgainst(candidate, surface) >= minRatio) {
+      return candidate;
+    }
+  }
+
+  const fallback: Oklch = {
+    mode: "oklch",
+    l: surfaceL >= 0.55 ? 0.36 : 0.84,
+    c: Math.min((preferred.c ?? 0) * 0.9, 0.17),
+    h: preferred.h ?? 0,
+  };
+  return contrastAgainst(fallback, surface) >= contrastAgainst(preferred, surface)
+    ? fallback
+    : preferred;
+}
+
+function pickInkOn(signal: Oklch): Oklch {
+  const white: Oklch = { mode: "oklch", l: 0.99, c: 0, h: 0 };
+  const black: Oklch = { mode: "oklch", l: 0.14, c: 0.02, h: signal.h ?? 0 };
+  return contrastAgainst(white, signal) >= contrastAgainst(black, signal) ? white : black;
+}
+
 export function buildSemanticCssVars(primaryHex: string, secondaryHex: string, mode: AppearanceMode): Record<string, string> {
   const parsedP = parse(primaryHex.trim());
   const parsedS = parse(secondaryHex.trim());
@@ -20,24 +75,15 @@ export function buildSemanticCssVars(primaryHex: string, secondaryHex: string, m
     throw new Error("Colors must resolve to OKLCH");
   }
 
-  const fmt = (c: typeof p) =>
-    `oklch(${c.l.toFixed(4)} ${(c.c ?? 0).toFixed(4)} ${(c.h ?? 0).toFixed(2)})`;
-
-  const shiftL = (c: typeof p, dl: number) => ({
-    ...c,
-    l: Math.min(0.995, Math.max(0, c.l + dl)),
-    mode: "oklch" as const,
-  });
-
-  let background: typeof p;
-  let foreground: typeof p;
-  let card: typeof p;
-  let muted: typeof p;
-  let mutedFg: typeof p;
-  let borderCol: typeof p;
-  let inputCol: typeof p;
-  let primaryFg: typeof p;
-  let secondaryFg: typeof p;
+  let background: Oklch;
+  let foreground: Oklch;
+  let card: Oklch;
+  let muted: Oklch;
+  let mutedFg: Oklch;
+  let borderCol: Oklch;
+  let inputCol: Oklch;
+  let primaryFg: Oklch;
+  let secondaryFg: Oklch;
 
   if (mode === "light") {
     background = {
@@ -73,6 +119,8 @@ export function buildSemanticCssVars(primaryHex: string, secondaryHex: string, m
       s.l > 0.62
         ? shiftL(s, -0.42)
         : { mode: "oklch", l: 0.985, c: Math.min((s.c ?? 0) * 0.06, 0.02), h: s.h ?? 90 };
+    const sidebar = shiftL(background, -0.01);
+    const accent = pickSignalColor(p, sidebar);
     return {
       "--background": fmt(background),
       "--foreground": fmt(foreground),
@@ -86,8 +134,8 @@ export function buildSemanticCssVars(primaryHex: string, secondaryHex: string, m
       "--secondary-foreground": fmt(secondaryFg),
       "--muted": fmt(muted),
       "--muted-foreground": fmt(mutedFg),
-      "--accent": fmt(shiftL(p, 0.18)),
-      "--accent-foreground": fmt(shiftL(foreground, -0.04)),
+      "--accent": fmt(accent),
+      "--accent-foreground": fmt(pickInkOn(accent)),
       "--destructive": "oklch(0.577 0.245 27.325)",
       "--destructive-foreground": "oklch(0.985 0 0)",
       "--border": fmt(borderCol),
@@ -98,7 +146,7 @@ export function buildSemanticCssVars(primaryHex: string, secondaryHex: string, m
       "--chart-3": fmt(shiftL(p, -0.05)),
       "--chart-4": fmt(shiftL(s, 0.05)),
       "--chart-5": fmt(shiftL(p, -0.08)),
-      "--sidebar": fmt(shiftL(background, -0.01)),
+      "--sidebar": fmt(sidebar),
       "--sidebar-foreground": fmt(foreground),
       "--sidebar-primary": fmt(p),
       "--sidebar-primary-foreground": fmt(primaryFg),
@@ -117,7 +165,8 @@ export function buildSemanticCssVars(primaryHex: string, secondaryHex: string, m
   borderCol = shiftL(background, 0.1);
   inputCol = borderCol;
 
-  const primaryInk = wcagContrast(fmt(shiftL(p, 0.06)), fmt(shiftL(background, 0.015))) >= 4.5
+  const primaryTone = shiftL(p, 0.05);
+  const primaryInk = contrastAgainst(primaryTone, shiftL(background, 0.015)) >= 4.5
     ? shiftL(background, 0)
     : {
         mode: "oklch" as const,
@@ -126,7 +175,9 @@ export function buildSemanticCssVars(primaryHex: string, secondaryHex: string, m
         h: background.h ?? p.h ?? 145,
       };
   const secondaryInk =
-    wcagContrast(fmt(shiftL(s, 0.06)), fmt(shiftL(background, 0.015))) >= 4.5 ? primaryInk : foreground;
+    contrastAgainst(shiftL(s, 0.06), shiftL(background, 0.015)) >= 4.5 ? primaryInk : foreground;
+  const sidebar = shiftL(background, 0.02);
+  const accent = pickSignalColor(shiftL(p, 0.06), sidebar);
 
   return {
     "--background": fmt(background),
@@ -135,14 +186,14 @@ export function buildSemanticCssVars(primaryHex: string, secondaryHex: string, m
     "--card-foreground": fmt(foreground),
     "--popover": fmt(background),
     "--popover-foreground": fmt(foreground),
-    "--primary": fmt(shiftL(p, 0.05)),
+    "--primary": fmt(primaryTone),
     "--primary-foreground": fmt(primaryInk),
     "--secondary": fmt(shiftL(s, 0.06)),
     "--secondary-foreground": fmt(secondaryInk),
     "--muted": fmt(muted),
     "--muted-foreground": fmt(mutedFg),
-    "--accent": fmt(shiftL(background, 0.1)),
-    "--accent-foreground": fmt(foreground),
+    "--accent": fmt(accent),
+    "--accent-foreground": fmt(pickInkOn(accent)),
     "--destructive": "oklch(0.62 0.22 25)",
     "--destructive-foreground": "oklch(0.98 0 0)",
     "--border": fmt(borderCol),
@@ -153,7 +204,7 @@ export function buildSemanticCssVars(primaryHex: string, secondaryHex: string, m
     "--chart-3": fmt(shiftL(p, -0.02)),
     "--chart-4": fmt(shiftL(s, -0.04)),
     "--chart-5": fmt(shiftL(p, -0.06)),
-    "--sidebar": fmt(shiftL(background, 0.02)),
+    "--sidebar": fmt(sidebar),
     "--sidebar-foreground": fmt(foreground),
     "--sidebar-primary": fmt(shiftL(p, 0.06)),
     "--sidebar-primary-foreground": fmt(primaryInk),

@@ -32,10 +32,10 @@ function DeckTabMenuButton({ compact = false }: { compact?: boolean }) {
           {!compact ? (
             <>
               <span className="max-w-[6.25rem] truncate">{activeTabMeta.label}</span>
-              <span className="rounded border border-primary/30 bg-primary/10 px-1 py-0 text-[9px]">
+              <span className="rounded border border-primary/30 bg-primary/10 px-1 py-0 text-[10px]">
                 {deckCounts[activeTabMeta.id]}
               </span>
-              <ChevronDown className="h-3.5 w-3.5 opacity-70" />
+              <ChevronDown className="h-3.5 w-3.5 shrink-0" />
             </>
           ) : null}
         </Button>
@@ -51,7 +51,7 @@ function DeckTabMenuButton({ compact = false }: { compact?: boolean }) {
             <DropdownMenuItem key={tab.id} onClick={() => setActiveTab(tab.id)}>
               <Icon className="h-3.5 w-3.5" />
               <span className={cn("text-xs font-mono uppercase tracking-wide", isActive && "text-primary")}>{tab.label}</span>
-              <span className="ml-auto rounded border border-border/60 px-1 py-0 text-[9px] font-mono uppercase tracking-wider text-muted-foreground">
+              <span className="ml-auto rounded border border-border/50 px-1 py-0 text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
                 {count}
               </span>
             </DropdownMenuItem>
@@ -121,7 +121,7 @@ export function DecksSidebarHeader() {
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={cn(
-                  "flex items-center gap-1 rounded px-2 py-1 text-[9px] font-mono uppercase tracking-wide transition-all",
+                  "flex items-center gap-1 rounded px-2 py-1 text-[10px] font-mono uppercase tracking-wide transition-colors",
                   isActive
                     ? "bg-primary/20 text-primary shadow-[0_0_10px_-3px_var(--primary)]"
                     : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
@@ -132,7 +132,7 @@ export function DecksSidebarHeader() {
                 {count > 0 ? (
                   <span
                     className={cn(
-                      "rounded px-1 py-0 text-[8px]",
+                      "rounded px-1 py-0 text-[10px]",
                       isActive ? "bg-primary/30" : "bg-muted"
                     )}
                   >

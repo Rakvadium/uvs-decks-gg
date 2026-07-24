@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Eye, Globe, Hexagon, Layers, Link2, Pencil, Trophy, UserPlus } from "lucide-react";
+import { Eye, Globe, Hexagon, Layers, Link2, Lock, Pencil, Trophy, UserPlus } from "lucide-react";
 import { deckTeamSharingFromDeck, normalizeDeckVisibility } from "@/lib/deck/visibility";
 import { useProfanityDisplayText } from "@/lib/moderation/use-profanity-display-text";
 import { useDeckGridItemContext } from "./context";
@@ -25,7 +25,7 @@ export function DeckGridItemMediaPanel() {
             alt={showName}
             fill
             sizes="120px"
-            className="object-cover object-top transition-all duration-150 group-hover:scale-105"
+            className="object-cover object-top transition-transform duration-150 group-hover:scale-105"
             priority={coverImagePriority}
             loading={coverImagePriority ? undefined : "lazy"}
           />
@@ -43,6 +43,10 @@ export function DeckGridItemMediaPanel() {
 
       <div className="absolute bottom-2 left-2">
         {visibility === "private" ? (
+          <div className="rounded border border-border/50 bg-muted/60 p-1.5 backdrop-blur-sm">
+            <Lock className="h-3 w-3 text-muted-foreground" />
+          </div>
+        ) : visibility === "unlisted" ? (
           <div className="rounded border border-border/50 bg-muted/60 p-1.5 backdrop-blur-sm">
             <Link2 className="h-3 w-3 text-muted-foreground" />
           </div>

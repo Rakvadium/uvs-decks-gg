@@ -18,6 +18,7 @@ import {
 } from "./card-store";
 import type { CachedCard } from "./card-store";
 import type { CardFilters, StatFilterValue } from "@/providers/UIStateProvider";
+import { fetchStaticCatalog } from "./static-catalog";
 
 export type { CachedCard } from "./card-store";
 
@@ -142,11 +143,16 @@ export function useUniversusCards(): UseUniversusCardsResult {
   }, [convex]);
 
   const galleryTotalEstimate = serverVersionData?.cardCount ?? 0;
+  const forceConvexCatalogSync =
+    typeof process !== "undefined" &&
+    process.env.NEXT_PUBLIC_FORCE_CONVEX_CATALOG_SYNC === "1";
 
   const fetchFromConvex = useCallback(async (): Promise<{
     gallery: CachedCard[];
     companions: CachedCard[];
   }> => {
+    await convex.mutation(api.rateLimit.claimCatalogSyncBudget, {});
+
     const gallery: CachedCard[] = [];
     let cursor: string | null = null;
     let isDone = false;
@@ -182,7 +188,45 @@ export function useUniversusCards(): UseUniversusCardsResult {
     return { gallery, companions };
   }, [convex, galleryTotalEstimate]);
 
-  const syncFromConvex = useCallback(
+  const fetchCatalog = useCallback(async (): Promise<{
+    gallery: CachedCard[];
+    companions: CachedCard[];
+  }> => {
+    const catalogUrl = serverVersionData?.catalogUrl;
+    const catalogSha256 = serverVersionData?.catalogSha256;
+    const canUseStatic =
+      !forceConvexCatalogSync &&
+      typeof catalogUrl === "string" &&
+      catalogUrl.length > 0 &&
+      typeof catalogSha256 === "string" &&
+      catalogSha256.length > 0;
+
+    if (canUseStatic) {
+      try {
+        setLoadProgress(5);
+        const gallery = await fetchStaticCatalog({
+          catalogUrl,
+          catalogSha256,
+        });
+        setLoadProgress(90);
+        const companions = await fetchCompanionCardsForGallery(gallery, convex);
+        setLoadProgress(100);
+        return { gallery, companions };
+      } catch (err) {
+        console.warn("Static catalog fetch failed; falling back to Convex sync", err);
+      }
+    }
+
+    return await fetchFromConvex();
+  }, [
+    convex,
+    fetchFromConvex,
+    forceConvexCatalogSync,
+    serverVersionData?.catalogSha256,
+    serverVersionData?.catalogUrl,
+  ]);
+
+  const syncCatalog = useCallback(
     async (gallery: CachedCard[], companions: CachedCard[], version: number) => {
       if (syncInProgress.current) return;
       syncInProgress.current = true;
@@ -208,6 +252,7 @@ export function useUniversusCards(): UseUniversusCardsResult {
         setUniqueValues(getUniqueValues(gallery));
         setLoadProgress(100);
         setIsLoading(false);
+        setError(null);
         dataEpochRef.current += 1;
       } catch (err) {
         if (err instanceof Error) {
@@ -234,9 +279,9 @@ export function useUniversusCards(): UseUniversusCardsResult {
     setIsLoading(true);
     syncInProgress.current = false;
 
-    const { gallery, companions } = await fetchFromConvex();
-    await syncFromConvex(gallery, companions, serverVersion);
-  }, [fetchFromConvex, syncFromConvex, serverVersion]);
+    const { gallery, companions } = await fetchCatalog();
+    await syncCatalog(gallery, companions, serverVersion);
+  }, [fetchCatalog, syncCatalog, serverVersion]);
 
   useEffect(() => {
     if (!isHydrated) return;
@@ -265,12 +310,20 @@ export function useUniversusCards(): UseUniversusCardsResult {
           setIsLoading(true);
           setIsLoadingMore(true);
           const epochBefore = dataEpochRef.current;
-          const { gallery, companions } = await fetchFromConvex();
-          if (epochBefore !== dataEpochRef.current) {
-            setIsLoadingMore(false);
-            return;
+          try {
+            const { gallery, companions } = await fetchCatalog();
+            if (epochBefore !== dataEpochRef.current) {
+              setIsLoadingMore(false);
+              return;
+            }
+            await syncCatalog(gallery, companions, 1);
+          } catch (err) {
+            if (err instanceof Error) {
+              setError(err);
+              console.error("Failed to sync cards:", err);
+            }
+            setIsLoading(false);
           }
-          await syncFromConvex(gallery, companions, 1);
           setIsLoadingMore(false);
         }
         return;
@@ -280,12 +333,20 @@ export function useUniversusCards(): UseUniversusCardsResult {
         setIsLoading(true);
         setIsLoadingMore(true);
         const epochBefore = dataEpochRef.current;
-        const { gallery, companions } = await fetchFromConvex();
-        if (epochBefore !== dataEpochRef.current) {
-          setIsLoadingMore(false);
-          return;
+        try {
+          const { gallery, companions } = await fetchCatalog();
+          if (epochBefore !== dataEpochRef.current) {
+            setIsLoadingMore(false);
+            return;
+          }
+          await syncCatalog(gallery, companions, serverVersion);
+        } catch (err) {
+          if (err instanceof Error) {
+            setError(err);
+            console.error("Failed to sync cards:", err);
+          }
+          setIsLoading(false);
         }
-        await syncFromConvex(gallery, companions, serverVersion);
         setIsLoadingMore(false);
         return;
       }
@@ -294,17 +355,26 @@ export function useUniversusCards(): UseUniversusCardsResult {
         console.log(`Cache outdated: local v${cachedVersion} vs server v${serverVersion}`);
         setIsSyncing(true);
         const epochBefore = dataEpochRef.current;
-        const { gallery, companions } = await fetchFromConvex();
-        if (epochBefore !== dataEpochRef.current) {
+        try {
+          const { gallery, companions } = await fetchCatalog();
+          if (epochBefore !== dataEpochRef.current) {
+            setIsSyncing(false);
+            return;
+          }
+          await syncCatalog(gallery, companions, serverVersion);
+        } catch (err) {
+          if (err instanceof Error) {
+            setError(err);
+            console.error("Failed to sync cards:", err);
+          }
           setIsSyncing(false);
-          return;
+          setIsLoading(false);
         }
-        await syncFromConvex(gallery, companions, serverVersion);
       }
     };
     
     checkAndSync();
-  }, [isHydrated, isCheckingVersion, serverVersion, cachedVersion, cards.length, fetchFromConvex, syncFromConvex]);
+  }, [isHydrated, isCheckingVersion, serverVersion, cachedVersion, cards.length, fetchCatalog, syncCatalog]);
 
   return useMemo(
     () => ({

@@ -63,7 +63,7 @@ export function DeckDetailsHeroCharacterImagePicker() {
               "rounded-tr-lg rounded-bl-lg rounded-tl-none rounded-br-none",
               "bg-background/80 backdrop-blur-sm",
               "border-l border-b border-border/40",
-              "transition-all hover:bg-primary/10 hover:border-primary/40"
+              "transition-colors hover:bg-primary/10 hover:border-primary/40"
             )}
           >
             <UserRoundPen className="h-3.5 w-3.5 text-muted-foreground" />

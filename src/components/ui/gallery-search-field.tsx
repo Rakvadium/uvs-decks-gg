@@ -3,12 +3,12 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
 export const galleryToolbarControlClassName = cn(
-  "h-9 rounded-md border border-[color:var(--control-dual-border)] bg-background/50 text-sm font-sans font-normal normal-case tracking-normal",
-  "shadow-[var(--chrome-search-field-shadow)] transition-all duration-200 outline-none",
+  "h-9 rounded-md border border-[color:var(--control-dual-border)] bg-background/50 text-base md:text-sm font-sans font-normal normal-case tracking-normal",
+  "shadow-[var(--chrome-search-field-shadow)] transition-[border-color,box-shadow,background-color,color] duration-200 outline-none",
   "hover:border-[color:var(--control-dual-border-strong)] hover:bg-[color-mix(in_oklch,var(--primary)_5%,var(--secondary)_4%,var(--background)_91%)]",
   "focus-visible:border-[color:var(--control-dual-border-strong)] focus-visible:shadow-[var(--chrome-search-field-shadow-focus)]",
   "focus-visible:ring-2 focus-visible:ring-[color:color-mix(in_oklch,var(--primary)_26%,var(--secondary)_26%,transparent)] focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-  "[&_svg:not([class*='text-'])]:text-secondary/85"
+  "[&_svg:not([class*='text-'])]:text-primary"
 );
 
 interface GallerySearchFieldProps {
@@ -17,6 +17,7 @@ interface GallerySearchFieldProps {
   onClear?: () => void;
   placeholder?: string;
   name?: string;
+  "aria-label"?: string;
   spellCheck?: boolean;
   appearance?: "prominent" | "quiet";
   leadingSlot?: React.ReactNode;
@@ -31,6 +32,7 @@ export function GallerySearchField({
   onClear,
   placeholder,
   name,
+  "aria-label": ariaLabel,
   spellCheck,
   appearance = "prominent",
   leadingSlot,
@@ -77,15 +79,17 @@ export function GallerySearchField({
         value={value}
         onChange={onChange}
         className={cn(
-          "h-9 bg-background/50 text-sm",
+          "h-9 bg-background/50 text-base md:text-sm",
           isQuiet
-            ? "border-border/60"
+            ? "border-border/50"
             : "border-[color:var(--control-dual-border)] shadow-[var(--chrome-search-field-shadow)] focus-visible:border-[color:var(--control-dual-border-strong)] focus-visible:shadow-[var(--chrome-search-field-shadow-focus),0_0_0_3px_color-mix(in_oklch,var(--secondary)_18%,transparent)]",
           !leadingSlot && "pl-9",
           inputClassName,
           hasTrailing && "pr-10"
         )}
         name={name}
+        aria-label={ariaLabel ?? "Search cards"}
+        autoComplete="off"
         spellCheck={spellCheck}
       />
     </div>

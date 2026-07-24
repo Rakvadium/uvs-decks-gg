@@ -184,7 +184,7 @@ export default function AdminSetDetailPageClient() {
         </Alert>
       ) : null}
 
-      <div className="flex flex-wrap items-center gap-2 rounded-lg border border-border/60 bg-card/30 px-3 py-2 text-sm">
+      <div className="flex flex-wrap items-center gap-2 rounded-lg border border-border/50 bg-card/30 px-3 py-2 text-sm">
         <Badge variant={set.isFuture ? "secondary" : "default"}>
           {set.isFuture ? "Future" : "Released"}
         </Badge>

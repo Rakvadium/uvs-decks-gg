@@ -153,7 +153,7 @@ export function CommunityTierListDetailPoolDialog() {
               </div>
             ) : null}
 
-            <div className="space-y-3 rounded-xl border border-border/50 bg-card/40 p-4">
+            <div className="space-y-3 rounded-xl border border-border/50 bg-card/50 p-4">
               <p className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground">Add to pool</p>
               <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
                 <div className="min-w-0 flex-1 space-y-2">

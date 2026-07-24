@@ -8,19 +8,19 @@ Use this list when **no specific task** was assigned. Work from **top to bottom*
 2. Mark it **In progress** (and optionally add your id or date in parentheses).
 3. When done, mark **Done** and record a summary in [CHANGELOG.md](./CHANGELOG.md) or the PR description.
 4. If you split work, add new backlog rows for the remainder.
-5. When the active list gets noisy, move **Done** rows to [archive/backlog-completed.md](./archive/backlog-completed.md).
+5. When the active list gets noisy, move **Done** rows to [_noLongerNeeded/docs/archive/backlog-completed.md](../_noLongerNeeded/docs/archive/backlog-completed.md).
 
 Statuses: `Open` | `In progress` | `Blocked` | `Done`
 
 **Coding agents:** Read [agent-onboarding.md](./agent-onboarding.md) before implementation.
 
-**Architecture:** Non-trivial UI must follow [component-architecture-playbook.md](./component-architecture-playbook.md). File-size targets: [CODE_SIZE_POLICY.md](./CODE_SIZE_POLICY.md).
+**Architecture:** Non-trivial UI must follow [component-architecture-playbook.md](./component-architecture-playbook.md).
 
 ---
 
 ## Active items
 
-**Archived (all Done):** Card catalog **CAT-001–CAT-008**, right sidebar **RSC-001–RSC-008**, teams **TM-001–TM-012**, content safety **MC-001–MC-007** — see [archive/backlog-completed.md](./archive/backlog-completed.md#archived-backlog-active-2026-04-22). **Admin area IA-1–USR-14** (same session) — [archive/backlog-completed.md#admin-area-epic-2026-04-22](./archive/backlog-completed.md#admin-area-epic-2026-04-22).
+**Archived (all Done):** Card catalog **CAT-001–CAT-008**, right sidebar **RSC-001–RSC-008**, teams **TM-001–TM-012**, content safety **MC-001–MC-007** — see [_noLongerNeeded/docs/archive/backlog-completed.md](../_noLongerNeeded/docs/archive/backlog-completed.md#archived-backlog-active-2026-04-22). **Admin area IA-1–USR-14** (same session) — [_noLongerNeeded/docs/archive/backlog-completed.md#admin-area-epic-2026-04-22](../_noLongerNeeded/docs/archive/backlog-completed.md#admin-area-epic-2026-04-22).
 
 ### Admin area — sets, cards, formats, content, users
 

@@ -1,55 +1,21 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
 import { Loader2, UsersRound } from "lucide-react";
 import type { Id } from "../../../../convex/_generated/dataModel";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { TeamLogoCropDialog } from "./team-logo-crop-dialog";
-
-type EditorNotice =
-  | null
-  | { kind: "pending" }
-  | { kind: "needs_review" }
-  | { kind: "rejected" };
-
-type Presentation = {
-  displayUrl: string | null;
-  editorNotice: EditorNotice;
-  canManageLogo: boolean;
-};
+import { useTeamLogoPicker, type TeamLogoPresentation } from "./use-team-logo-picker";
 
 interface TeamLogoSectionProps {
   teamId: Id<"teams">;
-  presentation: Presentation | null | undefined;
+  presentation: TeamLogoPresentation | null | undefined;
 }
 
 export function TeamLogoSection({ teamId, presentation }: TeamLogoSectionProps) {
-  const inputRef = useRef<HTMLInputElement>(null);
-  const [cropOpen, setCropOpen] = useState(false);
-  const [cropSrc, setCropSrc] = useState<string | null>(null);
-  const [cropMime, setCropMime] = useState("image/jpeg");
-
-  const onPickFile = useCallback((file: File | null) => {
-    if (!file || !file.type.startsWith("image/")) return;
-    setCropSrc((prev) => {
-      if (prev) URL.revokeObjectURL(prev);
-      return URL.createObjectURL(file);
-    });
-    setCropMime(file.type);
-    setCropOpen(true);
-  }, []);
-
-  const onCropDialogOpenChange = useCallback((open: boolean) => {
-    setCropOpen(open);
-    if (!open) {
-      setCropSrc((prev) => {
-        if (prev) URL.revokeObjectURL(prev);
-        return null;
-      });
-    }
-  }, []);
+  const { inputRef, cropOpen, cropSrc, cropMime, onPickFile, onCropDialogOpenChange } =
+    useTeamLogoPicker();
 
   const loadingPresentation = presentation === undefined;
   const displayUrl = presentation?.displayUrl ?? null;
@@ -67,7 +33,7 @@ export function TeamLogoSection({ teamId, presentation }: TeamLogoSectionProps) 
       />
       <div
         className={cn(
-          "relative flex h-24 w-24 items-center justify-center overflow-hidden rounded-2xl border border-border/60 bg-muted/40",
+          "relative flex h-24 w-24 items-center justify-center overflow-hidden rounded-2xl border border-border/50 bg-muted/50",
           "shadow-[var(--chrome-shell-nav-active-shadow)]",
         )}
       >
@@ -104,14 +70,14 @@ export function TeamLogoSection({ teamId, presentation }: TeamLogoSectionProps) 
         </>
       ) : null}
       {canManage && editorNotice?.kind === "pending" ? (
-        <Alert className="max-w-xs border-border/60 bg-muted/30 py-2">
+        <Alert className="max-w-xs border-border/50 bg-muted/20 py-2">
           <AlertDescription className="text-xs text-muted-foreground">
             Your logo is being reviewed. It will appear for everyone once approved.
           </AlertDescription>
         </Alert>
       ) : null}
       {canManage && editorNotice?.kind === "needs_review" ? (
-        <Alert className="max-w-xs border-border/60 bg-muted/30 py-2">
+        <Alert className="max-w-xs border-border/50 bg-muted/20 py-2">
           <AlertDescription className="text-xs text-muted-foreground">
             Your logo is awaiting manual review.
           </AlertDescription>

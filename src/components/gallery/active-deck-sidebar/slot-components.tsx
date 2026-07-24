@@ -14,19 +14,23 @@ export function ActiveDeckIcon({ className }: { className?: string }) {
   const startingCharacter = startingCharacterId ? cardIdMap.get(startingCharacterId) ?? null : null;
 
   if (!startingCharacter?.imageUrl) {
-    return <UserIcon className={className} />;
+    return (
+      <span className={cn("flex size-full items-center justify-center", className)}>
+        <UserIcon className="size-5" />
+      </span>
+    );
   }
 
   return (
-    <div className={cn("relative h-full w-full overflow-hidden", className)}>
+    <span className={cn("relative block size-full overflow-hidden rounded-[inherit]", className)}>
       <Image
         src={startingCharacter.imageUrl}
         alt={startingCharacter.name}
         fill
-        sizes="40px"
+        sizes="36px"
         className="object-cover object-top"
       />
-    </div>
+    </span>
   );
 }
 
@@ -41,7 +45,7 @@ export function ActiveDeckHeader() {
 
   return (
     <h3
-      className="truncate font-display text-[13px] font-bold uppercase tracking-[0.2em] text-primary [filter:var(--chrome-shell-deck-label-drop-shadow)]"
+      className="truncate font-display text-[13px] font-bold uppercase tracking-[0.18em] text-primary [filter:var(--chrome-shell-deck-label-drop-shadow)]"
       title={label}
     >
       {label}

@@ -6,6 +6,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { useColorScheme } from "@/lib/theme";
 import type { ThemePreference } from "@/lib/theme/appearance-types";
 import { cn } from "@/lib/utils";
+import { SHELL_RAIL_ITEM_SIZE_CLASS } from "../../shell-chrome";
 import { useLeftSidebarContext } from "../context";
 
 const OPTIONS: readonly {
@@ -31,7 +32,8 @@ export function LeftSidebarGuestThemeToggle() {
             variant="outline"
             size="icon"
             className={cn(
-              "h-10 w-10 shrink-0 border-border/70 bg-background text-sidebar-foreground/70 hover:text-sidebar-foreground [&_svg]:text-sidebar-foreground/70 hover:[&_svg]:text-sidebar-foreground",
+              SHELL_RAIL_ITEM_SIZE_CLASS,
+              "shrink-0 border-border/50 bg-background text-sidebar-foreground hover:text-primary [&_svg]:text-sidebar-foreground hover:[&_svg]:text-primary",
             )}
             aria-label={
               resolvedTheme === "dark"
@@ -59,7 +61,7 @@ export function LeftSidebarGuestThemeToggle() {
     <div
       role="radiogroup"
       aria-label="Appearance while signed out"
-      className="flex w-full items-center rounded-lg border border-border/70 bg-muted/25 p-0.5 gap-0.5"
+      className="flex w-full items-center rounded-lg border border-border/50 bg-muted/20 p-0.5 gap-0.5"
     >
       {OPTIONS.map(({ value: v, label, icon: Icon }) => (
         <Button
@@ -72,7 +74,7 @@ export function LeftSidebarGuestThemeToggle() {
           className={cn(
             "h-9 flex-1 gap-1 px-1 font-mono text-[10px] uppercase tracking-wider",
             theme === v && "shadow-sm",
-            theme !== v && "text-sidebar-foreground/70 hover:text-sidebar-foreground",
+            theme !== v && "text-sidebar-foreground hover:text-accent",
           )}
           onClick={() => setTheme(v)}
           title={v === "system" ? "Match system appearance" : `${label} mode`}

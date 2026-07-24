@@ -30,8 +30,8 @@ function SidebarGalleryListItemContent() {
     <>
       <div
         className={cn(
-          "group flex items-center gap-2 rounded-lg border border-border/50 bg-card/40 px-2 py-2 transition-colors",
-          "hover:border-primary/30 hover:bg-card/70",
+          "group flex items-center gap-2 rounded-lg border border-border/50 bg-card/50 px-2 py-2 transition-colors",
+          "hover:border-primary/30 hover:bg-card/80",
           isDragging && "opacity-60"
         )}
         style={{

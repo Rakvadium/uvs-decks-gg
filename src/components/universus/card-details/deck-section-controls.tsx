@@ -84,7 +84,7 @@ export function DeckSectionControls({ card, layout = "vertical" }: DeckSectionCo
         <Select value={selectedSection} onValueChange={(value) => setSelectedSection(value as DeckSection)}>
           <SelectTrigger
             size="sm"
-            className="h-8 w-[7rem] bg-card/40 px-2 text-[10px] tracking-widest"
+            className="h-8 w-[7rem] bg-card/50 px-2 text-[10px] tracking-widest"
           >
             <SelectValue />
           </SelectTrigger>
@@ -96,7 +96,7 @@ export function DeckSectionControls({ card, layout = "vertical" }: DeckSectionCo
             ))}
           </SelectContent>
         </Select>
-        <div className="flex h-8 shrink-0 items-center gap-1 rounded-md border border-border/40 bg-card/40 px-2">
+        <div className="flex h-8 shrink-0 items-center gap-1 rounded-md border border-border/40 bg-card/50 px-2">
           <Button
             variant="outline"
             size="icon-sm"
@@ -188,7 +188,7 @@ export function DeckSectionControls({ card, layout = "vertical" }: DeckSectionCo
       {sections.map((section) => (
         <div
           key={section.key}
-          className="flex items-center justify-between gap-2 rounded-md border border-border/40 bg-card/40 px-2.5 py-1.5"
+          className="flex items-center justify-between gap-2 rounded-md border border-border/40 bg-card/50 px-2.5 py-1.5"
         >
           <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
             {section.label}

@@ -8,6 +8,11 @@ import { Flag } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useLeftSidebarContext } from "./left-sidebar/context";
+import {
+  SHELL_NAV_ITEM_ACTIVE,
+  SHELL_NAV_ITEM_IDLE,
+  SHELL_RAIL_ITEM_COLLAPSED_CLASS,
+} from "./shell-chrome";
 
 type ShellTeamNavSidebarProps = {
   variant: "sidebar";
@@ -65,8 +70,8 @@ function TeamMark({
   return (
     <div
       className={cn(
-        "flex shrink-0 items-center justify-center overflow-hidden rounded-lg border border-sidebar-border/60 bg-sidebar-accent/30",
-        hasTeam && displayUrl ? "border-primary/25" : "border-border/60",
+        "flex shrink-0 items-center justify-center overflow-hidden rounded-lg border border-sidebar-border bg-sidebar-accent",
+        hasTeam && displayUrl ? "border-accent/30" : "border-sidebar-border",
         className
       )}
     >
@@ -133,11 +138,9 @@ function ShellTeamNavSidebarInner({
     <Link
       href={teamHref}
       className={cn(
-        "render-stable relative flex w-full items-center gap-3 rounded-md border px-3 py-2.5 text-sm font-medium transition-all duration-200",
-        collapsed && "w-full justify-center px-2 py-2.5",
-        isActive
-          ? "border-secondary/40 bg-secondary/15 text-primary shadow-[var(--chrome-shell-nav-active-shadow)]"
-          : "border-transparent text-sidebar-foreground/70 hover:border-sidebar-border/50 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
+        "relative flex items-center rounded-md border text-sm font-medium transition-colors duration-200",
+        collapsed ? cn(SHELL_RAIL_ITEM_COLLAPSED_CLASS, "overflow-hidden") : "w-full gap-3 px-3 py-2.5",
+        isActive ? SHELL_NAV_ITEM_ACTIVE : SHELL_NAV_ITEM_IDLE
       )}
     >
       <TeamMark
@@ -145,13 +148,13 @@ function ShellTeamNavSidebarInner({
         logoPending={hasTeam && logoPending}
         hasTeam={hasTeam}
         markIsActive={isActive}
-        className="h-8 w-8 rounded-full"
+        className={collapsed ? "size-full rounded-md border-0" : "h-8 w-8 rounded-full"}
         imgClassName=""
       />
       {!collapsed ? (
         <span className="whitespace-nowrap font-mono text-xs uppercase tracking-wider">{label}</span>
       ) : null}
-      {isActive ? <div className="pointer-events-none absolute inset-0 rounded-md border border-secondary/30" /> : null}
+      {isActive ? <div className="pointer-events-none absolute inset-0 rounded-md border border-accent/50" /> : null}
     </Link>
   );
   if (collapsed) {
@@ -164,7 +167,7 @@ function ShellTeamNavSidebarInner({
       </Tooltip>
     );
   }
-  return <div className="render-stable" style={prefersReducedMotion ? undefined : { animationDelay: "250ms" }}>{link}</div>;
+  return <div style={prefersReducedMotion ? undefined : { animationDelay: "250ms" }}>{link}</div>;
 }
 
 function ShellTeamNavProfileSheetInner({

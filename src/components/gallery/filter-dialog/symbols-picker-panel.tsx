@@ -27,7 +27,7 @@ function SymbolButton({
       aria-pressed={selected}
       title={symbol}
       className={cn(
-        "relative h-8 w-8 overflow-hidden border border-border/60 bg-background p-0 transition-colors hover:bg-muted",
+        "relative h-8 w-8 overflow-hidden border border-border/50 bg-background p-0 transition-colors hover:bg-muted",
         shape === "circle" ? "rounded-full" : "rounded-xs",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
         selected && "ring-2 ring-primary ring-offset-1 ring-offset-background"

@@ -73,7 +73,7 @@ export function VirtualizedSetsTable({
   return (
     <TooltipProvider>
       <div className="w-full max-w-full rounded-lg border">
-        <div className="grid w-full grid-cols-[minmax(0,1fr)_minmax(0,1.5fr)_auto_auto_auto_auto_auto] gap-2 border-b bg-muted/40 px-3 py-2 text-xs font-medium text-muted-foreground">
+        <div className="grid w-full grid-cols-[minmax(0,1fr)_minmax(0,1.5fr)_auto_auto_auto_auto_auto] gap-2 border-b bg-muted/50 px-3 py-2 text-xs font-medium text-muted-foreground">
           <div>Code</div>
           <div>Name</div>
           <div className="text-right">#</div>
@@ -104,8 +104,8 @@ export function VirtualizedSetsTable({
                     role="link"
                     tabIndex={0}
                     className={cn(
-                      "grid h-full w-full cursor-pointer grid-cols-[minmax(0,1fr)_minmax(0,1.5fr)_auto_auto_auto_auto_auto] items-center gap-2 border-b px-3 text-sm outline-none transition-colors hover:bg-muted/40 focus-visible:ring-2 focus-visible:ring-ring",
-                      virtualRow.index % 2 ? "bg-muted/15" : ""
+                      "grid h-full w-full cursor-pointer grid-cols-[minmax(0,1fr)_minmax(0,1.5fr)_auto_auto_auto_auto_auto] items-center gap-2 border-b px-3 text-sm outline-none transition-colors hover:bg-muted/50 focus-visible:ring-2 focus-visible:ring-ring",
+                      virtualRow.index % 2 ? "bg-muted/20" : ""
                     )}
                     onClick={() => router.push(href)}
                     onKeyDown={(e) => {

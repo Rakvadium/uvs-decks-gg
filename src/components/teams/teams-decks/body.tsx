@@ -71,7 +71,7 @@ export function TeamsDecksBody() {
     return (
       <div className="space-y-3">
         <div className="h-8 w-56 animate-pulse rounded-md bg-muted" />
-        <div className="h-10 w-full max-w-sm animate-pulse rounded-md bg-muted/70" />
+        <div className="h-10 w-full max-w-sm animate-pulse rounded-md bg-muted/60" />
         <div className="h-32 w-full animate-pulse rounded-md bg-muted/80" />
       </div>
     );
@@ -110,7 +110,7 @@ export function TeamsDecksBody() {
           </p>
         </div>
       ) : (
-        <div className="mt-6 overflow-x-auto rounded-lg border border-border/60">
+        <div className="mt-6 overflow-x-auto rounded-lg border border-border/50">
           <Table>
             <TableHeader>
               <TableRow className="hover:bg-transparent">

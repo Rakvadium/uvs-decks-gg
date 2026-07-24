@@ -181,7 +181,7 @@ export function SearchBar({
 
           {hasFooter && (
             <div className={cn(
-              "flex shrink-0 items-center justify-between bg-muted/30 px-4 py-3 border-t"
+              "flex shrink-0 items-center justify-between bg-muted/20 px-4 py-3 border-t"
             )}>
               <div>
                 {leftButton && (

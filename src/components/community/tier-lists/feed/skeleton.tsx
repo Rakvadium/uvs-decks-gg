@@ -9,7 +9,7 @@ export function TierListFeedSkeleton({ compact }: TierListFeedSkeletonProps) {
   return (
     <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
       {Array.from({ length: compact ? 3 : 4 }).map((_, index) => (
-        <Card key={index} className="border-border/60 bg-card/75">
+        <Card key={index} className="border-border/50 bg-card/80">
           <CardHeader className="space-y-3">
             <div className="flex items-center justify-between gap-3">
               <div className="flex flex-wrap gap-2">

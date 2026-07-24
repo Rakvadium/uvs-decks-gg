@@ -22,6 +22,7 @@ import {
   MobileActionsSheet,
 } from "@/components/shell";
 import { usePathname, useParams } from "next/navigation";
+import { useIsMobile } from "@/hooks/useIsMobile";
 import {
   Upload,
   Layers,
@@ -65,12 +66,12 @@ export type PageType = "gallery" | "decks" | "deckDetails" | "collection" | "com
 function getPageType(pathname: string): PageType | null {
   if (pathname.startsWith("/admin")) return "admin";
   if (pathname === "/settings") return "settings";
-  if (pathname.includes("/gallery")) return "gallery";
-  if (pathname.includes("/decks/") && pathname.split("/decks/")[1]) return "deckDetails";
-  if (pathname.includes("/decks")) return "decks";
-  if (pathname.includes("/collection")) return "collection";
-  if (pathname.includes("/community")) return "community";
-  if (pathname.includes("/home")) return "home";
+  if (pathname.startsWith("/gallery")) return "gallery";
+  if (/^\/decks\/[^/]+/.test(pathname)) return "deckDetails";
+  if (pathname === "/decks" || pathname.startsWith("/decks/")) return "decks";
+  if (pathname.startsWith("/collection")) return "collection";
+  if (pathname.startsWith("/community")) return "community";
+  if (pathname.startsWith("/home")) return "home";
   return null;
 }
 
@@ -118,7 +119,7 @@ function AdminSidebarContent() {
       </div>
 
       {showSetNav && setOverviewHref && setCardsHref && setReviewHref && setImportHref ? (
-        <div className="rounded-md border bg-muted/30 p-2 space-y-1">
+        <div className="rounded-md border bg-muted/20 p-2 space-y-1">
           <Link
             href="/admin/sets"
             className="block px-2 py-1.5 rounded text-xs text-muted-foreground hover:text-foreground hover:bg-muted"
@@ -220,6 +221,7 @@ function AdminSidebarSlotRegistration() {
 function ShellLayoutInner({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const params = useParams();
+  const isMobile = useIsMobile();
   const [leftSidebarCollapsed, setLeftSidebarCollapsed] = useState(() => {
     if (typeof window === "undefined") return false;
     const stored = window.localStorage.getItem(LEFT_SIDEBAR_KEY);
@@ -256,46 +258,39 @@ function ShellLayoutInner({ children }: { children: ReactNode }) {
   };
 
   const desktopLayout = (
-    <div className="hidden md:flex h-screen w-full overflow-hidden">
+    <div className="relative hidden h-screen w-full overflow-hidden bg-sidebar md:flex">
       {SHOW_DESKTOP_LEFT_SIDEBAR ? (
         <LeftSidebar
           collapsed={leftSidebarCollapsed}
           onToggle={toggleLeftSidebar}
         />
       ) : null}
-      <div className="flex flex-1 flex-col overflow-hidden bg-sidebar">
-        <div className="flex flex-1 overflow-hidden">
-          <div className="relative flex flex-1 flex-col min-w-0">
-            {SHOW_DESKTOP_LEFT_SIDEBAR ? (
-              <div className="pointer-events-none absolute -top-3 left-0 z-10 h-3 w-3">
-                <div className="h-full w-full rounded-br-xl bg-sidebar" />
-              </div>
-            ) : null}
-            {!hasRightSidebar ? (
-              <div className="pointer-events-none absolute -top-3 right-0 z-10 h-3 w-3">
-                <div className="h-full w-full rounded-bl-xl bg-sidebar" />
-              </div>
-            ) : null}
-            <main
+      <div className="relative z-10 flex min-w-0 flex-1 flex-col overflow-hidden">
+        <main
+          id={isMobile ? undefined : "main-content"}
+          className="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden"
+        >
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 bg-background"
+            style={{
+              backgroundImage: "var(--chrome-page-bg)",
+            }}
+          />
+          <div className="relative z-10 flex min-h-0 flex-1 flex-col overflow-hidden">
+            <AccountStatusBanner />
+            <div
               className={cn(
-                "min-h-0 flex-1 flex flex-col overflow-hidden bg-background",
+                "min-h-0 flex-1",
+                pathname.startsWith("/admin")
+                  ? "overflow-y-auto overflow-x-hidden"
+                  : "overflow-hidden"
               )}
-              style={{ backgroundImage: "var(--chrome-page-bg)" }}
             >
-              <AccountStatusBanner />
-              <div
-                className={cn(
-                  "min-h-0 flex-1",
-                  pathname.startsWith("/admin")
-                    ? "overflow-y-auto overflow-x-hidden"
-                    : "overflow-hidden"
-                )}
-              >
-                {children}
-              </div>
-            </main>
+              {children}
+            </div>
           </div>
-        </div>
+        </main>
       </div>
       {hasRightSidebar ? <RightSidebar /> : null}
     </div>
@@ -306,6 +301,7 @@ function ShellLayoutInner({ children }: { children: ReactNode }) {
       <div className="flex md:hidden h-[100dvh] min-h-0 w-full flex-col bg-background relative">
         <MobileHeader />
         <main
+          id={isMobile ? "main-content" : undefined}
           className="max-md:min-h-0 flex min-h-0 flex-1 flex-col overflow-y-auto bg-background"
           style={{
             backgroundImage: "var(--chrome-page-bg)",
@@ -314,7 +310,7 @@ function ShellLayoutInner({ children }: { children: ReactNode }) {
           <AccountStatusBanner />
           <div className="flex min-h-0 w-full flex-1 flex-col">{children}</div>
         </main>
-        <div className="relative z-40 shrink-0 border-t border-border/35">
+        <div className="relative z-40 shrink-0 border-t border-sidebar-border bg-sidebar">
           <MobileActionsSheet>
             <MobileTopBar pageType={pageType} />
             <MobileBottomNav />
@@ -327,6 +323,12 @@ function ShellLayoutInner({ children }: { children: ReactNode }) {
 
   const content = (
     <>
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-background focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      >
+        Skip to main content
+      </a>
       {pageType === "admin" ? <AdminSidebarSlotRegistration /> : null}
       {desktopLayout}
       {mobileLayout}
@@ -346,8 +348,8 @@ function ShellLayoutInner({ children }: { children: ReactNode }) {
       <GalleryFiltersProvider>
         <SiloedDeckProvider deckId={deckId}>
           <DeckDetailsProvider deckId={deckId}>
-          <DeckCollaborationProvider>{content}</DeckCollaborationProvider>
-        </DeckDetailsProvider>
+            <DeckCollaborationProvider>{content}</DeckCollaborationProvider>
+          </DeckDetailsProvider>
         </SiloedDeckProvider>
       </GalleryFiltersProvider>
     );
@@ -369,9 +371,7 @@ function ShellLayoutInner({ children }: { children: ReactNode }) {
 }
 
 function ShellLayout({ children }: { children: ReactNode }) {
-  return (
-    <ShellLayoutInner>{children}</ShellLayoutInner>
-  );
+  return <ShellLayoutInner>{children}</ShellLayoutInner>;
 }
 
 export default function AppLayout({ children }: { children: ReactNode }) {

@@ -12,7 +12,6 @@ import {
 import { COLOR_SCHEMES } from "@/lib/theme";
 import type { ColorPresetChoice } from "@/lib/theme/appearance-types";
 import { useLeftSidebarContext } from "../../context";
-import { MENU_ITEM_CLASS } from "./constants";
 
 export function LeftSidebarThemeControls() {
   const { colorPreset, isCustomAppearance, isDark, applyColorPreset, toggleTheme } =
@@ -20,14 +19,14 @@ export function LeftSidebarThemeControls() {
 
   return (
     <>
-      <DropdownMenuItem onClick={toggleTheme} className={MENU_ITEM_CLASS}>
-        {isDark ? <Sun className="mr-2 h-4 w-4" /> : <Moon className="mr-2 h-4 w-4" />}
-        {isDark ? "Light Mode" : "Dark Mode"}
+      <DropdownMenuItem onClick={toggleTheme}>
+        {isDark ? <Sun /> : <Moon />}
+        {isDark ? "Light mode" : "Dark mode"}
       </DropdownMenuItem>
 
       <DropdownMenuSub>
-        <DropdownMenuSubTrigger className={MENU_ITEM_CLASS}>
-          <Palette className="mr-2 h-4 w-4" />
+        <DropdownMenuSubTrigger>
+          <Palette />
           Color preset
           {isCustomAppearance ? (
             <span className="ml-auto text-xs text-muted-foreground">Custom</span>
@@ -39,7 +38,6 @@ export function LeftSidebarThemeControls() {
             return (
               <DropdownMenuItem
                 key={scheme.value}
-                className={MENU_ITEM_CLASS}
                 onClick={() => applyColorPreset(scheme.value as ColorPresetChoice)}
               >
                 <span>{scheme.label}</span>
@@ -52,7 +50,7 @@ export function LeftSidebarThemeControls() {
             );
           })}
           <DropdownMenuSeparator />
-          <DropdownMenuItem asChild className={MENU_ITEM_CLASS}>
+          <DropdownMenuItem asChild>
             <Link href="/settings#appearance">Custom colors…</Link>
           </DropdownMenuItem>
         </DropdownMenuSubContent>

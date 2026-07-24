@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Eye, Globe, Hexagon, Link2, Pencil, Trophy, UserPlus } from "lucide-react";
+import { Eye, Globe, Hexagon, Link2, Lock, Pencil, Trophy, UserPlus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import {
@@ -21,10 +21,12 @@ export function DeckSidebarItemHeader() {
   const visibility = normalizeDeckVisibility(deck);
   const VisIcon =
     visibility === "private"
-      ? Link2
-      : visibility === "share"
-        ? UserPlus
-        : visibility === "team"
+      ? Lock
+      : visibility === "unlisted"
+        ? Link2
+        : visibility === "share"
+          ? UserPlus
+          : visibility === "team"
             ? deckTeamSharingFromDeck(deck) === "team_editable"
               ? Pencil
               : Eye
@@ -35,7 +37,7 @@ export function DeckSidebarItemHeader() {
   return (
     <div className="flex items-start gap-3">
       {isMobile ? (
-        <div className="relative h-14 w-10 shrink-0 overflow-hidden rounded-md border border-border/50 bg-muted/40">
+        <div className="relative h-14 w-10 shrink-0 overflow-hidden rounded-md border border-border/50 bg-muted/50">
           {deckImageUrl ? (
             <Image
               src={deckImageUrl}
@@ -64,7 +66,7 @@ export function DeckSidebarItemHeader() {
           {isActive ? (
             <Badge
               variant="outline"
-              className="border-primary/40 text-[9px] font-mono uppercase tracking-wider text-primary"
+              className="border-primary/40 text-[10px] font-mono uppercase tracking-wider text-primary"
             >
               Active
             </Badge>

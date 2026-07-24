@@ -63,7 +63,7 @@ export function StatInput({ label, filterKey, labelPosition = "start" }: StatInp
       ) : null}
       <div
         className={cn(
-          "relative flex h-7 min-w-0 items-stretch overflow-hidden rounded-md border bg-background/50 transition-all",
+          "relative flex h-7 min-w-0 items-stretch overflow-hidden rounded-md border bg-background/50 transition-colors",
           labelPosition === "start" ? "flex-1" : "w-full flex-1",
           hasValue
             ? "border-primary/40 shadow-[var(--chrome-filter-tile-shadow-selected)]"
@@ -100,14 +100,17 @@ export function StatInput({ label, filterKey, labelPosition = "start" }: StatInp
 
         <input
           type="number"
+          inputMode="numeric"
           className={cn(
-            "min-h-0 min-w-0 flex-1 border-0 bg-transparent px-2 py-0 text-[11px] font-mono leading-none outline-none placeholder:text-muted-foreground/50 focus:outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none",
+            "min-h-0 min-w-0 flex-1 border-0 bg-transparent px-2 py-0 text-base font-mono leading-none outline-none placeholder:text-muted-foreground/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring md:text-[11px] [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none",
             labelPosition === "end" && "pr-1.5"
           )}
           value={value?.value ?? ""}
           onChange={handleValueChange}
           placeholder=""
-          aria-label={labelPosition === "end" ? label : undefined}
+          aria-label={label}
+          name={`stat-${filterKey}`}
+          autoComplete="off"
         />
         {labelPosition === "end" ? (
           <span

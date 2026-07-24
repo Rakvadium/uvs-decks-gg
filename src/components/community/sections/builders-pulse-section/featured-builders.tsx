@@ -9,20 +9,20 @@ function FeaturedBuilderCard({ index }: { index: number }) {
   const creator = FEATURED_BUILDERS[index];
 
   return (
-    <div className="group relative overflow-hidden rounded-xl border border-border/60 bg-card/60 p-4">
+    <div className="group relative overflow-hidden rounded-xl border border-border/50 bg-card/80 p-4">
       <div className={cn("absolute inset-0 bg-gradient-to-br opacity-40", creator.accent)} />
 
       <div className="relative space-y-3">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="relative h-12 w-12 overflow-hidden rounded-lg border border-border/60 bg-background/70">
+            <div className="relative h-12 w-12 overflow-hidden rounded-lg border border-border/50 bg-background/80">
               <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-transparent" />
               <div className="absolute bottom-2 left-2 font-display text-xs font-bold uppercase">{creator.name.slice(0, 2)}</div>
             </div>
             <div>
               <div className="flex items-center gap-2">
                 <p className="text-sm font-semibold">{creator.name}</p>
-                <Badge variant="secondary" className="text-[9px]">
+                <Badge variant="secondary" className="text-[10px]">
                   Featured
                 </Badge>
               </div>
@@ -30,7 +30,7 @@ function FeaturedBuilderCard({ index }: { index: number }) {
             </div>
           </div>
 
-          <Badge variant="outline" className="text-[9px]">
+          <Badge variant="outline" className="text-[10px]">
             {creator.status}
           </Badge>
         </div>
@@ -42,7 +42,7 @@ function FeaturedBuilderCard({ index }: { index: number }) {
 
         <div className="flex flex-wrap gap-2">
           {creator.tags.map((tag) => (
-            <Badge key={tag} variant="outline" className="text-[9px]">
+            <Badge key={tag} variant="outline" className="text-[10px]">
               {tag}
             </Badge>
           ))}

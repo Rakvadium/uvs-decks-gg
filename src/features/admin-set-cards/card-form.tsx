@@ -1,6 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+} from "react";
 import { useAction, useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import type { Doc, Id } from "../../../convex/_generated/dataModel";
@@ -46,7 +53,6 @@ import {
   analyzeCardRegions,
   type CardRegionAnalysis,
 } from "@/lib/universus/vision-card-regions";
-import { cn } from "@/lib/utils";
 import { Sparkles, Upload, X } from "lucide-react";
 
 const RARITY_SUGGESTIONS = [
@@ -426,10 +432,14 @@ function SectionHeading({ children }: { children: React.ReactNode }) {
   );
 }
 
-function zoneToneClassName(value: string) {
+function zoneToneStyle(value: string): CSSProperties | undefined {
   const [zone] = parseZoneDisplay(value);
   if (!zone) return undefined;
-  return cn(zone.bgColor, zone.borderColor, zone.textColor);
+  return {
+    color: zone.color,
+    borderColor: `${zone.color}4D`,
+    backgroundColor: `${zone.color}1A`,
+  };
 }
 
 function ZoneSelect({
@@ -446,7 +456,7 @@ function ZoneSelect({
       value={value || "__none__"}
       onValueChange={(v) => onChange(v === "__none__" ? "" : v)}
     >
-      <SelectTrigger className={cn("w-full", zoneToneClassName(value))}>
+      <SelectTrigger className="w-full" style={zoneToneStyle(value)}>
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
       <SelectContent>
@@ -454,7 +464,7 @@ function ZoneSelect({
         {UNIVERSUS_ZONES.map((zone) => {
           const [display] = parseZoneDisplay(zone);
           return (
-            <SelectItem key={zone} value={zone} className={zoneToneClassName(zone)}>
+            <SelectItem key={zone} value={zone} style={zoneToneStyle(zone)}>
               {display?.label ?? zone}
             </SelectItem>
           );

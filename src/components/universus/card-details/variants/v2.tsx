@@ -185,7 +185,7 @@ export function CardDetailsV2({
                     <button
                       type="button"
                       onClick={onToggleFlip}
-                      className="absolute bottom-0 right-0 z-10 flex items-center gap-2 rounded-none rounded-tl-(--radius-2xl) rounded-br-(--radius-2xl) border border-primary/25 bg-card/95 px-3 py-2 text-muted-foreground shadow-none backdrop-blur-sm transition-all hover:border-primary/40 hover:text-primary md:bottom-auto md:left-0 md:right-auto md:top-0"
+                      className="absolute bottom-0 right-0 z-10 flex items-center gap-2 rounded-none rounded-tl-(--radius-2xl) rounded-br-(--radius-2xl) border border-primary/25 bg-card/95 px-3 py-2 text-muted-foreground shadow-none backdrop-blur-sm transition-colors hover:border-primary/40 hover:text-primary md:bottom-auto md:left-0 md:right-auto md:top-0"
                     >
                       <RotateCcw
                         className={cn(

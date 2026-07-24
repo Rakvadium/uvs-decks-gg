@@ -31,7 +31,7 @@ export function TeamHubStatsContent({ teamId }: TeamHubStatsContentProps) {
         </p>
       </div>
       <div
-        className="rounded-lg border border-dashed border-border/80 bg-muted/15 px-4 py-12 text-center"
+        className="rounded-lg border border-dashed border-border/80 bg-muted/20 px-4 py-12 text-center"
         role="status"
       >
         <p className="text-sm text-muted-foreground">No statistics available yet.</p>

@@ -7,12 +7,12 @@ type CardVariant = "fx" | "quiet"
 const cardVariantStyles: Record<CardVariant, string> = {
   fx: cn(
     "shadow-[var(--chrome-card-shadow)] hover:shadow-[var(--chrome-card-shadow-hover)]",
-    "hover:border-[var(--chrome-card-border-hover)] transition-all duration-150",
+    "hover:border-[var(--chrome-card-border-hover)] transition-[border-color,box-shadow,background-color,opacity,transform] duration-150",
     "before:absolute before:inset-0 before:rounded-lg before:bg-gradient-to-br before:from-primary/5 before:to-transparent before:opacity-0 before:transition-opacity before:duration-150 hover:before:opacity-100",
   ),
   quiet: cn(
     "shadow-[var(--chrome-elevation-low)] hover:shadow-[var(--chrome-elevation-mid)]",
-    "hover:border-border transition-all duration-150",
+    "hover:border-border/50 transition-[border-color,box-shadow,background-color,opacity,transform] duration-150",
   ),
 }
 

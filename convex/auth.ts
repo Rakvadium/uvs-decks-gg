@@ -33,7 +33,7 @@ const passwordProvider = Password({
       }
       return {
         email: parsed.data.email,
-        username: parsed.data.username,
+        username: parsed.data.username.trim().toLowerCase(),
       };
     }
     return { email };

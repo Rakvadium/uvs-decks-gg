@@ -5,9 +5,9 @@ import { useGalleryFiltersOptional } from "@/providers/GalleryFiltersProvider";
 import { GalleryFilterDialogProvider } from "@/components/gallery/filter-dialog/context";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { GalleryTopBarFiltersProvider } from "./context";
-import { GalleryFilterControls, GalleryTopBarEndActions } from "./filter-controls";
-import { FormatQuickFilter, GalleryQuickFiltersRow, SetQuickFilter } from "./gallery-quick-filters";
+import { GalleryFilterControls } from "./filter-controls";
 import { GallerySearchControls } from "./search-controls";
+import { GalleryTopBarIslandVariant } from "./variants/variant-island";
 
 function GalleryTopBarFiltersContent() {
   const isMobile = useIsMobile();
@@ -41,20 +41,7 @@ function GalleryTopBarFiltersContent() {
 
   return (
     <GalleryFilterDialogProvider filtersContext={filtersContext}>
-      <div className="flex w-full min-w-0 flex-col gap-4">
-        <div className="flex w-full min-w-0 items-center gap-2">
-          <div className="min-w-0 flex-1">
-            <GallerySearchControls />
-          </div>
-          <div className="flex shrink-0 items-center gap-2">
-            <FormatQuickFilter />
-            <SetQuickFilter />
-          </div>
-          <GalleryTopBarEndActions placement="desktop-toolbar" />
-        </div>
-        <GalleryFilterControls />
-        <GalleryQuickFiltersRow />
-      </div>
+      <GalleryTopBarIslandVariant />
     </GalleryFilterDialogProvider>
   );
 }

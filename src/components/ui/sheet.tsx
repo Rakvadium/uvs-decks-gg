@@ -50,7 +50,7 @@ function SheetOverlay({
 }
 
 const sheetVariants = cva(
-  "fixed z-50 flex flex-col gap-4 bg-background shadow-lg transition ease-in-out data-[state=closed]:duration-200 data-[state=open]:duration-300 data-[state=open]:animate-in data-[state=closed]:animate-out",
+  "fixed z-50 flex flex-col gap-4 overscroll-contain bg-background shadow-lg transition ease-in-out data-[state=closed]:duration-200 data-[state=open]:duration-300 data-[state=open]:animate-in data-[state=closed]:animate-out",
   {
     variants: {
       side: {
@@ -93,7 +93,7 @@ function SheetContent({
         {showCloseButton && (
           <DialogPrimitive.Close
             data-slot="sheet-close"
-            className="ring-offset-background focus:ring-ring absolute right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary"
+            className="ring-offset-background focus-visible:ring-ring absolute right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary"
           >
             <XIcon className="h-4 w-4" />
             <span className="sr-only">Close</span>

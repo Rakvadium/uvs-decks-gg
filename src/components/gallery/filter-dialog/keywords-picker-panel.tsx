@@ -32,7 +32,7 @@ export function KeywordsPickerPanel({
             key={keyword}
             variant={selected ? "default" : "outline"}
             className={cn(
-              "w-full cursor-pointer justify-center truncate px-1 py-0.5 text-[10px] transition-all",
+              "w-full cursor-pointer justify-center truncate px-1 py-0.5 text-[10px] transition-colors",
               selected && "shadow-[var(--chrome-filter-tile-shadow-selected)]"
             )}
             onClick={() => onToggleKeyword(keyword)}

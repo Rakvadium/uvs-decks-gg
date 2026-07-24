@@ -34,7 +34,7 @@ function statActive(f: StatFilterValue | undefined): f is StatFilterValue {
 const miniIconClass = "size-3 shrink-0 opacity-90";
 
 const generalChipShell =
-  "inline-flex max-w-[9rem] shrink-0 items-center gap-0.5 rounded-md border px-1 py-px text-[9px] font-bold font-mono uppercase tracking-[0.08em] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)]";
+  "inline-flex max-w-[9rem] shrink-0 items-center gap-0.5 rounded-md border px-1 py-px text-[10px] font-bold font-mono uppercase tracking-[0.08em] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)]";
 
 const GENERAL_STATS: Array<{
   key: keyof Pick<
@@ -47,27 +47,32 @@ const GENERAL_STATS: Array<{
   {
     key: "difficulty",
     icon: Gauge,
-    chipClass: "border-violet-400/35 bg-violet-500/15 text-violet-100",
+    chipClass:
+      "border-violet-400/70 bg-violet-500/35 text-violet-950 dark:bg-violet-500/30 dark:text-violet-100",
   },
   {
     key: "control",
     icon: SlidersHorizontal,
-    chipClass: "border-sky-400/35 bg-sky-500/15 text-sky-100",
+    chipClass:
+      "border-sky-400/70 bg-sky-500/35 text-sky-950 dark:bg-sky-500/30 dark:text-sky-100",
   },
   {
     key: "health",
     icon: HeartPulse,
-    chipClass: "border-rose-400/35 bg-rose-500/15 text-rose-100",
+    chipClass:
+      "border-rose-400/70 bg-rose-500/35 text-rose-950 dark:bg-rose-500/30 dark:text-rose-100",
   },
   {
     key: "handSize",
     icon: Hand,
-    chipClass: "border-amber-400/35 bg-amber-500/15 text-amber-100",
+    chipClass:
+      "border-amber-400/70 bg-amber-500/35 text-amber-950 dark:bg-amber-500/30 dark:text-amber-100",
   },
   {
     key: "stamina",
     icon: Zap,
-    chipClass: "border-lime-400/35 bg-lime-500/15 text-lime-100",
+    chipClass:
+      "border-lime-400/70 bg-lime-500/35 text-lime-950 dark:bg-lime-500/30 dark:text-lime-100",
   },
 ];
 
@@ -104,16 +109,16 @@ function BlockStatsChip({
     <span
       className={cn(
         generalChipShell,
-        "max-w-[14rem] border-cyan-400/35 bg-gradient-to-br from-cyan-500/20 via-slate-900/40 to-blue-600/15 text-cyan-50"
+        "max-w-[14rem] border-cyan-400/70 bg-cyan-500/35 text-cyan-950 dark:bg-gradient-to-br dark:from-cyan-500/35 dark:via-slate-900/50 dark:to-blue-600/30 dark:text-cyan-50"
       )}
       title={[z, mod ? `${operatorSymbol(mod.operator)} ${mod.value}` : ""].filter(Boolean).join(" · ")}
     >
-      <Shield className={cn(miniIconClass, "text-cyan-200")} strokeWidth={2.25} />
+      <Shield className={cn(miniIconClass, "text-cyan-800 dark:text-cyan-200")} strokeWidth={2.25} />
       {mod ? (
-        <span className="shrink-0 normal-case text-cyan-100/90">{operatorSymbol(mod.operator)}</span>
+        <span className="shrink-0 normal-case text-cyan-900 dark:text-cyan-100/90">{operatorSymbol(mod.operator)}</span>
       ) : null}
-      {z ? <span className="min-w-0 truncate normal-case tracking-normal text-cyan-100/85">{z}</span> : null}
-      {mod ? <span className="shrink-0 tabular-nums text-cyan-50">{mod.value}</span> : null}
+      {z ? <span className="min-w-0 truncate normal-case tracking-normal text-cyan-900 dark:text-cyan-100/85">{z}</span> : null}
+      {mod ? <span className="shrink-0 tabular-nums text-cyan-950 dark:text-cyan-50">{mod.value}</span> : null}
     </span>
   );
 }
@@ -133,18 +138,18 @@ function AttackStatsChip({
   if (!z && !sp && !dm) return null;
 
   const segmentClass =
-    "inline-flex items-center gap-0.5 normal-case tabular-nums text-[9px] font-bold font-mono";
+    "inline-flex items-center gap-0.5 normal-case tabular-nums text-[10px] font-bold font-mono";
 
   if (z && !sp && !dm) {
     return (
       <span
         className={cn(
           generalChipShell,
-          "max-w-[12rem] border-orange-400/35 bg-gradient-to-br from-orange-500/18 via-red-950/25 to-amber-600/12 text-orange-50"
+          "max-w-[12rem] border-orange-400/70 bg-orange-500/35 text-orange-950 dark:bg-gradient-to-br dark:from-orange-500/35 dark:via-red-950/40 dark:to-amber-600/25 dark:text-orange-50"
         )}
         title={zones?.join(", ")}
       >
-        <Swords className={cn(miniIconClass, "text-orange-200")} strokeWidth={2.25} />
+        <Swords className={cn(miniIconClass, "text-orange-800 dark:text-orange-200")} strokeWidth={2.25} />
         <span className="min-w-0 truncate tracking-normal">{z}</span>
       </span>
     );
@@ -155,8 +160,8 @@ function AttackStatsChip({
     pieces.push({
       key: "sp",
       node: (
-        <span className={cn(segmentClass, "text-amber-100")} title={`Speed ${operatorSymbol(sp.operator)} ${sp.value}`}>
-          <Wind className={cn(miniIconClass, "text-amber-200")} strokeWidth={2.25} />
+        <span className={cn(segmentClass, "text-amber-900 dark:text-amber-100")} title={`Speed ${operatorSymbol(sp.operator)} ${sp.value}`}>
+          <Wind className={cn(miniIconClass, "text-amber-800 dark:text-amber-200")} strokeWidth={2.25} />
           <span>{operatorSymbol(sp.operator)}</span>
           <span>{sp.value}</span>
         </span>
@@ -168,7 +173,7 @@ function AttackStatsChip({
       key: "z",
       node: (
         <span
-          className={cn(segmentClass, "min-w-0 truncate tracking-normal text-orange-100/90")}
+          className={cn(segmentClass, "min-w-0 truncate tracking-normal text-orange-900 dark:text-orange-100/90")}
           title={zones?.join(", ")}
         >
           {z}
@@ -180,8 +185,8 @@ function AttackStatsChip({
     pieces.push({
       key: "dm",
       node: (
-        <span className={cn(segmentClass, "text-rose-100")} title={`Damage ${operatorSymbol(dm.operator)} ${dm.value}`}>
-          <Sword className={cn(miniIconClass, "text-rose-200")} strokeWidth={2.25} />
+        <span className={cn(segmentClass, "text-rose-900 dark:text-rose-100")} title={`Damage ${operatorSymbol(dm.operator)} ${dm.value}`}>
+          <Sword className={cn(miniIconClass, "text-rose-800 dark:text-rose-200")} strokeWidth={2.25} />
           <span>{operatorSymbol(dm.operator)}</span>
           <span>{dm.value}</span>
         </span>
@@ -193,13 +198,13 @@ function AttackStatsChip({
     <span
       className={cn(
         generalChipShell,
-        "max-w-[18rem] border-orange-400/35 bg-gradient-to-br from-orange-500/18 via-red-950/25 to-amber-600/12 text-orange-50"
+        "max-w-[18rem] border-orange-400/70 bg-orange-500/35 text-orange-950 dark:bg-gradient-to-br dark:from-orange-500/35 dark:via-red-950/40 dark:to-amber-600/25 dark:text-orange-50"
       )}
     >
       {pieces.map((piece, i) => (
         <Fragment key={piece.key}>
           {i > 0 ? (
-            <span className="text-[8px] text-orange-200/40" aria-hidden>
+            <span className="text-[10px] text-orange-700/50 dark:text-orange-200/40" aria-hidden>
               │
             </span>
           ) : null}

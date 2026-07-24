@@ -1,6 +1,5 @@
 "use client";
 
-import { AppPageHeader } from "@/components/shell/app-page-header";
 import { CollectionViewAuthRequiredState } from "./auth-required-state";
 import { CollectionViewProvider, useCollectionViewContext } from "./context";
 import { CollectionViewEmptyState } from "./empty-state";
@@ -21,7 +20,6 @@ function CollectionViewContent() {
 
   return (
     <div className="space-y-6">
-      <AppPageHeader title="My Collection" description="Track your card collection." />
       {stats && <CollectionViewStats />}
       {!collection || collection.length === 0 ? <CollectionViewEmptyState /> : <CollectionViewGrid />}
     </div>

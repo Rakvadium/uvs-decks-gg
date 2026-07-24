@@ -35,7 +35,7 @@ export function StatBar({
       </div>
       <div className="h-2 w-full overflow-hidden rounded-full bg-secondary">
         <div
-          className={cn("h-full rounded-full transition-all", color ?? "bg-primary")}
+          className={cn("h-full rounded-full transition-[width]", color ?? "bg-primary")}
           style={{ width: `${Math.min(percentage, 100)}%` }}
         />
       </div>

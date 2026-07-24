@@ -14,7 +14,7 @@ export function DecksEmptyState({ mode, onCreateDeck }: DecksEmptyStateProps) {
         {mode === "search" ? (
           <>
             <p className="mb-2 font-mono text-sm uppercase tracking-wider text-muted-foreground">No decks found</p>
-            <p className="text-sm text-muted-foreground/60">Try adjusting your search query</p>
+            <p className="text-sm text-muted-foreground">Try adjusting your search query</p>
           </>
         ) : mode === "my-decks" ? (
           <>

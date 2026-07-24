@@ -28,7 +28,7 @@ function CardListItemContent({ embedDetailsDialog }: { embedDetailsDialog: boole
         className={cn(
           "group flex min-h-[84px] w-full items-center gap-4 rounded-xl border border-border/50 bg-card/50 px-4 py-3 text-foreground",
           "shadow-[var(--chrome-card-image-glow-rest)]",
-          "[contain:layout_paint] transition-all duration-150 hover:border-[var(--chrome-card-border-hover)] hover:bg-card/70 hover:shadow-[var(--chrome-card-image-glow-hover)]",
+          "[contain:layout_paint] transition-[border-color,box-shadow,background-color] duration-150 hover:border-[var(--chrome-card-border-hover)] hover:bg-card/80 hover:shadow-[var(--chrome-card-image-glow-hover)]",
           isDragging && "opacity-60"
         )}
         style={{

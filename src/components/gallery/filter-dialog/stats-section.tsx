@@ -27,7 +27,7 @@ function ZoneSelector({
               key={zone}
               type="button"
               className={cn(
-                "h-full flex-1 text-[10px] font-mono transition-all",
+                "h-full flex-1 text-[10px] font-mono transition-colors",
                 index !== 0 && "border-l border-border/50",
                 selected
                   ? "bg-primary/20 text-primary shadow-[var(--chrome-filter-tile-shadow-selected-inset)]"
@@ -47,13 +47,21 @@ function ZoneSelector({
 const statsSectionLabelClass =
   "text-xs font-mono uppercase tracking-widest text-muted-foreground/70";
 
-export function StatsSection({ plain = false }: { plain?: boolean } = {}) {
+export function StatsSection({
+  plain = false,
+  columns = false,
+}: { plain?: boolean; columns?: boolean } = {}) {
   const statsGroupShell =
     "flex flex-col gap-4 rounded-md border border-border/50 bg-background/50 p-2.5";
 
   const grid = (
-    <div className="grid grid-cols-1 items-start gap-4 md:grid-cols-2">
-      <div className={cn(statsGroupShell, "md:row-span-2 w-full min-w-0")}>
+    <div
+      className={cn(
+        "grid grid-cols-1 items-start gap-4",
+        columns ? "@2xl:grid-cols-3" : "md:grid-cols-2"
+      )}
+    >
+      <div className={cn(statsGroupShell, !columns && "md:row-span-2", "w-full min-w-0")}>
         <span className={statsSectionLabelClass}>General</span>
         <div className="space-y-1.5">
           <StatInput label="Difficulty" filterKey="difficulty" labelPosition="end" />

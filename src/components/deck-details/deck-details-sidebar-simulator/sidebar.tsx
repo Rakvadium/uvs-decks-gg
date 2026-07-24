@@ -18,19 +18,19 @@ export function HandSimulatorSidebar() {
     <div className="flex h-full flex-col space-y-3 p-4">
       <div className="min-h-0 flex-1 space-y-2 overflow-y-auto">
         {!startingCharacter ? (
-          <div className="rounded-lg border border-dashed border-border/60 p-4 text-xs text-muted-foreground">
+          <div className="rounded-lg border border-dashed border-border/50 p-4 text-xs text-muted-foreground">
             Select a starting character to enable simulator draws.
           </div>
         ) : null}
 
         {startingCharacter && handSize <= 0 ? (
-          <div className="rounded-lg border border-dashed border-border/60 p-4 text-xs text-muted-foreground">
+          <div className="rounded-lg border border-dashed border-border/50 p-4 text-xs text-muted-foreground">
             Starting character has no hand size available.
           </div>
         ) : null}
 
         {drawnCards.length === 0 ? (
-          <div className="space-y-3 rounded-lg border border-dashed border-border/60 p-4">
+          <div className="space-y-3 rounded-lg border border-dashed border-border/50 p-4">
             <p className="text-xs text-muted-foreground">Draw your opening hand from the full Main deck.</p>
             <Button variant="outline" size="sm" className="w-full" onClick={drawHand} disabled={!canDraw}>
               Draw First Hand

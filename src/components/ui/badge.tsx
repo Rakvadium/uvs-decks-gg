@@ -5,7 +5,7 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const badgeVariants = cva(
-  "inline-flex items-center justify-center border px-2.5 py-0.5 text-xs font-semibold w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 gap-1.5 [&>svg]:pointer-events-none transition-all duration-200 overflow-hidden uppercase tracking-widest font-mono",
+  "inline-flex items-center justify-center border px-2.5 py-0.5 text-xs font-semibold w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 gap-1.5 [&>svg]:pointer-events-none transition-colors duration-200 overflow-hidden uppercase tracking-widest font-mono",
   {
     variants: {
       tone: {
@@ -16,7 +16,7 @@ const badgeVariants = cva(
         destructive:
           "rounded bg-destructive/20 text-destructive border-destructive/40 shadow-[var(--chrome-badge-destructive-shadow)] hover:shadow-[var(--chrome-badge-destructive-shadow-hover)]",
         outline:
-          "rounded bg-transparent text-foreground border-border hover:border-primary/50 hover:text-primary hover:shadow-[var(--chrome-badge-outline-shadow-hover)]",
+          "rounded bg-transparent text-foreground border-border/50 hover:border-primary/50 hover:text-primary hover:shadow-[var(--chrome-badge-outline-shadow-hover)]",
         muted:
           "rounded-full bg-muted/50 text-muted-foreground border-muted-foreground/30",
         entity:

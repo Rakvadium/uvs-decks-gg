@@ -41,15 +41,15 @@ function SelectTrigger({
       data-slot="select-trigger"
       data-size={size}
       className={cn(
-        "flex w-fit items-center justify-between gap-2 rounded-md border border-[color:var(--control-dual-border)] bg-background/50 px-3 py-2 text-sm whitespace-nowrap shadow-xs transition-all duration-200 outline-none",
+        "flex w-fit items-center justify-between gap-2 rounded-md border border-[color:var(--control-dual-border)] bg-background/50 px-3 py-2 text-base md:text-sm whitespace-nowrap shadow-xs transition-[border-color,box-shadow,background-color,color] duration-200 outline-none",
         "hover:border-[color:var(--control-dual-border-strong)] hover:bg-[color-mix(in_oklch,var(--primary)_6%,var(--secondary)_5%,var(--background)_89%)]",
         "focus-visible:border-[color:var(--control-dual-border-strong)] focus-visible:ring-2 focus-visible:ring-[color:color-mix(in_oklch,var(--primary)_28%,var(--secondary)_28%,transparent)] focus-visible:shadow-[var(--chrome-focus-shadow)]",
         "disabled:cursor-not-allowed disabled:opacity-50",
         "data-[placeholder]:text-muted-foreground",
-        "[&_svg:not([class*='text-'])]:text-secondary/85",
+        "[&_svg:not([class*='text-'])]:text-muted-foreground",
         "aria-invalid:ring-destructive/20 aria-invalid:border-destructive",
         "data-[size=default]:h-10 data-[size=sm]:h-8",
-        "font-mono text-sm tracking-wide uppercase",
+        "font-mono text-base tracking-wide uppercase md:text-sm",
         compactValue
           ? "[&>[data-slot=select-value]]:block [&>[data-slot=select-value]]:leading-none"
           : "*:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-2",
@@ -61,7 +61,7 @@ function SelectTrigger({
       {children}
       {hideIcon ? null : (
         <SelectPrimitive.Icon asChild>
-          <ChevronDownIcon className="size-4 text-secondary/80" />
+          <ChevronDownIcon className="size-4 text-muted-foreground" />
         </SelectPrimitive.Icon>
       )}
     </SelectPrimitive.Trigger>

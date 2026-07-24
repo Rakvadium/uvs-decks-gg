@@ -17,6 +17,7 @@ import {
   setLegalityValidator,
 } from "./validators";
 import { requireAdmin } from "./utils/validation";
+import { isDocAccountActiveForQuery } from "./lib/accountStatus";
 import { runCatalogAggregateRefresh } from "./cardFacets";
 import {
   syncSetCardCountByCode,
@@ -26,6 +27,7 @@ import { toPublicCardImageUrl } from "./publicCardUrls";
 import {
   createCardWithDerivedFields,
   deriveCardSearchFields,
+  sanitizeCardImportList,
 } from "./lib/cardCreate";
 
 const ADMIN_SET_LIST_MAX = 25_000;
@@ -79,45 +81,27 @@ export const getCardDeleteWarnings = query({
   },
 });
 
-export const releaseCards = mutation({
+export const releaseCards = action({
   args: {},
   returns: v.object({
     version: v.number(),
     cardCount: v.number(),
     previousVersion: v.union(v.number(), v.null()),
+    catalogUrl: v.string(),
   }),
-  handler: async (ctx) => {
-    await requireAdmin(ctx);
-
-    const { galleryCount: cardCount } = await runCatalogAggregateRefresh(ctx);
-
-    const now = Date.now();
-    const existingVersion = await ctx.db.query("cardDataVersion").first();
-
-    if (existingVersion) {
-      const newVersion = existingVersion.version + 1;
-      await ctx.db.patch(existingVersion._id, {
-        version: newVersion,
-        updatedAt: now,
-        cardCount,
-      });
-      return {
-        version: newVersion,
-        cardCount,
-        previousVersion: existingVersion.version,
-      };
-    } else {
-      await ctx.db.insert("cardDataVersion", {
-        version: 1,
-        updatedAt: now,
-        cardCount,
-      });
-      return {
-        version: 1,
-        cardCount,
-        previousVersion: null,
-      };
-    }
+  handler: async (ctx): Promise<{
+    version: number;
+    cardCount: number;
+    previousVersion: number | null;
+    catalogUrl: string;
+  }> => {
+    const result: {
+      version: number;
+      cardCount: number;
+      previousVersion: number | null;
+      catalogUrl: string;
+    } = await ctx.runAction(internal.catalogRelease.releaseCatalogInternal, {});
+    return result;
   },
 });
 
@@ -487,6 +471,7 @@ export const seedFormats = mutation({
     skipped: v.number(),
   }),
   handler: async (ctx) => {
+    await requireAdmin(ctx);
     const defaultFormats = [
       {
         key: "standard",
@@ -973,7 +958,7 @@ interface CardImportData {
 
 export const insertCardBatch = internalMutation({
   args: {
-    cards: v.array(v.any()),
+    cards: v.array(cardInputValidator),
     jobId: v.id("ingestionJobs"),
   },
   returns: v.object({
@@ -987,12 +972,8 @@ export const insertCardBatch = internalMutation({
     const errors: Array<string> = [];
     const affected = new Set<string>();
 
-    for (const card of args.cards as CardImportData[]) {
+    for (const card of args.cards) {
       try {
-        if (!card.name) {
-          throw new Error("Card must have a name");
-        }
-
         const { searchName, searchText, searchAll } = deriveCardSearchFields({
           name: card.name,
           searchName: card.searchName,
@@ -1033,7 +1014,7 @@ export const insertCardBatch = internalMutation({
         inserted++;
       } catch (e) {
         failed++;
-        errors.push(`Card "${card.name ?? "?"}": ${(e as Error).message}`);
+        errors.push(`Card "${card.name}": ${(e as Error).message}`);
       }
     }
 
@@ -1111,6 +1092,9 @@ export const ensureAdminForAction = internalMutation({
     if (!user || user.role !== "Admin") {
       throw new Error("Admin role required");
     }
+    if (!isDocAccountActiveForQuery(user)) {
+      throw new Error("Admin access requires an active account");
+    }
     return null;
   },
 });
@@ -1127,11 +1111,11 @@ export const bulkImportCards = action({
     totalRecords: v.number(),
   }),
   handler: async (ctx, args): Promise<{ jobId: Id<"ingestionJobs">; totalRecords: number }> => {
-    let cards: CardImportData[];
+    let parsed: unknown;
     if (args.format === "json") {
       try {
-        cards = JSON.parse(args.data) as CardImportData[];
-        if (!Array.isArray(cards)) {
+        parsed = JSON.parse(args.data);
+        if (!Array.isArray(parsed)) {
           throw new Error("JSON data must be an array of cards");
         }
       } catch (e) {
@@ -1141,7 +1125,7 @@ export const bulkImportCards = action({
       throw new Error("Only JSON format is currently supported");
     }
 
-    cards = cards.map((c) => ({
+    const cards = sanitizeCardImportList(parsed).map((c) => ({
       ...c,
       setCode: c.setCode ?? args.defaultSetCode,
       setName: c.setName ?? args.defaultSetName,
@@ -1272,105 +1256,19 @@ export const logAdminAudit = internalMutation({
   },
 });
 
-export const deleteCardsBatch = internalMutation({
-  args: {
-    limit: v.number(),
-  },
-  returns: v.number(),
-  handler: async (ctx, args) => {
-    const cards = await ctx.db
-      .query("cards")
-      .take(args.limit);
-
-    const affected = new Set<string>();
-    for (const card of cards) {
-      if (card.setCode) {
-        affected.add(card.setCode);
-      }
-      await ctx.db.delete(card._id);
-    }
-    await syncSetCardCountsByCodes(ctx, affected);
-    return cards.length;
-  },
-});
-
-export const deleteCardsBatchWithKey = mutation({
-  args: {
-    adminApiKey: v.string(),
-    limit: v.number(),
-  },
-  returns: v.number(),
-  handler: async (ctx, args) => {
-    validateAdminApiKey(args.adminApiKey);
-
-    const cards = await ctx.db
-      .query("cards")
-      .take(args.limit);
-
-    const affected = new Set<string>();
-    for (const card of cards) {
-      if (card.setCode) {
-        affected.add(card.setCode);
-      }
-      await ctx.db.delete(card._id);
-    }
-    await syncSetCardCountsByCodes(ctx, affected);
-    return cards.length;
-  },
-});
-
-export const clearAllCards = action({
-  args: {},
-  returns: v.object({
-    deletedCount: v.number(),
-  }),
-  handler: async (ctx) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
-      throw new Error("Not authenticated");
-    }
-
-    const BATCH_SIZE = 500;
-    let totalDeleted = 0;
-    let deletedInBatch = BATCH_SIZE;
-
-    while (deletedInBatch === BATCH_SIZE) {
-      deletedInBatch = await ctx.runMutation(internal.admin.deleteCardsBatch, {
-        limit: BATCH_SIZE,
-      });
-      totalDeleted += deletedInBatch;
-    }
-
-    await ctx.runMutation(internal.cardFacets.rebuildCardFacetSnapshot, {});
-    await ctx.runMutation(internal.sets.reconcileAllSetCardCounts, {});
-
-    await ctx.runMutation(internal.admin.logAdminAudit, {
-      userId,
-      action: "clearAllCards",
-      detail: JSON.stringify({ deletedCount: totalDeleted }),
-    });
-
-    return { deletedCount: totalDeleted };
-  },
-});
-
 export const getCardCount = query({
   args: {},
   returns: v.number(),
   handler: async (ctx) => {
-    let count = 0;
-    const query = ctx.db.query("cards");
-
-    for await (const _ of query) {
-      count++;
-    }
-    return count;
+    await requireAdmin(ctx);
+    const version = await ctx.db.query("cardDataVersion").first();
+    return version?.cardCount ?? 0;
   },
 });
 
 export const importCardsBatch = internalMutation({
   args: {
-    cards: v.array(v.any()),
+    cards: v.array(cardInputValidator),
   },
   returns: v.object({
     inserted: v.number(),
@@ -1381,33 +1279,23 @@ export const importCardsBatch = internalMutation({
     let failed = 0;
     const affected = new Set<string>();
 
-    for (const card of args.cards as CardImportData[]) {
+    for (const card of args.cards) {
       try {
-        if (!card.name) {
-          throw new Error("Card must have a name");
-        }
-
-        const searchName = card.searchName ?? card.name;
-        const searchText = [
-          card.name,
-          card.keywords ?? "",
-          card.text ?? "",
-        ].join(" ");
-        const searchAll = [
-          searchName,
-          searchText,
-          card.setName ?? "",
-          card.type ?? "",
-          card.rarity ?? "",
-        ].join(" ");
-
-        const touch = Date.now();
+        const { searchName, searchText, searchAll } = deriveCardSearchFields({
+          name: card.name,
+          searchName: card.searchName,
+          keywords: card.keywords,
+          text: card.text,
+          setName: card.setName,
+          type: card.type,
+          rarity: card.rarity,
+        });
         await ctx.db.insert("cards", {
           ...card,
           searchName,
           searchText,
           searchAll,
-          contentRevisionAt: touch,
+          contentRevisionAt: Date.now(),
         });
         if (card.setCode) {
           affected.add(card.setCode);
@@ -1437,16 +1325,19 @@ export const importUniversusCards = action({
     if (!userId) {
       throw new Error("Not authenticated");
     }
+    await ctx.runMutation(internal.admin.ensureAdminForAction, { userId });
 
-    let cards: CardImportData[];
+    let parsed: unknown;
     try {
-      cards = JSON.parse(args.cardsJson) as CardImportData[];
-      if (!Array.isArray(cards)) {
+      parsed = JSON.parse(args.cardsJson);
+      if (!Array.isArray(parsed)) {
         throw new Error("JSON data must be an array of cards");
       }
     } catch (e) {
       throw new Error(`Invalid JSON: ${(e as Error).message}`);
     }
+
+    const cards = sanitizeCardImportList(parsed);
 
     const BATCH_SIZE = 50;
     let totalInserted = 0;
@@ -1473,7 +1364,7 @@ export const importUniversusCards = action({
 
 export const importCardsOnly = action({
   args: {
-    cards: v.array(v.any()),
+    cards: v.array(cardInputValidator),
   },
   returns: v.object({
     imported: v.number(),
@@ -1485,6 +1376,7 @@ export const importCardsOnly = action({
     if (!userId) {
       throw new Error("Not authenticated");
     }
+    await ctx.runMutation(internal.admin.ensureAdminForAction, { userId });
 
     const result: { inserted: number; failed: number } = await ctx.runMutation(internal.admin.importCardsBatch, {
       cards: args.cards,
@@ -1572,6 +1464,7 @@ export const migrateCardFieldNames = action({
     if (!userId) {
       throw new Error("Not authenticated");
     }
+    await ctx.runMutation(internal.admin.ensureAdminForAction, { userId });
 
     let totalMigrated = 0;
     let batchesProcessed = 0;
@@ -1601,19 +1494,8 @@ export const migrateCardFieldNames = action({
   },
 });
 
-function validateAdminApiKey(apiKey: string): void {
-  const validKey = process.env.ADMIN_API_KEY;
-  if (!validKey) {
-    throw new Error("ADMIN_API_KEY environment variable not set");
-  }
-  if (apiKey !== validKey) {
-    throw new Error("Invalid admin API key");
-  }
-}
-
-export const upsertSet = mutation({
+export const upsertSet = internalMutation({
   args: {
-    adminApiKey: v.string(),
     code: v.string(),
     name: v.string(),
     setNumber: v.optional(v.number()),
@@ -1624,8 +1506,6 @@ export const upsertSet = mutation({
   },
   returns: v.id("sets"),
   handler: async (ctx, args) => {
-    validateAdminApiKey(args.adminApiKey);
-
     const existing = await ctx.db
       .query("sets")
       .withIndex("by_code", (q) => q.eq("code", args.code))
@@ -1655,10 +1535,14 @@ export const upsertSet = mutation({
   },
 });
 
-export const upsertCardsBatch = mutation({
+const upsertCardBatchItemValidator = cardInputValidator.extend({
+  abilities: v.optional(v.string()),
+  number: v.optional(v.number()),
+});
+
+export const upsertCardsBatch = internalMutation({
   args: {
-    adminApiKey: v.string(),
-    cards: v.array(v.any()),
+    cards: v.array(upsertCardBatchItemValidator),
   },
   returns: v.object({
     inserted: v.number(),
@@ -1666,47 +1550,13 @@ export const upsertCardsBatch = mutation({
     failed: v.number(),
   }),
   handler: async (ctx, args) => {
-    validateAdminApiKey(args.adminApiKey);
     let inserted = 0;
     let updated = 0;
     let failed = 0;
     const affected = new Set<string>();
 
-    for (const rawCard of args.cards) {
+    for (const card of args.cards) {
       try {
-        const card = rawCard as {
-          oracleId?: string;
-          name: string;
-          imageUrl?: string;
-          isFrontFace?: boolean;
-          isVariant?: boolean;
-          number?: number;
-          collectorNumber?: string;
-          rarity?: string;
-          type?: string;
-          difficulty?: number;
-          control?: number;
-          speed?: number;
-          damage?: number;
-          blockModifier?: number;
-          handSize?: number;
-          health?: number;
-          stamina?: number;
-          attackZone?: string;
-          blockZone?: string;
-          keywords?: string;
-          symbols?: string;
-          abilities?: string;
-          searchName?: string;
-          searchText?: string;
-          searchAll?: string;
-          copyLimit?: number;
-          setName?: string;
-          setNumber?: number;
-          setCode?: string;
-          legality?: string;
-        };
-
         if (!card.name) {
           failed++;
           continue;
@@ -1732,7 +1582,7 @@ export const upsertCardsBatch = mutation({
           stamina: card.stamina,
           attackZone: card.attackZone,
           blockZone: card.blockZone,
-          text: card.abilities,
+          text: card.text ?? card.abilities,
           keywords: card.keywords,
           symbols: card.symbols,
           searchName: card.searchName ?? card.name.toLowerCase(),
@@ -1774,9 +1624,8 @@ export const upsertCardsBatch = mutation({
   },
 });
 
-export const linkCardFaces = mutation({
+export const linkCardFaces = internalMutation({
   args: {
-    adminApiKey: v.string(),
     links: v.array(v.object({
       frontOracleId: v.string(),
       backOracleId: v.string(),
@@ -1787,7 +1636,6 @@ export const linkCardFaces = mutation({
     failed: v.number(),
   }),
   handler: async (ctx, args) => {
-    validateAdminApiKey(args.adminApiKey);
     let linked = 0;
     let failed = 0;
 
@@ -1911,6 +1759,7 @@ export const clearAllSets = action({
     if (!userId) {
       throw new Error("Not authenticated");
     }
+    await ctx.runMutation(internal.admin.ensureAdminForAction, { userId });
 
     const BATCH_SIZE = 100;
     let totalDeleted = 0;
@@ -2390,6 +2239,9 @@ export const getCardDataVersion = query({
       version: v.number(),
       updatedAt: v.number(),
       cardCount: v.number(),
+      catalogUrl: v.optional(v.string()),
+      catalogSha256: v.optional(v.string()),
+      catalogSchemaVersion: v.optional(v.number()),
     }),
     v.null()
   ),
@@ -2401,6 +2253,9 @@ export const getCardDataVersion = query({
       version: versionDoc.version,
       updatedAt: versionDoc.updatedAt,
       cardCount: versionDoc.cardCount,
+      catalogUrl: versionDoc.catalogUrl,
+      catalogSha256: versionDoc.catalogSha256,
+      catalogSchemaVersion: versionDoc.catalogSchemaVersion,
     };
   },
 });

@@ -3,40 +3,25 @@
 import { useCallback, useState } from "react";
 import { CardDetailsDialog } from "@/components/universus/card-details/dialog";
 import type { CachedCard } from "@/lib/universus/card-store";
-import { useInfiniteSlice } from "@/hooks/useInfiniteSlice";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { useGalleryFilters } from "@/providers/GalleryFiltersProvider";
+import { cn } from "@/lib/utils";
 import { GalleryTopBarFilters } from "../gallery-top-bar-filters";
 import { GalleryCardMapProvider, useGalleryCardMap } from "./card-map-context";
 import { GalleryDetailsView } from "./details-view";
 import { GalleryGridView } from "./grid-view";
 import { GalleryInitializationState } from "./initial-loading-state";
 import { GalleryListView } from "./list-view";
-import { GalleryMainScrollRootProvider, useGalleryMainScrollRootRef, useGalleryMainScrollSetRef } from "./gallery-main-scroll-root";
-import { LoadMoreIndicator } from "./load-more-indicator";
+import { GalleryMainScrollRootProvider, useGalleryMainScrollSetRef } from "./gallery-main-scroll-root";
 import { LoadingProgress } from "./loading-progress";
-
-const GALLERY_SLICE_PAGE = 72;
 
 function GalleryMainContentBody() {
   const { state, meta } = useGalleryFilters();
   const { getBackCard } = useGalleryCardMap();
   const [detailsCard, setDetailsCard] = useState<CachedCard | null>(null);
   const filterKey = meta.filteredListKey;
-  const scrollRef = useGalleryMainScrollRootRef();
   const setScrollRef = useGalleryMainScrollSetRef();
   const isMobile = useIsMobile();
-  const {
-    visibleItems: visibleFilteredCards,
-    hasMore,
-    loadMoreRef,
-  } = useInfiniteSlice({
-    items: meta.filteredCards,
-    pageSize: GALLERY_SLICE_PAGE,
-    resetKey: meta.filteredListKey,
-    rootRef: scrollRef,
-    rootMargin: isMobile ? "480px" : "720px",
-  });
 
   const openCardDetails = useCallback((card: CachedCard) => {
     setDetailsCard(card);
@@ -50,33 +35,38 @@ function GalleryMainContentBody() {
 
   return (
     <div className="relative z-10 flex min-h-0 flex-1 flex-col">
-      <div className="relative z-30 hidden shrink-0 border-b border-primary/40 bg-primary/15 shadow-[0_1px_0_color-mix(in_oklch,var(--primary)_12%,transparent)] md:block dark:border-sidebar-border/50 dark:bg-sidebar dark:shadow-none">
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-primary/10 via-transparent to-primary/5 dark:hidden" />
-        <div
-          className="pointer-events-none absolute inset-0 hidden dark:block"
-          style={{ background: "var(--chrome-shell-sidebar-wash)" }}
-        />
-        <div className="relative w-full px-4 py-3 md:px-6">
+      {!isMobile ? (
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-30 px-4 pt-3 md:px-6">
           <GalleryTopBarFilters />
         </div>
-      </div>
+      ) : null}
 
-      <div ref={setScrollRef} className="relative z-0 min-h-0 flex-1 overflow-y-auto">
-        <div className="space-y-4 p-4 pb-6 md:px-6 md:pb-4 md:pt-4">
+      <div
+        ref={setScrollRef}
+        className="relative z-0 min-h-0 flex-1 overflow-y-auto overscroll-y-contain [-webkit-overflow-scrolling:touch]"
+      >
+        <div className={cn("p-4 pb-6 md:px-6 md:pb-4 md:pt-[4.75rem]")}>
           {state.viewMode === "card" ? (
             <GalleryGridView
               key={filterKey}
-              cards={visibleFilteredCards}
+              cards={meta.filteredCards}
               cardsPerRow={state.cardsPerRow}
               onOpenCardDetails={openCardDetails}
             />
           ) : state.viewMode === "list" ? (
-            <GalleryListView key={filterKey} cards={visibleFilteredCards} onOpenCardDetails={openCardDetails} />
+            <GalleryListView
+              key={filterKey}
+              cards={meta.filteredCards}
+              onOpenCardDetails={openCardDetails}
+            />
           ) : (
-            <GalleryDetailsView key={filterKey} cards={visibleFilteredCards} onOpenCardDetails={openCardDetails} />
+            <GalleryDetailsView
+              key={filterKey}
+              cards={meta.filteredCards}
+              onOpenCardDetails={openCardDetails}
+            />
           )}
         </div>
-        {hasMore ? <LoadMoreIndicator loadMoreRef={loadMoreRef} /> : null}
       </div>
 
       <CardDetailsDialog

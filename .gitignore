@@ -41,6 +41,7 @@ yarn-error.log*
 next-env.d.ts
 /data/
 /scripts/*
+!/scripts/admin-http.ts
 !/scripts/calibrate-card-ocr.ts
 !/scripts/seed-card-drafts.ts
 !/scripts/ocr-calibration/

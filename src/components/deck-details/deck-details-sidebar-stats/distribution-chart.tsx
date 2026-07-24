@@ -70,7 +70,7 @@ export function PieDistributionChart({
             className="relative isolate h-[86px] w-[86px] shrink-0 rounded-full ring-1 ring-inset ring-border/40 [transform:translateZ(0)]"
             style={{ background: gradient }}
           >
-            <div className="absolute inset-[19px] flex items-center justify-center rounded-full bg-background/90 ring-1 ring-inset ring-border/40">
+            <div className="absolute inset-[19px] flex items-center justify-center rounded-full bg-background/95 ring-1 ring-inset ring-border/40">
               <span className="font-mono text-[10px] text-primary">{chartTotal}</span>
             </div>
           </div>

@@ -13,7 +13,7 @@ export function CommunityTierListsPageEmptyState({
   message,
 }: CommunityTierListsPageEmptyStateProps) {
   return (
-    <Card className="border-dashed border-border/60 bg-card/65">
+    <Card className="border-dashed border-border/50 bg-card/80">
       <CardContent className="flex flex-col items-center gap-4 py-14 text-center">
         <p className="max-w-lg text-sm text-muted-foreground">{message}</p>
         {action ?? (

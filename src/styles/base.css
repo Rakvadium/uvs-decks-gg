@@ -1,21 +1,19 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --font-geist-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system,
+  --font-app: var(--font-outfit), ui-sans-serif, system-ui, -apple-system,
     "Segoe UI", sans-serif;
-  --font-geist-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo,
-    Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-  --font-display: var(--font-geist-sans);
-  --font-serif: var(--font-geist-sans);
+  --font-display: var(--font-app);
+  --font-serif: var(--font-app);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-serif: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-display: var(--font-geist-sans);
+  --font-sans: var(--font-app);
+  --font-serif: var(--font-app);
+  --font-mono: var(--font-app);
+  --font-display: var(--font-app);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -115,8 +113,8 @@
     --chrome-card-shadow-hover: var(--chrome-elevation-mid);
     --chrome-card-border-hover: var(--border);
 
-    --chrome-card-title-font: var(--font-geist-sans);
-    --chrome-card-description-font: var(--font-geist-sans);
+    --chrome-card-title-font: var(--font-app);
+    --chrome-card-description-font: var(--font-app);
     --chrome-card-description-tracking: normal;
 
     --chrome-card-image-glow-rest: 0 0 0 1px oklch(0 0 0 / 0.08);
@@ -132,7 +130,11 @@
     --chrome-filter-tile-shadow-selected: none;
     --chrome-filter-tile-shadow-selected-inset: none;
 
-    --chrome-shell-sidebar-wash: none;
+    --chrome-shell-sidebar-wash: linear-gradient(
+      to bottom,
+      oklch(from var(--accent) l c h / 0.045) 0%,
+      transparent 42%
+    );
     --chrome-shell-icon-drop-shadow: none;
     --chrome-shell-nav-active-shadow: 0 1px 3px 0 oklch(0 0 0 / 0.06);
     --chrome-shell-brand-shadow: 0 1px 3px 0 oklch(0 0 0 / 0.06);
@@ -336,7 +338,7 @@
     --chrome-card-border-hover: oklch(from var(--primary) l c h / 0.3);
 
     --chrome-card-title-font: var(--font-display);
-    --chrome-card-description-font: var(--font-geist-mono);
+    --chrome-card-description-font: var(--font-app);
     --chrome-card-description-tracking: 0.05em;
 
     --chrome-card-image-glow-rest: 0 0 0 1px color-mix(in oklch, var(--primary) 18%, transparent), 0 0 4px color-mix(in oklch, var(--primary) 35%, transparent), 0 0 0 1px color-mix(in oklch, var(--secondary) 12%, transparent), 0 0 6px color-mix(in oklch, var(--secondary) 22%, transparent);
@@ -352,16 +354,21 @@
     --chrome-filter-tile-shadow-selected: 0 0 10px -3px var(--primary);
     --chrome-filter-tile-shadow-selected-inset: inset 0 0 8px -3px var(--primary);
 
-    --chrome-shell-sidebar-wash: linear-gradient(to bottom, oklch(from var(--primary) l c h / 0.05) 0%, transparent 50%, oklch(from var(--secondary) l c h / 0.05) 100%);
-    --chrome-shell-icon-drop-shadow: drop-shadow(0 0 3px var(--primary));
-    --chrome-shell-nav-active-shadow: 0 0 2px oklch(from var(--secondary) l c h / 0.55), 0 0 10px oklch(from var(--secondary) l c h / 0.38);
-    --chrome-shell-brand-shadow: 0 0 2px oklch(from var(--primary) l c h / 0.5), 0 0 5px oklch(from var(--primary) l c h / 0.4);
-    --chrome-shell-brand-shadow-hover: 0 0 3px var(--primary), 0 0 8px oklch(from var(--primary) l c h / 0.6);
-    --chrome-shell-rail-active-shadow: 0 0 2px oklch(from var(--secondary) l c h / 0.6), 0 0 10px oklch(from var(--secondary) l c h / 0.42);
-    --chrome-shell-rail-resize-shadow: 0 0 3px var(--primary), 0 0 8px oklch(from var(--primary) l c h / 0.6);
-    --chrome-shell-rail-resize-shadow-hover: 0 0 2px var(--primary), 0 0 6px oklch(from var(--primary) l c h / 0.5);
-    --chrome-shell-deck-label-drop-shadow: drop-shadow(0 0 8px var(--primary));
-    --chrome-shell-avatar-ring: 0 0 2px oklch(from var(--primary) l c h / 0.4), 0 0 6px oklch(from var(--primary) l c h / 0.35);
+    --chrome-shell-sidebar-wash: linear-gradient(
+      to bottom,
+      oklch(from var(--accent) l c h / 0.08) 0%,
+      transparent 50%,
+      oklch(from var(--secondary) l c h / 0.05) 100%
+    );
+    --chrome-shell-icon-drop-shadow: drop-shadow(0 0 3px var(--accent));
+    --chrome-shell-nav-active-shadow: 0 0 2px oklch(from var(--accent) l c h / 0.55), 0 0 10px oklch(from var(--accent) l c h / 0.38);
+    --chrome-shell-brand-shadow: 0 0 2px oklch(from var(--accent) l c h / 0.5), 0 0 5px oklch(from var(--accent) l c h / 0.4);
+    --chrome-shell-brand-shadow-hover: 0 0 3px var(--accent), 0 0 8px oklch(from var(--accent) l c h / 0.6);
+    --chrome-shell-rail-active-shadow: 0 0 2px oklch(from var(--accent) l c h / 0.6), 0 0 10px oklch(from var(--accent) l c h / 0.42);
+    --chrome-shell-rail-resize-shadow: 0 0 3px var(--accent), 0 0 8px oklch(from var(--accent) l c h / 0.6);
+    --chrome-shell-rail-resize-shadow-hover: 0 0 2px var(--accent), 0 0 6px oklch(from var(--accent) l c h / 0.5);
+    --chrome-shell-deck-label-drop-shadow: drop-shadow(0 0 8px var(--accent));
+    --chrome-shell-avatar-ring: 0 0 2px oklch(from var(--accent) l c h / 0.4), 0 0 6px oklch(from var(--accent) l c h / 0.35);
 
     --chrome-page-hero-wash-opacity: 1;
     --chrome-page-bg: linear-gradient(to bottom, var(--background), oklch(from var(--muted) l c h / 0.2));
@@ -456,6 +463,20 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
+  }
+  :root {
+    color-scheme: light;
+  }
+  .dark {
+    color-scheme: dark;
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
   }
   body {
     @apply bg-background text-foreground;
@@ -814,10 +835,12 @@
   .holo-shimmer,
   .pulse-glow,
   .flicker,
-  .data-stream::before {
-    animation: none;
+  .data-stream::before,
+  .drag-float,
+  .status-indicator {
+    animation: none !important;
   }
-  
+
   .hover-lift:hover {
     transform: none;
   }

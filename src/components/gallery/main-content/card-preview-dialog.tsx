@@ -34,7 +34,7 @@ function CardPreviewSection({ title, description, icon, badge, children, classNa
           <div className="flex items-center gap-2">
             <h3 className="text-sm font-semibold text-foreground">{title}</h3>
             {badge && (
-              <Badge variant="outline" className="h-4 px-1.5 font-mono text-[9px] uppercase tracking-wider">
+              <Badge variant="outline" className="h-4 px-1.5 font-mono text-[10px] uppercase tracking-wider">
                 {badge}
               </Badge>
             )}
@@ -100,11 +100,11 @@ function StackedCardMockup({ card }: { card: CachedCard }) {
               <div
                 key={layer}
                 aria-hidden="true"
-                className="pointer-events-none absolute inset-0 rounded-lg border border-border/60 bg-muted/60"
+                className="pointer-events-none absolute inset-0 rounded-lg border border-border/50 bg-muted/60"
                 style={{
                   transform: `translate(${layer * stackOffset}px, ${layer * stackOffset}px)`,
                   opacity: Math.max(0.4, 0.85 - layer * 0.12),
-                  boxShadow: "1px 1px 0 0 hsl(var(--border) / 0.4)",
+                  boxShadow: "1px 1px 0 0 color-mix(in oklch, var(--border) 40%, transparent)",
                 }}
               />
             ))}
@@ -130,18 +130,18 @@ function StackedCardMockup({ card }: { card: CachedCard }) {
               className={cn(
                 "absolute bottom-0 right-0 z-30 flex flex-col items-center overflow-hidden",
                 "rounded-tl-lg rounded-br-lg rounded-tr-none rounded-bl-none",
-                "bg-background/80 backdrop-blur-sm",
-                "border-l border-t border-border/40"
+                "bg-card/95 backdrop-blur-md",
+                "border-l border-t border-border/70 shadow-md"
               )}
             >
               <div className="flex h-6 w-7 items-center justify-center text-primary">
-                <Plus className="h-3 w-3" />
+                <Plus className="h-3.5 w-3.5 stroke-[2.5]" />
               </div>
-              <div className="flex h-6 w-7 items-center justify-center border-t border-b border-border/40 font-mono text-xs font-bold text-primary">
+              <div className="flex h-6 w-7 items-center justify-center border-t border-b border-border/60 font-mono text-xs font-bold tabular-nums text-primary">
                 {quantity}
               </div>
               <div className="flex h-6 w-7 items-center justify-center text-destructive">
-                <Minus className="h-3 w-3" />
+                <Minus className="h-3.5 w-3.5 stroke-[2.5]" />
               </div>
             </div>
 

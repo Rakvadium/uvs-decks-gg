@@ -4,7 +4,7 @@ import type { CachedCard } from "@/lib/universus/card-store";
 
 export function SimulatorHandImageCard({ card }: { card: CachedCard }) {
   return (
-    <div className="relative aspect-[2.5/3.5] overflow-hidden rounded-lg border border-border/50 bg-muted/30">
+    <div className="relative aspect-[2.5/3.5] overflow-hidden rounded-lg border border-border/50 bg-muted/20">
       {card.imageUrl ? (
         <Image
           src={card.imageUrl}

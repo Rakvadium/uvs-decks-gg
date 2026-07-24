@@ -35,7 +35,7 @@ function AuthLoadingSkeleton() {
   return (
     <>
       <div className="hidden h-screen w-full bg-sidebar md:flex">
-        <div className="flex h-full w-64 flex-col bg-sidebar">
+        <div className="flex h-full w-64 flex-col border-r border-sidebar-border bg-sidebar">
           <div className="flex h-14 items-center px-4">
             <Skeleton className="h-8 w-32" />
           </div>
@@ -49,31 +49,23 @@ function AuthLoadingSkeleton() {
           </div>
         </div>
 
-        <div className="flex flex-1 flex-col">
-          <div className="flex h-14 shrink-0 items-center justify-between bg-sidebar px-4">
-            <Skeleton className="h-8 w-64" />
-            <div className="flex items-center gap-2">
-              <Skeleton className="h-9 w-9 rounded-full" />
-              <Skeleton className="h-9 w-9 rounded-full" />
+        <div className="flex min-w-0 flex-1 flex-col overflow-hidden bg-sidebar">
+          <div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden bg-background">
+            <div className="flex h-14 shrink-0 items-center justify-between border-b border-sidebar-border bg-sidebar px-4">
+              <Skeleton className="h-8 w-64" />
+              <div className="flex items-center gap-2">
+                <Skeleton className="h-9 w-9 rounded-full" />
+                <Skeleton className="h-9 w-9 rounded-full" />
+              </div>
             </div>
-          </div>
-          <div className="flex flex-1">
-            <div className="relative flex-1">
-              <div className="pointer-events-none absolute -top-3 left-0 z-10 h-3 w-3">
-                <div className="h-full w-full rounded-br-xl bg-sidebar" />
-              </div>
-              <div className="pointer-events-none absolute -top-3 right-0 z-10 h-3 w-3">
-                <div className="h-full w-full rounded-bl-xl bg-sidebar" />
-              </div>
-              <div className="h-full rounded-tl-xl rounded-tr-xl bg-background p-6">
-                <div className="space-y-4">
-                  <Skeleton className="h-8 w-48" />
-                  <Skeleton className="h-4 w-96" />
-                  <div className="grid grid-cols-3 gap-4 pt-4">
-                    {Array.from({ length: 6 }).map((_, i) => (
-                      <Skeleton key={i} className="h-32 w-full" />
-                    ))}
-                  </div>
+            <div className="flex-1 p-6">
+              <div className="space-y-4">
+                <Skeleton className="h-8 w-48" />
+                <Skeleton className="h-4 w-96" />
+                <div className="grid grid-cols-3 gap-4 pt-4">
+                  {Array.from({ length: 6 }).map((_, i) => (
+                    <Skeleton key={i} className="h-32 w-full" />
+                  ))}
                 </div>
               </div>
             </div>
@@ -82,7 +74,7 @@ function AuthLoadingSkeleton() {
       </div>
 
       <div className="relative flex h-[100dvh] w-full flex-col bg-background md:hidden">
-        <div className="flex h-14 shrink-0 items-center justify-between border-b border-sidebar-border/50 bg-sidebar px-3">
+        <div className="flex h-14 shrink-0 items-center justify-between border-b border-sidebar-border bg-sidebar px-3">
           <div className="flex items-center gap-3">
             <Skeleton className="h-9 w-9 rounded-lg" />
             <Skeleton className="h-5 w-28" />
@@ -114,7 +106,7 @@ function AuthLoadingSkeleton() {
 
         <div className="pointer-events-none fixed inset-x-0 bottom-0 z-40">
           <div className="relative overflow-visible">
-            <div className="mx-0 overflow-hidden rounded-t-[8px] border-x border-t [border-color:var(--chrome-sheet-border)] bg-background/96 shadow-[var(--chrome-sheet-shadow)] backdrop-blur-md">
+            <div className="mx-0 overflow-hidden rounded-t-[8px] border-x border-t [border-color:var(--chrome-sheet-border)] bg-background/95 shadow-[var(--chrome-sheet-shadow)] backdrop-blur-md">
               <div className="flex justify-center">
                 <Skeleton className="mt-2 h-2 w-24 rounded-full" />
               </div>

@@ -32,7 +32,7 @@ function StatsSidebarContent() {
       </div>
 
       {mainTotal === 0 ? (
-        <div className="rounded-lg border border-dashed border-border/60 p-4 text-xs text-muted-foreground">
+        <div className="rounded-lg border border-dashed border-border/50 p-4 text-xs text-muted-foreground">
           Add cards to your Main deck to view stats.
         </div>
       ) : (

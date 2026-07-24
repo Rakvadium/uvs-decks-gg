@@ -30,7 +30,7 @@ export function FormatRow() {
                 key={format.key}
                 variant={selected ? "default" : "outline"}
                 className={cn(
-                  "cursor-pointer px-2 py-0.5 text-[10px] transition-all",
+                  "cursor-pointer px-2 py-0.5 text-[10px] transition-colors",
                   selected && "shadow-[var(--chrome-filter-tile-shadow-selected)]"
                 )}
                 onClick={() => toggleFormat(format.key)}

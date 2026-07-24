@@ -5,7 +5,7 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-all duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background uppercase tracking-wider",
+  "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity,transform] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background uppercase tracking-wider",
   {
     variants: {
       variant: {
@@ -15,7 +15,7 @@ const buttonVariants = cva(
         destructiveOutline:
           "border border-red-600/65 bg-transparent text-red-700 shadow-none hover:bg-red-500/[0.12] hover:border-red-600 hover:text-red-950 dark:border-red-500/55 dark:text-red-400 dark:hover:bg-red-500/14 dark:hover:border-red-400 dark:hover:text-red-300 [&_svg]:text-current focus-visible:border-red-600 focus-visible:ring-red-500/35 dark:focus-visible:border-red-400 dark:focus-visible:ring-red-400/35",
         outline:
-          "border border-[color:var(--control-dual-border)] bg-transparent text-primary hover:bg-[color:var(--control-dual-surface-hover)] hover:border-[color:var(--control-dual-border-strong)] hover:text-primary hover:shadow-[var(--chrome-button-shadow-outline-hover)] [&_svg]:text-secondary/90",
+          "border border-[color:var(--control-dual-border)] bg-transparent text-primary hover:bg-[color:var(--control-dual-surface-hover)] hover:border-[color:var(--control-dual-border-strong)] hover:text-primary hover:shadow-[var(--chrome-button-shadow-outline-hover)] [&_svg]:text-current",
         secondary:
           "bg-secondary/80 text-secondary-foreground hover:bg-secondary border border-secondary/50 hover:shadow-[var(--chrome-button-shadow-secondary-hover)]",
         ghost:

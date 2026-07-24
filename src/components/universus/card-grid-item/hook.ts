@@ -13,6 +13,8 @@ export function useCardGridItem({
   dragSourceId = "gallery-grid",
   showDeckActions = true,
   imagePriority = false,
+  imageSizes,
+  imageQuality,
 }: CardGridItemProps) {
   const isMobile = useIsMobile();
   const [usesTouchControls, setUsesTouchControls] = useState(false);
@@ -144,6 +146,8 @@ export function useCardGridItem({
     card,
     backCard,
     imagePriority,
+    imageSizes,
+    imageQuality,
     displayCard,
     dragPreviewImageRef,
     dragHandleProps,

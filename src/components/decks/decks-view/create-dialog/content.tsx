@@ -44,7 +44,7 @@ export function DeckCreateDialog() {
           </div>
 
           <div className="relative min-h-0 flex-1 overflow-y-auto px-6">
-            <DialogHeader className="border-border/20 pb-4 pt-6">
+            <DialogHeader className="border-border/30 pb-4 pt-6">
               <div className="flex items-start gap-3">
                 <div className="flex h-11 w-11 items-center justify-center rounded-lg border border-primary/30 bg-primary/10 shadow-[0_0_2px_var(--primary)/40,0_0_6px_var(--primary)/40]">
                   <Layers className="h-5 w-5 text-primary" />
@@ -59,16 +59,22 @@ export function DeckCreateDialog() {
             </DialogHeader>
 
             <DialogBody className="pt-4">
-              <label className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground">
+              <label
+                htmlFor="create-deck-name"
+                className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground"
+              >
                 Deck name
               </label>
               <div className="relative mt-2">
                 <PenLine className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/70" />
                 <Input
-                  placeholder="Deck name..."
+                  id="create-deck-name"
+                  name="deck-name"
+                  autoComplete="off"
+                  placeholder="My Standard Aggro…"
                   value={model.newDeckName}
                   onChange={(event) => model.setNewDeckName(event.target.value)}
-                  className="h-12 border-border/60 bg-background/40 pl-10 text-base focus-visible:ring-primary/25"
+                  className="h-12 bg-background/50 pl-10 text-base focus-visible:ring-primary/25"
                   onKeyDown={model.handleNameKeyDown}
                 />
               </div>

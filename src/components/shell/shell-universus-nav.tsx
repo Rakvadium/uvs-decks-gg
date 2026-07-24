@@ -12,6 +12,13 @@ import {
   useUniversusMediaDockOptional,
 } from "@/providers/UniversusMediaDockProvider";
 import { useLeftSidebarContext } from "./left-sidebar/context";
+import {
+  SHELL_NAV_ICON_ACTIVE,
+  SHELL_NAV_ITEM_ACTIVE,
+  SHELL_NAV_ITEM_BASE,
+  SHELL_NAV_ITEM_IDLE,
+  SHELL_RAIL_ITEM_COLLAPSED_CLASS,
+} from "./shell-chrome";
 
 type ShellUniversusNavSidebarProps = {
   variant: "sidebar";
@@ -36,17 +43,15 @@ function ShellUniversusNavSidebarInner() {
       onClick={() => toggleLauncher()}
       aria-pressed={isOpen}
       className={cn(
-        "render-stable relative flex w-full items-center gap-3 rounded-md border px-3 py-2.5 text-sm font-medium transition-all duration-200",
-        collapsed && "w-full justify-center px-2 py-2.5",
-        isOpen
-          ? "border-secondary/40 bg-secondary/15 text-primary shadow-[var(--chrome-shell-nav-active-shadow)]"
-          : "border-transparent text-sidebar-foreground/70 hover:border-sidebar-border/50 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
+        SHELL_NAV_ITEM_BASE,
+        collapsed ? SHELL_RAIL_ITEM_COLLAPSED_CLASS : "w-full",
+        isOpen ? SHELL_NAV_ITEM_ACTIVE : SHELL_NAV_ITEM_IDLE
       )}
     >
       <Tv
         className={cn(
-          "h-4 w-4 shrink-0 transition-all duration-200",
-          isOpen && "text-primary [filter:var(--chrome-shell-icon-drop-shadow)]"
+          "h-4 w-4 shrink-0 transition-colors duration-200",
+          isOpen && SHELL_NAV_ICON_ACTIVE
         )}
         aria-hidden
         strokeWidth={isOpen ? 0 : 2}
@@ -58,7 +63,7 @@ function ShellUniversusNavSidebarInner() {
         </span>
       ) : null}
       {isOpen ? (
-        <div className="pointer-events-none absolute inset-0 rounded-md border border-secondary/30" />
+        <div className="pointer-events-none absolute inset-0 rounded-md border border-accent/50" />
       ) : null}
     </button>
   );
@@ -79,7 +84,6 @@ function ShellUniversusNavSidebarInner() {
 
   return (
     <div
-      className="render-stable"
       style={prefersReducedMotion ? undefined : { animationDelay: "220ms" }}
     >
       {control}
@@ -100,8 +104,8 @@ function ShellUniversusNavMobileHeaderInner() {
       className={cn(
         "relative z-10 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border transition-colors",
         isOpen
-          ? "border-primary/50 bg-primary/25 text-primary"
-          : "border-sidebar-border/60 bg-sidebar-accent/20 text-sidebar-foreground/80 hover:bg-sidebar-accent/40 hover:text-sidebar-foreground"
+          ? "border-accent/55 bg-accent/20 text-accent"
+          : "border-sidebar-border bg-sidebar-accent text-sidebar-foreground hover:border-accent/40 hover:bg-accent/12 hover:text-accent"
       )}
     >
       <Tv

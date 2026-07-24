@@ -33,7 +33,7 @@ export function CommunityTierListDetailPoolPanel() {
   }
 
   return (
-    <div className="sticky bottom-0 z-20 border-t border-border/50 bg-background/92 backdrop-blur-xl">
+    <div className="sticky bottom-0 z-20 border-t border-border/50 bg-background/95 backdrop-blur-xl">
       <AnimatePresence>
         {isPresentationMode && presentationCard ? (
           <m.div

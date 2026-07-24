@@ -65,7 +65,7 @@ export function MobileActionsHandle({ className, decorative = false, ...props }:
 
   return (
     <button type="button" aria-label="Open actions panel" className={baseClassName} {...props}>
-      <span className="relative block h-4 w-24 rounded-full bg-primary transition-all duration-150 group-hover:bg-primary">
+      <span className="relative block h-4 w-24 rounded-full bg-primary transition-colors duration-150 group-hover:bg-primary">
         <span className="absolute inset-0 mx-auto w-px rounded-full bg-primary group-hover:bg-primary" />
       </span>
     </button>
@@ -365,7 +365,7 @@ export function MobileActionsDraggableDrawer({ children }: MobileActionsDraggabl
         <div className="pointer-events-none absolute inset-x-0 top-0 z-[1] h-14 rounded-t-4 bg-gradient-to-b from-white/[0.06] via-primary/[0.025] to-transparent" />
         <div className="pointer-events-none absolute inset-x-0 top-0 z-[1] h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
         <div className="relative z-0 flex min-h-0 flex-1 flex-col overflow-hidden">
-          <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-background/96 backdrop-blur-md">
+          <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-background/95 backdrop-blur-md">
             <div
               ref={grabberStripRef}
               className="flex shrink-0 touch-none justify-center px-4 pb-0.5 pt-1"
@@ -386,7 +386,7 @@ export function MobileActionsDraggableDrawer({ children }: MobileActionsDraggabl
             </div>
           </div>
           <div ref={bottomStackRef} className="shrink-0">
-            <div className="bg-background/96 backdrop-blur-md">{children}</div>
+            <div className="bg-background/95 backdrop-blur-md">{children}</div>
           </div>
         </div>
       </div>

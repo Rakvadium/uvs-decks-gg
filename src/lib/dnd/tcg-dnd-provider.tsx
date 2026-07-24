@@ -267,10 +267,10 @@ function DragOverlayImage({
   return (
     <div
       ref={overlayOuterRef}
-      className="pointer-events-none fixed left-0 top-0 z-[9999] will-change-transform"
+      className="pointer-events-none fixed left-0 top-0 z-[600] will-change-transform"
     >
       <div
-        className="overflow-hidden rounded-xl border bg-background/70 shadow-2xl ring-1 ring-primary/20"
+        className="overflow-hidden rounded-xl border bg-background/80 shadow-2xl ring-1 ring-primary/20"
         style={{ width: DRAG_OVERLAY_WIDTH, height: DRAG_OVERLAY_HEIGHT }}
       >
         {imageUrl ? (

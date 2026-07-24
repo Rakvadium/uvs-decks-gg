@@ -14,7 +14,7 @@ export function CardFlipButton({ className, onFlip, ...props }: CardFlipButtonPr
       size="icon"
       variant="default"
       className={cn(
-        "absolute left-0 top-0 z-20 h-7 w-7 rounded-bl-none rounded-br-md rounded-tl-md rounded-tr-none border border-primary/80 bg-primary/60 text-white opacity-0 shadow-lg backdrop-blur-sm transition-opacity duration-200 hover:bg-primary/80 group-hover:opacity-100",
+        "absolute left-0 top-0 z-20 h-7 w-7 rounded-bl-none rounded-br-md rounded-tl-md rounded-tr-none border border-primary/80 bg-primary/60 text-white opacity-0 shadow-lg backdrop-blur-sm transition-opacity duration-200 hover:bg-primary/80 group-hover:opacity-100 group-focus-within:opacity-100 max-md:opacity-100",
         className
       )}
       onClick={(event) => {

@@ -1,61 +1,51 @@
 # Documentation map
 
-**Product intent (read first):** [PRODUCT_VISION.md](./PRODUCT_VISION.md)
+**Product intent:** [PRODUCT_VISION.md](./PRODUCT_VISION.md)
 
-**How we structure UI code:** [component-architecture-playbook.md](./component-architecture-playbook.md)
+**Runtime picture:** [SYSTEM_ANALYSIS.md](./SYSTEM_ANALYSIS.md)
 
-**AI agents:** [agent-onboarding.md](./agent-onboarding.md) (implementation) · [orchestration-agent.md](./orchestration-agent.md) (delegate-only coordination)
+**UI structure:** [component-architecture-playbook.md](./component-architecture-playbook.md)
+
+**Agents:** [agent-workflow-playbook.md](./agent-workflow-playbook.md) (start here) · [agent-issue-queue.md](./agent-issue-queue.md) · [agent-onboarding.md](./agent-onboarding.md) · [`AGENTS.md`](../AGENTS.md)
 
 ---
 
-## Tier 1 — aligned with current goals
+## Core
 
 
-| Doc                                            | Role                                                                         |
-| ---------------------------------------------- | ---------------------------------------------------------------------------- |
-| [PRODUCT_VISION.md](./PRODUCT_VISION.md)       | Outcomes, scope, principles, roadmap themes                                  |
-| [SYSTEM_ANALYSIS.md](./SYSTEM_ANALYSIS.md)     | Runtime picture: clients, Convex, data, integrations                         |
-| [ARCHITECTURE_PLAN.md](./ARCHITECTURE_PLAN.md) | Vision ↔ repository layout, stack posture, playbook and file-size discipline |
-| [PROJECT_OVERVIEW.md](./PROJECT_OVERVIEW.md)   | Short orientation; links to vision and analysis                              |
+| Doc                                                                  | Role                                      |
+| -------------------------------------------------------------------- | ----------------------------------------- |
+| [PRODUCT_VISION.md](./PRODUCT_VISION.md)                             | Outcomes, scope, principles               |
+| [SYSTEM_ANALYSIS.md](./SYSTEM_ANALYSIS.md)                           | Clients, Convex, data, integrations       |
+| [component-architecture-playbook.md](./component-architecture-playbook.md) | Feature folders and UI module shape |
+| [UI_UX_DESIGN.md](./UI_UX_DESIGN.md)                                 | Interface patterns and constraints        |
+| [floating-header-islands.md](./floating-header-islands.md)          | Page header slot semantics (island bars)  |
+| [theme-and-chrome.md](./theme-and-chrome.md)                         | Theme tokens, calm / expressive chrome    |
 
 
-## Tier 2 — supporting detail
+## Features
 
 
-| Doc                                                              | Role                                                             |
-| ---------------------------------------------------------------- | ---------------------------------------------------------------- |
-| [TECH_STACK_DETAILS.md](./TECH_STACK_DETAILS.md)                 | Versions, tooling, where config lives                            |
-| [UI_UX_DESIGN.md](./UI_UX_DESIGN.md)                             | Interface patterns and design constraints                        |
-| [DEPLOYMENT.md](./DEPLOYMENT.md)                                 | Deploy and environment notes                                     |
-| [POTENTIAL_CHALLENGES.md](./POTENTIAL_CHALLENGES.md)             | Risks and open questions                                         |
-| [MEMORY_SYSTEM.md](./MEMORY_SYSTEM.md)                           | Reserved: product memory / persistence concepts (fill when used) |
-| [community-tier-list-system.md](./community-tier-list-system.md) | Tier lists, rankings, aggregation (feature deep-dive)            |
+| Doc                                                                                          | Role                                 |
+| -------------------------------------------------------------------------------------------- | ------------------------------------ |
+| [teams-feature-implementation.md](./teams-feature-implementation.md)                         | Teams permissions and flows          |
+| [implementation/notes/legality-dates.md](./implementation/notes/legality-dates.md)           | Format legality date semantics       |
+
+Missing / planned feature docs (see [agent-workflow-playbook.md](./agent-workflow-playbook.md) § Documentation gaps): `community-tier-list-system.md`, `card-data-hooks.md`, `content-moderation-and-language-filter.md`.
 
 
-## Process and hygiene
+## Process
 
 
-| Doc                                          | Role                                                     |
-| -------------------------------------------- | -------------------------------------------------------- |
-| [BACKLOG.md](./BACKLOG.md)                   | Queued work, statuses, acceptance hints                  |
-| [CHANGELOG.md](./CHANGELOG.md)               | Release-facing history                                   |
-| [CODE_SIZE_POLICY.md](./CODE_SIZE_POLICY.md) | File-size targets and how to split code (playbook-first) |
-| [AGENT_WORKFLOWS.md](./AGENT_WORKFLOWS.md)   | How coding and orchestration agents fit together         |
+| Doc                                                      | Role                                      |
+| -------------------------------------------------------- | ----------------------------------------- |
+| [BACKLOG.md](./BACKLOG.md)                               | Queued work                               |
+| [CHANGELOG.md](./CHANGELOG.md)                           | Release-facing history                    |
+| [agent-workflow-playbook.md](./agent-workflow-playbook.md) | Hardened loops, visual verify, test prompts, doc gaps |
+| [agent-issue-queue.md](./agent-issue-queue.md)           | GitHub issue labels, template, backlog-worker queue |
+| [agent-onboarding.md](./agent-onboarding.md)             | Coding-agent setup and local browser login |
 
 
-## Working notes
+## Historical material
 
-
-| Path                                                   | Role                              |
-| ------------------------------------------------------ | --------------------------------- |
-| [implementation/notes/](./implementation/notes/)       | Optional phase or spike notes     |
-| [orchestration/run-log.md](./orchestration/run-log.md) | Optional orchestrator session log |
-
-
-## Archive
-
-Superseded or historical material belongs in **[archive/](./archive/)** so the main map stays current.
-
-## Reference layout
-
-The **[reference/docs/](../_reference/docs/)** tree in this repository is an example documentation tree from another product. Use it for **folder shape and tone**, not as the source of truth for **tcg-decks** behavior. This `**docs/`** directory is canonical for this app.
+Older placeholders, process docs, finished checklists, handoffs, and deferred spikes live in **[`_noLongerNeeded/`](../_noLongerNeeded/)**.

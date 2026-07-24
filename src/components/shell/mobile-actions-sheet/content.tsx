@@ -5,7 +5,7 @@ import { MobileActionsSheetHeader } from "./header";
 import { MobileActionsSlotGrid } from "./slot-grid";
 
 const mobileSheetCollapseButtonClassName =
-  "relative flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-[color:var(--control-dual-border)] bg-background/60 text-muted-foreground transition-colors hover:border-[color:var(--control-dual-border-strong)] hover:bg-[color:var(--control-dual-surface-hover)] hover:text-primary";
+  "relative flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-[color:var(--control-dual-border)] bg-background/50 text-muted-foreground transition-colors hover:border-[color:var(--control-dual-border-strong)] hover:bg-[color:var(--control-dual-surface-hover)] hover:text-primary";
 
 export interface MobileActionsSheetActionPanelProps {
   onHeaderPointerDown: (event: ReactPointerEvent<HTMLElement>) => void;
@@ -24,7 +24,7 @@ export function MobileActionsSheetActionPanel({
 
   return (
     <div className="flex h-full min-h-0 flex-col overflow-hidden">
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-background/96 backdrop-blur-md">
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-background/95 backdrop-blur-md">
         <div
           className="touch-none shrink-0"
           onPointerDown={onHeaderPointerDown}
@@ -39,7 +39,7 @@ export function MobileActionsSheetActionPanel({
         </div>
       </div>
       {ActiveComponent ? (
-        <div className="shrink-0 border-t border-border/35 bg-transparent px-4 py-3">
+        <div className="shrink-0 border-t border-border/30 bg-transparent px-4 py-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
             {ActiveFooter ? (
               <div className="flex flex-wrap items-center justify-end gap-2">

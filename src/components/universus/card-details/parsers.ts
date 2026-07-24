@@ -1,52 +1,39 @@
+import { UNIVERSUS_COLORS } from "@/config/universus";
 import { KEYWORD_ABILITY_MAP } from "./constants";
 
 const ZONE_CONFIG: Record<
   string,
-  { label: string; textColor: string; borderColor: string; bgColor: string }
+  { label: string; color: string }
 > = {
   H: {
     label: "High",
-    textColor: "text-red-500",
-    borderColor: "border-red-500/30",
-    bgColor: "bg-red-500/10",
+    color: UNIVERSUS_COLORS.HIGH,
   },
   M: {
     label: "Mid",
-    textColor: "text-orange-500",
-    borderColor: "border-orange-500/30",
-    bgColor: "bg-orange-500/10",
+    color: UNIVERSUS_COLORS.MID,
   },
   L: {
     label: "Low",
-    textColor: "text-yellow-500",
-    borderColor: "border-yellow-500/30",
-    bgColor: "bg-yellow-500/10",
+    color: UNIVERSUS_COLORS.LOW,
   },
   high: {
     label: "High",
-    textColor: "text-red-500",
-    borderColor: "border-red-500/30",
-    bgColor: "bg-red-500/10",
+    color: UNIVERSUS_COLORS.HIGH,
   },
   mid: {
     label: "Mid",
-    textColor: "text-orange-500",
-    borderColor: "border-orange-500/30",
-    bgColor: "bg-orange-500/10",
+    color: UNIVERSUS_COLORS.MID,
   },
   low: {
     label: "Low",
-    textColor: "text-yellow-500",
-    borderColor: "border-yellow-500/30",
-    bgColor: "bg-yellow-500/10",
+    color: UNIVERSUS_COLORS.LOW,
   },
 };
 
 export type ZoneDisplay = {
   label: string;
-  textColor: string;
-  borderColor: string;
-  bgColor: string;
+  color: string;
 };
 
 export function parseSymbols(symbols?: string) {

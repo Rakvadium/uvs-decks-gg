@@ -25,8 +25,8 @@ export function DeckGridItemStatusRow() {
       <div className="ml-auto flex shrink-0 items-center gap-1.5">
         {showAuthor ? (
           <div className="flex items-center gap-1">
-            <User className="h-2.5 w-2.5 text-muted-foreground/50 sm:h-3 sm:w-3" />
-            <span className="font-mono text-[9px] uppercase tracking-wider text-muted-foreground/50 sm:text-[10px]">
+            <User className="h-2.5 w-2.5 text-muted-foreground sm:h-3 sm:w-3" />
+            <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground sm:text-[11px]">
               {authorLabel}
             </span>
           </div>
@@ -34,7 +34,7 @@ export function DeckGridItemStatusRow() {
 
         <div
           className={cn(
-            "flex items-center gap-1 rounded px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider sm:px-2 sm:text-[10px]",
+            "flex items-center gap-1 rounded px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-wider sm:px-2 sm:text-[10px]",
             isReady
               ? "border border-green-500/30 bg-green-500/10 text-green-500"
               : "border border-orange-500/30 bg-orange-500/10 text-orange-500"

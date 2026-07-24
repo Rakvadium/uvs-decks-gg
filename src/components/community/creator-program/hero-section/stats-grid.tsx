@@ -9,7 +9,7 @@ export function CreatorProgramHeroStatsGrid() {
         return (
           <div
             key={stat.label}
-            className="rounded-xl border border-border/60 bg-background/60 px-4 py-3 backdrop-blur-sm"
+            className="rounded-xl border border-border/50 bg-background/50 px-4 py-3 backdrop-blur-sm"
           >
             <div className="flex items-center justify-between">
               <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground">{stat.label}</span>

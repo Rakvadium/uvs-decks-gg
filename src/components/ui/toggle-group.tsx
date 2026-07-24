@@ -66,7 +66,7 @@ export function ToggleGroupItem({
     <button
       type="button"
       className={cn(
-        "inline-flex items-center justify-center rounded-md px-3 py-1.5 text-sm font-medium transition-all",
+        "inline-flex items-center justify-center rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
         "hover:bg-background/50",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
         "disabled:pointer-events-none disabled:opacity-50",

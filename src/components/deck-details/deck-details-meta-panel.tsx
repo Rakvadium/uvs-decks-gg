@@ -20,7 +20,7 @@ export function DeckDetailsMetaPanel() {
   if (!deck) return null;
 
   return (
-    <section className="min-w-0 flex-1 rounded-xl border border-border/50 bg-card/70 p-3 backdrop-blur-sm sm:p-4">
+    <section className="min-w-0 flex-1 rounded-xl border border-border/50 bg-card/80 p-3 backdrop-blur-sm sm:p-4">
       <div className="space-y-3">
         <div className="space-y-2">
           <h1 className="line-clamp-2 text-lg font-display font-bold uppercase tracking-[0.16em] sm:text-xl" title={deck.name}>

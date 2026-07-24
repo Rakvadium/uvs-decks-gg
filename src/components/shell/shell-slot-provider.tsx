@@ -11,6 +11,7 @@ export type {
   ShellSlotState,
   SlotArea,
   SlotIcon,
+  SlotIconFit,
   SlotRegistration,
   SlotRegistrationOptions,
 } from "./shell-slot-provider/types";

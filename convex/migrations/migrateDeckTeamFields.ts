@@ -1,7 +1,7 @@
-import { mutation } from "../_generated/server";
+import { internalMutation } from "../_generated/server";
 import { v } from "convex/values";
 
-export const backfillDeckTeamFields = mutation({
+export const backfillDeckTeamFields = internalMutation({
   args: {},
   returns: v.object({
     updated: v.number(),

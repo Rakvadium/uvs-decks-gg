@@ -8,18 +8,6 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import { CheckCircle, XCircle, Loader2 } from "lucide-react";
 import {
   AdminPageHeader,
@@ -28,8 +16,6 @@ import {
 } from "@/components/admin";
 import { toast } from "sonner";
 import { getConvexErrorMessage, toastConvexError } from "@/lib/convex-error-toast";
-
-const CLEAR_CATALOG_PHRASE = "DELETE ALL CARDS";
 
 type AdminImportPageClientProps = {
   setCode: string;
@@ -56,12 +42,7 @@ export default function AdminImportPageClient({
   const [bulkJobId, setBulkJobId] = useState<Id<"ingestionJobs"> | null>(null);
   const [bulkBusy, setBulkBusy] = useState(false);
 
-  const [clearOpen, setClearOpen] = useState(false);
-  const [clearPhrase, setClearPhrase] = useState("");
-  const [clearSubmitting, setClearSubmitting] = useState(false);
-
   const importCards = useAction(api.admin.importUniversusCards);
-  const clearCards = useAction(api.admin.clearAllCards);
   const previewBulkImportCards = useMutation(api.admin.previewBulkImportCards);
   const bulkImportCards = useAction(api.admin.bulkImportCards);
 
@@ -84,28 +65,6 @@ export default function AdminImportPageClient({
       toastConvexError(error, "Import failed");
     } finally {
       setIsImporting(false);
-    }
-  };
-
-  const runClearAll = async () => {
-    if (clearPhrase !== CLEAR_CATALOG_PHRASE) {
-      return;
-    }
-    setClearSubmitting(true);
-    setResult(null);
-    try {
-      const res = await clearCards({});
-      const msg = `Deleted ${res.deletedCount} cards.`;
-      setResult({ success: true, message: msg });
-      toast.success(msg);
-      setClearOpen(false);
-      setClearPhrase("");
-    } catch (error) {
-      const message = getConvexErrorMessage(error, "Delete failed");
-      setResult({ success: false, message });
-      toastConvexError(error, "Delete failed");
-    } finally {
-      setClearSubmitting(false);
     }
   };
 
@@ -210,27 +169,6 @@ export default function AdminImportPageClient({
           </div>
         </div>
 
-        <details className="rounded-lg border bg-muted/20 p-4">
-          <summary className="cursor-pointer text-sm font-medium">
-            Advanced — clear entire card catalog
-          </summary>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Removes all cards in the database (all sets), then rebuilds catalog aggregates. This is
-            rarely needed.
-          </p>
-          <Button
-            className="mt-3"
-            type="button"
-            variant="destructive"
-            onClick={() => {
-              setClearPhrase("");
-              setClearOpen(true);
-            }}
-          >
-            Clear all cards…
-          </Button>
-        </details>
-
         <Separator />
 
         <div className="space-y-4">
@@ -294,61 +232,6 @@ export default function AdminImportPageClient({
           ) : null}
         </div>
       </div>
-
-      <AlertDialog
-        open={clearOpen}
-        onOpenChange={(o) => {
-          setClearOpen(o);
-          if (!o) {
-            setClearPhrase("");
-          }
-        }}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete every card in the database?</AlertDialogTitle>
-            <AlertDialogDescription asChild>
-              <div className="space-y-3 text-sm text-muted-foreground">
-                <p>
-                  This runs the destructive <span className="font-mono">clearAllCards</span> action.
-                  The operation is written to the admin audit log.
-                </p>
-                <p>
-                  Type{" "}
-                  <span className="font-mono text-foreground">{CLEAR_CATALOG_PHRASE}</span> to
-                  confirm.
-                </p>
-                <div className="space-y-1.5">
-                  <Label htmlFor="clear-phrase">Confirmation phrase</Label>
-                  <Input
-                    id="clear-phrase"
-                    value={clearPhrase}
-                    onChange={(e) => setClearPhrase(e.target.value)}
-                    className="font-mono"
-                    autoComplete="off"
-                  />
-                </div>
-              </div>
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel type="button" disabled={clearSubmitting}>
-              Cancel
-            </AlertDialogCancel>
-            <AlertDialogAction
-              type="button"
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              disabled={clearSubmitting || clearPhrase !== CLEAR_CATALOG_PHRASE}
-              onClick={(e) => {
-                e.preventDefault();
-                void runClearAll();
-              }}
-            >
-              {clearSubmitting ? "Clearing…" : "Delete all cards"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </div>
   );
 }

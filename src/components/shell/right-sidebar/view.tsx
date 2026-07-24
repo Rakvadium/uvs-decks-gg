@@ -10,7 +10,7 @@ function RightSidebarContent() {
   if (sidebarSlots.length === 0) return null;
 
   return (
-    <div className="flex h-full overflow-hidden bg-sidebar">
+    <div className="relative z-10 flex h-full overflow-hidden text-sidebar-foreground">
       <RightSidebarIconRail />
       <RightSidebarExpandedPanel />
     </div>

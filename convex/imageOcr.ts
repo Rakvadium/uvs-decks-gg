@@ -1,6 +1,7 @@
 "use node";
 
 import { action } from "./_generated/server";
+import { internal } from "./_generated/api";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { v } from "convex/values";
 
@@ -36,6 +37,7 @@ export const extractText = action({
     if (!userId) {
       throw new Error("Not authenticated");
     }
+    await ctx.runMutation(internal.admin.ensureAdminForAction, { userId });
 
     if (Boolean(args.bytes) === Boolean(args.imageUrl)) {
       throw new Error("Provide exactly one of bytes or imageUrl");

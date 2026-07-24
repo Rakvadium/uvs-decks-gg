@@ -26,7 +26,7 @@ export function ActiveDeckCharacterSymbolSelector() {
             "rounded-bl-lg rounded-tr-lg rounded-tl-none rounded-br-none",
             "bg-background/80 backdrop-blur-sm",
             "border-r border-t border-border/40",
-            "transition-all hover:bg-primary/10 hover:border-primary/40"
+            "transition-colors hover:bg-primary/10 hover:border-primary/40"
           )}
         >
           <SymbolIcon symbol={selectedSymbol ?? characterSymbols[0]} size="lg" />

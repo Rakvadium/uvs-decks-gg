@@ -121,7 +121,7 @@ export function GalleryFilterDialogProvider({
       actions,
       meta,
       filters,
-      hasActiveFilters: meta.activeFilterCount > 0,
+      hasActiveFilters: meta.hasClearableFilters,
       setSearch,
       setSetSearch,
       clearSetSearch: () => setSetSearch(""),

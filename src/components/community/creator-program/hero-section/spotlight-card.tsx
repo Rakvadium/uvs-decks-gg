@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 
 export function CreatorProgramHeroSpotlightCard() {
   return (
-    <Card className="border-glow bg-background/70">
+    <Card className="border-glow bg-background/80">
       <CardHeader className="space-y-2">
         <CardTitle className="text-lg">Creator Spotlight</CardTitle>
         <CardDescription>Featured creator profiles and weekly drops.</CardDescription>
@@ -18,7 +18,7 @@ export function CreatorProgramHeroSpotlightCard() {
           <div>
             <div className="flex items-center gap-2">
               <p className="text-sm font-semibold">NovaEdge</p>
-              <Badge variant="secondary" className="text-[9px]">
+              <Badge variant="secondary" className="text-[10px]">
                 Verified
               </Badge>
             </div>

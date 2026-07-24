@@ -4,6 +4,14 @@ import * as m from "framer-motion/m";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { Kicker } from "@/components/ui/typography-headings";
+import {
+  SHELL_NAV_ICON_ACTIVE,
+  SHELL_NAV_ITEM_ACTIVE,
+  SHELL_NAV_ITEM_BASE,
+  SHELL_NAV_ITEM_IDLE,
+  SHELL_RAIL_ITEM_COLLAPSED_CLASS,
+  SHELL_RAIL_STACK_CLASS,
+} from "../shell-chrome";
 import { useLeftSidebarContext } from "./context";
 
 export function LeftSidebarNav() {
@@ -13,8 +21,8 @@ export function LeftSidebarNav() {
     <Link
       href="/"
       className={cn(
-        "rounded-md py-2 text-xs font-mono uppercase tracking-wider text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground",
-        collapsed ? "flex justify-center px-2" : "px-3"
+        "rounded-md text-xs font-mono uppercase tracking-wider text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+        collapsed ? cn("flex items-center", SHELL_RAIL_ITEM_COLLAPSED_CLASS) : "px-3 py-2"
       )}
     >
       <span className={cn("inline-flex items-center gap-2", collapsed && "justify-center")}>
@@ -25,7 +33,7 @@ export function LeftSidebarNav() {
   );
 
   return (
-    <nav className="flex flex-1 flex-col gap-1 p-2">
+    <nav className={cn(collapsed ? cn(SHELL_RAIL_STACK_CLASS, "flex-1") : "flex flex-1 flex-col gap-1 p-2")}>
       {!isOnAdminPage
         ? navItems.map((item, index) => {
             const href = `/${item.path}`;
@@ -33,24 +41,22 @@ export function LeftSidebarNav() {
             const Icon = item.icon;
 
             const navLink = (
-              <Link key={item.path} href={href}>
+              <Link key={item.path} href={href} aria-label={collapsed ? item.label : undefined}>
                 <m.div
                   initial={false}
                   whileHover={prefersReducedMotion ? undefined : { x: collapsed ? 0 : 4 }}
                   whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}
                   className={cn(
-                    "render-stable relative flex items-center gap-3 rounded-md border px-3 py-2.5 text-sm font-medium transition-all duration-200",
-                    collapsed && "justify-center px-2",
-                    isActive
-                      ? "border-secondary/40 bg-secondary/15 text-primary shadow-[var(--chrome-shell-nav-active-shadow)]"
-                      : "border-transparent text-sidebar-foreground/70 hover:border-sidebar-border/50 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
+                    SHELL_NAV_ITEM_BASE,
+                    collapsed && SHELL_RAIL_ITEM_COLLAPSED_CLASS,
+                    isActive ? SHELL_NAV_ITEM_ACTIVE : SHELL_NAV_ITEM_IDLE
                   )}
                   style={{ animationDelay: `${index * 50}ms` }}
                 >
                   <Icon
                     className={cn(
-                      "h-4 w-4 shrink-0 transition-all duration-200",
-                      isActive && "text-primary [filter:var(--chrome-shell-icon-drop-shadow)]"
+                      "h-4 w-4 shrink-0 transition-[color,filter] duration-200",
+                      isActive && SHELL_NAV_ICON_ACTIVE
                     )}
                   />
                   {!collapsed ? (
@@ -59,7 +65,7 @@ export function LeftSidebarNav() {
                     </span>
                   ) : null}
                   {isActive ? (
-                    <div className="pointer-events-none absolute inset-0 rounded-md border border-secondary/30" />
+                    <div className="pointer-events-none absolute inset-0 rounded-md border border-accent/50" />
                   ) : null}
                 </m.div>
               </Link>
@@ -81,10 +87,15 @@ export function LeftSidebarNav() {
         : null}
 
       {isOnAdminPage ? (
-        <div className={cn("flex items-center gap-2 px-3 py-2.5 text-sm font-semibold", collapsed && "justify-center px-2")}>
-          <Shield className="h-4 w-4 shrink-0 text-primary [filter:var(--chrome-shell-icon-drop-shadow)]" />
+        <div
+          className={cn(
+            "flex items-center gap-2 text-sm font-semibold",
+            collapsed ? SHELL_RAIL_ITEM_COLLAPSED_CLASS : "px-3 py-2.5"
+          )}
+        >
+          <Shield className={cn("h-4 w-4 shrink-0", SHELL_NAV_ICON_ACTIVE)} />
           {!collapsed ? (
-            <Kicker className="whitespace-nowrap font-display text-primary">
+            <Kicker className="whitespace-nowrap font-display text-accent">
               Admin Panel
             </Kicker>
           ) : null}

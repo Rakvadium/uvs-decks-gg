@@ -21,7 +21,7 @@ export function DeckDetailsSectionTabs() {
       orientation={isMobile ? "horizontal" : "vertical"}
       size="sm"
       stretch={isMobile}
-      className="w-full bg-muted/30"
+      className="w-full bg-muted/20"
       value={model.activeSection}
       onValueChange={(value) => model.setActiveSection(value as DeckSection)}
       items={sections.map((section) => {

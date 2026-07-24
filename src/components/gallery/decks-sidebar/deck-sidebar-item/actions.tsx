@@ -19,7 +19,7 @@ export function DeckSidebarItemActions() {
           {isActive ? "Active" : "Set Active"}
         </Button>
       ) : (
-        <span className="text-[9px] font-mono uppercase tracking-wider text-muted-foreground/70">
+        <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/70">
           Creator only
         </span>
       )}

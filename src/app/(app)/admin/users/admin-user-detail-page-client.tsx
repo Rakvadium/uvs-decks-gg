@@ -281,7 +281,7 @@ function AdminUserDetailInner({ userId }: { userId: Id<"users"> }) {
           ) : (
             <ul className="space-y-2 text-sm max-h-64 overflow-y-auto">
               {audit.results.map((row) => (
-                <li key={row._id} className="border-b border-border/60 pb-2">
+                <li key={row._id} className="border-b border-border/50 pb-2">
                   <div className="font-medium">{row.action}</div>
                   <div className="text-xs text-muted-foreground">
                     {new Date(row._creationTime).toLocaleString()}
@@ -316,7 +316,7 @@ function AdminUserDetailInner({ userId }: { userId: Id<"users"> }) {
             <AlertDialogDescription>
               {statusDialog === "active"
                 ? "Restore this account to active and clear time-boxed status fields where applicable."
-                : "This will apply on the user’s next mutation or query that checks status. See user-account-status.md for session behavior."}
+                : "This will apply on the user’s next mutation or query that checks status. The identity session may remain valid until it expires or they sign out."}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

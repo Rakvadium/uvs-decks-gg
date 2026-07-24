@@ -388,7 +388,7 @@ export function FormatFormContent({ mode, format }: FormatFormContentProps) {
             {s.subFormats.map((row, i) => (
               <li
                 key={i}
-                className="flex flex-wrap items-end gap-2 rounded-md border border-border/60 p-2"
+                className="flex flex-wrap items-end gap-2 rounded-md border border-border/50 p-2"
               >
                 <div className="min-w-0 flex-1 space-y-1">
                   <Label className="text-xs">Key</Label>
@@ -464,7 +464,7 @@ export function FormatDeleteSection({ format }: FormatDeleteSectionProps) {
   };
 
   return (
-    <div className="mt-10 border-t border-border pt-8">
+    <div className="mt-10 border-t border-border/50 pt-8">
       <h2 className="text-sm font-medium text-destructive">Delete format</h2>
       <p className="mt-1 text-sm text-muted-foreground">
         Permanently remove this format. Blocked if any decks, card legality, or set legality rows

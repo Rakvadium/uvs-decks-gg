@@ -9,7 +9,7 @@ export function SidebarGalleryListItemThumbnail() {
   } = useSidebarGalleryListItemContext();
 
   return (
-    <div className="relative h-12 w-8 shrink-0 overflow-hidden rounded border border-border/40 bg-muted/30">
+    <div className="relative h-12 w-8 shrink-0 overflow-hidden rounded border border-border/40 bg-muted/20">
       {imageUrl ? (
         <Image
           ref={dragPreviewImageRef}

@@ -4,6 +4,7 @@ import {
   internalQuery,
   mutation,
   query,
+  type MutationCtx,
 } from "./_generated/server";
 import { v, type Infer } from "convex/values";
 import type { Id } from "./_generated/dataModel";
@@ -42,16 +43,6 @@ const draftUploadInputValidator = v.object({
 function cleanString(value: string | undefined): string | undefined {
   const trimmed = value?.trim();
   return trimmed ? trimmed : undefined;
-}
-
-function validateAdminApiKey(apiKey: string): void {
-  const validKey = process.env.ADMIN_API_KEY;
-  if (!validKey) {
-    throw new Error("ADMIN_API_KEY environment variable not set");
-  }
-  if (apiKey !== validKey) {
-    throw new Error("Invalid admin API key");
-  }
 }
 
 function cleanDraft(draft: CardDraftEditable): CardDraftEditable {
@@ -180,16 +171,65 @@ export const generateDraftUploadUrl = mutation({
   },
 });
 
-export const generateDraftUploadUrlWithApiKey = mutation({
+async function insertDraftsFromStorageIds(
+  ctx: { db: MutationCtx["db"] },
   args: {
-    adminApiKey: v.string(),
+    setCode: string;
+    setName: string;
+    drafts: Array<{
+      storageId: Id<"_storage">;
+      fileName: string;
+      collectorNumber?: string;
+      sortIndex?: number;
+    }>;
   },
-  returns: v.object({ uploadUrl: v.string() }),
-  handler: async (ctx, args) => {
-    validateAdminApiKey(args.adminApiKey);
-    return { uploadUrl: await ctx.storage.generateUploadUrl() };
-  },
-});
+): Promise<Id<"cardDrafts">[]> {
+  if (args.drafts.length > DRAFT_UPLOAD_BATCH_MAX) {
+    throw new Error(`Upload at most ${DRAFT_UPLOAD_BATCH_MAX} draft images at once`);
+  }
+  const now = Date.now();
+  const set = await ctx.db
+    .query("sets")
+    .withIndex("by_code", (q) => q.eq("code", args.setCode))
+    .unique();
+  const ids: Id<"cardDrafts">[] = [];
+  for (let i = 0; i < args.drafts.length; i++) {
+    const draft = args.drafts[i];
+    const meta = await ctx.db.system.get("_storage", draft.storageId);
+    if (!meta) {
+      throw new Error(`Upload not found for ${draft.fileName}`);
+    }
+    const collectorNumber = cleanString(draft.collectorNumber) ?? inferCollectorNumber(draft.fileName);
+    const fileDraft = draftFieldsFromFileName(draft.fileName);
+    const draftId = await ctx.db.insert("cardDrafts", {
+      setCode: args.setCode,
+      setName: args.setName,
+      collectorNumber,
+      sortIndex: draft.sortIndex ?? now + i,
+      fileName: draft.fileName,
+      status: "pending",
+      imageStorageId: draft.storageId,
+      draft: cleanDraft({
+        ...fileDraft,
+        oracleId: crypto.randomUUID(),
+        setCode: args.setCode,
+        setName: args.setName,
+        setNumber: set?.setNumber,
+        collectorNumber,
+        copyLimit: 4,
+        isFrontFace: true,
+        isVariant: false,
+        isRevealHidden: true,
+        symbols: "",
+      }),
+      parseWarnings: [],
+      createdAt: now,
+      updatedAt: now,
+    });
+    ids.push(draftId);
+  }
+  return ids;
+}
 
 export const createDraftsFromStorageIds = mutation({
   args: {
@@ -200,109 +240,19 @@ export const createDraftsFromStorageIds = mutation({
   returns: v.array(v.id("cardDrafts")),
   handler: async (ctx, args) => {
     await requireAdmin(ctx);
-    if (args.drafts.length > DRAFT_UPLOAD_BATCH_MAX) {
-      throw new Error(`Upload at most ${DRAFT_UPLOAD_BATCH_MAX} draft images at once`);
-    }
-    const now = Date.now();
-    const set = await ctx.db
-      .query("sets")
-      .withIndex("by_code", (q) => q.eq("code", args.setCode))
-      .unique();
-    const ids: Id<"cardDrafts">[] = [];
-    for (let i = 0; i < args.drafts.length; i++) {
-      const draft = args.drafts[i];
-      const meta = await ctx.db.system.get("_storage", draft.storageId);
-      if (!meta) {
-        throw new Error(`Upload not found for ${draft.fileName}`);
-      }
-      const collectorNumber = cleanString(draft.collectorNumber) ?? inferCollectorNumber(draft.fileName);
-      const fileDraft = draftFieldsFromFileName(draft.fileName);
-      const draftId = await ctx.db.insert("cardDrafts", {
-        setCode: args.setCode,
-        setName: args.setName,
-        collectorNumber,
-        sortIndex: draft.sortIndex ?? now + i,
-        fileName: draft.fileName,
-        status: "pending",
-        imageStorageId: draft.storageId,
-        draft: cleanDraft({
-          ...fileDraft,
-          oracleId: crypto.randomUUID(),
-          setCode: args.setCode,
-          setName: args.setName,
-          setNumber: set?.setNumber,
-          collectorNumber,
-          copyLimit: 4,
-          isFrontFace: true,
-          isVariant: false,
-          isRevealHidden: true,
-          symbols: "",
-        }),
-        parseWarnings: [],
-        createdAt: now,
-        updatedAt: now,
-      });
-      ids.push(draftId);
-    }
-    return ids;
+    return await insertDraftsFromStorageIds(ctx, args);
   },
 });
 
-export const createDraftsFromStorageIdsWithApiKey = mutation({
+export const createDraftsFromStorageIdsInternal = internalMutation({
   args: {
-    adminApiKey: v.string(),
     setCode: v.string(),
     setName: v.string(),
     drafts: v.array(draftUploadInputValidator),
   },
   returns: v.array(v.id("cardDrafts")),
   handler: async (ctx, args) => {
-    validateAdminApiKey(args.adminApiKey);
-    if (args.drafts.length > DRAFT_UPLOAD_BATCH_MAX) {
-      throw new Error(`Upload at most ${DRAFT_UPLOAD_BATCH_MAX} draft images at once`);
-    }
-    const now = Date.now();
-    const set = await ctx.db
-      .query("sets")
-      .withIndex("by_code", (q) => q.eq("code", args.setCode))
-      .unique();
-    const ids: Id<"cardDrafts">[] = [];
-    for (let i = 0; i < args.drafts.length; i++) {
-      const draft = args.drafts[i];
-      const meta = await ctx.db.system.get("_storage", draft.storageId);
-      if (!meta) {
-        throw new Error(`Upload not found for ${draft.fileName}`);
-      }
-      const collectorNumber = cleanString(draft.collectorNumber) ?? inferCollectorNumber(draft.fileName);
-      const fileDraft = draftFieldsFromFileName(draft.fileName);
-      const draftId = await ctx.db.insert("cardDrafts", {
-        setCode: args.setCode,
-        setName: args.setName,
-        collectorNumber,
-        sortIndex: draft.sortIndex ?? now + i,
-        fileName: draft.fileName,
-        status: "pending",
-        imageStorageId: draft.storageId,
-        draft: cleanDraft({
-          ...fileDraft,
-          oracleId: crypto.randomUUID(),
-          setCode: args.setCode,
-          setName: args.setName,
-          setNumber: set?.setNumber,
-          collectorNumber,
-          copyLimit: 4,
-          isFrontFace: true,
-          isVariant: false,
-          isRevealHidden: true,
-          symbols: "",
-        }),
-        parseWarnings: [],
-        createdAt: now,
-        updatedAt: now,
-      });
-      ids.push(draftId);
-    }
-    return ids;
+    return await insertDraftsFromStorageIds(ctx, args);
   },
 });
 

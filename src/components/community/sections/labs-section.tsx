@@ -15,7 +15,7 @@ export function CommunityLabsSection() {
           description="Join collaborative spaces for tier ranking, deckbuilding, polls, and playtests."
         />
 
-        <Card className="border-primary/20 bg-card/70">
+        <Card className="border-primary/20 bg-card/80">
           <CardHeader className="space-y-2">
             <CardTitle className="text-lg">New: Tier List Lab</CardTitle>
             <CardDescription>
@@ -38,12 +38,12 @@ export function CommunityLabsSection() {
             const Icon = tool.icon;
 
             return (
-              <div key={tool.title} className="rounded-xl border border-border/60 bg-card/60 p-4">
+              <div key={tool.title} className="rounded-xl border border-border/50 bg-card/80 p-4">
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
                     {tool.kicker}
                   </span>
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-border/60 bg-background/70">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-border/50 bg-background/80">
                     <Icon className="h-4 w-4 text-primary" />
                   </div>
                 </div>
@@ -55,7 +55,7 @@ export function CommunityLabsSection() {
         </div>
       </div>
 
-      <Card className="border border-border/60">
+      <Card className="border border-border/50">
         <CardHeader className="space-y-2">
           <CardTitle className="text-lg">Community Resources</CardTitle>
           <CardDescription>High-signal places to catch up fast.</CardDescription>
@@ -66,10 +66,10 @@ export function CommunityLabsSection() {
             const Icon = resource.icon;
 
             return (
-              <div key={resource.label} className="rounded-lg border border-border/60 bg-background/60 px-3 py-3">
+              <div key={resource.label} className="rounded-lg border border-border/50 bg-background/50 px-3 py-3">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 flex items-start gap-2">
-                    <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-border/60 bg-card/60">
+                    <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-border/50 bg-card/80">
                       <Icon className="h-3.5 w-3.5 text-primary" />
                     </div>
                     <div className="min-w-0">
@@ -85,7 +85,7 @@ export function CommunityLabsSection() {
             );
           })}
 
-          <div className="rounded-lg border border-dashed border-border/60 bg-card/40 px-3 py-3">
+          <div className="rounded-lg border border-dashed border-border/50 bg-card/50 px-3 py-3">
             <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-muted-foreground">
               <Trophy className="h-4 w-4 text-secondary" />
               Creator note

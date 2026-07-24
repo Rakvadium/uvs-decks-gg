@@ -17,8 +17,8 @@ export function DeckDetailsTopBarInner() {
 
   return (
     <div className="flex w-full min-w-0 items-center gap-2">
-      <Link href="/decks">
-        <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0">
+      <Link href="/decks" aria-label="Back to decks">
+        <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" aria-label="Back to decks">
           <ArrowLeft className="h-4 w-4" />
         </Button>
       </Link>

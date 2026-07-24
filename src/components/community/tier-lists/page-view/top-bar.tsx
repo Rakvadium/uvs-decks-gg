@@ -22,7 +22,6 @@ export function CommunityTierListsPagePrimaryAction({
 
   return (
     <Button
-      variant="outline"
       size="sm"
       className={cn("h-9 gap-1.5", className)}
       onClick={handleOpenCreateDialog}
@@ -70,13 +69,15 @@ export function CommunityTierListsPageSearch() {
 
   return (
     <div className="relative w-full min-w-[300px] max-w-[30rem]">
-      <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+      <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" aria-hidden />
       <Input
-        placeholder="Search tier lists..."
+        placeholder="Search tier lists…"
         value={searchQuery}
         onChange={(event) => setSearchQuery(event.target.value)}
-        className="h-9 pl-8 text-sm"
+        className="h-9 pl-8"
         name="tier-lists-search-desktop"
+        aria-label="Search tier lists"
+        autoComplete="off"
         spellCheck={false}
       />
     </div>
@@ -116,13 +117,15 @@ export function CommunityTierListsPageTopBar() {
 
       {showSearch ? (
         <div className="relative min-w-0">
-          <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-primary/70" />
+          <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-primary/70" aria-hidden />
           <Input
-            placeholder="Search tier lists..."
+            placeholder="Search tier lists…"
             value={searchQuery}
             onChange={(event) => setSearchQuery(event.target.value)}
-            className="h-9 border-primary/40 bg-background/50 pl-8 pr-3 text-sm shadow-[0_0_10px_-3px_var(--primary)] focus-visible:border-primary focus-visible:shadow-[0_0_15px_-3px_var(--primary)]"
+            className="h-9 border-primary/40 bg-background/50 pl-8 pr-3 shadow-[0_0_10px_-3px_var(--primary)] focus-visible:border-primary focus-visible:shadow-[0_0_15px_-3px_var(--primary)]"
             name="tier-lists-search"
+            aria-label="Search tier lists"
+            autoComplete="off"
             spellCheck={false}
           />
         </div>

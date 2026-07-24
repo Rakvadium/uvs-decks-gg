@@ -36,8 +36,8 @@ export function CardDeckControls({
       className={cn(
         "pointer-events-none absolute bottom-0 right-0 z-30 flex flex-col items-center overflow-hidden",
         "rounded-tl-lg rounded-br-lg rounded-tr-none rounded-bl-none",
-        "border-l border-t border-border/40 shadow-sm",
-        frosted ? "bg-background/80 backdrop-blur-sm" : "bg-background/92"
+        "border-l border-t border-border/70 shadow-md",
+        frosted ? "bg-card/95 backdrop-blur-md" : "bg-card"
       )}
     >
       {showButtons && (
@@ -48,13 +48,13 @@ export function CardDeckControls({
           className={cn(
             "pointer-events-auto flex h-6 w-7 items-center justify-center",
             "text-primary transition-colors duration-150",
-            "hover:bg-primary/10",
-            "disabled:opacity-40 disabled:cursor-not-allowed",
-            !showQuantity && "border-b border-border/40"
+            "hover:bg-primary/15",
+            "disabled:cursor-not-allowed disabled:text-muted-foreground",
+            !showQuantity && "border-b border-border/60"
           )}
           aria-label="Add to deck"
         >
-          <Plus className="h-3 w-3" />
+          <Plus className="h-3.5 w-3.5 stroke-[2.5]" />
         </button>
       )}
 
@@ -62,9 +62,9 @@ export function CardDeckControls({
         <div
           className={cn(
             "flex h-6 w-7 items-center justify-center",
-            "font-mono text-xs font-bold",
-            showButtons && "border-t border-b border-border/40",
-            deckCount > 0 ? "text-primary" : "text-muted-foreground"
+            "font-mono text-xs font-bold tabular-nums",
+            showButtons && "border-t border-b border-border/60",
+            deckCount > 0 ? "text-primary" : "text-foreground"
           )}
         >
           {deckCount}
@@ -79,12 +79,12 @@ export function CardDeckControls({
           className={cn(
             "pointer-events-auto flex h-6 w-7 items-center justify-center",
             "text-destructive transition-colors duration-150",
-            "hover:bg-destructive/10",
-            "disabled:opacity-40 disabled:cursor-not-allowed"
+            "hover:bg-destructive/15",
+            "disabled:cursor-not-allowed disabled:text-muted-foreground"
           )}
           aria-label="Remove from deck"
         >
-          <Minus className="h-3 w-3" />
+          <Minus className="h-3.5 w-3.5 stroke-[2.5]" />
         </button>
       )}
     </div>

@@ -59,6 +59,12 @@ import {
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
+import {
+  FloatingBackPill,
+  FloatingCapsuleCluster,
+  FloatingPageBar,
+  FloatingPageLayout,
+} from "@/components/shell/floating-page-bar";
 
 const AVATAR_SYMBOLS = [
   { id: "fire", name: "Fire", path: "/universus/symbols/fire.png" },
@@ -114,7 +120,7 @@ function ModePairPickers({
   return (
     <div
       className={cn(
-        "rounded-lg border border-border p-4 space-y-3",
+        "rounded-lg border border-border/50 p-4 space-y-3",
         dense && "border-0 p-0",
       )}
     >
@@ -258,6 +264,26 @@ export default function SettingsPageClient() {
     });
   }, []);
 
+  useEffect(() => {
+    if (!hasChanges) return;
+    const onBeforeUnload = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = "";
+    };
+    window.addEventListener("beforeunload", onBeforeUnload);
+    return () => window.removeEventListener("beforeunload", onBeforeUnload);
+  }, [hasChanges]);
+
+  const handleBack = () => {
+    if (
+      hasChanges &&
+      !window.confirm("You have unsaved profile changes. Leave without saving?")
+    ) {
+      return;
+    }
+    router.back();
+  };
+
   const handleSaveProfile = async () => {
     setIsSaving(true);
     try {
@@ -268,7 +294,7 @@ export default function SettingsPageClient() {
       toast.success("Profile updated successfully");
       setHasChanges(false);
     } catch {
-      toast.error("Failed to update profile");
+      toast.error("Couldn’t update profile. Check your username and image URL, then try again.");
     } finally {
       setIsSaving(false);
     }
@@ -289,18 +315,33 @@ export default function SettingsPageClient() {
   });
 
   return (
-    <div className="min-h-0 flex-1 overflow-y-auto md:h-full">
-      <div className="mx-auto max-w-3xl px-6 py-8">
+    <FloatingPageLayout
+      bar={
+        <FloatingPageBar
+          left={
+            <>
+              <FloatingBackPill onClick={handleBack} label="Back" iconOnly />
+              <FloatingCapsuleCluster bodyClassName="px-4" glow>
+                <h1 className="truncate text-sm font-semibold tracking-tight text-foreground">
+                  Settings
+                </h1>
+              </FloatingCapsuleCluster>
+            </>
+          }
+        />
+      }
+    >
+      <div className="mx-auto w-full max-w-3xl">
         <m.div
           initial={prefersReducedMotion ? false : { opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: prefersReducedMotion ? 0 : 0.3 }}
-          className="mb-8"
+          className="mb-8 md:hidden"
         >
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => router.back()}
+            onClick={handleBack}
             className="mb-4 gap-2 text-muted-foreground hover:text-foreground"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -371,7 +412,7 @@ export default function SettingsPageClient() {
                         type="button"
                         onClick={() => setImageUrl(symbol.path)}
                         className={cn(
-                          "group relative flex flex-col items-center gap-2 rounded-xl border-2 p-3 transition-all hover:border-primary/50 hover:bg-muted/50",
+                          "group relative flex flex-col items-center gap-2 rounded-xl border-2 p-3 transition-colors hover:border-primary/50 hover:bg-muted/50",
                           imageUrl === symbol.path
                             ? "border-primary bg-primary/10"
                             : "border-muted"
@@ -535,7 +576,7 @@ export default function SettingsPageClient() {
                             void setAppearancePreset(scheme.value as ColorPresetChoice)
                           }
                           className={cn(
-                            "group relative rounded-xl border-2 p-3 text-left transition-all hover:border-primary/50",
+                            "group relative rounded-xl border-2 p-3 text-left transition-colors hover:border-primary/50",
                             active
                               ? "border-primary bg-primary/5"
                               : "border-muted hover:bg-muted/50",
@@ -544,7 +585,7 @@ export default function SettingsPageClient() {
                           <div className="flex items-center gap-2">
                             <div
                               className={cn(
-                                "h-4 w-4 rounded-full ring-2 ring-offset-2 ring-offset-background transition-all",
+                                "h-4 w-4 rounded-full ring-2 ring-offset-2 ring-offset-background transition-colors",
                                 active
                                   ? "bg-primary ring-primary"
                                   : "bg-muted ring-transparent group-hover:ring-muted",
@@ -565,7 +606,7 @@ export default function SettingsPageClient() {
                         )
                       }
                       className={cn(
-                        "group relative rounded-xl border-2 p-3 text-left transition-all hover:border-primary/50 sm:col-span-1 col-span-2",
+                        "group relative rounded-xl border-2 p-3 text-left transition-colors hover:border-primary/50 sm:col-span-1 col-span-2",
                         isCustomAppearance
                           ? "border-primary bg-primary/5"
                           : "border-muted hover:bg-muted/50",
@@ -574,7 +615,7 @@ export default function SettingsPageClient() {
                       <div className="flex items-center gap-2">
                         <div
                           className={cn(
-                            "h-4 w-4 rounded-full ring-2 ring-offset-2 ring-offset-background transition-all",
+                            "h-4 w-4 rounded-full ring-2 ring-offset-2 ring-offset-background transition-colors",
                             isCustomAppearance
                               ? "bg-primary ring-primary"
                               : "bg-muted ring-transparent group-hover:ring-muted",
@@ -599,7 +640,7 @@ export default function SettingsPageClient() {
                       }
                     />
                     <Collapsible>
-                      <CollapsibleTrigger className="flex w-full items-center gap-2 rounded-lg border border-border px-3 py-2 text-left text-sm font-medium hover:bg-muted/60 [&[data-state=open]_svg:first-child]:rotate-180">
+                      <CollapsibleTrigger className="flex w-full items-center gap-2 rounded-lg border border-border/50 px-3 py-2 text-left text-sm font-medium hover:bg-muted/60 [&[data-state=open]_svg:first-child]:rotate-180">
                         <ChevronDown className="h-4 w-4 shrink-0 transition-transform" />
                         Per-chrome color overrides
                         <Badge variant="secondary" className="ml-auto text-[10px] uppercase">
@@ -620,7 +661,7 @@ export default function SettingsPageClient() {
                             return (
                               <div
                                 key={opt.id}
-                                className="rounded-xl border border-border bg-muted/20 p-3 space-y-2"
+                                className="rounded-xl border border-border/50 bg-muted/20 p-3 space-y-2"
                               >
                                 <div className="flex flex-wrap items-start justify-between gap-2">
                                   <div className="min-w-0 space-y-0.5">
@@ -711,7 +752,7 @@ export default function SettingsPageClient() {
           </m.div>
         </div>
       </div>
-    </div>
+    </FloatingPageLayout>
   );
 }
 

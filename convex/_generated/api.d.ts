@@ -11,6 +11,7 @@
 import type * as ResendOTPPasswordReset from "../ResendOTPPasswordReset.js";
 import type * as accountStatusExpiry from "../accountStatusExpiry.js";
 import type * as admin from "../admin.js";
+import type * as adminHttp from "../adminHttp.js";
 import type * as adminUsers from "../adminUsers.js";
 import type * as auth from "../auth.js";
 import type * as cardDraftActions from "../cardDraftActions.js";
@@ -19,6 +20,8 @@ import type * as cardFacets from "../cardFacets.js";
 import type * as cardImages from "../cardImages.js";
 import type * as cardOcr from "../cardOcr.js";
 import type * as cards from "../cards.js";
+import type * as catalogPublish from "../catalogPublish.js";
+import type * as catalogRelease from "../catalogRelease.js";
 import type * as collections from "../collections.js";
 import type * as communityLive from "../communityLive.js";
 import type * as communityRankings from "../communityRankings.js";
@@ -34,6 +37,7 @@ import type * as formats from "../formats.js";
 import type * as http from "../http.js";
 import type * as imageOcr from "../imageOcr.js";
 import type * as lib_accountStatus from "../lib/accountStatus.js";
+import type * as lib_adminApiAuth from "../lib/adminApiAuth.js";
 import type * as lib_appearanceMigration from "../lib/appearanceMigration.js";
 import type * as lib_cardCreate from "../lib/cardCreate.js";
 import type * as lib_cardOcrTemplates from "../lib/cardOcrTemplates.js";
@@ -41,9 +45,12 @@ import type * as lib_cardTextParser from "../lib/cardTextParser.js";
 import type * as lib_deckAccess from "../lib/deckAccess.js";
 import type * as lib_deckFormatRules from "../lib/deckFormatRules.js";
 import type * as lib_deckList from "../lib/deckList.js";
+import type * as lib_deckQuantity from "../lib/deckQuantity.js";
 import type * as lib_moderation_localCommentHeuristic from "../lib/moderation/localCommentHeuristic.js";
 import type * as lib_moderation_providers from "../lib/moderation/providers.js";
 import type * as lib_moderation_textPublish from "../lib/moderation/textPublish.js";
+import type * as lib_r2Keys from "../lib/r2Keys.js";
+import type * as lib_username from "../lib/username.js";
 import type * as mediaAssetActions from "../mediaAssetActions.js";
 import type * as mediaAssets from "../mediaAssets.js";
 import type * as migrations_migrateDeckSchema from "../migrations/migrateDeckSchema.js";
@@ -55,6 +62,8 @@ import type * as publicCardUrls from "../publicCardUrls.js";
 import type * as publishTeamChatMessage from "../publishTeamChatMessage.js";
 import type * as publishTierListComment from "../publishTierListComment.js";
 import type * as r2 from "../r2.js";
+import type * as rateLimit from "../rateLimit.js";
+import type * as seedDummyDecks from "../seedDummyDecks.js";
 import type * as sessions from "../sessions.js";
 import type * as setCardCountSync from "../setCardCountSync.js";
 import type * as sets from "../sets.js";
@@ -89,6 +98,7 @@ declare const fullApi: ApiFromModules<{
   ResendOTPPasswordReset: typeof ResendOTPPasswordReset;
   accountStatusExpiry: typeof accountStatusExpiry;
   admin: typeof admin;
+  adminHttp: typeof adminHttp;
   adminUsers: typeof adminUsers;
   auth: typeof auth;
   cardDraftActions: typeof cardDraftActions;
@@ -97,6 +107,8 @@ declare const fullApi: ApiFromModules<{
   cardImages: typeof cardImages;
   cardOcr: typeof cardOcr;
   cards: typeof cards;
+  catalogPublish: typeof catalogPublish;
+  catalogRelease: typeof catalogRelease;
   collections: typeof collections;
   communityLive: typeof communityLive;
   communityRankings: typeof communityRankings;
@@ -112,6 +124,7 @@ declare const fullApi: ApiFromModules<{
   http: typeof http;
   imageOcr: typeof imageOcr;
   "lib/accountStatus": typeof lib_accountStatus;
+  "lib/adminApiAuth": typeof lib_adminApiAuth;
   "lib/appearanceMigration": typeof lib_appearanceMigration;
   "lib/cardCreate": typeof lib_cardCreate;
   "lib/cardOcrTemplates": typeof lib_cardOcrTemplates;
@@ -119,9 +132,12 @@ declare const fullApi: ApiFromModules<{
   "lib/deckAccess": typeof lib_deckAccess;
   "lib/deckFormatRules": typeof lib_deckFormatRules;
   "lib/deckList": typeof lib_deckList;
+  "lib/deckQuantity": typeof lib_deckQuantity;
   "lib/moderation/localCommentHeuristic": typeof lib_moderation_localCommentHeuristic;
   "lib/moderation/providers": typeof lib_moderation_providers;
   "lib/moderation/textPublish": typeof lib_moderation_textPublish;
+  "lib/r2Keys": typeof lib_r2Keys;
+  "lib/username": typeof lib_username;
   mediaAssetActions: typeof mediaAssetActions;
   mediaAssets: typeof mediaAssets;
   "migrations/migrateDeckSchema": typeof migrations_migrateDeckSchema;
@@ -133,6 +149,8 @@ declare const fullApi: ApiFromModules<{
   publishTeamChatMessage: typeof publishTeamChatMessage;
   publishTierListComment: typeof publishTierListComment;
   r2: typeof r2;
+  rateLimit: typeof rateLimit;
+  seedDummyDecks: typeof seedDummyDecks;
   sessions: typeof sessions;
   setCardCountSync: typeof setCardCountSync;
   sets: typeof sets;
@@ -307,6 +325,140 @@ export declare const components: {
         },
         { isNew: boolean }
       >;
+    };
+  };
+  rateLimiter: {
+    lib: {
+      checkRateLimit: FunctionReference<
+        "query",
+        "internal",
+        {
+          config:
+            | {
+                capacity?: number;
+                kind: "token bucket";
+                maxReserved?: number;
+                period: number;
+                rate: number;
+                shards?: number;
+                start?: null;
+              }
+            | {
+                capacity?: number;
+                kind: "fixed window";
+                maxReserved?: number;
+                period: number;
+                rate: number;
+                shards?: number;
+                start?: number;
+              };
+          count?: number;
+          key?: string;
+          name: string;
+          reserve?: boolean;
+          throws?: boolean;
+        },
+        { ok: true; retryAfter?: number } | { ok: false; retryAfter: number }
+      >;
+      clearAll: FunctionReference<
+        "mutation",
+        "internal",
+        { before?: number },
+        null
+      >;
+      getServerTime: FunctionReference<"mutation", "internal", {}, number>;
+      getValue: FunctionReference<
+        "query",
+        "internal",
+        {
+          config:
+            | {
+                capacity?: number;
+                kind: "token bucket";
+                maxReserved?: number;
+                period: number;
+                rate: number;
+                shards?: number;
+                start?: null;
+              }
+            | {
+                capacity?: number;
+                kind: "fixed window";
+                maxReserved?: number;
+                period: number;
+                rate: number;
+                shards?: number;
+                start?: number;
+              };
+          key?: string;
+          name: string;
+          sampleShards?: number;
+        },
+        {
+          config:
+            | {
+                capacity?: number;
+                kind: "token bucket";
+                maxReserved?: number;
+                period: number;
+                rate: number;
+                shards?: number;
+                start?: null;
+              }
+            | {
+                capacity?: number;
+                kind: "fixed window";
+                maxReserved?: number;
+                period: number;
+                rate: number;
+                shards?: number;
+                start?: number;
+              };
+          shard: number;
+          ts: number;
+          value: number;
+        }
+      >;
+      rateLimit: FunctionReference<
+        "mutation",
+        "internal",
+        {
+          config:
+            | {
+                capacity?: number;
+                kind: "token bucket";
+                maxReserved?: number;
+                period: number;
+                rate: number;
+                shards?: number;
+                start?: null;
+              }
+            | {
+                capacity?: number;
+                kind: "fixed window";
+                maxReserved?: number;
+                period: number;
+                rate: number;
+                shards?: number;
+                start?: number;
+              };
+          count?: number;
+          key?: string;
+          name: string;
+          reserve?: boolean;
+          throws?: boolean;
+        },
+        { ok: true; retryAfter?: number } | { ok: false; retryAfter: number }
+      >;
+      resetRateLimit: FunctionReference<
+        "mutation",
+        "internal",
+        { key?: string; name: string },
+        null
+      >;
+    };
+    time: {
+      getServerTime: FunctionReference<"mutation", "internal", {}, number>;
     };
   };
 };

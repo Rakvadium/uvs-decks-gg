@@ -3,17 +3,24 @@
 import { PageType } from "@/app/(app)/layout"
 import { DecksMobileTopBar } from "@/components/decks/decks-view/mobile-top-bar"
 import { GalleryTopBarFilters } from "@/components/gallery/gallery-top-bar-filters"
+import { cn } from "@/lib/utils"
 import { SlotRenderer, useShellSlotSlots } from "./shell-slot-provider"
 import { useDecksOptional } from "@/providers/DecksProvider"
+import {
+  SHELL_CHROME_EDGE_BOTTOM,
+  SHELL_CHROME_SURFACE,
+  SHELL_CHROME_WASH_STYLE,
+} from "./shell-chrome"
 
 interface MobileTopBarProps {
   pageType?: PageType | null
 }
 
-const mobileTopBarClassName = "relative shrink-0 bg-background border-b border-border/35"
-
-const galleryMobileTopBarClassName =
-  "relative shrink-0 border-b border-primary/40 bg-primary/15 pt-0 shadow-[0_1px_0_color-mix(in_oklch,var(--primary)_12%,transparent)] dark:border-sidebar-border/50 dark:bg-sidebar dark:shadow-none"
+const mobileChromeBarClassName = cn(
+  "shrink-0",
+  SHELL_CHROME_SURFACE,
+  SHELL_CHROME_EDGE_BOTTOM
+)
 
 export function MobileTopBar({ pageType }: MobileTopBarProps) {
   const slots = useShellSlotSlots()
@@ -22,12 +29,8 @@ export function MobileTopBar({ pageType }: MobileTopBarProps) {
 
   if (pageType === "gallery") {
     return (
-      <div className={galleryMobileTopBarClassName}>
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-primary/10 via-transparent to-primary/5 dark:hidden" />
-        <div
-          className="pointer-events-none absolute inset-0 hidden dark:block"
-          style={{ background: "var(--chrome-shell-sidebar-wash)" }}
-        />
+      <div className={mobileChromeBarClassName}>
+        <div className="pointer-events-none absolute inset-0" style={SHELL_CHROME_WASH_STYLE} />
         <div className="relative px-4 py-1.5">
           <GalleryTopBarFilters />
         </div>
@@ -40,7 +43,8 @@ export function MobileTopBar({ pageType }: MobileTopBarProps) {
       return null
     }
     return (
-      <div className={mobileTopBarClassName}>
+      <div className={mobileChromeBarClassName}>
+        <div className="pointer-events-none absolute inset-0" style={SHELL_CHROME_WASH_STYLE} />
         <div className="relative px-4 py-1.5">
           <DecksMobileTopBar />
         </div>
@@ -54,7 +58,8 @@ export function MobileTopBar({ pageType }: MobileTopBarProps) {
 
   if (pageType === "community" && hasTopBarSlots) {
     return (
-      <div className={mobileTopBarClassName}>
+      <div className={mobileChromeBarClassName}>
+        <div className="pointer-events-none absolute inset-0" style={SHELL_CHROME_WASH_STYLE} />
         <div className="relative px-4 py-1.5">
           <SlotRenderer area="top-bar" />
         </div>

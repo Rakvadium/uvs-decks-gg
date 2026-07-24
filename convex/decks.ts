@@ -19,6 +19,8 @@ import {
 } from "./lib/deckAccess";
 import { requireCapability } from "./teams/permissions";
 import { attachOwnerUsernames } from "./lib/deckList";
+import { getAuthUserId } from "@convex-dev/auth/server";
+import { requirePositiveIntegerQuantity } from "./lib/deckQuantity";
 
 export const listByUser = query({
   args: {
@@ -28,10 +30,18 @@ export const listByUser = query({
   },
   returns: v.array(deckValidator),
   handler: async (ctx, args) => {
+    const viewer = await getAuthUserId(ctx);
     let decks = await ctx.db
       .query("decks")
       .withIndex("by_user", (q) => q.eq("userId", args.userId))
       .collect();
+
+    if (viewer !== args.userId) {
+      decks = decks.filter((deck) => {
+        const vis = normalizeDeckVisibility(deck);
+        return vis === "public" || vis === "tournament";
+      });
+    }
 
     if (args.search) {
       const searchLower = args.search.toLowerCase();
@@ -47,6 +57,9 @@ export const listByUser = query({
       decks = decks.filter((deck) => normalizeDeckVisibility(deck) === args.visibility);
     }
 
+    if (viewer !== args.userId) {
+      return await attachOwnerUsernames(ctx, decks);
+    }
     return decks;
   },
 });
@@ -329,7 +342,7 @@ export const addCard = mutation({
     await requireNotBackFace(ctx, args.cardId);
 
     const cardIdStr = args.cardId.toString();
-    const addQuantity = args.quantity ?? 1;
+    const addQuantity = requirePositiveIntegerQuantity(args.quantity);
 
     const cardIdsKey = `${args.section}CardIds` as const;
     const quantitiesKey = `${args.section}Quantities` as const;
@@ -372,7 +385,7 @@ export const removeCard = mutation({
     assertTeamEditableCardWriteRevision(deck, args.expectedRevision);
 
     const cardIdStr = args.cardId.toString();
-    const removeQuantity = args.quantity ?? 1;
+    const removeQuantity = requirePositiveIntegerQuantity(args.quantity);
 
     const cardIdsKey = `${args.section}CardIds` as const;
     const quantitiesKey = `${args.section}Quantities` as const;
@@ -426,7 +439,7 @@ export const moveCard = mutation({
     }
 
     const cardIdStr = args.cardId.toString();
-    const moveQuantity = args.quantity ?? 1;
+    const moveQuantity = requirePositiveIntegerQuantity(args.quantity);
 
     const fromCardIdsKey = `${args.fromSection}CardIds` as const;
     const fromQuantitiesKey = `${args.fromSection}Quantities` as const;

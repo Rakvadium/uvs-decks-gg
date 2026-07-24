@@ -12,7 +12,7 @@ export function CharacterThumbnail({
   className: string;
 }) {
   return (
-    <div className={cn("relative overflow-hidden rounded border border-border/40 bg-muted/40", className)}>
+    <div className={cn("relative overflow-hidden rounded border border-border/40 bg-muted/50", className)}>
       {imageUrl ? (
         <Image src={imageUrl} alt={name} fill sizes="48px" className="object-cover object-top" />
       ) : (

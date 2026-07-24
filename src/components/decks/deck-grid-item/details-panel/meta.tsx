@@ -19,7 +19,7 @@ export function DeckGridItemMeta() {
         <SectionHeading className="truncate font-display text-sm font-bold uppercase tracking-wide transition-colors group-hover:text-primary sm:text-base">
           {showName}
         </SectionHeading>
-        <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground/30 transition-all group-hover:translate-x-0.5 group-hover:text-primary" />
+        <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground/60 transition-[color,transform] group-hover:translate-x-0.5 group-hover:text-primary" />
       </div>
 
       {format ? (

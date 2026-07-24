@@ -3,13 +3,15 @@ import {
   mutation,
   action,
   internalMutation,
+  internalQuery,
 } from "./_generated/server";
 import type { QueryCtx } from "./_generated/server";
 import type { Doc, Id } from "./_generated/dataModel";
 import { paginationOptsValidator } from "convex/server";
 import { v } from "convex/values";
 import { cardValidator } from "./validators";
-import { api } from "./_generated/api";
+import { internal } from "./_generated/api";
+import { getAuthUserId } from "@convex-dev/auth/server";
 import { runCatalogAggregateRefresh } from "./cardFacets";
 import { toPublicCardImageUrl } from "./publicCardUrls";
 
@@ -18,6 +20,8 @@ const LIST_CATALOG_MAX_ROUNDS = 50;
 const LIST_SORT_MAX_GALLERY = 5000;
 const SET_NAME_INDEX_MAX = 20_000;
 const LIST_ORACLE_VARIANT_MAX = 200;
+const LIST_RELEASED_PAGE_MAX = 1000;
+const LIST_RELEASED_PAGE_DEFAULT = 1000;
 
 function matchesCharacterSearch(name: string, searchName: string | undefined, search: string | undefined) {
   if (!search) {
@@ -270,20 +274,57 @@ export const listReleasedPaginated = query({
     isDone: v.boolean(),
   }),
   handler: async (ctx, args) => {
-    const limit = args.limit ?? 1000;
+    const limit = Math.min(
+      Math.max(args.limit ?? LIST_RELEASED_PAGE_DEFAULT, 1),
+      LIST_RELEASED_PAGE_MAX
+    );
     const cutoff = await getCatalogReleaseCutoff(ctx);
     const result = await ctx.db
       .query("cards")
       .paginate({ numItems: limit, cursor: args.cursor ?? null });
 
-    const cardsWithUrls = result.page.filter((card) => isGalleryCatalogCard(card, cutoff)).map((card) => {
-      const imageUrl = toPublicCardImageUrl(card.imageUrl);
-      return imageUrl !== card.imageUrl ? { ...card, imageUrl } : card;
-    });
+    const cardsWithUrls = result.page
+      .filter((card) => isGalleryCatalogCard(card, cutoff))
+      .map((card) => {
+        const imageUrl = toPublicCardImageUrl(card.imageUrl);
+        return imageUrl !== card.imageUrl ? { ...card, imageUrl } : card;
+      });
 
     return {
       cards: cardsWithUrls,
       cursor: result.continueCursor,
+      isDone: result.isDone,
+    };
+  },
+});
+
+export const listGalleryCatalogPageForPublish = internalQuery({
+  args: {
+    cursor: v.union(v.string(), v.null()),
+    limit: v.number(),
+    cutoff: v.number(),
+  },
+  returns: v.object({
+    cards: v.array(cardValidator),
+    cursor: v.union(v.string(), v.null()),
+    isDone: v.boolean(),
+  }),
+  handler: async (ctx, args) => {
+    const limit = Math.min(Math.max(args.limit, 1), LIST_RELEASED_PAGE_MAX);
+    const result = await ctx.db
+      .query("cards")
+      .paginate({ numItems: limit, cursor: args.cursor ?? null });
+
+    const cards = result.page
+      .filter((card) => isGalleryCatalogCard(card, args.cutoff))
+      .map((card) => {
+        const imageUrl = toPublicCardImageUrl(card.imageUrl);
+        return imageUrl !== card.imageUrl ? { ...card, imageUrl } : card;
+      });
+
+    return {
+      cards,
+      cursor: result.isDone ? null : result.continueCursor,
       isDone: result.isDone,
     };
   },
@@ -899,6 +940,9 @@ export const getCardDataVersion = query({
       version: v.number(),
       updatedAt: v.number(),
       cardCount: v.number(),
+      catalogUrl: v.optional(v.string()),
+      catalogSha256: v.optional(v.string()),
+      catalogSchemaVersion: v.optional(v.number()),
     }),
     v.null()
   ),
@@ -909,6 +953,9 @@ export const getCardDataVersion = query({
       version: versionDoc.version,
       updatedAt: versionDoc.updatedAt,
       cardCount: versionDoc.cardCount,
+      catalogUrl: versionDoc.catalogUrl,
+      catalogSha256: versionDoc.catalogSha256,
+      catalogSchemaVersion: versionDoc.catalogSchemaVersion,
     };
   },
 });
@@ -925,20 +972,23 @@ export const listAllCardsChunked = query({
     totalEstimate: v.number(),
   }),
   handler: async (ctx, args) => {
-    const chunkSize = args.chunkSize ?? 500;
+    const chunkSize = Math.min(
+      Math.max(args.chunkSize ?? 500, 1),
+      LIST_RELEASED_PAGE_MAX
+    );
     const cutoff = await getCatalogReleaseCutoff(ctx);
-    
+
     const result = await ctx.db
       .query("cards")
       .paginate({ numItems: chunkSize, cursor: args.cursor ?? null });
-    
-    const filteredCards = result.page.filter(
-      (card) => isGalleryCatalogCard(card, cutoff)
+
+    const filteredCards = result.page.filter((card) =>
+      isGalleryCatalogCard(card, cutoff)
     );
-    
+
     const versionDoc = await ctx.db.query("cardDataVersion").first();
     const totalEstimate = versionDoc?.cardCount ?? 0;
-    
+
     return {
       cards: filteredCards,
       nextCursor: result.isDone ? null : result.continueCursor,
@@ -1008,7 +1058,7 @@ export const updateCardDataVersion = internalMutation({
   },
 });
 
-export const initializeCardDataVersion = mutation({
+export const initializeCardDataVersion = internalMutation({
   args: {},
   returns: v.number(),
   handler: async (ctx) => {
@@ -1046,7 +1096,7 @@ function removeLeadingZerosFromImageUrl(imageUrl: string): string {
   return `${setName}/${numberWithoutZeros}${restOfFilename}`;
 }
 
-export const updateImageUrlsRemoveLeadingZeros = mutation({
+export const updateImageUrlsRemoveLeadingZeros = internalMutation({
   args: {
     paginationOpts: paginationOptsValidator,
   },
@@ -1103,6 +1153,12 @@ export const updateImageUrlsRemoveLeadingZerosBulk = action({
     batchesProcessed: v.number(),
   }),
   handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      throw new Error("Not authenticated");
+    }
+    await ctx.runMutation(internal.admin.ensureAdminForAction, { userId });
+
     let totalUpdated = 0;
     let totalSkipped = 0;
     let batchesProcessed = 0;
@@ -1115,7 +1171,7 @@ export const updateImageUrlsRemoveLeadingZerosBulk = action({
         skipped: number;
         continueCursor: string;
         isDone: boolean;
-      } = await ctx.runMutation(api.cards.updateImageUrlsRemoveLeadingZeros, {
+      } = await ctx.runMutation(internal.cards.updateImageUrlsRemoveLeadingZeros, {
         paginationOpts: {
           numItems: 100,
           cursor,

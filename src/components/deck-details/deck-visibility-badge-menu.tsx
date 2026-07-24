@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDown, Eye, Globe, Link2, Pencil, Trophy, UserPlus } from "lucide-react";
+import { ChevronDown, Eye, Globe, Link2, Lock, Pencil, Trophy, UserPlus } from "lucide-react";
 import { createElement } from "react";
 import type { LucideIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -31,7 +31,13 @@ const OPTIONS: Array<{
   {
     value: "private",
     label: "Private",
-    hint: "Anyone with the link can view in read-only mode; only you can edit.",
+    hint: "Only you can view this deck.",
+    Icon: Lock,
+  },
+  {
+    value: "unlisted",
+    label: "Unlisted",
+    hint: "Anyone with the link can view in read-only mode; not listed publicly.",
     Icon: Link2,
   },
   {
@@ -87,7 +93,7 @@ function badgeIconForDisplay(
     return teamSharing === "team_editable" ? Pencil : Eye;
   }
   const opt = OPTIONS.find((o) => o.value === visibility);
-  return opt?.Icon ?? Link2;
+  return opt?.Icon ?? Lock;
 }
 
 interface DeckVisibilityBadgeMenuProps {
@@ -136,14 +142,14 @@ export function DeckVisibilityBadgeMenu({
       variant={visibilityBadgeVariant(displayVisibility)}
       className={cn(
         compact
-          ? "h-8 shrink-0 items-center gap-1.5 px-2.5 text-[9px] sm:inline-flex"
-          : "h-8 shrink-0 items-center gap-1.5 px-2.5 text-[9px] inline-flex",
+          ? "h-8 shrink-0 items-center gap-1.5 px-2.5 text-[10px] sm:inline-flex"
+          : "h-8 shrink-0 items-center gap-1.5 px-2.5 text-[10px] inline-flex",
         isOwner && !readOnly && "cursor-pointer",
       )}
     >
       {badgeGlyph}
       {badgeLabel}
-      {isOwner && !readOnly ? <ChevronDown className="h-3 w-3 opacity-70" /> : null}
+      {isOwner && !readOnly ? <ChevronDown className="h-3 w-3 shrink-0 opacity-90" /> : null}
     </Badge>
   );
 

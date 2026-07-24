@@ -54,7 +54,7 @@ export default function AdminSetsPageContent() {
           </Button>
         }
         search={
-          <div className="flex w-full max-w-4xl flex-col gap-4 rounded-lg border bg-card/40 p-4">
+          <div className="flex w-full max-w-4xl flex-col gap-4 rounded-lg border bg-card/50 p-4">
             <Input
               placeholder="Search code or name…"
               value={q}

@@ -1,31 +1,29 @@
-import Link from "next/link";
-import { Hexagon } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Kicker } from "@/components/ui/typography-headings";
+import { AppBrandLink } from "@/components/brand/app-brand-link";
+import { SHELL_RAIL_TOP_PADDING_CLASS } from "../shell-chrome";
+import { LeftSidebarCollapseToggle } from "./collapse-toggle";
 import { useLeftSidebarContext } from "./context";
 
 export function LeftSidebarBrand() {
   const { collapsed } = useLeftSidebarContext();
 
   return (
-    <div className={cn("px-3 pb-2 pt-4", collapsed ? "flex justify-center" : "") }>
-      <Link href="/gallery" className="group flex items-center gap-3">
-        <div className="relative flex h-10 w-10 shrink-0 items-center justify-center">
-          <div className="absolute inset-0 rounded-lg border border-primary/40 bg-primary/20 shadow-[var(--chrome-shell-brand-shadow)] transition-shadow duration-150 hover:shadow-[var(--chrome-shell-brand-shadow-hover)]" />
-          <Hexagon className="relative h-5 w-5 text-primary [filter:var(--chrome-shell-icon-drop-shadow)]" />
-        </div>
-
-        {!collapsed ? (
-          <div className="flex flex-col">
-            <Kicker className="whitespace-nowrap font-display text-lg font-bold text-foreground">
-              UVS<span className="text-primary">DECKS</span>
-            </Kicker>
-            <span className="-mt-1 text-[10px] font-mono uppercase tracking-[0.3em] text-muted-foreground">
-              .GG
-            </span>
-          </div>
-        ) : null}
-      </Link>
+    <div
+      className={cn(
+        "px-3 pb-2",
+        SHELL_RAIL_TOP_PADDING_CLASS,
+        collapsed
+          ? "flex flex-col items-center gap-2"
+          : "flex items-center gap-1"
+      )}
+    >
+      <AppBrandLink
+        showWordmark={!collapsed}
+        wordmarkLayout="stacked"
+        markSize="md"
+        className={cn(!collapsed && "min-w-0 flex-1")}
+      />
+      <LeftSidebarCollapseToggle />
     </div>
   );
 }

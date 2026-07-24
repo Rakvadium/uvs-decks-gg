@@ -27,7 +27,8 @@ const CARD_TYPE_PIE_COLORS: Record<string, string> = {
   Asset: UNIVERSUS_COLORS.ASSET,
   Foundation: UNIVERSUS_COLORS.FOUNDATION,
   Backup: UNIVERSUS_COLORS.BACKUP,
-  Token: "#9ca3af",
+  Token: UNIVERSUS_COLORS.TOKEN,
+  Arena: UNIVERSUS_COLORS.ARENA,
   Other: "#94a3b8",
 };
 

@@ -94,7 +94,7 @@ export function CommunityTierListLaneRow({ tier }: { tier: BuilderTier }) {
             <Input
               value={tier.label}
               onChange={(event) => setTierLabel(tier.id, event.target.value)}
-              className="h-7 min-w-0 max-w-36 bg-background/70 font-display text-sm font-bold uppercase tracking-[0.2em]"
+              className="h-7 min-w-0 max-w-36 bg-background/80 font-display text-sm font-bold uppercase tracking-[0.18em]"
             />
           ) : (
             <SectionHeading
@@ -112,7 +112,7 @@ export function CommunityTierListLaneRow({ tier }: { tier: BuilderTier }) {
           ) : null}
         </div>
 
-        <Badge variant="outline" className="ml-auto h-5 shrink-0 px-2 text-[9px] uppercase tracking-[0.18em]">
+        <Badge variant="outline" className="ml-auto h-5 shrink-0 px-2 text-[10px] uppercase tracking-[0.18em]">
           {cardIds.length} cards
         </Badge>
       </div>

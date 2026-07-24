@@ -4,7 +4,7 @@ import { CommunityUpcomingEvents } from "./upcoming-events";
 
 export function CommunityPulseCard() {
   return (
-    <Card className="h-full border border-border/60">
+    <Card className="h-full border border-border/50">
       <CardHeader className="space-y-2">
         <CardTitle className="text-lg">Community Pulse</CardTitle>
         <CardDescription>Live snapshots from across the community.</CardDescription>

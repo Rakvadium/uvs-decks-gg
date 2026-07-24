@@ -2,6 +2,10 @@
 
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import {
+  SHELL_CHROME_EDGE_BOTTOM,
+  SHELL_CHROME_TOP_SURFACE,
+} from "./shell-chrome";
 
 export interface AppPageHeaderProps {
   title: ReactNode;
@@ -13,6 +17,7 @@ export interface AppPageHeaderProps {
   innerClassName?: string;
   withBottomBorder?: boolean;
   secondaryRowFirst?: boolean;
+  chrome?: boolean;
 }
 
 export function AppPageHeader({
@@ -25,6 +30,7 @@ export function AppPageHeader({
   innerClassName,
   withBottomBorder = true,
   secondaryRowFirst = false,
+  chrome = true,
 }: AppPageHeaderProps) {
   const secondaryRow = tabs ?? toolbar;
 
@@ -32,14 +38,26 @@ export function AppPageHeader({
     <div className="flex flex-wrap items-start justify-between gap-3">
       <div className="min-w-0 space-y-1">
         {typeof title === "string" ? (
-          <h1 className="text-xl font-semibold tracking-tight text-foreground md:text-2xl">
+          <h1
+            className={cn(
+              "text-xl font-semibold tracking-tight md:text-2xl",
+              chrome ? "text-sidebar-foreground" : "text-foreground"
+            )}
+          >
             {title}
           </h1>
         ) : (
           title
         )}
         {description ? (
-          <div className="text-sm text-muted-foreground">{description}</div>
+          <div
+            className={cn(
+              "text-sm",
+              chrome ? "text-sidebar-foreground/75" : "text-muted-foreground"
+            )}
+          >
+            {description}
+          </div>
         ) : null}
       </div>
       {actions ? (
@@ -73,13 +91,14 @@ export function AppPageHeader({
   return (
     <header
       className={cn(
-        withBottomBorder && "border-b border-border/50",
+        chrome && SHELL_CHROME_TOP_SURFACE,
+        withBottomBorder && (chrome ? SHELL_CHROME_EDGE_BOTTOM : "border-b border-border/50"),
         className
       )}
     >
       <div
         className={cn(
-          "flex flex-col gap-3 px-4 py-4 md:px-6 md:py-5",
+          "relative flex flex-col gap-3 px-4 py-4 md:px-6 md:py-5",
           innerClassName
         )}
       >

@@ -1,0 +1,88 @@
+---
+name: backlog-worker
+description: >-
+  Pulls the oldest GitHub Issue labeled agent-ready and size/S, runs the
+  hardened playbook on that single task, then opens or prepares a PR. Use when
+  the user asks to work the issue queue, run backlog-worker, drain agent-ready
+  tickets, or process the next agent task without specifying the task body.
+---
+
+# Backlog worker
+
+Canonical docs:
+
+- `docs/agent-issue-queue.md` — labels, filter, lifecycle
+- `docs/agent-workflow-playbook.md` — coding ritual
+
+## Default policy
+
+- Claim **one** issue per invocation unless the user sets a higher cap (max **3**).
+- Auto-claim filter only:
+
+```text
+is:issue is:open label:agent-ready label:size/S -label:blocked -label:needs-human
+```
+
+- Oldest first (`created` ascending).
+- Never auto-claim `size/M`, `size/L`, `needs-human`, or `blocked`.
+- Prefer GitHub Issues over `docs/BACKLOG.md`. If no matching issues, report empty queue; only fall back to BACKLOG.md if the user explicitly allows it.
+
+## Loop
+
+For each claim (up to cap):
+
+1. **List & pick**
+
+```bash
+gh issue list --state open --label "agent-ready,size/S" --json number,title,labels,createdAt,body --limit 50
+```
+
+Filter out issues that also have `blocked` or `needs-human`. Sort by `createdAt` ascending. Take the first.
+
+2. **Claim**
+
+```bash
+gh issue comment <n> --body "Claimed by backlog-worker. Following docs/agent-workflow-playbook.md."
+gh issue edit <n> --remove-label "agent-ready"
+```
+
+If claim fails (label race), pick the next issue.
+
+3. **Route**
+
+- Read issue body (Goal, Done when, Context, Out of scope, Size, Area).
+- Run `project-context-gate` using the issue as the task.
+- Then:
+  - `area/convex` → prefer `hardened-convex-ops` when it is a diagnosis/fix; else `hardened-coding`
+  - `area/ui` / `area/shell` / `area/admin` → `hardened-coding` (+ visual verify / `ui-ux-adversary` when UI)
+  - `area/docs` → docs-only change set; still Context Brief; skip UI adversary unless UI files change
+
+4. **Implement** under hardened rules (brief before edits, no drive-by restyles, lint/build, UI gates).
+
+5. **Finish the ticket**
+
+- If the user asked for a PR / cloud-style completion: open a PR on branch `agent/<n>-short-slug` with `Fixes #<n>` in the body. Do not merge unless asked.
+- If the user forbade commits/PRs: stop after local verify and summarize; leave a comment on the issue with status and that a PR is still needed.
+- If blocked: comment why, add `blocked` or `needs-human`, do not force the task.
+
+6. **Next** only if cap allows and queue still has matches; otherwise stop with a summary table:
+
+| Issue | Result | PR / notes |
+| --- | --- | --- |
+
+## Paste prompt
+
+```text
+Use backlog-worker.
+Follow docs/agent-issue-queue.md and docs/agent-workflow-playbook.md.
+Cap: 1 issue.
+Open a PR with Fixes #N when the task is done (unless I say not to commit).
+```
+
+## Forbidden
+
+- Inventing tasks when the queue is empty
+- Claiming multiple issues into one PR
+- Stripping `needs-human` to force work
+- Skipping Context Brief / UI adversary for UI issues
+- Merging PRs unless explicitly asked

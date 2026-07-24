@@ -1,36 +1,39 @@
 import { LogOut, Settings } from "lucide-react";
-import { DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 import { useLeftSidebarContext } from "../../context";
+import { LeftSidebarUserIdentity } from "../user-identity";
 import { LeftSidebarAdminItems } from "./admin-items";
-import { MENU_ITEM_CLASS } from "./constants";
 import { LeftSidebarThemeControls } from "./theme-submenu";
 
 export function LeftSidebarUserMenuContent() {
-  const { collapsed, handleSignOut, navigateTo } = useLeftSidebarContext();
+  const { handleSignOut, navigateTo } = useLeftSidebarContext();
 
   return (
     <DropdownMenuContent
-      className="w-56 rounded-lg border-primary/20 bg-popover/95 backdrop-blur-lg"
-      align="start"
-      side={collapsed ? "right" : "top"}
+      className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
+      side="right"
+      align="end"
       sideOffset={4}
     >
+      <DropdownMenuLabel className="p-0 font-normal normal-case tracking-normal text-foreground">
+        <LeftSidebarUserIdentity className="px-1 py-1.5" />
+      </DropdownMenuLabel>
+      <DropdownMenuSeparator />
       <LeftSidebarThemeControls />
-
-      <DropdownMenuItem onClick={() => navigateTo("/settings")} className={MENU_ITEM_CLASS}>
-        <Settings className="mr-2 h-4 w-4" />
+      <DropdownMenuItem onClick={() => navigateTo("/settings")}>
+        <Settings />
         Settings
       </DropdownMenuItem>
-
       <LeftSidebarAdminItems />
-
-      <DropdownMenuSeparator className="bg-border/50" />
-      <DropdownMenuItem
-        onClick={() => void handleSignOut()}
-        className="font-mono text-xs uppercase tracking-wider hover:bg-destructive/10 hover:text-destructive"
-      >
-        <LogOut className="mr-2 h-4 w-4" />
-        Sign Out
+      <DropdownMenuSeparator />
+      <DropdownMenuItem variant="destructive" onClick={() => void handleSignOut()}>
+        <LogOut />
+        Log out
       </DropdownMenuItem>
     </DropdownMenuContent>
   );

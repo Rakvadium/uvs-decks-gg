@@ -79,7 +79,7 @@ export function CommunityTierListsPageCreateDialog() {
           </div>
 
           <div className="relative min-h-0 flex-1 overflow-y-auto px-6">
-            <DialogHeader className="border-border/20 pb-4 pt-6">
+            <DialogHeader className="border-border/30 pb-4 pt-6">
               <DialogTitle className="text-xl">Create New Tier List</DialogTitle>
               <DialogDescription>
                 Choose whether this list is just for fun or should count toward a community ranking. New lists start private.
@@ -96,7 +96,7 @@ export function CommunityTierListsPageCreateDialog() {
                   placeholder="Tier list name..."
                   value={newListName}
                   onChange={(event) => setNewListName(event.target.value)}
-                  className="h-12 border-border/60 bg-background/40 pl-10 text-base focus-visible:ring-primary/25"
+                  className="h-12 bg-background/50 pl-10 text-base focus-visible:ring-primary/25"
                   onKeyDown={(event) => {
                     if (event.key === "Enter") {
                       event.preventDefault();
@@ -121,7 +121,7 @@ export function CommunityTierListsPageCreateDialog() {
                         type="button"
                         onClick={() => setNewRankingScope(option.value)}
                         className={cn(
-                          "rounded-xl border px-4 py-3 text-left transition-all",
+                          "rounded-xl border px-4 py-3 text-left transition-colors",
                           isSelected
                             ? "border-primary/60 bg-primary/10 shadow-[0_0_15px_-10px_var(--primary)]"
                             : "border-border/50 bg-background/50 hover:border-primary/30 hover:bg-primary/5"
@@ -135,7 +135,7 @@ export function CommunityTierListsPageCreateDialog() {
                           <span
                             className={cn(
                               "inline-flex h-3 w-3 shrink-0 rounded-full border transition-colors",
-                              isSelected ? "border-primary bg-primary" : "border-border/60 bg-transparent"
+                              isSelected ? "border-primary bg-primary" : "border-border/50 bg-transparent"
                             )}
                           />
                         </div>

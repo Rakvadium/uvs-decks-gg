@@ -32,7 +32,7 @@ export function DeckInvitePendingGate({ deckId, deckName }: DeckInvitePendingGat
 
   return (
     <div className="flex min-h-[50vh] items-center justify-center p-4">
-      <Card className="w-full max-w-md border-border/60">
+      <Card className="w-full max-w-md border-border/50">
         <CardHeader>
           <CardTitle className="font-display text-lg uppercase tracking-wider">Shared deck</CardTitle>
           <CardDescription>

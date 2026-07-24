@@ -44,7 +44,7 @@ export function DeckDetailsGallerySidebarBottomBar({ position = "bottom" }: Deck
 
         <button
           type="button"
-          className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-primary/30 bg-background/60 text-muted-foreground transition-colors hover:border-primary/60 hover:bg-primary/10 hover:text-primary"
+          className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-primary/30 bg-background/50 text-muted-foreground transition-colors hover:border-primary/60 hover:bg-primary/10 hover:text-primary"
           aria-label="Open filter panel"
           onClick={() => setIsFilterDialogOpen(true)}
         >
@@ -52,19 +52,19 @@ export function DeckDetailsGallerySidebarBottomBar({ position = "bottom" }: Deck
           {meta.activeFilterCount > 0 ? (
             <Badge
               variant="secondary"
-              className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center px-1 text-[9px]"
+              className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center px-1 text-[10px]"
             >
               {meta.activeFilterCount}
             </Badge>
           ) : null}
         </button>
 
-        {meta.activeFilterCount > 0 ? (
+        {meta.hasClearableFilters ? (
           <Button
             type="button"
             variant="destructiveOutline"
             size="icon-sm"
-            className="size-9 shrink-0 rounded-md bg-background/60"
+            className="size-9 shrink-0 rounded-md bg-background/50"
             onClick={actions.clearAllFilters}
             aria-label="Clear all filters"
           >

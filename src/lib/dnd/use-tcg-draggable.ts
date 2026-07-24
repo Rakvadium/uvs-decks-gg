@@ -10,13 +10,16 @@ import { useIsMobile } from "@/hooks/useIsMobile";
 function isDndDebugEnabled(): boolean {
   if (typeof window === "undefined") return false;
   try {
-    return (window as any).__TCG_DND_DEBUG__ === true || window.localStorage?.getItem("tcg:dndDebug") === "1";
+    return (
+      (window as Window & { __TCG_DND_DEBUG__?: boolean }).__TCG_DND_DEBUG__ === true ||
+      window.localStorage?.getItem("tcg:dndDebug") === "1"
+    );
   } catch {
-    return (window as any).__TCG_DND_DEBUG__ === true;
+    return (window as Window & { __TCG_DND_DEBUG__?: boolean }).__TCG_DND_DEBUG__ === true;
   }
 }
 
-function dndLog(...args: any[]) {
+function dndLog(...args: unknown[]) {
   if (!isDndDebugEnabled()) return;
   console.log("[tcg-dnd]", ...args);
 }
@@ -79,14 +82,16 @@ export function useTcgDraggable({
         return;
       }
 
-      const getPoint = (evt: any): { x: number; y: number } | null => {
-        if (evt?.touches && evt.touches.length > 0) {
+      const getPoint = (
+        evt: React.MouseEvent | React.TouchEvent | MouseEvent | TouchEvent,
+      ): { x: number; y: number } | null => {
+        if ("touches" in evt && evt.touches.length > 0) {
           return { x: evt.touches[0].clientX, y: evt.touches[0].clientY };
         }
-        if (evt?.changedTouches && evt.changedTouches.length > 0) {
+        if ("changedTouches" in evt && evt.changedTouches.length > 0) {
           return { x: evt.changedTouches[0].clientX, y: evt.changedTouches[0].clientY };
         }
-        if (typeof evt?.clientX === "number" && typeof evt?.clientY === "number") {
+        if ("clientX" in evt && typeof evt.clientX === "number" && typeof evt.clientY === "number") {
           return { x: evt.clientX, y: evt.clientY };
         }
         return null;
@@ -99,7 +104,7 @@ export function useTcgDraggable({
       startPointRef.current = startPoint;
       startedRef.current = false;
 
-      const handleMove = (evt: any) => {
+      const handleMove = (evt: MouseEvent | TouchEvent) => {
         if (startedRef.current) return;
         const p = getPoint(evt);
         const sp = startPointRef.current;

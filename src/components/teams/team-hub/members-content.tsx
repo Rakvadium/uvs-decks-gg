@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery } from "convex/react";
-import { Check, Copy } from "lucide-react";
+import { Check, Copy, Plus } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { api } from "../../../../convex/_generated/api";
@@ -36,6 +36,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useTeamHub } from "./hook";
+import { useRegisterTeamHubPrimaryAction } from "./primary-action-context";
 
 const ROLE_LABEL: Record<string, string> = {
   captain: "Captain",
@@ -133,6 +134,9 @@ export function TeamHubMembersContent({ teamId }: TeamHubMembersContentProps) {
     }
   }, [inviteUrl]);
 
+  const openInvite = useCallback(() => setInviteOpen(true), []);
+  useRegisterTeamHubPrimaryAction(caps?.canInviteMembers === true, "Invite member", openInvite, Plus);
+
   if (teamGone) {
     return null;
   }
@@ -166,8 +170,8 @@ export function TeamHubMembersContent({ teamId }: TeamHubMembersContentProps) {
         {showInvite ? (
           <Button
             type="button"
-            className="h-9 shrink-0 font-mono text-xs uppercase tracking-wider sm:mt-0.5"
-            onClick={() => setInviteOpen(true)}
+            className="h-9 shrink-0 font-mono text-xs uppercase tracking-wider sm:mt-0.5 md:hidden"
+            onClick={openInvite}
           >
             Invite member
           </Button>
@@ -253,7 +257,7 @@ export function TeamHubMembersContent({ teamId }: TeamHubMembersContentProps) {
           <p className="text-sm text-muted-foreground">No active members in this team.</p>
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-lg border border-border/60">
+        <div className="overflow-x-auto rounded-lg border border-border/50">
           <Table>
             <TableHeader>
               <TableRow className="hover:bg-transparent">

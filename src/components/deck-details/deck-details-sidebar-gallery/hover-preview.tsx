@@ -27,7 +27,7 @@ export function DeckDetailsGallerySidebarHoverPreview() {
       initial={false}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: prefersReducedMotion ? 0 : 0.2 }}
-      className="pointer-events-none fixed z-[80]"
+      className="pointer-events-none fixed z-[100]"
       style={{
         right,
         top: topOffset,
@@ -35,7 +35,7 @@ export function DeckDetailsGallerySidebarHoverPreview() {
         height: previewHeight,
       }}
     >
-      <div className="relative h-full w-full overflow-hidden rounded-xl border border-primary/40 bg-background/90 shadow-[0_0_0_1px_var(--primary)/30,0_0_6px_var(--primary)/70,0_0_14px_var(--primary)/20]">
+      <div className="relative h-full w-full overflow-hidden rounded-xl border border-primary/40 bg-background/95 shadow-[0_0_0_1px_var(--primary)/30,0_0_6px_var(--primary)/70,0_0_14px_var(--primary)/20]">
         {hoveredListCard.imageUrl ? (
           <Image
             src={hoveredListCard.imageUrl}

@@ -55,8 +55,8 @@ export function CommunityRankingsView({ embedded = false }: CommunityRankingsVie
       <div className={cn("relative z-10 flex min-h-full flex-col gap-4", embedded ? "py-2" : "p-4 md:p-6")}>
         <Card
           className={cn(
-            "bg-card/75",
-            leaderboard ? "border-border/60" : "border-dashed border-border/60",
+            "bg-card/80",
+            leaderboard ? "border-border/50" : "border-dashed border-border/50",
           )}
         >
           <CardHeader className="space-y-4">
@@ -91,7 +91,7 @@ export function CommunityRankingsView({ embedded = false }: CommunityRankingsVie
           </CardHeader>
           <CardContent>
             {!leaderboard ? (
-              <div className="flex min-h-48 items-center justify-center rounded-xl border border-dashed border-border/40 bg-background/20 px-4 py-8 text-center text-sm text-muted-foreground">
+              <div className="flex min-h-48 items-center justify-center rounded-xl border border-dashed border-border/40 bg-background/30 px-4 py-8 text-center text-sm text-muted-foreground">
                 {scopeType === "set_scope"
                   ? "No ranked set-scoped lists are available yet."
                   : "No ranked global lists are available yet."}
@@ -127,7 +127,7 @@ export function CommunityRankingsView({ embedded = false }: CommunityRankingsVie
                             type="button"
                             variant="outline"
                             size="sm"
-                            className="shrink-0 border-border/60 bg-background/40"
+                            className="shrink-0 border-border/50 bg-background/50"
                             onClick={() =>
                               setDialogTier({
                                 label: tier.label,
@@ -161,7 +161,7 @@ export function CommunityRankingsView({ embedded = false }: CommunityRankingsVie
                           })}
                         </div>
                       ) : (
-                        <div className="rounded-xl border border-dashed border-border/40 bg-background/20 px-4 py-5 text-sm text-muted-foreground">
+                        <div className="rounded-xl border border-dashed border-border/40 bg-background/30 px-4 py-5 text-sm text-muted-foreground">
                           No cards have landed in this community tier yet.
                         </div>
                       )}

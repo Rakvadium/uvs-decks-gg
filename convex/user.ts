@@ -2,6 +2,7 @@ import { query, mutation, internalQuery } from "./_generated/server";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { v } from "convex/values";
 import { buildAdminSearchText } from "./lib/accountStatus";
+import { assertValidUsername, normalizeUsernameInput } from "./lib/username";
 import { publicUserFromDocument, userValidator, currentUserSelfValidator } from "./validators";
 import { requireUserCanUpdateProfile } from "./utils/validation";
 
@@ -63,7 +64,16 @@ export const updateProfile = mutation({
     const updates: { username?: string; image?: string } = {};
     
     if (args.username !== undefined) {
-      updates.username = args.username;
+      const username = normalizeUsernameInput(args.username).toLowerCase();
+      assertValidUsername(username);
+      const existing = await ctx.db
+        .query("users")
+        .withIndex("by_username", (q) => q.eq("username", username))
+        .unique();
+      if (existing && existing._id !== userId) {
+        throw new Error("Username already taken");
+      }
+      updates.username = username;
     }
     
     if (args.image !== undefined) {

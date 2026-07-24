@@ -1,6 +1,7 @@
 "use client";
 
 import { useMutation, usePaginatedQuery, useQuery } from "convex/react";
+import { Plus } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { api } from "../../../../convex/_generated/api";
@@ -21,6 +22,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { useTeamHub } from "./hook";
+import { useRegisterTeamHubPrimaryAction } from "./primary-action-context";
 import type { TeamHubCaps } from "./team-hub-caps";
 
 interface TeamHubAnnouncementsContentProps {
@@ -81,6 +83,14 @@ export function TeamHubAnnouncementsContent({ teamId }: TeamHubAnnouncementsCont
     }
   }, [body, caps?.canPostAnnouncements, create, id, title]);
 
+  const openCreate = useCallback(() => setCreateOpen(true), []);
+  useRegisterTeamHubPrimaryAction(
+    caps?.canPostAnnouncements === true,
+    "Announcement",
+    openCreate,
+    Plus,
+  );
+
   if (teamGone) {
     return null;
   }
@@ -114,10 +124,10 @@ export function TeamHubAnnouncementsContent({ teamId }: TeamHubAnnouncementsCont
         {caps.canPostAnnouncements ? (
           <Button
             type="button"
-            className="h-9 shrink-0 font-mono text-xs uppercase tracking-wider sm:mt-0.5"
-            onClick={() => setCreateOpen(true)}
+            className="h-9 shrink-0 font-mono text-xs uppercase tracking-wider sm:mt-0.5 md:hidden"
+            onClick={openCreate}
           >
-            Create Announcement
+            Announcement
           </Button>
         ) : null}
       </div>
@@ -296,7 +306,7 @@ function AnnouncementCard({
   const canDelete = isAuthor || caps.canModerateChat;
 
   return (
-    <li className="rounded-lg border border-border/60 bg-background/60 p-4 shadow-[0_0_0_1px_hsl(var(--border)/0.2)]">
+    <li className="rounded-lg border border-border/50 bg-background/50 p-4">
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div className="min-w-0 flex-1">
           {editing ? (

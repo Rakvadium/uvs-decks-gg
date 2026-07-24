@@ -11,6 +11,8 @@ export function CardGridItemImageStage() {
     backCard,
     dragPreviewImageRef,
     imagePriority,
+    imageSizes,
+    imageQuality,
     isFlipped,
     isHovered,
     isDragging,
@@ -23,23 +25,25 @@ export function CardGridItemImageStage() {
 
   return (
     <div
-      className="relative h-full w-full overflow-hidden rounded-xl transition-shadow duration-150"
+      className="relative z-[1] h-full w-full overflow-hidden rounded-xl transition-shadow duration-150"
       style={{ boxShadow: isDragging ? CARD_GLOW_REST : isHovered ? CARD_GLOW_HOVER : CARD_GLOW_REST }}
     >
       {!hasBackFace ? (
-        <div className="absolute inset-0 overflow-hidden rounded-xl [backface-visibility:hidden]">
+        <div className="absolute inset-0 overflow-hidden rounded-xl">
           <CardImageDisplay
             imageUrl={card.imageUrl}
             name={card.name}
             imgRef={dragPreviewImageRef}
             priority={imagePriority}
+            sizes={imageSizes}
+            quality={imageQuality}
           />
         </div>
       ) : (
         <>
           <div
             className={cn(
-              "absolute inset-0 overflow-hidden rounded-xl [backface-visibility:hidden] transition-opacity",
+              "absolute inset-0 overflow-hidden rounded-xl transition-opacity",
               transitionClass,
               isFlipped ? "pointer-events-none opacity-0" : "opacity-100"
             )}
@@ -49,12 +53,14 @@ export function CardGridItemImageStage() {
               name={card.name}
               imgRef={!isFlipped ? dragPreviewImageRef : undefined}
               priority={imagePriority && !isFlipped}
+              sizes={imageSizes}
+              quality={imageQuality}
               fetchPriority={isFlipped ? "low" : undefined}
             />
           </div>
           <div
             className={cn(
-              "absolute inset-0 overflow-hidden rounded-xl [backface-visibility:hidden] transition-opacity",
+              "absolute inset-0 overflow-hidden rounded-xl transition-opacity",
               transitionClass,
               !isFlipped ? "pointer-events-none opacity-0" : "opacity-100"
             )}
@@ -64,6 +70,8 @@ export function CardGridItemImageStage() {
               name={backCard!.name}
               imgRef={isFlipped ? dragPreviewImageRef : undefined}
               priority={imagePriority && isFlipped}
+              sizes={imageSizes}
+              quality={imageQuality}
               fetchPriority={!isFlipped ? "low" : undefined}
             />
           </div>

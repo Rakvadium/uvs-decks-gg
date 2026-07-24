@@ -13,9 +13,11 @@ Deliver a **credible, fast, and shareable** deck-building experience for UniVers
 ## Product principles
 
 1. **Card truth in one place** — Canonical card and set data lives in Convex; imports and admin tools keep it consistent.
-2. **Explicit community rules** — Ranked versus unranked tier lists, scopes, and aggregation logic are documented ([community-tier-list-system.md](./community-tier-list-system.md)) and reflected in the UI.
+2. **Explicit community rules** — Ranked versus unranked tier lists, scopes, and aggregation logic should stay documented and reflected in the UI (community deep-dive doc currently missing; see [agent-workflow-playbook.md](./agent-workflow-playbook.md) gaps).
 3. **Composable UI** — Features grow as **folder modules** with clear entrypoints ([component-architecture-playbook.md](./component-architecture-playbook.md)); avoid monolithic route files.
 4. **Account-bound progress** — Decks, collections, and session preferences belong to authenticated users unless explicitly public.
+
+
 
 ## Core capabilities (current direction)
 
@@ -25,10 +27,13 @@ Deliver a **credible, fast, and shareable** deck-building experience for UniVers
 - **Community** — Tier list CRUD, comments/likes where enabled, rankings pages driven by snapshot and ranking tables.
 - **Admin** — Imports and set/card maintenance for operators.
 
+
+
 ## Non-goals (for now)
 
 - Replacing official tournament software or judge tools.
-- Full social graph or messaging (unless added explicitly later).
+
+
 
 ## Roadmap themes
 
@@ -37,9 +42,11 @@ Deliver a **credible, fast, and shareable** deck-building experience for UniVers
 3. **Performance** — Keep list and gallery interactions snappy; cache or snapshot where aggregation is heavy.
 4. **Contributor experience** — Documentation and backlog that make agent and human contributors productive ([BACKLOG.md](./BACKLOG.md), [agent-onboarding.md](./agent-onboarding.md)).
 
+
+
 ## Related documents
 
 - [SYSTEM_ANALYSIS.md](./SYSTEM_ANALYSIS.md)
-- [ARCHITECTURE_PLAN.md](./ARCHITECTURE_PLAN.md)
-- [POTENTIAL_CHALLENGES.md](./POTENTIAL_CHALLENGES.md)
+- [component-architecture-playbook.md](./component-architecture-playbook.md)
+- [UI_UX_DESIGN.md](./UI_UX_DESIGN.md)
 

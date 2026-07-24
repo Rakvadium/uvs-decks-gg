@@ -4,12 +4,15 @@ export type SlotArea = "top-bar" | "right-sidebar";
 
 export type SlotIcon = ComponentType<{ className?: string }>;
 
+export type SlotIconFit = "glyph" | "media";
+
 export interface SlotRegistration {
   id: string;
   component: ComponentType;
   priority?: number;
   label?: string;
   icon?: SlotIcon;
+  iconFit?: SlotIconFit;
   header?: ComponentType;
   footer?: ComponentType;
 }
@@ -18,6 +21,7 @@ export interface SlotRegistrationOptions {
   priority?: number;
   label?: string;
   icon?: SlotIcon;
+  iconFit?: SlotIconFit;
   header?: ComponentType;
   footer?: ComponentType;
 }

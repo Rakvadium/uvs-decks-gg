@@ -58,13 +58,13 @@ export function SearchableMultiSelect({
               "flex h-9 w-full items-center justify-between rounded-md border px-3 text-left transition-colors",
               selectedValues.length > 0
                 ? "border-primary/40 bg-primary/10 text-primary"
-                : "border-border/60 bg-background/60 text-foreground hover:border-primary/30 hover:bg-muted/40"
+                : "border-border/50 bg-background/50 text-foreground hover:border-primary/30 hover:bg-muted/50"
             )}
           >
             <span className="truncate text-xs font-mono uppercase tracking-wider">
               {selectedValues.length > 0 ? `${selectedValues.length} selected` : triggerLabel}
             </span>
-            <ChevronDown className="h-3.5 w-3.5 opacity-70" />
+            <ChevronDown className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
           </button>
         </PopoverTrigger>
         <PopoverContent
@@ -113,7 +113,9 @@ export function SearchableMultiSelect({
                       <span
                         className={cn(
                           "flex h-4 w-4 items-center justify-center rounded border",
-                          selected ? "border-primary/60 bg-primary/20" : "border-border/70 bg-background/60"
+                          selected
+                            ? "border-primary bg-primary text-primary-foreground"
+                            : "border-muted-foreground/55 bg-background dark:border-muted-foreground/65"
                         )}
                       >
                         {selected ? <Check className="h-3 w-3" /> : null}
@@ -152,7 +154,7 @@ export function SearchableMultiSelect({
             </span>
           ))}
           {selectedLabels.length > 3 ? (
-            <span className="rounded border border-border/60 px-1.5 py-0.5 text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+            <span className="rounded border border-border/50 px-1.5 py-0.5 text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
               +{selectedLabels.length - 3}
             </span>
           ) : null}

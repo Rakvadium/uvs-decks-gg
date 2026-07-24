@@ -28,7 +28,7 @@ export function StartingCharacterButton({ card, className, compact }: StartingCh
         })
       }
       className={cn(
-        "gap-2 transition-all",
+        "gap-2 transition-colors",
         isStartingCharacter
           ? "bg-amber-500/20 text-amber-400 border-amber-500/40 hover:bg-amber-500/30"
           : "border-amber-500/20 text-muted-foreground hover:text-amber-400 hover:border-amber-500/40 hover:bg-amber-500/10",

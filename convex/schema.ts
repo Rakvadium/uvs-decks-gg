@@ -23,6 +23,10 @@ export default defineSchema({
     version: v.number(),
     updatedAt: v.number(),
     cardCount: v.number(),
+    catalogUrl: v.optional(v.string()),
+    catalogSha256: v.optional(v.string()),
+    catalogSchemaVersion: v.optional(v.number()),
+    catalogObjectKey: v.optional(v.string()),
   }),
 
   cardFacetSnapshot: defineTable({

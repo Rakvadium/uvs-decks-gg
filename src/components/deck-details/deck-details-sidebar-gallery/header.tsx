@@ -17,14 +17,14 @@ export function DeckDetailsGallerySidebarHeader() {
               {meta.filteredCount.toLocaleString()} cards
             </span>
             {meta.activeFilterCount > 0 ? (
-              <Badge variant="secondary" className="h-4 px-1 text-[9px]">
+              <Badge variant="secondary" className="h-4 px-1 text-[10px]">
                 {meta.activeFilterCount} filter{meta.activeFilterCount === 1 ? "" : "s"}
               </Badge>
             ) : null}
           </div>
         </div>
 
-        <div className="inline-flex items-center gap-1 rounded-md border border-border/50 bg-muted/30 p-0.5">
+        <div className="inline-flex items-center gap-1 rounded-md border border-border/50 bg-muted/20 p-0.5">
           {(["card", "list"] as SidebarGalleryViewMode[]).map((mode) => {
             const Icon = mode === "card" ? LayoutGrid : List;
             const isActive = viewMode === mode;

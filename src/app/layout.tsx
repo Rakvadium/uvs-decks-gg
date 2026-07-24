@@ -1,13 +1,18 @@
 import type { Metadata, Viewport } from "next";
+import { Outfit } from "next/font/google";
 import { ConvexAuthNextjsServerProvider } from "@convex-dev/auth/nextjs/server";
 import { Providers } from "./providers";
 import "./globals.css";
 
+const outfit = Outfit({
+  subsets: ["latin"],
+  variable: "--font-outfit",
+  display: "swap",
+});
+
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
   viewportFit: "cover",
 };
 
@@ -22,7 +27,7 @@ export const metadata: Metadata = {
     template: "%s | UVSDECKS.GG",
   },
   description:
-    "Build UniVersus decks, browse the card gallery, track your collection, and explore community tier lists on UVSDECKS.GG.",
+    "Build UniVersus decks, browse the card gallery, and explore community tier lists on UVSDECKS.GG.",
 };
 
 export default function RootLayout({
@@ -37,8 +42,9 @@ export default function RootLayout({
       suppressHydrationWarning
       data-color-theme="default"
       data-chrome="calm"
+      className={outfit.variable}
     >
-      <body className="subpixel-antialiased">
+      <body className={`${outfit.className} subpixel-antialiased`}>
         <Providers>{children}</Providers>
       </body>
     </html>

@@ -1,7 +1,6 @@
 "use client";
 
 import { LeftSidebarBrand } from "./brand";
-import { LeftSidebarCollapseToggle } from "./collapse-toggle";
 import { LeftSidebarProvider } from "./context";
 import { LeftSidebarDivider } from "./divider";
 import { LeftSidebarFrame } from "./frame";
@@ -21,7 +20,6 @@ export function LeftSidebar({ collapsed, onToggle }: LeftSidebarProps) {
         <LeftSidebarDivider />
         <LeftSidebarNav />
         <LeftSidebarDivider />
-        <LeftSidebarCollapseToggle />
         <LeftSidebarUserMenu />
       </LeftSidebarFrame>
     </LeftSidebarProvider>

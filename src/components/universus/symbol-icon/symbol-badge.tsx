@@ -16,7 +16,7 @@ export function SymbolBadge({ symbol, selected, onClick, size = "sm", className 
       onClick={onClick}
       className={cn(
         "inline-flex items-center justify-center rounded-md border p-1.5 transition-colors",
-        selected ? "border-primary bg-primary/10" : "border-border bg-background hover:bg-muted",
+        selected ? "border-primary bg-primary/10" : "border-border/50 bg-background hover:bg-muted",
         className
       )}
       title={symbol}

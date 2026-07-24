@@ -453,6 +453,8 @@ export const UNIVERSUS_COLORS = {
   ACTION: '#0081C9',
   ASSET: '#009956',
   ATTACK: '#F1841B',
+  TOKEN: '#1A1A1A',
+  ARENA: '#1A1A1A',
   ENHANCE: '#F1841B',
   RESPONSE: '#009956',
   BLITZ: '#CD1181',
@@ -620,7 +622,11 @@ export function getSymbolColor(symbol: string): { bg: string; text: string; bord
 export function formatUniversusCardType(type?: string): UniversusCardType | undefined {
   if (!type) return undefined;
   const normalized = type.charAt(0).toUpperCase() + type.slice(1).toLowerCase();
-  if (["Character", "Attack", "Action", "Asset", "Foundation", "Backup", "Token"].includes(normalized)) {
+  if (
+    ["Character", "Attack", "Action", "Asset", "Foundation", "Backup", "Token", "Arena"].includes(
+      normalized
+    )
+  ) {
     return normalized as UniversusCardType;
   }
   return type as UniversusCardType;
@@ -633,7 +639,8 @@ export const CARD_TYPE_CHIP_COLORS: Record<string, string> = {
   Asset: UNIVERSUS_COLORS.ASSET,
   Foundation: UNIVERSUS_COLORS.FOUNDATION,
   Backup: UNIVERSUS_COLORS.BACKUP,
-  Token: "#9ca3af",
+  Token: UNIVERSUS_COLORS.TOKEN,
+  Arena: UNIVERSUS_COLORS.ARENA,
   Other: "#94a3b8",
 };
 
@@ -647,4 +654,28 @@ export function getCardTypeChipColor(type: string): string {
   }
   const title = type.charAt(0).toUpperCase() + type.slice(1).toLowerCase();
   return CARD_TYPE_CHIP_COLORS[title] ?? CARD_TYPE_CHIP_COLORS.Other;
+}
+
+export function getZoneColor(zone?: string | null): string | undefined {
+  if (!zone) return undefined;
+
+  const normalized = zone.toLowerCase().trim();
+  if (!normalized) return undefined;
+
+  if (normalized === "h" || normalized === "high" || normalized.startsWith("high")) {
+    return UNIVERSUS_COLORS.HIGH;
+  }
+  if (normalized === "m" || normalized === "mid" || normalized.startsWith("mid")) {
+    return UNIVERSUS_COLORS.MID;
+  }
+  if (normalized === "l" || normalized === "low" || normalized.startsWith("low")) {
+    return UNIVERSUS_COLORS.LOW;
+  }
+
+  const first = normalized.charAt(0);
+  if (first === "h") return UNIVERSUS_COLORS.HIGH;
+  if (first === "m") return UNIVERSUS_COLORS.MID;
+  if (first === "l") return UNIVERSUS_COLORS.LOW;
+
+  return undefined;
 }

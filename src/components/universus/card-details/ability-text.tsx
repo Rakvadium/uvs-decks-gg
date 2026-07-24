@@ -15,7 +15,7 @@ export function AbilityText({ text, showHeading = true }: AbilityTextProps) {
   return (
     <div className="space-y-2.5">
       {showHeading ? (
-        <span className="text-[9px] font-mono font-bold uppercase tracking-[0.25em] text-muted-foreground/60">
+        <span className="text-xs font-mono font-bold uppercase tracking-[0.18em] text-muted-foreground/60">
           Abilities
         </span>
       ) : null}
@@ -24,7 +24,7 @@ export function AbilityText({ text, showHeading = true }: AbilityTextProps) {
 
         if (colonIndex === -1) {
           return (
-            <p key={index} className="text-sm leading-relaxed text-foreground/80">
+            <p key={index} className="text-base leading-relaxed text-foreground/80">
               <InlineSymbolText text={segment} />
             </p>
           );
@@ -36,7 +36,7 @@ export function AbilityText({ text, showHeading = true }: AbilityTextProps) {
 
         if (!abilityMatch) {
           return (
-            <p key={index} className="text-sm leading-relaxed text-foreground/80">
+            <p key={index} className="text-base leading-relaxed text-foreground/80">
               <InlineSymbolText text={segment} />
             </p>
           );
@@ -49,9 +49,9 @@ export function AbilityText({ text, showHeading = true }: AbilityTextProps) {
         const remainingBeforeColon = beforeColon.slice((prefix + abilityKeyword).length).trim();
 
         return (
-          <p key={index} className="text-sm leading-relaxed text-foreground/90">
+          <p key={index} className="text-base leading-relaxed text-foreground/90">
             <span
-              className="mr-0.5 inline-flex items-center rounded-sm px-1.5 py-px text-[10px] font-bold font-mono uppercase tracking-[0.1em] align-middle"
+              className="mr-0.5 inline-flex items-center rounded-sm px-1.5 py-px text-xs font-bold font-mono uppercase tracking-[0.1em] align-middle"
               style={{
                 backgroundColor: abilityColor,
                 color: "#fff",

@@ -16,7 +16,7 @@ export function DeckDetailsGallerySidebarBody() {
   return (
     <div className="min-h-0 flex-1 overflow-y-auto px-3 py-3">
       {visibleCards.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-border/60 p-4 text-center text-xs text-muted-foreground">
+        <div className="rounded-lg border border-dashed border-border/50 p-4 text-center text-xs text-muted-foreground">
           No cards match your current filters.
         </div>
       ) : viewMode === "card" ? (

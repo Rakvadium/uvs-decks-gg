@@ -106,7 +106,7 @@ export function TeamHubChatContent({ teamId }: TeamHubChatContentProps) {
         </div>
       )}
       <div
-        className="flex min-h-0 flex-1 flex-col-reverse gap-2 overflow-y-auto rounded-lg border border-border/60 bg-muted/10 p-3"
+        className="flex min-h-0 flex-1 flex-col-reverse gap-2 overflow-y-auto rounded-lg border border-border/50 bg-muted/20 p-3"
         role="log"
         aria-live="polite"
       >

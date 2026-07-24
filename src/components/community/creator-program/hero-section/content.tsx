@@ -6,7 +6,7 @@ import { CreatorProgramHeroStatsGrid } from "./stats-grid";
 
 export function CreatorProgramHeroSection() {
   return (
-    <section className="relative overflow-hidden rounded-2xl border border-border/60 bg-card/60 p-6 md:p-10">
+    <section className="relative overflow-hidden rounded-2xl border border-border/50 bg-card/80 p-6 md:p-10">
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-secondary/10" />
       <div className="pointer-events-none absolute inset-0 holo-shimmer opacity-30" />
 

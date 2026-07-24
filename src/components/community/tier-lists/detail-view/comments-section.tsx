@@ -13,7 +13,7 @@ export function CommunityTierListDetailCommentsSection() {
   }
 
   return (
-    <Card className="border-border/60 bg-card/75">
+    <Card className="border-border/50 bg-card/80">
       <CardHeader className="pb-2">
         <CardTitle className="text-base">Comments</CardTitle>
       </CardHeader>

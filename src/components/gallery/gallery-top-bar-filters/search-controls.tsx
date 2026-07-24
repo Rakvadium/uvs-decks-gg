@@ -51,7 +51,7 @@ export function GallerySearchControls() {
           >
             <SelectTrigger
               size="sm"
-              className="mx-1 h-7 min-w-[3.5rem] rounded-none border-y-0 border-x border-x-[color:var(--control-dual-border)] bg-transparent px-2 py-0 text-xs shadow-none hover:border-x-[color:var(--control-dual-border-strong)] hover:bg-muted/35 focus-visible:ring-0 focus-visible:border-x-[color:var(--control-dual-border-strong)] focus-visible:shadow-none"
+              className="mx-1 h-7 min-w-[3.5rem] rounded-none border-y-0 border-x border-x-[color:var(--control-dual-border)] bg-transparent px-2 py-0 text-xs shadow-none hover:border-x-[color:var(--control-dual-border-strong)] hover:bg-muted/50 focus-visible:ring-0 focus-visible:border-x-[color:var(--control-dual-border-strong)] focus-visible:shadow-none"
             >
               <SelectValue />
             </SelectTrigger>

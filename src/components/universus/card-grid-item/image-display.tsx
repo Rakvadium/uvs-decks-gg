@@ -18,6 +18,7 @@ interface CardImageDisplayProps {
   imgRef?: RefObject<HTMLImageElement | null>;
   priority?: boolean;
   sizes?: string;
+  quality?: number;
   fetchPriority?: "auto" | "high" | "low";
 }
 
@@ -28,6 +29,7 @@ export function CardImageDisplay({
   imgRef,
   priority,
   sizes,
+  quality = 95,
   fetchPriority,
 }: CardImageDisplayProps) {
   const hasValidImageUrl = Boolean(imageUrl && isValidUrl(imageUrl));
@@ -46,7 +48,7 @@ export function CardImageDisplay({
   }
 
   const defaultSizes =
-    "(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, (max-width: 1280px) 20vw, 16vw";
+    "(max-width: 640px) 50vw, (max-width: 768px) 40vw, (max-width: 1024px) 33vw, (max-width: 1280px) 28vw, 24vw";
 
   return (
     <Image
@@ -55,11 +57,13 @@ export function CardImageDisplay({
       alt={name}
       fill
       sizes={sizes ?? defaultSizes}
-      className={cn("object-cover", className)}
+      quality={quality}
+      className={cn("h-full w-full object-cover", className)}
       priority={priority ?? false}
       loading={priority ? undefined : "lazy"}
       fetchPriority={fetchPriority}
       draggable={false}
+      decoding="async"
     />
   );
 }

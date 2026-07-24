@@ -15,7 +15,7 @@ export function ActiveDeckSectionHeader() {
 
       <div className="flex items-center gap-2">
         {canDrop ? (
-          <Badge variant="outline" className="border-primary/60 text-[9px] text-primary">
+          <Badge variant="outline" className="border-primary/60 text-[10px] text-primary">
             {isOver ? "Release" : "Drop"}
           </Badge>
         ) : null}

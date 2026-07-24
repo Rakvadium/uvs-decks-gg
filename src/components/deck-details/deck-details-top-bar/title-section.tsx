@@ -24,7 +24,7 @@ export function DeckDetailsTopBarTitleSection({ compact = false }: DeckDetailsTo
 
   return (
     <div className="flex min-w-0 flex-1 items-center gap-2">
-      <h1 className="truncate font-display text-sm font-bold uppercase tracking-[0.2em]" title={deck.name}>
+      <h1 className="truncate font-display text-sm font-bold uppercase tracking-[0.18em]" title={deck.name}>
         {deck.name}
       </h1>
 

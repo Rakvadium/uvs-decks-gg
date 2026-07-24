@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useMutation, useQuery } from "convex/react";
+import { useAction, useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { Button } from "@/components/ui/button";
 import {
@@ -31,7 +31,7 @@ export function CatalogReleaseDialog({
   buttonClassName,
 }: CatalogReleaseDialogProps) {
   const versionDoc = useQuery(api.admin.getCardDataVersion, {});
-  const releaseCards = useMutation(api.admin.releaseCards);
+  const releaseCards = useAction(api.admin.releaseCards);
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [publishAnnounce, setPublishAnnounce] = useState("");
@@ -78,7 +78,7 @@ export function CatalogReleaseDialog({
             <AlertDialogDescription asChild>
               <div className="space-y-3 text-sm text-muted-foreground">
                 <p>
-                  This bumps the global{" "}
+                  This uploads a versioned static catalog blob to R2, bumps the global{" "}
                   <span className="font-mono text-foreground">cardDataVersion</span>,
                   rebuilds catalog aggregates, and triggers clients to pick up the
                   new snapshot on their next sync.

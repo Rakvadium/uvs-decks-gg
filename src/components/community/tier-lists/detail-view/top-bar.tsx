@@ -59,8 +59,8 @@ export function CommunityTierListDetailTopBar() {
   if (detail === undefined) {
     return (
       <div className="flex w-full min-w-0 items-center gap-2">
-        <Link href="/community/tier-lists">
-          <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0">
+        <Link href="/community/tier-lists" aria-label="Back to tier lists">
+          <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" aria-label="Back to tier lists">
             <ArrowLeft className="h-4 w-4" />
           </Button>
         </Link>
@@ -75,8 +75,8 @@ export function CommunityTierListDetailTopBar() {
   if (!detail) {
     return (
       <div className="flex w-full min-w-0 items-center gap-2">
-        <Link href="/community/tier-lists">
-          <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0">
+        <Link href="/community/tier-lists" aria-label="Back to tier lists">
+          <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" aria-label="Back to tier lists">
             <ArrowLeft className="h-4 w-4" />
           </Button>
         </Link>
@@ -111,11 +111,11 @@ export function CommunityTierListDetailTopBar() {
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-md border border-border/60 px-2.5 text-[10px] font-mono uppercase tracking-[0.18em] text-foreground transition-colors hover:border-primary/40 hover:text-primary"
+          className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-md border border-border/50 px-2.5 text-[10px] font-mono uppercase tracking-[0.18em] text-foreground transition-colors hover:border-primary/40 hover:text-primary"
         >
           {isPublic ? <Globe className="h-3 w-3" /> : <Lock className="h-3 w-3" />}
           {displayPublicity}
-          <ChevronDown className="h-3 w-3 opacity-70" />
+          <ChevronDown className="h-3 w-3 shrink-0 text-muted-foreground" />
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start">
@@ -130,7 +130,7 @@ export function CommunityTierListDetailTopBar() {
       </DropdownMenuContent>
     </DropdownMenu>
   ) : (
-    <Badge variant={isPublic ? "default" : "outline"} className="hidden h-8 items-center gap-1.5 px-2.5 text-[9px] sm:inline-flex">
+    <Badge variant={isPublic ? "default" : "outline"} className="hidden h-8 items-center gap-1.5 px-2.5 text-[10px] sm:inline-flex">
       {isPublic ? <Globe className="h-3 w-3" /> : <Lock className="h-3 w-3" />}
       {displayPublicity}
     </Badge>
@@ -141,10 +141,10 @@ export function CommunityTierListDetailTopBar() {
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-md border border-border/60 px-2.5 text-[10px] font-mono uppercase tracking-[0.18em] text-foreground transition-colors hover:border-primary/40 hover:text-primary"
+          className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-md border border-border/50 px-2.5 text-[10px] font-mono uppercase tracking-[0.18em] text-foreground transition-colors hover:border-primary/40 hover:text-primary"
         >
           {rankingScopeLabel}
-          <ChevronDown className="h-3 w-3 opacity-70" />
+          <ChevronDown className="h-3 w-3 shrink-0 text-muted-foreground" />
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start">
@@ -156,7 +156,7 @@ export function CommunityTierListDetailTopBar() {
       </DropdownMenuContent>
     </DropdownMenu>
   ) : (
-    <Badge variant="outline" className="hidden h-8 items-center gap-1.5 px-2.5 text-[9px] sm:inline-flex">
+    <Badge variant="outline" className="hidden h-8 items-center gap-1.5 px-2.5 text-[10px] sm:inline-flex">
       {rankingScopeLabel}
     </Badge>
   );
@@ -210,8 +210,8 @@ export function CommunityTierListDetailTopBar() {
   return (
     <>
       <div className="flex w-full min-w-0 items-center gap-2">
-        <Link href="/community/tier-lists">
-          <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0">
+        <Link href="/community/tier-lists" aria-label="Back to tier lists">
+          <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" aria-label="Back to tier lists">
             <ArrowLeft className="h-4 w-4" />
           </Button>
         </Link>
@@ -221,12 +221,12 @@ export function CommunityTierListDetailTopBar() {
             <Input
               value={title}
               onChange={(event) => setTitle(event.target.value)}
-              className="h-8 min-w-0 font-display text-sm font-bold uppercase tracking-[0.2em]"
+              className="h-8 min-w-0 font-display text-sm font-bold uppercase tracking-[0.18em]"
               placeholder="Tier list name..."
             />
           ) : (
             <PageHeading
-              className="truncate font-display text-sm font-bold uppercase tracking-[0.2em]"
+              className="truncate font-display text-sm font-bold uppercase tracking-[0.18em]"
               title={viewTitle}
             >
               {viewTitle}
