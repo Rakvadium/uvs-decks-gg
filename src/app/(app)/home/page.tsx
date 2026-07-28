@@ -117,7 +117,7 @@ function HomePage() {
   const greetingName = isAuthenticated ? username : "UniVersus";
 
   return (
-    <div className="relative flex min-h-0 flex-1 flex-col overflow-y-auto md:h-full" style={{ transform: "translateZ(0)" }}>
+    <div className="relative flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-y-contain [-webkit-overflow-scrolling:touch] md:h-full" style={{ transform: "translateZ(0)" }}>
       <div className="pointer-events-none absolute inset-0 overflow-hidden" style={{ opacity: "var(--chrome-page-hero-wash-opacity)" as unknown as number }}>
         <div className="absolute left-1/4 top-0 h-96 w-96 rounded-full bg-primary/5 blur-3xl" />
         <div className="absolute bottom-0 right-1/4 h-96 w-96 rounded-full bg-secondary/5 blur-3xl" />

@@ -6,7 +6,7 @@ import { SectionHeading } from "@/components/ui/typography-headings";
 
 export default function CollectionPageClient() {
   return (
-    <div className="flex min-h-0 flex-1 flex-col overflow-y-auto p-6 md:h-full">
+    <div className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-y-contain [-webkit-overflow-scrolling:touch] p-6 md:h-full">
       <Card className="border-2 border-dashed border-primary/30">
         <CardContent className="flex flex-col items-center justify-center py-16">
           <div
