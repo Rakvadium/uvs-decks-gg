@@ -65,6 +65,7 @@ import {
   FloatingPageBar,
   FloatingPageLayout,
 } from "@/components/shell/floating-page-bar";
+import { SettingsAuthRequiredState } from "./auth-required-state";
 
 const AVATAR_SYMBOLS = [
   { id: "fire", name: "Fire", path: "/universus/symbols/fire.png" },
@@ -251,18 +252,13 @@ export default function SettingsPageClient() {
   }, [username, imageUrl, user]);
 
   useEffect(() => {
-    if (user === null) {
-      router.push("/");
-    }
-  }, [user, router]);
-
-  useEffect(() => {
+    if (!user) return;
     if (typeof window === "undefined") return;
     if (window.location.hash !== "#appearance") return;
     queueMicrotask(() => {
       document.getElementById("appearance")?.scrollIntoView({ behavior: "smooth", block: "start" });
     });
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     if (!hasChanges) return;
@@ -300,11 +296,47 @@ export default function SettingsPageClient() {
     }
   };
 
-  if (user === undefined || user === null) {
+  if (user === undefined) {
     return (
       <div className="flex h-full items-center justify-center">
         <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
       </div>
+    );
+  }
+
+  if (user === null) {
+    return (
+      <FloatingPageLayout
+        bar={
+          <FloatingPageBar
+            left={
+              <>
+                <FloatingBackPill onClick={() => router.back()} label="Back" iconOnly />
+                <FloatingCapsuleCluster bodyClassName="px-4" glow>
+                  <h1 className="truncate text-sm font-semibold tracking-tight text-foreground">
+                    Settings
+                  </h1>
+                </FloatingCapsuleCluster>
+              </>
+            }
+          />
+        }
+      >
+        <div className="mx-auto w-full max-w-3xl">
+          <div className="mb-6 md:hidden">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => router.back()}
+              className="mb-4 gap-2 text-muted-foreground hover:text-foreground"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back
+            </Button>
+          </div>
+          <SettingsAuthRequiredState />
+        </div>
+      </FloatingPageLayout>
     );
   }
 
