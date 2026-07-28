@@ -76,7 +76,7 @@ export function CardDetailsV2({
   onVariantCreated,
 }: CardDetailsVariantProps) {
   const prefersReducedMotion = usePrefersReducedMotion();
-  const { isAuthenticated } = useConvexAuth();
+  const { isAuthenticated, isLoading: isAuthLoading } = useConvexAuth();
   const currentUser = useQuery(api.user.currentUser, isAuthenticated ? {} : "skip");
   const isAdmin = currentUser?.role === "Admin";
   const [variantOpen, setVariantOpen] = useState(false);
@@ -85,7 +85,7 @@ export function CardDetailsV2({
   const heroSizes = "(max-width: 768px) min(92vw, 340px), 340px";
   const { hasDeck } = useDeckEditor();
   const showDeckControlsBar = hasDeck && canAddCardToDeck(card);
-  const showGuestDeckAuth = !isAuthenticated;
+  const showGuestDeckAuth = !isAuthLoading && !isAuthenticated;
   const needsBottomChrome = showDeckControlsBar || showGuestDeckAuth || Boolean(isAdmin);
 
   return (
