@@ -22,7 +22,7 @@ export function GalleryGuestDeckAuthPrompt({
       )}
     >
       <div className="flex items-start gap-2">
-        <FolderKanban className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+        <FolderKanban aria-hidden className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
         <p className="min-w-0 text-xs leading-relaxed text-foreground/80">
           {compact
             ? "Sign in to build decks from the gallery: pick an active deck and add cards while you browse."
