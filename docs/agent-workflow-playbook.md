@@ -1,6 +1,6 @@
 # Agent workflow playbook
 
-Single entry point for stable, anti-drift agent work in this repo. Use this when testing hardened loops.
+Implement/verify ritual for hardened loops. **Operating system (tasks → routing → workflows):** [agent-os.md](./agent-os.md).
 
 **Skills (canonical):** `.agents/skills/` (mirrored in `.cursor/skills/`)  
 **Onboarding / login:** [agent-onboarding.md](./agent-onboarding.md)  
@@ -26,8 +26,10 @@ Other modes:
 | Convex/ops | `hardened-convex-ops` | Failures, schema/data, deploy health |
 | PR babysit | `hardened-pr-babysit` | Keep a PR merge-ready |
 | Queue worker | `backlog-worker` | Pull next `agent-ready` + `size/S` issue |
+| Create task | `create-task` | File one issue (no implementation) |
+| Review → queue | `scheduled-reviewer` | File review findings as issues only |
 
-Issue queue setup: [agent-issue-queue.md](./agent-issue-queue.md)
+OS / queue: [agent-os.md](./agent-os.md) · [agent-issue-queue.md](./agent-issue-queue.md)
 
 Never freestyle a parallel process. Same ritual → semi-predictable outcomes.
 
@@ -135,10 +137,14 @@ Do not merge unless I ask.
 
 ```text
 Use backlog-worker.
-Follow docs/agent-issue-queue.md and docs/agent-workflow-playbook.md.
+Follow docs/agent-os.md.
 Cap: 1 issue.
 Open a PR with Fixes #N when done (unless I say not to commit).
 ```
+
+### F) Create task / scheduled review
+
+See paste prompts in [agent-os.md](./agent-os.md).
 
 ---
 

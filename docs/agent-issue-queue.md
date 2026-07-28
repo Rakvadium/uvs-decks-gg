@@ -1,11 +1,12 @@
 # Agent issue queue
 
-How executable work is queued for `backlog-worker` and hardened loops.
+Label and lifecycle detail for the GitHub Issues queue.
 
+**OS (start here):** [agent-os.md](./agent-os.md)  
 **Ritual:** [agent-workflow-playbook.md](./agent-workflow-playbook.md)  
 **Template:** [.github/ISSUE_TEMPLATE/agent-task.yml](../.github/ISSUE_TEMPLATE/agent-task.yml)
 
-`docs/BACKLOG.md` remains a scratch/inbox. **GitHub Issues with labels are the claimable queue.**
+**GitHub Issues with labels are the only claimable queue.** `docs/BACKLOG.md` is legacy scratch — promote rows to issues; do not auto-claim from it.
 
 ---
 
@@ -73,9 +74,9 @@ If blocked: comment why, add `blocked` or `needs-human`, stop that item.
 
 ---
 
-## Promoting from BACKLOG.md
+## Promoting from BACKLOG.md (legacy)
 
 1. Pick an Open row from [BACKLOG.md](./BACKLOG.md).
-2. File an **Agent task** issue (template).
-3. Add `size/*` + `area/*`.
-4. Mark the backlog row Done or link the issue ID in the row.
+2. Use `create-task` or the **Agent task** issue template.
+3. Add `size/*` + `area/*` (+ readiness).
+4. Mark the backlog row Done and link `#<issue>`.

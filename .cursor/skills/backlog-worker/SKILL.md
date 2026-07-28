@@ -11,6 +11,7 @@ description: >-
 
 Canonical docs:
 
+- `docs/agent-os.md` — tasks, routing, workflows
 - `docs/agent-issue-queue.md` — labels, filter, lifecycle
 - `docs/agent-workflow-playbook.md` — coding ritual
 
@@ -25,7 +26,7 @@ is:issue is:open label:agent-ready label:size/S -label:blocked -label:needs-huma
 
 - Oldest first (`created` ascending).
 - Never auto-claim `size/M`, `size/L`, `needs-human`, or `blocked`.
-- Prefer GitHub Issues over `docs/BACKLOG.md`. If no matching issues, report empty queue; only fall back to BACKLOG.md if the user explicitly allows it.
+- GitHub Issues only. If no matching issues, report empty queue. Do not read `docs/BACKLOG.md` unless the user explicitly allows legacy fallback.
 
 ## Loop
 
@@ -74,7 +75,7 @@ If claim fails (label race), pick the next issue.
 
 ```text
 Use backlog-worker.
-Follow docs/agent-issue-queue.md and docs/agent-workflow-playbook.md.
+Follow docs/agent-os.md.
 Cap: 1 issue.
 Open a PR with Fixes #N when the task is done (unless I say not to commit).
 ```

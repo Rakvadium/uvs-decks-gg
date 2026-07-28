@@ -2,7 +2,8 @@
 
 Read this before editing application code in **`src/`** or **`convex/`**.
 
-**Converged workflow + test prompts:** [agent-workflow-playbook.md](./agent-workflow-playbook.md)
+**Agent OS (tasks → workflows):** [agent-os.md](./agent-os.md)  
+**Implement ritual:** [agent-workflow-playbook.md](./agent-workflow-playbook.md)
 
 ## 0. Investigate first (mandatory)
 
@@ -55,7 +56,7 @@ After UI edits, run **`ui-ux-adversary`** and clear must-fix findings before cla
 - Prefer **Bun** for installs and scripts (`bun install`, `bun run lint`, `bun run build`). See stack notes in [SYSTEM_ANALYSIS.md](./SYSTEM_ANALYSIS.md) / docs hub.
 - Follow [AGENTS.md](../AGENTS.md) for Cursor skills.
 - Preferred closed loops: `hardened-coding`, `hardened-convex-ops`, `hardened-pr-babysit`.
-- Issue queue / auto-claim: [agent-issue-queue.md](./agent-issue-queue.md) + `backlog-worker`.
+- Tasks / routing / workflows: [agent-os.md](./agent-os.md) (`create-task`, `backlog-worker`, `scheduled-reviewer`).
 
 ## 4. Verification
 
