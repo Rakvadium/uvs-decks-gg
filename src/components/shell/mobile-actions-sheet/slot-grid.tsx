@@ -6,6 +6,7 @@ import { useMobileActionsSheetContext } from "./context";
 const SLOT_DESCRIPTIONS: Record<string, string> = {
   "active-deck": "Adjust your current build and section counts.",
   decks: "Browse your deck library and switch active deck.",
+  "gallery-guest-decks": "Sign in to pick a deck and add cards from the gallery.",
 };
 
 export function MobileActionsSlotGrid() {

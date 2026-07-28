@@ -7,6 +7,7 @@ import { Hexagon, RotateCcw, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DialogClose } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
+import { GalleryGuestDeckAuthPrompt } from "@/components/gallery/gallery-guest-deck-auth-prompt";
 import { canAddCardToDeck, useDeckEditor } from "@/lib/deck";
 import { usePrefersReducedMotion } from "@/lib/reduced-motion";
 import { api } from "../../../../../convex/_generated/api";
@@ -75,7 +76,7 @@ export function CardDetailsV2({
   onVariantCreated,
 }: CardDetailsVariantProps) {
   const prefersReducedMotion = usePrefersReducedMotion();
-  const { isAuthenticated } = useConvexAuth();
+  const { isAuthenticated, isLoading: isAuthLoading } = useConvexAuth();
   const currentUser = useQuery(api.user.currentUser, isAuthenticated ? {} : "skip");
   const isAdmin = currentUser?.role === "Admin";
   const [variantOpen, setVariantOpen] = useState(false);
@@ -84,7 +85,8 @@ export function CardDetailsV2({
   const heroSizes = "(max-width: 768px) min(92vw, 340px), 340px";
   const { hasDeck } = useDeckEditor();
   const showDeckControlsBar = hasDeck && canAddCardToDeck(card);
-  const needsBottomChrome = showDeckControlsBar || Boolean(isAdmin);
+  const showGuestDeckAuth = !isAuthLoading && !isAuthenticated;
+  const needsBottomChrome = showDeckControlsBar || showGuestDeckAuth || Boolean(isAdmin);
 
   return (
     <CardDetailsContentProvider card={displayCard}>
@@ -242,12 +244,19 @@ export function CardDetailsV2({
               )}
             >
               <CardDetailsReadoutPanel />
+              {showGuestDeckAuth ? (
+                <div className="px-4 pb-4 pt-1 md:px-5">
+                  <GalleryGuestDeckAuthPrompt compact />
+                </div>
+              ) : null}
             </CardDetailsReadoutSurface>
-            <DeckSectionControls
-              key={card._id}
-              card={card}
-              layout="detailsBar"
-            />
+            {showGuestDeckAuth ? null : (
+              <DeckSectionControls
+                key={card._id}
+                card={card}
+                layout="detailsBar"
+              />
+            )}
             <CardDetailsAdminJsonControls
               card={displayCard}
               enabled={Boolean(isAdmin)}
