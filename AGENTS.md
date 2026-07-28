@@ -2,24 +2,30 @@ Before implementing code, check whether any available skills apply. If one appli
 
 ## Start here
 
-**[docs/agent-workflow-playbook.md](docs/agent-workflow-playbook.md)** — converged ritual, paste prompts, visual verify, doc gaps.
+**[docs/agent-os.md](docs/agent-os.md)** — tasks, routing, workflows, triggers (the operating system).
+
+Supporting detail:
+
+- Queue/labels: [docs/agent-issue-queue.md](docs/agent-issue-queue.md)
+- Implement ritual: [docs/agent-workflow-playbook.md](docs/agent-workflow-playbook.md)
+- Onboarding/login: [docs/agent-onboarding.md](docs/agent-onboarding.md)
 
 ## Required gate
 
-For any non-trivial change to `src/` or `convex/`, start with **`project-context-gate`**. Do not edit until a Context Brief exists (docs read, code neighbors, UI placement + visual verify plan when UI is touched).
+For any non-trivial change to `src/` or `convex/`, start with **`project-context-gate`**. Do not edit until a Context Brief exists.
 
 ## Workflow skills
 
-| Skill | Use when |
+| Skill | Purpose |
 | --- | --- |
-| `project-context-gate` | Before coding; prevents pattern/UI drift |
-| `hardened-coding` | Feature/bugfix closed loop (+ visual before/after for UI) |
-| `hardened-convex-ops` | Convex/logs/schema/data diagnosis loop |
+| `create-task` | File one GitHub issue (no implementation) |
+| `scheduled-reviewer` | Review UI/code; file issues only |
+| `project-context-gate` | Investigate-first Context Brief |
+| `hardened-coding` | Implement + verify (+ visual/UI adversary) |
+| `hardened-convex-ops` | Convex/ops diagnosis loop |
+| `ui-ux-adversary` | Nit-picky UI review + image compare |
 | `hardened-pr-babysit` | Keep a PR merge-ready |
-| `ui-ux-adversary` | After UI changes; nit-picky review + image compare |
-| `backlog-worker` | Claim next `agent-ready` + `size/S` GitHub issue and run the ritual |
-
-Issue queue: [docs/agent-issue-queue.md](docs/agent-issue-queue.md)
+| `backlog-worker` | Claim next `agent-ready` + `size/S` and run the right workflow |
 
 ## Implementation skills
 
@@ -33,8 +39,6 @@ Use ShadCN and MagicUI for styling/components when possible.
 ## Docs
 
 - Hub: [docs/README.md](docs/README.md)
-- Workflow playbook: [docs/agent-workflow-playbook.md](docs/agent-workflow-playbook.md)
-- Agent onboarding: [docs/agent-onboarding.md](docs/agent-onboarding.md)
 - UI modules: [docs/component-architecture-playbook.md](docs/component-architecture-playbook.md)
-- UI tokens/patterns: [docs/UI_UX_DESIGN.md](docs/UI_UX_DESIGN.md)
-- Header/action placement: [docs/floating-header-islands.md](docs/floating-header-islands.md)
+- UI tokens: [docs/UI_UX_DESIGN.md](docs/UI_UX_DESIGN.md)
+- Header placement: [docs/floating-header-islands.md](docs/floating-header-islands.md)

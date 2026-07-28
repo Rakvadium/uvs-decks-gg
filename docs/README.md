@@ -6,7 +6,7 @@
 
 **UI structure:** [component-architecture-playbook.md](./component-architecture-playbook.md)
 
-**Agents:** [agent-workflow-playbook.md](./agent-workflow-playbook.md) (start here) · [agent-issue-queue.md](./agent-issue-queue.md) · [agent-onboarding.md](./agent-onboarding.md) · [`AGENTS.md`](../AGENTS.md)
+**Agents:** [agent-os.md](./agent-os.md) (start here) · [agent-workflow-playbook.md](./agent-workflow-playbook.md) · [agent-issue-queue.md](./agent-issue-queue.md) · [agent-onboarding.md](./agent-onboarding.md) · [`AGENTS.md`](../AGENTS.md)
 
 ---
 
@@ -41,8 +41,9 @@ Missing / planned feature docs (see [agent-workflow-playbook.md](./agent-workflo
 | -------------------------------------------------------- | ----------------------------------------- |
 | [BACKLOG.md](./BACKLOG.md)                               | Queued work                               |
 | [CHANGELOG.md](./CHANGELOG.md)                           | Release-facing history                    |
+| [agent-os.md](./agent-os.md)                             | Tasks, routing, workflows, triggers (start here) |
 | [agent-workflow-playbook.md](./agent-workflow-playbook.md) | Hardened loops, visual verify, test prompts, doc gaps |
-| [agent-issue-queue.md](./agent-issue-queue.md)           | GitHub issue labels, template, backlog-worker queue |
+| [agent-issue-queue.md](./agent-issue-queue.md)           | GitHub issue labels, template, claim filter |
 | [agent-onboarding.md](./agent-onboarding.md)             | Coding-agent setup and local browser login |
 
 

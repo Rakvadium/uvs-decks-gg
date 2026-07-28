@@ -1,20 +1,12 @@
-# Backlog — tcg-decks
+# Backlog — tcg-decks (legacy scratch)
 
-Use this list when **no specific task** was assigned. Work from **top to bottom** within each priority band unless an item requires skills or context you do not have—then take the next suitable item.
+**Live queue = GitHub Issues.** See [agent-os.md](./agent-os.md) and [agent-issue-queue.md](./agent-issue-queue.md).
 
-**Workflow**
+Do not auto-claim work from this file. Promote Open rows to **Agent task** issues (`create-task` or the GitHub template), then mark the row Done with `#<issue>`.
 
-1. Pick one **Open** item.
-2. Mark it **In progress** (and optionally add your id or date in parentheses).
-3. When done, mark **Done** and record a summary in [CHANGELOG.md](./CHANGELOG.md) or the PR description.
-4. If you split work, add new backlog rows for the remainder.
-5. When the active list gets noisy, move **Done** rows to [_noLongerNeeded/docs/archive/backlog-completed.md](../_noLongerNeeded/docs/archive/backlog-completed.md).
+Historical workflow (human scratch only): Open → In progress → Done; archive noise to [_noLongerNeeded/docs/archive/backlog-completed.md](../_noLongerNeeded/docs/archive/backlog-completed.md).
 
-Statuses: `Open` | `In progress` | `Blocked` | `Done`
-
-**Coding agents:** Read [agent-onboarding.md](./agent-onboarding.md) before implementation.
-
-**Architecture:** Non-trivial UI must follow [component-architecture-playbook.md](./component-architecture-playbook.md).
+**Coding agents:** [agent-os.md](./agent-os.md) · [agent-onboarding.md](./agent-onboarding.md) · [component-architecture-playbook.md](./component-architecture-playbook.md).
 
 ---
 

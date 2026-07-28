@@ -1,7 +1,7 @@
 "use client";
 
 import { memo, useEffect, useState } from "react";
-import { Layers, LayoutGrid, ArrowRight, Hexagon, Users, Zap, Database, Activity, ChevronRight } from "lucide-react";
+import { Layers, LayoutGrid, ArrowRight, Hexagon, Users, Zap, Database, Activity, ChevronRight, Clapperboard } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "convex/react";
@@ -174,6 +174,13 @@ function HomePage() {
                 </Button>
               </>
             ) : null}
+            <div className="h-4 w-px bg-border" />
+            <Button variant="outline" size="sm" asChild>
+              <Link href="/tour">
+                <Clapperboard className="h-4 w-4" />
+                Watch Tour
+              </Link>
+            </Button>
           </div>
         </m.div>
 
