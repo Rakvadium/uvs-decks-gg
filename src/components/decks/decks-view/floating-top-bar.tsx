@@ -1,6 +1,7 @@
 "use client";
 
 import { Plus } from "lucide-react";
+import { useAuthDialog } from "@/components/auth/auth-dialog";
 import {
   FloatingActionPill,
   FloatingPageBar,
@@ -12,6 +13,7 @@ import { TABS } from "./constants";
 
 export function DecksFloatingTopBar() {
   const context = useDecksOptional();
+  const { openAuthDialog } = useAuthDialog();
   if (!context) return null;
 
   const {
@@ -21,6 +23,14 @@ export function DecksFloatingTopBar() {
   } = context;
 
   const visibleTabs = TABS.filter((tab) => (tab.id === "my-decks" ? isAuthenticated : true));
+
+  const handleNewDeck = () => {
+    if (!isAuthenticated) {
+      openAuthDialog();
+      return;
+    }
+    actions.openCreateDialog();
+  };
 
   return (
     <FloatingPageBar
@@ -46,12 +56,10 @@ export function DecksFloatingTopBar() {
         />
       }
       right={
-        isAuthenticated ? (
-          <FloatingActionPill onClick={actions.openCreateDialog}>
-            <Plus className="h-3.5 w-3.5" />
-            <span className="text-xs">New Deck</span>
-          </FloatingActionPill>
-        ) : null
+        <FloatingActionPill onClick={handleNewDeck}>
+          <Plus className="h-3.5 w-3.5" />
+          <span className="text-xs">New Deck</span>
+        </FloatingActionPill>
       }
     />
   );
