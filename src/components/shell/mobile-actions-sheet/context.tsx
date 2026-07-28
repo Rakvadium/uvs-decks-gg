@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useCallback, useContext, useMemo, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, type ReactNode } from "react";
 import { useMobileShell } from "../mobile-shell-context";
 import {
   useShellSlotActions,
@@ -46,6 +46,15 @@ export function MobileActionsSheetProvider({ children }: { children: ReactNode }
     setActionsSheetOpen(true);
   }, [setActionsSheetOpen]);
 
+  useEffect(() => {
+    if (!isActionsSheetOpen || activeActionId || sidebarSlots.length !== 1) {
+      return;
+    }
+    const onlySlot = sidebarSlots[0];
+    if (!onlySlot) return;
+    setActiveSidebarAction(onlySlot.id);
+  }, [activeActionId, isActionsSheetOpen, setActiveSidebarAction, sidebarSlots]);
+
   const handleOpenChange = useCallback(
     (open: boolean) => {
       if (!open) {
@@ -59,9 +68,14 @@ export function MobileActionsSheetProvider({ children }: { children: ReactNode }
   );
 
   const handleBack = useCallback(() => {
+    if (sidebarSlots.length <= 1) {
+      setActiveSidebarAction(null);
+      closeSheet();
+      return;
+    }
     setActiveSidebarAction(null);
     openSheet();
-  }, [setActiveSidebarAction, openSheet]);
+  }, [closeSheet, openSheet, setActiveSidebarAction, sidebarSlots.length]);
 
   const selectSlot = useCallback(
     (id: string) => {
