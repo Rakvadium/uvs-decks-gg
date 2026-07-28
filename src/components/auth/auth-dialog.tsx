@@ -51,7 +51,7 @@ export function AuthDialogProvider({ children }: AuthDialogProviderProps) {
 
   const handleSuccess = useCallback(() => {
     setIsOpen(false);
-    if (pathname === "/") {
+    if (pathname === "/" || pathname === "/sign-in" || pathname === "/sign-up") {
       router.push("/home");
     }
   }, [pathname, router]);
