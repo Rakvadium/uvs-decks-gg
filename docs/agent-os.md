@@ -44,8 +44,8 @@ Both use the same issue shape and labels. Reviewer defaults to `needs-human` unl
 | `agent-ready` | Safe to auto-claim / run worker |
 | `needs-human` | Ambiguous — do not auto-implement |
 | `blocked` | Waiting on dependency/decision |
-| `size/S` | Auto-claim OK |
-| `size/M` / `size/L` | Human-started unless you override |
+| `size/S` / `size/M` | Auto-claim OK |
+| `size/L` | Human-started unless you override |
 | `area/*` | Routes to a workflow family |
 
 Lifecycle: create → label → claim → PR (`Fixes #N`) → human merge → close.  
