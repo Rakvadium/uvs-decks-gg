@@ -60,6 +60,7 @@ The floating bar is desktop-only (`hidden md:block` inside `FloatingPageLayout`)
 | Team hub | Team identity pill + tabs (News … Calendar) | — | Section primary (Create Announcement / Invite member / Create Calendar Item) |
 | Teams decks index | Title pill | — | — |
 | Settings | Back + title pill | — | — |
+| Collection | Title pill | — | — |
 
 ## Adding a new page
 
