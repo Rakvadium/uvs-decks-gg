@@ -55,8 +55,9 @@ flowchart LR
 
 1. **Gallery and search** — Client subscribes to Convex queries; card search uses Convex search indexes on derived fields such as `searchName`, `searchText`, `searchAll`.
 2. **Deck build** — Deck documents store ordered card ids, quantities, layout metadata, and format fields; mutations persist edits; public decks are readable under index rules. Format validation uses `setLegality` (`rotatesOutAt` vs `Date.now()` in `convex/formats.ts`) and `cardLegality` (bans/restrictions honor `effectiveDate` in `convex/deckValidation.ts`). Admin: `/admin/formats/[key]` tabs; note [legality-dates.md](./implementation/notes/legality-dates.md).
-3. **Collection** — Per-user rows keyed by user and card with quantity and optional condition/foil.
-4. **Tier lists and rankings** — Tier list documents hold tier definitions and metadata; items assign cards to lanes; scheduled or triggered jobs compute community rankings and snapshots (details in [community-tier-list-system.md](./community-tier-list-system.md)).
+3. **Collection** (planned) — Schema and Convex APIs exist for per-user card quantities; `/collection` currently renders a coming-soon placeholder rather than the full ownership UI.
+4. **Tier lists and rankings** — Tier list documents hold tier definitions and metadata; items assign cards to lanes; scheduled or triggered jobs compute community rankings and snapshots (details in [features/community/TierListSystem.md](./features/community/TierListSystem.md)).
+5. **Teams** — Membership, invites, hub surfaces, and team-scoped decks (see [teams-feature-implementation.md](./teams-feature-implementation.md)).
 
 ## Cross-cutting concerns
 

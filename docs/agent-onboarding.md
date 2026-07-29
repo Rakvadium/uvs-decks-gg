@@ -29,7 +29,7 @@ If placement or pattern is still ambiguous, ask — do not invent a new spot for
 | 5 | [floating-header-islands.md](./floating-header-islands.md) | Where page actions/search/tabs belong |
 | 6 | [theme-and-chrome.md](./theme-and-chrome.md) | Theme/chrome axes and tokens |
 
-If you touch community rankings or tier lists, prefer code neighbors under `src/components/community/` — the dedicated community doc is currently missing (see [agent-workflow-playbook.md](./agent-workflow-playbook.md) gaps).
+If you touch community rankings or tier lists, read [features/community/TierListSystem.md](./features/community/TierListSystem.md) and prefer code neighbors under `src/components/community/`.
 
 Feature-specific docs are listed in [README.md](./README.md).
 

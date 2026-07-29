@@ -46,7 +46,7 @@ For each fix batch:
 ## Rules
 
 - Never edit CI workflows only to force green.
-- Sync with base before treating possibly-unrelated failures as PR bugs.
+- Sync with base **`dev`** before treating possibly-unrelated failures as PR bugs (`gh pr view --json baseRefName`; retarget with `gh pr edit <pr> --base dev` if aimed at `master`/`main`).
 - Validate Bugbot; dispute with evidence when wrong.
 - If conflict intents collide, stop and ask.
 - Max ~5 push/recheck cycles, then report blockers.
