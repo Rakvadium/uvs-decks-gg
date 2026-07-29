@@ -24,7 +24,8 @@ For any non-trivial change to `src/` or `convex/`, start with **`project-context
 | `hardened-coding` | Implement + verify (+ visual/UI adversary) |
 | `hardened-convex-ops` | Convex/ops diagnosis loop |
 | `ui-ux-adversary` | Nit-picky UI review + image compare |
-| `hardened-pr-babysit` | Keep a PR merge-ready |
+| `hardened-pr-babysit` | Keep a PR merge-ready (CI/conflicts/comments) |
+| `pr-issue-verify` | Verify a PR completes its linked issue’s Done when |
 | `backlog-worker` | Claim next `agent-ready` + `size/S` and run the right workflow |
 
 ## Implementation skills
