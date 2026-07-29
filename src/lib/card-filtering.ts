@@ -1,5 +1,6 @@
 import { Doc } from "../../convex/_generated/dataModel";
 import type { CardFilters } from "@/providers/UIStateProvider";
+import { cardMatchesRarityFilter } from "@/lib/universus/rarity";
 
 type Card = Doc<"cards">;
 
@@ -40,7 +41,7 @@ export function filterCardsBySearch(cards: Card[], search?: string): Card[] {
 
 export function filterCardsByRarity(cards: Card[], rarities?: string[]): Card[] {
     if (!rarities || rarities.length === 0) return cards;
-    return cards.filter((card) => card.rarity && rarities.includes(card.rarity));
+    return cards.filter((card) => cardMatchesRarityFilter(card.rarity, rarities));
 }
 
 export function filterCardsByType(cards: Card[], types?: string[]): Card[] {
