@@ -18,14 +18,9 @@ Canonical docs:
 ## Default policy
 
 - Claim **one** issue per invocation unless the user sets a higher cap (max **3**).
-- Auto-claim filter only:
-
-```text
-is:issue is:open label:agent-ready label:size/S -label:blocked -label:needs-human
-```
-
-- Oldest first (`created` ascending).
-- Never auto-claim `size/M`, `size/L`, `needs-human`, or `blocked`.
+- Auto-claim: open + `agent-ready` + (`size/S` or `size/M`) + not `blocked` + not `needs-human`.
+- Oldest first (`created` ascending); prefer `size/S` before `size/M` when both exist.
+- Never auto-claim `size/L`, `needs-human`, or `blocked`.
 - GitHub Issues only. If no matching issues, report empty queue. Do not read `docs/BACKLOG.md` unless the user explicitly allows legacy fallback.
 
 ## Loop
@@ -35,10 +30,10 @@ For each claim (up to cap):
 1. **List & pick**
 
 ```bash
-gh issue list --state open --label "agent-ready,size/S" --json number,title,labels,createdAt,body --limit 50
+gh issue list --state open --label "agent-ready" --json number,title,labels,createdAt,body --limit 50
 ```
 
-Filter out issues that also have `blocked` or `needs-human`. Sort by `createdAt` ascending. Take the first.
+Keep only issues that have `size/S` or `size/M`, and exclude any with `blocked`, `needs-human`, or `size/L`. Sort by size (S before M), then `createdAt` ascending. Take the first.
 
 2. **Claim**
 
@@ -62,7 +57,7 @@ If claim fails (label race), pick the next issue.
 
 5. **Finish the ticket**
 
-- If the user asked for a PR / cloud-style completion: open a PR on branch `agent/<n>-short-slug` with `Fixes #<n>` in the body. Do not merge unless asked.
+- If the user asked for a PR / cloud-style completion: open a PR from branch `agent/<n>-short-slug` **into `dev`** (base=`dev`, never `master`/`main`) with `Fixes #<n>` in the body. Example: `gh pr create --base dev --head agent/<n>-short-slug --title "..." --body "Fixes #<n>\n\n..."`. Do not merge unless asked.
 - If the user forbade commits/PRs: stop after local verify and summarize; leave a comment on the issue with status and that a PR is still needed.
 - If blocked: comment why, add `blocked` or `needs-human`, do not force the task.
 
@@ -77,13 +72,14 @@ If claim fails (label race), pick the next issue.
 Use backlog-worker.
 Follow docs/agent-os.md.
 Cap: 1 issue.
-Open a PR with Fixes #N when the task is done (unless I say not to commit).
+Open a PR into base `dev` (not master/main) with Fixes #N when the task is done (unless I say not to commit).
 ```
 
 ## Forbidden
 
 - Inventing tasks when the queue is empty
 - Claiming multiple issues into one PR
+- Opening PRs against `master` or `main` (always target `dev`)
 - Stripping `needs-human` to force work
 - Skipping Context Brief / UI adversary for UI issues
 - Merging PRs unless explicitly asked

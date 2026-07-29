@@ -139,7 +139,7 @@ Do not merge unless I ask.
 Use backlog-worker.
 Follow docs/agent-os.md.
 Cap: 1 issue.
-Open a PR with Fixes #N when done (unless I say not to commit).
+Open a PR into base `dev` (not master/main) with Fixes #N when done (unless I say not to commit).
 ```
 
 ### F) Create task / scheduled review
@@ -176,7 +176,7 @@ Noted while converging this playbook. Not blockers for starting loop tests; fill
 
 | Gap | Why it matters | Suggested artifact |
 | --- | --- | --- |
-| Broken links in [README.md](./README.md) | Agents may chase missing files | Restore or remove: `card-data-hooks.md`, `community-tier-list-system.md`, `content-moderation-and-language-filter.md`, `CODE_REVIEW_2026-07-23.md` |
+| Broken links in [README.md](./README.md) | Agents may chase missing files | Restore or remove remaining gaps: `card-data-hooks.md`, `content-moderation-and-language-filter.md`, `CODE_REVIEW_2026-07-23.md` (tier lists restored at [features/community/TierListSystem.md](./features/community/TierListSystem.md)) |
 | No gallery / deck-editor UX deep-dive | Highest-churn UI; placement inventory helps but interaction patterns live only in code | `docs/gallery-and-deck-editor-ux.md` (controls, sidebars, symbol/character pickers) |
 | No aesthetic “do not drift” examples | Vision doc is principles-only; agents lack visual do/don’t | Short section in `UI_UX_DESIGN.md` or `PRODUCT_VISION.md` with 3–5 anti-patterns |
 | No golden Context Brief example | Agents improvise brief quality | `docs/examples/context-brief.example.md` from a real task |

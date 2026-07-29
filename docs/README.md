@@ -28,10 +28,11 @@
 
 | Doc                                                                                          | Role                                 |
 | -------------------------------------------------------------------------------------------- | ------------------------------------ |
+| [features/community/TierListSystem.md](./features/community/TierListSystem.md)               | Tier lists, ranked scopes, rankings  |
 | [teams-feature-implementation.md](./teams-feature-implementation.md)                         | Teams permissions and flows          |
 | [implementation/notes/legality-dates.md](./implementation/notes/legality-dates.md)           | Format legality date semantics       |
 
-Missing / planned feature docs (see [agent-workflow-playbook.md](./agent-workflow-playbook.md) § Documentation gaps): `community-tier-list-system.md`, `card-data-hooks.md`, `content-moderation-and-language-filter.md`.
+Missing / planned feature docs (see [agent-workflow-playbook.md](./agent-workflow-playbook.md) § Documentation gaps): `card-data-hooks.md`, `content-moderation-and-language-filter.md`.
 
 
 ## Process

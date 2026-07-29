@@ -35,7 +35,7 @@ Template: [.github/ISSUE_TEMPLATE/agent-task.yml](../.github/ISSUE_TEMPLATE/agen
 | `create-task` | Turn a description / finding into one well-formed issue |
 | `scheduled-reviewer` | Review UI/code on a cadence; **only** file issues (no implementation) |
 
-Both use the same issue shape and labels. Reviewer defaults to `needs-human` unless the finding is tiny and unambiguous (`agent-ready` + `size/S`).
+Both use the same issue shape and labels. Readiness: `size/S` and `size/M` → `agent-ready` when clear; `size/L` → `needs-human`.
 
 ### Manage
 
@@ -48,8 +48,10 @@ Both use the same issue shape and labels. Reviewer defaults to `needs-human` unl
 | `size/L` | Human-started unless you override |
 | `area/*` | Routes to a workflow family |
 
-Lifecycle: create → label → claim → PR (`Fixes #N`) → human merge → close.  
-One issue → one PR. Branch: `agent/<n>-short-slug`.
+Lifecycle: create → label → claim → PR into **`dev`** (`Fixes #N`) → human merge → close.  
+One issue → one PR. Head: `agent/<n>-short-slug`. Base: always **`dev`** (never `master`/`main`).
+
+**Branch model:** `dev` is the integration branch for agent/feature PRs. `master` stays the production/default branch; promote `dev` → `master` separately (human).
 
 ---
 
@@ -71,7 +73,7 @@ Or for Convex ops / PR babysit / UI adversary — use the skill names in the tab
 **Claim filter** (what `backlog-worker` pulls):
 
 ```text
-is:issue is:open label:agent-ready label:size/S -label:blocked -label:needs-human
+is:issue is:open label:agent-ready (size/S OR size/M) -label:blocked -label:needs-human
 ```
 
 **Area → workflow** (after claim or when you delegate):
@@ -126,7 +128,7 @@ Shared laws (full text in playbook): neighbors beat novelty; header slots fixed;
 ```text
 Use create-task.
 Turn this into one GitHub Agent-task issue with correct labels.
-Default readiness: needs-human unless it is clearly size/S and unambiguous — then agent-ready.
+Readiness: size/S or size/M → agent-ready; size/L → needs-human.
 ```
 
 ### Run scheduled review (also for Cursor Automations)
@@ -146,7 +148,7 @@ Label needs-human by default; agent-ready+size/S only for trivial unambiguous fi
 ```text
 Follow docs/agent-os.md.
 Use the workflow for issue #<n> based on its area/* labels.
-Open a PR with Fixes #<n> when done (unless I say not to commit).
+Open a PR into base `dev` (not master/main) with Fixes #<n> when done (unless I say not to commit).
 ```
 
 ### Drain ready queue
@@ -155,7 +157,7 @@ Open a PR with Fixes #<n> when done (unless I say not to commit).
 Use backlog-worker.
 Follow docs/agent-os.md.
 Cap: 1 issue.
-Open a PR with Fixes #N when done.
+Open a PR into base `dev` (not master/main) with Fixes #N when done.
 ```
 
 ### Verify PR completes the issue (Automations: PR opened / pushed)
@@ -165,6 +167,7 @@ Use pr-issue-verify.
 Follow docs/agent-os.md.
 PR: from event context.
 Resolve linked issue via Fixes/Closes #N in the PR body.
+Confirm base branch is `dev` (wrong base = blocker).
 For each Done when item: pass/fail with evidence (UI: repro + screenshot/recording with correct auth/viewport).
 Post an "Issue completion review" comment on the PR with verdict: fixes issue | partial | does not fix.
 Do not merge.
@@ -179,7 +182,7 @@ Model policy: single-agent when possible; sub-agents only if needed and must use
 1. Open [cursor.com/automations](https://cursor.com/automations)
 2. **Weekly UI review:** schedule + repo + scheduled-reviewer prompt (scope: rotate UI surfaces)
 3. **Biweekly code/convex review:** same with scope convex/structure
-4. Optionally a separate automation: “run backlog-worker cap 1” only if you want unattended implementation of `agent-ready`+`size/S` (keep human merge)
+4. Optionally a separate automation: “run backlog-worker cap 1” only if you want unattended implementation of `agent-ready`+`size/S|M` (keep human merge)
 5. **PR issue verify:** trigger Pull request opened + Pull request pushed → `pr-issue-verify` prompt above; enable Comment on PR + computer use for UI
 
 ---

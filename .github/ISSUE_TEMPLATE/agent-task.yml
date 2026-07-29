@@ -6,8 +6,12 @@ body:
   - type: markdown
     attributes:
       value: |
-        Write this so an agent can execute without a meeting. After submit, add labels:
-        `size/S` (or M/L) and one `area/*` (see docs/agent-issue-queue.md).
+        Write this so an agent can execute without a meeting.
+
+        **Required after submit:** add GitHub sidebar labels `size/S|M|L` and one `area/*`
+        (and `needs-human` or `agent-ready`). The Size/Area dropdowns below are for humans
+        writing the form — they do **not** apply labels automatically. Agents must use
+        `gh issue create --label` (see `create-task` skill / docs/agent-issue-queue.md).
   - type: textarea
     id: goal
     attributes:
@@ -74,11 +78,11 @@ body:
   - type: checkboxes
     id: agent-ready-confirm
     attributes:
-      label: Agent-ready checklist
+      label: Label checklist (after create)
       options:
         - label: Done when is testable without product invention
           required: true
-        - label: Placement/IA is unambiguous (or marked needs-human instead of agent-ready)
+        - label: I will add size/* and area/* GitHub labels after creating this issue
           required: true
-        - label: I will add size/* and area/* labels after creating this issue
+        - label: Readiness label — size/S or size/M → agent-ready; size/L → needs-human (use needs-human if still ambiguous)
           required: true

@@ -28,6 +28,8 @@ gh pr view <pr> --json number,title,body,baseRefName,headRefName,files,commits,s
 gh pr diff <pr>
 ```
 
+**Base branch:** agent PRs must target `dev`. If `baseRefName` is `master` or `main`, verdict cannot be `fixes issue` until retargeted — note as blocker (`gh pr edit <pr> --base dev`).
+
 Resolve issue number from body. Then:
 
 ```bash
@@ -70,6 +72,7 @@ Parse Goal, Done when, Context, Out of scope (and auth/viewport notes if present
 - [x] or [ ] <item> — evidence: ...
 
 ### Scope
+- Base branch: `dev` | wrong (`master`/`main`) — ...
 - In scope: ...
 - Out of scope / drive-by: ...
 
@@ -91,6 +94,7 @@ Use pr-issue-verify.
 Follow docs/agent-os.md.
 PR: from event context (or #<pr>).
 Resolve linked issue via Fixes/Closes #N.
+Confirm base branch is `dev` (flag master/main as blocker).
 Post the Issue completion review comment on the PR.
 Do not merge.
 Do not implement unless the PR only needs a trivial gap fix and you state what you changed.
@@ -102,5 +106,6 @@ Model policy: prefer single-agent work; if sub-agents are required use composer-
 
 - Merging without explicit ask
 - Approving “fixes issue” without evidence per Done when item
+- Ignoring wrong base branch (`master`/`main` instead of `dev`)
 - Ignoring Out of scope drive-by changes
 - Filing a new issue instead of reviewing (unless you discover a separate bug — then use create-task and still complete this review)

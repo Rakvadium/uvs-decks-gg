@@ -93,4 +93,4 @@ Default frosted chrome: `backdrop-blur-sm`. Use `backdrop-blur-md` / `xl` only f
 
 - [PRODUCT_VISION.md](./PRODUCT_VISION.md)
 - [floating-header-islands.md](./floating-header-islands.md) for page header slot semantics
-- [community-tier-list-system.md](./community-tier-list-system.md) for community-specific UX rules
+- [features/community/TierListSystem.md](./features/community/TierListSystem.md) for community-specific UX rules

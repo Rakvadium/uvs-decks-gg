@@ -33,15 +33,25 @@ Ignore errors if a label already exists.
 
 ## Queue filter (what workers pull)
 
-Default auto-claim query:
+Default auto-claim:
 
 ```text
-is:issue is:open label:agent-ready label:size/S -label:blocked -label:needs-human
+is:issue is:open label:agent-ready (label:size/S OR label:size/M) -label:blocked -label:needs-human
 ```
 
-Sort: oldest first.
+Sort: `size/S` before `size/M`, then oldest first.
 
-Do **not** auto-claim `size/M` / `size/L` unless a human explicitly says so.
+Do **not** auto-claim `size/L` (those stay `needs-human` until a human breaks them down or explicitly delegates).
+
+## Readiness by size
+
+| Size | Default readiness |
+| --- | --- |
+| `size/S` | `agent-ready` |
+| `size/M` | `agent-ready` |
+| `size/L` | `needs-human` |
+
+If an S/M issue is still ambiguous, use `needs-human` instead of guessing.
 
 ---
 
@@ -56,9 +66,9 @@ backlog-worker claims
   → comment "Claimed by agent"
   → remove agent-ready (optional) or leave and rely on assignee/In progress comment
   → implement via playbook
-  → open PR with Fixes #N
+  → open PR into **`dev`** with Fixes #N
 
-Human reviews / merges
+Human reviews / merges into `dev`
   → close issue
 ```
 
@@ -68,8 +78,10 @@ If blocked: comment why, add `blocked` or `needs-human`, stop that item.
 
 ## One issue → one PR
 
-- Branch: `agent/<issue-number>-short-slug`
+- Head branch: `agent/<issue-number>-short-slug`
+- Base branch: always **`dev`** (never `master` / `main`)
 - PR body references `Fixes #<issue-number>`
+- Example: `gh pr create --base dev --title "..." --body "Fixes #N\n\n..."`
 - Do not batch unrelated issues into one PR
 
 ---
