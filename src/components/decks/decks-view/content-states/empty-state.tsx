@@ -5,9 +5,9 @@ import type { DecksEmptyStateProps } from "./types";
 
 export function DecksEmptyState({ mode, onCreateDeck }: DecksEmptyStateProps) {
   return (
-    <Card className="border-2 border-dashed border-primary/20">
+    <Card className="border-2 border-dashed border-border/80">
       <CardContent className="flex flex-col items-center justify-center py-16">
-        <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-lg border border-primary/30" style={{ boxShadow: "var(--chrome-deck-state-icon-shadow)" }}>
+        <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-lg border border-border/50" style={{ boxShadow: "var(--chrome-deck-state-icon-shadow)" }}>
           {mode === "search" ? <Search className="h-8 w-8 text-primary/50" /> : <Layers className="h-8 w-8 text-primary/50" />}
         </div>
 
