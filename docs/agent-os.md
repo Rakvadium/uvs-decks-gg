@@ -83,6 +83,7 @@ is:issue is:open label:agent-ready label:size/S -label:blocked -label:needs-huma
 | `area/convex` feature work | `project-context-gate` → `hardened-coding` |
 | `area/docs` | `project-context-gate` → docs-only `hardened-coding` |
 | Open PR needs cleanup | `hardened-pr-babysit` |
+| PR must prove it fixes the issue | `pr-issue-verify` |
 | Next ready ticket (no issue chosen) | `backlog-worker` |
 
 ### Triggers to configure (outside the repo)
@@ -92,6 +93,7 @@ is:issue is:open label:agent-ready label:size/S -label:blocked -label:needs-huma
 | You paste a prompt | Any workflow skill | Cursor chat |
 | Schedule (e.g. weekly) | `scheduled-reviewer` | [cursor.com/automations](https://cursor.com/automations) — see prompt below |
 | “Drain ready work” | `backlog-worker` (cap 1–3) | Chat or Automation |
+| PR opened / pushed | `pr-issue-verify` | Automations — see paste prompt below |
 
 Reviewer must **not** implement. Worker must **not** invent tasks.
 
@@ -110,6 +112,7 @@ Every implementation path starts with **`project-context-gate`** (Context Brief 
 | `hardened-convex-ops` | Fix Convex/ops with evidence | Dev first; logs/insights/repro; no auth weakening |
 | `ui-ux-adversary` | Scrutinize UI | Placement, tokens, neighbors, BEFORE/AFTER images |
 | `hardened-pr-babysit` | Merge-ready PR | Conflicts → CI → comments → UI check if needed |
+| `pr-issue-verify` | Issue completion on a PR | Each Done when item evidenced; PR comment verdict |
 | `backlog-worker` | Claim queue item + route | One issue per PR; playbook gates |
 
 Shared laws (full text in playbook): neighbors beat novelty; header slots fixed; tokens over taste; no drive-by polish; ambiguity → ask; update docs when behavior/architecture changes.
@@ -155,6 +158,20 @@ Cap: 1 issue.
 Open a PR with Fixes #N when done.
 ```
 
+### Verify PR completes the issue (Automations: PR opened / pushed)
+
+```text
+Use pr-issue-verify.
+Follow docs/agent-os.md.
+PR: from event context.
+Resolve linked issue via Fixes/Closes #N in the PR body.
+For each Done when item: pass/fail with evidence (UI: repro + screenshot/recording with correct auth/viewport).
+Post an "Issue completion review" comment on the PR with verdict: fixes issue | partial | does not fix.
+Do not merge.
+Do not implement unless only a trivial in-scope gap remains and you state what you changed.
+Model policy: single-agent when possible; sub-agents only if needed and must use composer-2.5; never Sonnet/Opus.
+```
+
 ---
 
 ## Cursor Automations (optional setup)
@@ -163,6 +180,7 @@ Open a PR with Fixes #N when done.
 2. **Weekly UI review:** schedule + repo + scheduled-reviewer prompt (scope: rotate UI surfaces)
 3. **Biweekly code/convex review:** same with scope convex/structure
 4. Optionally a separate automation: “run backlog-worker cap 1” only if you want unattended implementation of `agent-ready`+`size/S` (keep human merge)
+5. **PR issue verify:** trigger Pull request opened + Pull request pushed → `pr-issue-verify` prompt above; enable Comment on PR + computer use for UI
 
 ---
 
@@ -174,4 +192,5 @@ Open a PR with Fixes #N when done.
 | Have an agent add work | `create-task` or `scheduled-reviewer` |
 | Do a specific task now | Name workflow + issue/goal |
 | Process next ready task | `backlog-worker` |
+| Check a PR fixed the issue | `pr-issue-verify` |
 | Tweak a workflow | Edit that skill’s `SKILL.md` under `.agents/skills/` (mirror to `.cursor/skills/`) |
