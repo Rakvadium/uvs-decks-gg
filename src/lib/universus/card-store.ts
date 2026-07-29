@@ -1,4 +1,5 @@
 import type { Doc } from "../../../convex/_generated/dataModel";
+import { dedupeRarityOptions } from "./rarity";
 
 export type CachedCard = Doc<"cards">;
 
@@ -287,7 +288,7 @@ export function getUniqueValues(cards: CachedCard[]): {
 
   return {
     types: Array.from(types).filter(t => t !== "Special").sort(),
-    rarities: Array.from(rarities).sort(),
+    rarities: dedupeRarityOptions(rarities),
     setCodes: sortedSets.map(([code]) => code),
     setNames: sortedSets.map(([, data]) => data.name),
     setNumbers: sortedSets.map(([, data]) => data.number),
