@@ -179,10 +179,8 @@ function persistUIState(state: UIState) {
       localStorage.removeItem(getStorageKey("galleryViewMode"));
     }
 
-    if (state.galleryCardsPerRow) {
+    if (typeof state.galleryCardsPerRow === "number" && !Number.isNaN(state.galleryCardsPerRow)) {
       localStorage.setItem(getStorageKey("galleryCardsPerRow"), state.galleryCardsPerRow.toString());
-    } else {
-      localStorage.removeItem(getStorageKey("galleryCardsPerRow"));
     }
     localStorage.removeItem(getStorageKey("galleryCardsPerRowOpen"));
     localStorage.removeItem(getStorageKey("galleryCardsPerRowClosed"));
