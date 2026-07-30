@@ -18,9 +18,8 @@ import { sortCards } from "@/lib/universus/use-universus-cards";
 import type { CachedCard } from "@/lib/universus/card-store";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { useLocationSearchParams } from "@/hooks/useLocationSearchParams";
-import { usePrefersReducedMotion } from "@/lib/reduced-motion";
 import { useUIState, type CardFilters, type GalleryViewMode } from "@/providers/UIStateProvider";
-import { useShellSlotActiveSidebarActionId } from "@/components/shell/shell-slot-provider";
+import { clampGalleryCardsPerRow } from "@/lib/gallery/cards-per-row-preference";
 import {
   fromGalleryViewMode,
   galleryUrlHasState,
@@ -31,8 +30,6 @@ import {
   type GallerySearchMode,
   type GalleryUiViewMode,
 } from "@/lib/gallery/url-state";
-
-const DENSITY_LAYOUT_SIDEBAR_SYNC_MS = 220;
 
 type SearchMode = GallerySearchMode;
 type ViewMode = GalleryUiViewMode;
@@ -101,8 +98,6 @@ export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
     setGallerySortField,
     setGallerySortDirection,
   } = useUIState();
-  const activeSidebarActionId = useShellSlotActiveSidebarActionId();
-  const prefersReducedMotion = usePrefersReducedMotion();
   const isMobile = useIsMobile();
   const {
     isLoading,
@@ -119,22 +114,6 @@ export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
   const { formats } = useCardReferenceData();
   const [search, setSearchState] = useState("");
   const [searchMode, setSearchModeState] = useState<SearchMode>("all");
-  const isSidebarOpen = useMemo(
-    () => Boolean(activeSidebarActionId) && !isMobile,
-    [activeSidebarActionId, isMobile]
-  );
-  const [densityLayoutSidebarOpen, setDensityLayoutSidebarOpen] = useState(isSidebarOpen);
-
-  useEffect(() => {
-    if (prefersReducedMotion) {
-      setDensityLayoutSidebarOpen(isSidebarOpen);
-      return;
-    }
-    const id = window.setTimeout(() => {
-      setDensityLayoutSidebarOpen(isSidebarOpen);
-    }, DENSITY_LAYOUT_SIDEBAR_SYNC_MS);
-    return () => window.clearTimeout(id);
-  }, [isSidebarOpen, prefersReducedMotion]);
 
   const viewMode: ViewMode = useMemo(() => {
     return fromGalleryViewMode(uiState.galleryViewMode);
@@ -142,26 +121,14 @@ export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
   const cardsPerRow = useMemo(() => {
     const minCardsPerRow = isMobile ? 1 : 3;
     const maxCardsPerRow = isMobile ? 2 : 10;
-    const clampCardsPerRow = (value: number | undefined, fallback: number) => {
-      const raw = typeof value === "number" ? value : fallback;
-      if (Number.isNaN(raw)) return fallback;
-      return Math.min(maxCardsPerRow, Math.max(minCardsPerRow, Math.round(raw)));
-    };
-
-    const legacy = uiState.galleryCardsPerRow;
-    const openDefault = isMobile ? 1 : 4;
-    const closedDefault = isMobile ? 2 : 6;
-    const openValue = clampCardsPerRow(uiState.galleryCardsPerRowOpen ?? legacy, openDefault);
-    const closedValue = clampCardsPerRow(uiState.galleryCardsPerRowClosed ?? legacy, closedDefault);
-
-    return densityLayoutSidebarOpen ? openValue : closedValue;
-  }, [
-    uiState.galleryCardsPerRow,
-    uiState.galleryCardsPerRowOpen,
-    uiState.galleryCardsPerRowClosed,
-    densityLayoutSidebarOpen,
-    isMobile,
-  ]);
+    const fallback = isMobile ? 2 : 6;
+    return clampGalleryCardsPerRow(
+      uiState.galleryCardsPerRow,
+      fallback,
+      minCardsPerRow,
+      maxCardsPerRow
+    );
+  }, [uiState.galleryCardsPerRow, isMobile]);
 
   const galleryFilters = useMemo(() => uiState.galleryFilters ?? {}, [uiState.galleryFilters]);
   const defaultFormat = formats.find((format) => format.isDefault)?.key ?? "standard";
@@ -267,10 +234,10 @@ export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
     (count: number) => {
       const minCardsPerRow = isMobile ? 1 : 3;
       const maxCardsPerRow = isMobile ? 2 : 10;
-      const next = Math.min(maxCardsPerRow, Math.max(minCardsPerRow, Math.round(count)));
-      setGalleryCardsPerRow(next, isSidebarOpen);
+      const next = clampGalleryCardsPerRow(count, isMobile ? 2 : 6, minCardsPerRow, maxCardsPerRow);
+      setGalleryCardsPerRow(next);
     },
-    [setGalleryCardsPerRow, isSidebarOpen, isMobile]
+    [setGalleryCardsPerRow, isMobile]
   );
 
   useEffect(() => {
