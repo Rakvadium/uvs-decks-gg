@@ -113,18 +113,12 @@ export function TeamHubAnnouncementsContent({ teamId }: TeamHubAnnouncementsCont
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <h1 className="font-display text-lg font-semibold text-foreground">Announcements</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Pinned items stay at the top. Everyone can post; co-captains and the captain can pin or remove
-            others&apos; posts.
-          </p>
-        </div>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between md:hidden">
+        <h1 className="font-display text-lg font-semibold text-foreground">News</h1>
         {caps.canPostAnnouncements ? (
           <Button
             type="button"
-            className="h-9 shrink-0 font-mono text-xs uppercase tracking-wider sm:mt-0.5 md:hidden"
+            className="h-9 shrink-0 font-mono text-xs uppercase tracking-wider sm:mt-0.5"
             onClick={openCreate}
           >
             Announcement

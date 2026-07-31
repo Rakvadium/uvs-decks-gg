@@ -85,12 +85,7 @@ export function TeamHubChatContent({ teamId }: TeamHubChatContentProps) {
 
   return (
     <div className="flex h-[min(70vh,560px)] flex-col gap-4">
-      <div>
-        <h1 className="font-display text-lg font-semibold text-foreground">Chat</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Team channel — newest messages at the bottom. Load older above.
-        </p>
-      </div>
+      <h1 className="font-display text-lg font-semibold text-foreground md:hidden">Chat</h1>
       {showLoadMore && (
         <div className="flex shrink-0 justify-center">
           <Button
