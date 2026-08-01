@@ -6,7 +6,7 @@ import { useConvexAuth, useQuery } from "convex/react"
 import { api } from "../../../convex/_generated/api"
 import { cn } from "@/lib/utils"
 import { LayoutGrid, Layers, Users, type LucideIcon } from "lucide-react"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { UserAvatar } from "@/components/user-avatar"
 import { useMobileShell } from "./mobile-shell-context"
 import {
   SHELL_CHROME_SURFACE,
@@ -80,12 +80,13 @@ export function MobileBottomNav() {
           className="relative flex flex-1 flex-col items-center justify-center gap-1.5 py-2 text-sidebar-foreground transition-[color] duration-200 hover:text-accent"
           aria-label="Open profile"
         >
-          <Avatar className="h-6 w-6 border border-accent/35 shadow-[var(--chrome-shell-avatar-ring)]">
-            {user?.image ? <AvatarImage src={user.image} alt={user.username || "User"} /> : null}
-            <AvatarFallback className="bg-accent/20 font-mono text-xs font-bold text-accent">
-              {user?.username?.charAt(0).toUpperCase() || "?"}
-            </AvatarFallback>
-          </Avatar>
+          <UserAvatar
+            username={user?.username}
+            image={user?.image}
+            alt={user?.username || "User"}
+            className="h-6 w-6 border border-accent/35 shadow-[var(--chrome-shell-avatar-ring)]"
+            fallbackClassName="bg-accent/20 font-mono text-xs font-bold text-accent"
+          />
           <span className="text-[10px] font-mono uppercase tracking-widest">Profile</span>
         </button>
       </div>
