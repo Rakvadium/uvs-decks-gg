@@ -14,6 +14,7 @@ import { DeckDetailsReadOnlyBanner } from "@/components/deck-details/deck-detail
 import { useDeckDetails } from "@/providers/DeckDetailsProvider";
 import { useRegisterSlot } from "@/components/shell/shell-slot-provider";
 import { FloatingPageLayout } from "@/components/shell/floating-page-bar";
+import { cn } from "@/lib/utils";
 import { DeckDetailsFloatingTopBar } from "./deck-details-floating-top-bar";
 import { DeckDetailsMetaTags } from "./deck-details-meta-tags";
 import { DeckDetailsTopBar } from "./deck-details-top-bar";
@@ -34,6 +35,11 @@ import { DeckDetailsViewModeToggle } from "./deck-details-view-mode-toggle";
 import { DeckDetailsEditDialog } from "./deck-details-edit-dialog";
 import { TeamEditableWriteConflictBanner } from "@/components/deck/team-editable-write-conflict-banner";
 
+function quantityTotal(quantities: Record<string, number> | undefined) {
+  if (!quantities) return 0;
+  return Object.values(quantities).reduce((sum, quantity) => sum + quantity, 0);
+}
+
 function DeckDetailsGallerySlotRegistration() {
   const gallerySlotOptions = useMemo(() => ({ label: "Gallery", icon: LayoutGrid, priority: 0 }), []);
   useRegisterSlot("right-sidebar", "deck-gallery", GallerySidebar, gallerySlotOptions);
@@ -49,6 +55,16 @@ export function DeckDetailsView() {
       ? { deckId: deckId as Id<"decks"> }
       : "skip",
   );
+
+  const isDeckEmpty = useMemo(() => {
+    if (!deck) return true;
+    return (
+      quantityTotal(deck.mainQuantities) +
+        quantityTotal(deck.sideQuantities) +
+        quantityTotal(deck.referenceQuantities) ===
+      0
+    );
+  }, [deck]);
 
   const statsSlotOptions = useMemo(() => ({ label: "Stats", icon: BarChart3, priority: 1 }), []);
   const simulatorSlotOptions = useMemo(
@@ -99,19 +115,36 @@ export function DeckDetailsView() {
 
               <DeckCardsSectionProvider>
                 <div className="relative flex flex-col lg:flex-row gap-4 lg:gap-6">
-                  <div className="flex flex-col gap-3 shrink-0 w-full lg:w-48 lg:self-start lg:sticky lg:top-6">
+                  <div
+                    className={cn(
+                      "flex w-full shrink-0 flex-col gap-3 lg:w-48 lg:self-start lg:sticky lg:top-6",
+                      isDeckEmpty && "max-lg:order-2",
+                    )}
+                  >
                     <DeckDetailsHeroPanel />
                     <DeckDetailsMetaTags className="hidden md:block" />
                     <DeckDetailsPrivateLinkPanel />
                     <DeckDetailsSharePanel />
-                    <DeckDetailsSectionTabs />
+                    <div className={cn(isDeckEmpty && "max-lg:hidden")}>
+                      <DeckDetailsSectionTabs />
+                    </div>
                     <div className="hidden md:flex md:flex-col md:gap-2">
                       <DeckDetailsViewModeToggle />
                       <DeckDetailsDesktopListSort />
                     </div>
                   </div>
 
-                  <div className="flex-1 min-w-0">
+                  <div
+                    className={cn(
+                      "flex min-w-0 flex-1 flex-col gap-3",
+                      isDeckEmpty && "max-lg:order-1",
+                    )}
+                  >
+                    {isDeckEmpty ? (
+                      <div className="lg:hidden">
+                        <DeckDetailsSectionTabs />
+                      </div>
+                    ) : null}
                     <DeckCardsSection />
                   </div>
                 </div>
