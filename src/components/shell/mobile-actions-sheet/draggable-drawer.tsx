@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ComponentPropsWithoutRef, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
 import { usePathname } from "next/navigation";
+import { ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { MobileActionsSheetActionPanel } from "./content";
 import { useMobileActionsSheetContext } from "./context";
@@ -56,7 +57,7 @@ export function MobileActionsHandle({ className, decorative = false, ...props }:
   if (decorative) {
     return (
       <div aria-hidden className={baseClassName}>
-        <span className="relative block h-1 w-16 shrink-0 rounded-full bg-primary">
+        <span className="relative block h-1.5 w-16 shrink-0 rounded-full bg-primary">
           <span className="absolute inset-0 mx-auto w-px rounded-full bg-primary" />
         </span>
       </div>
@@ -65,7 +66,7 @@ export function MobileActionsHandle({ className, decorative = false, ...props }:
 
   return (
     <button type="button" aria-label="Open actions panel" className={baseClassName} {...props}>
-      <span className="relative block h-4 w-24 rounded-full bg-primary transition-colors duration-150 group-hover:bg-primary">
+      <span className="relative block h-1.5 w-24 rounded-full bg-primary transition-colors duration-150 group-hover:bg-primary">
         <span className="absolute inset-0 mx-auto w-px rounded-full bg-primary group-hover:bg-primary" />
       </span>
     </button>
@@ -223,6 +224,12 @@ export function MobileActionsDraggableDrawer({ children }: MobileActionsDraggabl
   }, []);
 
   const useDrawerChrome = sidebarSlots.length > 0 && !isMobileDeckDatabaseListPath(pathname);
+  const collapsedAffordanceLabel = useMemo(() => {
+    if (sidebarSlots.length === 1) {
+      return sidebarSlots[0]?.label ?? "Actions";
+    }
+    return "Actions";
+  }, [sidebarSlots]);
 
   if (!useDrawerChrome) {
     return (
@@ -368,13 +375,35 @@ export function MobileActionsDraggableDrawer({ children }: MobileActionsDraggabl
           <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-background/95 backdrop-blur-md">
             <div
               ref={grabberStripRef}
-              className="flex shrink-0 touch-none justify-center px-4 pb-0.5 pt-1"
+              className={cn(
+                "flex shrink-0 touch-none justify-center px-4",
+                isActionsSheetOpen ? "pb-0.5 pt-1" : "pb-1 pt-1.5"
+              )}
               onPointerDown={beginDrag}
               onPointerMove={updateDrag}
               onPointerUp={endDrag}
               onPointerCancel={cancelDrag}
             >
-              <MobileActionsHandle decorative />
+              {isActionsSheetOpen ? (
+                <MobileActionsHandle decorative />
+              ) : (
+                <button
+                  type="button"
+                  onClick={openSheet}
+                  aria-expanded={false}
+                  aria-label={`Open ${collapsedAffordanceLabel}`}
+                  className="flex min-h-11 w-full max-w-sm items-center justify-center gap-2 rounded-md px-3 text-muted-foreground transition-colors duration-150 hover:bg-primary/5 hover:text-primary"
+                >
+                  <span
+                    aria-hidden
+                    className="relative block h-1.5 w-10 shrink-0 rounded-full bg-primary"
+                  />
+                  <span className="text-[10px] font-mono uppercase tracking-[0.18em]">
+                    {collapsedAffordanceLabel}
+                  </span>
+                  <ChevronUp className="h-4 w-4 shrink-0" aria-hidden />
+                </button>
+              )}
             </div>
             <div ref={actionPanelRef} className="min-h-0 overflow-hidden" style={{ height: actionPanelHeight }}>
               <MobileActionsSheetActionPanel
