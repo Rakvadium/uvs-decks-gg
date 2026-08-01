@@ -19,9 +19,9 @@ export function GalleryGuestDecksSidebar() {
           and keep everything synced while you browse.
         </p>
         <ul className="space-y-2 text-sm leading-snug text-foreground/90">
-          <li>Browse all your decks and switch between them without leaving this panel.</li>
+          <li>Browse and switch between decks after you sign in — without leaving this panel.</li>
           <li>Create new deck lists when you spot a lineup you want to try.</li>
-          <li>Manage the deck you&apos;re actively building alongside the gallery search.</li>
+          <li>Keep an active deck alongside gallery search while you add cards.</li>
         </ul>
       </div>
       <div className="mt-auto flex shrink-0 flex-col gap-2 border-t border-border/40 pt-6">
