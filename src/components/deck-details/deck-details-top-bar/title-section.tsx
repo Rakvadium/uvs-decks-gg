@@ -12,7 +12,7 @@ interface DeckDetailsTopBarTitleSectionProps {
   compact?: boolean;
 }
 
-export function DeckDetailsTopBarTitleSection({ compact: _compact = false }: DeckDetailsTopBarTitleSectionProps) {
+export function DeckDetailsTopBarTitleSection(_props: DeckDetailsTopBarTitleSectionProps) {
   const {
     deck,
     isOwner,
