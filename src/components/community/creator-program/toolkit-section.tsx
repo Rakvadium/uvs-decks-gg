@@ -1,5 +1,4 @@
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 import { CREATOR_TOOLKIT } from "./data";
 import { CommunitySectionHeader } from "../shared/section-header";
 import { SectionHeading } from "@/components/ui/typography-headings";
@@ -10,11 +9,6 @@ export function CreatorProgramToolkitSection() {
       <CommunitySectionHeader
         title="Creator Toolkit"
         description="Everything you need to publish, engage, and grow your community presence."
-        action={
-          <Button variant="outline" size="sm">
-            See All Tools
-          </Button>
-        }
       />
 
       <div className="grid gap-4 md:grid-cols-2">
