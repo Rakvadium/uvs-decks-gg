@@ -435,32 +435,32 @@ export default function SettingsPageClient() {
                       const selected =
                         normalizeAvatarImagePath(imageUrl) === symbol.path;
                       return (
-                      <button
-                        key={symbol.id}
-                        type="button"
-                        onClick={() => setImageUrl(symbol.path)}
-                        className={cn(
-                          "group relative flex flex-col items-center gap-2 rounded-xl border-2 p-3 transition-colors hover:border-primary/50 hover:bg-muted/50",
-                          selected
-                            ? "border-primary bg-primary/10"
-                            : "border-muted"
-                        )}
-                      >
-                        <div className="relative h-10 w-10">
-                          <Image
-                            src={symbol.path}
-                            alt={symbol.name}
-                            fill
-                            className="object-contain"
-                          />
-                        </div>
-                        <span className="text-xs font-medium">{symbol.name}</span>
-                        {selected && (
-                          <div className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                            <Check className="h-3 w-3" />
+                        <button
+                          key={symbol.id}
+                          type="button"
+                          onClick={() => setImageUrl(symbol.path)}
+                          className={cn(
+                            "group relative flex flex-col items-center gap-2 rounded-xl border-2 p-3 transition-colors hover:border-primary/50 hover:bg-muted/50",
+                            selected
+                              ? "border-primary bg-primary/10"
+                              : "border-muted"
+                          )}
+                        >
+                          <div className="relative h-10 w-10">
+                            <Image
+                              src={symbol.path}
+                              alt={symbol.name}
+                              fill
+                              className="object-contain"
+                            />
                           </div>
-                        )}
-                      </button>
+                          <span className="text-xs font-medium">{symbol.name}</span>
+                          {selected && (
+                            <div className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                              <Check className="h-3 w-3" />
+                            </div>
+                          )}
+                        </button>
                       );
                     })}
                   </div>
