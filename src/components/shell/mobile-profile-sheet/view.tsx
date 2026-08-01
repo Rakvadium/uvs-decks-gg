@@ -14,7 +14,7 @@ function MobileProfileSheetContent() {
 
   return (
     <Sheet open={isProfileSheetOpen} onOpenChange={setProfileSheetOpen}>
-      <SheetContent side="right" className="flex w-full max-w-sm flex-col p-0" showCloseButton={false}>
+      <SheetContent side="right" className="flex flex-col p-0">
         <MobileProfileSheetHeader />
 
         <div className="min-h-0 flex-1 overflow-y-auto">
