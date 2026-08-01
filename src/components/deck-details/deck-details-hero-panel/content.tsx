@@ -1,6 +1,5 @@
 "use client";
 
-import { useMemo } from "react";
 import { CardDetailsDialog } from "@/components/universus/card-details/dialog";
 import { useDeckDetails } from "@/providers/DeckDetailsProvider";
 import { cn } from "@/lib/utils";
@@ -9,11 +8,6 @@ import { DeckDetailsHeroCharacterImagePicker } from "./character-image-picker";
 import { DeckDetailsHeroReadyBadge } from "./ready-badge";
 import { DeckDetailsHeroStaticImage } from "./static-image";
 import { DeckDetailsHeroSymbolSelector } from "./symbol-selector";
-
-function quantityTotal(quantities: Record<string, number> | undefined) {
-  if (!quantities) return 0;
-  return Object.values(quantities).reduce((sum, quantity) => sum + quantity, 0);
-}
 
 function DeckDetailsHeroPanelEmptyState({ compactMobile }: { compactMobile?: boolean }) {
   return (
@@ -34,22 +28,8 @@ function DeckDetailsHeroPanelContent() {
     isOwner,
     startingCharacter,
     startingCharacterBack,
-    imageCard,
-    mainCount,
+    compactEmptyMobile,
   } = useDeckDetailsHeroPanelContext();
-
-  const isDeckEmpty = useMemo(() => {
-    if (!deck) return true;
-    return (
-      mainCount +
-        quantityTotal(deck.sideQuantities) +
-        quantityTotal(deck.referenceQuantities) ===
-      0
-    );
-  }, [deck, mainCount]);
-
-  const hasHeroImage = Boolean(imageCard?.imageUrl || startingCharacter?.imageUrl);
-  const compactEmptyMobile = isDeckEmpty && !hasHeroImage;
 
   if (!deck) {
     return <DeckDetailsHeroPanelEmptyState compactMobile />;

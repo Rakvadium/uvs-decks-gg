@@ -14,7 +14,7 @@ import { DeckDetailsReadOnlyBanner } from "@/components/deck-details/deck-detail
 import { useDeckDetails } from "@/providers/DeckDetailsProvider";
 import { useRegisterSlot } from "@/components/shell/shell-slot-provider";
 import { FloatingPageLayout } from "@/components/shell/floating-page-bar";
-import { cn } from "@/lib/utils";
+import { useIsBelowLg } from "@/hooks/useIsMobile";
 import { DeckDetailsFloatingTopBar } from "./deck-details-floating-top-bar";
 import { DeckDetailsMetaTags } from "./deck-details-meta-tags";
 import { DeckDetailsTopBar } from "./deck-details-top-bar";
@@ -34,11 +34,7 @@ import { DeckDetailsDesktopListSort } from "./deck-list-sort-select";
 import { DeckDetailsViewModeToggle } from "./deck-details-view-mode-toggle";
 import { DeckDetailsEditDialog } from "./deck-details-edit-dialog";
 import { TeamEditableWriteConflictBanner } from "@/components/deck/team-editable-write-conflict-banner";
-
-function quantityTotal(quantities: Record<string, number> | undefined) {
-  if (!quantities) return 0;
-  return Object.values(quantities).reduce((sum, quantity) => sum + quantity, 0);
-}
+import { isDeckQuantitiesEmpty } from "./deck-empty";
 
 function DeckDetailsGallerySlotRegistration() {
   const gallerySlotOptions = useMemo(() => ({ label: "Gallery", icon: LayoutGrid, priority: 0 }), []);
@@ -49,6 +45,7 @@ function DeckDetailsGallerySlotRegistration() {
 export function DeckDetailsView() {
   const { deckId, deck, isLoading, isOwner } = useDeckDetails();
   const { isAuthenticated } = useConvexAuth();
+  const isBelowLg = useIsBelowLg();
   const pendingInvite = useQuery(
     api.deckShares.getPendingInvitePreview,
     !isLoading && !deck && isAuthenticated && deckId
@@ -56,15 +53,8 @@ export function DeckDetailsView() {
       : "skip",
   );
 
-  const isDeckEmpty = useMemo(() => {
-    if (!deck) return true;
-    return (
-      quantityTotal(deck.mainQuantities) +
-        quantityTotal(deck.sideQuantities) +
-        quantityTotal(deck.referenceQuantities) ===
-      0
-    );
-  }, [deck]);
+  const isDeckEmpty = isDeckQuantitiesEmpty(deck);
+  const prioritizeCardsChrome = isDeckEmpty && isBelowLg;
 
   const statsSlotOptions = useMemo(() => ({ label: "Stats", icon: BarChart3, priority: 1 }), []);
   const simulatorSlotOptions = useMemo(
@@ -114,39 +104,42 @@ export function DeckDetailsView() {
               <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-secondary/5 to-accent/5 rounded-xl blur-xl" />
 
               <DeckCardsSectionProvider>
-                <div className="relative flex flex-col lg:flex-row gap-4 lg:gap-6">
-                  <div
-                    className={cn(
-                      "flex w-full shrink-0 flex-col gap-3 lg:w-48 lg:self-start lg:sticky lg:top-6",
-                      isDeckEmpty && "max-lg:order-2",
-                    )}
-                  >
-                    <DeckDetailsHeroPanel />
-                    <DeckDetailsMetaTags className="hidden md:block" />
-                    <DeckDetailsPrivateLinkPanel />
-                    <DeckDetailsSharePanel />
-                    <div className={cn(isDeckEmpty && "max-lg:hidden")}>
-                      <DeckDetailsSectionTabs />
-                    </div>
-                    <div className="hidden md:flex md:flex-col md:gap-2">
-                      <DeckDetailsViewModeToggle />
-                      <DeckDetailsDesktopListSort />
-                    </div>
-                  </div>
-
-                  <div
-                    className={cn(
-                      "flex min-w-0 flex-1 flex-col gap-3",
-                      isDeckEmpty && "max-lg:order-1",
-                    )}
-                  >
-                    {isDeckEmpty ? (
-                      <div className="lg:hidden">
-                        <DeckDetailsSectionTabs />
+                <div className="relative flex flex-col gap-4 lg:flex-row lg:gap-6">
+                  {prioritizeCardsChrome ? (
+                    <>
+                      <div className="flex min-w-0 flex-1 flex-col gap-3">
+                        <DeckDetailsSectionTabs layout="stacked-full" />
+                        <DeckCardsSection />
                       </div>
-                    ) : null}
-                    <DeckCardsSection />
-                  </div>
+                      <div className="flex w-full shrink-0 flex-col gap-3 lg:w-48 lg:self-start lg:sticky lg:top-6">
+                        <DeckDetailsHeroPanel />
+                        <DeckDetailsMetaTags className="hidden md:block" />
+                        <DeckDetailsPrivateLinkPanel />
+                        <DeckDetailsSharePanel />
+                        <div className="hidden md:flex md:flex-col md:gap-2">
+                          <DeckDetailsViewModeToggle />
+                          <DeckDetailsDesktopListSort />
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="flex w-full shrink-0 flex-col gap-3 lg:w-48 lg:self-start lg:sticky lg:top-6">
+                        <DeckDetailsHeroPanel />
+                        <DeckDetailsMetaTags className="hidden md:block" />
+                        <DeckDetailsPrivateLinkPanel />
+                        <DeckDetailsSharePanel />
+                        <DeckDetailsSectionTabs />
+                        <div className="hidden md:flex md:flex-col md:gap-2">
+                          <DeckDetailsViewModeToggle />
+                          <DeckDetailsDesktopListSort />
+                        </div>
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <DeckCardsSection />
+                      </div>
+                    </>
+                  )}
                 </div>
               </DeckCardsSectionProvider>
             </div>
