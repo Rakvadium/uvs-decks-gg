@@ -12,6 +12,10 @@ All notable changes to this project are recorded here.
 
 ### Added
 
+- **Collection in signed-in main nav** — Profile sheet (mobile) and left sidebar include Collection between Decks and Community, routing to `/collection`.
+  - **Context:** Issue #64.
+  - **Files:** `src/components/shell/main-nav-build.ts`.
+
 - **Product tour sizzle reel** — Fullscreen interactive feature tour at `/tour` with auto-advancing beats, keyboard controls, and a Home “Watch Tour” entry.
   - **Context:** Request for a web sizzle reel to showcase product features.
   - **Decisions:** Standalone route outside the app shell (no floating header); CSS feature stages instead of live screenshots; respects `prefers-reduced-motion`.
