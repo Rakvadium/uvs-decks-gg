@@ -12,7 +12,7 @@ interface DeckDetailsTopBarTitleSectionProps {
   compact?: boolean;
 }
 
-export function DeckDetailsTopBarTitleSection(_props: DeckDetailsTopBarTitleSectionProps) {
+export function DeckDetailsTopBarTitleSection({ compact = false }: DeckDetailsTopBarTitleSectionProps) {
   const {
     deck,
     isOwner,
@@ -28,7 +28,7 @@ export function DeckDetailsTopBarTitleSection(_props: DeckDetailsTopBarTitleSect
   const noopVis = (_value: DeckVisibility) => {};
 
   return (
-    <div className="flex min-w-0 flex-1 flex-col gap-1">
+    <div className={cn("flex min-w-0 flex-1 flex-col", compact ? "gap-1" : "gap-1.5")}>
       <h1 className="min-w-0">
         <button
           type="button"
