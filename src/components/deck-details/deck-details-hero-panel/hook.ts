@@ -3,6 +3,7 @@ import { useCardIdMap } from "@/hooks/useCardIdMap";
 import { useCardData } from "@/lib/universus/card-data-provider";
 import { useDeckDetails } from "@/providers/DeckDetailsProvider";
 import type { Id } from "../../../../convex/_generated/dataModel";
+import { isDeckQuantitiesEmpty } from "../deck-empty";
 
 export function useDeckDetailsHeroPanelModel() {
   const { deck, isOwner, updateDeck } = useDeckDetails();
@@ -37,6 +38,10 @@ export function useDeckDetailsHeroPanelModel() {
     return Object.values(deck.mainQuantities).reduce((sum, quantity) => sum + quantity, 0);
   }, [deck]);
 
+  const isDeckEmpty = isDeckQuantitiesEmpty(deck);
+  const hasHeroImage = Boolean(imageCard?.imageUrl || startingCharacter?.imageUrl);
+  const compactEmptyMobile = isDeckEmpty && !hasHeroImage;
+
   const handleSelectCharacter = async (characterId: Id<"cards">) => {
     await updateDeck({ startingCharacterId: characterId });
     setCharacterOpen(false);
@@ -68,6 +73,8 @@ export function useDeckDetailsHeroPanelModel() {
     selectedSymbol,
     characterSymbols,
     mainCount,
+    isDeckEmpty,
+    compactEmptyMobile,
     handleSelectCharacter,
     handleSelectSymbol,
     handleImageClick,
