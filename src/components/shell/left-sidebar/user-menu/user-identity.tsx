@@ -1,4 +1,4 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { UserAvatar } from "@/components/user-avatar";
 import { cn } from "@/lib/utils";
 import { useLeftSidebarContext } from "../context";
 
@@ -18,10 +18,13 @@ export function LeftSidebarUserIdentity({
 
   return (
     <div className={cn("flex items-center gap-2 text-left text-sm", className)}>
-      <Avatar className={cn("h-8 w-8 rounded-lg border-0 shadow-none", avatarClassName)}>
-        {user?.image ? <AvatarImage src={user.image} alt={name} /> : null}
-        <AvatarFallback className="rounded-lg">{name.charAt(0).toUpperCase()}</AvatarFallback>
-      </Avatar>
+      <UserAvatar
+        username={user?.username}
+        image={user?.image}
+        alt={name}
+        className={cn("h-8 w-8 rounded-lg border-0 shadow-none", avatarClassName)}
+        fallbackClassName="rounded-lg"
+      />
       {showDetails ? (
         <div className="grid flex-1 text-left text-sm leading-tight">
           <span className="truncate font-medium">{name}</span>
