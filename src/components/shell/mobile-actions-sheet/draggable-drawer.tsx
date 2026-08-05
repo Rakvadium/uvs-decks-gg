@@ -1,14 +1,15 @@
 "use client";
 
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ComponentPropsWithoutRef, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ComponentPropsWithoutRef, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
 import { usePathname } from "next/navigation";
-import { ChevronUp } from "lucide-react";
+import { PanelBottomClose, PanelBottomOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { MobileActionsSheetActionPanel } from "./content";
 import { useMobileActionsSheetContext } from "./context";
 
 const DEFAULT_HEIGHT = 600;
 const MAX_HEIGHT_RATIO = 0.82;
+const MOBILE_ACTIONS_HANDLE_ATTR = "data-mobile-actions-handle";
 
 function getMaxDrawerHeight() {
   if (typeof window === "undefined") {
@@ -32,6 +33,10 @@ type DragState = {
 
 function isInteractiveTarget(target: EventTarget | null) {
   if (!(target instanceof Element)) {
+    return false;
+  }
+
+  if (target.closest(`[${MOBILE_ACTIONS_HANDLE_ATTR}]`)) {
     return false;
   }
 
@@ -70,6 +75,54 @@ export function MobileActionsHandle({ className, decorative = false, ...props }:
         <span className="absolute inset-0 mx-auto w-px rounded-full bg-primary group-hover:bg-primary" />
       </span>
     </button>
+  );
+}
+
+interface MobileActionsPullTabProps {
+  isOpen: boolean;
+  label: string;
+  onToggle: () => void;
+}
+
+function MobileActionsPullTab({ isOpen, label, onToggle }: MobileActionsPullTabProps) {
+  const handleKeyDown = (event: ReactKeyboardEvent<HTMLDivElement>) => {
+    if (event.key !== "Enter" && event.key !== " ") {
+      return;
+    }
+    event.preventDefault();
+    onToggle();
+  };
+
+  return (
+    <div
+      data-mobile-actions-handle=""
+      role="button"
+      tabIndex={0}
+      aria-expanded={isOpen}
+      aria-label={isOpen ? `Close ${label}` : `Open ${label}`}
+      onKeyDown={handleKeyDown}
+      className={cn(
+        "relative z-20 flex h-7 w-11 shrink-0 items-center justify-center rounded-full",
+        "border border-[color:var(--control-dual-border)] bg-background/80 text-muted-foreground shadow-xs",
+        "transition-colors duration-150 hover:border-[color:var(--control-dual-border-strong)] hover:bg-[color:var(--control-dual-surface-hover)] hover:text-primary",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      )}
+    >
+      <span className="relative block h-4 w-4" aria-hidden>
+        <PanelBottomOpen
+          className={cn(
+            "absolute inset-0 h-4 w-4 transition-[opacity,transform] duration-200",
+            isOpen ? "scale-75 opacity-0" : "scale-100 opacity-100"
+          )}
+        />
+        <PanelBottomClose
+          className={cn(
+            "absolute inset-0 h-4 w-4 transition-[opacity,transform] duration-200",
+            isOpen ? "scale-100 opacity-100" : "scale-75 opacity-0"
+          )}
+        />
+      </span>
+    </div>
   );
 }
 
@@ -224,12 +277,20 @@ export function MobileActionsDraggableDrawer({ children }: MobileActionsDraggabl
   }, []);
 
   const useDrawerChrome = sidebarSlots.length > 0 && !isMobileDeckDatabaseListPath(pathname);
-  const collapsedAffordanceLabel = useMemo(() => {
+  const pullTabLabel = useMemo(() => {
     if (sidebarSlots.length === 1) {
       return sidebarSlots[0]?.label ?? "Actions";
     }
     return "Actions";
   }, [sidebarSlots]);
+
+  const toggleSheet = useCallback(() => {
+    if (isActionsSheetOpen) {
+      closeSheet();
+      return;
+    }
+    openSheet();
+  }, [closeSheet, isActionsSheetOpen, openSheet]);
 
   if (!useDrawerChrome) {
     return (
@@ -375,35 +436,17 @@ export function MobileActionsDraggableDrawer({ children }: MobileActionsDraggabl
           <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-background/95 backdrop-blur-md">
             <div
               ref={grabberStripRef}
-              className={cn(
-                "flex shrink-0 touch-none justify-center px-4",
-                isActionsSheetOpen ? "pb-0.5 pt-1" : "pb-1 pt-1.5"
-              )}
+              className="flex shrink-0 touch-none justify-center px-4 py-1"
               onPointerDown={beginDrag}
               onPointerMove={updateDrag}
               onPointerUp={endDrag}
               onPointerCancel={cancelDrag}
             >
-              {isActionsSheetOpen ? (
-                <MobileActionsHandle decorative />
-              ) : (
-                <button
-                  type="button"
-                  onClick={openSheet}
-                  aria-expanded={false}
-                  aria-label={`Open ${collapsedAffordanceLabel}`}
-                  className="flex min-h-11 w-full max-w-sm items-center justify-center gap-2 rounded-md px-3 text-muted-foreground transition-colors duration-150 hover:bg-primary/5 hover:text-primary"
-                >
-                  <span
-                    aria-hidden
-                    className="relative block h-1.5 w-10 shrink-0 rounded-full bg-primary"
-                  />
-                  <span className="text-[10px] font-mono uppercase tracking-[0.18em]">
-                    {collapsedAffordanceLabel}
-                  </span>
-                  <ChevronUp className="h-4 w-4 shrink-0" aria-hidden />
-                </button>
-              )}
+              <MobileActionsPullTab
+                isOpen={isActionsSheetOpen}
+                label={pullTabLabel}
+                onToggle={toggleSheet}
+              />
             </div>
             <div ref={actionPanelRef} className="min-h-0 overflow-hidden" style={{ height: actionPanelHeight }}>
               <MobileActionsSheetActionPanel
