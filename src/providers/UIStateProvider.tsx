@@ -147,7 +147,7 @@ function loadPersistedUIState(): UIState {
       galleryFilters,
       galleryViewMode,
       galleryCardsPerRow,
-      rightSidebarAction;
+      rightSidebarAction,
       galleryFormat,
       gallerySets,
       gallerySortField,
