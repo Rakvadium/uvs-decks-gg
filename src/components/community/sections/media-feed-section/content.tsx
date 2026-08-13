@@ -11,10 +11,22 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { useChromeMode } from "@/lib/theme";
 import { chromeUsesScanlines } from "@/lib/theme/chrome-behavior";
-import { CommunitySectionHeader } from "../../shared/section-header";
 import { SectionHeading } from "@/components/ui/typography-headings";
 import { useCommunityMediaFeedModel } from "./hook";
 import { YoutubeEmbed } from "./youtube-embed";
+
+function MediaFeedSectionChrome() {
+  return (
+    <div className="flex flex-wrap items-center justify-between gap-3 md:hidden">
+      <SectionHeading className="text-xl font-display font-bold uppercase tracking-[0.18em]">
+        UniVersus Content
+      </SectionHeading>
+      <Button variant="outline" size="sm" asChild>
+        <Link href="/community/creators">Creator program</Link>
+      </Button>
+    </div>
+  );
+}
 
 function MediaFeedSkeleton() {
   return (
@@ -74,15 +86,7 @@ export function CommunityMediaFeedSection() {
   if (feed === undefined) {
     return (
       <section id="universus-content" className="space-y-5 scroll-mt-24">
-        <CommunitySectionHeader
-          title="UniVersus Content"
-          description="Deck tech, matches, and event recaps from the UniVersus scene in one feed."
-          action={
-            <Button variant="outline" size="sm" asChild>
-              <Link href="/community/creators">Creator program</Link>
-            </Button>
-          }
-        />
+        <MediaFeedSectionChrome />
         <MediaFeedSkeleton />
         <AttributionFooter />
       </section>
@@ -92,15 +96,7 @@ export function CommunityMediaFeedSection() {
   if (feed.feedKind === "empty" || feed.items.length === 0) {
     return (
       <section id="universus-content" className="space-y-5 scroll-mt-24">
-        <CommunitySectionHeader
-          title="UniVersus Content"
-          description="Deck tech, matches, and event recaps from the UniVersus scene in one feed."
-          action={
-            <Button variant="outline" size="sm" asChild>
-              <Link href="/community/creators">Creator program</Link>
-            </Button>
-          }
-        />
+        <MediaFeedSectionChrome />
         <Card className="border-border/50 bg-background/50 shadow-none">
           <CardContent className="flex flex-col items-center gap-2 py-12 text-center">
             <p className="text-sm text-muted-foreground">
@@ -134,15 +130,7 @@ export function CommunityMediaFeedSection() {
 
   return (
     <section id="universus-content" className="space-y-5 scroll-mt-24">
-      <CommunitySectionHeader
-        title="UniVersus Content"
-        description="Deck tech, matches, and event recaps from the UniVersus scene in one feed."
-        action={
-          <Button variant="outline" size="sm" asChild>
-            <Link href="/community/creators">Creator program</Link>
-          </Button>
-        }
-      />
+      <MediaFeedSectionChrome />
 
       {feed.feedKind === "pending_all" ? (
         <p className="text-xs text-muted-foreground">
