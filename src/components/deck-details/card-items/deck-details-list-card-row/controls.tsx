@@ -26,33 +26,33 @@ export function DeckDetailsListCardRowControls() {
 
   return (
     <div
-      className="pointer-events-none absolute right-2 top-1/2 flex -translate-y-1/2 items-center gap-1 opacity-0 transition-opacity duration-150 group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100 max-md:pointer-events-auto max-md:opacity-100"
+      className="pointer-events-none absolute right-2 top-1/2 flex -translate-y-1/2 items-center gap-1 opacity-0 transition-opacity duration-150 group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100 max-md:pointer-events-auto max-md:opacity-100 max-md:gap-2"
       onClick={(e) => e.stopPropagation()}
     >
       <Button
         variant="ghost"
         size="icon-sm"
-        className="h-7 w-7"
+        className="h-7 w-7 max-md:h-10 max-md:w-10"
         onClick={() => removeCard(card._id, sectionKey)}
         disabled={count <= 0}
         aria-label={`Remove one ${card.name}`}
       >
-        <Minus className="h-3.5 w-3.5" />
+        <Minus className="h-3.5 w-3.5 max-md:h-4 max-md:w-4" />
       </Button>
 
-      <span className="min-w-[26px] text-center font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+      <span className="min-w-[26px] text-center font-mono text-[10px] uppercase tracking-wider text-muted-foreground max-md:min-w-10">
         x{count}
       </span>
 
       <Button
         variant="ghost"
         size="icon-sm"
-        className="h-7 w-7"
+        className="h-7 w-7 max-md:h-10 max-md:w-10"
         onClick={() => addCard(card._id, sectionKey)}
         disabled={!canAddToDeck}
         aria-label={`Add one ${card.name}`}
       >
-        <Plus className="h-3.5 w-3.5" />
+        <Plus className="h-3.5 w-3.5 max-md:h-4 max-md:w-4" />
       </Button>
 
       <DropdownMenu>
@@ -60,7 +60,7 @@ export function DeckDetailsListCardRowControls() {
           <Button
             variant="ghost"
             size="icon-sm"
-            className="h-7 w-7"
+            className="h-7 w-7 max-md:ml-0.5"
             data-no-drag
             aria-label={`More actions for ${card.name}`}
           >
