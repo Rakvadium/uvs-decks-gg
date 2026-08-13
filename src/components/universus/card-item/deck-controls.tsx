@@ -13,6 +13,7 @@ interface CardDeckControlsProps {
   onRemove: (e: React.MouseEvent) => void;
   showQuantity?: boolean;
   forceSolidSurface?: boolean;
+  enlargeTouchTargets?: boolean;
 }
 
 export function CardDeckControls({
@@ -23,11 +24,14 @@ export function CardDeckControls({
   onRemove,
   showQuantity = true,
   forceSolidSurface = false,
+  enlargeTouchTargets = false,
 }: CardDeckControlsProps) {
   const chromeMode = useChromeMode();
   const frosted = !forceSolidSurface && chromeHasNeonChrome(chromeMode);
   const showButtons = isHovered;
   const showCount = showQuantity ? deckCount > 0 || showButtons : showButtons;
+  const cellClass = enlargeTouchTargets ? "h-10 w-10" : "h-6 w-7";
+  const iconClass = enlargeTouchTargets ? "h-4 w-4 stroke-[2.5]" : "h-3.5 w-3.5 stroke-[2.5]";
 
   if (!showCount) return null;
 
@@ -46,7 +50,8 @@ export function CardDeckControls({
           onClick={onAdd}
           disabled={!canAdd}
           className={cn(
-            "pointer-events-auto flex h-6 w-7 items-center justify-center",
+            "pointer-events-auto flex items-center justify-center",
+            cellClass,
             "text-primary transition-colors duration-150",
             "hover:bg-primary/15",
             "disabled:cursor-not-allowed disabled:text-muted-foreground",
@@ -54,14 +59,15 @@ export function CardDeckControls({
           )}
           aria-label="Add to deck"
         >
-          <Plus className="h-3.5 w-3.5 stroke-[2.5]" />
+          <Plus className={iconClass} />
         </button>
       )}
 
       {showQuantity ? (
         <div
           className={cn(
-            "flex h-6 w-7 items-center justify-center",
+            "flex items-center justify-center",
+            cellClass,
             "font-mono text-xs font-bold tabular-nums",
             showButtons && "border-t border-b border-border/60",
             deckCount > 0 ? "text-primary" : "text-foreground"
@@ -77,14 +83,15 @@ export function CardDeckControls({
           onClick={onRemove}
           disabled={deckCount === 0}
           className={cn(
-            "pointer-events-auto flex h-6 w-7 items-center justify-center",
+            "pointer-events-auto flex items-center justify-center",
+            cellClass,
             "text-destructive transition-colors duration-150",
             "hover:bg-destructive/15",
             "disabled:cursor-not-allowed disabled:text-muted-foreground"
           )}
           aria-label="Remove from deck"
         >
-          <Minus className="h-3.5 w-3.5 stroke-[2.5]" />
+          <Minus className={iconClass} />
         </button>
       )}
     </div>
