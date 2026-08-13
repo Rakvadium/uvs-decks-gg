@@ -3,6 +3,7 @@
 import { FolderKanban } from "lucide-react";
 import { useAuthDialog } from "@/components/auth/auth-dialog";
 import { Button } from "@/components/ui/button";
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 export function GalleryGuestDecksIcon({ className }: { className?: string }) {
   return <FolderKanban className={className} />;
@@ -10,13 +11,16 @@ export function GalleryGuestDecksIcon({ className }: { className?: string }) {
 
 export function GalleryGuestDecksSidebar() {
   const { openAuthDialog } = useAuthDialog();
+  const isMobile = useIsMobile();
+  const intro = isMobile
+    ? "Sign in to use deck tools from the gallery: pick an active deck, add cards from the catalog, and keep everything synced while you browse."
+    : "Sign in to use deck tools from the gallery sidebar: pick an active deck, add cards from the catalog, and keep everything synced while you browse.";
 
   return (
     <div className="flex h-full min-h-0 flex-col overflow-y-auto p-4">
       <div className="space-y-4">
         <p className="text-sm leading-relaxed text-muted-foreground">
-          Sign in to use deck tools from the gallery sidebar: pick an active deck, add cards from the catalog,
-          and keep everything synced while you browse.
+          {intro}
         </p>
         <ul className="space-y-2 text-sm leading-snug text-foreground/90">
           <li>Browse all your decks and switch between them without leaving this panel.</li>
