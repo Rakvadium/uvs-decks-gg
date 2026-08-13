@@ -19,6 +19,7 @@ import {
 import type { CachedCard } from "./card-store";
 import type { CardFilters, StatFilterValue } from "@/providers/UIStateProvider";
 import { fetchStaticCatalog } from "./static-catalog";
+import { cardMatchesRarityFilter } from "./rarity";
 
 export type { CachedCard } from "./card-store";
 
@@ -527,7 +528,7 @@ export function filterCards(
     }
 
     if (hasRarityFilter) {
-      if (!card.rarity || !rarities!.includes(card.rarity)) continue;
+      if (!cardMatchesRarityFilter(card.rarity, rarities)) continue;
     }
 
     if (hasSetFilter) {
