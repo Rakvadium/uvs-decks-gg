@@ -93,21 +93,21 @@ export function CardDetailsV2({
       <div className="flex w-full max-md:h-auto max-md:flex-none flex-col gap-4 p-3 max-md:!pointer-events-none md:h-[min(85vh,calc(100dvh-2rem))] md:max-h-[min(85vh,calc(100dvh-2rem))] md:min-h-0 md:flex-1 md:flex-row md:items-stretch md:gap-5 md:overflow-hidden md:pb-3 md:pl-3 md:!pointer-events-auto md:pt-12">
         <div
           className={cn(
-            "flex w-full shrink-0 flex-col items-center justify-center max-md:!pointer-events-auto md:h-full md:min-h-0",
+            "flex w-full shrink-0 flex-col items-center justify-center max-md:pointer-events-none md:h-full md:min-h-0",
             "lg:sticky lg:top-0 lg:w-[400px] lg:max-w-[400px] lg:self-start"
           )}
         >
           <div className="w-full">
-            <div className="flex items-center justify-center gap-3">
+            <div className="flex w-full items-center justify-center gap-3 max-md:pointer-events-none">
               <div
                 className={cn(
-                  "shrink-0 justify-center md:hidden",
+                  "shrink-0 justify-center md:hidden max-md:pointer-events-auto",
                   mobileNavigationPrevious ? "flex w-10" : "hidden"
                 )}
               >
                 {mobileNavigationPrevious}
               </div>
-              <div className="w-full max-w-[260px] md:max-w-[340px]">
+              <div className="w-full max-w-[260px] max-md:pointer-events-auto md:max-w-[340px]">
                 <div className="relative aspect-[2.5/3.5] w-full" style={{ perspective: 1000 }}>
                   {!hasBackFace ? (
                     <div
@@ -206,7 +206,7 @@ export function CardDetailsV2({
               </div>
               <div
                 className={cn(
-                  "shrink-0 justify-center md:hidden",
+                  "shrink-0 justify-center md:hidden max-md:pointer-events-auto",
                   mobileNavigationNext ? "flex w-10" : "hidden"
                 )}
               >
@@ -214,7 +214,7 @@ export function CardDetailsV2({
               </div>
             </div>
             <CardDetailsPrintingsBlock
-              className="mt-3"
+              className="mt-3 max-md:pointer-events-auto"
               card={card}
               isAdmin={Boolean(isAdmin)}
               onSelectPrinting={onSelectPrinting}
@@ -230,7 +230,7 @@ export function CardDetailsV2({
                 type="button"
                 variant="outline"
                 size="icon"
-                className="pointer-events-auto absolute top-0 right-0 z-30 h-9 w-9 rounded-none rounded-tr-xl rounded-bl-xl !border-primary/25 bg-card/95 shadow-none backdrop-blur-sm hover:!border-primary/40 hover:shadow-none"
+                className="pointer-events-auto absolute top-0 right-0 z-30 hidden h-9 w-9 rounded-none rounded-tr-xl rounded-bl-xl !border-primary/25 bg-card/95 shadow-none backdrop-blur-sm hover:!border-primary/40 hover:shadow-none md:inline-flex"
                 aria-label="Close"
               >
                 <X className="h-4 w-4" />

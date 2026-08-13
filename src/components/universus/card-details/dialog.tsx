@@ -2,12 +2,13 @@
 
 import { lazy, Suspense, useCallback, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { useQuery } from "convex/react";
 import type { CachedCard } from "@/lib/universus/card-store";
 import { api } from "../../../../convex/_generated/api";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -198,6 +199,22 @@ export function CardDetailsDialog({
           </Suspense>
         ) : null}
       </DialogContent>
+
+      {open && typeof document !== "undefined" &&
+        createPortal(
+          <DialogClose
+            data-card-dialog-nav
+            className={cn(
+              "pointer-events-auto fixed z-[60] md:hidden",
+              "top-[max(0.75rem,env(safe-area-inset-top))] right-3",
+              navigationButtonClassName(true)
+            )}
+            aria-label="Close"
+          >
+            <X className="h-5 w-5" />
+          </DialogClose>,
+          document.body
+        )}
 
       {hasNavigation && open && typeof document !== "undefined" &&
         createPortal(
