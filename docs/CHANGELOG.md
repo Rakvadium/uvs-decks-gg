@@ -10,6 +10,13 @@ All notable changes to this project are recorded here.
 
 ## [Unreleased]
 
+### Fixed
+
+- **Community destination tabs on tier-lists browser** — Desktop `/community/tier-lists` keeps Tier Lists / Rankings / Creators in the left header slot instead of replacing them with a Back pill.
+  - **Context:** GitHub #53.
+  - **Decisions:** Keep parent destination tabs visible (inventory + mobile dest nav). Nest Public / My Lists under Tier Lists only. Rankings stays a Community destination, not a duplicate nested tab. Hub feed remains via sidebar Community.
+  - **Files:** `src/components/community/community-destination-tabs.tsx`, `src/components/community/community-view/floating-top-bar.tsx`, `src/components/community/tier-lists/page-view/floating-top-bar.tsx`, `docs/floating-header-islands.md`.
+
 ### Added
 
 - **Collection in signed-in main nav** — Profile sheet (mobile) and left sidebar include Collection between Decks and Community, routing to `/collection`.

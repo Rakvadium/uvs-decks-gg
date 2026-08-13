@@ -3,13 +3,15 @@
 import { Plus } from "lucide-react";
 import {
   FloatingActionPill,
-  FloatingBackPill,
   FloatingPageBar,
   FloatingSearchCapsule,
   FloatingTabsPill,
 } from "@/components/shell/floating-page-bar";
+import { CommunityDestinationTabs } from "../../community-destination-tabs";
 import { useOptionalCommunityTierListsPageContext } from "./context";
 import { BROWSER_TABS } from "./hook";
+
+const LIST_BROWSER_TABS = BROWSER_TABS.filter((tab) => tab.id !== "rankings");
 
 export function CommunityTierListsFloatingTopBar() {
   const context = useOptionalCommunityTierListsPageContext();
@@ -25,32 +27,34 @@ export function CommunityTierListsFloatingTopBar() {
     handleOpenCreateDialog,
   } = context;
 
-  const showSearch = activeTab !== "rankings";
+  const showListBrowser = activeTab !== "rankings";
 
   return (
     <FloatingPageBar
       left={
         <>
-          <FloatingBackPill href="/community" label="Community" />
-          <FloatingTabsPill
-            value={activeTab}
-            onValueChange={(value) => setActiveTab(value as typeof activeTab)}
-            items={BROWSER_TABS.map((tab) => ({
-              value: tab.id,
-              label: tab.label,
-              icon: tab.icon,
-              badge:
-                tab.id === "public"
-                  ? publicLists?.length || undefined
-                  : tab.id === "mine"
-                    ? myLists?.length || undefined
-                    : undefined,
-            }))}
-          />
+          <CommunityDestinationTabs />
+          {showListBrowser ? (
+            <FloatingTabsPill
+              value={activeTab}
+              onValueChange={(value) => setActiveTab(value as typeof activeTab)}
+              items={LIST_BROWSER_TABS.map((tab) => ({
+                value: tab.id,
+                label: tab.label,
+                icon: tab.icon,
+                badge:
+                  tab.id === "public"
+                    ? publicLists?.length || undefined
+                    : tab.id === "mine"
+                      ? myLists?.length || undefined
+                      : undefined,
+              }))}
+            />
+          ) : null}
         </>
       }
       center={
-        showSearch ? (
+        showListBrowser ? (
           <FloatingSearchCapsule
             value={searchQuery}
             onChange={setSearchQuery}
