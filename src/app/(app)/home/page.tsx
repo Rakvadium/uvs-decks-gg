@@ -187,8 +187,8 @@ function HomePage() {
         <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
           <StatCard label="Cards Indexed" value={cardsLabel} icon={Database} delay={0.1} animate={introAnimations} />
           <StatCard
-            label={showPersonalStats ? "Your Decks" : "Your Decks"}
-            value={showPersonalStats ? totalDecks : "—"}
+            label={showPersonalStats ? "Your Decks" : "Saved Decks"}
+            value={showPersonalStats ? totalDecks : "Sign in"}
             icon={Layers}
             delay={0.2}
             animate={introAnimations}
@@ -210,7 +210,11 @@ function HomePage() {
             href="/decks"
             icon={Layers}
             title="Deck Builder"
-            description="Create, edit, and refine decks with main, side, and reference zones."
+            description={
+              showPersonalStats
+                ? "Create, edit, and refine decks with main, side, and reference zones."
+                : "Browse public decks. Sign in to create and edit your own lists."
+            }
             accentColor="secondary"
             delay={0.3}
             animate={introAnimations}

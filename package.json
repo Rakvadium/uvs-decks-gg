@@ -19,7 +19,6 @@
   },
   "dependencies": {
     "@auth/core": "0.37.0",
-    "@aws-sdk/client-s3": "^3.975.0",
     "@convex-dev/auth": "^0.0.90",
     "@convex-dev/r2": "^0.8.1",
     "@convex-dev/rate-limiter": "^0.3.2",

@@ -10,17 +10,22 @@ import {
 } from "@/lib/deck/display-config";
 import { useDeckCardsSectionContext } from "./deck-details-cards-section-context";
 
-export function DeckDetailsSectionTabs() {
+export function DeckDetailsSectionTabs({
+  layout = "auto",
+}: {
+  layout?: "auto" | "stacked-full";
+} = {}) {
   const model = useDeckCardsSectionContext();
   const isMobile = useIsMobile();
+  const stackedFull = layout === "stacked-full" || isMobile;
 
   const sections = ["main", "side", "reference"] as DeckSection[];
 
   return (
     <SegmentedControl
-      orientation={isMobile ? "horizontal" : "vertical"}
+      orientation={stackedFull ? "horizontal" : "vertical"}
       size="sm"
-      stretch={isMobile}
+      stretch={stackedFull}
       className="w-full bg-muted/20"
       value={model.activeSection}
       onValueChange={(value) => model.setActiveSection(value as DeckSection)}
@@ -32,7 +37,7 @@ export function DeckDetailsSectionTabs() {
           value: section,
           label: (
             <span className="flex-1 text-left">
-              {isMobile ? MOBILE_TAB_LABELS[section] : config.label}
+              {stackedFull ? MOBILE_TAB_LABELS[section] : config.label}
             </span>
           ),
           icon: config.icon,

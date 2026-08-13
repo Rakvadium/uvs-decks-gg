@@ -3,12 +3,14 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { CreatorProgramView } from "@/components/community/creator-program-view";
+import { CommunityFloatingTopBar } from "@/components/community/community-view/floating-top-bar";
 import { CommunityMobileDestinationNav } from "@/components/community/community-mobile-destination-nav";
+import { FloatingPageLayout } from "@/components/shell/floating-page-bar";
 import { Button } from "@/components/ui/button";
 
 export default function CreatorProgramPage() {
   return (
-    <div className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-y-contain [-webkit-overflow-scrolling:touch] p-6 md:h-full">
+    <FloatingPageLayout bar={<CommunityFloatingTopBar />}>
       <div className="md:hidden mb-4 space-y-3 border-b border-border/50 pb-4">
         <Button variant="ghost" size="sm" className="-ml-2 h-8 w-fit gap-2 px-2" asChild>
           <Link href="/community">
@@ -21,6 +23,6 @@ export default function CreatorProgramPage() {
         </div>
       </div>
       <CreatorProgramView />
-    </div>
+    </FloatingPageLayout>
   );
 }

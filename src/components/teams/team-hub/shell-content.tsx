@@ -79,7 +79,7 @@ export function TeamHubShellContent({ teamId, children }: TeamHubShellContentPro
         <div className="relative z-10">
           <div className="md:hidden border-b border-border/50 pb-4">
             {mobileBranding}
-            <div className="mt-4 flex min-w-0 items-center gap-2 overflow-x-auto pb-0.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <div className="mt-4 min-w-0 max-w-full overflow-x-auto overflow-y-hidden pb-1 [scrollbar-width:thin]">
               <TeamHubSectionNav teamId={teamId} />
             </div>
           </div>
