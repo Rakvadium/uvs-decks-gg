@@ -10,6 +10,13 @@ All notable changes to this project are recorded here.
 
 ## [Unreleased]
 
+### Fixed
+
+- **Creator Program guest CTAs** — Signed-out Apply/Start Verification open the sign-up dialog with creator-apply framing instead of silent no-ops; dead View Creator Profile and See All Tools controls are removed.
+  - **Context:** Issue #55 (duplicate #59). PR #83 landed the same fix on `master` only.
+  - **Decisions:** No verification backend; signed-in apply scrolls to the verification path. Keep neon hero/CTA hierarchy and Back to Community (working destination).
+  - **Files:** `src/components/community/creator-program/*`.
+
 ### Added
 
 - **Product tour sizzle reel** — Fullscreen interactive feature tour at `/tour` with auto-advancing beats, keyboard controls, and a Home “Watch Tour” entry.
