@@ -1,4 +1,4 @@
-import { LayoutGrid, Layers, Users, type LucideIcon } from "lucide-react";
+import { LayoutGrid, Layers, Library, Users, type LucideIcon } from "lucide-react";
 
 export interface MainNavItem {
   path: string;
@@ -9,6 +9,7 @@ export interface MainNavItem {
 export const BASE_MAIN_NAV_ITEMS: MainNavItem[] = [
   { path: "gallery", label: "Card Gallery", icon: LayoutGrid },
   { path: "decks", label: "Decks", icon: Layers },
+  { path: "collection", label: "Collection", icon: Library },
   { path: "community", label: "Community", icon: Users },
 ];
 
