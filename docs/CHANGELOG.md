@@ -10,6 +10,13 @@ All notable changes to this project are recorded here.
 
 ## [Unreleased]
 
+### Fixed
+
+- **Collection discoverability and floating identity** — Signed-in chrome now links to Collection (sidebar + mobile profile Navigation). Desktop `/collection` has a left identity pill; the coming-soon stub uses dashed `border-border/80`.
+  - **Context:** Issue #32 (port of PR #44 which landed on `master` only).
+  - **Decisions:** Title-pill-only header matching Teams decks; do not build collection tracking.
+  - **Files:** `src/components/shell/main-nav-build.ts`, `src/app/(app)/collection/collection-page-client.tsx`, `docs/floating-header-islands.md`.
+
 ### Added
 
 - **Product tour sizzle reel** — Fullscreen interactive feature tour at `/tour` with auto-advancing beats, keyboard controls, and a Home “Watch Tour” entry.
