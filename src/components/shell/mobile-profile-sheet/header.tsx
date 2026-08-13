@@ -1,5 +1,5 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { UserAvatar } from "@/components/user-avatar";
 import { useMobileProfileSheetContext } from "./context";
 
 export function MobileProfileSheetHeader() {

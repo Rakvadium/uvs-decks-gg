@@ -19,7 +19,6 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Card,
   CardContent,
@@ -65,22 +64,13 @@ import {
   FloatingPageBar,
   FloatingPageLayout,
 } from "@/components/shell/floating-page-bar";
+import { UserAvatar } from "@/components/user-avatar";
+import {
+  AVATAR_SYMBOLS,
+  isAvatarSymbolPath,
+  normalizeAvatarImagePath,
+} from "@/lib/user-avatar";
 import { SettingsAuthRequiredState } from "./auth-required-state";
-
-const AVATAR_SYMBOLS = [
-  { id: "fire", name: "Fire", path: "/universus/symbols/fire.png" },
-  { id: "water", name: "Water", path: "/universus/symbols/water.png" },
-  { id: "earth", name: "Earth", path: "/universus/symbols/earth.png" },
-  { id: "air", name: "Air", path: "/universus/symbols/air.png" },
-  { id: "life", name: "Life", path: "/universus/symbols/life.png" },
-  { id: "death", name: "Death", path: "/universus/symbols/death.png" },
-  { id: "order", name: "Order", path: "/universus/symbols/order.png" },
-  { id: "chaos", name: "Chaos", path: "/universus/symbols/chaos.png" },
-  { id: "good", name: "Good", path: "/universus/symbols/good.png" },
-  { id: "evil", name: "Evil", path: "/universus/symbols/evil.png" },
-  { id: "void", name: "Void", path: "/universus/symbols/void.png" },
-  { id: "all", name: "All", path: "/universus/symbols/all.png" },
-] as const;
 
 const MODE_OPTIONS: readonly {
   value: ThemePreference;
@@ -239,14 +229,16 @@ export default function SettingsPageClient() {
   useEffect(() => {
     if (user) {
       setUsername(user.username || "");
-      setImageUrl(user.image || "");
+      setImageUrl(normalizeAvatarImagePath(user.image));
     }
   }, [user]);
 
   useEffect(() => {
     if (user) {
       const usernameChanged = username !== (user.username || "");
-      const imageChanged = imageUrl !== (user.image || "");
+      const imageChanged =
+        normalizeAvatarImagePath(imageUrl) !==
+        normalizeAvatarImagePath(user.image);
       setHasChanges(usernameChanged || imageChanged);
     }
   }, [username, imageUrl, user]);
@@ -285,7 +277,7 @@ export default function SettingsPageClient() {
     try {
       await updateProfile({
         username: username || undefined,
-        image: imageUrl || undefined,
+        image: normalizeAvatarImagePath(imageUrl) || undefined,
       });
       toast.success("Profile updated successfully");
       setHasChanges(false);
@@ -410,12 +402,13 @@ export default function SettingsPageClient() {
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="flex items-start gap-6">
-                  <Avatar className="h-20 w-20 border-2 border-muted">
-                    {imageUrl && <AvatarImage src={imageUrl} alt={username || "User"} />}
-                    <AvatarFallback className="bg-primary/10 text-2xl font-medium text-primary">
-                      {username?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase() || "?"}
-                    </AvatarFallback>
-                  </Avatar>
+                  <UserAvatar
+                    username={username || user.username}
+                    image={imageUrl}
+                    alt={username || user.username || "User"}
+                    className="h-20 w-20 border-2 border-muted"
+                    fallbackClassName="bg-primary/10 text-2xl font-medium text-primary"
+                  />
                   <div className="flex-1 space-y-4">
                     <div className="space-y-2">
                       <Label htmlFor="username" className="flex items-center gap-2">
@@ -438,36 +431,40 @@ export default function SettingsPageClient() {
                     Avatar Symbol
                   </Label>
                   <div className="grid grid-cols-4 gap-3 sm:grid-cols-6">
-                    {AVATAR_SYMBOLS.map((symbol) => (
-                      <button
-                        key={symbol.id}
-                        type="button"
-                        onClick={() => setImageUrl(symbol.path)}
-                        className={cn(
-                          "group relative flex flex-col items-center gap-2 rounded-xl border-2 p-3 transition-colors hover:border-primary/50 hover:bg-muted/50",
-                          imageUrl === symbol.path
-                            ? "border-primary bg-primary/10"
-                            : "border-muted"
-                        )}
-                      >
-                        <div className="relative h-10 w-10">
-                          <Image
-                            src={symbol.path}
-                            alt={symbol.name}
-                            fill
-                            className="object-contain"
-                          />
-                        </div>
-                        <span className="text-xs font-medium">{symbol.name}</span>
-                        {imageUrl === symbol.path && (
-                          <div className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                            <Check className="h-3 w-3" />
+                    {AVATAR_SYMBOLS.map((symbol) => {
+                      const selected =
+                        normalizeAvatarImagePath(imageUrl) === symbol.path;
+                      return (
+                        <button
+                          key={symbol.id}
+                          type="button"
+                          onClick={() => setImageUrl(symbol.path)}
+                          className={cn(
+                            "group relative flex flex-col items-center gap-2 rounded-xl border-2 p-3 transition-colors hover:border-primary/50 hover:bg-muted/50",
+                            selected
+                              ? "border-primary bg-primary/10"
+                              : "border-muted"
+                          )}
+                        >
+                          <div className="relative h-10 w-10">
+                            <Image
+                              src={symbol.path}
+                              alt={symbol.name}
+                              fill
+                              className="object-contain"
+                            />
                           </div>
-                        )}
-                      </button>
-                    ))}
+                          <span className="text-xs font-medium">{symbol.name}</span>
+                          {selected && (
+                            <div className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                              <Check className="h-3 w-3" />
+                            </div>
+                          )}
+                        </button>
+                      );
+                    })}
                   </div>
-                  {imageUrl && !AVATAR_SYMBOLS.some(s => s.path === imageUrl) && (
+                  {imageUrl && !isAvatarSymbolPath(imageUrl) && (
                     <p className="text-xs text-muted-foreground">
                       You have a custom avatar. Select a symbol above to change it.
                     </p>
