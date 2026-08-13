@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import {
   Dialog,
   DialogBody,
@@ -25,13 +25,7 @@ const TIER_PREVIEW_CARD_LIMIT = 10;
 
 export function CommunityRankingsView({ embedded = false }: CommunityRankingsViewProps) {
   const tierListsPage = useOptionalCommunityTierListsPageContext();
-  const {
-    scopeType,
-    selectedSetScopeKey,
-    leaderboard,
-    cardMap,
-    setScopes,
-  } = useCommunityRankingsModel();
+  const { scopeType, leaderboard, cardMap } = useCommunityRankingsModel();
 
   const [dialogTier, setDialogTier] = useState<{
     label: string;
@@ -39,12 +33,6 @@ export function CommunityRankingsView({ embedded = false }: CommunityRankingsVie
     cardIds: Id<"cards">[];
     scopeLabel: string;
   } | null>(null);
-
-  const scopeSubtitle =
-    leaderboard?.scopeLabel ??
-    (scopeType === "global"
-      ? "Global rankings"
-      : (setScopes ?? []).find((s) => s.scopeKey === selectedSetScopeKey)?.scopeLabel ?? "Set scope");
 
   return (
     <div className={cn("relative flex h-full flex-col overflow-y-auto", embedded && "overflow-visible")}>
@@ -59,25 +47,21 @@ export function CommunityRankingsView({ embedded = false }: CommunityRankingsVie
             leaderboard ? "border-border/50" : "border-dashed border-border/50",
           )}
         >
-          <CardHeader className="space-y-4">
-            <div className="space-y-1">
-              <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-                <CardTitle>Generated Community Tier List</CardTitle>
+          <CardHeader>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+              <div className="max-w-2xl space-y-2">
                 {leaderboard ? (
-                  <Badge variant="outline" className="shrink-0 text-xs font-normal">
+                  <Badge variant="outline" className="w-fit shrink-0 text-xs font-normal">
                     {leaderboard.lastComputedAt ? new Date(leaderboard.lastComputedAt).toLocaleString() : "Pending"}
                   </Badge>
                 ) : null}
+                <p className="text-sm leading-relaxed text-muted-foreground">
+                  This view combines each duelist&apos;s latest public ranked list for the selected scope and turns those
+                  votes into shared tier bands. When you publish a ranked list, it helps shape what everyone sees here. A
+                  card needs at least {COMMUNITY_TIER_RANKING.minimumVotesToRank} community rankings in that scope before
+                  it can appear here, so low-data picks stay out until there&apos;s enough signal.
+                </p>
               </div>
-              <CardDescription>{scopeSubtitle}</CardDescription>
-            </div>
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-              <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground">
-                This view combines each duelist&apos;s latest public ranked list for the selected scope and turns those
-                votes into shared tier bands. When you publish a ranked list, it helps shape what everyone sees here. A
-                card needs at least {COMMUNITY_TIER_RANKING.minimumVotesToRank} community rankings in that scope before
-                it can appear here, so low-data picks stay out until there&apos;s enough signal.
-              </p>
               {tierListsPage ? (
                 <Button type="button" className="shrink-0" onClick={tierListsPage.handleOpenCreateDialog}>
                   Create your tier list
