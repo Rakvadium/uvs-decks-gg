@@ -7,7 +7,7 @@ import {
   communityDestinationFromLocation,
 } from "./community-destinations";
 
-export function CommunityDestinationTabs() {
+export function CommunityDestinationTabs({ compact = false }: { compact?: boolean } = {}) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -22,7 +22,7 @@ export function CommunityDestinationTabs() {
       }}
       items={COMMUNITY_DESTINATIONS.map((item) => ({
         value: item.value,
-        label: item.label,
+        label: compact ? <span className="sr-only">{item.label}</span> : item.label,
         icon: item.icon,
         hideLabelBelowLg: false,
       }))}
