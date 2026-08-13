@@ -3,8 +3,14 @@
 import Link from "next/link";
 import { COLOR_SCHEMES } from "@/lib/theme";
 import type { ColorPresetChoice } from "@/lib/theme/appearance-types";
-import { cn } from "@/lib/utils";
-import { Moon, Palette, Settings, Sun } from "lucide-react";
+import { Check, ChevronDown, Moon, Palette, Settings, Sun } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useMobileProfileSheetContext } from "./context";
 
 export function MobileProfilePreferencesSection() {
@@ -17,6 +23,10 @@ export function MobileProfilePreferencesSection() {
     handleSettingsClick,
     closeSheet,
   } = useMobileProfileSheetContext();
+
+  const selectedLabel = isCustomAppearance
+    ? "Custom"
+    : (COLOR_SCHEMES.find((scheme) => scheme.value === colorPreset)?.label ?? "Default");
 
   return (
     <div className="p-4">
@@ -33,42 +43,45 @@ export function MobileProfilePreferencesSection() {
           <span>{isDark ? "Light mode" : "Dark mode"}</span>
         </button>
 
-        <div className="space-y-2 rounded-lg px-3 py-2.5">
-          <div className="flex items-center gap-3 text-sm font-medium text-foreground">
-            <Palette className="h-5 w-5" />
-            <span>Color preset</span>
-            {isCustomAppearance ? (
-              <span className="text-xs font-normal text-muted-foreground">Custom palette</span>
-            ) : null}
-          </div>
-          <div className="ml-8 flex flex-wrap gap-2">
-            <Link
-              href="/settings#appearance"
-              className={cn(
-                "rounded-md px-3 py-1.5 text-xs font-medium transition-colors hover:bg-muted/80",
-                isCustomAppearance ? "bg-primary text-primary-foreground hover:bg-primary/90" : "bg-muted",
-              )}
-              onClick={closeSheet}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              type="button"
+              className="flex min-h-11 w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted"
             >
-              Custom
-            </Link>
-            {COLOR_SCHEMES.map((scheme) => (
-              <button
-                type="button"
-                key={scheme.value}
-                onClick={() => applyColorPreset(scheme.value as ColorPresetChoice)}
-                className={cn(
-                  "rounded-md px-3 py-1.5 text-xs font-medium transition-colors",
-                  !isCustomAppearance && colorPreset === scheme.value
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-muted text-foreground hover:bg-muted/80",
-                )}
-              >
-                {scheme.label}
-              </button>
-            ))}
-          </div>
-        </div>
+              <Palette className="h-5 w-5 shrink-0" />
+              <span className="flex-1 text-left">Color preset</span>
+              <span className="max-w-[9rem] truncate text-xs font-normal text-muted-foreground">
+                {selectedLabel}
+              </span>
+              <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="min-w-[12rem]">
+            {COLOR_SCHEMES.map((scheme) => {
+              const picked = !isCustomAppearance && scheme.value === colorPreset;
+              return (
+                <DropdownMenuItem
+                  key={scheme.value}
+                  onClick={() => applyColorPreset(scheme.value as ColorPresetChoice)}
+                >
+                  <span className="flex-1">{scheme.label}</span>
+                  {picked ? (
+                    <Check className="ml-auto h-3.5 w-3.5 text-primary" aria-hidden />
+                  ) : (
+                    <span className="ml-auto w-3.5" aria-hidden />
+                  )}
+                </DropdownMenuItem>
+              );
+            })}
+            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild>
+              <Link href="/settings#appearance" onClick={closeSheet}>
+                Custom colors…
+              </Link>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
 
         <button
           type="button"

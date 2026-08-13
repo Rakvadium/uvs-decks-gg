@@ -92,7 +92,7 @@ function TokenSymbolIcons({
                 className="h-full w-full object-contain"
               />
             ) : (
-              <span className="max-w-full truncate px-0.5 text-[8px] leading-none text-muted-foreground">
+              <span className="max-w-full truncate px-0.5 text-[10px] leading-none text-muted-foreground">
                 {symbol.slice(0, 2)}
               </span>
             )}
@@ -182,7 +182,7 @@ export function FilterTokens({
             onClick={() => setFilterPanelOpen(true)}
             title={token.values.join(", ")}
           >
-            <span className="shrink-0 select-none font-mono text-[9px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
+            <span className="shrink-0 select-none font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
               {token.label}
             </span>
             <TokenContent token={token} />

@@ -12,6 +12,7 @@ export function DeckDetailsHeroCharacterImagePicker() {
     deck,
     imageCard,
     startingCharacter,
+    compactEmptyMobile,
     handleSelectCharacter,
     handleImageClick,
   } = useDeckDetailsHeroPanelContext();
@@ -40,9 +41,19 @@ export function DeckDetailsHeroCharacterImagePicker() {
         ) : (
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="relative">
-              <Hexagon className="h-20 w-20 text-primary/20" />
+              <Hexagon
+                className={cn(
+                  "text-primary/20",
+                  compactEmptyMobile ? "h-12 w-12 max-lg:h-10 max-lg:w-10" : "h-20 w-20",
+                )}
+              />
               <div className="absolute inset-0 flex items-center justify-center">
-                <Layers className="h-8 w-8 text-primary/40" />
+                <Layers
+                  className={cn(
+                    "text-primary/40",
+                    compactEmptyMobile ? "h-5 w-5 max-lg:h-4 max-lg:w-4" : "h-8 w-8",
+                  )}
+                />
               </div>
             </div>
           </div>
