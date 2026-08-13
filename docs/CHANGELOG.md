@@ -10,6 +10,13 @@ All notable changes to this project are recorded here.
 
 ## [Unreleased]
 
+### Fixed
+
+- **Deck details mobile sticky chrome** — Phone-width owned-deck sticky bar exposes the full title via tap-to-expand, shows visibility + format on a second row so the format badge no longer starves the name, and uses 40px icon actions (Set Active / Edit).
+  - **Context:** Issue #67 (port onto `dev`; prior PR #90 merged to `master`).
+  - **Decisions:** Keep desktop floating Set Active / Edit pills unchanged; visibility in sticky chrome is read-only state (edit remains the change path).
+  - **Files:** `src/components/deck-details/deck-details-top-bar/{title-section,content,view-actions}.tsx`.
+
 ### Added
 
 - **Product tour sizzle reel** — Fullscreen interactive feature tour at `/tour` with auto-advancing beats, keyboard controls, and a Home “Watch Tour” entry.
