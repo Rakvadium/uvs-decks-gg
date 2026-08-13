@@ -37,7 +37,7 @@ export function DecksSidebarList() {
 
   if (currentDecks.length === 0) {
     return (
-      <div className="rounded-lg border border-dashed border-border/50 bg-card/30 px-4 py-6 text-center">
+      <div className="rounded-lg border border-dashed border-border/80 bg-card/30 px-4 py-6 text-center">
         <p className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
           {searchQuery.trim()
             ? "No decks match your search"
