@@ -10,6 +10,13 @@ All notable changes to this project are recorded here.
 
 ## [Unreleased]
 
+### Fixed
+
+- **Teams landing page identity** — Desktop `/teams` (no team) now has a left identity pill `h1` (“Teams”); Create Team stays in the right action slot. Mobile keeps a matching `md:hidden` heading.
+  - **Context:** Issue #102.
+  - **Decisions:** Copy the teams-decks / settings title-pill pattern; do not add a desktop in-content PageHero.
+  - **Files:** `src/components/teams/teams-landing-view.tsx`, `docs/floating-header-islands.md`.
+
 ### Added
 
 - **Product tour sizzle reel** — Fullscreen interactive feature tour at `/tour` with auto-advancing beats, keyboard controls, and a Home “Watch Tour” entry.
