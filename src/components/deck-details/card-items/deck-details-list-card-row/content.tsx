@@ -38,7 +38,7 @@ function DeckDetailsListCardRowContent() {
     <>
       <div
         className={cn(
-          "group relative flex min-h-9 cursor-pointer items-stretch overflow-hidden rounded-sm border border-border/30 bg-card/30 transition",
+          "group relative flex min-h-9 max-md:min-h-11 cursor-pointer items-stretch overflow-hidden rounded-sm border border-border/30 bg-card/30 transition",
           "hover:border-primary/30 hover:bg-primary/6",
           isDragging && "opacity-60"
         )}
