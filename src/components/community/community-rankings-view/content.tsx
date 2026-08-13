@@ -56,7 +56,7 @@ export function CommunityRankingsView({ embedded = false }: CommunityRankingsVie
         <Card
           className={cn(
             "bg-card/80",
-            leaderboard ? "border-border/50" : "border-dashed border-border/50",
+            leaderboard ? "border-border/50" : "border-dashed border-border/80",
           )}
         >
           <CardHeader className="space-y-4">
@@ -91,7 +91,7 @@ export function CommunityRankingsView({ embedded = false }: CommunityRankingsVie
           </CardHeader>
           <CardContent>
             {!leaderboard ? (
-              <div className="flex min-h-48 items-center justify-center rounded-xl border border-dashed border-border/40 bg-background/30 px-4 py-8 text-center text-sm text-muted-foreground">
+              <div className="flex min-h-48 items-center justify-center rounded-xl border border-dashed border-border/80 bg-background/30 px-4 py-8 text-center text-sm text-muted-foreground">
                 {scopeType === "set_scope"
                   ? "No ranked set-scoped lists are available yet."
                   : "No ranked global lists are available yet."}
@@ -161,7 +161,7 @@ export function CommunityRankingsView({ embedded = false }: CommunityRankingsVie
                           })}
                         </div>
                       ) : (
-                        <div className="rounded-xl border border-dashed border-border/40 bg-background/30 px-4 py-5 text-sm text-muted-foreground">
+                        <div className="rounded-xl border border-dashed border-border/80 bg-background/30 px-4 py-5 text-sm text-muted-foreground">
                           No cards have landed in this community tier yet.
                         </div>
                       )}
