@@ -3,7 +3,7 @@ import { useActiveDeckSectionContext } from "./context";
 
 function ActiveDeckSectionEmptyState() {
   return (
-    <div className="rounded-md border border-dashed border-border/50 px-3 py-2 text-[11px] text-muted-foreground">
+    <div className="rounded-md border border-dashed border-border/80 px-3 py-2 text-[11px] text-muted-foreground">
       No cards in this section yet.
     </div>
   );
