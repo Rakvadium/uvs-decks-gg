@@ -1,16 +1,19 @@
 import { useCallback, useState } from "react";
-import { Hexagon, Loader2 } from "lucide-react";
+import { Hexagon, Layers, Loader2 } from "lucide-react";
 import { CardHoverPreviewPortal } from "@/components/deck/shared";
+import { TeamEditableWriteConflictBanner } from "@/components/deck/team-editable-write-conflict-banner";
+import { useShellSlotActions } from "@/components/shell/shell-slot-provider";
+import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { usePrefersReducedMotion } from "@/lib/reduced-motion";
 import type { CachedCard } from "@/lib/universus/card-store";
-import { TeamEditableWriteConflictBanner } from "@/components/deck/team-editable-write-conflict-banner";
 import { useActiveDeck } from "@/providers/ActiveDeckProvider";
 import { ActiveDeckCharacterPanel } from "./character-panel";
 import { ActiveDeckSections } from "./sections";
 
 export function ActiveDeckSidebar() {
   const { activeDeck, isLoading } = useActiveDeck();
+  const { setActiveSidebarAction } = useShellSlotActions();
   const isMobile = useIsMobile();
   const prefersReducedMotion = usePrefersReducedMotion();
   const [hoveredCard, setHoveredCard] = useState<CachedCard | null>(null);
@@ -46,16 +49,28 @@ export function ActiveDeckSidebar() {
 
   if (!activeDeck) {
     return (
-      <div className="space-y-4 p-4">
-        <div className="flex items-center gap-2 text-muted-foreground">
-          <Hexagon className="h-5 w-5 text-primary/30" />
-          <span className="text-sm font-mono uppercase tracking-wider">
-            No Active Deck
-          </span>
+      <div className="p-4">
+        <div className="rounded-lg border border-dashed border-border/50 bg-card/30 px-4 py-6 text-center">
+          <div className="flex items-center justify-center gap-2 text-muted-foreground">
+            <Hexagon className="h-5 w-5 text-primary/30" />
+            <span className="text-sm font-mono uppercase tracking-wider">
+              No Active Deck
+            </span>
+          </div>
+          <p className="mt-3 text-xs font-mono text-muted-foreground/60">
+            Select a deck to start adding cards
+          </p>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="mt-3"
+            onClick={() => setActiveSidebarAction("decks")}
+          >
+            <Layers className="h-3.5 w-3.5" />
+            Open Decks
+          </Button>
         </div>
-        <p className="text-xs font-mono text-muted-foreground/60">
-          Select a deck to start adding cards
-        </p>
       </div>
     );
   }
