@@ -66,10 +66,10 @@ export function TeamHubSectionNav({ teamId, className }: TeamHubSectionNavProps)
   );
 
   return (
-    <nav className={cn("min-w-0", className)} aria-label="Team hub sections">
+    <nav className={cn("w-max shrink-0", className)} aria-label="Team hub sections">
       <SegmentedControl
         size="sm"
-        className="w-max min-w-0 max-w-none"
+        className="w-max max-w-none"
         value={value}
         onValueChange={onValueChange}
         items={[
