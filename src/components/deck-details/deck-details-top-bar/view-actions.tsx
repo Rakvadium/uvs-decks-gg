@@ -18,7 +18,7 @@ export function DeckDetailsTopBarViewActions({ compact = false }: DeckDetailsTop
       size={compact ? "icon" : "sm"}
       onClick={setAsActiveDeck}
       disabled={isActiveDeck}
-      className={cn("h-8", compact && "w-8", isActiveDeck && "disabled:opacity-100")}
+      className={cn(isActiveDeck && "disabled:opacity-100")}
       aria-label={isActiveDeck ? "Active deck" : "Set as active deck"}
     >
       <Zap className={cn("h-4 w-4", !compact && "mr-1", isActiveDeck && "text-yellow-400")} />
