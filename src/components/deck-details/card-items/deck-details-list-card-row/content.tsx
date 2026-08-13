@@ -67,7 +67,7 @@ function DeckDetailsListCardRowContent() {
         <div
           className={cn(
             "min-w-0 flex flex-1 items-center px-2.5 py-1.5 transition-colors duration-200",
-            isOwner && "group-hover:pr-24"
+            isOwner && "group-hover:pr-24 max-md:pr-48"
           )}
         >
           <p className="truncate text-xs font-medium leading-tight">{card.name}</p>
@@ -76,7 +76,7 @@ function DeckDetailsListCardRowContent() {
         <span
           className={cn(
             "flex items-center px-2 text-[10px] font-mono uppercase tracking-wider text-muted-foreground transition-opacity duration-150",
-            isOwner && "group-hover:opacity-0"
+            isOwner && "group-hover:opacity-0 max-md:hidden"
           )}
         >
           x{count}
