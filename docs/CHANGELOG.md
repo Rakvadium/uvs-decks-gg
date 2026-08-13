@@ -10,6 +10,13 @@ All notable changes to this project are recorded here.
 
 ## [Unreleased]
 
+### Fixed
+
+- **Gallery cards-per-row is one preference** — Opening or closing the gallery sidebar no longer switches to a different remembered density.
+  - **Context:** Issue #38. Silent dual `galleryCardsPerRowOpen` / `galleryCardsPerRowClosed` keys made the View Mode slider look like it reset.
+  - **Decisions:** Single `galleryCardsPerRow` localStorage key; migrate preferring single → closed → open; drop dual keys on persist. No second hidden preference or width auto-fit.
+  - **Files:** `src/providers/UIStateProvider.tsx`, `src/providers/GalleryFiltersProvider.tsx`, `src/lib/gallery/cards-per-row-preference.ts`, `tests/cards-per-row-preference.test.ts`.
+
 ### Added
 
 - **Product tour sizzle reel** — Fullscreen interactive feature tour at `/tour` with auto-advancing beats, keyboard controls, and a Home “Watch Tour” entry.
