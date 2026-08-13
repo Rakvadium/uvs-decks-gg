@@ -9,6 +9,7 @@ import { useAuthDialog } from "@/components/auth/auth-dialog";
 import {
   FLOATING_ACTION_PILL_CLASS,
   FloatingActionPill,
+  FloatingCapsuleCluster,
   FloatingPageBar,
   FloatingPageLayout,
 } from "@/components/shell/floating-page-bar";
@@ -20,6 +21,13 @@ function TeamsLandingFloatingBar({ isAuthenticated }: { isAuthenticated: boolean
 
   return (
     <FloatingPageBar
+      left={
+        <FloatingCapsuleCluster bodyClassName="px-4" glow>
+          <h1 className="truncate text-sm font-semibold tracking-tight text-foreground">
+            Teams
+          </h1>
+        </FloatingCapsuleCluster>
+      }
       right={
         isAuthenticated ? (
           <CreateTeamButton className={FLOATING_ACTION_PILL_CLASS} />
@@ -81,7 +89,8 @@ export function TeamsLandingView() {
           <div className="h-full w-full bg-gradient-to-b from-primary/[0.07] via-primary/[0.03] via-40% to-transparent to-100%" />
         </div>
         <div className="relative z-10 space-y-6">
-          <div className="md:hidden">
+          <div className="space-y-3 md:hidden">
+            <h1 className="font-display text-lg font-semibold text-foreground">Teams</h1>
             {isAuthenticated ? (
               <CreateTeamButton className="w-full justify-center" />
             ) : (
