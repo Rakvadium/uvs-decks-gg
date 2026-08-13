@@ -1,21 +1,18 @@
-const { chromium } = require('playwright');
-const path = require('path');
-const fs = require('fs');
+import { chromium } from "playwright";
+import fs from "node:fs";
+import path from "node:path";
 
-const BASE_URL = 'http://localhost:8090';
-const AUTH_TOKEN = '21756fdf57a808c36f5a3459baf0c3b828dd5783feb1434b';
+const BASE_URL = "http://localhost:8090";
+const AUTH_TOKEN = process.env.AGENT_AUTH_SECRET;
+if (!AUTH_TOKEN) {
+  throw new Error("AGENT_AUTH_SECRET is required");
+}
 const LOGIN_URL = `${BASE_URL}/agent-login?token=${AUTH_TOKEN}&next=/gallery`;
 
 const VIEWPORTS = {
   desktop: { width: 1280, height: 800 },
-  mobile: { width: 390, height: 844 } // iPhone 12 Pro aspect ratio
+  mobile: { width: 390, height: 844 },
 };
-
-const ROUTES = [
-  { path: '/gallery', name: 'gallery' },
-  { path: '/decks', name: 'decks', needsDeckId: true },
-  { path: '/admin', name: 'admin' }
-];
 
 async function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
