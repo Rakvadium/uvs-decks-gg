@@ -247,6 +247,8 @@ export function FloatingActionPill({
   type = "button",
   variant = "default",
   asChild,
+  disabled,
+  "aria-label": ariaLabel,
 }: {
   children: ReactNode;
   className?: string;
@@ -254,6 +256,8 @@ export function FloatingActionPill({
   type?: "button" | "submit";
   variant?: "default" | "outline" | "ghost" | "secondary" | "destructive";
   asChild?: boolean;
+  disabled?: boolean;
+  "aria-label"?: string;
 }) {
   return (
     <Button
@@ -263,6 +267,8 @@ export function FloatingActionPill({
       className={cn(FLOATING_ACTION_PILL_CLASS, className)}
       onClick={onClick}
       asChild={asChild}
+      disabled={disabled}
+      aria-label={ariaLabel}
     >
       {children}
     </Button>
