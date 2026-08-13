@@ -10,6 +10,13 @@ All notable changes to this project are recorded here.
 
 ## [Unreleased]
 
+### Fixed
+
+- **Guest home Deck Builder copy** — Signed-out `/home` no longer promises create/edit on the Deck Builder card; `/decks` shows compact guest framing that building requires sign-in.
+  - **Context:** GitHub #58 (duplicate #62).
+  - **Decisions:** Keep OPEN → `/decks` public browse (option a) rather than opening auth immediately; signed-in card copy unchanged.
+  - **Files:** `src/app/(app)/home/page.tsx`, `src/components/decks/decks-view/guest-browse-banner.tsx`, `src/components/decks/decks-view/content.tsx`, `src/components/decks/decks-view/heading.tsx`.
+
 ### Added
 
 - **Product tour sizzle reel** — Fullscreen interactive feature tour at `/tour` with auto-advancing beats, keyboard controls, and a Home “Watch Tour” entry.
