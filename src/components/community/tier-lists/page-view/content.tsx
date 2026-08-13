@@ -28,7 +28,10 @@ export function CommunityTierListsPageView() {
     filteredMyLists,
     cardMap,
     handleOpenCreateDialog,
+    searchQuery,
   } = useCommunityTierListsPageContext();
+
+  const hasActiveSearch = searchQuery.trim().length > 0;
 
   useRegisterSlot("top-bar", "community-tier-lists-page", CommunityTierListsPageTopBar);
 
@@ -90,8 +93,12 @@ export function CommunityTierListsPageView() {
           <CommunityTierListsPageEmptyState
             message={
               activeTab === "mine"
-                ? "No saved tier lists match that search yet."
-                : "No public tier lists match that search yet."
+                ? hasActiveSearch
+                  ? "No saved tier lists match that search yet."
+                  : "No saved tier lists yet."
+                : hasActiveSearch
+                  ? "No public tier lists match that search yet."
+                  : "No public tier lists yet."
             }
             action={
               activeTab === "mine" ? (
