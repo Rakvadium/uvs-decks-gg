@@ -19,8 +19,13 @@ export function useCreatorApply() {
     }
 
     toast.message("Verification submit is not open yet. Review the path below.");
-    const target = document.getElementById("creator-verification");
-    target?.scrollIntoView({ behavior: "smooth", block: "start" });
+    const nodes = document.querySelectorAll("#creator-verification");
+    for (const node of nodes) {
+      if (node instanceof HTMLElement && node.getClientRects().length > 0) {
+        node.scrollIntoView({ behavior: "smooth", block: "start" });
+        break;
+      }
+    }
   }, [isAuthenticated, isLoading, openAuthDialog]);
 
   return { startCreatorApply };
