@@ -33,7 +33,7 @@ export function CommunityTierListsFloatingTopBar() {
     <FloatingPageBar
       left={
         <>
-          <CommunityDestinationTabs />
+          <CommunityDestinationTabs compact />
           {showListBrowser ? (
             <FloatingTabsPill
               value={activeTab}
