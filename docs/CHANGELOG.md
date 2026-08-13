@@ -10,6 +10,13 @@ All notable changes to this project are recorded here.
 
 ## [Unreleased]
 
+### Fixed
+
+- **Rankings in-content title** — Drop the desktop `Generated Community Tier List` / `Global Rankings` hero under the floating Rankings tabs; empty tiers stay readable.
+  - **Context:** Issue #106.
+  - **Decisions:** Rankings tab already provides context, so the heading is dropped rather than adding a floating identity pill.
+  - **Files:** `src/components/community/community-rankings-view/content.tsx`.
+
 ### Added
 
 - **Collection in signed-in main nav** — Profile sheet (mobile) and left sidebar include Collection between Decks and Community, routing to `/collection`.
