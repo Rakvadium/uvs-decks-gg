@@ -12,6 +12,10 @@ All notable changes to this project are recorded here.
 
 ### Added
 
+- **Collection in signed-in main nav** — Profile sheet (mobile) and left sidebar include Collection between Decks and Community, routing to `/collection`.
+  - **Context:** Issue #64.
+  - **Files:** `src/components/shell/main-nav-build.ts`.
+
 - **Mobile header guest Sign In** — Persistent Sign In control in mobile top chrome for signed-out users.
   - **Context:** Issue #74 — guest `/gallery` lacked chrome-level Sign In; Profile sheet was the only discovery path.
   - **Decisions:** Mirror desktop left-sidebar guest Sign In in `MobileHeader` (compact accent outline); leave Profile Sign In as a secondary path; do not add Home to bottom nav.
