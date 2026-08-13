@@ -24,12 +24,7 @@ export function TeamHubStatsContent({ teamId }: TeamHubStatsContentProps) {
 
   return (
     <div className="space-y-4">
-      <div>
-        <h1 className="font-display text-lg font-semibold text-foreground">Stats</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Team performance metrics and analytics will appear here in a later release.
-        </p>
-      </div>
+      <h1 className="font-display text-lg font-semibold text-foreground md:hidden">Stats</h1>
       <div
         className="rounded-lg border border-dashed border-border/80 bg-muted/20 px-4 py-12 text-center"
         role="status"
