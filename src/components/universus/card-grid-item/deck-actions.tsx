@@ -14,6 +14,7 @@ export function CardDeckActions() {
       canAdd={canAddToDeck}
       onAdd={addToDeck}
       onRemove={removeFromDeck}
+      enlargeTouchTargets={isMobile}
     />
   );
 }
