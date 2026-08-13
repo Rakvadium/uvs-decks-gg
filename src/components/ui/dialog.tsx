@@ -147,11 +147,11 @@ function DialogContent({
           !isPlain &&
             "md:inset-auto md:top-[50%] md:left-[50%] md:h-auto md:max-h-[85vh] md:translate-x-[-50%] md:translate-y-[-50%] md:rounded-lg md:border md:overflow-y-auto",
           isPlain &&
-            "max-md:!pointer-events-none md:pointer-events-auto md:inset-auto md:top-[50%] md:left-[50%] md:h-auto md:max-h-[85vh] md:translate-x-[-50%] md:translate-y-[-50%] md:overflow-hidden md:rounded-none md:border-0",
+            "max-md:!pointer-events-none max-md:!inset-x-4 max-md:!top-12 max-md:!bottom-6 max-md:!h-auto max-md:!w-auto md:pointer-events-auto md:inset-auto md:top-[50%] md:left-[50%] md:h-auto md:max-h-[85vh] md:translate-x-[-50%] md:translate-y-[-50%] md:overflow-hidden md:rounded-none md:border-0",
           "md:data-[state=closed]:zoom-out-95 md:data-[state=open]:zoom-in-95",
           dialogSizeStyles[size],
           className,
-          "max-md:min-w-0 max-md:!max-w-none"
+          !isPlain && "max-md:min-w-0 max-md:!max-w-none"
         )}
         {...props}
       >
@@ -164,7 +164,7 @@ function DialogContent({
         <div
           className={cn(
             "relative z-10 flex min-h-0 flex-1 flex-col overflow-y-auto",
-            isPlain && "max-md:pointer-events-auto md:overflow-hidden"
+            isPlain && "max-md:pointer-events-none md:overflow-hidden"
           )}
         >
           <div
