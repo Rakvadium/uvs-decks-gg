@@ -54,7 +54,7 @@ The floating bar is desktop-only (`hidden md:block` inside `FloatingPageLayout`)
 | Gallery | — | Search island (`FloatingIsland`) | — |
 | Decks list | Tabs (My / Public / Tournament) | Search | New Deck |
 | Deck details | Back + deck name pill | — | Set Active, Edit |
-| Community | Tabs (Tier Lists / Rankings / Creators) | — | — |
+| Community | Tabs (Hub / Tier Lists / Rankings / Creators) | — | — |
 | Tier list detail | Back + title pill + meta cluster | — | Edit / Save / Cancel / Delete |
 | Teams landing | — | — | Create Team / Sign in |
 | Team hub | Team identity pill + tabs (News … Calendar) | — | Section primary (Create Announcement / Invite member / Create Calendar Item) |
