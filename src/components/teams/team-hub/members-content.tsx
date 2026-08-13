@@ -160,17 +160,12 @@ export function TeamHubMembersContent({ teamId }: TeamHubMembersContentProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <h1 className="font-display text-lg font-semibold text-foreground">Members</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Roles and access follow the team capability matrix. Only co-captains and the captain can change roles.
-          </p>
-        </div>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between md:hidden">
+        <h1 className="font-display text-lg font-semibold text-foreground">Members</h1>
         {showInvite ? (
           <Button
             type="button"
-            className="h-9 shrink-0 font-mono text-xs uppercase tracking-wider sm:mt-0.5 md:hidden"
+            className="h-9 shrink-0 font-mono text-xs uppercase tracking-wider sm:mt-0.5"
             onClick={openInvite}
           >
             Invite member

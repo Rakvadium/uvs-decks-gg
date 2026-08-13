@@ -128,18 +128,12 @@ export function TeamHubEventsContent({ teamId }: TeamHubEventsContentProps) {
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <h1 className="font-display text-lg font-semibold text-foreground">Calendar</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Scheduled team events, sorted by start time. Co-captains and the captain can add or remove
-            events.
-          </p>
-        </div>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between md:hidden">
+        <h1 className="font-display text-lg font-semibold text-foreground">Calendar</h1>
         {caps.canManageEvents ? (
           <Button
             type="button"
-            className="h-9 shrink-0 font-mono text-xs uppercase tracking-wider sm:mt-0.5 md:hidden"
+            className="h-9 shrink-0 font-mono text-xs uppercase tracking-wider sm:mt-0.5"
             onClick={openCreate}
           >
             Create Calendar Item

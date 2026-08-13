@@ -67,13 +67,7 @@ export function TeamHubDecksContent({ teamId }: TeamHubDecksContentProps) {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="font-display text-lg font-semibold text-foreground">Team decks</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Decks shared with this team. View-only means only the owner edits; editable mode allows team
-          members with deck permissions to co-edit.
-        </p>
-      </div>
+      <h1 className="font-display text-lg font-semibold text-foreground md:hidden">Decks</h1>
       <div>
         <p className="mb-2 text-xs font-mono uppercase tracking-widest text-muted-foreground">
           Collaboration
