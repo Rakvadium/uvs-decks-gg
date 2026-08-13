@@ -1,5 +1,4 @@
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export function CreatorProgramHeroSpotlightCard() {
@@ -37,10 +36,6 @@ export function CreatorProgramHeroSpotlightCard() {
             Matchup Lab
           </Badge>
         </div>
-
-        <Button variant="neon-magenta" size="sm" className="w-full">
-          View Creator Profile
-        </Button>
       </CardContent>
     </Card>
   );
