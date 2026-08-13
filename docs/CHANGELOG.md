@@ -10,6 +10,13 @@ All notable changes to this project are recorded here.
 
 ## [Unreleased]
 
+### Fixed
+
+- **Gallery guest Deck tools copy** — Signed-out Deck tools bullets no longer say “your decks” or “actively building” as if the guest already has decks.
+  - **Context:** Issue #57 (port of #85, which landed on master).
+  - **Decisions:** Keep Sign in / Create account CTAs and unlock intro; authenticated sidebar unchanged.
+  - **Files:** `src/components/gallery/gallery-guest-decks-sidebar.tsx`.
+
 ### Added
 
 - **Product tour sizzle reel** — Fullscreen interactive feature tour at `/tour` with auto-advancing beats, keyboard controls, and a Home “Watch Tour” entry.
