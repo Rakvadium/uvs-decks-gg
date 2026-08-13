@@ -4,7 +4,7 @@ import Link from "next/link";
 import { COLOR_SCHEMES } from "@/lib/theme";
 import type { ColorPresetChoice } from "@/lib/theme/appearance-types";
 import { cn } from "@/lib/utils";
-import { Moon, Palette, Settings, Sun } from "lucide-react";
+import { Check, Moon, Palette, Settings, Sun } from "lucide-react";
 import { useMobileProfileSheetContext } from "./context";
 
 export function MobileProfilePreferencesSection() {
@@ -34,39 +34,54 @@ export function MobileProfilePreferencesSection() {
         </button>
 
         <div className="space-y-2 rounded-lg px-3 py-2.5">
-          <div className="flex items-center gap-3 text-sm font-medium text-foreground">
+          <div
+            id="mobile-color-preset-label"
+            className="flex items-center gap-3 text-sm font-medium text-foreground"
+          >
             <Palette className="h-5 w-5" />
             <span>Color preset</span>
             {isCustomAppearance ? (
               <span className="text-xs font-normal text-muted-foreground">Custom palette</span>
             ) : null}
           </div>
-          <div className="ml-8 flex flex-wrap gap-2">
+          <div
+            className="flex flex-col gap-2"
+            role="group"
+            aria-labelledby="mobile-color-preset-label"
+          >
             <Link
               href="/settings#appearance"
               className={cn(
-                "rounded-md px-3 py-1.5 text-xs font-medium transition-colors hover:bg-muted/80",
-                isCustomAppearance ? "bg-primary text-primary-foreground hover:bg-primary/90" : "bg-muted",
+                "flex min-h-11 w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+                isCustomAppearance
+                  ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                  : "bg-muted text-foreground hover:bg-muted/80",
               )}
               onClick={closeSheet}
             >
-              Custom
+              <span className="flex-1 text-left">Custom</span>
+              {isCustomAppearance ? <Check className="h-4 w-4 shrink-0" aria-hidden /> : null}
             </Link>
-            {COLOR_SCHEMES.map((scheme) => (
-              <button
-                type="button"
-                key={scheme.value}
-                onClick={() => applyColorPreset(scheme.value as ColorPresetChoice)}
-                className={cn(
-                  "rounded-md px-3 py-1.5 text-xs font-medium transition-colors",
-                  !isCustomAppearance && colorPreset === scheme.value
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-muted text-foreground hover:bg-muted/80",
-                )}
-              >
-                {scheme.label}
-              </button>
-            ))}
+            {COLOR_SCHEMES.map((scheme) => {
+              const picked = !isCustomAppearance && colorPreset === scheme.value;
+              return (
+                <button
+                  type="button"
+                  key={scheme.value}
+                  aria-pressed={picked}
+                  onClick={() => applyColorPreset(scheme.value as ColorPresetChoice)}
+                  className={cn(
+                    "flex min-h-11 w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+                    picked
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-muted text-foreground hover:bg-muted/80",
+                  )}
+                >
+                  <span className="flex-1 text-left">{scheme.label}</span>
+                  {picked ? <Check className="h-4 w-4 shrink-0" aria-hidden /> : null}
+                </button>
+              );
+            })}
           </div>
         </div>
 
