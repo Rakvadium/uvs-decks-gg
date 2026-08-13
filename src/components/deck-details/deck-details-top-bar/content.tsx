@@ -16,23 +16,22 @@ export function DeckDetailsTopBarInner() {
   }
 
   return (
-    <div className="flex w-full min-w-0 items-center gap-2">
-      <Link href="/decks" aria-label="Back to decks">
-        <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" aria-label="Back to decks">
+    <div className="flex w-full min-w-0 items-start gap-2">
+      <Link href="/decks" aria-label="Back to decks" className="shrink-0 pt-0.5">
+        <Button variant="ghost" size="icon" aria-label="Back to decks">
           <ArrowLeft className="h-4 w-4" />
         </Button>
       </Link>
 
       <DeckDetailsTopBarTitleSection compact />
 
-      <div className="ml-auto flex shrink-0 items-center gap-2">
+      <div className="ml-auto flex shrink-0 items-center gap-2 pt-0.5">
         {isOwner ? (
           <>
             <DeckDetailsTopBarViewActions compact />
             <Button
               variant="outline"
               size="icon"
-              className="h-8 w-8"
               aria-label="Edit deck details"
               onClick={() => startEditing()}
             >

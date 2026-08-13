@@ -2,7 +2,6 @@
 
 import { createHash } from "crypto";
 import { gzipSync } from "zlib";
-import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { v } from "convex/values";
 import { internalAction } from "./_generated/server";
 import { internal } from "./_generated/api";
@@ -59,14 +58,15 @@ export const uploadCatalogBlob = internalAction({
     const catalogObjectKey = catalogObjectKeyForVersion(args.version);
     const catalogUrl = toPublicCatalogUrl(args.version);
 
-    const putCommand = new PutObjectCommand({
-      Bucket: r2.config.bucket,
-      Key: catalogObjectKey,
-      Body: compressed,
-      ContentType: "application/gzip",
-      CacheControl: "public, max-age=31536000, immutable",
+    const existing = await r2.getMetadata(ctx, catalogObjectKey);
+    if (existing) {
+      await r2.deleteObject(ctx, catalogObjectKey);
+    }
+
+    await r2.store(ctx, compressed, {
+      key: catalogObjectKey,
+      type: "application/gzip",
     });
-    await (r2.r2 as { send: (command: unknown) => Promise<unknown> }).send(putCommand);
 
     return {
       catalogUrl,
@@ -83,13 +83,8 @@ export const deleteCatalogObject = internalAction({
     objectKey: v.string(),
   },
   returns: v.null(),
-  handler: async (_ctx, args) => {
-    const { DeleteObjectCommand } = await import("@aws-sdk/client-s3");
-    const deleteCommand = new DeleteObjectCommand({
-      Bucket: r2.config.bucket,
-      Key: args.objectKey,
-    });
-    await (r2.r2 as { send: (command: unknown) => Promise<unknown> }).send(deleteCommand);
+  handler: async (ctx, args) => {
+    await r2.deleteObject(ctx, args.objectKey);
     return null;
   },
 });
