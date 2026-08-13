@@ -5,7 +5,7 @@ import { CREATOR_BENEFITS, CONTENT_FORMATS, VERIFICATION_STEPS } from "./data";
 
 export function CreatorProgramVerificationSection() {
   return (
-    <section className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
+    <section id="creator-verification" className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
       <Card className="border border-border/50">
         <CardHeader className="space-y-2">
           <CardTitle className="text-lg">Verification Path</CardTitle>
