@@ -57,7 +57,7 @@ If claim fails (label race), pick the next issue.
 
 5. **Finish the ticket**
 
-- If the user asked for a PR / cloud-style completion: open a PR from branch `agent/<n>-short-slug` **into `dev`** (base=`dev`, never `master`/`main`) with `Fixes #<n>` in the body. Example: `gh pr create --base dev --head agent/<n>-short-slug --title "..." --body "Fixes #<n>\n\n..."`. Do not merge unless asked.
+- If the user asked for a PR / cloud-style completion: open a PR from branch `agent/<n>-short-slug` **into `dev`** (base=`dev`, never `master`/`main`) with `Fixes #<n>` in the body. Example: `gh pr create --base dev --head agent/<n>-short-slug --title "..." --body "Fixes #<n>\n\n..."`. For UI work, commit Before/After files under `.github/pr-captures/<n>/`, push them, then embed **both** with raw GitHub URLs — never `cursor.com/artifacts`. Do not merge unless asked.
 - If the user forbade commits/PRs: stop after local verify and summarize; leave a comment on the issue with status and that a PR is still needed.
 - If blocked: comment why, add `blocked` or `needs-human`, do not force the task.
 

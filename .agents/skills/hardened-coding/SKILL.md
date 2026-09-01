@@ -49,7 +49,8 @@ If any UI file changed:
 1. Capture AFTER snapshots (same routes/viewports/states as BEFORE).  
 2. Run `ui-ux-adversary` on diff/routes; adversary must compare BEFORE vs AFTER when images exist.  
 3. Clear must-fix findings before claiming done.  
-4. Confirm placement still matches Context Brief / floating-header inventory.  
+4. Confirm placement still matches Context Brief / floating-header inventory.
+5. If opening a PR: commit captures to `.github/pr-captures/<issue>/` and embed Before **and** After with raw GitHub URLs. Never use `cursor.com/artifacts` in the PR body (they expire; GitHub usually shows only Before). See `docs/agent-workflow-playbook.md` § PR visual embeds.  
 
 ## Forbidden
 

@@ -83,6 +83,28 @@ Use browser preview snapshots (and short recordings only for interaction-heavy w
 
 **Do not** claim UI done from code review alone when snapshots were possible.
 
+### PR visual embeds (GitHub)
+
+GitHub PR bodies cannot show Cursor chat attachments. `https://cursor.com/artifacts/...` links 302 to signed S3 URLs that expire in ~15 minutes, so Camo usually keeps the first fetch (Before) and drops After.
+
+For UI PRs:
+
+1. Write captures to `.github/pr-captures/<issue>/` on the PR branch (`before-desktop.png`, `before-mobile.png`, `after-desktop.png`, `after-mobile.png`).
+2. Commit and push those files **before** writing image URLs into the PR body.
+3. Embed **both** Before and After with raw GitHub URLs (public repo). Do not use `cursor.com/artifacts` or chat attachment links.
+4. Create or update the PR body only after After shots exist. A Before-only description is incomplete.
+
+```markdown
+## Visual
+
+| | Desktop | Mobile |
+| --- | --- | --- |
+| Before | ![Before desktop](https://raw.githubusercontent.com/Rakvadium/uvs-decks-gg/<head-branch>/.github/pr-captures/<issue>/before-desktop.png) | ![Before mobile](https://raw.githubusercontent.com/Rakvadium/uvs-decks-gg/<head-branch>/.github/pr-captures/<issue>/before-mobile.png) |
+| After | ![After desktop](https://raw.githubusercontent.com/Rakvadium/uvs-decks-gg/<head-branch>/.github/pr-captures/<issue>/after-desktop.png) | ![After mobile](https://raw.githubusercontent.com/Rakvadium/uvs-decks-gg/<head-branch>/.github/pr-captures/<issue>/after-mobile.png) |
+```
+
+Replace `<head-branch>` with the PR head (e.g. `agent/101-gallery-active-deck-empty`) and `<issue>` with the issue number.
+
 ---
 
 ## Paste prompts for testing
