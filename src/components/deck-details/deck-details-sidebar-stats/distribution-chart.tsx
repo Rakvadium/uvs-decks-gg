@@ -58,8 +58,8 @@ export function PieDistributionChart({
   return (
     <div className="space-y-2 rounded-lg border border-border/50 bg-card/30 p-3">
       <div className="flex items-center justify-between">
-        <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">{title}</span>
-        <span className="font-mono text-[10px] text-muted-foreground">{chartTotal}</span>
+        <span className="chrome-label-case text-[10px] text-muted-foreground">{title}</span>
+        <span className="text-[10px] text-muted-foreground">{chartTotal}</span>
       </div>
 
       {visibleBuckets.length === 0 ? (
@@ -71,7 +71,7 @@ export function PieDistributionChart({
             style={{ background: gradient }}
           >
             <div className="absolute inset-[19px] flex items-center justify-center rounded-full bg-background/95 ring-1 ring-inset ring-border/40">
-              <span className="font-mono text-[10px] text-primary">{chartTotal}</span>
+              <span className="text-[10px] text-primary">{chartTotal}</span>
             </div>
           </div>
 
@@ -81,7 +81,7 @@ export function PieDistributionChart({
               const color = resolvePieBucketColor(colorStrategy, bucket.label, index);
 
               return (
-                <div key={`${title}-${bucket.label}`} className="flex items-center justify-between gap-2 font-mono text-[10px]">
+                <div key={`${title}-${bucket.label}`} className="flex items-center justify-between gap-2 text-[10px]">
                   <div className="flex min-w-0 items-center gap-1.5">
                     <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: color }} />
                     <span className="truncate text-muted-foreground">{bucket.label}</span>

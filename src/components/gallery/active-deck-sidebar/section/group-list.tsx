@@ -21,10 +21,10 @@ export function ActiveDeckSectionGroups() {
       {groups.map((group) => (
         <div key={group.type} className="space-y-1.5">
           <div className="flex items-center justify-between">
-            <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+            <span className="chrome-label-case text-[10px] text-muted-foreground">
               {group.label}
             </span>
-            <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+            <span className="chrome-label-case text-[10px] text-muted-foreground">
               {group.total}
             </span>
           </div>

@@ -15,7 +15,7 @@ import {
 } from "./use-active-filter-tokens";
 
 const colorChipClassName =
-  "inline-flex max-w-[6.5rem] shrink-0 items-center truncate rounded-sm px-1.5 py-px text-[10px] font-bold font-mono uppercase tracking-[0.08em]";
+  "chrome-label-case inline-flex max-w-[6.5rem] shrink-0 items-center truncate rounded-sm px-1.5 py-px text-[10px] font-bold";
 
 function TokenColorChips({
   values,
@@ -50,7 +50,7 @@ function TokenColorChips({
         );
       })}
       {rest > 0 ? (
-        <span className="shrink-0 text-[10px] font-mono text-muted-foreground">+{rest}</span>
+        <span className="shrink-0 text-[10px] text-muted-foreground">+{rest}</span>
       ) : null}
     </span>
   );
@@ -100,10 +100,10 @@ function TokenSymbolIcons({
         );
       })}
       {rest > 0 ? (
-        <span className="shrink-0 text-[10px] font-mono text-muted-foreground">+{rest}</span>
+        <span className="shrink-0 text-[10px] text-muted-foreground">+{rest}</span>
       ) : null}
       {excludesInfinity ? (
-        <span className="shrink-0 pl-0.5 text-[10px] font-mono text-primary">no ∞</span>
+        <span className="shrink-0 pl-0.5 text-[10px] text-primary">no ∞</span>
       ) : null}
     </span>
   );
@@ -182,7 +182,7 @@ export function FilterTokens({
             onClick={() => setFilterPanelOpen(true)}
             title={token.values.join(", ")}
           >
-            <span className="shrink-0 select-none font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+            <span className="chrome-label-case shrink-0 select-none text-[10px] font-bold text-muted-foreground">
               {token.label}
             </span>
             <TokenContent token={token} />
@@ -200,7 +200,7 @@ export function FilterTokens({
       {tokens.length > 1 ? (
         <button
           type="button"
-          className="inline-flex h-6 items-center gap-1 rounded-md border border-[color:var(--control-dual-border)] bg-popover/95 px-2 font-mono text-[10px] uppercase tracking-wider text-muted-foreground shadow-[0_2px_8px_rgba(0,0,0,0.35)] transition-colors hover:border-destructive/50 hover:bg-destructive/15 hover:text-destructive focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[color:var(--control-dual-ring)]"
+          className="chrome-label-case inline-flex h-6 items-center gap-1 rounded-md border border-[color:var(--control-dual-border)] bg-popover/95 px-2 text-[10px] text-muted-foreground shadow-[0_2px_8px_rgba(0,0,0,0.35)] transition-colors hover:border-destructive/50 hover:bg-destructive/15 hover:text-destructive focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[color:var(--control-dual-ring)]"
           onClick={actions.clearAllFilters}
         >
           <FilterX className="size-3.5" />

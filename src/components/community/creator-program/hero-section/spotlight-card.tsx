@@ -12,7 +12,7 @@ export function CreatorProgramHeroSpotlightCard() {
         <div className="flex items-center gap-3">
           <div className="relative h-12 w-12 overflow-hidden rounded-lg border border-primary/40 bg-primary/10">
             <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-transparent to-transparent" />
-            <div className="absolute bottom-2 left-2 text-xs font-display font-bold uppercase">NE</div>
+            <div className="chrome-label-case absolute bottom-2 left-2 text-xs font-bold">NE</div>
           </div>
           <div>
             <div className="flex items-center gap-2">

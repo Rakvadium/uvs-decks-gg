@@ -9,11 +9,11 @@ export function CardListItemDetails() {
       <div className="min-w-0 flex items-center gap-2">
         <p className="truncate text-sm font-semibold">{card.name}</p>
         {card.collectorNumber ? (
-          <span className="shrink-0 font-mono text-[10px] text-muted-foreground">#{card.collectorNumber}</span>
+          <span className="shrink-0 text-[10px] text-muted-foreground">#{card.collectorNumber}</span>
         ) : null}
       </div>
 
-      <div className="mt-1 flex flex-wrap items-center gap-2 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+      <div className="chrome-label-case mt-1 flex flex-wrap items-center gap-2 text-[10px] text-muted-foreground">
         {card.type ? (
           <Badge tone="entity" className="border-primary/40 bg-card/50 backdrop-blur-none">
             {card.type}

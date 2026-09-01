@@ -46,7 +46,7 @@ export function GalleryViewModeFields({
               )}
             >
               <Icon className="h-4 w-4" />
-              <span className="font-mono text-[10px] uppercase">{mode}</span>
+              <span className="chrome-label-case text-[10px]">{mode}</span>
             </button>
           );
         })}
@@ -55,8 +55,8 @@ export function GalleryViewModeFields({
       {currentMode === "card" ? (
         <div className="space-y-2 border-t border-border/30 pt-2">
           <div className="flex items-center justify-between">
-            <span className="font-mono text-xs text-muted-foreground">Cards per row</span>
-            <span className="font-mono text-xs text-[color:var(--control-dual-mix)]">{state.cardsPerRow}</span>
+            <span className="text-xs text-muted-foreground">Cards per row</span>
+            <span className="text-xs text-[color:var(--control-dual-mix)]">{state.cardsPerRow}</span>
           </div>
           {isMobile ? (
             <div className="grid grid-cols-2 gap-1.5">
@@ -66,7 +66,7 @@ export function GalleryViewModeFields({
                   type="button"
                   onClick={() => actions.setCardsPerRow(value)}
                   className={cn(
-                    "rounded-md border px-2 py-1 text-xs font-mono uppercase tracking-wider transition-colors",
+                    "chrome-label-case rounded-md border px-2 py-1 text-xs transition-colors",
                     state.cardsPerRow === value
                       ? "border-[color:var(--control-dual-border-strong)] bg-[color:var(--control-dual-surface-hover)] text-primary"
                       : "border-[color:var(--control-dual-border)] text-muted-foreground hover:bg-muted hover:border-[color:var(--control-dual-border-strong)]"
@@ -104,7 +104,7 @@ export function GalleryViewModeFields({
             "[&[data-state=open]_svg]:rotate-180"
           )}
         >
-          <span className="font-mono text-xs uppercase tracking-widest text-muted-foreground">View Mode</span>
+          <span className="chrome-label-case text-xs text-muted-foreground">View Mode</span>
           <ChevronDown className="size-4 shrink-0 text-muted-foreground transition-transform duration-200" aria-hidden />
         </CollapsibleTrigger>
         <CollapsibleContent>
@@ -116,7 +116,7 @@ export function GalleryViewModeFields({
 
   return (
     <div className="space-y-3">
-      <span className="font-mono text-xs uppercase tracking-widest text-muted-foreground">View Mode</span>
+      <span className="chrome-label-case text-xs text-muted-foreground">View Mode</span>
       {modeAndDensity}
     </div>
   );

@@ -1,5 +1,6 @@
 "use client";
 
+import { PageHeading } from "@/components/ui/typography-headings";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,7 +23,7 @@ export function ResetPasswordFormDialog({
     return (
       <>
         <div className="mb-6 text-center">
-          <h1 className="text-3xl font-bold tracking-tight">Check your email</h1>
+          <PageHeading size="lg">Check your email</PageHeading>
           <p className="mt-2 text-muted-foreground">
             We&apos;ve sent you a link to reset your password.
           </p>
@@ -42,7 +43,7 @@ export function ResetPasswordFormDialog({
   return (
     <>
       <div className="mb-6 text-center">
-        <h1 className="text-3xl font-bold tracking-tight">Reset password</h1>
+        <PageHeading size="lg">Reset password</PageHeading>
         <p className="mt-2 text-muted-foreground">
           Enter your email and we&apos;ll send you a reset link
         </p>

@@ -197,7 +197,7 @@ export function CardDetailsV2({
                           isFlipped && "rotate-180"
                         )}
                       />
-                      <span className="text-[10px] font-mono uppercase tracking-[0.15em]">
+                      <span className="chrome-label-case text-[10px]">
                         {isFlipped ? "Front" : "Back"}
                       </span>
                     </button>

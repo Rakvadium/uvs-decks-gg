@@ -106,7 +106,7 @@ export function DeckSectionControls({ card, layout = "vertical" }: DeckSectionCo
           >
             <Minus className="h-3 w-3 text-destructive" />
           </Button>
-          <span className="w-5 text-center font-mono text-xs font-bold text-primary">
+          <span className="w-5 text-center text-xs font-bold text-primary">
             {activeSection.count}
           </span>
           <Button
@@ -136,7 +136,7 @@ export function DeckSectionControls({ card, layout = "vertical" }: DeckSectionCo
           <Select value={selectedSection} onValueChange={(value) => setSelectedSection(value as DeckSection)}>
             <SelectTrigger
               size="sm"
-              className="h-8 w-28 min-w-0 shrink-0 border-0 bg-transparent px-0.5 text-xs font-mono font-semibold uppercase tracking-widest shadow-none focus:ring-0"
+              className="chrome-label-case h-8 w-28 min-w-0 shrink-0 border-0 bg-transparent px-0.5 text-xs font-semibold shadow-none focus:ring-0"
             >
               <SelectValue />
             </SelectTrigger>
@@ -160,7 +160,7 @@ export function DeckSectionControls({ card, layout = "vertical" }: DeckSectionCo
             >
               <Minus className="h-3.5 w-3.5" />
             </Button>
-            <span className="min-w-[1.5rem] text-center text-sm font-mono font-bold text-primary">
+            <span className="min-w-[1.5rem] text-center text-sm font-bold text-primary">
               {activeSection.count}
             </span>
             <Button
@@ -181,7 +181,7 @@ export function DeckSectionControls({ card, layout = "vertical" }: DeckSectionCo
 
   return (
     <div className="mt-4 space-y-2">
-      <span className="block text-center text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+      <span className="chrome-label-case block text-center text-[10px] text-muted-foreground">
         Deck Sections
       </span>
 
@@ -190,7 +190,7 @@ export function DeckSectionControls({ card, layout = "vertical" }: DeckSectionCo
           key={section.key}
           className="flex items-center justify-between gap-2 rounded-md border border-border/40 bg-card/50 px-2.5 py-1.5"
         >
-          <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+          <span className="chrome-label-case text-[10px] text-muted-foreground">
             {section.label}
           </span>
           <div className="flex items-center gap-1.5">
@@ -203,7 +203,7 @@ export function DeckSectionControls({ card, layout = "vertical" }: DeckSectionCo
             >
               <Minus className="h-4 w-4 text-destructive" />
             </Button>
-            <span className="w-7 text-center font-mono text-xs font-bold text-primary">{section.count}</span>
+            <span className="w-7 text-center text-xs font-bold text-primary">{section.count}</span>
             <Button
               variant="outline"
               size="icon-sm"
@@ -218,7 +218,7 @@ export function DeckSectionControls({ card, layout = "vertical" }: DeckSectionCo
       ))}
 
       {copyLimit !== Number.POSITIVE_INFINITY && (
-        <span className="block text-center text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+        <span className="chrome-label-case block text-center text-[10px] text-muted-foreground">
           Limit {copyLimit} in Main/Side
         </span>
       )}

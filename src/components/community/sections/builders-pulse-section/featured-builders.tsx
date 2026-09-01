@@ -17,7 +17,7 @@ function FeaturedBuilderCard({ index }: { index: number }) {
           <div className="flex items-center gap-3">
             <div className="relative h-12 w-12 overflow-hidden rounded-lg border border-border/50 bg-background/80">
               <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-transparent" />
-              <div className="absolute bottom-2 left-2 font-display text-xs font-bold uppercase">{creator.name.slice(0, 2)}</div>
+              <div className="chrome-label-case absolute bottom-2 left-2 text-xs font-bold">{creator.name.slice(0, 2)}</div>
             </div>
             <div>
               <div className="flex items-center gap-2">
@@ -35,7 +35,7 @@ function FeaturedBuilderCard({ index }: { index: number }) {
           </Badge>
         </div>
 
-        <div className="flex items-center justify-between font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+        <div className="chrome-label-case flex items-center justify-between text-[10px] text-muted-foreground">
           <span>{creator.focus}</span>
           <span>{creator.activity}</span>
         </div>
@@ -49,7 +49,7 @@ function FeaturedBuilderCard({ index }: { index: number }) {
         </div>
 
         <div className="flex items-center justify-between">
-          <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{creator.cadence}</span>
+          <span className="chrome-label-case text-[10px] text-muted-foreground">{creator.cadence}</span>
           <Button variant="ghost" size="sm">
             View Profile
             <ArrowUpRight className="h-3.5 w-3.5" />

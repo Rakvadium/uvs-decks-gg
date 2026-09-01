@@ -58,7 +58,7 @@ function ShellUniversusNavSidebarInner() {
         fill={isOpen ? "currentColor" : "none"}
       />
       {!collapsed ? (
-        <span className="whitespace-nowrap font-mono text-xs uppercase tracking-wider">
+        <span className="chrome-label-case whitespace-nowrap text-xs">
           {label}
         </span>
       ) : null}
@@ -74,7 +74,7 @@ function ShellUniversusNavSidebarInner() {
         <TooltipTrigger asChild>{control}</TooltipTrigger>
         <TooltipContent
           side="right"
-          className="font-mono text-xs uppercase tracking-wider"
+          className="chrome-label-case text-xs"
         >
           {label}
         </TooltipContent>

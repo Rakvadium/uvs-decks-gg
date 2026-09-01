@@ -54,7 +54,7 @@ export function DeckDetailsSharePanel() {
   return (
     <div className="space-y-3 rounded-lg border border-border/50 bg-background/50 p-3">
       <div className="space-y-1">
-        <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">Share with</p>
+        <p className="chrome-label-case text-[10px] text-muted-foreground">Share with</p>
         <p className="text-xs text-muted-foreground">
           Enter a member&apos;s exact username. They must sign in and accept the invite from this deck link.
         </p>
@@ -85,7 +85,7 @@ export function DeckDetailsSharePanel() {
             <li key={row._id} className="flex items-center justify-between gap-2 text-xs">
               <span className="min-w-0 truncate font-medium">
                 {row.username ?? row.userId}
-                <span className="ml-2 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+                <span className="chrome-label-case ml-2 text-[10px] text-muted-foreground">
                   {row.status}
                 </span>
               </span>

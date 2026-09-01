@@ -38,14 +38,14 @@ export function ActiveDeckHeader() {
   const { activeDeck, isLoading } = useActiveDeck();
 
   if (isLoading) {
-    return <span className="text-xs font-mono uppercase tracking-wider text-muted-foreground">Loading deck</span>;
+    return <span className="chrome-label-case text-xs text-muted-foreground">Loading deck</span>;
   }
 
   const label = activeDeck?.name ?? "Active Deck";
 
   return (
     <h3
-      className="truncate font-display text-[13px] font-bold uppercase tracking-[0.18em] text-primary [filter:var(--chrome-shell-deck-label-drop-shadow)]"
+      className="chrome-heading-case truncate text-[13px] font-bold text-primary [filter:var(--chrome-shell-deck-label-drop-shadow)]"
       title={label}
     >
       {label}

@@ -12,10 +12,10 @@ export function CreatorProgramHeroStatsGrid() {
             className="rounded-xl border border-border/50 bg-background/50 px-4 py-3 backdrop-blur-sm"
           >
             <div className="flex items-center justify-between">
-              <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground">{stat.label}</span>
+              <span className="chrome-label-case text-xs text-muted-foreground">{stat.label}</span>
               <Icon className="h-4 w-4 text-primary" />
             </div>
-            <div className="mt-2 text-2xl font-display font-bold text-foreground">{stat.value}</div>
+            <div className="mt-2 text-2xl font-bold text-foreground">{stat.value}</div>
           </div>
         );
       })}

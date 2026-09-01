@@ -6,6 +6,7 @@ import { Eye, FlipHorizontal, Layers, Minus, MousePointer, Plus, Sparkles, UserR
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { SectionHeading } from "@/components/ui/typography-headings";
 import { CardNavigationProvider } from "@/components/universus/card-details/navigation-context";
 import { CardGridItem } from "@/components/universus/card-grid-item";
 import { CardDetailsDialog } from "@/components/universus/card-details/dialog";
@@ -32,9 +33,9 @@ function CardPreviewSection({ title, description, icon, badge, children, classNa
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <h3 className="text-sm font-semibold text-foreground">{title}</h3>
+            <SectionHeading as="h3" size="xs">{title}</SectionHeading>
             {badge && (
-              <Badge variant="outline" className="h-4 px-1.5 font-mono text-[10px] uppercase tracking-wider">
+              <Badge variant="outline" className="h-4 px-1.5 text-[10px]">
                 {badge}
               </Badge>
             )}
@@ -137,7 +138,7 @@ function StackedCardMockup({ card }: { card: CachedCard }) {
               <div className="flex h-6 w-7 items-center justify-center text-primary">
                 <Plus className="h-3.5 w-3.5 stroke-[2.5]" />
               </div>
-              <div className="flex h-6 w-7 items-center justify-center border-t border-b border-border/60 font-mono text-xs font-bold tabular-nums text-primary">
+              <div className="flex h-6 w-7 items-center justify-center border-t border-b border-border/60 text-xs font-bold tabular-nums text-primary">
                 {quantity}
               </div>
               <div className="flex h-6 w-7 items-center justify-center text-destructive">
@@ -189,13 +190,14 @@ export function CardPreviewDialog({ open, onOpenChange }: CardPreviewDialogProps
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         contentPadding="none"
-        className="flex max-h-[90vh] w-full max-w-3xl flex-col gap-0 overflow-hidden p-0"
+        size="content-xl"
+        className="flex max-h-[90vh] flex-col gap-0 overflow-hidden p-0"
         showCloseButton={false}
       >
         <DialogHeader className="shrink-0 border-b border-border/50 px-6 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <DialogTitle className="font-display text-lg font-bold">Card Item Design Preview</DialogTitle>
+              <DialogTitle className="text-lg font-bold">Card Item Design Preview</DialogTitle>
               <p className="mt-0.5 text-xs text-muted-foreground">
                 Hover over cards to see interactive states. Temporary design review tool.
               </p>
@@ -265,7 +267,7 @@ export function CardPreviewDialog({ open, onOpenChange }: CardPreviewDialogProps
                     <span className="text-xs text-muted-foreground">Loading...</span>
                   </div>
                 )}
-                <p className="text-center font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+                <p className="chrome-label-case text-center text-[10px] text-muted-foreground">
                   Load a deck to see controls
                 </p>
               </div>
@@ -297,7 +299,7 @@ export function CardPreviewDialog({ open, onOpenChange }: CardPreviewDialogProps
           </div>
 
           <div className="border-t border-border/50 px-6 py-4">
-            <h3 className="mb-3 text-xs font-semibold uppercase tracking-widest text-muted-foreground">Design Notes</h3>
+            <SectionHeading as="h3" size="xs" className="mb-3 text-muted-foreground">Design Notes</SectionHeading>
             <ul className="space-y-1.5 text-xs text-muted-foreground">
               <li className="flex items-start gap-2">
                 <span className="mt-0.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary/60" />
@@ -340,7 +342,7 @@ export function CardPreviewDialogTrigger() {
         variant="outline"
         size="sm"
         onClick={() => setOpen(true)}
-        className="gap-1.5 border-primary/30 font-mono text-xs uppercase tracking-wider hover:border-primary/60 hover:bg-primary/5"
+        className="gap-1.5 border-primary/30 text-xs hover:border-primary/60 hover:bg-primary/5"
       >
         <Eye className="h-3.5 w-3.5 text-primary" />
         Card Preview

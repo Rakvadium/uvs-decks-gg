@@ -61,7 +61,7 @@ export function SearchableMultiSelect({
                 : "border-border/50 bg-background/50 text-foreground hover:border-primary/30 hover:bg-muted/50"
             )}
           >
-            <span className="truncate text-xs font-mono uppercase tracking-wider">
+            <span className="chrome-label-case truncate text-xs">
               {selectedValues.length > 0 ? `${selectedValues.length} selected` : triggerLabel}
             </span>
             <ChevronDown className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
@@ -121,12 +121,12 @@ export function SearchableMultiSelect({
                         {selected ? <Check className="h-3 w-3" /> : null}
                       </span>
 
-                      <span className="truncate text-[11px] font-mono uppercase tracking-wide">
+                      <span className="chrome-label-case truncate text-[11px]">
                         {option.label}
                       </span>
 
                       {option.meta ? (
-                        <span className="ml-auto truncate text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+                        <span className="chrome-label-case ml-auto truncate text-[10px] text-muted-foreground">
                           {option.meta}
                         </span>
                       ) : null}
@@ -135,7 +135,7 @@ export function SearchableMultiSelect({
                 })}
               </div>
             ) : (
-              <div className="px-2 py-5 text-center text-[11px] font-mono uppercase tracking-wider text-muted-foreground">
+              <div className="chrome-label-case px-2 py-5 text-center text-[11px] text-muted-foreground">
                 {emptyMessage}
               </div>
             )}
@@ -148,13 +148,13 @@ export function SearchableMultiSelect({
           {selectedLabels.slice(0, 3).map((label) => (
             <span
               key={`${triggerLabel}-${label}`}
-              className="rounded border border-primary/40 bg-primary/10 px-1.5 py-0.5 text-[10px] font-mono uppercase tracking-wider text-primary"
+              className="chrome-label-case rounded border border-primary/40 bg-primary/10 px-1.5 py-0.5 text-[10px] text-primary"
             >
               {label}
             </span>
           ))}
           {selectedLabels.length > 3 ? (
-            <span className="rounded border border-border/50 px-1.5 py-0.5 text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+            <span className="chrome-label-case rounded border border-border/50 px-1.5 py-0.5 text-[10px] text-muted-foreground">
               +{selectedLabels.length - 3}
             </span>
           ) : null}

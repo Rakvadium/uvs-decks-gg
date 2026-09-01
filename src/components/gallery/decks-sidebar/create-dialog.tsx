@@ -55,7 +55,7 @@ export function DeckCreateDialog() {
             </DialogHeader>
 
             <DialogBody className="pt-4">
-              <label className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground">
+              <label className="chrome-label-case text-[11px] text-muted-foreground">
                 Deck name
               </label>
               <div className="relative mt-2">

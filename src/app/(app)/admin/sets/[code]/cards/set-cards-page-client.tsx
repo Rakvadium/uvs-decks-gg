@@ -39,7 +39,7 @@ export default function AdminSetCardsPageClient() {
     return (
       <div className="flex min-h-0 flex-1 flex-col overflow-y-auto md:h-full">
         <p className="text-muted-foreground">
-          No set found for code <span className="font-mono">{code}</span>.
+          No set found for code <span className="">{code}</span>.
         </p>
         <Link href="/admin/sets" className="mt-4 text-primary hover:underline">
           Back to sets

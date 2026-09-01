@@ -5,7 +5,7 @@ import { COMMUNITY_EVENTS } from "../../community-content-data";
 export function CommunityUpcomingEvents() {
   return (
     <div id="community-events" className="space-y-3">
-      <div className="flex items-center justify-between font-mono text-xs uppercase tracking-widest text-muted-foreground">
+      <div className="chrome-label-case flex items-center justify-between text-xs text-muted-foreground">
         <span>Upcoming</span>
         <Badge variant="outline" className="text-[10px]">
           Events
@@ -26,7 +26,7 @@ export function CommunityUpcomingEvents() {
               </div>
               <div>
                 <p className="text-xs font-semibold">{event.label}</p>
-                <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{event.time}</p>
+                <p className="chrome-label-case text-[10px] text-muted-foreground">{event.time}</p>
               </div>
             </div>
             <Button variant="ghost" size="sm">

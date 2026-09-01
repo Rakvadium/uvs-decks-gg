@@ -16,7 +16,7 @@ export function SidebarGalleryListItemActions() {
       >
         <Minus className="h-3.5 w-3.5" />
       </Button>
-      <span className="w-7 text-center font-mono text-[10px] text-primary">{quantity}</span>
+      <span className="w-7 text-center text-[10px] text-primary">{quantity}</span>
       <Button
         variant="ghost"
         size="icon-sm"

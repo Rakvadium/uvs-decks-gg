@@ -20,7 +20,7 @@ export function DeckCardsContent() {
       {...model.deckDropProps}
     >
       {model.canDropToActiveSection && (
-        <div className="rounded-t-xl border-b border-primary/20 bg-primary/10 px-3 py-1.5 text-[10px] font-mono uppercase tracking-wider text-primary">
+        <div className="chrome-label-case rounded-t-xl border-b border-primary/20 bg-primary/10 px-3 py-1.5 text-[10px] text-primary">
           {model.isDeckDropOver
             ? `Release to add to ${SECTION_CONFIG[model.activeSection].label}`
             : `Drag card here to add to ${SECTION_CONFIG[model.activeSection].label}`}

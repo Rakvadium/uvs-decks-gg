@@ -131,7 +131,7 @@ export function EditSetDialog({ row, onOpenChange }: EditSetDialogProps) {
         }
       }}
     >
-      <DialogContent className="max-h-[min(90vh,720px)] overflow-y-auto sm:max-w-lg p-0" contentPadding="none">
+      <DialogContent size="content-md" className="max-h-[min(90vh,720px)] overflow-y-auto p-0" contentPadding="none">
         <DialogHeader className="px-4 pt-6 md:px-6">
           <DialogTitle>Edit set</DialogTitle>
         </DialogHeader>
@@ -140,7 +140,7 @@ export function EditSetDialog({ row, onOpenChange }: EditSetDialogProps) {
             <DialogBody className="space-y-4 px-4 md:px-6">
             <div className="space-y-2">
               <Label>Code</Label>
-              <Input className="font-mono" value={s.code} disabled readOnly />
+              <Input className="" value={s.code} disabled readOnly />
             </div>
             <div className="space-y-2">
               <Label htmlFor="ed-name">Name</Label>

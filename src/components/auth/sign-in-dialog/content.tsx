@@ -1,5 +1,6 @@
 "use client";
 
+import { PageHeading } from "@/components/ui/typography-headings";
 import { LogIn, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,7 +19,7 @@ export function SignInFormDialog({
   return (
     <>
       <div className="mb-6 text-center">
-        <h1 className="text-3xl font-bold tracking-tight">Welcome back</h1>
+        <PageHeading size="lg">Welcome back</PageHeading>
         <p className="mt-2 text-muted-foreground">Sign in to continue to your account</p>
       </div>
       <form className="flex flex-col" onSubmit={handleSubmit}>

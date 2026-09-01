@@ -61,10 +61,10 @@ export function AnchoredFilterPanel({ className }: { className?: string }) {
       <div className="flex shrink-0 items-center justify-between gap-3 border-b border-border/30 px-4 py-2.5">
         <div className="flex min-w-0 items-center gap-2.5">
           <SlidersHorizontal className="size-4 shrink-0 text-primary" />
-          <span className="font-mono text-xs uppercase tracking-widest text-foreground">
+          <span className="chrome-label-case text-xs text-foreground">
             Filters
           </span>
-          <span className="truncate font-mono text-[11px] tabular-nums text-muted-foreground">
+          <span className="truncate text-[11px] tabular-nums text-muted-foreground">
             {meta.filteredCount.toLocaleString()} / {meta.totalCards.toLocaleString()} cards
           </span>
         </div>
@@ -78,7 +78,7 @@ export function AnchoredFilterPanel({ className }: { className?: string }) {
               onClick={actions.clearAllFilters}
             >
               <X className="size-3.5" />
-              <span className="font-mono text-[10px] uppercase tracking-wider">Clear all</span>
+              <span className="chrome-label-case text-[10px]">Clear all</span>
             </Button>
           ) : null}
           <button

@@ -80,7 +80,7 @@ export function TeamIdentityPill({ teamId, name, presentation, loading }: TeamId
               <span
                 className={cn(
                   "absolute -right-0.5 -top-0.5 size-2.5 rounded-full border border-background",
-                  presentation?.editorNotice?.kind === "rejected" ? "bg-destructive" : "bg-amber-500"
+                  presentation?.editorNotice?.kind === "rejected" ? "bg-destructive" : "bg-warning"
                 )}
                 aria-hidden
               />
@@ -97,7 +97,7 @@ export function TeamIdentityPill({ teamId, name, presentation, loading }: TeamId
       ) : (
         avatar
       )}
-      <h1 className="truncate text-sm font-semibold tracking-tight text-foreground" title={name}>
+      <h1 className="chrome-heading-case truncate text-sm font-semibold text-foreground" title={name}>
         {name}
       </h1>
     </FloatingCapsuleCluster>

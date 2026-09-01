@@ -15,7 +15,7 @@ export function AbilityText({ text, showHeading = true }: AbilityTextProps) {
   return (
     <div className="space-y-2.5">
       {showHeading ? (
-        <span className="text-xs font-mono font-bold uppercase tracking-[0.18em] text-muted-foreground/60">
+        <span className="chrome-label-case text-xs font-bold text-muted-foreground/60">
           Abilities
         </span>
       ) : null}
@@ -51,7 +51,7 @@ export function AbilityText({ text, showHeading = true }: AbilityTextProps) {
         return (
           <p key={index} className="text-base leading-relaxed text-foreground/90">
             <span
-              className="mr-0.5 inline-flex items-center rounded-sm px-1.5 py-px text-xs font-bold font-mono uppercase tracking-[0.1em] align-middle"
+              className="chrome-label-case mr-0.5 inline-flex items-center rounded-sm px-1.5 py-px text-xs font-bold align-middle"
               style={{
                 backgroundColor: abilityColor,
                 color: "#fff",

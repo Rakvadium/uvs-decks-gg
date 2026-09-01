@@ -1,5 +1,6 @@
 "use client";
 
+import { SectionHeading } from "@/components/ui/typography-headings";
 import { useState, type ReactNode } from "react";
 import { useAction, useMutation } from "convex/react";
 import type { Id } from "../../../../../convex/_generated/dataModel";
@@ -132,7 +133,7 @@ export default function AdminImportPageClient({
         title={`Import${titleSuffix}`}
         description={
           <span>
-            Import card data from JSON (set context: <span className="font-mono">{setCode}</span>).
+            Import card data from JSON (set context: <span className="">{setCode}</span>).
             Payload may include multiple sets.
           </span>
         }
@@ -154,12 +155,12 @@ export default function AdminImportPageClient({
         ) : null}
 
         <div className="space-y-4">
-          <h2 className="text-lg font-semibold">JSON import</h2>
+          <SectionHeading size="md">JSON import</SectionHeading>
           <Textarea
             placeholder="Paste JSON card data here..."
             value={jsonData}
             onChange={(e) => setJsonData(e.target.value)}
-            className="min-h-[300px] font-mono text-sm"
+            className="min-h-[300px] text-sm"
           />
           <div className="flex flex-wrap gap-4">
             <Button onClick={() => void handleImport()} disabled={isImporting || !jsonData.trim()}>
@@ -172,14 +173,14 @@ export default function AdminImportPageClient({
         <Separator />
 
         <div className="space-y-4">
-          <h2 className="text-lg font-semibold">Bulk array import (ingestion job)</h2>
+          <SectionHeading size="md">Bulk array import (ingestion job)</SectionHeading>
           <p className="text-sm text-muted-foreground">
             JSON array of card objects. Rows are prefilled with set code{" "}
-            <span className="font-mono">{setCode}</span>
+            <span className="">{setCode}</span>
             {setName ? (
               <>
                 {" "}
-                and name <span className="font-mono">{setName}</span>
+                and name <span className="">{setName}</span>
               </>
             ) : null}{" "}
             when omitted per row. Use dry run to validate before writing.
@@ -188,7 +189,7 @@ export default function AdminImportPageClient({
             placeholder='[ { "name": "...", "collectorNumber": "1", ... }, ... ]'
             value={bulkJson}
             onChange={(e) => setBulkJson(e.target.value)}
-            className="min-h-[220px] font-mono text-sm"
+            className="min-h-[220px] text-sm"
           />
           <div className="flex flex-wrap gap-3">
             <Button

@@ -21,7 +21,7 @@ export function LoadingProgress({ progress, isLoadingMore }: LoadingProgressProp
         <div className="absolute inset-0 h-6 w-6 animate-ping rounded-full bg-primary/20" />
       </div>
       <div className="flex flex-col gap-2">
-        <Kicker className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
+        <Kicker>
           Syncing Database
         </Kicker>
         <div className="h-2 w-44 overflow-hidden rounded-full bg-muted/50">
@@ -34,7 +34,7 @@ export function LoadingProgress({ progress, isLoadingMore }: LoadingProgressProp
           />
         </div>
       </div>
-      <span className="text-sm font-mono font-bold text-primary">{progress}%</span>
+      <span className="text-sm font-bold text-primary">{progress}%</span>
     </div>
   );
 }

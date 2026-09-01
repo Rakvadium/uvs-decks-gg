@@ -117,7 +117,7 @@ export function TeamLogoCropDialog({
                 />
               </div>
               <div className="space-y-2">
-                <Label className="text-xs font-mono uppercase tracking-wider">Zoom</Label>
+                <Label className="chrome-label-case text-xs">Zoom</Label>
                 <Slider min={1} max={3} step={0.02} value={[zoom]} onValueChange={(v) => setZoom(v[0] ?? 1)} />
               </div>
             </>

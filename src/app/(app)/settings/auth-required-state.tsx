@@ -16,7 +16,7 @@ export function SettingsAuthRequiredState() {
         >
           <Lock className="h-10 w-10 text-primary/50" />
         </div>
-        <p className="font-mono text-muted-foreground uppercase tracking-wider">
+        <p className="chrome-label-case text-muted-foreground">
           Sign in to manage settings
         </p>
         <p className="mx-auto max-w-sm text-sm text-muted-foreground">

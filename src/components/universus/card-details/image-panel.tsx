@@ -44,7 +44,7 @@ export function CardDetailsImagePanel({
       <div className="flex h-full w-full items-center justify-center border border-border/50 bg-muted/50">
         <div className="text-center">
           <Hexagon className="mx-auto mb-2 h-12 w-12 text-primary/30" />
-          <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground">No Image</span>
+          <span className="chrome-label-case text-xs text-muted-foreground">No Image</span>
         </div>
       </div>
     );
@@ -107,7 +107,7 @@ export function CardDetailsImagePanel({
                   isFlipped && "rotate-180"
                 )}
               />
-              <span className="text-xs font-mono uppercase tracking-wider">{isFlipped ? "Front" : "Back"}</span>
+              <span className="chrome-label-case text-xs">{isFlipped ? "Front" : "Back"}</span>
             </Button>
           )}
         </div>

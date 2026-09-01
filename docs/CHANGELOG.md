@@ -10,6 +10,12 @@ All notable changes to this project are recorded here.
 
 ## [Unreleased]
 
+### Changed
+
+- **Design system consistency** — Theme, chrome, and primitives now own color, casing, radius, and overlay styling so pages stop one-offing buttons, headings, and status chips.
+  - **Decisions:** Casing comes from chrome tokens (`chrome-heading-case` / `chrome-label-case`), not inline `uppercase`. Status uses `--success` / `--warning` / `--info`. Dialogs share one scrim and content-size scale.
+  - **Files:** `src/styles/base.css`, `src/components/ui/*`, `docs/UI_UX_DESIGN.md`, `docs/theme-and-chrome.md`.
+
 ### Fixed
 
 - **Rankings in-content title** — Drop the desktop `Generated Community Tier List` / `Global Rankings` hero under the floating Rankings tabs; empty tiers stay readable.

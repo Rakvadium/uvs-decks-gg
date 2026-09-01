@@ -28,8 +28,7 @@ export function FloatingIslandCapsule({
         className={cn(
           "relative rounded-full p-px transition-shadow duration-300",
           "bg-[linear-gradient(115deg,color-mix(in_oklch,var(--primary)_40%,transparent),color-mix(in_oklch,var(--border)_65%,transparent)_28%,color-mix(in_oklch,var(--border)_65%,transparent)_72%,color-mix(in_oklch,var(--secondary)_40%,transparent))]",
-          "shadow-[0_4px_16px_-10px_rgba(0,0,0,0.25)] dark:shadow-[0_12px_36px_-16px_rgba(0,0,0,0.75)]",
-          "focus-within:shadow-[0_6px_24px_-12px_color-mix(in_oklch,var(--primary)_24%,transparent)] dark:focus-within:shadow-[0_12px_44px_-12px_color-mix(in_oklch,var(--primary)_38%,transparent),0_0_24px_-8px_color-mix(in_oklch,var(--secondary)_30%,transparent)]"
+          "shadow-[var(--chrome-floating-shadow)] focus-within:shadow-[var(--chrome-floating-shadow-focus)]"
         )}
       >
         <div

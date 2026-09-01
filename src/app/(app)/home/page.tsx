@@ -1,5 +1,6 @@
 "use client";
 
+import { PageHeading } from "@/components/ui/typography-headings";
 import { memo, useEffect, useState } from "react";
 import { Layers, LayoutGrid, ArrowRight, Hexagon, Users, Zap, Database, Activity, ChevronRight, Clapperboard } from "lucide-react";
 import Link from "next/link";
@@ -28,8 +29,8 @@ function StatCard({ label, value, icon: Icon, delay = 0, animate = true }: { lab
           <Icon className="h-5 w-5 text-primary" />
         </div>
         <div>
-          <p className="font-display text-2xl font-bold tabular-nums text-foreground">{value}</p>
-          <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground">{label}</p>
+          <p className="text-2xl font-bold tabular-nums text-foreground">{value}</p>
+          <p className="chrome-label-case text-xs text-muted-foreground">{label}</p>
         </div>
       </div>
     </m.div>
@@ -78,11 +79,11 @@ function NavCard({ href, icon: Icon, title, description, accentColor = "primary"
             </div>
 
             <div className="space-y-2">
-              <h3 className="font-display text-lg font-semibold uppercase tracking-wider text-pretty">{title}</h3>
-              <p className="font-mono text-sm leading-relaxed text-muted-foreground">{description}</p>
+              <h3 className="chrome-heading-case text-lg font-semibold text-pretty">{title}</h3>
+              <p className="text-sm leading-relaxed text-muted-foreground">{description}</p>
             </div>
 
-            <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-muted-foreground transition-colors group-hover:text-foreground">
+            <div className="chrome-label-case flex items-center gap-2 text-xs text-muted-foreground transition-colors group-hover:text-foreground">
               <span>Open</span>
               <ChevronRight className="h-3 w-3" />
             </div>
@@ -132,37 +133,37 @@ function HomePage() {
           className="space-y-6"
         >
           <div className="flex flex-wrap items-center gap-3">
-            <div className="flex h-3 w-3 rounded-full bg-green-500" style={{ boxShadow: "var(--chrome-page-status-dot-shadow)", animation: "var(--chrome-decks-heading-dot-animation)" }} />
-            <span className="font-mono text-xs uppercase tracking-widest text-muted-foreground">UVSDECKS.GG</span>
-            <span className="font-mono text-xs uppercase tracking-widest text-muted-foreground/60">
+            <div className="flex h-3 w-3 rounded-full bg-success" style={{ boxShadow: "var(--chrome-page-status-dot-shadow)", animation: "var(--chrome-decks-heading-dot-animation)" }} />
+            <span className="chrome-label-case text-xs text-muted-foreground">UVSDECKS.GG</span>
+            <span className="chrome-label-case text-xs text-muted-foreground/60">
               {isLoading ? "Checking session…" : isAuthenticated ? "Signed in" : "Browsing as guest"}
             </span>
           </div>
 
           <div className="space-y-3">
-            <h1 className="font-display text-4xl font-bold tracking-tight text-pretty md:text-5xl lg:text-6xl">
+            <PageHeading size="hero" className="text-pretty lg:text-6xl">
               <span className="text-foreground">{greetingLead}</span>
               <br />
               <span className="text-primary" style={{ filter: "var(--chrome-page-heading-drop-shadow)" }}>
                 {greetingName}
               </span>
-            </h1>
-            <p className="max-w-2xl font-mono text-lg text-muted-foreground md:text-xl">
+            </PageHeading>
+            <p className="max-w-2xl text-lg text-muted-foreground md:text-xl">
               Browse the card gallery, build competitive decks, and explore community tier lists.
             </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-4 pt-2">
             <div className="flex items-center gap-2">
-              <Activity className="h-4 w-4 text-green-500" />
-              <span className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
+              <Activity className="h-4 w-4 text-success" />
+              <span className="chrome-label-case text-xs text-muted-foreground">
                 {cardsLoading ? "Loading catalog…" : "Catalog ready"}
               </span>
             </div>
             <div className="h-4 w-px bg-border" />
             <div className="flex items-center gap-2">
               <Zap className={`h-4 w-4 ${isAuthenticated ? "text-primary" : "text-muted-foreground"}`} />
-              <span className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
+              <span className="chrome-label-case text-xs text-muted-foreground">
                 {isLoading ? "Linking session…" : isAuthenticated ? `Signed in as ${username}` : "Sign in to save decks"}
               </span>
             </div>
@@ -240,11 +241,11 @@ function HomePage() {
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5" style={{ opacity: "var(--chrome-page-hero-wash-opacity)" as unknown as number }} />
           <div className="relative z-10 space-y-4 p-6 md:p-8">
             <div className="space-y-1">
-              <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground">Next Step</p>
-              <h2 className="font-display text-lg uppercase tracking-widest text-pretty">
+              <p className="chrome-label-case text-xs text-muted-foreground">Next Step</p>
+              <h2 className="chrome-heading-case text-lg text-pretty">
                 {showPersonalStats ? "Keep Building" : "Start Exploring"}
               </h2>
-              <p className="max-w-2xl font-mono text-sm text-muted-foreground">
+              <p className="max-w-2xl text-sm text-muted-foreground">
                 {showPersonalStats
                   ? `You have ${totalDecks} deck${totalDecks === 1 ? "" : "s"} saved. Jump back into the gallery or open community rankings.`
                   : "You can browse cards and public decks without an account. Sign in when you are ready to save your own lists."}
@@ -276,10 +277,10 @@ function HomePage() {
           initial={introAnimations ? { opacity: 0 } : false}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.8 }}
-          className="flex items-center justify-center gap-4 py-8 font-mono text-xs text-muted-foreground"
+          className="flex items-center justify-center gap-4 py-8 text-xs text-muted-foreground"
         >
           <Hexagon className="h-4 w-4" />
-          <span className="uppercase tracking-[0.3em]">UVSDECKS.GG</span>
+          <span className="chrome-label-case">UVSDECKS.GG</span>
           <Hexagon className="h-4 w-4" />
         </m.div>
       </div>

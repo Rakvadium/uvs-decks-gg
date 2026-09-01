@@ -18,7 +18,7 @@ export function CommunitySectionHeader({
   return (
     <div className={cn("flex flex-wrap items-center justify-between gap-3", className)}>
       <div>
-        <SectionHeading className="text-xl font-display font-bold uppercase tracking-[0.18em]">{title}</SectionHeading>
+        <SectionHeading size="lg">{title}</SectionHeading>
         <p className="text-sm text-muted-foreground">{description}</p>
       </div>
       {action}

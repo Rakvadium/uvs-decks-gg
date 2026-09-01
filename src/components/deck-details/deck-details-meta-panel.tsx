@@ -23,7 +23,7 @@ export function DeckDetailsMetaPanel() {
     <section className="min-w-0 flex-1 rounded-xl border border-border/50 bg-card/80 p-3 backdrop-blur-sm sm:p-4">
       <div className="space-y-3">
         <div className="space-y-2">
-          <h1 className="line-clamp-2 text-lg font-display font-bold uppercase tracking-[0.16em] sm:text-xl" title={deck.name}>
+          <h1 className="chrome-heading-case line-clamp-2 text-lg font-bold sm:text-xl" title={deck.name}>
             {deck.name}
           </h1>
           <div className="flex flex-wrap items-center gap-1.5">

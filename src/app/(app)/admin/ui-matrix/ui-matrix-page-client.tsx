@@ -1,5 +1,6 @@
 "use client";
 
+import { PageHeading } from "@/components/ui/typography-headings";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -38,7 +39,7 @@ function Section({
 }) {
   return (
     <div className="space-y-4">
-      <h2 className="text-lg font-semibold tracking-wide uppercase text-muted-foreground">
+      <h2 className="chrome-heading-case text-lg font-semibold text-muted-foreground">
         {title}
       </h2>
       {children}
@@ -50,7 +51,7 @@ export default function UiMatrixPageClient() {
   return (
     <div className="space-y-12 max-w-4xl">
       <div>
-        <h1 className="text-2xl font-bold">UI Matrix</h1>
+        <PageHeading size="md">UI Matrix</PageHeading>
         <p className="text-muted-foreground">
           Component variant reference for the design system
         </p>

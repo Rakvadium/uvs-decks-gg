@@ -44,13 +44,13 @@ export function AdminFeedbackPageClient() {
             <TableBody>
               {rows.map((row) => (
                 <TableRow key={row._id}>
-                  <TableCell className="whitespace-nowrap align-top text-muted-foreground text-xs font-mono">
+                  <TableCell className="whitespace-nowrap align-top text-muted-foreground text-xs">
                     {new Date(row._creationTime).toLocaleString()}
                   </TableCell>
                   <TableCell className="align-top whitespace-nowrap">
                     {labelForUserFeedbackKind(row.kind)}
                   </TableCell>
-                  <TableCell className="align-top font-mono text-xs break-all">
+                  <TableCell className="align-top text-xs break-all">
                     {row.pagePath}
                   </TableCell>
                   <TableCell className="align-top text-sm whitespace-pre-wrap break-words max-w-md">

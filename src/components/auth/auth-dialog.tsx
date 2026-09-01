@@ -62,7 +62,8 @@ export function AuthDialogProvider({ children }: AuthDialogProviderProps) {
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogContent
           contentPadding="none"
-          className="max-w-md overflow-hidden p-0"
+          size="content-sm"
+          className="overflow-hidden p-0"
           showCloseButton={false}
           footer={
             <DialogClose asChild>

@@ -14,8 +14,8 @@ export function GalleryFilterDialogHeader() {
             <Filter className="h-5 w-5 text-primary [filter:var(--chrome-filter-icon-drop-shadow)]" />
           </div>
           <div className="min-w-0">
-            <SectionHeading className="text-xl font-display font-bold uppercase tracking-wide sm:text-xl">Filter Cards</SectionHeading>
-            <Kicker className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
+            <SectionHeading size="lg">Filter Cards</SectionHeading>
+            <Kicker>
               {meta.filteredCount.toLocaleString()} of {meta.totalCards.toLocaleString()} cards
             </Kicker>
           </div>
@@ -30,7 +30,7 @@ export function GalleryFilterDialogHeader() {
               className="hidden gap-2 md:flex"
             >
               <X className="h-3.5 w-3.5" />
-              <span className="text-xs font-mono uppercase tracking-wider">Clear All</span>
+              <span className="chrome-label-case text-xs">Clear All</span>
             </Button>
           ) : null}
         </div>

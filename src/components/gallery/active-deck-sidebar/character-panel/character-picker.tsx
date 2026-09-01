@@ -70,7 +70,7 @@ export function ActiveDeckCharacterPicker() {
               <UserRoundPen className="h-3.5 w-3.5 text-muted-foreground" />
             </button>
           </TooltipTrigger>
-          <TooltipContent side="left" className="font-mono text-xs uppercase tracking-wider">
+          <TooltipContent side="left" className="chrome-label-case text-xs">
             <p>Change Character</p>
           </TooltipContent>
         </Tooltip>

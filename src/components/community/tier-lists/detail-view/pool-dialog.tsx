@@ -122,7 +122,7 @@ export function CommunityTierListDetailPoolDialog() {
 
             {poolScopes.length > 0 ? (
               <div className="space-y-2">
-                <p className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground">
+                <p className="chrome-label-case text-[11px] text-muted-foreground">
                   Active pool
                 </p>
                 <ul className="max-h-[28vh] space-y-2 overflow-y-auto pr-1">
@@ -154,7 +154,7 @@ export function CommunityTierListDetailPoolDialog() {
             ) : null}
 
             <div className="space-y-3 rounded-xl border border-border/50 bg-card/50 p-4">
-              <p className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground">Add to pool</p>
+              <p className="chrome-label-case text-[11px] text-muted-foreground">Add to pool</p>
               <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
                 <div className="min-w-0 flex-1 space-y-2">
                   <p className="text-xs text-muted-foreground">Set</p>

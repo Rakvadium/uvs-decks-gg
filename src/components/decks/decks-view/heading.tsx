@@ -10,8 +10,8 @@ export function DecksViewHeading() {
   return (
     <div className="space-y-3">
       <div className="space-y-1">
-        <PageHeading className="font-display text-2xl font-bold uppercase tracking-widest">Deck Database</PageHeading>
-        <p className="font-mono text-sm tracking-wide text-muted-foreground">
+        <PageHeading>Deck Database</PageHeading>
+        <p className="text-sm tracking-wide text-muted-foreground">
           {isAuthenticated
             ? "Build, browse, and manage decks"
             : "Browse public decks — sign in to build"}

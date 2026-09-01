@@ -9,7 +9,7 @@ export function DeckDetailsHeroReadyBadge() {
 
   return (
     <div className="absolute right-2 top-2 z-20">
-      <Badge variant="default" className="border-green-500/30 bg-green-500/20 text-[10px] text-green-500">
+      <Badge tone="success" className="text-[10px]">
         <Check className="mr-1 h-3 w-3" />
         Ready
       </Badge>

@@ -21,7 +21,7 @@ export function DeckDetailsTopBarViewActions({ compact = false }: DeckDetailsTop
       className={cn(isActiveDeck && "disabled:opacity-100")}
       aria-label={isActiveDeck ? "Active deck" : "Set as active deck"}
     >
-      <Zap className={cn("h-4 w-4", !compact && "mr-1", isActiveDeck && "text-yellow-400")} />
+      <Zap className={cn("h-4 w-4", !compact && "mr-1", isActiveDeck && "text-warning")} />
       {!compact ? (isActiveDeck ? "Active" : "Set Active") : null}
     </Button>
   );

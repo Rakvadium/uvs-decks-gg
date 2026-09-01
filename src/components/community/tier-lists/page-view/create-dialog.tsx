@@ -87,7 +87,7 @@ export function CommunityTierListsPageCreateDialog() {
             </DialogHeader>
 
             <DialogBody className="space-y-5 pt-4">
-              <label className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground">
+              <label className="chrome-label-case text-[11px] text-muted-foreground">
                 List name
               </label>
               <div className="relative mt-2">
@@ -107,7 +107,7 @@ export function CommunityTierListsPageCreateDialog() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground">
+                <label className="chrome-label-case text-[11px] text-muted-foreground">
                   Ranking scope
                 </label>
 

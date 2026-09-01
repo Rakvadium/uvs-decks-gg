@@ -16,7 +16,7 @@ export function CommunityView() {
       <CommunityRightSidebarSlots />
 
       <div className="md:hidden space-y-3 border-b border-border/50 pb-4">
-        <PageHeading className="font-display text-2xl font-bold uppercase tracking-widest">
+        <PageHeading>
           Community
         </PageHeading>
         <div className="flex min-w-0 items-center gap-2 overflow-x-auto pb-0.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">

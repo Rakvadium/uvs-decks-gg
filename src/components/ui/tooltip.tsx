@@ -42,7 +42,7 @@ function TooltipContent({
         data-slot="tooltip-content"
         sideOffset={sideOffset}
         className={cn(
-          "z-50 w-fit origin-(--radix-tooltip-content-transform-origin) rounded px-3 py-1.5 text-xs text-balance",
+          "z-[200] w-fit origin-(--radix-tooltip-content-transform-origin) rounded-md px-3 py-1.5 text-xs text-balance",
           "bg-foreground/95 text-background backdrop-blur-sm",
           "border [border-color:var(--chrome-tooltip-border)] shadow-[var(--chrome-tooltip-shadow)]",
           "animate-in fade-in-0 zoom-in-95",

@@ -5,7 +5,7 @@ export function DecksCountFooter({ count }: DecksCountFooterProps) {
 
   return (
     <div className="flex items-center justify-center pt-4">
-      <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
+      <p className="chrome-label-case text-xs text-muted-foreground">
         Showing {count} deck{count !== 1 ? "s" : ""}
       </p>
     </div>

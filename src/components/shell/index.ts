@@ -7,6 +7,7 @@ export {
   FloatingBackPill,
   FloatingCapsuleCluster,
   FloatingPageBar,
+  FloatingPageTitle,
   FloatingPageLayout,
   FloatingSearchCapsule,
   FloatingTabsPill,

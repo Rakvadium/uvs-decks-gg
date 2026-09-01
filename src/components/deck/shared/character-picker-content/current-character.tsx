@@ -15,7 +15,7 @@ export function CurrentCharacterRow() {
         <CharacterThumbnail imageUrl={currentCharacter.imageUrl} name={currentCharacter.name} className="h-9 w-7" />
         <div className="min-w-0">
           <p className="truncate text-xs font-medium">{currentCharacter.name}</p>
-          <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+          <p className="chrome-label-case text-[10px] text-muted-foreground">
             {subtitleFor(currentCharacter)}
           </p>
         </div>
@@ -24,7 +24,7 @@ export function CurrentCharacterRow() {
         <Button
           variant="ghost"
           size="sm"
-          className="h-7 px-2 text-[10px] font-mono uppercase tracking-wider"
+          className="h-7 px-2 text-[10px]"
           onClick={onViewDetails}
         >
           View Details

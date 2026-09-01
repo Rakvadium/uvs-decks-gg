@@ -152,7 +152,7 @@ function ShellTeamNavSidebarInner({
         imgClassName=""
       />
       {!collapsed ? (
-        <span className="whitespace-nowrap font-mono text-xs uppercase tracking-wider">{label}</span>
+        <span className="chrome-label-case whitespace-nowrap text-xs">{label}</span>
       ) : null}
       {isActive ? <div className="pointer-events-none absolute inset-0 rounded-md border border-accent/50" /> : null}
     </Link>
@@ -161,7 +161,7 @@ function ShellTeamNavSidebarInner({
     return (
       <Tooltip>
         <TooltipTrigger asChild>{link}</TooltipTrigger>
-        <TooltipContent side="right" className="font-mono text-xs uppercase tracking-wider">
+        <TooltipContent side="right" className="chrome-label-case text-xs">
           {label}
         </TooltipContent>
       </Tooltip>

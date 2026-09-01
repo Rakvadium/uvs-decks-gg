@@ -27,7 +27,7 @@ export function FooterActionButton({
   const content = (
     <>
       {Icon && iconPosition === "left" ? <Icon className="h-4 w-4" /> : null}
-      <span className="text-xs font-mono uppercase tracking-wider">{label}</span>
+      <span className="chrome-label-case text-xs">{label}</span>
       {Icon && iconPosition === "right" ? <Icon className="h-4 w-4" /> : null}
     </>
   );

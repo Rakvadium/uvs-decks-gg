@@ -225,7 +225,7 @@ export function DeckCharacterPickerDialog({
 
           <div ref={loadMoreRef} className="flex h-16 items-center justify-center">
             {!isLoading && !hasMore && visibleCharacters.length > 0 ? (
-              <span className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
+              <span className="chrome-label-case text-xs text-muted-foreground">
                 End of characters
               </span>
             ) : null}

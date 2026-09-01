@@ -9,9 +9,9 @@ export function CardDetailsTitleSection() {
   return (
     <div className="space-y-3">
       <div className="flex items-start justify-between gap-4">
-        <SectionHeading className="text-2xl font-display font-bold uppercase tracking-wide">{card.name}</SectionHeading>
+        <SectionHeading size="xl">{card.name}</SectionHeading>
         {card.collectorNumber ? (
-          <span className="shrink-0 text-xs font-mono text-muted-foreground">#{card.collectorNumber}</span>
+          <span className="shrink-0 text-xs text-muted-foreground">#{card.collectorNumber}</span>
         ) : null}
       </div>
 

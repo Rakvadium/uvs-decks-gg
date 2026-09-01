@@ -13,7 +13,7 @@ export function CreatorProgramCtaSection() {
     <section className="rounded-2xl border border-border/50 bg-card/80 p-6 md:p-8">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div className="space-y-2">
-          <SectionHeading className="text-xl font-display font-bold uppercase tracking-[0.18em]">Ready to Apply?</SectionHeading>
+          <SectionHeading size="lg">Ready to Apply?</SectionHeading>
           <p className="text-sm text-muted-foreground">
             Share your best decklists and community wins, then submit your verification request.
           </p>

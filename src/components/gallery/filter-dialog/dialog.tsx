@@ -55,7 +55,7 @@ export function GalleryFilterDialog({
           <>
             <DialogClose asChild>
               <Button variant="outline">
-                <span className="text-xs font-mono uppercase tracking-wider">Close</span>
+                <span className="chrome-label-case text-xs">Close</span>
               </Button>
             </DialogClose>
             {filtersContext.meta.hasClearableFilters ? (
@@ -66,7 +66,7 @@ export function GalleryFilterDialog({
                 className="gap-2 md:hidden"
               >
                 <X className="h-3.5 w-3.5" />
-                <span className="text-xs font-mono uppercase tracking-wider">Clear All</span>
+                <span className="chrome-label-case text-xs">Clear All</span>
               </Button>
             ) : null}
           </>

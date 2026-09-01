@@ -48,7 +48,7 @@ export function InlineFunnelButton({ className }: { className?: string }) {
     >
       <SlidersHorizontal className="size-4" />
       {meta.activeFilterCount > 0 ? (
-        <span className="absolute -right-0.5 -top-0.5 flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-primary px-0.5 font-mono text-[9px] font-bold tabular-nums text-primary-foreground">
+        <span className="absolute -right-0.5 -top-0.5 flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-primary px-0.5 text-[9px] font-bold tabular-nums text-primary-foreground">
           {meta.activeFilterCount}
         </span>
       ) : null}
@@ -85,7 +85,7 @@ export function InlineResultCount({ className }: { className?: string }) {
   return (
     <span
       className={cn(
-        "shrink-0 select-none font-mono text-[11px] tabular-nums text-muted-foreground",
+        "shrink-0 select-none text-[11px] tabular-nums text-muted-foreground",
         className
       )}
       title={`${meta.filteredCount.toLocaleString()} of ${meta.totalCards.toLocaleString()} cards`}
@@ -110,7 +110,7 @@ export function InlineScopeSelect({ className }: { className?: string }) {
       <SelectTrigger
         size="sm"
         className={cn(
-          "h-6 min-w-[3.25rem] shrink-0 rounded-sm border-none bg-transparent px-1.5 py-0 font-mono text-[11px] uppercase tracking-wider text-muted-foreground shadow-none hover:bg-muted/50 hover:text-foreground focus-visible:ring-1 focus-visible:ring-[color:var(--control-dual-ring)] focus-visible:shadow-none",
+          "chrome-label-case h-6 min-w-[3.25rem] shrink-0 rounded-sm border-none bg-transparent px-1.5 py-0 text-[11px] text-muted-foreground shadow-none hover:bg-muted/50 hover:text-foreground focus-visible:ring-1 focus-visible:ring-[color:var(--control-dual-ring)] focus-visible:shadow-none",
           className
         )}
         aria-label="Search scope"

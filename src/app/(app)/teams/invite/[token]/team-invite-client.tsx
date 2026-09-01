@@ -1,5 +1,6 @@
 "use client";
 
+import { PageHeading } from "@/components/ui/typography-headings";
 import { type ReactNode, useCallback, useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useConvexAuth, useMutation, useQuery } from "convex/react";
@@ -169,7 +170,7 @@ export function TeamInviteClient() {
   return (
     <div className="mx-auto flex max-w-md flex-col gap-6 p-6">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Team invite</h1>
+        <PageHeading size="md">Team invite</PageHeading>
         <p className="mt-2 text-sm text-muted-foreground">
           You have been invited to join{" "}
           <span className="font-medium text-foreground">{details.teamName}</span>.

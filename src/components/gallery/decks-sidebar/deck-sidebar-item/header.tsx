@@ -58,7 +58,7 @@ export function DeckSidebarItemHeader() {
         <div className="min-w-0 flex items-center gap-2">
           <Link
             href={`/decks/${deck._id}`}
-            className="truncate font-display text-sm font-bold uppercase tracking-wide transition-colors hover:text-primary"
+            className="chrome-label-case truncate text-sm font-bold transition-colors hover:text-primary"
             title={showName}
           >
             {showName}
@@ -66,14 +66,14 @@ export function DeckSidebarItemHeader() {
           {isActive ? (
             <Badge
               variant="outline"
-              className="border-primary/40 text-[10px] font-mono uppercase tracking-wider text-primary"
+              className="border-primary/40 text-[10px] text-primary"
             >
               Active
             </Badge>
           ) : null}
         </div>
 
-        <div className="flex flex-wrap items-center gap-2 text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+        <div className="chrome-label-case flex flex-wrap items-center gap-2 text-[10px] text-muted-foreground">
           <span className="inline-flex items-center gap-1">
             <VisIcon className={visibility === "public" || visibility === "tournament" ? "h-3 w-3 text-primary" : "h-3 w-3"} />
             {deckVisibilityDisplayLabel(deck)}

@@ -1,5 +1,6 @@
 "use client";
 
+import { PageHeading } from "@/components/ui/typography-headings";
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { AnimatePresence } from "framer-motion";
@@ -108,11 +109,11 @@ export function SizzleReelContent() {
                 transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
                 className="space-y-4"
               >
-                <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">{beat.kicker}</p>
-                <h1 className="max-w-xl font-display text-4xl font-bold tracking-tight text-pretty md:text-5xl lg:text-6xl">
+                <p className="chrome-label-case text-[10px] text-muted-foreground">{beat.kicker}</p>
+                <PageHeading size="hero" className="max-w-xl text-pretty lg:text-6xl">
                   {beat.title}
-                </h1>
-                <p className="max-w-lg font-mono text-sm leading-relaxed text-muted-foreground md:text-base">
+                </PageHeading>
+                <p className="max-w-lg text-sm leading-relaxed text-muted-foreground md:text-base">
                   {beat.line}
                 </p>
                 {beat.ctaHref && beat.ctaLabel ? (
@@ -135,7 +136,7 @@ export function SizzleReelContent() {
               <Button variant="outline" size="icon-sm" onClick={next} aria-label="Next segment">
                 <SkipForward className="h-4 w-4" />
               </Button>
-              <span className="ml-1 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+              <span className="chrome-label-case ml-1 text-[10px] text-muted-foreground">
                 {String(index + 1).padStart(2, "0")} / {String(beats.length).padStart(2, "0")}
               </span>
             </div>
@@ -152,7 +153,7 @@ export function SizzleReelContent() {
         </div>
 
         <footer className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-3 border-t border-border/30 pt-4">
-          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+          <p className="chrome-label-case text-[10px] text-muted-foreground">
             Space play/pause · Arrows seek
           </p>
           <div className="flex flex-wrap gap-2">

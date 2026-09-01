@@ -14,7 +14,7 @@ export function SymbolsSection() {
 
   return (
     <div className="space-y-2">
-      <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Symbols</span>
+      <span className="chrome-label-case text-xs text-muted-foreground">Symbols</span>
       <SymbolsPickerPanel
         selectedSymbols={selectedSymbols}
         standardSymbols={standardSymbols}

@@ -1,5 +1,6 @@
 "use client";
 
+import { PageHeading, SectionHeading } from "@/components/ui/typography-headings";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useConvexAuth, useQuery } from "convex/react";
@@ -9,9 +10,9 @@ import { useAuthDialog } from "@/components/auth/auth-dialog";
 import {
   FLOATING_ACTION_PILL_CLASS,
   FloatingActionPill,
-  FloatingCapsuleCluster,
   FloatingPageBar,
   FloatingPageLayout,
+  FloatingPageTitle,
 } from "@/components/shell/floating-page-bar";
 import { CreateTeamButton } from "@/components/teams/create-team-dialog";
 import { Surface } from "@/components/ui/card";
@@ -22,11 +23,7 @@ function TeamsLandingFloatingBar({ isAuthenticated }: { isAuthenticated: boolean
   return (
     <FloatingPageBar
       left={
-        <FloatingCapsuleCluster bodyClassName="px-4" glow>
-          <h1 className="truncate text-sm font-semibold tracking-tight text-foreground">
-            Teams
-          </h1>
-        </FloatingCapsuleCluster>
+        <FloatingPageTitle>Teams</FloatingPageTitle>
       }
       right={
         isAuthenticated ? (
@@ -90,7 +87,7 @@ export function TeamsLandingView() {
         </div>
         <div className="relative z-10 space-y-6">
           <div className="space-y-3 md:hidden">
-            <h1 className="font-display text-lg font-semibold text-foreground">Teams</h1>
+            <PageHeading size="sm">Teams</PageHeading>
             {isAuthenticated ? (
               <CreateTeamButton className="w-full justify-center" />
             ) : (
@@ -102,7 +99,7 @@ export function TeamsLandingView() {
           </div>
 
           <Surface className="rounded-3xl border-border/50 bg-card/80 p-5 backdrop-blur-sm md:p-7">
-            <h2 className="font-display text-lg font-semibold tracking-tight text-foreground">What you get</h2>
+            <SectionHeading size="md">What you get</SectionHeading>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
               {isAuthenticated
                 ? "You can belong to one team at a time. Create a team to get a shared hub, or wait for an invite from a captain."

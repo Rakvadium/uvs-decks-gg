@@ -19,7 +19,7 @@ export function DecksSidebarList() {
     return (
       <div className="rounded-lg border border-dashed border-primary/30 bg-primary/5 px-4 py-6 text-center">
         <Lock className="mx-auto h-8 w-8 text-primary/60" />
-        <p className="mt-3 text-xs font-mono uppercase tracking-wider text-muted-foreground">
+        <p className="chrome-label-case mt-3 text-xs text-muted-foreground">
           Sign in to manage your decks
         </p>
       </div>
@@ -30,7 +30,7 @@ export function DecksSidebarList() {
     return (
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
         <Loader2 className="h-4 w-4 animate-spin text-primary" />
-        <span className="text-xs font-mono uppercase tracking-wider">Loading decks</span>
+        <span className="chrome-label-case text-xs">Loading decks</span>
       </div>
     );
   }
@@ -38,7 +38,7 @@ export function DecksSidebarList() {
   if (currentDecks.length === 0) {
     return (
       <div className="rounded-lg border border-dashed border-border/80 bg-card/30 px-4 py-6 text-center">
-        <p className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
+        <p className="chrome-label-case text-xs text-muted-foreground">
           {searchQuery.trim()
             ? "No decks match your search"
             : activeTab === "public"

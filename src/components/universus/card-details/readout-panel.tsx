@@ -5,6 +5,7 @@ import {
   getZoneColor,
   UNIVERSUS_COLORS,
 } from "@/config/universus";
+import { PageHeading } from "@/components/ui/typography-headings";
 import { cn } from "@/lib/utils";
 import { SymbolIcon } from "../symbol-icon";
 import { AbilityText } from "./ability-text";
@@ -84,7 +85,7 @@ function CompactStatsBand({ columns }: { columns: StatColumn[] }) {
               }}
             />
             <h2
-              className="text-xs font-mono font-semibold uppercase tracking-[0.18em] text-muted-foreground/75"
+              className="chrome-heading-case text-xs font-semibold text-muted-foreground/75"
               style={{ color: col.accent }}
             >
               {col.title}
@@ -96,11 +97,11 @@ function CompactStatsBand({ columns }: { columns: StatColumn[] }) {
                   key={row.key}
                   className="flex min-w-0 flex-col items-start gap-0.5 sm:flex-row sm:items-baseline sm:gap-x-1.5 sm:gap-y-0 md:gap-x-2"
                 >
-                  <dt className="order-2 m-0 max-w-full text-xs font-semibold uppercase leading-tight tracking-[0.05em] text-muted-foreground/70 sm:order-1 sm:shrink-0 sm:tracking-[0.08em]">
+                  <dt className="chrome-label-case order-2 m-0 max-w-full text-xs font-semibold leading-tight text-muted-foreground/70 sm:order-1 sm:shrink-0">
                     {row.key}
                   </dt>
                   <dd
-                    className="order-1 m-0 min-w-0 font-display text-sm font-extrabold tabular-nums leading-none tracking-[-0.02em] sm:order-2 sm:text-base md:text-lg"
+                    className="order-1 m-0 min-w-0 text-sm font-extrabold tabular-nums leading-none tracking-[-0.02em] sm:order-2 sm:text-base md:text-lg"
                     style={{ color: row.color ?? col.accent }}
                   >
                     {row.value}
@@ -236,13 +237,13 @@ export function CardDetailsReadoutPanel() {
   return (
     <div className="relative z-[1] px-5 py-5 pr-12 md:px-8 md:py-6 md:pr-12 lg:px-9 lg:pr-12 lg:py-7">
       <header className="mb-6 md:mb-7">
-        <h1 className="min-w-0 text-[clamp(1.5rem,3.75vw,2.5rem)] font-extrabold leading-[1.05] tracking-[-0.04em] text-foreground">
+        <PageHeading size="lg" className="min-w-0 leading-[1.05] text-foreground">
           {card.name}
-        </h1>
+        </PageHeading>
         <div className="mt-3 flex flex-wrap items-center gap-2.5">
           {card.type && typeColor ? (
             <span
-              className="inline-flex items-center rounded-full border px-3 py-1 text-xs font-mono font-bold uppercase tracking-[0.18em] text-white"
+              className="chrome-label-case inline-flex items-center rounded-full border px-3 py-1 text-xs font-bold text-white"
               style={{
                 backgroundColor: typeColor,
                 borderColor:
@@ -274,7 +275,7 @@ export function CardDetailsReadoutPanel() {
       {hasKeywords && (
         <section className="mb-6 md:mb-7" aria-label="Keywords">
           <div className="mb-2 flex items-center gap-3">
-            <p className="shrink-0 font-mono text-xs font-semibold uppercase tracking-[0.38em] text-muted-foreground/50">
+            <p className="chrome-label-case shrink-0 text-xs font-semibold text-muted-foreground/50">
               Keywords
             </p>
             <span className="h-px flex-1 bg-gradient-to-r from-border/60 via-border/25 to-transparent" />
@@ -299,7 +300,7 @@ export function CardDetailsReadoutPanel() {
       {card.text && (
         <section aria-label="Card text">
           <div className="mb-2 flex items-center gap-3">
-            <p className="shrink-0 font-mono text-xs font-semibold uppercase tracking-[0.38em] text-muted-foreground/50">
+            <p className="chrome-label-case shrink-0 text-xs font-semibold text-muted-foreground/50">
               Abilities
             </p>
             <span className="h-px flex-1 bg-gradient-to-r from-border/60 via-border/25 to-transparent" />

@@ -94,11 +94,11 @@ export function CommunityTierListLaneRow({ tier }: { tier: BuilderTier }) {
             <Input
               value={tier.label}
               onChange={(event) => setTierLabel(tier.id, event.target.value)}
-              className="h-7 min-w-0 max-w-36 bg-background/80 font-display text-sm font-bold uppercase tracking-[0.18em]"
+              className="chrome-label-case h-7 min-w-0 max-w-36 bg-background/80 text-sm font-bold"
             />
           ) : (
             <SectionHeading
-              className="truncate text-sm font-semibold uppercase tracking-[0.18em]"
+              className="truncate text-sm font-semibold"
               title={showLaneLabel}
             >
               {showLaneLabel}
@@ -112,7 +112,7 @@ export function CommunityTierListLaneRow({ tier }: { tier: BuilderTier }) {
           ) : null}
         </div>
 
-        <Badge variant="outline" className="ml-auto h-5 shrink-0 px-2 text-[10px] uppercase tracking-[0.18em]">
+        <Badge variant="outline" className="ml-auto h-5 shrink-0 px-2 text-[10px]">
           {cardIds.length} cards
         </Badge>
       </div>

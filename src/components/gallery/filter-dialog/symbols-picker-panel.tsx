@@ -108,14 +108,14 @@ export function SymbolsPickerPanel({
             checked={includeInfinityResults}
             onCheckedChange={onIncludeInfinityResultsChange}
           />
-          <Label className="cursor-pointer text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+          <Label className="chrome-label-case cursor-pointer text-[10px] text-muted-foreground">
             Infinity
           </Label>
         </div>
 
         <div className="flex items-center gap-2">
           <Switch checked={symbolMatchAll} onCheckedChange={onSymbolMatchAllChange} />
-          <Label className="cursor-pointer text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+          <Label className="chrome-label-case cursor-pointer text-[10px] text-muted-foreground">
             Match All
           </Label>
         </div>
@@ -124,7 +124,7 @@ export function SymbolsPickerPanel({
       <div className="grid grid-cols-1 gap-3 md:grid-cols-1">
         <div className="space-y-2 mt-4">
           {!plain ? (
-            <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70">
+            <span className="chrome-label-case text-[10px] text-muted-foreground/70">
               Standard
             </span>
           ) : null}
@@ -138,7 +138,7 @@ export function SymbolsPickerPanel({
         <Separator />
         <div className="space-y-2 mt-2">
           {!plain ? (
-            <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70">
+            <span className="chrome-label-case text-[10px] text-muted-foreground/70">
               Attuned
             </span>
           ) : null}

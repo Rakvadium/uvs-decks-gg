@@ -55,7 +55,7 @@ export function CommunityTierListDetailPoolPanel() {
               <Layers3 className="h-4 w-4 text-primary" />
               <p className="text-sm font-semibold">Card Pool</p>
             </div>
-            <p className="mt-1 text-xs font-mono uppercase tracking-[0.18em] text-muted-foreground">
+            <p className="chrome-label-case mt-1 text-xs text-muted-foreground">
               {poolCardIds.length} cards waiting to be ranked
             </p>
           </div>

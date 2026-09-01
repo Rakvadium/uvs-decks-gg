@@ -31,10 +31,10 @@ export function DeprecatedImportBanner() {
       <AlertTitle>Global import URL updated</AlertTitle>
       <AlertDescription className="space-y-2 text-foreground/90">
         <p>
-          The old <span className="font-mono">/admin/import</span> route is deprecated. Use{" "}
+          The old <span className="">/admin/import</span> route is deprecated. Use{" "}
           <strong>Sets</strong>, open a set, then <strong>Import</strong> for set-scoped bulk
           import and job status. Bookmark{" "}
-          <span className="font-mono">/admin/import?legacy=1</span> if you need the legacy helper
+          <span className="">/admin/import?legacy=1</span> if you need the legacy helper
           page.
         </p>
         <Button type="button" variant="secondary" size="sm" onClick={dismiss}>

@@ -82,7 +82,7 @@ export function OraclePrintingsCarousel({
                       ) : null}
                     </div>
                     {c.isVariant === true ? (
-                      <span className="text-center text-[10px] font-mono uppercase tracking-wider text-amber-500/90">
+                      <span className="chrome-label-case text-center text-[10px] text-warning">
                         Alt
                       </span>
                     ) : null}

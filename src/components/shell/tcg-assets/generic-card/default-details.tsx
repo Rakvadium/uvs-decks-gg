@@ -1,3 +1,4 @@
+import { SectionHeading } from "@/components/ui/typography-headings";
 import { Minus, Plus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -12,7 +13,7 @@ export function DefaultDetails({
   return (
     <div className="space-y-4">
       <div>
-        <h3 className="mb-2 text-lg font-semibold">Card Details</h3>
+        <SectionHeading as="h3" size="md" className="mb-2">Card Details</SectionHeading>
         <div className="space-y-2">
           <div className="flex justify-between">
             <span className="font-medium">Type:</span>

@@ -23,10 +23,10 @@ export function GalleryStats({ totalCards, filteredCount, isLoading }: GallerySt
           <Database className="h-4 w-4 text-primary" />
         </div>
         <div className="flex flex-col">
-          <SectionHeading className="text-lg leading-none font-display font-bold text-foreground sm:text-lg">
+          <SectionHeading className="leading-none">
             {filteredCount.toLocaleString()}
           </SectionHeading>
-          <Kicker className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+          <Kicker size="meta">
             {filteredCount === totalCards ? "Total Cards" : `of ${totalCards.toLocaleString()}`}
           </Kicker>
         </div>
@@ -38,12 +38,12 @@ export function GalleryStats({ totalCards, filteredCount, isLoading }: GallerySt
         {isLoading ? (
           <>
             <Loader2 className="h-4 w-4 animate-spin text-primary" />
-            <Kicker className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Loading</Kicker>
+            <Kicker>Loading</Kicker>
           </>
         ) : (
           <>
-            <div className="h-2 w-2 animate-pulse rounded-full bg-green-500" style={{ boxShadow: "var(--chrome-gallery-stats-dot-shadow)" }} />
-            <Kicker className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Ready</Kicker>
+            <div className="h-2 w-2 animate-pulse rounded-full bg-success" style={{ boxShadow: "var(--chrome-gallery-stats-dot-shadow)" }} />
+            <Kicker>Ready</Kicker>
           </>
         )}
       </div>
