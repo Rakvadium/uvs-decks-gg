@@ -467,7 +467,7 @@ These snapshots power the Community rankings page without needing to recompute t
 
 The rankings UI lives in [community-rankings-view.tsx](../../../src/components/community/community-rankings-view.tsx).
 
-In the app shell, it is presented as the `Rankings` tab within the tier-list browser page so users can browse lists and inspect aggregate stats in one place.
+In the app shell, it is presented as the `Rankings` tab within the tier-list browser. The Community hub is the overview; dest tabs drill into lists, rankings, or creators, and an icon-only back returns to the hub.
 
 Current capabilities:
 
