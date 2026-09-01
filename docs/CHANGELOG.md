@@ -22,6 +22,11 @@ All notable changes to this project are recorded here.
   - **Decisions:** Keep parent destination tabs visible (inventory + mobile dest nav). Nest Public / My Lists under Tier Lists only. Rankings stays a Community destination, not a duplicate nested tab. On the tier-lists bar, destination tabs are icon-only (names in `sr-only`) so they fit beside Public / My Lists in the left slot at 1440px. Hub feed remains via sidebar Community.
   - **Files:** `src/components/community/community-destination-tabs.tsx`, `src/components/community/community-view/floating-top-bar.tsx`, `src/components/community/tier-lists/page-view/floating-top-bar.tsx`, `docs/floating-header-islands.md`.
 
+- **Teams landing page identity** — Desktop `/teams` (no team) now has a left identity pill `h1` (“Teams”); Create Team stays in the right action slot. Mobile keeps a matching `md:hidden` heading.
+  - **Context:** Issue #102.
+  - **Decisions:** Copy the teams-decks / settings title-pill pattern; do not add a desktop in-content PageHero.
+  - **Files:** `src/components/teams/teams-landing-view.tsx`, `docs/floating-header-islands.md`.
+
 ### Added
 
 - **Collection in signed-in main nav** — Profile sheet (mobile) and left sidebar include Collection between Decks and Community, routing to `/collection`.

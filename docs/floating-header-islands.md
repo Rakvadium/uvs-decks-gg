@@ -57,7 +57,7 @@ The floating bar is desktop-only (`hidden md:block` inside `FloatingPageLayout`)
 | Community | Tabs (Hub / Tier Lists / Rankings / Creators) | — | — |
 | Tier lists browser | Destination tabs (Hub / Tier Lists / Rankings / Creators; icon-only so labels fit beside list tabs); Public / My Lists when on Tier Lists | Search (Public / My Lists) | New List |
 | Tier list detail | Back + title pill + meta cluster | — | Edit / Save / Cancel / Delete |
-| Teams landing | — | — | Create Team / Sign in |
+| Teams landing | Title pill | — | Create Team / Sign in |
 | Team hub | Team identity pill + tabs (News … Calendar) | — | Section primary (Create Announcement / Invite member / Create Calendar Item) |
 | Teams decks index | Title pill | — | — |
 | Settings | Back + title pill | — | — |
