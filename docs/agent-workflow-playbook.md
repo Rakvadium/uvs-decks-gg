@@ -39,7 +39,7 @@ Never freestyle a parallel process. Same ritual → semi-predictable outcomes.
 
 1. **Neighbors beat novelty** — copy 2–3 existing examples of the same job.
 2. **Header slots are fixed** — left context / center search / right actions ([floating-header-islands.md](./floating-header-islands.md)).
-3. **Tokens over taste** — [UI_UX_DESIGN.md](./UI_UX_DESIGN.md), [theme-and-chrome.md](./theme-and-chrome.md), ShadCN/MagicUI, shell primitives.
+3. **Tokens over taste** — [theme-chrome-guidelines.md](./theme-chrome-guidelines.md), [UI_UX_DESIGN.md](./UI_UX_DESIGN.md), [theme-and-chrome.md](./theme-and-chrome.md), ShadCN/MagicUI, shell primitives.
 4. **Vision is a veto** — [PRODUCT_VISION.md](./PRODUCT_VISION.md); do not make a surface look like a different product.
 5. **No drive-by polish** — only touch the brief’s file list.
 6. **Ambiguity → ask** — do not guess placement.
