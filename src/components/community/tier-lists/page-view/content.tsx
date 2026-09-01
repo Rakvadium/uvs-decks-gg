@@ -10,7 +10,6 @@ import { TierListBrowserCard } from "./browser-card";
 import { useCommunityTierListsPageContext } from "./context";
 import { CommunityTierListsPageCreateDialog } from "./create-dialog";
 import { CommunityTierListsPageEmptyState } from "./empty-state";
-import { CommunityMobileDestinationNav } from "@/components/community/community-mobile-destination-nav";
 import { CommunityTierListsPageHeading } from "./heading";
 import { CommunityTierListsPageLoadingState } from "./loading-state";
 import {
@@ -38,15 +37,11 @@ export function CommunityTierListsPageView() {
   return (
     <div className="space-y-6">
       <div className="md:hidden space-y-3">
-        <Button variant="ghost" size="sm" className="-ml-2 h-8 w-fit gap-2 px-2" asChild>
-          <Link href="/community">
-            <ArrowLeft className="h-4 w-4 shrink-0" />
-            Back to community
+        <Button variant="ghost" size="icon" className="-ml-2" asChild>
+          <Link href="/community" aria-label="Community">
+            <ArrowLeft className="h-4 w-4" />
           </Link>
         </Button>
-        <div className="flex min-w-0 items-center gap-2 overflow-x-auto pb-0.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          <CommunityMobileDestinationNav />
-        </div>
         <CommunityTierListsPageHeading />
         <CommunityTierListsPagePrimaryAction className="w-full justify-center" label="New Tier List" />
       </div>

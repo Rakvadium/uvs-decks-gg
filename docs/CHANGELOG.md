@@ -10,6 +10,12 @@ All notable changes to this project are recorded here.
 
 ## [Unreleased]
 
+### Changed
+
+- **Community hub drill-back** — `/community` is the overview; dest tabs (Tier Lists / Rankings / Creators) live only there. Drilled pages drop dest tabs and use an icon-only back to the hub. The tier-lists browser keeps Rankings / Public / My Lists as local tabs. Entity backs (deck detail, settings, list detail) stay icon-only with destination names for accessibility.
+  - **Decisions:** Hub is not a dest sibling. Dest tabs do not persist on lists or creators. Do not show the word “Back” as visible label text. Title and Public / Global Ranked stay separate islands on list detail.
+  - **Files:** `src/components/community/community-destination-tabs.tsx`, `src/components/community/community-view/floating-top-bar.tsx`, `src/components/community/tier-lists/page-view/floating-top-bar.tsx`, `src/app/(app)/community/creators/page.tsx`, `docs/floating-header-islands.md`.
+
 ### Fixed
 
 - **Rankings in-content title** — Drop the desktop `Generated Community Tier List` / `Global Rankings` hero under the floating Rankings tabs; empty tiers stay readable.
