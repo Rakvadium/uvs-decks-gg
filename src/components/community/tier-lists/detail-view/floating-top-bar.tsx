@@ -122,7 +122,7 @@ export function CommunityTierListDetailFloatingTopBar() {
       <FloatingPageBar
         left={
           <>
-            <FloatingBackPill href="/community/tier-lists" label="All tier lists" iconOnly />
+            <FloatingBackPill href="/community/tier-lists" label="Tier lists" iconOnly />
             <FloatingCapsuleCluster
               className="min-w-0 max-w-[min(100%,22rem)]"
               bodyClassName="min-w-0 px-4"

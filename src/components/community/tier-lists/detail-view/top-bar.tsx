@@ -59,8 +59,8 @@ export function CommunityTierListDetailTopBar() {
   if (detail === undefined) {
     return (
       <div className="flex w-full min-w-0 items-center gap-2">
-        <Link href="/community/tier-lists" aria-label="Back to tier lists">
-          <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" aria-label="Back to tier lists">
+        <Link href="/community/tier-lists" aria-label="Tier lists">
+          <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" aria-label="Tier lists">
             <ArrowLeft className="h-4 w-4" />
           </Button>
         </Link>
@@ -75,8 +75,8 @@ export function CommunityTierListDetailTopBar() {
   if (!detail) {
     return (
       <div className="flex w-full min-w-0 items-center gap-2">
-        <Link href="/community/tier-lists" aria-label="Back to tier lists">
-          <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" aria-label="Back to tier lists">
+        <Link href="/community/tier-lists" aria-label="Tier lists">
+          <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" aria-label="Tier lists">
             <ArrowLeft className="h-4 w-4" />
           </Button>
         </Link>
@@ -210,8 +210,8 @@ export function CommunityTierListDetailTopBar() {
   return (
     <>
       <div className="flex w-full min-w-0 items-center gap-2">
-        <Link href="/community/tier-lists" aria-label="Back to tier lists">
-          <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" aria-label="Back to tier lists">
+        <Link href="/community/tier-lists" aria-label="Tier lists">
+          <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" aria-label="Tier lists">
             <ArrowLeft className="h-4 w-4" />
           </Button>
         </Link>

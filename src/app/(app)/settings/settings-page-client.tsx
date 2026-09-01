@@ -304,8 +304,12 @@ export default function SettingsPageClient() {
           <FloatingPageBar
             left={
               <>
-                <FloatingBackPill onClick={() => router.back()} label="Back" iconOnly />
-                <FloatingPageTitle>Settings</FloatingPageTitle>
+                <FloatingBackPill onClick={() => router.back()} label="Go back" iconOnly />
+                <FloatingCapsuleCluster bodyClassName="px-4" glow>
+                  <h1 className="truncate text-sm font-semibold tracking-tight text-foreground">
+                    Settings
+                  </h1>
+                </FloatingCapsuleCluster>
               </>
             }
           />
@@ -315,12 +319,12 @@ export default function SettingsPageClient() {
           <div className="mb-6 md:hidden">
             <Button
               variant="ghost"
-              size="sm"
+              size="icon"
               onClick={() => router.back()}
-              className="mb-4 gap-2 text-muted-foreground hover:text-foreground"
+              aria-label="Go back"
+              className="mb-4 text-muted-foreground hover:text-foreground"
             >
               <ArrowLeft className="h-4 w-4" />
-              Back
             </Button>
           </div>
           <SettingsAuthRequiredState />
@@ -341,8 +345,12 @@ export default function SettingsPageClient() {
         <FloatingPageBar
           left={
             <>
-              <FloatingBackPill onClick={handleBack} label="Back" iconOnly />
-              <FloatingPageTitle>Settings</FloatingPageTitle>
+              <FloatingBackPill onClick={handleBack} label="Go back" iconOnly />
+              <FloatingCapsuleCluster bodyClassName="px-4" glow>
+                <h1 className="truncate text-sm font-semibold tracking-tight text-foreground">
+                  Settings
+                </h1>
+              </FloatingCapsuleCluster>
             </>
           }
         />
@@ -357,12 +365,12 @@ export default function SettingsPageClient() {
         >
           <Button
             variant="ghost"
-            size="sm"
+            size="icon"
             onClick={handleBack}
-            className="mb-4 gap-2 text-muted-foreground hover:text-foreground"
+            aria-label="Go back"
+            className="mb-4 text-muted-foreground hover:text-foreground"
           >
             <ArrowLeft className="h-4 w-4" />
-            Back
           </Button>
           <div className="flex items-center gap-4">
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10">

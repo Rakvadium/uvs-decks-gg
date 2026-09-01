@@ -3,11 +3,11 @@
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { FloatingTabsPill } from "@/components/shell/floating-page-bar";
 import {
-  COMMUNITY_DESKTOP_DESTINATIONS,
+  COMMUNITY_DESTINATIONS,
   communityDestinationFromLocation,
 } from "./community-destinations";
 
-export function CommunityDestinationTabs({ compact = false }: { compact?: boolean } = {}) {
+export function CommunityDestinationTabs() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -17,12 +17,12 @@ export function CommunityDestinationTabs({ compact = false }: { compact?: boolea
     <FloatingTabsPill
       value={value}
       onValueChange={(next) => {
-        const dest = COMMUNITY_DESKTOP_DESTINATIONS.find((item) => item.value === next);
+        const dest = COMMUNITY_DESTINATIONS.find((item) => item.value === next);
         if (dest) router.push(dest.href);
       }}
-      items={COMMUNITY_DESKTOP_DESTINATIONS.map((item) => ({
+      items={COMMUNITY_DESTINATIONS.map((item) => ({
         value: item.value,
-        label: compact ? <span className="sr-only">{item.label}</span> : item.label,
+        label: item.label,
         icon: item.icon,
         hideLabelBelowLg: false,
       }))}

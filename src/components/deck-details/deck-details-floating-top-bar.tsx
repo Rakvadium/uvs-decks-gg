@@ -22,7 +22,7 @@ export function DeckDetailsFloatingTopBar() {
     <FloatingPageBar
       left={
         <div className="flex min-w-0 items-center gap-2">
-          <FloatingBackPill href="/decks" label="Back to all decks" iconOnly />
+          <FloatingBackPill href="/decks" label="Decks" iconOnly />
           <FloatingCapsuleCluster
             className="min-w-0 max-w-[min(100%,28rem)]"
             bodyClassName="min-w-0 px-4"
