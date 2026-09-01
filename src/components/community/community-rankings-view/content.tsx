@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import {
   Dialog,
   DialogBody,
@@ -23,10 +23,8 @@ const TIER_PREVIEW_CARD_LIMIT = 10;
 export function CommunityRankingsView({ embedded = false }: CommunityRankingsViewProps) {
   const {
     scopeType,
-    selectedSetScopeKey,
     leaderboard,
     cardMap,
-    setScopes,
   } = useCommunityRankingsModel();
 
   const [dialogTier, setDialogTier] = useState<{
@@ -35,12 +33,6 @@ export function CommunityRankingsView({ embedded = false }: CommunityRankingsVie
     cardIds: Id<"cards">[];
     scopeLabel: string;
   } | null>(null);
-
-  const scopeSubtitle =
-    leaderboard?.scopeLabel ??
-    (scopeType === "global"
-      ? "Global rankings"
-      : (setScopes ?? []).find((s) => s.scopeKey === selectedSetScopeKey)?.scopeLabel ?? "Set scope");
 
   return (
     <div className={cn("relative flex h-full flex-col overflow-y-auto", embedded && "overflow-visible")}>
@@ -55,17 +47,13 @@ export function CommunityRankingsView({ embedded = false }: CommunityRankingsVie
             leaderboard ? "border-border/50" : "border-dashed border-border/80",
           )}
         >
-          <CardHeader className="space-y-1">
-            <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-              <CardTitle>Generated Community Tier List</CardTitle>
-              {leaderboard ? (
-                <Badge variant="outline" className="shrink-0 text-xs font-normal">
-                  {leaderboard.lastComputedAt ? new Date(leaderboard.lastComputedAt).toLocaleString() : "Pending"}
-                </Badge>
-              ) : null}
-            </div>
-            <CardDescription>{scopeSubtitle}</CardDescription>
-          </CardHeader>
+          {leaderboard ? (
+            <CardHeader className="space-y-1">
+              <Badge variant="outline" className="w-fit shrink-0 text-xs font-normal">
+                {leaderboard.lastComputedAt ? new Date(leaderboard.lastComputedAt).toLocaleString() : "Pending"}
+              </Badge>
+            </CardHeader>
+          ) : null}
           <CardContent>
             {!leaderboard ? (
               <div className="flex min-h-48 items-center justify-center rounded-xl border border-dashed border-border/80 bg-background/30 px-4 py-8 text-center text-sm text-muted-foreground">
