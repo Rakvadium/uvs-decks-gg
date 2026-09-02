@@ -46,7 +46,7 @@ export function ToggleBadgeRow({
     <div className="flex items-start gap-2">
       <span
         className={cn(
-          "w-12 shrink-0 text-[10px] font-mono uppercase tracking-widest text-muted-foreground",
+          "chrome-label-case w-12 shrink-0 text-[10px] text-muted-foreground",
           topAligned && "pt-0.5"
         )}
       >

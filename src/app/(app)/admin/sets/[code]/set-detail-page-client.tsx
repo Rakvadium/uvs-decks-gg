@@ -1,5 +1,6 @@
 "use client";
 
+import { SectionHeading } from "@/components/ui/typography-headings";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams, useSearchParams } from "next/navigation";
@@ -77,7 +78,7 @@ export default function AdminSetDetailPageClient() {
     return (
       <div className="flex flex-col gap-4">
         <p className="text-muted-foreground">
-          No set found for code <span className="font-mono">{code}</span>.
+          No set found for code <span className="">{code}</span>.
         </p>
         <Link href="/admin/sets" className="text-primary hover:underline">
           Back to sets
@@ -121,7 +122,7 @@ export default function AdminSetDetailPageClient() {
         title={set.name}
         description={
           <div className="space-y-1">
-            <p className="font-mono text-sm text-muted-foreground">{set.code}</p>
+            <p className="text-sm text-muted-foreground">{set.code}</p>
             {set.updatedAt ? (
               <p className="text-xs text-muted-foreground">
                 Updated {new Date(set.updatedAt).toLocaleString()}
@@ -173,8 +174,8 @@ export default function AdminSetDetailPageClient() {
       />
 
       {audit?.mismatch ? (
-        <Alert className="border-amber-500/50 bg-amber-500/5">
-          <AlertTriangle className="h-4 w-4 text-amber-600" />
+        <Alert variant="warning">
+          <AlertTriangle className="h-4 w-4" />
           <AlertTitle>Card count mismatch</AlertTitle>
           <AlertDescription>
             Stored count is {set.cardCount ?? "unset"} but the catalog lists{" "}
@@ -214,7 +215,7 @@ export default function AdminSetDetailPageClient() {
           list cards
         </span>
         {set.cardCount != null && set.cardCount !== audit?.actualListCardCount ? (
-          <span className="text-xs text-amber-600 dark:text-amber-400">
+          <span className="text-xs text-warning">
             stored count {set.cardCount}
           </span>
         ) : null}
@@ -250,7 +251,7 @@ export default function AdminSetDetailPageClient() {
       </div>
 
       <div className="space-y-3">
-        <h2 className="text-base font-semibold tracking-tight">Cards</h2>
+        <SectionHeading size="sm">Cards</SectionHeading>
         <SetAdminCards
           variant="embedded"
           setCode={set.code}

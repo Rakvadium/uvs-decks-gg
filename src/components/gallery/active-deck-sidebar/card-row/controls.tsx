@@ -40,7 +40,7 @@ export function ActiveDeckCardRowControls() {
         <Minus className="h-3.5 w-3.5" />
       </Button>
 
-      <span className="min-w-[26px] text-center font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+      <span className="chrome-label-case min-w-[26px] text-center text-[10px] text-muted-foreground">
         x{count}
       </span>
 

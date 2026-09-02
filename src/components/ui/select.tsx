@@ -49,7 +49,7 @@ function SelectTrigger({
         "[&_svg:not([class*='text-'])]:text-muted-foreground",
         "aria-invalid:ring-destructive/20 aria-invalid:border-destructive",
         "data-[size=default]:h-10 data-[size=sm]:h-8",
-        "font-mono text-base tracking-wide uppercase md:text-sm",
+        "chrome-label-case text-base md:text-sm",
         compactValue
           ? "[&>[data-slot=select-value]]:block [&>[data-slot=select-value]]:leading-none"
           : "*:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-2",
@@ -118,7 +118,7 @@ function SelectLabel({
   return (
     <SelectPrimitive.Label
       data-slot="select-label"
-      className={cn("text-muted-foreground px-2 py-1.5 text-xs font-mono uppercase tracking-widest", className)}
+      className={cn("chrome-label-case text-muted-foreground px-2 py-1.5 text-xs", className)}
       {...props}
     />
   )
@@ -136,7 +136,7 @@ function SelectItem({
         "relative flex w-full cursor-default items-center gap-2 rounded py-2 pr-8 pl-3 text-sm outline-hidden select-none transition-colors",
         "hover:bg-[color:var(--control-option-hover-bg)] hover:text-foreground focus:bg-[color:var(--control-option-hover-bg)] focus:text-foreground",
         "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-        "font-mono uppercase tracking-wide text-xs",
+        "chrome-label-case text-xs",
         "[&_svg:not([class*='text-'])]:text-muted-foreground",
         "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         "*:[span]:last:flex *:[span]:last:items-center *:[span]:last:gap-2",

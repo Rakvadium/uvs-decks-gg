@@ -105,9 +105,9 @@ function FeedbackFormDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        size="sm"
+        size="content-sm"
         contentPadding="none"
-        className="max-w-md overflow-hidden p-0"
+        className="overflow-hidden p-0"
         footer={
           <>
             <DialogClose asChild>

@@ -1,5 +1,6 @@
 "use client";
 
+import { PageHeading, SectionHeading } from "@/components/ui/typography-headings";
 import { useMutation, usePaginatedQuery, useQuery } from "convex/react";
 import { Plus } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
@@ -114,11 +115,11 @@ export function TeamHubAnnouncementsContent({ teamId }: TeamHubAnnouncementsCont
   return (
     <div className="space-y-8">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between md:hidden">
-        <h1 className="font-display text-lg font-semibold text-foreground">News</h1>
+        <PageHeading size="sm">News</PageHeading>
         {caps.canPostAnnouncements ? (
           <Button
             type="button"
-            className="h-9 shrink-0 font-mono text-xs uppercase tracking-wider sm:mt-0.5"
+            className="h-9 shrink-0 text-xs sm:mt-0.5"
             onClick={openCreate}
           >
             Announcement
@@ -134,7 +135,7 @@ export function TeamHubAnnouncementsContent({ teamId }: TeamHubAnnouncementsCont
           </DialogHeader>
           <DialogBody className="space-y-4 px-6">
             <div className="space-y-2">
-              <Label htmlFor="ann-title" className="text-xs font-mono uppercase tracking-wider">
+              <Label htmlFor="ann-title" className="chrome-label-case text-xs">
                 Title
               </Label>
               <Input
@@ -145,7 +146,7 @@ export function TeamHubAnnouncementsContent({ teamId }: TeamHubAnnouncementsCont
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="ann-body" className="text-xs font-mono uppercase tracking-wider">
+              <Label htmlFor="ann-body" className="chrome-label-case text-xs">
                 Body
               </Label>
               <Textarea
@@ -176,7 +177,7 @@ export function TeamHubAnnouncementsContent({ teamId }: TeamHubAnnouncementsCont
 
       {pinnedList.length > 0 && (
         <div className="space-y-3">
-          <h2 className="font-mono text-xs uppercase tracking-widest text-primary">Pinned</h2>
+          <h2 className="chrome-heading-case text-xs text-primary">Pinned</h2>
           <ul className="space-y-3">
             {pinnedList.map((row) => (
               <AnnouncementCard
@@ -213,14 +214,14 @@ export function TeamHubAnnouncementsContent({ teamId }: TeamHubAnnouncementsCont
       )}
 
       <div className="space-y-3">
-        <h2 className="font-mono text-xs uppercase tracking-widest text-muted-foreground">Chronological</h2>
+        <h2 className="chrome-heading-case text-xs text-muted-foreground">Chronological</h2>
         {showLoadMore && (
           <div className="flex justify-center">
             <Button
               type="button"
               variant="outline"
               size="sm"
-              className="font-mono text-xs uppercase tracking-wider"
+              className="text-xs"
               disabled={status === "LoadingMore"}
               onClick={() => loadMore(12)}
             >
@@ -325,7 +326,7 @@ function AnnouncementCard({
             </div>
           ) : (
             <>
-              <h3 className="font-display text-base font-semibold text-foreground">{a.title}</h3>
+              <SectionHeading as="h3" size="sm">{a.title}</SectionHeading>
               <p className="mt-2 whitespace-pre-wrap break-words text-sm text-foreground/90">{a.body}</p>
             </>
           )}

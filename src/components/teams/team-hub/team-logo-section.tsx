@@ -61,7 +61,7 @@ export function TeamLogoSection({ teamId, presentation }: TeamLogoSectionProps) 
             type="button"
             variant="outline"
             size="sm"
-            className="font-mono text-xs uppercase tracking-wider"
+            className="text-xs"
             disabled={loadingPresentation}
             onClick={() => inputRef.current?.click()}
           >

@@ -16,7 +16,7 @@ export function DeckCardsEmptyState() {
         <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-lg border border-primary/30 shadow-[0_0_20px_-5px_var(--primary)]">
           <Layers className="h-7 w-7 text-primary/50" />
         </div>
-        <p className="mb-4 text-sm font-mono uppercase tracking-wider text-muted-foreground">
+        <p className="chrome-label-case mb-4 text-sm text-muted-foreground">
           No cards in {SECTION_CONFIG[activeSection].label.toLowerCase()}
         </p>
         <Link href="/gallery">

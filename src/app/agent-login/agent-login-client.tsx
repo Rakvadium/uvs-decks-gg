@@ -1,5 +1,6 @@
 "use client";
 
+import { PageHeading } from "@/components/ui/typography-headings";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthActions } from "@convex-dev/auth/react";
@@ -130,7 +131,7 @@ export function AgentLoginClient({ token, nextPath }: AgentLoginClientProps) {
   return (
     <main className="flex min-h-[100dvh] items-center justify-center bg-background px-6">
       <div className="w-full max-w-md space-y-3 text-center">
-        <h1 className="text-2xl font-semibold tracking-tight">Agent login</h1>
+        <PageHeading size="md">Agent login</PageHeading>
         <p className="text-sm text-muted-foreground">{status}</p>
         {error ? <p className="text-sm text-destructive">{error}</p> : null}
       </div>

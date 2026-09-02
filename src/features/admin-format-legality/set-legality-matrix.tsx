@@ -123,7 +123,7 @@ export function SetLegalityMatrix({ formatKey }: SetLegalityMatrixProps) {
               return (
                 <TableRow key={s._id}>
                   <TableCell className="font-medium">{s.name}</TableCell>
-                  <TableCell className="font-mono text-sm">{s.code}</TableCell>
+                  <TableCell className="text-sm">{s.code}</TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
                       <Switch
@@ -145,7 +145,7 @@ export function SetLegalityMatrix({ formatKey }: SetLegalityMatrixProps) {
                   <TableCell>
                     <Input
                       type="datetime-local"
-                      className="font-mono text-xs max-w-[220px]"
+                      className="text-xs max-w-[220px]"
                       defaultValue={rotVal}
                       key={`${s.code}-${rotVal}`}
                       disabled={busyCode === s.code}

@@ -10,16 +10,16 @@ export function ActiveDeckCharacterSummary() {
   return (
     <div className="min-w-0 space-y-1">
       <div className="min-w-0 space-y-0.5">
-        <p className="truncate font-display text-base font-semibold tracking-wide">
+        <p className="truncate text-base font-semibold tracking-wide">
           {primaryName}
         </p>
         {subtitleName ? (
-          <p className="line-clamp-1 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+          <p className="chrome-label-case line-clamp-1 text-[10px] text-muted-foreground">
             {subtitleName}
           </p>
         ) : null}
       </div>
-      <p className="line-clamp-2 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+      <p className="chrome-label-case line-clamp-2 text-[10px] text-muted-foreground">
         {activeDeck?.description?.trim() ? activeDeck.description : "No description yet."}
       </p>
     </div>

@@ -1,9 +1,9 @@
 "use client";
 
 import {
-  FloatingCapsuleCluster,
   FloatingPageBar,
   FloatingPageLayout,
+  FloatingPageTitle,
 } from "@/components/shell/floating-page-bar";
 import { TeamsDecksBody } from "./body";
 import { TeamsDecksHeading } from "./heading";
@@ -18,11 +18,7 @@ export function TeamsDecksView() {
       bar={
         <FloatingPageBar
           left={
-            <FloatingCapsuleCluster bodyClassName="px-4" glow>
-              <h1 className="truncate text-sm font-semibold tracking-tight text-foreground">
-                {TITLE}
-              </h1>
-            </FloatingCapsuleCluster>
+            <FloatingPageTitle>{TITLE}</FloatingPageTitle>
           }
         />
       }

@@ -1,5 +1,6 @@
 "use client";
 
+import { SectionHeading } from "@/components/ui/typography-headings";
 import { useEffect, useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { useRouter } from "next/navigation";
@@ -257,7 +258,7 @@ export function FormatFormContent({ mode, format }: FormatFormContentProps) {
             value={s.key}
             onChange={(e) => setField("key", e.target.value)}
             placeholder="e.g. my-format"
-            className="font-mono"
+            className=""
             autoComplete="off"
           />
           <p className="text-sm text-muted-foreground">
@@ -267,7 +268,7 @@ export function FormatFormContent({ mode, format }: FormatFormContentProps) {
       ) : (
         <div className="space-y-1">
           <p className="text-sm text-muted-foreground">Key</p>
-          <p className="font-mono text-sm">{format?.key}</p>
+          <p className="text-sm">{format?.key}</p>
         </div>
       )}
 
@@ -336,11 +337,11 @@ export function FormatFormContent({ mode, format }: FormatFormContentProps) {
           id="sideboard"
           value={s.sideboardRule}
           onChange={(e) => setField("sideboardRule", e.target.value)}
-          className="font-mono"
+          className=""
         />
         <p className="text-sm text-muted-foreground">
-          Examples: <span className="font-mono">optional</span>,{" "}
-          <span className="font-mono">exact:15</span>, <span className="font-mono">max:10</span>
+          Examples: <span className="">optional</span>,{" "}
+          <span className="">exact:15</span>, <span className="">max:10</span>
         </p>
       </div>
 
@@ -395,7 +396,7 @@ export function FormatFormContent({ mode, format }: FormatFormContentProps) {
                   <Input
                     value={row.key}
                     onChange={(e) => patchSubForm(i, "key", e.target.value)}
-                    className="font-mono h-8 text-sm"
+                    className="h-8 text-sm"
                   />
                 </div>
                 <div className="min-w-0 flex-1 space-y-1">
@@ -465,7 +466,7 @@ export function FormatDeleteSection({ format }: FormatDeleteSectionProps) {
 
   return (
     <div className="mt-10 border-t border-border/50 pt-8">
-      <h2 className="text-sm font-medium text-destructive">Delete format</h2>
+      <SectionHeading size="xs" className="text-destructive">Delete format</SectionHeading>
       <p className="mt-1 text-sm text-muted-foreground">
         Permanently remove this format. Blocked if any decks, card legality, or set legality rows
         reference it.
@@ -489,7 +490,7 @@ export function FormatDeleteSection({ format }: FormatDeleteSectionProps) {
           Delete format
         </Button>
         {!canDelete && blockers && blockers !== null ? (
-          <p className="mt-2 text-sm text-amber-600 dark:text-amber-500">
+          <p className="mt-2 text-sm text-warning">
             Remove dependencies before delete is allowed.
           </p>
         ) : null}
@@ -500,8 +501,8 @@ export function FormatDeleteSection({ format }: FormatDeleteSectionProps) {
             <AlertDialogTitle>Delete this format?</AlertDialogTitle>
             <AlertDialogDescription>
               This will permanently remove{" "}
-              <span className="font-mono text-foreground">{format.name}</span> (
-              <span className="font-mono">{format.key}</span>). This cannot be undone.
+              <span className="text-foreground">{format.name}</span> (
+              <span className="">{format.key}</span>). This cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

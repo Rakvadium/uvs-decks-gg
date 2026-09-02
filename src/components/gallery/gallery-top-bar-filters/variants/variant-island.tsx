@@ -55,7 +55,7 @@ export function GalleryTopBarIslandVariant() {
           <X className="size-4" />
         </button>
       ) : (
-        <kbd className="hidden shrink-0 select-none items-center rounded-full border border-border/60 bg-muted/40 px-2 py-0.5 font-mono text-[10px] text-muted-foreground lg:flex">
+        <kbd className="hidden shrink-0 select-none items-center rounded-full border border-border/60 bg-muted/40 px-2 py-0.5 text-[10px] text-muted-foreground lg:flex">
           /
         </kbd>
       )}

@@ -56,7 +56,7 @@ export function CardHoverPreviewPortal({
             fetchPriority="low"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center px-4 text-center text-xs font-mono uppercase tracking-wider text-muted-foreground">
+          <div className="chrome-label-case flex h-full w-full items-center justify-center px-4 text-center text-xs text-muted-foreground">
             <Hexagon className="mr-2 h-4 w-4 text-muted-foreground/60" />
             {card.name}
           </div>

@@ -11,8 +11,8 @@ export function GalleryInitializationState() {
         <div className="absolute -inset-4 animate-pulse rounded-2xl blur-xl" style={{ background: "var(--chrome-gallery-empty-wash)" }} />
       </div>
       <div className="space-y-2 text-center">
-        <SectionHeading className="font-display font-semibold uppercase tracking-widest text-base sm:text-base">Initializing Database</SectionHeading>
-        <Kicker className="text-sm font-mono tracking-wide text-muted-foreground">Loading card data...</Kicker>
+        <SectionHeading size="sm">Initializing Database</SectionHeading>
+        <Kicker size="md">Loading card data...</Kicker>
       </div>
     </div>
   );

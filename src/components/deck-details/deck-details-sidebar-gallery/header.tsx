@@ -11,9 +11,9 @@ export function DeckDetailsGallerySidebarHeader() {
     <div className="shrink-0 border-b border-border/40 px-3 py-3">
       <div className="flex items-center justify-between gap-3">
         <div className="min-w-0">
-          <div className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">Gallery</div>
+          <div className="chrome-label-case text-[10px] text-muted-foreground">Gallery</div>
           <div className="mt-0.5 flex items-center gap-2">
-            <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+            <span className="chrome-label-case text-[10px] text-muted-foreground">
               {meta.filteredCount.toLocaleString()} cards
             </span>
             {meta.activeFilterCount > 0 ? (
@@ -36,8 +36,8 @@ export function DeckDetailsGallerySidebarHeader() {
                 onClick={() => setViewMode(mode)}
                 className={
                   isActive
-                    ? "flex items-center gap-1 rounded bg-primary/20 px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-primary transition-colors"
-                    : "flex items-center gap-1 rounded px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-muted-foreground transition-colors hover:text-foreground"
+                    ? "chrome-label-case flex items-center gap-1 rounded bg-primary/20 px-2 py-1 text-[10px] text-primary transition-colors"
+                    : "chrome-label-case flex items-center gap-1 rounded px-2 py-1 text-[10px] text-muted-foreground transition-colors hover:text-foreground"
                 }
               >
                 <Icon className="h-3.5 w-3.5" />

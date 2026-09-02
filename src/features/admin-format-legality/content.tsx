@@ -56,7 +56,7 @@ export function AdminFormatDetailWorkspace({
           <p>
             <span className="text-foreground">rotatesOutAt</span> on a set row
             is compared to the server clock at validation time (same basis as{" "}
-            <span className="font-mono">Date.now()</span> in Convex). When that
+            <span className="">Date.now()</span> in Convex). When that
             instant has passed, the set is treated as not legal in the format
             even if the toggle still reads allowed.
           </p>
@@ -65,7 +65,7 @@ export function AdminFormatDetailWorkspace({
             row schedules a ban or restriction: if the timestamp is in the
             future, the card is still treated as legal until that moment.
           </p>
-          <p className="font-mono text-xs">
+          <p className="text-xs">
             Longer reference: docs/implementation/notes/legality-dates.md
           </p>
         </section>

@@ -1,5 +1,6 @@
 "use client";
 
+import { PageHeading } from "@/components/ui/typography-headings";
 import { ArrowLeft, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,7 +19,7 @@ export function SignUpFormDialog({
   return (
     <>
       <div className="mb-6 text-center">
-        <h1 className="text-3xl font-bold tracking-tight">Create an account</h1>
+        <PageHeading size="lg">Create an account</PageHeading>
         <p className="mt-2 text-muted-foreground">Enter your information below to create your account</p>
       </div>
       <form className="flex flex-col" onSubmit={handleSubmit}>

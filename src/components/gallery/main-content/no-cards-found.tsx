@@ -18,8 +18,8 @@ export function NoCardsFound() {
         </div>
         <div className="absolute -inset-4 -z-10 rounded-2xl blur-xl" style={{ background: "var(--chrome-gallery-empty-wash)" }} />
       </div>
-      <SectionHeading className="mb-2 text-xl font-display font-bold uppercase tracking-widest sm:text-xl">No Cards Found</SectionHeading>
-      <p className="max-w-md text-sm font-mono tracking-wide text-muted-foreground">
+      <SectionHeading size="lg" className="mb-2">No Cards Found</SectionHeading>
+      <p className="max-w-md text-sm tracking-wide text-muted-foreground">
         Try adjusting your search query or filters to find what you&apos;re looking for
       </p>
     </m.div>

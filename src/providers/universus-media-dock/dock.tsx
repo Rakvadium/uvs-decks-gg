@@ -396,7 +396,7 @@ export function UniversusMediaDock() {
           >
             <div className="flex min-w-0 flex-1 items-center gap-2">
               <Tv className="h-4 w-4 shrink-0 text-primary" />
-              <span className="truncate font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+              <span className="chrome-label-case truncate text-[10px] font-semibold text-muted-foreground">
                 Mini player
               </span>
               {liveRows.length > 0 ? (
@@ -454,7 +454,7 @@ export function UniversusMediaDock() {
               ) : (
                 <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground" />
               )}
-              <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Queue</span>
+              <span className="chrome-label-case text-[10px] text-muted-foreground">Queue</span>
             </button>
             <button
               type="button"
@@ -483,7 +483,7 @@ export function UniversusMediaDock() {
                   <>
                     {liveRows.length > 0 ? (
                       <div className="mb-3 space-y-1.5">
-                        <p className="px-1 font-mono text-[10px] uppercase tracking-widest text-red-400/90">Live now</p>
+                        <p className="chrome-label-case px-1 text-[10px] text-red-400/90">Live now</p>
                         {liveRows.map((row) => {
                           const active = playbackEquals(playback, row.playback);
                           return (
@@ -504,7 +504,7 @@ export function UniversusMediaDock() {
                                     <Play className="h-4 w-4 text-red-400" />
                                   </div>
                                 )}
-                                <span className="absolute bottom-0.5 left-0.5 rounded bg-red-600 px-1 font-mono text-[10px] font-bold text-white">
+                                <span className="absolute bottom-0.5 left-0.5 rounded bg-red-600 px-1 text-[10px] font-bold text-white">
                                   LIVE
                                 </span>
                               </div>
@@ -528,7 +528,7 @@ export function UniversusMediaDock() {
                     {feed.feedKind !== "empty" && feed.items.length > 0 ? (
                       <>
                         {liveRows.length > 0 ? (
-                          <p className="mb-1.5 px-1 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                          <p className="chrome-label-case mb-1.5 px-1 text-[10px] text-muted-foreground">
                             Curated
                           </p>
                         ) : null}

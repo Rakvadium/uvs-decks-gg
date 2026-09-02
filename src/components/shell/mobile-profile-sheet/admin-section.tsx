@@ -6,7 +6,7 @@ export function MobileProfileAdminSection() {
 
   return (
     <div className="p-4 pb-24">
-      <p className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">Admin</p>
+      <p className="chrome-label-case mb-2 text-xs font-medium text-muted-foreground">Admin</p>
       <button
         onClick={handleAdminToggle}
         className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted"

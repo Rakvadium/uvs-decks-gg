@@ -64,7 +64,7 @@ export function TierListFeed({
         <Card>
           <CardContent className="flex flex-col items-center justify-center gap-3 py-12">
             <Sparkles className="h-6 w-6 text-primary" />
-            <p className="text-sm font-mono uppercase tracking-[0.18em] text-muted-foreground">
+            <p className="chrome-label-case text-sm text-muted-foreground">
               No public tier lists yet
             </p>
             <Button size="sm" asChild>

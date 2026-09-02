@@ -19,7 +19,7 @@ export function CardDetailsGeneralStatsSection() {
 
   return (
     <div className="space-y-2">
-      <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground">General</span>
+      <span className="chrome-label-case text-xs text-muted-foreground">General</span>
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
         <StatBlock icon={Gauge} label="Difficulty" value={card.difficulty} color="orange" />
         <StatBlock icon={Shield} label="Check" value={card.control} color="primary" />
@@ -37,8 +37,8 @@ export function CardDetailsGeneralStatsSection() {
           <div className="flex items-center gap-2 rounded-lg border border-secondary/30 bg-secondary/10 px-3 py-2">
             <Gauge className="h-4 w-4 text-secondary" />
             <div className="flex flex-col">
-              <span className="text-lg font-display font-bold text-secondary">{card.stamina}</span>
-              <span className="text-[10px] font-mono uppercase tracking-widest opacity-70 text-secondary">
+              <span className="text-lg font-bold text-secondary">{card.stamina}</span>
+              <span className="chrome-label-case text-[10px] opacity-70 text-secondary">
                 Stamina
               </span>
             </div>
@@ -49,8 +49,8 @@ export function CardDetailsGeneralStatsSection() {
           <div className="flex items-center gap-2 rounded-lg border border-primary/30 bg-primary/10 px-3 py-2">
             <Copy className="h-4 w-4 text-primary" />
             <div className="flex flex-col">
-              <span className="text-lg font-display font-bold text-primary">{card.handSize}</span>
-              <span className="text-[10px] font-mono uppercase tracking-widest opacity-70 text-primary">
+              <span className="text-lg font-bold text-primary">{card.handSize}</span>
+              <span className="chrome-label-case text-[10px] opacity-70 text-primary">
                 Hand Size
               </span>
             </div>

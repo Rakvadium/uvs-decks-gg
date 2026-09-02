@@ -23,8 +23,8 @@ export function StatBlock({ icon: Icon, label, value, color = "primary" }: StatB
     <div className={cn("flex items-center gap-2 rounded-lg border px-3 py-2", COLOR_CLASSES[color])}>
       <Icon className="h-4 w-4" />
       <div className="flex flex-col">
-        <span className="text-lg font-display font-bold">{value}</span>
-        <span className="text-[10px] font-mono uppercase tracking-widest opacity-70">{label}</span>
+        <span className="text-lg font-bold">{value}</span>
+        <span className="chrome-label-case text-[10px] opacity-70">{label}</span>
       </div>
     </div>
   );

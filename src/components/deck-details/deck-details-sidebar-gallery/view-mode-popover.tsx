@@ -29,7 +29,7 @@ export function DeckDetailsGalleryViewModePopover() {
       </PopoverTrigger>
       <PopoverContent className="w-48 p-3" align="end">
         <div className="space-y-3">
-          <span className="font-mono text-xs uppercase tracking-widest text-muted-foreground">View Mode</span>
+          <span className="chrome-label-case text-xs text-muted-foreground">View Mode</span>
 
           <div className="flex gap-1">
             {(["card", "list"] as const).map((mode) => {
@@ -48,7 +48,7 @@ export function DeckDetailsGalleryViewModePopover() {
                   )}
                 >
                   <Icon className="h-4 w-4" />
-                  <span className="font-mono text-[10px] uppercase">{mode}</span>
+                  <span className="chrome-label-case text-[10px]">{mode}</span>
                 </button>
               );
             })}

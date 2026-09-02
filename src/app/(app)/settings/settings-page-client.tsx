@@ -1,5 +1,6 @@
 "use client";
 
+import { PageHeading } from "@/components/ui/typography-headings";
 import { useState, useEffect, useOptimistic, useTransition, useCallback } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
@@ -60,9 +61,9 @@ import { cn } from "@/lib/utils";
 import Image from "next/image";
 import {
   FloatingBackPill,
-  FloatingCapsuleCluster,
   FloatingPageBar,
   FloatingPageLayout,
+  FloatingPageTitle,
 } from "@/components/shell/floating-page-bar";
 import { UserAvatar } from "@/components/user-avatar";
 import {
@@ -118,7 +119,7 @@ function ModePairPickers({
       {title ? <p className="text-sm font-medium">{title}</p> : null}
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
-          <p className="text-xs uppercase tracking-wide text-muted-foreground">Light</p>
+          <p className="chrome-label-case text-xs text-muted-foreground">Light</p>
           <ColorSwatchRow
             label="Primary"
             value={pair.light.primary}
@@ -131,7 +132,7 @@ function ModePairPickers({
           />
         </div>
         <div className="space-y-2">
-          <p className="text-xs uppercase tracking-wide text-muted-foreground">Dark</p>
+          <p className="chrome-label-case text-xs text-muted-foreground">Dark</p>
           <ColorSwatchRow
             label="Primary"
             value={pair.dark.primary}
@@ -304,11 +305,7 @@ export default function SettingsPageClient() {
             left={
               <>
                 <FloatingBackPill onClick={() => router.back()} label="Go back" iconOnly />
-                <FloatingCapsuleCluster bodyClassName="px-4" glow>
-                  <h1 className="truncate text-sm font-semibold tracking-tight text-foreground">
-                    Settings
-                  </h1>
-                </FloatingCapsuleCluster>
+                <FloatingPageTitle>Settings</FloatingPageTitle>
               </>
             }
           />
@@ -345,11 +342,7 @@ export default function SettingsPageClient() {
           left={
             <>
               <FloatingBackPill onClick={handleBack} label="Go back" iconOnly />
-              <FloatingCapsuleCluster bodyClassName="px-4" glow>
-                <h1 className="truncate text-sm font-semibold tracking-tight text-foreground">
-                  Settings
-                </h1>
-              </FloatingCapsuleCluster>
+              <FloatingPageTitle>Settings</FloatingPageTitle>
             </>
           }
         />
@@ -376,7 +369,7 @@ export default function SettingsPageClient() {
               <User className="h-6 w-6 text-primary" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold tracking-tight">Settings</h1>
+              <PageHeading size="md">Settings</PageHeading>
               <p className="text-muted-foreground">
                 Manage your account and preferences
               </p>
@@ -672,7 +665,7 @@ export default function SettingsPageClient() {
                       <CollapsibleTrigger className="flex w-full items-center gap-2 rounded-lg border border-border/50 px-3 py-2 text-left text-sm font-medium hover:bg-muted/60 [&[data-state=open]_svg:first-child]:rotate-180">
                         <ChevronDown className="h-4 w-4 shrink-0 transition-transform" />
                         Per-chrome color overrides
-                        <Badge variant="secondary" className="ml-auto text-[10px] uppercase">
+                        <Badge variant="secondary" className="ml-auto text-[10px]">
                           Advanced
                         </Badge>
                       </CollapsibleTrigger>
@@ -697,11 +690,11 @@ export default function SettingsPageClient() {
                                     <div className="flex flex-wrap items-center gap-2">
                                       <p className="text-sm font-medium">{opt.label}</p>
                                       {hasOverride ? (
-                                        <Badge variant="outline" className="text-[10px] uppercase">
+                                        <Badge variant="outline" className="text-[10px]">
                                           Override
                                         </Badge>
                                       ) : (
-                                        <span className="text-[10px] uppercase text-muted-foreground">
+                                        <span className="chrome-label-case text-[10px] text-muted-foreground">
                                           inherits shared palette
                                         </span>
                                       )}

@@ -24,7 +24,7 @@ function DeckTabMenuButton({ compact = false }: { compact?: boolean }) {
           variant="outline"
           size="sm"
           className={cn(
-            "h-9 gap-1.5 px-2.5 text-[10px] font-mono uppercase tracking-wide",
+            "h-9 gap-1.5 px-2.5 text-[10px]",
             compact && "w-9 px-0"
           )}
         >
@@ -50,8 +50,8 @@ function DeckTabMenuButton({ compact = false }: { compact?: boolean }) {
           return (
             <DropdownMenuItem key={tab.id} onClick={() => setActiveTab(tab.id)}>
               <Icon className="h-3.5 w-3.5" />
-              <span className={cn("text-xs font-mono uppercase tracking-wide", isActive && "text-primary")}>{tab.label}</span>
-              <span className="ml-auto rounded border border-border/50 px-1 py-0 text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+              <span className={cn("chrome-label-case text-xs", isActive && "text-primary")}>{tab.label}</span>
+              <span className="chrome-label-case ml-auto rounded border border-border/50 px-1 py-0 text-[10px] text-muted-foreground">
                 {count}
               </span>
             </DropdownMenuItem>
@@ -81,8 +81,8 @@ export function DecksSidebarHeader() {
       <div className="shrink-0 border-b border-border/30 p-4">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Deck Browser</p>
-            <p className="truncate font-display text-sm font-semibold uppercase tracking-wide text-foreground">
+            <p className="chrome-label-case text-[10px] text-muted-foreground">Deck Browser</p>
+            <p className="chrome-label-case truncate text-sm font-semibold text-foreground">
               {activeTabMeta.label}
             </p>
           </div>
@@ -90,7 +90,7 @@ export function DecksSidebarHeader() {
           <DeckTabMenuButton />
         </div>
 
-        <p className="mt-2 text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+        <p className="chrome-label-case mt-2 text-[10px] text-muted-foreground">
           {deckCounts[activeTabMeta.id]} total
         </p>
       </div>
@@ -121,7 +121,7 @@ export function DecksSidebarHeader() {
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={cn(
-                  "flex items-center gap-1 rounded px-2 py-1 text-[10px] font-mono uppercase tracking-wide transition-colors",
+                  "chrome-label-case flex items-center gap-1 rounded px-2 py-1 text-[10px] transition-colors",
                   isActive
                     ? "bg-primary/20 text-primary shadow-[0_0_10px_-3px_var(--primary)]"
                     : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"

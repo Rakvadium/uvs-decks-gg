@@ -1,3 +1,4 @@
+import { SectionHeading } from "@/components/ui/typography-headings";
 import type React from "react";
 import Image from "next/image";
 import { Minus, Plus } from "lucide-react";
@@ -36,7 +37,7 @@ export function ListVariant({ className, ...props }: ListVariantProps) {
       </div>
 
       <div className="ml-20 min-w-0 flex-1">
-        <h3 className="truncate font-semibold">{cardData.name}</h3>
+        <SectionHeading as="h3" size="md" className="truncate">{cardData.name}</SectionHeading>
         <p className="text-sm text-muted-foreground">
           {cardData.type} • {cardData.rarity}
         </p>

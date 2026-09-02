@@ -1,5 +1,6 @@
 "use client";
 
+import { SectionHeading } from "@/components/ui/typography-headings";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import type { Id } from "../../../convex/_generated/dataModel";
@@ -101,7 +102,7 @@ export function CardLegalityAdminPanel({
   return (
     <div className="space-y-8 px-1 pb-8">
       <div className="rounded-lg border bg-card/30 p-4 space-y-4">
-        <h3 className="text-sm font-medium">Search catalog</h3>
+        <SectionHeading as="h3" size="xs">Search catalog</SectionHeading>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <div className="space-y-2 sm:col-span-2">
             <Label htmlFor="leg-search">Card search</Label>
@@ -146,7 +147,7 @@ export function CardLegalityAdminPanel({
                     <TableCell className="font-medium max-w-[200px] truncate">
                       {c.name}
                     </TableCell>
-                    <TableCell className="font-mono text-xs">
+                    <TableCell className="text-xs">
                       {c.setCode ?? "—"}
                     </TableCell>
                     <TableCell>
@@ -195,7 +196,7 @@ export function CardLegalityAdminPanel({
 
       <div className="space-y-3">
         <div className="flex flex-wrap items-end justify-between gap-4">
-          <h3 className="text-sm font-medium">Overrides for this format</h3>
+          <SectionHeading as="h3" size="xs">Overrides for this format</SectionHeading>
           <div className="space-y-2">
             <Label>Filter</Label>
             <Select
@@ -245,11 +246,11 @@ export function CardLegalityAdminPanel({
                   >
                     <TableCell className="font-medium max-w-[220px] truncate">
                       {r.cardName}
-                      <span className="block font-mono text-[10px] text-muted-foreground truncate">
+                      <span className="block text-[10px] text-muted-foreground truncate">
                         {r.cardId}
                       </span>
                     </TableCell>
-                    <TableCell className="font-mono text-xs">
+                    <TableCell className="text-xs">
                       {r.cardSetCode ?? "—"}
                     </TableCell>
                     <TableCell>
@@ -279,7 +280,7 @@ export function CardLegalityAdminPanel({
                     </TableCell>
                     <TableCell>
                       <Input
-                        className="w-20 font-mono text-xs"
+                        className="w-20 text-xs"
                         defaultValue={
                           r.copyLimitOverride !== undefined
                             ? String(r.copyLimitOverride)
@@ -306,7 +307,7 @@ export function CardLegalityAdminPanel({
                     <TableCell>
                       <Input
                         type="datetime-local"
-                        className="font-mono text-xs max-w-[200px]"
+                        className="text-xs max-w-[200px]"
                         defaultValue={
                           r.effectiveDate !== undefined
                             ? msToDatetimeLocal(r.effectiveDate)

@@ -38,13 +38,15 @@ Search or filtering for the page's primary collection, via `FloatingSearchCapsul
 
 ## Right slot
 
-Page-level actions. Primary action as a filled `FloatingActionPill`; secondary actions as outline/ghost pills. Beyond two or three actions, fold the rest into an overflow menu.
+Page-level actions. Primary action as a filled `FloatingActionPill` (opens a flow). Secondary as outline. A **context toggle** (Set Active → Active) is not a second primary and is not a dialog opener — off and on must read as different states. Beyond two or three actions, fold the rest into an overflow menu. See [theme-and-chrome.md](./theme-and-chrome.md) control roles.
 
 ## Titles and descriptions
 
 - Desktop page titles live in the left identity pill, not in an in-content hero. Do not add `PageHero`-style title/description blocks above page content on desktop.
 - Descriptive/instructional verbiage ("Shared workspace for…", "Drag cards into lanes…") is dropped, not relocated. If guidance is genuinely needed, put it next to the thing it explains, or in an empty state.
 - The pill title should be the `h1` for the desktop layout.
+- Section roots (Decks, Collection, Community, Teams, Settings) show an identity title pill (`FloatingPageTitle`). Gallery is the exception and stays untitled.
+- Floating title, back, and tab labels derive family / transform / tracking from chrome via `chrome-heading-case` / `chrome-label-case`. Do not hardcode `uppercase` or `tracking-*` on those controls. Capsule and pill shadows come from `--chrome-floating-shadow`.
 
 ## Mobile
 

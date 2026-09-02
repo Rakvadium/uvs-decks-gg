@@ -72,7 +72,7 @@ export function LeftSidebarGuestThemeToggle() {
           variant={theme === v ? "secondary" : "ghost"}
           size="sm"
           className={cn(
-            "h-9 flex-1 gap-1 px-1 font-mono text-[10px] uppercase tracking-wider",
+            "h-9 flex-1 gap-1 px-1 text-[10px]",
             theme === v && "shadow-sm",
             theme !== v && "text-sidebar-foreground hover:text-accent",
           )}

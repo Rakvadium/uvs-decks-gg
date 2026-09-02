@@ -28,7 +28,7 @@ export function DeckDetailsFloatingTopBar() {
             bodyClassName="min-w-0 px-4"
             glow
           >
-            <h1 className="truncate text-sm font-semibold tracking-tight text-foreground">
+            <h1 className="chrome-heading-case truncate text-sm font-semibold text-foreground">
               {deck.name}
             </h1>
           </FloatingCapsuleCluster>

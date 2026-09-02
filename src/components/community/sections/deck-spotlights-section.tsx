@@ -16,7 +16,7 @@ export function CommunityDeckSpotlightsSection() {
     <section id="deck-spotlights" className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <SectionHeading className="text-xl font-display font-bold uppercase tracking-[0.18em]">
+          <SectionHeading size="lg">
             Deck Spotlights
           </SectionHeading>
           <p className="text-sm text-muted-foreground">
@@ -51,7 +51,7 @@ export function CommunityDeckSpotlightsSection() {
                     <Badge tone="entity" className="text-[10px]">
                       Spotlight
                     </Badge>
-                    <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+                    <span className="chrome-label-case text-[10px] text-muted-foreground">
                       #{index + 1}
                     </span>
                   </div>

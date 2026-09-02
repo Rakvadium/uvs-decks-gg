@@ -192,7 +192,7 @@ export function DeckDetailsEditDialog() {
               id="deck-edit-name"
               value={editName}
               onChange={(event) => setEditName(event.target.value)}
-              className="h-10 font-display text-sm font-semibold uppercase tracking-wide"
+              className="chrome-label-case h-10 text-sm font-semibold"
               placeholder="Deck name"
             />
           </div>

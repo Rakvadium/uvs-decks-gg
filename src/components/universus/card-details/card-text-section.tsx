@@ -8,7 +8,7 @@ export function CardDetailsTextSection() {
 
   return (
     <div className="space-y-2">
-      <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Card Text</span>
+      <span className="chrome-label-case text-xs text-muted-foreground">Card Text</span>
       <div className="rounded-lg border border-border/50 bg-card/30 p-4 backdrop-blur-sm">
         <AbilityText text={card.text} />
       </div>

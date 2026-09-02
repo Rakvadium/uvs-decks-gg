@@ -1,5 +1,6 @@
 "use client";
 
+import { PageHeading } from "@/components/ui/typography-headings";
 import { useMutation, useQuery } from "convex/react";
 import { Plus } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
@@ -129,11 +130,11 @@ export function TeamHubEventsContent({ teamId }: TeamHubEventsContentProps) {
   return (
     <div className="space-y-8">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between md:hidden">
-        <h1 className="font-display text-lg font-semibold text-foreground">Calendar</h1>
+        <PageHeading size="sm">Calendar</PageHeading>
         {caps.canManageEvents ? (
           <Button
             type="button"
-            className="h-9 shrink-0 font-mono text-xs uppercase tracking-wider sm:mt-0.5"
+            className="h-9 shrink-0 text-xs sm:mt-0.5"
             onClick={openCreate}
           >
             Create Calendar Item
@@ -149,7 +150,7 @@ export function TeamHubEventsContent({ teamId }: TeamHubEventsContentProps) {
           </DialogHeader>
           <DialogBody className="space-y-4 px-6">
             <div className="space-y-2">
-              <Label htmlFor="ev-title" className="text-xs font-mono uppercase tracking-wider">
+              <Label htmlFor="ev-title" className="chrome-label-case text-xs">
                 Title
               </Label>
               <Input
@@ -160,7 +161,7 @@ export function TeamHubEventsContent({ teamId }: TeamHubEventsContentProps) {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="ev-desc" className="text-xs font-mono uppercase tracking-wider">
+              <Label htmlFor="ev-desc" className="chrome-label-case text-xs">
                 Description
               </Label>
               <Textarea
@@ -172,7 +173,7 @@ export function TeamHubEventsContent({ teamId }: TeamHubEventsContentProps) {
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="ev-start" className="text-xs font-mono uppercase tracking-wider">
+                <Label htmlFor="ev-start" className="chrome-label-case text-xs">
                   Starts
                 </Label>
                 <Input
@@ -183,7 +184,7 @@ export function TeamHubEventsContent({ teamId }: TeamHubEventsContentProps) {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="ev-end" className="text-xs font-mono uppercase tracking-wider">
+                <Label htmlFor="ev-end" className="chrome-label-case text-xs">
                   Ends
                 </Label>
                 <Input
@@ -209,7 +210,7 @@ export function TeamHubEventsContent({ teamId }: TeamHubEventsContentProps) {
       </Dialog>
 
       <div className="space-y-3">
-        <h2 className="font-mono text-xs uppercase tracking-widest text-muted-foreground">Upcoming &amp; past</h2>
+        <h2 className="chrome-heading-case text-xs text-muted-foreground">Upcoming &amp; past</h2>
         {events.length === 0 ? (
           <p className="text-sm text-muted-foreground">No events scheduled.</p>
         ) : (
@@ -226,7 +227,7 @@ export function TeamHubEventsContent({ teamId }: TeamHubEventsContentProps) {
                     {e.description?.trim() ? (
                       <p className="mt-1 text-sm text-muted-foreground whitespace-pre-wrap">{e.description}</p>
                     ) : null}
-                    <p className="mt-1 font-mono text-xs text-primary">{formatRange(e.startsAt, e.endsAt)}</p>
+                    <p className="mt-1 text-xs text-primary">{formatRange(e.startsAt, e.endsAt)}</p>
                     <p className="text-xs text-muted-foreground">
                       Added by {row.creatorUsername?.trim() || e.createdByUserId.slice(-6)}
                     </p>

@@ -1,5 +1,6 @@
 "use client";
 
+import { SectionHeading } from "@/components/ui/typography-headings";
 import Link from "next/link";
 import { BookOpen, Layers, MessageSquare, Newspaper, Package, Users } from "lucide-react";
 import { useQuery } from "convex/react";
@@ -51,7 +52,7 @@ export function AdminDashboardClient() {
             </CardTitle>
             <CardDescription>
               Global{" "}
-              <span className="font-mono text-foreground">cardDataVersion</span>{" "}
+              <span className="text-foreground">cardDataVersion</span>{" "}
               players sync against.
             </CardDescription>
           </CardHeader>
@@ -97,7 +98,7 @@ export function AdminDashboardClient() {
             <div className="flex items-center gap-4">
               <Layers className="h-8 w-8 shrink-0 text-primary" />
               <div>
-                <h2 className="text-lg font-semibold">Sets</h2>
+                <SectionHeading size="md">Sets</SectionHeading>
                 <p className="text-sm text-muted-foreground">
                   {sets !== undefined
                     ? `${sets.length} sets — cards & import per set`
@@ -113,7 +114,7 @@ export function AdminDashboardClient() {
             <div className="flex items-center gap-4">
               <BookOpen className="h-8 w-8 shrink-0 text-primary" />
               <div>
-                <h2 className="text-lg font-semibold">Formats</h2>
+                <SectionHeading size="md">Formats</SectionHeading>
                 <p className="text-sm text-muted-foreground">
                   {formats !== undefined
                     ? `${formats.length} formats — legality hub`
@@ -129,7 +130,7 @@ export function AdminDashboardClient() {
             <div className="flex items-center gap-4">
               <Newspaper className="h-8 w-8 shrink-0 text-primary" />
               <div>
-                <h2 className="text-lg font-semibold">Content</h2>
+                <SectionHeading size="md">Content</SectionHeading>
                 <p className="text-sm text-muted-foreground">
                   Moderation & site content tools
                 </p>
@@ -143,7 +144,7 @@ export function AdminDashboardClient() {
             <div className="flex items-center gap-4">
               <Users className="h-8 w-8 shrink-0 text-primary" />
               <div>
-                <h2 className="text-lg font-semibold">Users</h2>
+                <SectionHeading size="md">Users</SectionHeading>
                 <p className="text-sm text-muted-foreground">
                   User administration (coming soon)
                 </p>
@@ -157,7 +158,7 @@ export function AdminDashboardClient() {
             <div className="flex items-center gap-4">
               <MessageSquare className="h-8 w-8 shrink-0 text-primary" />
               <div>
-                <h2 className="text-lg font-semibold">User feedback</h2>
+                <SectionHeading size="md">User feedback</SectionHeading>
                 <p className="text-sm text-muted-foreground">
                   Inbox from the site feedback form
                 </p>

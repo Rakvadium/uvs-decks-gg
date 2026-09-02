@@ -46,7 +46,7 @@ export function CreateTeamButton({ className, size = "sm", variant = "default" }
         type="button"
         variant={variant}
         size={size}
-        className={cn("h-9 gap-1.5 font-mono text-xs uppercase tracking-wider", className)}
+        className={cn("h-9 gap-1.5 text-xs", className)}
         onClick={onOpen}
       >
         <Plus className="h-3.5 w-3.5" />
@@ -154,7 +154,7 @@ function CreateTeamFormDialog({ open, onOpenChange }: CreateTeamFormDialogProps)
 
             <DialogBody className="space-y-5 pt-2">
               <div>
-                <label className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground">
+                <label className="chrome-label-case text-[11px] text-muted-foreground">
                   Name
                 </label>
                 <div className="relative mt-2">
@@ -175,7 +175,7 @@ function CreateTeamFormDialog({ open, onOpenChange }: CreateTeamFormDialogProps)
                 </div>
               </div>
               <div>
-                <label className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground">
+                <label className="chrome-label-case text-[11px] text-muted-foreground">
                   URL slug (optional)
                 </label>
                 <div className="relative mt-2">
@@ -184,13 +184,13 @@ function CreateTeamFormDialog({ open, onOpenChange }: CreateTeamFormDialogProps)
                     value={slug}
                     onChange={(e) => setSlug(e.target.value)}
                     placeholder="my-team"
-                    className="h-12 bg-background/50 pl-10 font-mono text-sm focus-visible:ring-primary/25"
+                    className="h-12 bg-background/50 pl-10 text-sm focus-visible:ring-primary/25"
                     autoComplete="off"
                   />
                 </div>
               </div>
               <div>
-                <label className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground">
+                <label className="chrome-label-case text-[11px] text-muted-foreground">
                   Description (optional)
                 </label>
                 <Textarea

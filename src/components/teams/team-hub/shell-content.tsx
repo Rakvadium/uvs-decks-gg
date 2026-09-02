@@ -1,5 +1,6 @@
 "use client";
 
+import { PageHeading } from "@/components/ui/typography-headings";
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { useQuery } from "convex/react";
@@ -31,7 +32,7 @@ export function TeamHubShellContent({ teamId, children }: TeamHubShellContentPro
         <p className="text-sm font-medium text-muted-foreground">This team was not found or you do not have access.</p>
         <Link
           href="/teams"
-          className="text-sm font-mono uppercase tracking-wider text-primary underline-offset-4 hover:underline"
+          className="chrome-label-case text-sm text-primary underline-offset-4 hover:underline"
         >
           About teams
         </Link>
@@ -52,7 +53,7 @@ export function TeamHubShellContent({ teamId, children }: TeamHubShellContentPro
     <div className="flex flex-wrap items-start gap-4">
       <TeamLogoSection teamId={id} presentation={logoPresentation} />
       <div className="min-w-0 flex-1 space-y-1 pt-0.5">
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">{team.name}</h1>
+        <PageHeading size="sm">{team.name}</PageHeading>
         {description ? (
           <p className="text-sm leading-relaxed text-muted-foreground">{description}</p>
         ) : null}

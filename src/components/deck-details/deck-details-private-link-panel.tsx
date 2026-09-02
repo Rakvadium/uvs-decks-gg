@@ -30,7 +30,7 @@ export function DeckDetailsPrivateLinkPanel() {
   return (
     <div className="space-y-2 rounded-lg border border-border/50 bg-background/50 p-3">
       <div className="space-y-1">
-        <p className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+        <p className="chrome-label-case flex items-center gap-1.5 text-[10px] text-muted-foreground">
           <Link2 className="h-3 w-3" />
           Share link
         </p>

@@ -48,8 +48,8 @@ export function MobileActionsSlotGrid() {
               </div>
 
               <div className="min-w-0 flex-1 text-left">
-                <Kicker className="truncate font-display text-sm tracking-wide text-card-foreground">{label}</Kicker>
-                <p className="line-clamp-2 text-[10px] font-mono uppercase tracking-wide text-muted-foreground">
+                <Kicker size="md" tone="foreground" className="truncate">{label}</Kicker>
+                <p className="chrome-label-case line-clamp-2 text-[10px] text-muted-foreground">
                   {description}
                 </p>
               </div>

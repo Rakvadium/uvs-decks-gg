@@ -14,7 +14,7 @@ export function LoadMoreIndicator({ loadMoreRef }: LoadMoreIndicatorProps) {
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
           <div className="absolute inset-0 h-8 w-8 animate-ping rounded-full bg-primary/20" />
         </div>
-        <Kicker className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Loading more cards</Kicker>
+        <Kicker>Loading more cards</Kicker>
       </div>
     </div>
   );

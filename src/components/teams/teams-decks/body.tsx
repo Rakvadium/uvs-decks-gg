@@ -58,7 +58,7 @@ export function TeamsDecksBody() {
         <p className="mt-3 text-sm">
           <Link
             href="/teams"
-            className="font-mono text-xs uppercase tracking-wider text-primary underline-offset-4 hover:underline"
+            className="chrome-label-case text-xs text-primary underline-offset-4 hover:underline"
           >
             About teams
           </Link>
@@ -83,7 +83,7 @@ export function TeamsDecksBody() {
     <div>
       <div className="space-y-4">
         <div>
-          <p className="mb-2 text-xs font-mono uppercase tracking-widest text-muted-foreground">Collaboration</p>
+          <p className="chrome-label-case mb-2 text-xs text-muted-foreground">Collaboration</p>
           <ToggleGroup type="single" value={filter} onValueChange={(v) => v && setFilter(v as CollabFilter)}>
             <ToggleGroupItem value="all">All</ToggleGroupItem>
             <ToggleGroupItem value="team_viewable">View only</ToggleGroupItem>
@@ -103,7 +103,7 @@ export function TeamsDecksBody() {
           <p className="mt-3 text-sm">
             <Link
               href="/decks"
-              className="font-mono text-xs uppercase tracking-wider text-primary underline-offset-4 hover:underline"
+              className="chrome-label-case text-xs text-primary underline-offset-4 hover:underline"
             >
               Open decks
             </Link>

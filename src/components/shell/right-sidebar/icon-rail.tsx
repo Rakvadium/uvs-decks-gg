@@ -88,11 +88,11 @@ export function RightSidebarIconRail() {
                       )}
                     />
                   ) : (
-                    <span className="text-xs font-mono font-semibold">{label.slice(0, 1)}</span>
+                    <span className="text-xs font-semibold">{label.slice(0, 1)}</span>
                   )}
                 </Button>
               </TooltipTrigger>
-              <TooltipContent side="left" className="font-mono text-xs uppercase tracking-wider">
+              <TooltipContent side="left" className="chrome-label-case text-xs">
                 {label}
               </TooltipContent>
             </Tooltip>

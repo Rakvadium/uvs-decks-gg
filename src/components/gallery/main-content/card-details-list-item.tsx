@@ -72,7 +72,7 @@ export function CardDetailsListItem({ card, onOpenCardDetails, imagePriority = f
                   <div className="flex h-full w-full items-center justify-center border border-border/50 bg-muted/50">
                     <div className="text-center">
                       <Hexagon className="mx-auto mb-2 h-10 w-10 text-primary/30" />
-                      <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground">No Image</span>
+                      <span className="chrome-label-case text-xs text-muted-foreground">No Image</span>
                     </div>
                   </div>
                 )}
@@ -92,7 +92,7 @@ export function CardDetailsListItem({ card, onOpenCardDetails, imagePriority = f
                       isFlipped && "rotate-180"
                     )}
                   />
-                  <span className="text-xs font-mono uppercase tracking-wider">{isFlipped ? "Front" : "Back"}</span>
+                  <span className="chrome-label-case text-xs">{isFlipped ? "Front" : "Back"}</span>
                 </Button>
               ) : null}
 
@@ -105,7 +105,7 @@ export function CardDetailsListItem({ card, onOpenCardDetails, imagePriority = f
                 className="gap-2"
               >
                 <FileText className="h-4 w-4" />
-                <span className="text-xs font-mono uppercase tracking-wider">Open Dialog</span>
+                <span className="chrome-label-case text-xs">Open Dialog</span>
               </Button>
             </div>
           </div>

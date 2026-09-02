@@ -23,9 +23,9 @@ export function TeamsDecksHeading({ title, description }: TeamsDecksHeadingProps
               animation: "var(--chrome-decks-heading-dot-animation)",
             }}
           />
-          <PageHeading className="font-display text-2xl font-bold uppercase tracking-widest">{title}</PageHeading>
+          <PageHeading>{title}</PageHeading>
         </div>
-        <div className="pl-5 font-mono text-sm tracking-wide text-muted-foreground">{description}</div>
+        <div className="pl-5 text-sm tracking-wide text-muted-foreground">{description}</div>
       </div>
     </div>
   );

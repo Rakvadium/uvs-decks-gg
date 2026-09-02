@@ -1,12 +1,12 @@
 import { Bookmark, BookOpen, Layers } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
 import { useDeckSidebarItemContext } from "./context";
 
 export function DeckSidebarItemCounts() {
   const { mainCount, sideCount, referenceCount } = useDeckSidebarItemContext();
 
   return (
-    <div className="flex items-center gap-3 text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+    <div className="chrome-label-case flex items-center gap-3 text-[10px] text-muted-foreground">
       <div className="flex items-center gap-1 text-primary/80">
         <Layers className="h-3.5 w-3.5" />
         <span>{mainCount}</span>
@@ -26,16 +26,9 @@ export function DeckSidebarItemCounts() {
         </div>
       ) : null}
 
-      <span
-        className={cn(
-          "ml-auto rounded border px-2 py-0.5 text-[10px] font-mono uppercase tracking-wider",
-          mainCount >= 60
-            ? "border-green-500/30 bg-green-500/10 text-green-500"
-            : "border-orange-500/30 bg-orange-500/10 text-orange-500"
-        )}
-      >
+      <Badge tone={mainCount >= 60 ? "success" : "warning"} className="ml-auto px-2 py-0.5 text-[10px]">
         {mainCount >= 60 ? "Ready" : "Building"}
-      </span>
+      </Badge>
     </div>
   );
 }

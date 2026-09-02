@@ -12,7 +12,7 @@ export function CardDetailsAttackStatsSection() {
 
   return (
     <div className="space-y-2">
-      <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Attack</span>
+      <span className="chrome-label-case text-xs text-muted-foreground">Attack</span>
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
         <StatBlock icon={Zap} label="Speed" value={card.speed} color="accent" />
         <ZoneIndicator zone={card.attackZone} label="Zone" />

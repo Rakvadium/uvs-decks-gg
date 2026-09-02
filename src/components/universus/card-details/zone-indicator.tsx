@@ -26,7 +26,7 @@ export function ZoneIndicator({ zone, label }: ZoneIndicatorProps) {
           {zones.map((value, index) => (
             <span
               key={`${value.label}-${index}`}
-              className="text-lg font-display font-bold"
+              className="text-lg font-bold"
               style={{ color: value.color }}
             >
               {value.label}
@@ -39,7 +39,7 @@ export function ZoneIndicator({ zone, label }: ZoneIndicatorProps) {
           ))}
         </div>
         <span
-          className={cn("text-[10px] font-mono uppercase tracking-widest opacity-70")}
+          className={cn("chrome-label-case text-[10px] opacity-70")}
           style={{ color: primaryZone.color }}
         >
           {label}

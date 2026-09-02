@@ -36,7 +36,7 @@ export function CommunityTierListDetailCommentsSection() {
               <p className="mt-1 text-xs text-muted-foreground">
                 {who}
                 <time
-                  className="ml-2 font-mono"
+                  className="ml-2"
                   dateTime={new Date(row.comment.createdAt).toISOString()}
                 >
                   {new Date(row.comment.createdAt).toLocaleString(undefined, {

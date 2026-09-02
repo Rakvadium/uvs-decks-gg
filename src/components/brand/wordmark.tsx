@@ -21,7 +21,7 @@ export function AppBrandWordmark({
     return (
       <Kicker
         className={cn(
-          "truncate whitespace-nowrap font-display font-bold text-sidebar-foreground",
+          "truncate whitespace-nowrap font-bold text-sidebar-foreground",
           size === "sm" ? "text-sm" : "text-lg",
           className
         )}
@@ -36,13 +36,13 @@ export function AppBrandWordmark({
     <div className={cn("flex flex-col", className)}>
       <Kicker
         className={cn(
-          "whitespace-nowrap font-display font-bold text-sidebar-foreground",
+          "whitespace-nowrap font-bold text-sidebar-foreground",
           size === "sm" ? "text-sm" : "text-lg"
         )}
       >
         UVS<span className="text-accent">DECKS</span>
       </Kicker>
-      <span className="-mt-1 text-[10px] font-mono uppercase tracking-[0.3em] text-sidebar-foreground/70">
+      <span className="chrome-label-case -mt-1 text-[10px] text-sidebar-foreground/70">
         .GG
       </span>
     </div>

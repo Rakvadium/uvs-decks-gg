@@ -87,13 +87,13 @@ export function AppBrandRailWordmark({ className }: AppBrandRailWordmarkProps) {
         className
       )}
     >
-      <FitWidthLine className="font-display font-bold uppercase text-sidebar-foreground">
+      <FitWidthLine className="chrome-label-case font-bold text-sidebar-foreground">
         UVS
       </FitWidthLine>
-      <FitWidthLine className="font-display font-bold uppercase text-accent">
+      <FitWidthLine className="chrome-label-case font-bold text-accent">
         DECKS
       </FitWidthLine>
-      <span className="mt-0.5 self-center font-mono text-[16px] font-bold uppercase leading-none tracking-[0.1em] text-sidebar-foreground/70">
+      <span className="chrome-label-case mt-0.5 self-center text-[16px] font-bold leading-none text-sidebar-foreground/70">
         GG
       </span>
     </div>

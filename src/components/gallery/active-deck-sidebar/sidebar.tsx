@@ -40,7 +40,7 @@ export function ActiveDeckSidebar() {
     return (
       <div className="flex items-center gap-3 p-4">
         <Loader2 className="h-4 w-4 animate-spin text-primary" />
-        <span className="text-sm font-mono uppercase tracking-wider text-muted-foreground">
+        <span className="chrome-label-case text-sm text-muted-foreground">
           Loading deck
         </span>
       </div>
@@ -53,11 +53,11 @@ export function ActiveDeckSidebar() {
         <div className="rounded-lg border border-dashed border-border/50 bg-card/30 px-4 py-6 text-center">
           <div className="flex items-center justify-center gap-2 text-muted-foreground">
             <Hexagon className="h-5 w-5 text-primary/30" />
-            <span className="text-sm font-mono uppercase tracking-wider">
+            <span className="chrome-label-case text-sm">
               No Active Deck
             </span>
           </div>
-          <p className="mt-3 text-xs font-mono text-muted-foreground/60">
+          <p className="mt-3 text-xs text-muted-foreground/60">
             Select a deck to start adding cards
           </p>
           <Button

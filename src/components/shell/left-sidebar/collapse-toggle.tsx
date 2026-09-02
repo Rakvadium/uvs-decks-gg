@@ -26,7 +26,7 @@ export function LeftSidebarCollapseToggle() {
           <Icon className="h-4 w-4" />
         </Button>
       </TooltipTrigger>
-      <TooltipContent side="right" className="font-mono text-xs uppercase tracking-wider">
+      <TooltipContent side="right" className="chrome-label-case text-xs">
         {collapsed ? "Expand" : "Collapse"}
       </TooltipContent>
     </Tooltip>

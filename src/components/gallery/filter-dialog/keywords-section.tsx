@@ -38,7 +38,7 @@ export function KeywordsSection() {
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
-        <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
+        <span className="chrome-label-case text-xs text-muted-foreground">
           Keywords
         </span>
         <div className="flex items-center gap-1.5">
@@ -46,7 +46,7 @@ export function KeywordsSection() {
             checked={filters.keywordMatchAll ?? false}
             onCheckedChange={(checked) => setBooleanFilter("keywordMatchAll", checked)}
           />
-          <Label className="cursor-pointer text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+          <Label className="chrome-label-case cursor-pointer text-[10px] text-muted-foreground">
             Match All
           </Label>
         </div>
@@ -67,13 +67,13 @@ export function KeywordsSection() {
               <Badge
                 key={`keyword-selected-${keyword}`}
                 variant="outline"
-                className="px-1.5 py-0.5 text-[10px] font-mono uppercase tracking-wide"
+                className="px-1.5 py-0.5 text-[10px]"
               >
                 {keyword}
               </Badge>
             ))}
             {selectedKeywords.length > 6 ? (
-              <Badge variant="outline" className="px-1.5 py-0.5 text-[10px] font-mono uppercase tracking-wide">
+              <Badge variant="outline" className="px-1.5 py-0.5 text-[10px]">
                 +{selectedKeywords.length - 6}
               </Badge>
             ) : null}

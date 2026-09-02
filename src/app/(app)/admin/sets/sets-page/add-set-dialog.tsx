@@ -122,7 +122,7 @@ export function AddSetDialog({ open, onOpenChange }: AddSetDialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto p-0" contentPadding="none">
+      <DialogContent size="content-sm" className="max-h-[90vh] overflow-y-auto p-0" contentPadding="none">
         <DialogHeader className="px-4 pt-6 md:px-6">
           <DialogTitle>Add set</DialogTitle>
         </DialogHeader>
@@ -132,13 +132,13 @@ export function AddSetDialog({ open, onOpenChange }: AddSetDialogProps) {
             <Label htmlFor="add-code">Code</Label>
             <Input
               id="add-code"
-              className="font-mono"
+              className=""
               value={code}
               onChange={(e) => setCode(e.target.value)}
               autoComplete="off"
             />
             {codeError ? (
-              <p className="text-sm text-amber-600 dark:text-amber-400">
+              <p className="text-sm text-warning">
                 {codeError}
               </p>
             ) : null}

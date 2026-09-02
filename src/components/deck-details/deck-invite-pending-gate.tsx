@@ -34,7 +34,7 @@ export function DeckInvitePendingGate({ deckId, deckName }: DeckInvitePendingGat
     <div className="flex min-h-[50vh] items-center justify-center p-4">
       <Card className="w-full max-w-md border-border/50">
         <CardHeader>
-          <CardTitle className="font-display text-lg uppercase tracking-wider">Shared deck</CardTitle>
+          <CardTitle className="text-lg">Shared deck</CardTitle>
           <CardDescription>
             <span className="font-medium text-foreground">{deckName}</span>
             <span className="mt-1 block">Accept the invite to view this deck.</span>

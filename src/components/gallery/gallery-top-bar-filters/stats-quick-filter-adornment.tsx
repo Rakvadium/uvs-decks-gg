@@ -34,7 +34,7 @@ function statActive(f: StatFilterValue | undefined): f is StatFilterValue {
 const miniIconClass = "size-3 shrink-0 opacity-90";
 
 const generalChipShell =
-  "inline-flex max-w-[9rem] shrink-0 items-center gap-0.5 rounded-md border px-1 py-px text-[10px] font-bold font-mono uppercase tracking-[0.08em] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)]";
+  "chrome-label-case inline-flex max-w-[9rem] shrink-0 items-center gap-0.5 rounded-md border px-1 py-px text-[10px] font-bold shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)]";
 
 const GENERAL_STATS: Array<{
   key: keyof Pick<
@@ -138,7 +138,7 @@ function AttackStatsChip({
   if (!z && !sp && !dm) return null;
 
   const segmentClass =
-    "inline-flex items-center gap-0.5 normal-case tabular-nums text-[10px] font-bold font-mono";
+    "inline-flex items-center gap-0.5 normal-case tabular-nums text-[10px] font-bold";
 
   if (z && !sp && !dm) {
     return (

@@ -1,5 +1,6 @@
 "use client";
 
+import { SectionHeading } from "@/components/ui/typography-headings";
 import Link from "next/link";
 import type { Id } from "../../../convex/_generated/dataModel";
 import type { Doc } from "../../../convex/_generated/dataModel";
@@ -37,14 +38,13 @@ export function IngestionJobsPanel({
   return (
     <div className={cn("space-y-3", isCompact && "text-sm")}>
       <div>
-        <h2
-          className={cn(
-            "font-semibold text-foreground",
+        <SectionHeading size="md"
+          className={cn("",
             isCompact ? "text-sm" : "text-lg"
           )}
         >
           Import / ingestion jobs
-        </h2>
+        </SectionHeading>
         {!isCompact ? (
           <p className="text-sm text-muted-foreground">
             Bulk array runs create a job you can track here.
@@ -60,7 +60,7 @@ export function IngestionJobsPanel({
                 is the supported path.
               </>
             ) : null}{" "}
-            The legacy <span className="font-mono">/admin/import</span> route forwards to Sets with a
+            The legacy <span className="">/admin/import</span> route forwards to Sets with a
             notice.
           </p>
         ) : null}
@@ -131,7 +131,7 @@ export function IngestionJobsPanel({
                   activeJobId === job._id && "bg-muted/50"
                 )}
               >
-                <div className="font-mono text-xs text-muted-foreground">
+                <div className="text-xs text-muted-foreground">
                   {job._id}
                 </div>
                 <div className="text-sm">{jobLabel(job)}</div>

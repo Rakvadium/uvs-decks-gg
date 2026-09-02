@@ -54,7 +54,7 @@ function DialogOverlay({
       data-slot="dialog-overlay"
       className={cn(
         "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
-        "fixed inset-0 z-50 bg-background/50 backdrop-blur-[2px]",
+        overlayScrimClassName,
         className
       )}
       {...props}
@@ -80,7 +80,13 @@ const dialogSizeStyles = {
   lg: "md:w-[70vw] md:min-w-[70vw] md:max-w-[70vw]",
   xl: "md:w-[85vw] md:min-w-[85vw] md:max-w-[85vw]",
   full: "md:w-[95vw] md:min-w-[95vw] md:max-w-[95vw]",
+  "content-sm": "md:w-full md:min-w-0 md:max-w-md",
+  "content-md": "md:w-full md:min-w-0 md:max-w-lg",
+  "content-lg": "md:w-full md:min-w-0 md:max-w-2xl",
+  "content-xl": "md:w-full md:min-w-0 md:max-w-3xl",
 }
+
+export const overlayScrimClassName = "fixed inset-0 z-50 bg-background/50 backdrop-blur-[2px]"
 
 type DialogSize = keyof typeof dialogSizeStyles
 
@@ -252,22 +258,15 @@ function DialogFooter({ className, ...props }: React.ComponentProps<"div">) {
 
 function DialogTitle({
   className,
-  style,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Title>) {
   return (
     <DialogPrimitive.Title
       data-slot="dialog-title"
       className={cn(
-        "text-lg leading-none font-semibold",
+        "chrome-heading-case text-lg leading-none font-semibold",
         className
       )}
-      style={{
-        fontFamily: "var(--chrome-card-title-font)",
-        textTransform: "var(--chrome-heading-transform)" as React.CSSProperties["textTransform"],
-        letterSpacing: "var(--chrome-heading-letter-spacing)",
-        ...style,
-      }}
       {...props}
     />
   )
@@ -280,7 +279,7 @@ function DialogDescription({
   return (
     <DialogPrimitive.Description
       data-slot="dialog-description"
-      className={cn("text-muted-foreground text-sm font-mono", className)}
+      className={cn("text-muted-foreground text-sm", className)}
       {...props}
     />
   )

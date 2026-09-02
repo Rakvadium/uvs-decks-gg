@@ -58,7 +58,7 @@ export function SegmentedControl({
   return (
     <div
       className={cn(
-        "tab-container overflow-hidden rounded-sm border border-border/50 bg-muted/50 backdrop-blur-sm",
+        "tab-container overflow-hidden rounded-md border border-border/50 bg-muted/50 backdrop-blur-sm",
         orientation === "vertical"
           ? "tab-container-vertical flex w-full flex-col"
           : cn("items-stretch", fillRow ? "flex w-full" : "inline-flex justify-center"),
@@ -78,7 +78,7 @@ export function SegmentedControl({
             disabled={item.disabled}
             onClick={() => onValueChange?.(item.value)}
             className={cn(
-              "inline-flex items-center justify-center gap-2 border border-transparent font-mono uppercase tracking-wider transition-colors duration-150",
+              "inline-flex items-center justify-center gap-2 border border-transparent chrome-label-case transition-colors duration-150",
               orientation === "vertical"
                 ? cn("w-full justify-start border-b border-border/50", isLast && "border-b-0")
                 : cn(
@@ -102,7 +102,7 @@ export function SegmentedControl({
             {item.badge !== undefined && item.badge !== null ? (
               <span
                 className={cn(
-                  "shrink-0 rounded-sm",
+                  "shrink-0 rounded-md",
                   isActive ? "bg-primary/20" : "bg-muted",
                   sizeStyles.badge
                 )}

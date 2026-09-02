@@ -23,14 +23,14 @@ export function CreatorProgramToolkitSection() {
               <div className={cn("absolute inset-0 bg-gradient-to-br opacity-40", tool.accent)} />
               <div className="relative space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+                  <span className="chrome-label-case text-[10px] text-muted-foreground">
                     {tool.kicker}
                   </span>
                   <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-border/50 bg-background/80">
                     <Icon className="h-4 w-4 text-primary" />
                   </div>
                 </div>
-                <SectionHeading className="text-sm font-semibold">{tool.title}</SectionHeading>
+                <SectionHeading size="xs">{tool.title}</SectionHeading>
                 <p className="text-xs text-muted-foreground">{tool.description}</p>
               </div>
             </div>

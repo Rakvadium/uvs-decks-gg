@@ -1,5 +1,6 @@
 "use client";
 
+import { PageHeading } from "@/components/ui/typography-headings";
 import { ReactNode } from "react";
 import Link from "next/link";
 import { useQuery } from "convex/react";
@@ -21,7 +22,7 @@ function AdminRoleCheck({ children }: { children: ReactNode }) {
     return (
       <div className="flex h-full flex-col items-center justify-center text-center p-8">
         <Shield className="h-12 w-12 text-destructive mb-4" />
-        <h1 className="text-2xl font-bold mb-2">Access Denied</h1>
+        <PageHeading size="md" className="mb-2">Access Denied</PageHeading>
         <p className="text-muted-foreground mb-4">
           You need Admin privileges to access this page.
         </p>

@@ -1,5 +1,6 @@
 "use client";
 
+import { PageHeading } from "@/components/ui/typography-headings";
 import { useMutation, useQuery } from "convex/react";
 import { Check, Copy, Plus } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
@@ -161,11 +162,11 @@ export function TeamHubMembersContent({ teamId }: TeamHubMembersContentProps) {
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between md:hidden">
-        <h1 className="font-display text-lg font-semibold text-foreground">Members</h1>
+        <PageHeading size="sm">Members</PageHeading>
         {showInvite ? (
           <Button
             type="button"
-            className="h-9 shrink-0 font-mono text-xs uppercase tracking-wider sm:mt-0.5"
+            className="h-9 shrink-0 text-xs sm:mt-0.5"
             onClick={openInvite}
           >
             Invite member
@@ -186,7 +187,7 @@ export function TeamHubMembersContent({ teamId }: TeamHubMembersContentProps) {
               </DialogHeader>
               <DialogBody className="space-y-4 px-6">
                 <div className="space-y-2">
-                  <Label htmlFor="invite-role" className="text-xs font-mono uppercase tracking-wider">
+                  <Label htmlFor="invite-role" className="chrome-label-case text-xs">
                     Role when they join
                   </Label>
                   <Select value={inviteRole} onValueChange={(v) => setInviteRole(v as (typeof ASSIGNABLE_ORDER)[number])}>
@@ -228,7 +229,7 @@ export function TeamHubMembersContent({ teamId }: TeamHubMembersContentProps) {
               </DialogHeader>
               <DialogBody className="space-y-3 px-6">
                 <div className="flex min-w-0 gap-2">
-                  <Input readOnly value={inviteUrl} className="min-w-0 font-mono text-xs" />
+                  <Input readOnly value={inviteUrl} className="min-w-0 text-xs" />
                   <Button type="button" variant="outline" size="icon" className="shrink-0" onClick={() => void copyLink()}>
                     {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                   </Button>

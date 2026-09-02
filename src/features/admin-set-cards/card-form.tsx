@@ -399,7 +399,7 @@ function CardPicker({
                   }}
                 >
                   <span className="truncate">{c.name}</span>
-                  <span className="shrink-0 font-mono text-xs text-muted-foreground">
+                  <span className="shrink-0 text-xs text-muted-foreground">
                     {c.collectorNumber ? `#${c.collectorNumber}` : ""}
                     {c.isFrontFace === false ? " back" : ""}
                   </span>
@@ -426,7 +426,7 @@ function CardPicker({
 
 function SectionHeading({ children }: { children: React.ReactNode }) {
   return (
-    <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+    <h3 className="chrome-heading-case text-sm font-semibold text-muted-foreground">
       {children}
     </h3>
   );
@@ -747,7 +747,8 @@ export function CardFormDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         contentPadding="none"
-        className="max-h-[min(92vh,860px)] overflow-y-auto p-0 sm:max-w-2xl"
+        size="content-lg"
+        className="max-h-[min(92vh,860px)] overflow-y-auto p-0"
       >
         <DialogHeader className="px-4 pt-6 md:px-6">
           <DialogTitle>{dialogTitle}</DialogTitle>
@@ -934,7 +935,7 @@ export function CardFormDialog({
                 onChange={(e) => setField("text", e.target.value)}
               />
               <p className="text-xs text-muted-foreground">
-                Use <span className="font-mono">|</span> to separate abilities.
+                Use <span className="">|</span> to separate abilities.
               </p>
             </div>
 

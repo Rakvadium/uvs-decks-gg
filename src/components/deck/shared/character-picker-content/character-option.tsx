@@ -20,7 +20,7 @@ export function CharacterOption({ card }: { card: CachedCard }) {
       <CharacterThumbnail imageUrl={card.imageUrl} name={card.name} className="h-8 w-6" />
       <div className="min-w-0">
         <p className="truncate text-xs font-medium">{card.name}</p>
-        <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">{subtitleFor(card)}</p>
+        <p className="chrome-label-case text-[10px] text-muted-foreground">{subtitleFor(card)}</p>
       </div>
     </button>
   );

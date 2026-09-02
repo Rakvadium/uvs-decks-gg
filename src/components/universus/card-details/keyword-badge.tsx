@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { KEYWORD_ABILITY_MAP, TIMING_COLORS } from "./constants";
 
 const keywordChipClassName =
-  "inline-flex items-center rounded-sm border px-2.5 py-1 text-xs font-bold font-mono uppercase tracking-[0.12em]";
+  "chrome-label-case inline-flex items-center rounded-sm border px-2.5 py-1 text-xs font-bold";
 
 interface KeywordBadgeProps {
   keyword: string;
@@ -51,7 +51,7 @@ export function KeywordBadge({ keyword }: KeywordBadgeProps) {
         }}
         onPointerDownOutside={() => setTooltipOpen(false)}
       >
-        <p className="text-sm font-mono text-foreground">{abilityDef.description}</p>
+        <p className="text-sm text-foreground">{abilityDef.description}</p>
       </TooltipContent>
     </Tooltip>
   );

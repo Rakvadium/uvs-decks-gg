@@ -18,7 +18,7 @@ import { YoutubeEmbed } from "./youtube-embed";
 function MediaFeedSectionChrome() {
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 md:hidden">
-      <SectionHeading className="text-xl font-display font-bold uppercase tracking-[0.18em]">
+      <SectionHeading size="lg">
         UniVersus Content
       </SectionHeading>
       <Button variant="outline" size="sm" asChild>
@@ -135,14 +135,14 @@ export function CommunityMediaFeedSection() {
       {feed.feedKind === "pending_all" ? (
         <p className="text-xs text-muted-foreground">
           Loading titles, channels, and thumbnails from YouTube… If this does not finish, set{" "}
-          <span className="font-mono">YOUTUBE_DATA_API_KEY</span> for this deployment in the Convex environment
+          <span className="">YOUTUBE_DATA_API_KEY</span> for this deployment in the Convex environment
           settings.
         </p>
       ) : null}
 
       {showDegraded ? (
         <div
-          className="flex items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-sm text-amber-200"
+          className="flex items-start gap-2 rounded-lg border border-warning/40 bg-warning/10 px-3 py-2 text-sm text-foreground [&>svg]:text-warning"
           role="status"
         >
           <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
@@ -198,10 +198,10 @@ export function CommunityMediaFeedSection() {
               <div className="pointer-events-none absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
 
               <div className="relative z-[1] flex flex-wrap items-center justify-between gap-3">
-                <Badge variant="secondary" className="border border-border/50 bg-background/80 text-[10px] uppercase tracking-[0.18em]">
+                <Badge variant="secondary" className="border border-border/50 bg-background/80 text-[10px]">
                   {activeVideo.youtubeVideoId === featuredVideo.youtubeVideoId ? "Featured drop" : "Now playing"}
                 </Badge>
-                <div className="text-[10px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
+                <div className="chrome-label-case text-[10px] text-muted-foreground">
                   {activeVideo.rowStatus === "ok" ? (
                     <>
                       {activeVideo.durationLabel} / {activeVideo.viewCountLabel} views
@@ -228,7 +228,7 @@ export function CommunityMediaFeedSection() {
                         ? "YouTube"
                         : "Error"}
                   </Badge>
-                  <Button variant="ghost" size="sm" className="h-7 px-2 text-[10px] font-mono uppercase tracking-[0.18em]" asChild>
+                  <Button variant="ghost" size="sm" className="h-7 px-2 text-[10px]" asChild>
                     <a href={activeVideo.watchUrl} target="_blank" rel="noopener noreferrer">
                       Open on YouTube
                       <ArrowUpRight className="ml-1 inline h-3 w-3" />
@@ -236,7 +236,7 @@ export function CommunityMediaFeedSection() {
                   </Button>
                 </div>
                 <div className="space-y-2">
-                  <SectionHeading className="max-w-xl text-2xl font-semibold leading-tight text-foreground md:text-3xl">
+                  <SectionHeading size="xl" className="max-w-xl leading-tight">
                     {activeVideo.title ??
                       (activeVideo.rowStatus === "error"
                         ? "Video metadata unavailable"
@@ -305,7 +305,7 @@ export function CommunityMediaFeedSection() {
                       />
                     </div>
                     {video.rowStatus === "ok" && video.durationLabel ? (
-                      <span className="absolute bottom-1 right-1 rounded bg-black/70 px-1 py-px font-mono text-[10px] leading-none text-white">
+                      <span className="absolute bottom-1 right-1 rounded bg-black/70 px-1 py-px text-[10px] leading-none text-white">
                         {video.durationLabel}
                       </span>
                     ) : null}
@@ -338,7 +338,7 @@ export function CommunityMediaFeedSection() {
                     ) : null}
                   </div>
                   {video.editorialLabel ? (
-                    <Badge variant="secondary" className="w-fit bg-primary/10 px-1.5 py-0 text-[10px] uppercase leading-4 tracking-[0.12em] text-primary">
+                    <Badge variant="secondary" className="w-fit bg-primary/10 px-1.5 py-0 text-[10px] leading-4 text-primary">
                       {video.editorialLabel}
                     </Badge>
                   ) : null}

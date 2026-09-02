@@ -67,7 +67,7 @@ function ActiveDeckCardRowContent() {
         <p className="truncate text-xs font-medium leading-tight">{card.name}</p>
       </div>
 
-      <span className="flex items-center px-2 text-[10px] font-mono uppercase tracking-wider text-muted-foreground transition-opacity duration-150 group-hover:opacity-0">
+      <span className="chrome-label-case flex items-center px-2 text-[10px] text-muted-foreground transition-opacity duration-150 group-hover:opacity-0">
         x{count}
       </span>
 
