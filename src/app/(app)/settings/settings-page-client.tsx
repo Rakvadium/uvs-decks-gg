@@ -305,11 +305,7 @@ export default function SettingsPageClient() {
             left={
               <>
                 <FloatingBackPill onClick={() => router.back()} label="Go back" iconOnly />
-                <FloatingCapsuleCluster bodyClassName="px-4" glow>
-                  <h1 className="truncate text-sm font-semibold tracking-tight text-foreground">
-                    Settings
-                  </h1>
-                </FloatingCapsuleCluster>
+                <FloatingPageTitle>Settings</FloatingPageTitle>
               </>
             }
           />
@@ -346,11 +342,7 @@ export default function SettingsPageClient() {
           left={
             <>
               <FloatingBackPill onClick={handleBack} label="Go back" iconOnly />
-              <FloatingCapsuleCluster bodyClassName="px-4" glow>
-                <h1 className="truncate text-sm font-semibold tracking-tight text-foreground">
-                  Settings
-                </h1>
-              </FloatingCapsuleCluster>
+              <FloatingPageTitle>Settings</FloatingPageTitle>
             </>
           }
         />
