@@ -65,7 +65,7 @@ export function CommunityTierListDetailFloatingTopBar() {
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full border border-border/50 px-2.5 text-[10px] font-mono uppercase tracking-[0.18em] text-foreground transition-colors hover:border-primary/40 hover:text-primary"
+          className="chrome-label-case inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full border border-border/50 px-2.5 text-[10px] text-foreground transition-colors hover:border-primary/40 hover:text-primary"
         >
           {isPublic ? <Globe className="h-3 w-3" /> : <Lock className="h-3 w-3" />}
           {displayPublicity}
@@ -95,7 +95,7 @@ export function CommunityTierListDetailFloatingTopBar() {
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full border border-border/50 px-2.5 text-[10px] font-mono uppercase tracking-[0.18em] text-foreground transition-colors hover:border-primary/40 hover:text-primary"
+          className="chrome-label-case inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full border border-border/50 px-2.5 text-[10px] text-foreground transition-colors hover:border-primary/40 hover:text-primary"
         >
           {rankingScopeLabel}
           <ChevronDown className="h-3 w-3 shrink-0 text-muted-foreground" />
@@ -122,7 +122,7 @@ export function CommunityTierListDetailFloatingTopBar() {
       <FloatingPageBar
         left={
           <>
-            <FloatingBackPill href="/community/tier-lists" label="All tier lists" iconOnly />
+            <FloatingBackPill href="/community/tier-lists" label="Tier lists" iconOnly />
             <FloatingCapsuleCluster
               className="min-w-0 max-w-[min(100%,22rem)]"
               bodyClassName="min-w-0 px-4"
@@ -138,7 +138,7 @@ export function CommunityTierListDetailFloatingTopBar() {
                 />
               ) : (
                 <h1
-                  className="truncate text-sm font-semibold tracking-tight text-foreground"
+                  className="chrome-heading-case truncate text-sm font-semibold text-foreground"
                   title={viewTitle}
                 >
                   {viewTitle}

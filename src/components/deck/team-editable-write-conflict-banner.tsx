@@ -21,17 +21,17 @@ export function TeamEditableWriteConflictBanner({
     return null;
   }
   return (
-    <Alert className={cn("border-amber-500/40 bg-amber-500/5 pr-10", className)}>
-      <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-500" />
-      <AlertTitle className="text-amber-950 dark:text-amber-100">Deck was updated elsewhere</AlertTitle>
-      <AlertDescription className="text-amber-900/90 dark:text-amber-200/90">
+    <Alert variant="warning" className={cn("pr-10", className)}>
+      <AlertCircle className="h-4 w-4" />
+      <AlertTitle>Deck was updated elsewhere</AlertTitle>
+      <AlertDescription className="text-muted-foreground">
         Another teammate or tab changed this deck. Your list now matches the server. You can keep editing from here.
       </AlertDescription>
       <Button
         type="button"
         variant="ghost"
-        size="icon"
-        className="absolute right-2 top-2 h-7 w-7 text-amber-900/80 hover:bg-amber-500/10 hover:text-amber-950 dark:text-amber-200 dark:hover:text-amber-50"
+        size="icon-sm"
+        className="absolute right-2 top-2"
         aria-label="Dismiss"
         onClick={dismissTeamEditableWriteConflict}
       >

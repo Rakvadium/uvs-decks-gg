@@ -3,15 +3,13 @@
 import { Plus } from "lucide-react";
 import {
   FloatingActionPill,
+  FloatingBackPill,
   FloatingPageBar,
   FloatingSearchCapsule,
   FloatingTabsPill,
 } from "@/components/shell/floating-page-bar";
-import { CommunityDestinationTabs } from "../../community-destination-tabs";
 import { useOptionalCommunityTierListsPageContext } from "./context";
 import { BROWSER_TABS } from "./hook";
-
-const LIST_BROWSER_TABS = BROWSER_TABS.filter((tab) => tab.id !== "rankings");
 
 export function CommunityTierListsFloatingTopBar() {
   const context = useOptionalCommunityTierListsPageContext();
@@ -33,24 +31,22 @@ export function CommunityTierListsFloatingTopBar() {
     <FloatingPageBar
       left={
         <>
-          <CommunityDestinationTabs compact />
-          {showListBrowser ? (
-            <FloatingTabsPill
-              value={activeTab}
-              onValueChange={(value) => setActiveTab(value as typeof activeTab)}
-              items={LIST_BROWSER_TABS.map((tab) => ({
-                value: tab.id,
-                label: tab.label,
-                icon: tab.icon,
-                badge:
-                  tab.id === "public"
-                    ? publicLists?.length || undefined
-                    : tab.id === "mine"
-                      ? myLists?.length || undefined
-                      : undefined,
-              }))}
-            />
-          ) : null}
+          <FloatingBackPill href="/community" label="Community" iconOnly />
+          <FloatingTabsPill
+            value={activeTab}
+            onValueChange={(value) => setActiveTab(value as typeof activeTab)}
+            items={BROWSER_TABS.map((tab) => ({
+              value: tab.id,
+              label: tab.label,
+              icon: tab.icon,
+              badge:
+                tab.id === "public"
+                  ? publicLists?.length || undefined
+                  : tab.id === "mine"
+                    ? myLists?.length || undefined
+                    : undefined,
+            }))}
+          />
         </>
       }
       center={

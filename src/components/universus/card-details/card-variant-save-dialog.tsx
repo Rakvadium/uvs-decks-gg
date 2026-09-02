@@ -93,7 +93,7 @@ export function CardVariantSaveDialog({
 
           <div className="flex shrink-0 items-center justify-between gap-3 border-b border-primary/20 px-3 py-2 sm:px-4 sm:py-3">
             <div className="min-w-0">
-              <span className="truncate text-xs font-mono font-semibold uppercase tracking-widest text-foreground">
+              <span className="chrome-label-case truncate text-xs font-semibold text-foreground">
                 New variant
               </span>
               <p className="mt-0.5 truncate text-[10px] text-muted-foreground">
@@ -105,7 +105,7 @@ export function CardVariantSaveDialog({
                 type="button"
                 variant="default"
                 size="sm"
-                className="h-8 gap-1.5 text-[10px] font-mono uppercase tracking-wider"
+                className="h-8 gap-1.5 text-[10px]"
                 onClick={() => void handleSave()}
               >
                 <Save className="h-3 w-3" />
@@ -130,7 +130,7 @@ export function CardVariantSaveDialog({
               }}
               spellCheck={false}
               className={cn(
-                "min-h-[min(50dvh,400px)] resize-y font-mono text-[11px] leading-relaxed sm:text-xs",
+                "min-h-[min(50dvh,400px)] resize-y text-[11px] leading-relaxed sm:text-xs",
                 "border-primary/20 bg-background/50",
                 parseError && "border-destructive/60"
               )}
@@ -156,7 +156,7 @@ export function CardVariantSaveTrigger({
       variant="outline"
       size="sm"
       disabled={disabled}
-      className="h-8 gap-1.5 border-primary/25 text-[10px] font-mono uppercase tracking-wider"
+      className="h-8 gap-1.5 border-primary/25 text-[10px]"
       onClick={onClick}
     >
       <Plus className="h-3.5 w-3.5" />

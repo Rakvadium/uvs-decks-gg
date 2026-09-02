@@ -9,7 +9,7 @@ export function MobileProfileNavigationSection() {
 
   return (
     <div className="p-4">
-      <p className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">Navigation</p>
+      <p className="chrome-label-case mb-2 text-xs font-medium text-muted-foreground">Navigation</p>
       <div className="space-y-1">
         {navItems.map((item) => {
           const Icon = item.icon;

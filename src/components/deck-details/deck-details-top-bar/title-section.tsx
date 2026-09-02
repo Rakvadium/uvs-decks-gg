@@ -33,7 +33,7 @@ export function DeckDetailsTopBarTitleSection({ compact = false }: DeckDetailsTo
         <button
           type="button"
           className={cn(
-            "block w-full min-w-0 text-left font-display text-sm font-bold uppercase tracking-[0.18em]",
+            "chrome-heading-case block w-full min-w-0 text-left text-sm font-bold",
             "rounded-sm focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring",
             titleExpanded ? "whitespace-normal break-words" : "truncate",
           )}

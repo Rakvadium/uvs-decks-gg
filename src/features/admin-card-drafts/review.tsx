@@ -789,7 +789,7 @@ export default function AdminCardDraftReview({
         title={`Review cards — ${setName}`}
         description={
           <span>
-            OCR draft queue for <span className="font-mono">{setCode}</span>. Approved
+            OCR draft queue for <span className="">{setCode}</span>. Approved
             cards follow the normal catalog release workflow.
           </span>
         }
@@ -869,7 +869,7 @@ export default function AdminCardDraftReview({
                 <span>
                   {batchVision.processed} of {batchVision.total} processed
                 </span>
-                <span className="font-mono text-muted-foreground">{batchVisionPercent}%</span>
+                <span className="text-muted-foreground">{batchVisionPercent}%</span>
               </div>
               <div className="h-2 overflow-hidden rounded-full bg-muted">
                 <div
@@ -894,7 +894,7 @@ export default function AdminCardDraftReview({
                   className="flex items-start gap-2 rounded-md px-2 py-1.5 text-sm"
                 >
                   {item.status === "done" ? (
-                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-success" />
                   ) : item.status === "processing" ? (
                     <Loader2 className="mt-0.5 h-4 w-4 shrink-0 animate-spin text-primary" />
                   ) : item.status === "error" ? (
@@ -1024,7 +1024,7 @@ export default function AdminCardDraftReview({
                 </div>
               )}
               <div className="grid gap-2 text-sm">
-                <div className="font-mono text-xs text-muted-foreground">{activeDraft.fileName}</div>
+                <div className="text-xs text-muted-foreground">{activeDraft.fileName}</div>
                 {activeDraft.parseWarnings?.length ? (
                   <Alert>
                     <AlertTitle>Parse warnings</AlertTitle>
@@ -1163,7 +1163,7 @@ export default function AdminCardDraftReview({
                 <div className="space-y-3 rounded-lg border bg-card/30 p-3">
                   <div className="flex items-center justify-between">
                     <Label>Symbols</Label>
-                    <span className="font-mono text-xs text-muted-foreground">{values.symbols || "none"}</span>
+                    <span className="text-xs text-muted-foreground">{values.symbols || "none"}</span>
                   </div>
                   <SymbolGrid
                     symbols={UNIVERSUS_FILTER_SYMBOLS}

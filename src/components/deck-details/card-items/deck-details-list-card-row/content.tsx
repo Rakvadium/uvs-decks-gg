@@ -75,7 +75,7 @@ function DeckDetailsListCardRowContent() {
 
         <span
           className={cn(
-            "flex items-center px-2 text-[10px] font-mono uppercase tracking-wider text-muted-foreground transition-opacity duration-150",
+            "chrome-label-case flex items-center px-2 text-[10px] text-muted-foreground transition-opacity duration-150",
             isOwner && "group-hover:opacity-0 max-md:hidden"
           )}
         >

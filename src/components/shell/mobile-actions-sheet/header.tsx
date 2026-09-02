@@ -1,3 +1,4 @@
+import { SectionHeading } from "@/components/ui/typography-headings";
 import type { HTMLAttributes } from "react";
 import { ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -27,9 +28,9 @@ export function MobileActionsSheetHeader({ className, ...props }: MobileActionsS
         {ActiveHeader ? (
           <ActiveHeader />
         ) : (
-          <h2 className="text-left text-lg font-semibold text-foreground">
+          <SectionHeading size="md" className="text-left">
             {activeSlot ? (activeSlot.label ?? activeSlot.id) : "Actions"}
-          </h2>
+          </SectionHeading>
         )}
       </div>
     </div>

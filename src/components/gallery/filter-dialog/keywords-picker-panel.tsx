@@ -48,13 +48,13 @@ export function KeywordsPickerPanel({
     <div className="space-y-2">
       <div className={cn("flex items-center", plain ? "justify-end" : "justify-between")}>
         {!plain ? (
-          <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
+          <span className="chrome-label-case text-xs text-muted-foreground">
             Keywords
           </span>
         ) : null}
         <div className="flex items-center gap-1.5">
           <Switch checked={keywordMatchAll} onCheckedChange={onKeywordMatchAllChange} />
-          <Label className="cursor-pointer text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+          <Label className="chrome-label-case cursor-pointer text-[10px] text-muted-foreground">
             Match All
           </Label>
         </div>

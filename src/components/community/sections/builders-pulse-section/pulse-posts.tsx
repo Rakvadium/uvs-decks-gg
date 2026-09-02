@@ -4,7 +4,7 @@ import { COMMUNITY_PULSE } from "../../community-content-data";
 export function CommunityPulsePosts() {
   return (
     <div className="space-y-3">
-      <div className="flex items-center justify-between font-mono text-xs uppercase tracking-widest text-muted-foreground">
+      <div className="chrome-label-case flex items-center justify-between text-xs text-muted-foreground">
         <span>Top Posts</span>
         <Badge variant="default" className="text-[10px]">
           Live
@@ -23,12 +23,12 @@ export function CommunityPulsePosts() {
                 </div>
                 <div className="min-w-0">
                   <p className="truncate text-xs font-semibold">{post.title}</p>
-                  <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                  <p className="chrome-label-case text-[10px] text-muted-foreground">
                     {post.author} • {post.time}
                   </p>
                 </div>
               </div>
-              <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+              <span className="chrome-label-case text-[10px] text-muted-foreground">
                 {post.comments} comments
               </span>
             </div>

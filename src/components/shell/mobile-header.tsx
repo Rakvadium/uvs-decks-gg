@@ -32,7 +32,7 @@ function MobileHeaderGuestSignIn() {
         "h-9 shrink-0 gap-1.5 px-2.5",
         "border-accent/35 bg-sidebar-accent text-sidebar-foreground",
         "hover:border-accent/60 hover:bg-accent/10 hover:text-accent",
-        "font-mono text-xs uppercase tracking-wider"
+        "text-xs"
       )}
     >
       <LogIn className="h-4 w-4" aria-hidden />

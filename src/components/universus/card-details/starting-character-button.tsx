@@ -30,13 +30,13 @@ export function StartingCharacterButton({ card, className, compact }: StartingCh
       className={cn(
         "gap-2 transition-colors",
         isStartingCharacter
-          ? "bg-amber-500/20 text-amber-400 border-amber-500/40 hover:bg-amber-500/30"
-          : "border-amber-500/20 text-muted-foreground hover:text-amber-400 hover:border-amber-500/40 hover:bg-amber-500/10",
+          ? "bg-warning/20 text-warning border-warning/40 hover:bg-warning/30"
+          : "border-warning/20 text-muted-foreground hover:text-warning hover:border-warning/40 hover:bg-warning/10",
         className
       )}
     >
-      <Star className={cn("h-4 w-4", isStartingCharacter && "fill-amber-400")} />
-      <span className="text-xs font-mono uppercase tracking-wider">
+      <Star className={cn("h-4 w-4", isStartingCharacter && "fill-warning")} />
+      <span className="chrome-label-case text-xs">
         {compact
           ? isStartingCharacter ? "Starting" : "Set Starter"
           : isStartingCharacter ? "Starting Character" : "Set As Starting Character"

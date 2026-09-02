@@ -68,7 +68,7 @@ export function CardDeckControls({
           className={cn(
             "flex items-center justify-center",
             cellClass,
-            "font-mono text-xs font-bold tabular-nums",
+            "text-xs font-bold tabular-nums",
             showButtons && "border-t border-b border-border/60",
             deckCount > 0 ? "text-primary" : "text-foreground"
           )}

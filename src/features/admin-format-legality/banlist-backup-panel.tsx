@@ -1,5 +1,6 @@
 "use client";
 
+import { SectionHeading } from "@/components/ui/typography-headings";
 import { useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import type { Id } from "../../../convex/_generated/dataModel";
@@ -160,7 +161,7 @@ export function BanlistBackupPanel({ formatKey }: BanlistBackupPanelProps) {
   return (
     <div className="space-y-6 px-1 pb-8">
       <div className="rounded-lg border bg-card/30 p-4 space-y-3">
-        <h3 className="text-sm font-medium">Export</h3>
+        <SectionHeading as="h3" size="xs">Export</SectionHeading>
         <p className="text-sm text-muted-foreground">
           Snapshot of card and set legality rows for this format (Convex document
           ids for cards).
@@ -176,7 +177,7 @@ export function BanlistBackupPanel({ formatKey }: BanlistBackupPanelProps) {
       </div>
 
       <div className="rounded-lg border bg-card/30 p-4 space-y-4">
-        <h3 className="text-sm font-medium">Restore or merge</h3>
+        <SectionHeading as="h3" size="xs">Restore or merge</SectionHeading>
         <p className="text-sm text-muted-foreground">
           Paste a bundle from export or another environment. Replace wipes
           existing rows for this format in that category before applying the
@@ -208,7 +209,7 @@ export function BanlistBackupPanel({ formatKey }: BanlistBackupPanelProps) {
           <Label htmlFor="json-in">JSON</Label>
           <Textarea
             id="json-in"
-            className="font-mono text-xs min-h-[200px]"
+            className="text-xs min-h-[200px]"
             value={jsonText}
             onChange={(e) => setJsonText(e.target.value)}
             placeholder='{"formatKey":"…","cardLegality":[…],"setLegality":[…]}'

@@ -115,7 +115,7 @@ export function VirtualizedSetsTable({
                       }
                     }}
                   >
-                    <div className="min-w-0 truncate font-mono text-xs">{set.code}</div>
+                    <div className="min-w-0 truncate text-xs">{set.code}</div>
                     <div className="min-w-0 truncate font-medium">{set.name}</div>
                     <div className="text-right tabular-nums text-xs">
                       {set.setNumber ?? "—"}
@@ -124,7 +124,7 @@ export function VirtualizedSetsTable({
                       {r.mismatch ? (
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <span className="inline-flex text-amber-600 dark:text-amber-400">
+                            <span className="inline-flex text-warning">
                               <AlertTriangle className="h-3.5 w-3.5" />
                             </span>
                           </TooltipTrigger>

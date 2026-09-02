@@ -18,7 +18,7 @@ export function FormatRow() {
   if (!isMobile) {
     return (
       <div className="flex items-center gap-2">
-        <span className="w-12 shrink-0 text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+        <span className="chrome-label-case w-12 shrink-0 text-[10px] text-muted-foreground">
           Format
         </span>
         <div className="flex flex-wrap gap-1">
@@ -46,7 +46,7 @@ export function FormatRow() {
 
   return (
     <div className="flex items-center gap-2">
-      <span className="w-16 shrink-0 text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+      <span className="chrome-label-case w-16 shrink-0 text-[10px] text-muted-foreground">
         Format
       </span>
       <Select value={activeFormat} onValueChange={toggleFormat}>

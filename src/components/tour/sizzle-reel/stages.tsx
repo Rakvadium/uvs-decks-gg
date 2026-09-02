@@ -99,7 +99,7 @@ function DecksStage({ active, animate }: StageProps) {
     <StageShell active={active} animate={animate}>
       <div className="grid w-full max-w-5xl gap-3 md:grid-cols-[1.1fr_0.9fr] md:gap-4">
         <div className="overflow-hidden rounded-3xl border border-border/50 bg-card/80 p-4 shadow-[var(--chrome-elevation-mid)] backdrop-blur-md md:p-6">
-          <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">Main</p>
+          <p className="chrome-label-case mb-3 text-[10px] text-muted-foreground">Main</p>
           <div className="grid grid-cols-4 gap-2 md:grid-cols-5">
             {Array.from({ length: 10 }).map((_, i) => (
               <CardTile key={i} animate={animate && active} delay={0.03 * i} className="opacity-95" />
@@ -112,7 +112,7 @@ function DecksStage({ active, animate }: StageProps) {
               key={label}
               className="rounded-2xl border border-border/50 bg-background/80 p-4 shadow-[var(--chrome-elevation-low)] backdrop-blur-md"
             >
-              <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">{label}</p>
+              <p className="chrome-label-case mb-3 text-[10px] text-muted-foreground">{label}</p>
               <div className="grid grid-cols-3 gap-2">
                 {Array.from({ length: 3 }).map((_, i) => (
                   <CardTile key={i} animate={animate && active} delay={0.12 + lane * 0.1 + i * 0.04} />
@@ -141,8 +141,8 @@ function CollectionStage({ active, animate }: StageProps) {
             <div className="h-12 w-9 shrink-0 rounded-md border border-border/50 bg-gradient-to-br from-primary/30 to-muted/40" />
             <div className="min-w-0 flex-1 space-y-1.5">
               <div className="flex items-center justify-between gap-3">
-                <p className="truncate font-display text-sm font-semibold uppercase tracking-wider">{row}</p>
-                <span className="font-mono text-xs tabular-nums text-primary">×{4 + i * 3}</span>
+                <p className="chrome-label-case truncate text-sm font-semibold">{row}</p>
+                <span className="text-xs tabular-nums text-primary">×{4 + i * 3}</span>
               </div>
               <div className="h-1.5 overflow-hidden rounded-full bg-muted/50">
                 <m.div
@@ -180,7 +180,7 @@ function CommunityStage({ active, animate }: StageProps) {
           >
             <div
               className={cn(
-                "flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-border/50 bg-gradient-to-br to-transparent font-display text-lg font-bold",
+                "flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-border/50 bg-gradient-to-br to-transparent text-lg font-bold",
                 lane.tone
               )}
             >
@@ -207,12 +207,12 @@ function TeamsStage({ active, animate }: StageProps) {
       <div className="grid w-full max-w-4xl gap-3 md:grid-cols-[0.9fr_1.1fr]">
         <div className="rounded-3xl border border-border/50 bg-card/80 p-5 shadow-[var(--chrome-elevation-mid)] backdrop-blur-md">
           <div className="mb-4 flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full border border-primary/40 bg-primary/15 font-display text-lg font-bold text-primary">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full border border-primary/40 bg-primary/15 text-lg font-bold text-primary">
               T
             </div>
             <div>
-              <p className="font-display text-base font-semibold uppercase tracking-wider">Team Hub</p>
-              <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">4 members</p>
+              <p className="chrome-label-case text-base font-semibold">Team Hub</p>
+              <p className="chrome-label-case text-[10px] text-muted-foreground">4 members</p>
             </div>
           </div>
           <div className="space-y-2">
@@ -222,7 +222,7 @@ function TeamsStage({ active, animate }: StageProps) {
                 initial={animate && active ? { opacity: 0, x: -10 } : false}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.35, delay: 0.08 * i }}
-                className="rounded-lg border border-border/40 bg-background/60 px-3 py-2 font-mono text-xs uppercase tracking-widest text-muted-foreground"
+                className="chrome-label-case rounded-lg border border-border/40 bg-background/60 px-3 py-2 text-xs text-muted-foreground"
               >
                 {item}
               </m.div>
@@ -230,7 +230,7 @@ function TeamsStage({ active, animate }: StageProps) {
           </div>
         </div>
         <div className="rounded-3xl border border-border/50 bg-background/80 p-5 shadow-[var(--chrome-elevation-low)] backdrop-blur-md">
-          <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">Shared Decks</p>
+          <p className="chrome-label-case mb-3 text-[10px] text-muted-foreground">Shared Decks</p>
           <div className="grid grid-cols-2 gap-3">
             {Array.from({ length: 4 }).map((_, i) => (
               <m.div

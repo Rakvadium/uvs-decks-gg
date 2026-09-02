@@ -1,5 +1,6 @@
 "use client";
 
+import { PageHeading } from "@/components/ui/typography-headings";
 import { ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
@@ -61,7 +62,7 @@ export function AdminPageHeader({
           </Button>
         ) : null}
         <div className="min-w-0 space-y-1">
-          <h1 className="text-xl font-semibold tracking-tight md:text-2xl">{title}</h1>
+          <PageHeading size="sm" className="md:text-2xl">{title}</PageHeading>
           {meta}
         </div>
       </div>

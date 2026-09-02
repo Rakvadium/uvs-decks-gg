@@ -83,7 +83,7 @@ export function CardDetailsAdminJsonControls({
           )}
         >
           <Braces className="h-3.5 w-3.5 shrink-0 text-primary" />
-          <span className="truncate text-xs font-mono font-semibold uppercase tracking-widest">JSON</span>
+          <span className="chrome-label-case truncate text-xs font-semibold">JSON</span>
         </button>
       </div>
 
@@ -113,7 +113,7 @@ export function CardDetailsAdminJsonControls({
             </DialogPrimitive.Description>
 
             <div className="flex shrink-0 items-center justify-between gap-3 border-b border-primary/20 px-3 py-2 sm:px-4 sm:py-3">
-              <span className="truncate text-xs font-mono font-semibold uppercase tracking-widest text-foreground">
+              <span className="chrome-label-case truncate text-xs font-semibold text-foreground">
                 Card JSON
               </span>
               <div className="flex shrink-0 flex-wrap items-center justify-end gap-1.5">
@@ -121,7 +121,7 @@ export function CardDetailsAdminJsonControls({
                   type="button"
                   variant="outline"
                   size="sm"
-                  className="h-8 gap-1.5 border-primary/25 text-[10px] font-mono uppercase tracking-wider"
+                  className="h-8 gap-1.5 border-primary/25 text-[10px]"
                   onClick={async () => {
                     try {
                       await navigator.clipboard.writeText(draft);
@@ -136,7 +136,7 @@ export function CardDetailsAdminJsonControls({
                   type="button"
                   variant="default"
                   size="sm"
-                  className="h-8 gap-1.5 text-[10px] font-mono uppercase tracking-wider"
+                  className="h-8 gap-1.5 text-[10px]"
                   onClick={() => void handleSave()}
                 >
                   <Save className="h-3 w-3" />
@@ -161,7 +161,7 @@ export function CardDetailsAdminJsonControls({
                 }}
                 spellCheck={false}
                 className={cn(
-                  "min-h-[min(50dvh,400px)] resize-y font-mono text-[11px] leading-relaxed sm:text-xs",
+                  "min-h-[min(50dvh,400px)] resize-y text-[11px] leading-relaxed sm:text-xs",
                   "border-primary/20 bg-background/50",
                   parseError && "border-destructive/60"
                 )}

@@ -67,7 +67,7 @@ export function TierListBrowserCard({
               </Badge>
               <Badge variant="outline">{getTierListScopeLabel(tierList.rankingScope)}</Badge>
             </div>
-            <span className="text-[10px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
+            <span className="chrome-label-case text-[10px] text-muted-foreground">
               {formatDate(tierList.updatedAt)}
             </span>
           </div>
@@ -85,7 +85,7 @@ export function TierListBrowserCard({
         <CardContent className="space-y-4">
           <TierListPreviewGrid cards={previewCards} emptyLabel="Slot" />
 
-          <div className="flex flex-wrap gap-2 text-[10px] font-mono uppercase tracking-[0.16em] text-muted-foreground">
+          <div className="chrome-label-case flex flex-wrap gap-2 text-[10px] text-muted-foreground">
             <span>{tierList.itemCount} cards</span>
             <span>{tierList.tierCount} tiers</span>
             {tierList.selectedSetCodes.slice(0, 2).map((setCode) => (

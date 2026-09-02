@@ -1,5 +1,6 @@
 "use client";
 
+import { SectionHeading } from "@/components/ui/typography-headings";
 import { useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -123,12 +124,12 @@ function AdminUserDetailInner({ userId }: { userId: Id<"users"> }) {
         backHref="/admin/users"
         backLabel="Users"
         meta={
-          <p className="text-sm text-muted-foreground font-mono break-all">{user._id}</p>
+          <p className="text-sm text-muted-foreground break-all">{user._id}</p>
         }
       />
       <div className="grid max-w-3xl gap-6">
         <section className="space-y-2 rounded-lg border p-4">
-          <h2 className="text-sm font-medium">Profile</h2>
+          <SectionHeading size="xs">Profile</SectionHeading>
           <dl className="grid gap-1 text-sm">
             <div>
               <dt className="text-muted-foreground">Email</dt>
@@ -161,7 +162,7 @@ function AdminUserDetailInner({ userId }: { userId: Id<"users"> }) {
           </dl>
         </section>
         <section className="space-y-3 rounded-lg border p-4">
-          <h2 className="text-sm font-medium">Counts (capped at 500)</h2>
+          <SectionHeading size="xs">Counts (capped at 500)</SectionHeading>
           <ul className="text-sm text-muted-foreground space-y-1">
             <li>Decks: {data.deckCount}{data.deckCountCapped ? "+" : ""}</li>
             <li>Tier lists: {data.tierListCount}{data.tierListCountCapped ? "+" : ""}</li>
@@ -170,7 +171,7 @@ function AdminUserDetailInner({ userId }: { userId: Id<"users"> }) {
           </ul>
         </section>
         <section className="space-y-3 rounded-lg border p-4">
-          <h2 className="text-sm font-medium">Role</h2>
+          <SectionHeading size="xs">Role</SectionHeading>
           <Select
             value={user.role === "Admin" ? "Admin" : "user"}
             onValueChange={(v) => void runRole(v as "Admin" | "user")}
@@ -185,7 +186,7 @@ function AdminUserDetailInner({ userId }: { userId: Id<"users"> }) {
           </Select>
         </section>
         <section className="space-y-3 rounded-lg border p-4">
-          <h2 className="text-sm font-medium">Account status</h2>
+          <SectionHeading size="xs">Account status</SectionHeading>
           <p className="text-sm text-muted-foreground">
             User-facing copy is shown on the account banner. Internal reason is for moderators only.
           </p>
@@ -238,7 +239,7 @@ function AdminUserDetailInner({ userId }: { userId: Id<"users"> }) {
         </section>
         {data.pendingTierListIds.length > 0 ? (
           <section className="space-y-3 rounded-lg border p-4">
-            <h2 className="text-sm font-medium">Pending tier list moderation</h2>
+            <SectionHeading size="xs">Pending tier list moderation</SectionHeading>
             <ul className="space-y-2">
               {data.pendingTierListIds.map((id) => (
                 <li key={id} className="flex items-center gap-2 text-sm">
@@ -273,7 +274,7 @@ function AdminUserDetailInner({ userId }: { userId: Id<"users"> }) {
           </section>
         ) : null}
         <section className="space-y-3 rounded-lg border p-4">
-          <h2 className="text-sm font-medium">Moderation audit (this user)</h2>
+          <SectionHeading size="xs">Moderation audit (this user)</SectionHeading>
           {audit.status === "LoadingFirstPage" ? (
             <p className="text-sm text-muted-foreground">Loading…</p>
           ) : audit.results.length === 0 ? (

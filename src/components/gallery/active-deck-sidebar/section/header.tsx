@@ -8,7 +8,7 @@ export function ActiveDeckSectionHeader() {
     <div className="flex items-center justify-between">
       <div className="flex items-center gap-2">
         <Icon className="h-4 w-4 text-muted-foreground" />
-        <span className="font-mono text-xs uppercase tracking-wider text-muted-foreground">
+        <span className="chrome-label-case text-xs text-muted-foreground">
           {sectionMeta.label}
         </span>
       </div>
@@ -22,7 +22,7 @@ export function ActiveDeckSectionHeader() {
 
         <Badge
           variant="outline"
-          className="border-primary/50 bg-primary/15 px-2.5 py-0.5 font-mono text-sm font-bold text-primary"
+          className="border-primary/50 bg-primary/15 px-2.5 py-0.5 text-sm font-bold text-primary"
         >
           {currentSectionCount}
         </Badge>

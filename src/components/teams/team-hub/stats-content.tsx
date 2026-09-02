@@ -1,5 +1,6 @@
 "use client";
 
+import { PageHeading } from "@/components/ui/typography-headings";
 import { useTeamHub } from "./hook";
 
 interface TeamHubStatsContentProps {
@@ -24,7 +25,7 @@ export function TeamHubStatsContent({ teamId }: TeamHubStatsContentProps) {
 
   return (
     <div className="space-y-4">
-      <h1 className="font-display text-lg font-semibold text-foreground md:hidden">Stats</h1>
+      <PageHeading size="sm" className="md:hidden">Stats</PageHeading>
       <div
         className="rounded-lg border border-dashed border-border/80 bg-muted/20 px-4 py-12 text-center"
         role="status"

@@ -323,7 +323,7 @@ export default function SetAdminCards({
                   {visibleItems.map((card) => (
                     <TableRow key={card._id}>
                       <TableCell className="font-medium max-w-[240px] truncate">{card.name}</TableCell>
-                      <TableCell className="font-mono text-sm">{card.collectorNumber ?? "—"}</TableCell>
+                      <TableCell className="text-sm">{card.collectorNumber ?? "—"}</TableCell>
                       <TableCell>{card.type ?? "—"}</TableCell>
                       <TableCell>{card.rarity ?? "—"}</TableCell>
                       <TableCell className="text-xs text-muted-foreground">
@@ -332,7 +332,7 @@ export default function SetAdminCards({
                       </TableCell>
                       <TableCell className="text-xs">
                         {card.isRevealHidden === true ? (
-                          <span className="rounded border border-amber-500/40 bg-amber-500/10 px-2 py-1 font-mono uppercase tracking-wide text-amber-700 dark:text-amber-300">
+                          <span className="chrome-label-case rounded-md border border-warning/40 bg-warning/10 px-2 py-1 text-warning">
                             Unrevealed
                           </span>
                         ) : card.revealedAt ? (
@@ -446,12 +446,12 @@ export default function SetAdminCards({
                 <>
                   This will permanently remove <strong>{deleteTarget.name}</strong>.
                   {(deleteWarnings?.backLinked.length ?? 0) > 0 ? (
-                    <span className="mt-2 block text-amber-600 dark:text-amber-400">
+                    <span className="mt-2 block text-warning">
                       {deleteWarnings?.backLinked.length} card(s) use this as back face.
                     </span>
                   ) : null}
                   {(deleteWarnings?.frontLinked.length ?? 0) > 0 ? (
-                    <span className="mt-2 block text-amber-600 dark:text-amber-400">
+                    <span className="mt-2 block text-warning">
                       {deleteWarnings?.frontLinked.length} card(s) use this as front face.
                     </span>
                   ) : null}
@@ -500,7 +500,7 @@ export default function SetAdminCards({
         title={setName ? `Cards — ${setName}` : `Cards — ${setCode}`}
         description={
           <span>
-            Cards for set <span className="font-mono">{setCode}</span>
+            Cards for set <span className="">{setCode}</span>
             {versionDoc ? (
               <>
                 {" "}

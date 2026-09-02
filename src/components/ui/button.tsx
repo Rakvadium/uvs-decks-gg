@@ -5,7 +5,7 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity,transform] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background uppercase tracking-wider",
+  "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity,transform] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case",
   {
     variants: {
       variant: {
@@ -13,7 +13,7 @@ const buttonVariants = cva(
         destructive:
           "bg-destructive text-white hover:bg-destructive/90 shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive/50",
         destructiveOutline:
-          "border border-red-600/65 bg-transparent text-red-700 shadow-none hover:bg-red-500/[0.12] hover:border-red-600 hover:text-red-950 dark:border-red-500/55 dark:text-red-400 dark:hover:bg-red-500/14 dark:hover:border-red-400 dark:hover:text-red-300 [&_svg]:text-current focus-visible:border-red-600 focus-visible:ring-red-500/35 dark:focus-visible:border-red-400 dark:focus-visible:ring-red-400/35",
+          "border border-destructive/60 bg-transparent text-destructive shadow-none hover:bg-destructive/10 hover:border-destructive hover:text-destructive [&_svg]:text-current focus-visible:border-destructive focus-visible:ring-destructive/35",
         outline:
           "border border-[color:var(--control-dual-border)] bg-transparent text-primary hover:bg-[color:var(--control-dual-surface-hover)] hover:border-[color:var(--control-dual-border-strong)] hover:text-primary hover:shadow-[var(--chrome-button-shadow-outline-hover)] [&_svg]:text-current",
         secondary:
@@ -27,10 +27,10 @@ const buttonVariants = cva(
       },
       size: {
         default: "h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
-        sm: "h-8 rounded gap-1.5 px-3.5 text-xs has-[>svg]:px-2.5",
+        sm: "h-8 rounded-md gap-1.5 px-3.5 text-xs has-[>svg]:px-2.5",
         lg: "h-12 rounded-md px-8 text-base has-[>svg]:px-5",
         icon: "size-10 rounded-md",
-        "icon-sm": "size-8 rounded",
+        "icon-sm": "size-8 rounded-md",
         "icon-lg": "size-12 rounded-md",
       },
     },

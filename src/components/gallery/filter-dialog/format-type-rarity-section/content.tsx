@@ -16,7 +16,7 @@ function SearchModeRow() {
 
   return (
     <div className="flex items-center gap-2">
-      <span className="w-16 shrink-0 text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+      <span className="chrome-label-case w-16 shrink-0 text-[10px] text-muted-foreground">
         Search In
       </span>
       <Select

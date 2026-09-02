@@ -36,7 +36,7 @@ export default function AdminFormatDetailPageClient() {
     return (
       <div className="flex flex-col gap-4">
         <p className="text-muted-foreground">
-          No format found for key <span className="font-mono">{key}</span>.
+          No format found for key <span className="">{key}</span>.
         </p>
         <Link href="/admin/formats" className="mt-4 text-primary hover:underline">
           Back to formats
@@ -49,7 +49,7 @@ export default function AdminFormatDetailPageClient() {
     <div className="flex min-h-0 flex-col gap-6 pb-10">
       <AdminPageHeader
         title={format.name}
-        meta={<p className="font-mono text-sm text-muted-foreground">{format.key}</p>}
+        meta={<p className="text-sm text-muted-foreground">{format.key}</p>}
         description="Format rules, per-set inclusion, card banlist, and JSON backup share this key."
         backHref="/admin/formats"
         backLabel="All formats"

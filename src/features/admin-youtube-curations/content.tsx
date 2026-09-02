@@ -148,7 +148,7 @@ function SortableCurationRow({
           {row.channelTitle ? (
             <p className="text-sm text-muted-foreground line-clamp-1">{row.channelTitle}</p>
           ) : null}
-          <p className="text-[11px] text-muted-foreground font-mono truncate" title={row.youtubeVideoId}>
+          <p className="text-[11px] text-muted-foreground truncate" title={row.youtubeVideoId}>
             {row.youtubeVideoId}
           </p>
           <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
@@ -201,7 +201,7 @@ function SortableCurationRow({
               void saveAccent();
             }}
             placeholder="from-primary/20 …"
-            className="h-9 font-mono text-xs"
+            className="h-9 text-xs"
           />
           <div className="flex flex-wrap gap-1">
             {ACCENT_PRESETS.map((p) => (

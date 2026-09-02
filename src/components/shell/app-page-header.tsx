@@ -1,5 +1,6 @@
 "use client";
 
+import { PageHeading } from "@/components/ui/typography-headings";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import {
@@ -38,14 +39,13 @@ export function AppPageHeader({
     <div className="flex flex-wrap items-start justify-between gap-3">
       <div className="min-w-0 space-y-1">
         {typeof title === "string" ? (
-          <h1
-            className={cn(
-              "text-xl font-semibold tracking-tight md:text-2xl",
+          <PageHeading size="sm"
+            className={cn("md:text-2xl",
               chrome ? "text-sidebar-foreground" : "text-foreground"
             )}
           >
             {title}
-          </h1>
+          </PageHeading>
         ) : (
           title
         )}

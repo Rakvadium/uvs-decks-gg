@@ -13,23 +13,23 @@ export function DecksEmptyState({ mode, onCreateDeck }: DecksEmptyStateProps) {
 
         {mode === "search" ? (
           <>
-            <p className="mb-2 font-mono text-sm uppercase tracking-wider text-muted-foreground">No decks found</p>
+            <p className="chrome-label-case mb-2 text-sm text-muted-foreground">No decks found</p>
             <p className="text-sm text-muted-foreground">Try adjusting your search query</p>
           </>
         ) : mode === "my-decks" ? (
           <>
-            <p className="mb-6 font-mono text-sm uppercase tracking-wider text-muted-foreground">No decks yet</p>
+            <p className="chrome-label-case mb-6 text-sm text-muted-foreground">No decks yet</p>
             <Button variant="default" onClick={onCreateDeck}>
               <Plus className="mr-2 h-4 w-4" />
               Create Your First Deck
             </Button>
           </>
         ) : mode === "tournament" ? (
-          <p className="font-mono text-sm uppercase tracking-wider text-muted-foreground">
+          <p className="chrome-label-case text-sm text-muted-foreground">
             No tournament decks available
           </p>
         ) : (
-          <p className="font-mono text-sm uppercase tracking-wider text-muted-foreground">
+          <p className="chrome-label-case text-sm text-muted-foreground">
             No public decks available
           </p>
         )}

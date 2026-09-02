@@ -59,14 +59,9 @@ function CardTitle({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="card-title"
       className={cn(
-        "leading-none font-semibold text-foreground",
+        "chrome-heading-case leading-none font-semibold text-foreground",
         className
       )}
-      style={{
-        fontFamily: "var(--chrome-card-title-font)",
-        textTransform: "var(--chrome-heading-transform)" as React.CSSProperties["textTransform"],
-        letterSpacing: "var(--chrome-heading-letter-spacing)",
-      }}
       {...props}
     />
   )

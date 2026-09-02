@@ -25,14 +25,14 @@ export function ImportExportSidebarImportSection() {
 
   return (
     <div className="space-y-2">
-      <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+      <span className="chrome-label-case text-[10px] text-muted-foreground">
         Import from UVS Ultra
       </span>
       <Textarea
         value={importText}
         onChange={(event) => setImportText(event.target.value)}
         placeholder={IMPORT_PLACEHOLDER}
-        className="min-h-[180px] font-mono text-[11px] leading-relaxed"
+        className="min-h-[180px] text-[11px] leading-relaxed"
       />
       <Button
         variant="outline"

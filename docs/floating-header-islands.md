@@ -23,7 +23,10 @@ Consistency lives at the role level, not the pixel level:
 
 The left slot scales by clustering pills, always in this order:
 
-1. **Back pill** (`FloatingBackPill`, prefer `iconOnly`) — only on detail/leaf pages.
+1. **Back pill** (`FloatingBackPill`) — only when this page has a parent to leave for.
+   - **Overview drill-back** (Community hub → lists / rankings / creators): `iconOnly`. The hub is the overview; dest tabs live there, not on the drilled page.
+   - **Entity back** (an identity pill already names this page): `iconOnly`. The `label` is the destination name for accessibility (`Decks`, `Tier lists`).
+   - Never show the word “Back” as visible label text.
 2. **Identity pill** (`FloatingCapsuleCluster` with an `h1`, optionally an avatar) — the entity or page you are inside (deck name, team avatar + name, page title).
 3. **Local nav tabs** (`FloatingTabsPill`) — section switching within this area.
 
@@ -35,13 +38,15 @@ Search or filtering for the page's primary collection, via `FloatingSearchCapsul
 
 ## Right slot
 
-Page-level actions. Primary action as a filled `FloatingActionPill`; secondary actions as outline/ghost pills. Beyond two or three actions, fold the rest into an overflow menu.
+Page-level actions. Primary action as a filled `FloatingActionPill` (opens a flow). Secondary as outline. A **context toggle** (Set Active → Active) is not a second primary and is not a dialog opener — off and on must read as different states. Beyond two or three actions, fold the rest into an overflow menu. See [theme-and-chrome.md](./theme-and-chrome.md) control roles.
 
 ## Titles and descriptions
 
 - Desktop page titles live in the left identity pill, not in an in-content hero. Do not add `PageHero`-style title/description blocks above page content on desktop.
 - Descriptive/instructional verbiage ("Shared workspace for…", "Drag cards into lanes…") is dropped, not relocated. If guidance is genuinely needed, put it next to the thing it explains, or in an empty state.
 - The pill title should be the `h1` for the desktop layout.
+- Section roots (Decks, Collection, Community, Teams, Settings) show an identity title pill (`FloatingPageTitle`). Gallery is the exception and stays untitled.
+- Floating title, back, and tab labels derive family / transform / tracking from chrome via `chrome-heading-case` / `chrome-label-case`. Do not hardcode `uppercase` or `tracking-*` on those controls. Capsule and pill shadows come from `--chrome-floating-shadow`.
 
 ## Mobile
 
@@ -53,14 +58,15 @@ The floating bar is desktop-only (`hidden md:block` inside `FloatingPageLayout`)
 | --- | --- | --- | --- |
 | Gallery | — | Search island (`FloatingIsland`) | — |
 | Decks list | Tabs (My / Public / Tournament) | Search | New Deck |
-| Deck details | Back + deck name pill | — | Set Active, Edit |
-| Community | Tabs (Hub / Tier Lists / Rankings / Creators) | — | — |
-| Tier lists browser | Destination tabs (Hub / Tier Lists / Rankings / Creators; icon-only so labels fit beside list tabs); Public / My Lists when on Tier Lists | Search (Public / My Lists) | New List |
-| Tier list detail | Back + title pill + meta cluster | — | Edit / Save / Cancel / Delete |
+| Deck details | Icon-only back + deck name pill | — | Set Active, Edit |
+| Community hub | Dest tabs (Tier Lists / Rankings / Creators) | — | — |
+| Creators | Icon-only back to Community | — | — |
+| Tier lists browser | Icon-only back + tabs (Rankings / Public / My Lists) | Search (Public / My Lists) | New List |
+| Tier list detail | Icon-only back + title pill + meta cluster | — | Edit / Save / Cancel / Delete |
 | Teams landing | Title pill | — | Create Team / Sign in |
 | Team hub | Team identity pill + tabs (News … Calendar) | — | Section primary (Create Announcement / Invite member / Create Calendar Item) |
 | Teams decks index | Title pill | — | — |
-| Settings | Back + title pill | — | — |
+| Settings | Icon-only back + title pill | — | — |
 | Collection | Title pill | — | — |
 
 ## Adding a new page

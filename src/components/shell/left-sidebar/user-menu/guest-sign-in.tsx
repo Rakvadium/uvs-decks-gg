@@ -20,11 +20,11 @@ export function LeftSidebarGuestSignInButton() {
           )}
         >
           <LogIn className="h-4 w-4 shrink-0" />
-          {!collapsed ? <span className="font-mono text-xs uppercase tracking-wider">Sign In</span> : null}
+          {!collapsed ? <span className="chrome-label-case text-xs">Sign In</span> : null}
         </Button>
       </TooltipTrigger>
       {collapsed ? (
-        <TooltipContent side="right" className="font-mono text-xs uppercase tracking-wider">
+        <TooltipContent side="right" className="chrome-label-case text-xs">
           Sign In
         </TooltipContent>
       ) : null}

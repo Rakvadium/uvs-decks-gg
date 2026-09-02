@@ -24,7 +24,7 @@ describe("community destinations", () => {
     );
   });
 
-  test("desktop tabs include hub so hub value matches an item", () => {
+  test("dest tabs exclude hub; desktop destination list still includes it", () => {
     expect(COMMUNITY_DESTINATIONS.map((item) => item.value)).toEqual([
       "tier-lists",
       "rankings",

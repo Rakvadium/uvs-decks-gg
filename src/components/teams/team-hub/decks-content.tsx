@@ -1,5 +1,6 @@
 "use client";
 
+import { PageHeading } from "@/components/ui/typography-headings";
 import { useQuery } from "convex/react";
 import Link from "next/link";
 import { useState } from "react";
@@ -67,9 +68,9 @@ export function TeamHubDecksContent({ teamId }: TeamHubDecksContentProps) {
 
   return (
     <div className="space-y-6">
-      <h1 className="font-display text-lg font-semibold text-foreground md:hidden">Decks</h1>
+      <PageHeading size="sm" className="md:hidden">Decks</PageHeading>
       <div>
-        <p className="mb-2 text-xs font-mono uppercase tracking-widest text-muted-foreground">
+        <p className="chrome-label-case mb-2 text-xs text-muted-foreground">
           Collaboration
         </p>
         <ToggleGroup type="single" value={filter} onValueChange={(v) => v && setFilter(v as CollabFilter)}>
@@ -90,7 +91,7 @@ export function TeamHubDecksContent({ teamId }: TeamHubDecksContentProps) {
             <p className="mt-3 text-sm">
               <Link
                 href="/decks"
-                className="font-mono text-xs uppercase tracking-wider text-primary underline-offset-4 hover:underline"
+                className="chrome-label-case text-xs text-primary underline-offset-4 hover:underline"
               >
                 Open decks
               </Link>

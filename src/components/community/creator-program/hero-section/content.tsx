@@ -15,7 +15,7 @@ export function CreatorProgramHeroSection() {
           <CreatorProgramHeroBadges />
 
           <div className="space-y-4">
-            <PageHeading className="text-glow-cyan text-3xl font-display font-bold uppercase tracking-[0.15em] md:text-5xl">
+            <PageHeading size="hero" className="text-glow-cyan">
               Build with the community. Publish like a creator.
             </PageHeading>
             <p className="max-w-2xl text-base text-muted-foreground md:text-lg">

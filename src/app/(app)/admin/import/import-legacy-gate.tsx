@@ -32,7 +32,7 @@ export function AdminImportLegacyGate() {
             <Link href="/admin/sets" className="text-primary hover:underline">
               Sets
             </Link>{" "}
-            and use <span className="font-mono">…/import</span> for bulk JSON and job status
+            and use <span className="">…/import</span> for bulk JSON and job status
             in context.
           </AlertDescription>
         </Alert>
@@ -43,7 +43,7 @@ export function AdminImportLegacyGate() {
             placeholder="e.g. ABC"
             value={code}
             onChange={(e) => setCode(e.target.value)}
-            className="font-mono"
+            className=""
           />
         </div>
         <Button
@@ -68,7 +68,7 @@ export function AdminImportLegacyGate() {
                     href={`/admin/sets/${encodeURIComponent(s.code)}/import`}
                     className="text-primary hover:underline"
                   >
-                    <span className="font-mono">{s.code}</span> — {s.name}
+                    <span className="">{s.code}</span> — {s.name}
                   </Link>
                 </li>
               ))}

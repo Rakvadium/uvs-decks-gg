@@ -16,7 +16,7 @@ function ZoneSelector({
   return (
     <div className="flex items-center gap-1.5 md:gap-3">
       {!hideZoneLabel ? (
-        <span className="w-14 shrink-0 text-[11px] font-mono text-muted-foreground md:w-16">Zone</span>
+        <span className="w-14 shrink-0 text-[11px] text-muted-foreground md:w-16">Zone</span>
       ) : null}
       <div className="flex h-7 min-w-0 flex-1 items-center overflow-hidden rounded-md border border-border/50 bg-background/50">
         {ZONE_OPTIONS.map((zone, index) => {
@@ -27,7 +27,7 @@ function ZoneSelector({
               key={zone}
               type="button"
               className={cn(
-                "h-full flex-1 text-[10px] font-mono transition-colors",
+                "h-full flex-1 text-[10px] transition-colors",
                 index !== 0 && "border-l border-border/50",
                 selected
                   ? "bg-primary/20 text-primary shadow-[var(--chrome-filter-tile-shadow-selected-inset)]"
@@ -45,7 +45,7 @@ function ZoneSelector({
 }
 
 const statsSectionLabelClass =
-  "text-xs font-mono uppercase tracking-widest text-muted-foreground/70";
+  "chrome-label-case text-xs text-muted-foreground/70";
 
 export function StatsSection({
   plain = false,
@@ -97,7 +97,7 @@ export function StatsSection({
 
   return (
     <div className="space-y-2">
-      <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Stats</span>
+      <span className="chrome-label-case text-xs text-muted-foreground">Stats</span>
       <div className="md:rounded-lg md:border md:border-border/50 md:bg-card/30 md:p-3 md:backdrop-blur-sm">
         {grid}
       </div>

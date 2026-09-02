@@ -126,8 +126,8 @@ function AdminSidebarContent() {
           >
             ← All sets
           </Link>
-          <p className="px-2 pt-1 text-xs font-medium text-muted-foreground uppercase tracking-wide">
-            Set · <span className="font-mono normal-case">{setCode}</span>
+          <p className="chrome-label-case px-2 pt-1 text-xs font-medium text-muted-foreground">
+            Set · <span className="normal-case">{setCode}</span>
           </p>
           <Link
             href={setOverviewHref}
@@ -160,7 +160,7 @@ function AdminSidebarContent() {
       ) : null}
 
       <div className="border-t pt-4">
-        <p className="px-3 text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">
+        <p className="chrome-label-case px-3 text-xs font-medium text-muted-foreground mb-2">
           Catalog
         </p>
         <div className="space-y-1">

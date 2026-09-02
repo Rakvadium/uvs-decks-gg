@@ -125,13 +125,13 @@ export default function AdminFormatsPageClient() {
                     router.push(`/admin/formats/${encodeURIComponent(format.key)}`)
                   }
                 >
-                  <TableCell className="font-mono text-sm">{format.key}</TableCell>
+                  <TableCell className="text-sm">{format.key}</TableCell>
                   <TableCell className="font-medium">{format.name}</TableCell>
                   <TableCell className="text-right tabular-nums text-muted-foreground">
                     {format.minDeckSize}
                     {format.maxDeckSize != null ? `–${format.maxDeckSize}` : ""}
                   </TableCell>
-                  <TableCell className="max-w-[200px] truncate font-mono text-sm text-muted-foreground">
+                  <TableCell className="max-w-[200px] truncate text-sm text-muted-foreground">
                     {format.sideboardRule}
                   </TableCell>
                   <TableCell className="text-right tabular-nums text-muted-foreground">

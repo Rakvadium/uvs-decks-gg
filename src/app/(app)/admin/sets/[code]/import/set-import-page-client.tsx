@@ -47,7 +47,7 @@ export default function AdminSetImportPageClient() {
     return (
       <div className="flex min-h-0 flex-1 flex-col overflow-y-auto md:h-full">
         <p className="text-muted-foreground">
-          No set found for code <span className="font-mono">{code}</span>.
+          No set found for code <span className="">{code}</span>.
         </p>
         <div className="mt-4 flex flex-wrap gap-2">
           <Button type="button" variant="secondary" onClick={() => router.refresh()}>

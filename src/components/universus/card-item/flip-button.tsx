@@ -54,7 +54,7 @@ export function CardFlipButton({
           />
         </button>
       </TooltipTrigger>
-      <TooltipContent side="right" className="font-mono text-xs uppercase tracking-wider">
+      <TooltipContent side="right" className="chrome-label-case text-xs">
         <p>{isFlipped ? "View Front" : "View Back"}</p>
       </TooltipContent>
     </Tooltip>

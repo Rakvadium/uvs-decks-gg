@@ -5,18 +5,24 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const badgeVariants = cva(
-  "inline-flex items-center justify-center border px-2.5 py-0.5 text-xs font-semibold w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 gap-1.5 [&>svg]:pointer-events-none transition-colors duration-200 overflow-hidden uppercase tracking-widest font-mono",
+  "inline-flex items-center justify-center border px-2.5 py-0.5 text-xs font-semibold w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 gap-1.5 [&>svg]:pointer-events-none transition-colors duration-200 overflow-hidden chrome-label-case",
   {
     variants: {
       tone: {
         default:
-          "rounded bg-primary/20 text-primary border-primary/40 shadow-[var(--chrome-badge-default-shadow)] hover:shadow-[var(--chrome-badge-default-shadow-hover)] hover:bg-primary/30",
+          "rounded-md bg-primary/20 text-primary border-primary/40 shadow-[var(--chrome-badge-default-shadow)] hover:shadow-[var(--chrome-badge-default-shadow-hover)] hover:bg-primary/30",
         secondary:
-          "rounded bg-secondary/20 text-secondary border-secondary/40 shadow-[var(--chrome-badge-secondary-shadow)] hover:shadow-[var(--chrome-badge-secondary-shadow-hover)] hover:bg-secondary/30",
+          "rounded-md bg-secondary/20 text-secondary border-secondary/40 shadow-[var(--chrome-badge-secondary-shadow)] hover:shadow-[var(--chrome-badge-secondary-shadow-hover)] hover:bg-secondary/30",
         destructive:
-          "rounded bg-destructive/20 text-destructive border-destructive/40 shadow-[var(--chrome-badge-destructive-shadow)] hover:shadow-[var(--chrome-badge-destructive-shadow-hover)]",
+          "rounded-md bg-destructive/20 text-destructive border-destructive/40 shadow-[var(--chrome-badge-destructive-shadow)] hover:shadow-[var(--chrome-badge-destructive-shadow-hover)]",
         outline:
-          "rounded bg-transparent text-foreground border-border/50 hover:border-primary/50 hover:text-primary hover:shadow-[var(--chrome-badge-outline-shadow-hover)]",
+          "rounded-md bg-transparent text-foreground border-border/50 hover:border-primary/50 hover:text-primary hover:shadow-[var(--chrome-badge-outline-shadow-hover)]",
+        success:
+          "rounded-md bg-success/15 text-success border-success/40",
+        warning:
+          "rounded-md bg-warning/15 text-warning border-warning/40",
+        info:
+          "rounded-md bg-info/15 text-info border-info/40",
         muted:
           "rounded-full bg-muted/50 text-muted-foreground border-muted-foreground/30",
         entity:

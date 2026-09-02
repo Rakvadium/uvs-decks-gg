@@ -18,8 +18,8 @@ export function DeckCardsStackedView() {
           <div key={group.type} className="space-y-2.5">
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-2">
-                <span className="text-sm font-display font-bold uppercase tracking-[0.18em]">{group.label}</span>
-                <Badge variant="outline" className="text-[10px] font-mono uppercase tracking-wider">
+                <span className="chrome-label-case text-sm font-bold">{group.label}</span>
+                <Badge variant="outline" className="text-[10px]">
                   {totalCount}
                 </Badge>
               </div>

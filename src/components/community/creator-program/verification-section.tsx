@@ -27,7 +27,7 @@ export function CreatorProgramVerificationSection() {
           ))}
 
           <div className="rounded-lg border border-dashed border-border/50 bg-card/50 px-3 py-3">
-            <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-muted-foreground">
+            <div className="chrome-label-case flex items-center gap-2 text-xs text-muted-foreground">
               <Flame className="h-4 w-4 text-secondary" />
               Creator perks
             </div>

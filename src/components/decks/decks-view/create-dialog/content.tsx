@@ -61,7 +61,7 @@ export function DeckCreateDialog() {
             <DialogBody className="pt-4">
               <label
                 htmlFor="create-deck-name"
-                className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground"
+                className="chrome-label-case text-[11px] text-muted-foreground"
               >
                 Deck name
               </label>

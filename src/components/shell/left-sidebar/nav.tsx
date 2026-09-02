@@ -21,7 +21,7 @@ export function LeftSidebarNav() {
     <Link
       href="/"
       className={cn(
-        "rounded-md text-xs font-mono uppercase tracking-wider text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+        "chrome-label-case rounded-md text-xs text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
         collapsed ? cn("flex items-center", SHELL_RAIL_ITEM_COLLAPSED_CLASS) : "px-3 py-2"
       )}
     >
@@ -60,7 +60,7 @@ export function LeftSidebarNav() {
                     )}
                   />
                   {!collapsed ? (
-                    <span className="whitespace-nowrap font-mono text-xs uppercase tracking-wider">
+                    <span className="chrome-label-case whitespace-nowrap text-xs">
                       {item.label}
                     </span>
                   ) : null}
@@ -75,7 +75,7 @@ export function LeftSidebarNav() {
               return (
                 <Tooltip key={item.path}>
                   <TooltipTrigger asChild>{navLink}</TooltipTrigger>
-                  <TooltipContent side="right" className="font-mono text-xs uppercase tracking-wider">
+                  <TooltipContent side="right" className="chrome-label-case text-xs">
                     {item.label}
                   </TooltipContent>
                 </Tooltip>
@@ -95,7 +95,7 @@ export function LeftSidebarNav() {
         >
           <Shield className={cn("h-4 w-4 shrink-0", SHELL_NAV_ICON_ACTIVE)} />
           {!collapsed ? (
-            <Kicker className="whitespace-nowrap font-display text-accent">
+            <Kicker className="whitespace-nowrap text-accent">
               Admin Panel
             </Kicker>
           ) : null}
@@ -108,7 +108,7 @@ export function LeftSidebarNav() {
         collapsed ? (
           <Tooltip>
             <TooltipTrigger asChild>{adminBackLink}</TooltipTrigger>
-            <TooltipContent side="right" className="font-mono text-xs uppercase tracking-wider">
+            <TooltipContent side="right" className="chrome-label-case text-xs">
               Back to App
             </TooltipContent>
           </Tooltip>

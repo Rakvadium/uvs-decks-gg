@@ -9,7 +9,7 @@ import { useSlashToFocus } from "@/hooks/use-slash-to-focus";
 import { FloatingIslandCapsule } from "./floating-island";
 
 export const FLOATING_ACTION_PILL_CLASS =
-  "pointer-events-auto h-10 shrink-0 gap-1.5 rounded-full px-4 shadow-[0_4px_16px_-10px_rgba(0,0,0,0.25)] dark:shadow-[0_12px_36px_-16px_rgba(0,0,0,0.75)]";
+  "pointer-events-auto h-10 shrink-0 gap-1.5 rounded-full px-4 shadow-[var(--chrome-floating-shadow)]";
 
 export function FloatingPageBar({
   left,
@@ -98,7 +98,7 @@ export function FloatingTabsPill({
             onClick={() => onValueChange(item.value)}
             aria-pressed={isActive}
             className={cn(
-              "flex h-8 shrink-0 items-center gap-1.5 rounded-full px-3 font-mono text-[11px] uppercase tracking-wider transition-colors duration-150",
+              "chrome-label-case flex h-8 shrink-0 items-center gap-1.5 rounded-full px-3 text-[11px] font-semibold transition-colors duration-150",
               isActive
                 ? "bg-primary/15 text-primary"
                 : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
@@ -166,7 +166,7 @@ export function FloatingSearchCapsule({
           <X className="size-4" />
         </button>
       ) : (
-        <kbd className="hidden shrink-0 select-none items-center rounded-full border border-border/60 bg-muted/40 px-2 py-0.5 font-mono text-[10px] text-muted-foreground lg:flex">
+        <kbd className="hidden shrink-0 select-none items-center rounded-full border border-border/60 bg-muted/40 px-2 py-0.5 text-[10px] text-muted-foreground lg:flex">
           /
         </kbd>
       )}
@@ -197,7 +197,7 @@ export function FloatingBackPill({
           className={cn(
             "relative size-11 rounded-full p-px transition-shadow duration-300",
             "bg-[linear-gradient(115deg,color-mix(in_oklch,var(--primary)_40%,transparent),color-mix(in_oklch,var(--border)_65%,transparent)_28%,color-mix(in_oklch,var(--border)_65%,transparent)_72%,color-mix(in_oklch,var(--secondary)_40%,transparent))]",
-            "shadow-[0_4px_16px_-10px_rgba(0,0,0,0.25)] dark:shadow-[0_12px_36px_-16px_rgba(0,0,0,0.75)]"
+            "shadow-[var(--chrome-floating-shadow)]"
           )}
         >
           {href ? (
@@ -215,7 +215,7 @@ export function FloatingBackPill({
   }
 
   const labelButtonClass =
-    "h-8 gap-1.5 rounded-full px-3 font-mono text-[11px] uppercase tracking-wider text-muted-foreground hover:bg-muted/60 hover:text-foreground";
+    "h-8 gap-1.5 rounded-full px-3 text-[11px] font-semibold text-muted-foreground hover:bg-muted/60 hover:text-foreground";
 
   return (
     <FloatingIslandCapsule
@@ -237,6 +237,16 @@ export function FloatingBackPill({
         </Button>
       )}
     </FloatingIslandCapsule>
+  );
+}
+
+export function FloatingPageTitle({ children }: { children: ReactNode }) {
+  return (
+    <FloatingCapsuleCluster bodyClassName="px-4" glow>
+      <h1 className="chrome-heading-case truncate text-sm font-semibold text-foreground">
+        {children}
+      </h1>
+    </FloatingCapsuleCluster>
   );
 }
 

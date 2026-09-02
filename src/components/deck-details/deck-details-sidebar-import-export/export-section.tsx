@@ -9,7 +9,7 @@ export function ImportExportSidebarExportSection() {
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
-        <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+        <span className="chrome-label-case text-[10px] text-muted-foreground">
           Export to UVS Ultra
         </span>
         <Button variant="outline" size="sm" className="h-7 px-2" onClick={() => void handleCopyExport()}>
@@ -17,7 +17,7 @@ export function ImportExportSidebarExportSection() {
           Copy
         </Button>
       </div>
-      <Textarea value={exportText} readOnly className="min-h-[180px] font-mono text-[11px] leading-relaxed" />
+      <Textarea value={exportText} readOnly className="min-h-[180px] text-[11px] leading-relaxed" />
     </div>
   );
 }

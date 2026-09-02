@@ -64,7 +64,7 @@ export function MobileBottomNav() {
               />
               <span
                 className={cn(
-                  "text-[10px] font-mono uppercase tracking-widest",
+                  "chrome-label-case text-[10px]",
                   isActive && "font-semibold"
                 )}
               >
@@ -85,9 +85,9 @@ export function MobileBottomNav() {
             image={user?.image}
             alt={user?.username || "User"}
             className="h-6 w-6 border border-accent/35 shadow-[var(--chrome-shell-avatar-ring)]"
-            fallbackClassName="bg-accent/20 font-mono text-xs font-bold text-accent"
+            fallbackClassName="bg-accent/20 text-xs font-bold text-accent"
           />
-          <span className="text-[10px] font-mono uppercase tracking-widest">Profile</span>
+          <span className="chrome-label-case text-[10px]">Profile</span>
         </button>
       </div>
     </nav>

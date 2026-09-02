@@ -79,7 +79,7 @@ export function CatalogReleaseDialog({
               <div className="space-y-3 text-sm text-muted-foreground">
                 <p>
                   This uploads a versioned static catalog blob to R2, bumps the global{" "}
-                  <span className="font-mono text-foreground">cardDataVersion</span>,
+                  <span className="text-foreground">cardDataVersion</span>,
                   rebuilds catalog aggregates, and triggers clients to pick up the
                   new snapshot on their next sync.
                 </p>

@@ -59,12 +59,12 @@ export function CommunityTierListDetailTopBar() {
   if (detail === undefined) {
     return (
       <div className="flex w-full min-w-0 items-center gap-2">
-        <Link href="/community/tier-lists" aria-label="Back to tier lists">
-          <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" aria-label="Back to tier lists">
+        <Link href="/community/tier-lists" aria-label="Tier lists">
+          <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" aria-label="Tier lists">
             <ArrowLeft className="h-4 w-4" />
           </Button>
         </Link>
-        <div className="flex items-center gap-2 text-sm font-mono uppercase tracking-[0.18em] text-muted-foreground">
+        <div className="chrome-label-case flex items-center gap-2 text-sm text-muted-foreground">
           <Loader2 className="h-4 w-4 animate-spin" />
           <span>Loading Tier List</span>
         </div>
@@ -75,12 +75,12 @@ export function CommunityTierListDetailTopBar() {
   if (!detail) {
     return (
       <div className="flex w-full min-w-0 items-center gap-2">
-        <Link href="/community/tier-lists" aria-label="Back to tier lists">
-          <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" aria-label="Back to tier lists">
+        <Link href="/community/tier-lists" aria-label="Tier lists">
+          <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" aria-label="Tier lists">
             <ArrowLeft className="h-4 w-4" />
           </Button>
         </Link>
-        <span className="truncate text-sm font-mono uppercase tracking-[0.18em] text-muted-foreground">
+        <span className="chrome-label-case truncate text-sm text-muted-foreground">
           Tier List Unavailable
         </span>
       </div>
@@ -111,7 +111,7 @@ export function CommunityTierListDetailTopBar() {
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-md border border-border/50 px-2.5 text-[10px] font-mono uppercase tracking-[0.18em] text-foreground transition-colors hover:border-primary/40 hover:text-primary"
+          className="chrome-label-case inline-flex h-8 shrink-0 items-center gap-1.5 rounded-md border border-border/50 px-2.5 text-[10px] text-foreground transition-colors hover:border-primary/40 hover:text-primary"
         >
           {isPublic ? <Globe className="h-3 w-3" /> : <Lock className="h-3 w-3" />}
           {displayPublicity}
@@ -141,7 +141,7 @@ export function CommunityTierListDetailTopBar() {
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-md border border-border/50 px-2.5 text-[10px] font-mono uppercase tracking-[0.18em] text-foreground transition-colors hover:border-primary/40 hover:text-primary"
+          className="chrome-label-case inline-flex h-8 shrink-0 items-center gap-1.5 rounded-md border border-border/50 px-2.5 text-[10px] text-foreground transition-colors hover:border-primary/40 hover:text-primary"
         >
           {rankingScopeLabel}
           <ChevronDown className="h-3 w-3 shrink-0 text-muted-foreground" />
@@ -210,8 +210,8 @@ export function CommunityTierListDetailTopBar() {
   return (
     <>
       <div className="flex w-full min-w-0 items-center gap-2">
-        <Link href="/community/tier-lists" aria-label="Back to tier lists">
-          <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" aria-label="Back to tier lists">
+        <Link href="/community/tier-lists" aria-label="Tier lists">
+          <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" aria-label="Tier lists">
             <ArrowLeft className="h-4 w-4" />
           </Button>
         </Link>
@@ -221,12 +221,12 @@ export function CommunityTierListDetailTopBar() {
             <Input
               value={title}
               onChange={(event) => setTitle(event.target.value)}
-              className="h-8 min-w-0 font-display text-sm font-bold uppercase tracking-[0.18em]"
+              className="chrome-label-case h-8 min-w-0 text-sm font-bold"
               placeholder="Tier list name..."
             />
           ) : (
             <PageHeading
-              className="truncate font-display text-sm font-bold uppercase tracking-[0.18em]"
+              className="truncate text-sm font-bold"
               title={viewTitle}
             >
               {viewTitle}

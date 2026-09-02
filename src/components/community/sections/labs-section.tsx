@@ -40,14 +40,14 @@ export function CommunityLabsSection() {
             return (
               <div key={tool.title} className="rounded-xl border border-border/50 bg-card/80 p-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+                  <span className="chrome-label-case text-[10px] text-muted-foreground">
                     {tool.kicker}
                   </span>
                   <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-border/50 bg-background/80">
                     <Icon className="h-4 w-4 text-primary" />
                   </div>
                 </div>
-                <SectionHeading className="mt-3 text-sm font-semibold">{tool.title}</SectionHeading>
+                <SectionHeading size="xs" className="mt-3">{tool.title}</SectionHeading>
                 <p className="mt-1 text-xs text-muted-foreground">{tool.description}</p>
               </div>
             );
@@ -73,7 +73,7 @@ export function CommunityLabsSection() {
                       <Icon className="h-3.5 w-3.5 text-primary" />
                     </div>
                     <div className="min-w-0">
-                      <p className="text-xs font-semibold uppercase tracking-wider">{resource.label}</p>
+                      <p className="chrome-label-case text-xs font-semibold">{resource.label}</p>
                       <p className="mt-1 text-xs text-muted-foreground">{resource.detail}</p>
                     </div>
                   </div>
@@ -86,7 +86,7 @@ export function CommunityLabsSection() {
           })}
 
           <div className="rounded-lg border border-dashed border-border/50 bg-card/50 px-3 py-3">
-            <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-muted-foreground">
+            <div className="chrome-label-case flex items-center gap-2 text-xs text-muted-foreground">
               <Trophy className="h-4 w-4 text-secondary" />
               Creator note
             </div>
@@ -95,7 +95,7 @@ export function CommunityLabsSection() {
             </p>
             <Link
               href="/community/creators"
-              className="mt-3 inline-flex items-center gap-1 text-xs font-mono uppercase tracking-widest text-primary hover:underline"
+              className="chrome-label-case mt-3 inline-flex items-center gap-1 text-xs text-primary hover:underline"
             >
               Learn about creator verification
               <ArrowUpRight className="h-3.5 w-3.5" />

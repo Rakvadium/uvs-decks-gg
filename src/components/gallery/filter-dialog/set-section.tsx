@@ -89,7 +89,7 @@ export function SetSection({ plain = false }: { plain?: boolean } = {}) {
 
     return (
       <div className="space-y-2">
-        <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Set</span>
+        <span className="chrome-label-case text-xs text-muted-foreground">Set</span>
         <div className="space-y-2 rounded-lg border border-border/50 bg-card/30 p-3 backdrop-blur-sm">
           {list}
         </div>
@@ -99,7 +99,7 @@ export function SetSection({ plain = false }: { plain?: boolean } = {}) {
 
   return (
     <div className="space-y-2">
-      <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Set</span>
+      <span className="chrome-label-case text-xs text-muted-foreground">Set</span>
       <SearchableMultiSelect
         options={options}
         selectedValues={selectedSets}

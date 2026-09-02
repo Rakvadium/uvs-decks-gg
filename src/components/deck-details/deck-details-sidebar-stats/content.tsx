@@ -26,7 +26,7 @@ function StatsSidebarContent() {
   return (
     <div className="h-full space-y-3 overflow-y-auto p-4">
       <div className="flex items-center justify-end">
-        <Badge variant="outline" className="font-mono text-[10px]">
+        <Badge variant="outline" className="text-[10px]">
           Main {mainTotal}
         </Badge>
       </div>

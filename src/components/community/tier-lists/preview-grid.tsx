@@ -27,7 +27,7 @@ export function TierListPreviewGrid({
         : Array.from({ length: 4 }).map((_, index) => (
             <div
               key={index}
-              className="flex aspect-[2.5/3.5] items-center justify-center rounded-lg border border-dashed border-border/50 bg-background/30 text-[10px] font-mono uppercase tracking-[0.18em] text-muted-foreground"
+              className="chrome-label-case flex aspect-[2.5/3.5] items-center justify-center rounded-lg border border-dashed border-border/50 bg-background/30 text-[10px] text-muted-foreground"
             >
               {emptyLabel}
             </div>

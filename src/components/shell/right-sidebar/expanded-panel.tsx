@@ -53,7 +53,7 @@ export function RightSidebarExpandedPanel() {
                 {ActiveHeader ? (
                   <ActiveHeader />
                 ) : (
-                  <SectionHeading className="font-display text-sm font-medium uppercase tracking-wider text-sidebar-foreground">
+                  <SectionHeading size="xs" className="text-sidebar-foreground">
                     {activeSlot?.label}
                   </SectionHeading>
                 )}

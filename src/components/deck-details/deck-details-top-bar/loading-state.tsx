@@ -1,6 +1,6 @@
 export function DeckDetailsTopBarLoadingState() {
   return (
-    <span className="font-mono text-xs uppercase tracking-wider text-muted-foreground">
+    <span className="chrome-label-case text-xs text-muted-foreground">
       Loading deck
     </span>
   );

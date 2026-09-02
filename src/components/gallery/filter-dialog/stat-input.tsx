@@ -57,7 +57,7 @@ export function StatInput({ label, filterKey, labelPosition = "start" }: StatInp
       )}
     >
       {labelPosition === "start" ? (
-        <span className="w-14 shrink-0 text-[11px] font-mono text-muted-foreground md:w-16">
+        <span className="w-14 shrink-0 text-[11px] text-muted-foreground md:w-16">
           {label}
         </span>
       ) : null}
@@ -77,7 +77,7 @@ export function StatInput({ label, filterKey, labelPosition = "start" }: StatInp
               compactValue
               className={cn(
                 "flex h-full min-h-0 w-full !items-center !justify-center gap-0 rounded-none border-0 bg-transparent p-0 shadow-none",
-                "text-center text-[11px] font-mono normal-case leading-none tracking-normal",
+                "text-center text-[11px] normal-case leading-none tracking-normal",
                 "focus-visible:z-10 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-0",
                 "[&>[data-slot=select-value]]:block [&>[data-slot=select-value]]:text-center [&>[data-slot=select-value]]:tabular-nums"
               )}
@@ -89,7 +89,7 @@ export function StatInput({ label, filterKey, labelPosition = "start" }: StatInp
                 <SelectItem
                   key={operatorOption.value}
                   value={operatorOption.value}
-                  className="text-xs font-mono"
+                  className="text-xs"
                 >
                   {operatorOption.label}
                 </SelectItem>
@@ -102,7 +102,7 @@ export function StatInput({ label, filterKey, labelPosition = "start" }: StatInp
           type="number"
           inputMode="numeric"
           className={cn(
-            "min-h-0 min-w-0 flex-1 border-0 bg-transparent px-2 py-0 text-base font-mono leading-none outline-none placeholder:text-muted-foreground/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring md:text-[11px] [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none",
+            "min-h-0 min-w-0 flex-1 border-0 bg-transparent px-2 py-0 text-base leading-none outline-none placeholder:text-muted-foreground/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring md:text-[11px] [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none",
             labelPosition === "end" && "pr-1.5"
           )}
           value={value?.value ?? ""}
@@ -114,7 +114,7 @@ export function StatInput({ label, filterKey, labelPosition = "start" }: StatInp
         />
         {labelPosition === "end" ? (
           <span
-            className="flex h-full shrink-0 items-center border-l border-border/50 bg-muted/60 px-2.5 text-[11px] font-mono leading-none text-muted-foreground"
+            className="flex h-full shrink-0 items-center border-l border-border/50 bg-muted/60 px-2.5 text-[11px] leading-none text-muted-foreground"
             aria-hidden
           >
             {label}

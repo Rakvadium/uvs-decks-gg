@@ -1,5 +1,6 @@
 "use client";
 
+import { PageHeading, SectionHeading } from "@/components/ui/typography-headings";
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useAction, useMutation, useQuery } from "convex/react";
@@ -236,7 +237,7 @@ export default function CommunityMediaPageClient() {
       <div className="mx-auto w-full max-w-5xl space-y-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <h1 className="text-2xl font-bold">Community media</h1>
+            <PageHeading size="md">Community media</PageHeading>
             <p className="text-muted-foreground">
               Videos shown in Community → Universus Content. Order matches the
               public feed.
@@ -312,7 +313,7 @@ export default function CommunityMediaPageClient() {
                     </TableCell>
                     <TableCell>
                       <div className="flex flex-col gap-1">
-                        <code className="text-xs font-mono">
+                        <code className="text-xs">
                           {row.youtubeVideoId}
                         </code>
                         <Link
@@ -366,7 +367,7 @@ export default function CommunityMediaPageClient() {
         </div>
 
         <div className="rounded-lg border p-6 space-y-4">
-          <h2 className="text-lg font-semibold">Add video</h2>
+          <SectionHeading size="md">Add video</SectionHeading>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2 sm:col-span-2">
               <Label htmlFor="add-url">YouTube URL or video ID</Label>
@@ -411,7 +412,7 @@ export default function CommunityMediaPageClient() {
               </Select>
               {addAccent === "__custom__" && (
                 <Input
-                  className="mt-2 font-mono text-xs"
+                  className="mt-2 text-xs"
                   placeholder="Tailwind gradient classes"
                   value={addCustomAccent}
                   onChange={(e) => setAddCustomAccent(e.target.value)}
@@ -427,7 +428,7 @@ export default function CommunityMediaPageClient() {
       </div>
 
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
-        <DialogContent className="max-w-lg">
+        <DialogContent size="content-md">
           <DialogHeader>
             <DialogTitle>Edit video</DialogTitle>
           </DialogHeader>
@@ -437,7 +438,7 @@ export default function CommunityMediaPageClient() {
               <Input
                 id="edit-url"
                 readOnly
-                className="bg-muted/50 font-mono text-xs"
+                className="bg-muted/50 text-xs"
                 value={editUrl}
               />
             </div>
@@ -474,7 +475,7 @@ export default function CommunityMediaPageClient() {
               </Select>
               {editAccent === "__custom__" && (
                 <Input
-                  className="font-mono text-xs"
+                  className="text-xs"
                   placeholder="Tailwind gradient classes"
                   value={editCustomAccent}
                   onChange={(e) => setEditCustomAccent(e.target.value)}

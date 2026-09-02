@@ -3,9 +3,9 @@
 import { Library } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import {
-  FloatingCapsuleCluster,
   FloatingPageBar,
   FloatingPageLayout,
+  FloatingPageTitle,
 } from "@/components/shell/floating-page-bar";
 import { PageHeading, SectionHeading } from "@/components/ui/typography-headings";
 
@@ -15,17 +15,13 @@ export default function CollectionPageClient() {
       bar={
         <FloatingPageBar
           left={
-            <FloatingCapsuleCluster bodyClassName="px-4" glow>
-              <h1 className="truncate text-sm font-semibold tracking-tight text-foreground">
-                Collection
-              </h1>
-            </FloatingCapsuleCluster>
+            <FloatingPageTitle>Collection</FloatingPageTitle>
           }
         />
       }
     >
       <div className="mb-6 md:hidden">
-        <PageHeading className="font-display text-2xl font-bold uppercase tracking-widest">
+        <PageHeading>
           Collection
         </PageHeading>
       </div>
@@ -37,10 +33,10 @@ export default function CollectionPageClient() {
           >
             <Library className="h-8 w-8 text-muted-foreground" />
           </div>
-          <SectionHeading className="mb-2 text-lg font-display font-bold uppercase tracking-wider">
+          <SectionHeading className="mb-2">
             Coming soon
           </SectionHeading>
-          <p className="mb-8 max-w-xl text-center text-sm font-mono uppercase tracking-wider text-muted-foreground">
+          <p className="chrome-label-case mb-8 max-w-xl text-center text-sm text-muted-foreground">
             Collection is on the way. Here is what you can look forward to.
           </p>
           <ul className="max-w-md space-y-3 text-sm text-muted-foreground">

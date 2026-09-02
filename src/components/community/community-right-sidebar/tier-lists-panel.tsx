@@ -63,7 +63,7 @@ export function CommunityTierListsSidebarPanel() {
                         <Badge variant="outline" className="h-5 px-1.5 text-[10px] font-normal">
                           {getTierListScopeLabel(tierList.rankingScope)}
                         </Badge>
-                        <span className="text-[10px] font-mono uppercase tracking-wide text-muted-foreground">
+                        <span className="chrome-label-case text-[10px] text-muted-foreground">
                           {formatUpdatedAt(tierList.updatedAt)}
                         </span>
                       </div>
@@ -105,7 +105,7 @@ export function CommunityTierListsSidebarPanel() {
                         <Badge variant="outline" className="h-5 px-1.5 text-[10px] font-normal">
                           {getTierListScopeLabel(tierList.rankingScope)}
                         </Badge>
-                        <span className="text-[10px] font-mono uppercase tracking-wide text-muted-foreground">
+                        <span className="chrome-label-case text-[10px] text-muted-foreground">
                           {formatUpdatedAt(tierList.updatedAt)}
                         </span>
                       </div>

@@ -5,6 +5,7 @@ import { useAuthDialog } from "@/components/auth/auth-dialog";
 import {
   FloatingActionPill,
   FloatingPageBar,
+  FloatingPageTitle,
   FloatingSearchCapsule,
   FloatingTabsPill,
 } from "@/components/shell/floating-page-bar";
@@ -35,16 +36,19 @@ export function DecksFloatingTopBar() {
   return (
     <FloatingPageBar
       left={
-        <FloatingTabsPill
-          value={state.activeTab}
-          onValueChange={(value) => actions.setActiveTab(value as typeof state.activeTab)}
-          items={visibleTabs.map((tab) => ({
-            value: tab.id,
-            label: tab.shortLabel,
-            icon: tab.icon,
-            badge: deckCounts[tab.id] > 0 ? deckCounts[tab.id] : undefined,
-          }))}
-        />
+        <>
+          <FloatingPageTitle>Decks</FloatingPageTitle>
+          <FloatingTabsPill
+            value={state.activeTab}
+            onValueChange={(value) => actions.setActiveTab(value as typeof state.activeTab)}
+            items={visibleTabs.map((tab) => ({
+              value: tab.id,
+              label: tab.shortLabel,
+              icon: tab.icon,
+              badge: deckCounts[tab.id] > 0 ? deckCounts[tab.id] : undefined,
+            }))}
+          />
+        </>
       }
       center={
         <FloatingSearchCapsule

@@ -12,21 +12,21 @@ export function DeckSidebarItemActions() {
         <Button
           variant={isActive ? "secondary" : "outline"}
           size="sm"
-          className="h-7 px-2 text-[10px] font-mono"
+          className="h-7 px-2 text-[10px]"
           onClick={handleSetActive}
         >
           {isActive ? <Check className="h-3 w-3" /> : null}
           {isActive ? "Active" : "Set Active"}
         </Button>
       ) : (
-        <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/70">
+        <span className="chrome-label-case text-[10px] text-muted-foreground/70">
           Creator only
         </span>
       )}
 
       <Link
         href={`/decks/${deck._id}`}
-        className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground transition-colors hover:text-primary"
+        className="chrome-label-case text-[10px] text-muted-foreground transition-colors hover:text-primary"
       >
         Open
       </Link>

@@ -1,5 +1,6 @@
 "use client";
 
+import { PageHeading } from "@/components/ui/typography-headings";
 import { useAction, useMutation, usePaginatedQuery, useQuery } from "convex/react";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
@@ -85,14 +86,14 @@ export function TeamHubChatContent({ teamId }: TeamHubChatContentProps) {
 
   return (
     <div className="flex h-[min(70vh,560px)] flex-col gap-4">
-      <h1 className="font-display text-lg font-semibold text-foreground md:hidden">Chat</h1>
+      <PageHeading size="sm" className="md:hidden">Chat</PageHeading>
       {showLoadMore && (
         <div className="flex shrink-0 justify-center">
           <Button
             type="button"
             variant="outline"
             size="sm"
-            className="font-mono text-xs uppercase tracking-wider"
+            className="text-xs"
             disabled={status === "LoadingMore"}
             onClick={() => loadMore(25)}
           >
@@ -116,7 +117,7 @@ export function TeamHubChatContent({ teamId }: TeamHubChatContentProps) {
                 className="rounded-md border border-border/40 bg-background/80 px-3 py-2 text-sm"
               >
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
-                  <span className="font-mono text-xs font-medium text-foreground">
+                  <span className="text-xs font-medium text-foreground">
                     {row.authorUsername?.trim() || m.authorUserId.slice(-6)}
                   </span>
                   <time className="text-xs text-muted-foreground" dateTime={new Date(m.createdAt).toISOString()}>

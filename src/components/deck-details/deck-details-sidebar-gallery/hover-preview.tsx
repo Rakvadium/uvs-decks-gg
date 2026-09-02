@@ -35,7 +35,7 @@ export function DeckDetailsGallerySidebarHoverPreview() {
         height: previewHeight,
       }}
     >
-      <div className="relative h-full w-full overflow-hidden rounded-xl border border-primary/40 bg-background/95 shadow-[0_0_0_1px_var(--primary)/30,0_0_6px_var(--primary)/70,0_0_14px_var(--primary)/20]">
+      <div className="relative h-full w-full overflow-hidden rounded-xl border border-[color:var(--chrome-deck-details-hover-preview-border)] bg-background/95 shadow-[var(--chrome-deck-details-hover-preview-shadow)]">
         {hoveredListCard.imageUrl ? (
           <Image
             src={hoveredListCard.imageUrl}
@@ -47,7 +47,7 @@ export function DeckDetailsGallerySidebarHoverPreview() {
             fetchPriority="low"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center px-4 text-center font-mono text-xs uppercase tracking-wider text-muted-foreground">
+          <div className="chrome-label-case flex h-full w-full items-center justify-center px-4 text-center text-xs text-muted-foreground">
             {hoveredListCard.name}
           </div>
         )}

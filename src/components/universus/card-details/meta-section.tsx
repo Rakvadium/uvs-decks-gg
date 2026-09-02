@@ -8,8 +8,8 @@ export function CardDetailsMetaSection() {
     <>
       <Separator className="bg-border/30" />
 
-      <div className="flex items-center justify-between text-xs font-mono text-muted-foreground">
-        <span className="uppercase tracking-widest">
+      <div className="flex items-center justify-between text-xs text-muted-foreground">
+        <span className="chrome-label-case">
           {card.setCode} • {card.rarity}
         </span>
 

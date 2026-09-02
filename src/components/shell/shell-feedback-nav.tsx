@@ -39,7 +39,7 @@ function ShellFeedbackNavSidebarInner() {
     >
       <MessageSquare className="h-4 w-4 shrink-0" />
       {!collapsed ? (
-        <span className="whitespace-nowrap font-mono text-xs uppercase tracking-wider">
+        <span className="chrome-label-case whitespace-nowrap text-xs">
           {label}
         </span>
       ) : null}
@@ -51,7 +51,7 @@ function ShellFeedbackNavSidebarInner() {
         <TooltipTrigger asChild>{control}</TooltipTrigger>
         <TooltipContent
           side="right"
-          className="font-mono text-xs uppercase tracking-wider"
+          className="chrome-label-case text-xs"
         >
           {label}
         </TooltipContent>

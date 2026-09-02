@@ -41,7 +41,7 @@ export function CardImageDisplay({
           <div className="mx-auto mb-2 flex h-8 w-8 items-center justify-center rounded border border-primary/30">
             <span className="text-lg text-primary/50">?</span>
           </div>
-          <span className="text-xs font-mono uppercase tracking-wider text-muted-foreground">No Image</span>
+          <span className="chrome-label-case text-xs text-muted-foreground">No Image</span>
         </div>
       </div>
     );
