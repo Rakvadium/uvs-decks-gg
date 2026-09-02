@@ -2,6 +2,8 @@
 
 How **appearance mode**, **color palettes**, and **chrome** combine at runtime and where they are persisted.
 
+Token ownership, styling ladders, and authoring rules: [theme-chrome-guidelines.md](./theme-chrome-guidelines.md). This file is the implementation map for this app.
+
 ## Three axes
 
 | Axis | Meaning | Persistence |
@@ -105,4 +107,6 @@ Legacy **`colorScheme`** + **`chromePreference`** rows are upgraded once via **`
 
 ## See also
 
+- [theme-chrome-guidelines.md](./theme-chrome-guidelines.md) — portable theme / chrome / styling law
 - [SYSTEM_ANALYSIS.md](./SYSTEM_ANALYSIS.md) — client shell and providers
+- [UI_UX_DESIGN.md](./UI_UX_DESIGN.md) — product UX principles

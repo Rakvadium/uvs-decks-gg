@@ -25,9 +25,10 @@ If placement or pattern is still ambiguous, ask — do not invent a new spot for
 | 1 | [PRODUCT_VISION.md](./PRODUCT_VISION.md) | Scope and principles |
 | 2 | [SYSTEM_ANALYSIS.md](./SYSTEM_ANALYSIS.md) | Where data and flows live |
 | 3 | [component-architecture-playbook.md](./component-architecture-playbook.md) | How to structure UI modules |
-| 4 | [UI_UX_DESIGN.md](./UI_UX_DESIGN.md) | Borders, surfaces, radius, motion, labels |
-| 5 | [floating-header-islands.md](./floating-header-islands.md) | Where page actions/search/tabs belong |
-| 6 | [theme-and-chrome.md](./theme-and-chrome.md) | Theme/chrome axes and tokens |
+| 4 | [UI_UX_DESIGN.md](./UI_UX_DESIGN.md) | Product UX principles |
+| 5 | [theme-chrome-guidelines.md](./theme-chrome-guidelines.md) | Tokens, chrome, styling ladders |
+| 6 | [floating-header-islands.md](./floating-header-islands.md) | Where page actions/search/tabs belong |
+| 7 | [theme-and-chrome.md](./theme-and-chrome.md) | This app’s appearance wiring |
 
 If you touch community rankings or tier lists, read [features/community/TierListSystem.md](./features/community/TierListSystem.md) and prefer code neighbors under `src/components/community/`.
 
@@ -64,7 +65,7 @@ Before you report completion:
 
 - `bun run lint`
 - `bun run build`
-- If UI changed: BEFORE/AFTER snapshots (desktop + mobile), `ui-ux-adversary` with image compare, placement still matches [floating-header-islands.md](./floating-header-islands.md)
+- If UI changed: BEFORE/AFTER snapshots (desktop + mobile), `ui-ux-adversary` with image compare, placement still matches [floating-header-islands.md](./floating-header-islands.md). On the PR, embed both shots from `.github/pr-captures/<issue>/` with raw GitHub URLs — not `cursor.com/artifacts` ([playbook](./agent-workflow-playbook.md) § PR visual embeds).
 
 If you change Convex schema or function signatures, ensure Convex codegen and types are consistent with your local workflow.
 

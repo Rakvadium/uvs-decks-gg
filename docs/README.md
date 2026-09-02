@@ -19,8 +19,9 @@
 | [SYSTEM_ANALYSIS.md](./SYSTEM_ANALYSIS.md)                           | Clients, Convex, data, integrations       |
 | [component-architecture-playbook.md](./component-architecture-playbook.md) | Feature folders and UI module shape |
 | [UI_UX_DESIGN.md](./UI_UX_DESIGN.md)                                 | Interface patterns and constraints        |
+| [theme-chrome-guidelines.md](./theme-chrome-guidelines.md)           | Portable theme / chrome / styling law     |
 | [floating-header-islands.md](./floating-header-islands.md)          | Page header slot semantics (island bars)  |
-| [theme-and-chrome.md](./theme-and-chrome.md)                         | Theme tokens, calm / expressive chrome    |
+| [theme-and-chrome.md](./theme-and-chrome.md)                         | This app’s appearance wiring              |
 
 
 ## Features

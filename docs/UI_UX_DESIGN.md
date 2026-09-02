@@ -129,9 +129,12 @@ See [theme-and-chrome.md](./theme-and-chrome.md) for the token table.
 ## Backdrop
 
 Default frosted chrome: `backdrop-blur-sm`. Use `backdrop-blur-md` / `xl` only for full-screen or floating overlays.
+- **Theming and styling:** Follow [theme-chrome-guidelines.md](./theme-chrome-guidelines.md) for token ownership, ladders (border, surface, elevation, radius, z-index, motion, type, backdrop), and authoring. Session-backed preferences and DOM attributes are in [theme-and-chrome.md](./theme-and-chrome.md).
 
 ## Related
 
+- [theme-chrome-guidelines.md](./theme-chrome-guidelines.md) — portable theme / chrome / styling law
+- [theme-and-chrome.md](./theme-and-chrome.md) — this app’s appearance wiring
 - [PRODUCT_VISION.md](./PRODUCT_VISION.md)
 - [floating-header-islands.md](./floating-header-islands.md) for page header slot semantics
 - [features/community/TierListSystem.md](./features/community/TierListSystem.md) for community-specific UX rules

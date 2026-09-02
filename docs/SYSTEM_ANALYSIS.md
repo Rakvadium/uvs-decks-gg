@@ -73,6 +73,7 @@ flowchart LR
 ## See also
 
 - [PRODUCT_VISION.md](./PRODUCT_VISION.md)
+- [theme-chrome-guidelines.md](./theme-chrome-guidelines.md)
 - [theme-and-chrome.md](./theme-and-chrome.md)
 - [card-data-hooks.md](./card-data-hooks.md)
 

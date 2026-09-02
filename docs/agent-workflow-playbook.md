@@ -39,7 +39,7 @@ Never freestyle a parallel process. Same ritual → semi-predictable outcomes.
 
 1. **Neighbors beat novelty** — copy 2–3 existing examples of the same job.
 2. **Header slots are fixed** — left context / center search / right actions ([floating-header-islands.md](./floating-header-islands.md)).
-3. **Tokens over taste** — [UI_UX_DESIGN.md](./UI_UX_DESIGN.md), [theme-and-chrome.md](./theme-and-chrome.md), ShadCN/MagicUI, shell primitives.
+3. **Tokens over taste** — [theme-chrome-guidelines.md](./theme-chrome-guidelines.md), [UI_UX_DESIGN.md](./UI_UX_DESIGN.md), [theme-and-chrome.md](./theme-and-chrome.md), ShadCN/MagicUI, shell primitives.
 4. **Vision is a veto** — [PRODUCT_VISION.md](./PRODUCT_VISION.md); do not make a surface look like a different product.
 5. **No drive-by polish** — only touch the brief’s file list.
 6. **Ambiguity → ask** — do not guess placement.
@@ -82,6 +82,28 @@ Use browser preview snapshots (and short recordings only for interaction-heavy w
 4. Optional: one short recording for dialogs, drag, sheets, hover flows.
 
 **Do not** claim UI done from code review alone when snapshots were possible.
+
+### PR visual embeds (GitHub)
+
+GitHub PR bodies cannot show Cursor chat attachments. `https://cursor.com/artifacts/...` links 302 to signed S3 URLs that expire in ~15 minutes, so Camo usually keeps the first fetch (Before) and drops After.
+
+For UI PRs:
+
+1. Write captures to `.github/pr-captures/<issue>/` on the PR branch (`before-desktop.png`, `before-mobile.png`, `after-desktop.png`, `after-mobile.png`).
+2. Commit and push those files **before** writing image URLs into the PR body.
+3. Embed **both** Before and After with raw GitHub URLs (public repo). Do not use `cursor.com/artifacts` or chat attachment links.
+4. Create or update the PR body only after After shots exist. A Before-only description is incomplete.
+
+```markdown
+## Visual
+
+| | Desktop | Mobile |
+| --- | --- | --- |
+| Before | ![Before desktop](https://raw.githubusercontent.com/Rakvadium/uvs-decks-gg/<head-branch>/.github/pr-captures/<issue>/before-desktop.png) | ![Before mobile](https://raw.githubusercontent.com/Rakvadium/uvs-decks-gg/<head-branch>/.github/pr-captures/<issue>/before-mobile.png) |
+| After | ![After desktop](https://raw.githubusercontent.com/Rakvadium/uvs-decks-gg/<head-branch>/.github/pr-captures/<issue>/after-desktop.png) | ![After mobile](https://raw.githubusercontent.com/Rakvadium/uvs-decks-gg/<head-branch>/.github/pr-captures/<issue>/after-mobile.png) |
+```
+
+Replace `<head-branch>` with the PR head (e.g. `agent/101-gallery-active-deck-empty`) and `<issue>` with the issue number.
 
 ---
 
