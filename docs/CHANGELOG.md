@@ -21,6 +21,10 @@ All notable changes to this project are recorded here.
 
 ### Fixed
 
+- **Mobile dialog click-through** — Closing a dialog (Gallery card details especially) no longer also taps the card, deck control, or chrome underneath.
+  - **Decisions:** Swallow the leftover pointer/click after dismiss instead of changing the card-dialog layout or mobile `pointer-events-none` gutter.
+  - **Files:** `src/components/ui/dialog.tsx`, `src/lib/suppress-subsequent-pointer.ts`.
+
 - **Rankings in-content title** — Drop the desktop `Generated Community Tier List` / `Global Rankings` hero under the floating Rankings tabs; empty tiers stay readable.
   - **Context:** Issue #106.
   - **Decisions:** Rankings tab already provides context, so the heading is dropped rather than adding a floating identity pill.

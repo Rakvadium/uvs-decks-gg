@@ -5,6 +5,7 @@ import * as DialogPrimitive from "@radix-ui/react-dialog"
 import { XIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
+import { suppressSubsequentPointerEvents } from "@/lib/suppress-subsequent-pointer"
 
 const DialogOnOpenChangeContext = React.createContext<
   DialogPrimitive.DialogProps["onOpenChange"] | undefined
@@ -14,11 +15,21 @@ function Dialog({
   onOpenChange,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Root>) {
+  const handleOpenChange = React.useCallback(
+    (open: boolean) => {
+      if (!open) {
+        suppressSubsequentPointerEvents()
+      }
+      onOpenChange?.(open)
+    },
+    [onOpenChange]
+  )
+
   return (
-    <DialogOnOpenChangeContext.Provider value={onOpenChange}>
+    <DialogOnOpenChangeContext.Provider value={handleOpenChange}>
       <DialogPrimitive.Root
         data-slot="dialog"
-        onOpenChange={onOpenChange}
+        onOpenChange={handleOpenChange}
         {...props}
       />
     </DialogOnOpenChangeContext.Provider>
