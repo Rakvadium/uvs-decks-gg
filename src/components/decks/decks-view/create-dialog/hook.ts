@@ -1,11 +1,15 @@
 import { useCallback, useState, type KeyboardEvent } from "react";
 import { useMutation } from "convex/react";
+import { useRouter } from "next/navigation";
 import { api } from "../../../../../convex/_generated/api";
+import { useActiveDeck } from "@/providers/ActiveDeckProvider";
 import { useDecks } from "@/providers/DecksProvider";
 
 export function useDeckCreateDialogModel() {
   const { state, actions } = useDecks();
+  const { setActiveDeck } = useActiveDeck();
   const createDeck = useMutation(api.decks.create);
+  const router = useRouter();
   const [newDeckName, setNewDeckName] = useState("");
   const [isCreating, setIsCreating] = useState(false);
 
@@ -14,13 +18,15 @@ export function useDeckCreateDialogModel() {
 
     setIsCreating(true);
     try {
-      await createDeck({ name: newDeckName });
+      const newDeckId = await createDeck({ name: newDeckName });
+      setActiveDeck(newDeckId);
       setNewDeckName("");
       actions.closeCreateDialog();
+      router.push(`/decks/${newDeckId}`);
     } finally {
       setIsCreating(false);
     }
-  }, [actions, createDeck, newDeckName]);
+  }, [actions, createDeck, newDeckName, router, setActiveDeck]);
 
   const handleOpenChange = useCallback(
     (open: boolean) => {

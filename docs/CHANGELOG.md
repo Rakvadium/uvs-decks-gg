@@ -26,6 +26,9 @@ All notable changes to this project are recorded here.
 
 ### Fixed
 
+- **Create deck from list** — Creating a deck on `/decks` now sets it as the session Active deck and navigates into `/decks/[id]` instead of closing the dialog onto the list.
+  - **Files:** `src/components/decks/decks-view/create-dialog/hook.ts`.
+
 - **Non-owner deck view** — Viewing someone else’s deck no longer shows add/remove or card-details section controls. Quantities stay visible; cards and the starting character still open full details.
   - **Files:** `src/components/deck-details/card-items/deck-card-stack-item/actions.tsx`, `src/components/deck-details/deck-details-hero-panel/static-image.tsx`, `src/components/universus/card-details/deck-section-controls.tsx`, `src/components/universus/card-details/variants/v2.tsx`.
 
