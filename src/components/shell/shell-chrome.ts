@@ -25,7 +25,7 @@ export const SHELL_SIDEBAR_SURFACE_STYLE = {
 } as const;
 
 export const SHELL_NAV_ITEM_BASE =
-  "relative flex items-center gap-3 rounded-md border px-3 py-2.5 text-sm font-medium transition-[color,background-color,border-color,box-shadow,transform] duration-200";
+  "group relative flex items-center gap-3 rounded-md border px-3 py-2.5 text-sm font-medium transition-[color,background-color,border-color] duration-150";
 
 export const SHELL_NAV_ITEM_IDLE =
   "border-transparent text-sidebar-foreground hover:border-sidebar-border hover:bg-sidebar-accent hover:text-sidebar-accent-foreground";
