@@ -492,7 +492,7 @@ export function UniversusMediaDock() {
                               type="button"
                               onClick={() => setPlayback(row.playback)}
                               className={cn(
-                                "flex w-full items-center gap-2 rounded-lg border border-border/40 px-2 py-2 text-left transition hover:border-primary/30 hover:bg-primary/[0.06]",
+                                "flex w-full items-center gap-2 rounded-lg border border-border/40 px-2 py-2 text-left transition-colors duration-150 hover:border-primary/30 hover:bg-primary/[0.06]",
                                 active && "border-primary/40 bg-primary/[0.08]"
                               )}
                             >
@@ -546,7 +546,7 @@ export function UniversusMediaDock() {
                                   type="button"
                                   onClick={() => setPlayback(vodPlayback)}
                                   className={cn(
-                                    "flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left transition hover:bg-primary/[0.06]",
+                                    "flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left transition-colors duration-150 hover:bg-primary/[0.06]",
                                     active && "bg-primary/[0.08]"
                                   )}
                                 >

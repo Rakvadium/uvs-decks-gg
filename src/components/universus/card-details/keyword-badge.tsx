@@ -32,7 +32,10 @@ export function KeywordBadge({ keyword }: KeywordBadgeProps) {
       <TooltipTrigger asChild>
         <button
           type="button"
-          className={cn(keywordChipClassName, "cursor-pointer transition-transform hover:scale-105")}
+          className={cn(
+            keywordChipClassName,
+            "cursor-pointer motion-safe:transition-transform motion-safe:duration-150 motion-safe:hover:scale-105"
+          )}
           style={{
             backgroundColor: `${color}20`,
             color,

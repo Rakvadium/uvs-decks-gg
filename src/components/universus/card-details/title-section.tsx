@@ -27,7 +27,7 @@ export function CardDetailsTitleSection() {
               {symbols.map((symbol) => (
                 <div
                   key={symbol}
-                  className="transition-transform hover:scale-110"
+                  className="motion-safe:transition-transform motion-safe:duration-150 motion-safe:hover:scale-110"
                   title={symbol.charAt(0).toUpperCase() + symbol.slice(1)}
                 >
                   <SymbolIcon symbol={symbol} size="md" />

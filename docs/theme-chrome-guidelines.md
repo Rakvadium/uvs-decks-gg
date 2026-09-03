@@ -148,9 +148,33 @@ New layers append to this table. Do not pick an unused integer because it “loo
 
 ### Motion
 
-- Prefer `transition-colors`, `transition-opacity`, `transition-transform`, or an explicit property list — not `transition-all`.
-- Durations: `duration-150` for hover/chrome feedback; `duration-200` for controls.
-- Honor `prefers-reduced-motion`: FX, pulses, and scanlines become static.
+Finite steps. If a needed duration or property set is missing, add it here — do not invent `duration-300` hovers or `transition-all`.
+
+| Role | Duration | What may change |
+| --- | --- | --- |
+| Hover / press / chrome feedback | `duration-150` | Color, opacity, `transform` |
+| Controls (input, button, focus chrome) | `duration-200` | Color, border, background, `box-shadow` when the shadow token actually changes |
+| Overlay enter / exit | `duration-200` close / `duration-300` open | Opacity + `transform` via the overlay primitive, not a hover list |
+
+**Properties.** Prefer `transition-colors`, `transition-opacity`, `transition-transform`, or an explicit list of only the properties that change. Never `transition-all`. Never a bare `transition` class — Tailwind’s default set is almost `all` (includes `filter`, `box-shadow`, `transform`).
+
+Hover and press stay on the compositor: `transform` and `opacity`. Color / background / border are allowed for chrome feedback. Do not hover-animate `width`, `height`, `padding`, `margin`, or `filter`. Do not put `box-shadow` or `transform` in a transition list unless that property changes on that state.
+
+**Tool.** CSS (`hover:`, `active:`, `group-hover:`, `motion-safe:`) for hover and press. A JS motion library is for enter/exit, panel open/close, and choreographed sequences — not a 4px nudge.
+
+**Hit box.** Translate or scale an inner wrapper, not the pointer target. Moving the hit box under the cursor restarts hover and looks like stutter.
+
+**One driver.** Do not CSS-`transition` `transform` on a node whose `transform` is also written by JS every frame.
+
+**`will-change`.** Only for the duration of a known animation, then remove. Do not leave it on idle tiles.
+
+**Reduced motion.** `motion-safe:` / `motion-reduce:` at the call site for CSS travel. Decorative FX, pulses, scanlines, and `animate-pulse` become static. Do not rely on a late JS `matchMedia` read to suppress hover motion — that hydrates as “motion on” first.
+
+**Do not**
+
+- Dual-drive `transform` (JS + CSS transition on the same node).
+- Use `transition-all`, a bare `transition`, or leftover `animation-delay` with no animation.
+- Animate layout (`width`, `padding`) for hover feedback.
 
 ### Label type
 
@@ -251,7 +275,7 @@ Spot-check before shipping appearance work:
 - **System** mode: OS appearance change updates the app without a reload.
 - **Quiet vs loud chrome**: same screens; FX present only where chrome tokens say so.
 - **Controls vs structure**: inputs use control borders; cards use the border ladder.
-- **Reduced motion**: pulses and scanlines stop.
+- **Reduced motion**: pulses, scanlines, and `animate-pulse` stop; hover travel (`translate` / `scale`) does not run (`motion-safe:`).
 - **Migration** (if you have legacy ids): one load after deploy looks like the old bundled theme.
 
 ## Implementation companion

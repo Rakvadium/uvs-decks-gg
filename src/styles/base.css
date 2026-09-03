@@ -727,14 +727,6 @@
     }
   }
   
-  .hover-lift {
-    transition: transform 0.12s ease, box-shadow 0.12s ease;
-  }
-  
-  .hover-lift:hover {
-    transform: translateY(-2px);
-  }
-  
   .cyber-clip {
     clip-path: polygon(
       0 8px,
@@ -857,11 +849,8 @@
   .flicker,
   .data-stream::before,
   .drag-float,
-  .status-indicator {
+  .status-indicator,
+  .animate-pulse {
     animation: none !important;
-  }
-
-  .hover-lift:hover {
-    transform: none;
   }
 }

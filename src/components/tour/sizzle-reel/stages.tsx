@@ -146,10 +146,10 @@ function CollectionStage({ active, animate }: StageProps) {
               </div>
               <div className="h-1.5 overflow-hidden rounded-full bg-muted/50">
                 <m.div
-                  initial={animate && active ? { width: "0%" } : false}
-                  animate={{ width: `${48 + i * 18}%` }}
+                  initial={animate && active ? { scaleX: 0 } : false}
+                  animate={{ scaleX: (48 + i * 18) / 100 }}
                   transition={{ duration: 0.8, delay: 0.15 * i }}
-                  className="h-full rounded-full bg-primary/70"
+                  className="h-full w-full origin-left rounded-full bg-primary/70"
                 />
               </div>
             </div>

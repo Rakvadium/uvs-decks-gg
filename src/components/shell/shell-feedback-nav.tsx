@@ -24,7 +24,7 @@ type ShellFeedbackNavMobileHeaderProps = {
 };
 
 function ShellFeedbackNavSidebarInner() {
-  const { collapsed, prefersReducedMotion } = useLeftSidebarContext();
+  const { collapsed } = useLeftSidebarContext();
   const { openFeedbackDialog } = useFeedbackDialogControl();
   const label = "Feedback";
   const control = (
@@ -58,13 +58,7 @@ function ShellFeedbackNavSidebarInner() {
       </Tooltip>
     );
   }
-  return (
-    <div
-      style={prefersReducedMotion ? undefined : { animationDelay: "200ms" }}
-    >
-      {control}
-    </div>
-  );
+  return control;
 }
 
 function ShellFeedbackNavMobileHeaderInner() {

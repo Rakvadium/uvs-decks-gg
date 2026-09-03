@@ -1,6 +1,4 @@
 import { Database, Loader2 } from "lucide-react";
-import * as m from "framer-motion/m";
-import { usePrefersReducedMotion } from "@/lib/reduced-motion";
 import { Kicker, SectionHeading } from "@/components/ui/typography-headings";
 
 interface GalleryStatsProps {
@@ -10,14 +8,8 @@ interface GalleryStatsProps {
 }
 
 export function GalleryStats({ totalCards, filteredCount, isLoading }: GalleryStatsProps) {
-  const prefersReducedMotion = usePrefersReducedMotion();
-
   return (
-    <m.div
-      initial={false}
-      animate={prefersReducedMotion ? {} : { opacity: 1, y: 0 }}
-      className="flex items-center gap-4 px-2 py-3"
-    >
+    <div className="flex items-center gap-4 px-2 py-3">
       <div className="flex items-center gap-2">
         <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-primary/30 bg-primary/10">
           <Database className="h-4 w-4 text-primary" />
@@ -47,6 +39,6 @@ export function GalleryStats({ totalCards, filteredCount, isLoading }: GallerySt
           </>
         )}
       </div>
-    </m.div>
+    </div>
   );
 }

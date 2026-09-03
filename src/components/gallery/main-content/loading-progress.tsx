@@ -1,9 +1,7 @@
 "use client";
 
 import { Loader2 } from "lucide-react";
-import * as m from "framer-motion/m";
 import { Kicker } from "@/components/ui/typography-headings";
-import { usePrefersReducedMotion } from "@/lib/reduced-motion";
 
 interface LoadingProgressProps {
   progress: number;
@@ -11,7 +9,6 @@ interface LoadingProgressProps {
 }
 
 export function LoadingProgress({ progress, isLoadingMore }: LoadingProgressProps) {
-  const prefersReducedMotion = usePrefersReducedMotion();
   if (!isLoadingMore || progress >= 100) return null;
 
   return (
@@ -25,12 +22,12 @@ export function LoadingProgress({ progress, isLoadingMore }: LoadingProgressProp
           Syncing Database
         </Kicker>
         <div className="h-2 w-44 overflow-hidden rounded-full bg-muted/50">
-          <m.div
-            className="h-full bg-gradient-to-r from-primary to-secondary"
-            initial={false}
-            animate={{ width: `${progress}%` }}
-            transition={{ duration: prefersReducedMotion ? 0 : 0.3 }}
-            style={{ boxShadow: "var(--chrome-gallery-progress-bar-glow)" }}
+          <div
+            className="h-full w-full origin-left bg-gradient-to-r from-primary to-secondary motion-safe:transition-transform motion-safe:duration-200"
+            style={{
+              transform: `scaleX(${Math.min(Math.max(progress, 0), 100) / 100})`,
+              boxShadow: "var(--chrome-gallery-progress-bar-glow)",
+            }}
           />
         </div>
       </div>

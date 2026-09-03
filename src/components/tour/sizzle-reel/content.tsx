@@ -38,8 +38,8 @@ function ProgressSegments({
             className="group relative h-1.5 flex-1 overflow-hidden rounded-full bg-foreground/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <span
-              className="absolute inset-y-0 left-0 rounded-full bg-primary transition-[width] duration-100 ease-linear group-hover:bg-primary/90"
-              style={{ width: `${fill * 100}%` }}
+              className="absolute inset-y-0 left-0 w-full origin-left rounded-full bg-primary motion-safe:transition-transform motion-safe:duration-100 motion-safe:ease-linear group-hover:bg-primary/90"
+              style={{ transform: `scaleX(${Math.min(Math.max(fill, 0), 1)})` }}
             />
           </button>
         );

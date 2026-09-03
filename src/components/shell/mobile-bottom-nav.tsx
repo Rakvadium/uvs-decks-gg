@@ -47,7 +47,7 @@ export function MobileBottomNav() {
               key={item.path}
               href={`/${item.path}`}
               className={cn(
-                "relative flex flex-1 flex-col items-center justify-center gap-1.5 py-2 transition-[color,opacity] duration-200",
+                "relative flex flex-1 flex-col items-center justify-center gap-1.5 py-2 transition-colors duration-150",
                 isActive
                   ? "text-accent"
                   : "text-sidebar-foreground hover:text-accent"
@@ -58,7 +58,7 @@ export function MobileBottomNav() {
               ) : null}
               <Icon
                 className={cn(
-                  "h-5 w-5 transition-[filter] duration-200",
+                  "h-5 w-5",
                   isActive && "[filter:var(--chrome-shell-icon-drop-shadow)]"
                 )}
               />
@@ -77,7 +77,7 @@ export function MobileBottomNav() {
         <button
           type="button"
           onClick={() => setProfileSheetOpen(true)}
-          className="relative flex flex-1 flex-col items-center justify-center gap-1.5 py-2 text-sidebar-foreground transition-[color] duration-200 hover:text-accent"
+          className="relative flex flex-1 flex-col items-center justify-center gap-1.5 py-2 text-sidebar-foreground transition-colors duration-150 hover:text-accent"
           aria-label="Open profile"
         >
           <UserAvatar

@@ -96,7 +96,7 @@ function StackedCardMockup({ card }: { card: CachedCard }) {
     <>
       <div className="w-44 group">
         <div className="relative pb-3 pr-3">
-          <div className="relative aspect-[2.5/3.5] overflow-visible transition-transform duration-150 group-hover:-translate-x-0.5 group-hover:-translate-y-0.5">
+          <div className="relative aspect-[2.5/3.5] overflow-visible motion-safe:transition-transform motion-safe:duration-150 motion-safe:group-hover:-translate-x-0.5 motion-safe:group-hover:-translate-y-0.5">
             {stackedLayers.map((layer) => (
               <div
                 key={layer}
