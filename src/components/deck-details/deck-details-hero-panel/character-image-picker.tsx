@@ -1,6 +1,6 @@
-import Image from "next/image";
 import { Hexagon, Layers, UserRoundPen } from "lucide-react";
 import { DeckCharacterPickerDialog } from "@/components/deck/shared";
+import { CardImageDisplay } from "@/components/universus/card-grid-item/image-display";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { useDeckDetailsHeroPanelContext } from "./context";
@@ -30,12 +30,10 @@ export function DeckDetailsHeroCharacterImagePicker() {
         onClick={handleImageClick}
       >
         {displayImage ? (
-          <Image
-            src={displayImage}
-            alt={deck.name}
-            fill
+          <CardImageDisplay
+            imageUrl={displayImage}
+            name={startingCharacter?.name ?? deck.name}
             sizes="(max-width: 1023px) 260px, 192px"
-            className="object-cover object-top"
             priority
           />
         ) : (

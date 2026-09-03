@@ -13,8 +13,8 @@ function DeckDetailsHeroPanelEmptyState({ compactMobile }: { compactMobile?: boo
   return (
     <div
       className={cn(
-        "relative mx-auto w-full max-w-[260px] shrink-0 overflow-hidden rounded-xl border border-border/50 bg-gradient-to-br from-primary/10 via-card to-secondary/10 lg:mx-0 lg:aspect-auto lg:h-64 lg:w-48",
-        compactMobile ? "aspect-auto h-24 max-lg:max-w-none" : "aspect-[5/7]",
+        "relative mx-auto w-full max-w-[260px] shrink-0 overflow-hidden rounded-lg bg-gradient-to-br from-primary/10 via-card to-secondary/10 ring-1 ring-border/50 lg:mx-0 lg:w-48",
+        compactMobile ? "aspect-auto h-24 max-lg:max-w-none" : "aspect-[2.5/3.5]",
       )}
     />
   );
@@ -39,8 +39,8 @@ function DeckDetailsHeroPanelContent() {
     <>
       <div
         className={cn(
-          "relative mx-auto w-full max-w-[260px] shrink-0 overflow-hidden rounded-xl border border-primary/20 bg-card shadow-[0_0_0_1px_var(--primary)/15,0_0_8px_var(--primary)/30] lg:mx-0 lg:aspect-auto lg:h-64 lg:w-48",
-          compactEmptyMobile ? "aspect-auto h-24 max-lg:max-w-none" : "aspect-[5/7]",
+          "relative mx-auto w-full max-w-[260px] shrink-0 overflow-hidden rounded-lg bg-card shadow-[0_0_0_1px_var(--primary)/15,0_0_8px_var(--primary)/30] lg:mx-0 lg:w-48",
+          compactEmptyMobile ? "aspect-auto h-24 max-lg:max-w-none" : "aspect-[2.5/3.5]",
         )}
       >
         {isOwner ? (

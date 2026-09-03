@@ -1,7 +1,7 @@
 "use client";
 
-import Image from "next/image";
 import { Hexagon, Layers } from "lucide-react";
+import { CardImageDisplay } from "@/components/universus/card-grid-item/image-display";
 import { useDeckDetailsHeroPanelContext } from "./context";
 
 export function DeckDetailsHeroStaticImage() {
@@ -16,16 +16,12 @@ export function DeckDetailsHeroStaticImage() {
       onClick={handleImageClick}
     >
       {displayImage ? (
-        <>
-          <Image
-            src={displayImage}
-            alt={deck?.name ?? "Character"}
-            fill
-            sizes="(max-width: 1023px) 260px, 192px"
-            className="object-cover object-top"
-            priority
-          />
-        </>
+        <CardImageDisplay
+          imageUrl={displayImage}
+          name={startingCharacter?.name ?? deck?.name ?? "Character"}
+          sizes="(max-width: 1023px) 260px, 192px"
+          priority
+        />
       ) : (
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="relative">
