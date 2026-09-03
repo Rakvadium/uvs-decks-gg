@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Home, Shield } from "lucide-react";
-import * as m from "framer-motion/m";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { Kicker } from "@/components/ui/typography-headings";
@@ -15,7 +14,7 @@ import {
 import { useLeftSidebarContext } from "./context";
 
 export function LeftSidebarNav() {
-  const { collapsed, isOnAdminPage, navItems, pathname, prefersReducedMotion } = useLeftSidebarContext();
+  const { collapsed, isOnAdminPage, navItems, pathname } = useLeftSidebarContext();
 
   const adminBackLink = (
     <Link
@@ -35,27 +34,32 @@ export function LeftSidebarNav() {
   return (
     <nav className={cn(collapsed ? cn(SHELL_RAIL_STACK_CLASS, "flex-1") : "flex flex-1 flex-col gap-1 p-2")}>
       {!isOnAdminPage
-        ? navItems.map((item, index) => {
+        ? navItems.map((item) => {
             const href = `/${item.path}`;
             const isActive = pathname.includes(`/${item.path}`);
             const Icon = item.icon;
 
             const navLink = (
-              <Link key={item.path} href={href} aria-label={collapsed ? item.label : undefined}>
-                <m.div
-                  initial={false}
-                  whileHover={prefersReducedMotion ? undefined : { x: collapsed ? 0 : 4 }}
-                  whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}
+              <Link
+                key={item.path}
+                href={href}
+                aria-label={collapsed ? item.label : undefined}
+                className={cn(
+                  SHELL_NAV_ITEM_BASE,
+                  collapsed && SHELL_RAIL_ITEM_COLLAPSED_CLASS,
+                  isActive ? SHELL_NAV_ITEM_ACTIVE : SHELL_NAV_ITEM_IDLE
+                )}
+              >
+                <span
                   className={cn(
-                    SHELL_NAV_ITEM_BASE,
-                    collapsed && SHELL_RAIL_ITEM_COLLAPSED_CLASS,
-                    isActive ? SHELL_NAV_ITEM_ACTIVE : SHELL_NAV_ITEM_IDLE
+                    "flex min-w-0 items-center gap-3",
+                    !collapsed &&
+                      "motion-safe:transition-transform motion-safe:duration-150 motion-safe:ease-out motion-safe:group-hover:translate-x-1 motion-safe:group-active:scale-[0.98]"
                   )}
-                  style={{ animationDelay: `${index * 50}ms` }}
                 >
                   <Icon
                     className={cn(
-                      "h-4 w-4 shrink-0 transition-[color,filter] duration-200",
+                      "h-4 w-4 shrink-0 transition-colors duration-150",
                       isActive && SHELL_NAV_ICON_ACTIVE
                     )}
                   />
@@ -64,10 +68,10 @@ export function LeftSidebarNav() {
                       {item.label}
                     </span>
                   ) : null}
-                  {isActive ? (
-                    <div className="pointer-events-none absolute inset-0 rounded-md border border-accent/50" />
-                  ) : null}
-                </m.div>
+                </span>
+                {isActive ? (
+                  <div className="pointer-events-none absolute inset-0 rounded-md border border-accent/50" />
+                ) : null}
               </Link>
             );
 
