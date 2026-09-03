@@ -21,6 +21,10 @@ All notable changes to this project are recorded here.
 
 ### Fixed
 
+- **Mobile card details scroll** — Gallery card details dialog on phone-width viewports scrolls through the stacked image and readout again. The recent floating-dialog pass left the column height-bounded with `overflow-hidden` and a `pointer-events-none` gutter, so nothing was a usable scrollport.
+  - **Decisions:** Keep the overlay dismiss gutter. Make the mobile content column the scrollport (`overflow-y-auto`, `pointer-events-auto`) and stop overflow-hidden descendants from trapping the swipe. Desktop split is unchanged.
+  - **Files:** `src/components/ui/dialog.tsx`, `src/components/universus/card-details/variants/v2.tsx`.
+
 - **Mobile dialog click-through** — Closing a dialog (Gallery card details especially) no longer also taps the card, deck control, or chrome underneath.
   - **Decisions:** Swallow the leftover pointer/click after dismiss instead of changing the card-dialog layout or mobile `pointer-events-none` gutter.
   - **Files:** `src/components/ui/dialog.tsx`, `src/lib/suppress-subsequent-pointer.ts`.

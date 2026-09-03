@@ -9,7 +9,10 @@ import {
 } from "./content-states";
 import { DecksGuestBrowseBanner } from "./guest-browse-banner";
 
-function getEmptyMode(searchQuery: string, activeTab: "my-decks" | "public" | "tournament") {
+function getEmptyMode(
+  searchQuery: string,
+  activeTab: "my-decks" | "public" | "tournament",
+) {
   if (searchQuery.trim()) return "search";
   if (activeTab === "my-decks") return "my-decks";
   if (activeTab === "tournament") return "tournament";
@@ -32,7 +35,7 @@ export function DecksViewContent() {
 
   const emptyMode = useMemo(
     () => getEmptyMode(state.searchQuery, state.activeTab),
-    [state.searchQuery, state.activeTab]
+    [state.searchQuery, state.activeTab],
   );
 
   if (isTabLoading) {
@@ -46,15 +49,23 @@ export function DecksViewContent() {
   if (currentDecks.length === 0) {
     return withGuestBrowseBanner(
       isAuthenticated,
-      <DecksEmptyState mode={emptyMode} onCreateDeck={actions.openCreateDialog} />
+      <DecksEmptyState
+        mode={emptyMode}
+        onCreateDeck={actions.openCreateDialog}
+      />,
     );
   }
 
   return withGuestBrowseBanner(
     isAuthenticated,
     <>
-      <DecksGrid decks={currentDecks} showAuthor={state.activeTab === "public" || state.activeTab === "tournament"} />
+      <DecksGrid
+        decks={currentDecks}
+        showAuthor={
+          state.activeTab === "public" || state.activeTab === "tournament"
+        }
+      />
       <DecksCountFooter count={currentDecks.length} />
-    </>
+    </>,
   );
 }
