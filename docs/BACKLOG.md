@@ -108,6 +108,7 @@ Historical workflow (human scratch only): Open → In progress → Done; archive
 | CNT-2 | Done   | Convex | **Public read:** Query for community page returning curated ids + metadata; keep metadata cache refresh.                                   |
 | CNT-3 | Done   | Admin  | **Content UI:** Drag reorder; inline label/accent; preview via existing YouTube metadata flow; duplicate id validation.                    |
 | CNT-4 | Done   | Ops    | **Defaults vs production:** `ensureDefaultCurations` must not overwrite manual curations on deploy.                                        |
+| CNT-5 | Done   | Convex | **Channel watchlist:** Admin-managed creator channels sync newest uploads into the community feed on cron.                                 |
 
 
 #### Global import & safety

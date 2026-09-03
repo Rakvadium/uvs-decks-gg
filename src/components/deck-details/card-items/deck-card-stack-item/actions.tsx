@@ -26,8 +26,7 @@ export function DeckCardStackItemActions({ card, quantity, isHovered }: DeckCard
         isHovered={false}
         canAdd={false}
         forceSolidSurface
-        onAdd={(e) => e.stopPropagation()}
-        onRemove={(e) => e.stopPropagation()}
+        readOnly
       />
     );
   }

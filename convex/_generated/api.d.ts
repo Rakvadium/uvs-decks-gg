@@ -26,6 +26,7 @@ import type * as collections from "../collections.js";
 import type * as communityLive from "../communityLive.js";
 import type * as communityRankings from "../communityRankings.js";
 import type * as communityYoutube from "../communityYoutube.js";
+import type * as communityYoutubeChannels from "../communityYoutubeChannels.js";
 import type * as crons from "../crons.js";
 import type * as deckShares from "../deckShares.js";
 import type * as deckValidation from "../deckValidation.js";
@@ -113,6 +114,7 @@ declare const fullApi: ApiFromModules<{
   communityLive: typeof communityLive;
   communityRankings: typeof communityRankings;
   communityYoutube: typeof communityYoutube;
+  communityYoutubeChannels: typeof communityYoutubeChannels;
   crons: typeof crons;
   deckShares: typeof deckShares;
   deckValidation: typeof deckValidation;

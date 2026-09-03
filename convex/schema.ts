@@ -613,9 +613,13 @@ export default defineSchema({
     label: v.optional(v.string()),
     accentClass: v.optional(v.string()),
     sortOrder: v.number(),
+    source: v.optional(v.union(v.literal("manual"), v.literal("channel"))),
+    sourceChannelId: v.optional(v.string()),
+    publishedAt: v.optional(v.number()),
   })
     .index("by_sortOrder", ["sortOrder"])
-    .index("by_youtubeVideoId", ["youtubeVideoId"]),
+    .index("by_youtubeVideoId", ["youtubeVideoId"])
+    .index("by_sourceChannelId", ["sourceChannelId"]),
 
   youtubeVideoMetadataCache: defineTable({
     youtubeVideoId: v.string(),
@@ -626,6 +630,25 @@ export default defineSchema({
     thumbnailUrl: v.string(),
     fetchedAt: v.number(),
     fetchError: v.optional(v.string()),
+    publishedAt: v.optional(v.number()),
+  }).index("by_youtubeVideoId", ["youtubeVideoId"]),
+
+  communityYoutubeChannels: defineTable({
+    channelId: v.string(),
+    title: v.string(),
+    handle: v.optional(v.string()),
+    uploadsPlaylistId: v.string(),
+    topicPlaylistId: v.optional(v.string()),
+    titleIncludes: v.optional(v.array(v.string())),
+    titleExcludes: v.optional(v.array(v.string())),
+    enabled: v.boolean(),
+    maxVideos: v.number(),
+    lastSyncedAt: v.optional(v.number()),
+    lastSyncError: v.optional(v.string()),
+  }).index("by_channelId", ["channelId"]),
+
+  communityYoutubeFeedExclusions: defineTable({
+    youtubeVideoId: v.string(),
   }).index("by_youtubeVideoId", ["youtubeVideoId"]),
 
   youtubeFeedRefreshSettings: defineTable({

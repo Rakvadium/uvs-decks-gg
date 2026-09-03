@@ -9,11 +9,12 @@ interface CardDeckControlsProps {
   deckCount: number;
   isHovered: boolean;
   canAdd: boolean;
-  onAdd: (e: React.MouseEvent) => void;
-  onRemove: (e: React.MouseEvent) => void;
+  onAdd?: (e: React.MouseEvent) => void;
+  onRemove?: (e: React.MouseEvent) => void;
   showQuantity?: boolean;
   forceSolidSurface?: boolean;
   enlargeTouchTargets?: boolean;
+  readOnly?: boolean;
 }
 
 export function CardDeckControls({
@@ -25,10 +26,11 @@ export function CardDeckControls({
   showQuantity = true,
   forceSolidSurface = false,
   enlargeTouchTargets = false,
+  readOnly = false,
 }: CardDeckControlsProps) {
   const chromeMode = useChromeMode();
   const frosted = !forceSolidSurface && chromeHasNeonChrome(chromeMode);
-  const showButtons = isHovered;
+  const showButtons = !readOnly && isHovered;
   const showCount = showQuantity ? deckCount > 0 || showButtons : showButtons;
   const cellClass = enlargeTouchTargets ? "h-10 w-10" : "h-6 w-7";
   const iconClass = enlargeTouchTargets ? "h-4 w-4 stroke-[2.5]" : "h-3.5 w-3.5 stroke-[2.5]";
@@ -48,7 +50,7 @@ export function CardDeckControls({
         <button
           type="button"
           onClick={onAdd}
-          disabled={!canAdd}
+          disabled={!canAdd || !onAdd}
           className={cn(
             "pointer-events-auto flex items-center justify-center",
             cellClass,
@@ -81,7 +83,7 @@ export function CardDeckControls({
         <button
           type="button"
           onClick={onRemove}
-          disabled={deckCount === 0}
+          disabled={deckCount === 0 || !onRemove}
           className={cn(
             "pointer-events-auto flex items-center justify-center",
             cellClass,

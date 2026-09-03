@@ -11,6 +11,7 @@ import {
   type DeckSection,
   useDeckEditor,
 } from "@/lib/deck";
+import { useDeckDetailsOptional } from "@/providers/DeckDetailsProvider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface DeckSectionControlsProps {
@@ -20,6 +21,8 @@ interface DeckSectionControlsProps {
 
 export function DeckSectionControls({ card, layout = "vertical" }: DeckSectionControlsProps) {
   const { hasDeck, addCard, removeCard, mainCounts, sideCounts, referenceCounts } = useDeckEditor();
+  const deckDetails = useDeckDetailsOptional();
+  const canEditViewedDeck = deckDetails?.isOwner ?? true;
 
   const sectionCounts = useMemo(
     () => ({ mainCounts, sideCounts, referenceCounts }),
@@ -34,7 +37,7 @@ export function DeckSectionControls({ card, layout = "vertical" }: DeckSectionCo
 
   const copyLimit = useMemo(() => getCardCopyLimit(card), [card]);
 
-  const showDeckSectionControls = hasDeck && canAddCardToDeck(card);
+  const showDeckSectionControls = canEditViewedDeck && hasDeck && canAddCardToDeck(card);
 
   const sections = useMemo(
     () => {

@@ -10,6 +10,11 @@ All notable changes to this project are recorded here.
 
 ## [Unreleased]
 
+### Added
+
+- **Community YouTube channel watchlist** — Admins add creator channels on `/admin/content/youtube`; the two-hour cron (and admin/public refresh) pulls each channel’s newest uploads into the UniVersus Content stream, sorted by publish date. Per-channel title include/exclude words and an optional playlist keep mixed-game creators on-topic. Removing a synced video excludes it from later pulls.
+  - **Files:** `convex/communityYoutubeChannels.ts`, `convex/communityYoutube.ts`, `convex/schema.ts`, `src/features/admin-youtube-curations/*`, `docs/SYSTEM_ANALYSIS.md`.
+
 ### Changed
 
 - **Design system consistency** — Theme, chrome, and primitives now own color, casing, radius, and overlay styling so pages stop one-offing buttons, headings, and status chips.
@@ -20,6 +25,12 @@ All notable changes to this project are recorded here.
   - **Files:** `src/components/community/community-destination-tabs.tsx`, `src/components/community/community-view/floating-top-bar.tsx`, `src/components/community/tier-lists/page-view/floating-top-bar.tsx`, `src/app/(app)/community/creators/page.tsx`, `docs/floating-header-islands.md`.
 
 ### Fixed
+
+- **Create deck from list** — Creating a deck on `/decks` now sets it as the session Active deck and navigates into `/decks/[id]` instead of closing the dialog onto the list.
+  - **Files:** `src/components/decks/decks-view/create-dialog/hook.ts`.
+
+- **Non-owner deck view** — Viewing someone else’s deck no longer shows add/remove or card-details section controls. Quantities stay visible; cards and the starting character still open full details.
+  - **Files:** `src/components/deck-details/card-items/deck-card-stack-item/actions.tsx`, `src/components/deck-details/deck-details-hero-panel/static-image.tsx`, `src/components/universus/card-details/deck-section-controls.tsx`, `src/components/universus/card-details/variants/v2.tsx`.
 
 - **Mobile card details scroll** — Gallery card details dialog on phone-width viewports scrolls through the stacked image and readout again. The recent floating-dialog pass left the column height-bounded with `overflow-hidden` and a `pointer-events-none` gutter, so nothing was a usable scrollport.
   - **Decisions:** Keep the overlay dismiss gutter. Make the mobile content column the scrollport (`overflow-y-auto`, `pointer-events-auto`) and stop overflow-hidden descendants from trapping the swipe. Desktop split is unchanged.
