@@ -10,6 +10,11 @@ All notable changes to this project are recorded here.
 
 ## [Unreleased]
 
+### Added
+
+- **Community YouTube channel watchlist** — Admins add creator channels on `/admin/content/youtube`; the two-hour cron (and admin/public refresh) pulls each channel’s newest uploads into the UniVersus Content stream, sorted by publish date. Per-channel title include/exclude words and an optional playlist keep mixed-game creators on-topic. Removing a synced video excludes it from later pulls.
+  - **Files:** `convex/communityYoutubeChannels.ts`, `convex/communityYoutube.ts`, `convex/schema.ts`, `src/features/admin-youtube-curations/*`, `docs/SYSTEM_ANALYSIS.md`.
+
 ### Changed
 
 - **Design system consistency** — Theme, chrome, and primitives now own color, casing, radius, and overlay styling so pages stop one-offing buttons, headings, and status chips.

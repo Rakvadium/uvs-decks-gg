@@ -11,6 +11,7 @@ import {
 } from "./_generated/server";
 import { internal } from "./_generated/api";
 import type { Doc, Id } from "./_generated/dataModel";
+import { getAuthUserId } from "@convex-dev/auth/server";
 import { extractYoutubeVideoId } from "../shared/extract-youtube-video-id";
 import { requireAdmin } from "./utils/validation";
 
@@ -106,9 +107,28 @@ type YoutubeFeedItemWithCuration = {
   thumbnailUrl?: string;
   watchUrl: string;
   fetchedAt?: number;
+  publishedAt?: number;
+  source?: "manual" | "channel";
   rowStatus: "ok" | "pending" | "error";
   fetchError?: string;
 };
+
+function publishedAtForCuration(
+  c: Doc<"communityYoutubeCurations">,
+  cache: Doc<"youtubeVideoMetadataCache"> | null
+): number | undefined {
+  return cache?.publishedAt ?? c.publishedAt;
+}
+
+function compareFeedItems(
+  a: { publishedAt?: number; sortOrder: number },
+  b: { publishedAt?: number; sortOrder: number }
+): number {
+  const ap = a.publishedAt ?? 0;
+  const bp = b.publishedAt ?? 0;
+  if (bp !== ap) return bp - ap;
+  return a.sortOrder - b.sortOrder;
+}
 
 async function buildFeedItemForCuration(
   ctx: QueryCtx,
@@ -120,6 +140,8 @@ async function buildFeedItemForCuration(
     .unique();
 
   const watchUrl = `https://www.youtube.com/watch?v=${encodeURIComponent(c.youtubeVideoId)}`;
+  const publishedAt = publishedAtForCuration(c, cache);
+  const source = c.source;
 
   if (!cache) {
     return {
@@ -129,6 +151,8 @@ async function buildFeedItemForCuration(
       editorialLabel: c.label,
       accentClass: c.accentClass,
       watchUrl,
+      publishedAt,
+      source,
       rowStatus: "pending",
     };
   }
@@ -142,6 +166,8 @@ async function buildFeedItemForCuration(
       accentClass: c.accentClass,
       watchUrl,
       fetchedAt: cache.fetchedAt,
+      publishedAt,
+      source,
       rowStatus: "error",
       fetchError: cache.fetchError,
     };
@@ -156,6 +182,8 @@ async function buildFeedItemForCuration(
       accentClass: c.accentClass,
       watchUrl,
       fetchedAt: cache.fetchedAt,
+      publishedAt,
+      source,
       rowStatus: "pending",
     };
   }
@@ -173,6 +201,8 @@ async function buildFeedItemForCuration(
     thumbnailUrl: cache.thumbnailUrl || undefined,
     watchUrl,
     fetchedAt: cache.fetchedAt,
+    publishedAt,
+    source,
     rowStatus: "ok",
   };
 }
@@ -191,6 +221,27 @@ export const listCurationsOrdered = internalQuery({
     const rows = await ctx.db.query("communityYoutubeCurations").collect();
     rows.sort((a, b) => a.sortOrder - b.sortOrder);
     return rows;
+  },
+});
+
+export const countCurationsInternal = internalQuery({
+  args: {},
+  returns: v.number(),
+  handler: async (ctx) => {
+    const rows = await ctx.db.query("communityYoutubeCurations").collect();
+    return rows.length;
+  },
+});
+
+export const clearFeedExclusionsInternal = internalMutation({
+  args: {},
+  returns: v.null(),
+  handler: async (ctx) => {
+    const rows = await ctx.db.query("communityYoutubeFeedExclusions").collect();
+    for (const row of rows) {
+      await ctx.db.delete(row._id);
+    }
+    return null;
   },
 });
 
@@ -266,7 +317,14 @@ type NormalizedVideo = {
   viewCount: number;
   thumbnailUrl: string;
   fetchedAt: number;
+  publishedAt?: number;
 };
+
+function parsePublishedAt(iso?: string): number | undefined {
+  if (!iso) return undefined;
+  const n = Date.parse(iso);
+  return Number.isFinite(n) ? n : undefined;
+}
 
 export const upsertVideoCacheBatch = internalMutation({
   args: {
@@ -279,6 +337,7 @@ export const upsertVideoCacheBatch = internalMutation({
         viewCount: v.number(),
         thumbnailUrl: v.string(),
         fetchedAt: v.number(),
+        publishedAt: v.optional(v.number()),
       })
     ),
     errors: v.array(
@@ -307,6 +366,7 @@ export const upsertVideoCacheBatch = internalMutation({
           thumbnailUrl: vrow.thumbnailUrl,
           fetchedAt: vrow.fetchedAt,
           fetchError: undefined,
+          publishedAt: vrow.publishedAt ?? existing.publishedAt,
         });
       } else {
         await ctx.db.insert("youtubeVideoMetadataCache", {
@@ -317,6 +377,7 @@ export const upsertVideoCacheBatch = internalMutation({
           viewCount: vrow.viewCount,
           thumbnailUrl: vrow.thumbnailUrl,
           fetchedAt: vrow.fetchedAt,
+          publishedAt: vrow.publishedAt,
         });
       }
     }
@@ -355,6 +416,7 @@ type YoutubeListItem = {
   snippet?: {
     title?: string;
     channelTitle?: string;
+    publishedAt?: string;
     thumbnails?: {
       maxres?: { url?: string };
       high?: { url?: string };
@@ -443,6 +505,7 @@ async function fetchAndStoreYoutubeVideos(
         viewCount,
         thumbnailUrl,
         fetchedAt: now,
+        publishedAt: parsePublishedAt(item.snippet?.publishedAt),
       });
     }
 
@@ -469,6 +532,7 @@ export const cronRefreshFeed = internalAction({
   args: {},
   handler: async (ctx) => {
     await ctx.runMutation(internal.communityYoutube.ensureDefaultCurations, {});
+    await ctx.runAction(internal.communityYoutubeChannels.syncEnabledChannels, {});
     const apiKey = process.env.YOUTUBE_DATA_API_KEY?.trim() ?? "";
     if (apiKey === "") {
       return;
@@ -500,6 +564,38 @@ export const requestClientRefresh = action({
     if (!gate.allowed) {
       return { ok: false as const, reason: "rate_limited" as const };
     }
+    await ctx.runAction(internal.communityYoutubeChannels.syncEnabledChannels, {});
+    return await fetchAndStoreYoutubeVideos(ctx, apiKey);
+  },
+});
+
+export const requestAdminFeedRefresh = action({
+  args: {},
+  returns: v.object({
+    ok: v.boolean(),
+    reason: v.optional(v.string()),
+  }),
+  handler: async (
+    ctx
+  ): Promise<{ ok: boolean; reason?: string }> => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      throw new Error("Not authenticated");
+    }
+    await ctx.runMutation(internal.admin.ensureAdminForAction, { userId });
+    await ctx.runMutation(internal.communityYoutube.ensureDefaultCurations, {});
+    const apiKey = process.env.YOUTUBE_DATA_API_KEY?.trim() ?? "";
+    if (apiKey === "") {
+      return { ok: false as const, reason: "missing_api_key" as const };
+    }
+    const curationCount: number = await ctx.runQuery(
+      internal.communityYoutube.countCurationsInternal,
+      {}
+    );
+    if (curationCount === 0) {
+      await ctx.runMutation(internal.communityYoutube.clearFeedExclusionsInternal, {});
+    }
+    await ctx.runAction(internal.communityYoutubeChannels.syncEnabledChannels, {});
     return await fetchAndStoreYoutubeVideos(ctx, apiKey);
   },
 });
@@ -508,7 +604,6 @@ export const getFeed = query({
   args: {},
   handler: async (ctx) => {
     const curations = await ctx.db.query("communityYoutubeCurations").collect();
-    curations.sort((a, b) => a.sortOrder - b.sortOrder);
 
     if (curations.length === 0) {
       return {
@@ -521,6 +616,7 @@ export const getFeed = query({
     const withIds = await Promise.all(
       curations.map((c) => buildFeedItemForCuration(ctx, c))
     );
+    withIds.sort(compareFeedItems);
     const items = withIds.map((row) => stripCurationId(row));
 
     let okCount = 0;
@@ -555,13 +651,13 @@ export const listYoutubeCurationsForAdmin = query({
   handler: async (ctx) => {
     await requireAdmin(ctx);
     const curations = await ctx.db.query("communityYoutubeCurations").collect();
-    curations.sort((a, b) => a.sortOrder - b.sortOrder);
     if (curations.length === 0) {
       return { feedKind: "empty" as const, items: [] as YoutubeFeedItemWithCuration[], cacheTtlMs: CACHE_TTL_MS };
     }
     const withIds = await Promise.all(
       curations.map((c) => buildFeedItemForCuration(ctx, c))
     );
+    withIds.sort(compareFeedItems);
     let okCount = 0;
     let errorCount = 0;
     let pendingCount = 0;
@@ -597,6 +693,13 @@ export const addYoutubeCuration = mutation({
     if (dup) {
       throw new Error("That video is already in the curation list");
     }
+    const exclusion = await ctx.db
+      .query("communityYoutubeFeedExclusions")
+      .withIndex("by_youtubeVideoId", (q) => q.eq("youtubeVideoId", videoId))
+      .unique();
+    if (exclusion) {
+      await ctx.db.delete(exclusion._id);
+    }
     const all = await ctx.db.query("communityYoutubeCurations").collect();
     let maxOrder = -1;
     for (const c of all) {
@@ -605,6 +708,7 @@ export const addYoutubeCuration = mutation({
     const curationId = await ctx.db.insert("communityYoutubeCurations", {
       youtubeVideoId: videoId,
       sortOrder: maxOrder + 1,
+      source: "manual",
     });
     return curationId;
   },
@@ -652,6 +756,15 @@ export const deleteYoutubeCuration = mutation({
     const row = await ctx.db.get(args.curationId);
     if (!row) {
       throw new Error("Curation not found");
+    }
+    const exclusion = await ctx.db
+      .query("communityYoutubeFeedExclusions")
+      .withIndex("by_youtubeVideoId", (q) => q.eq("youtubeVideoId", row.youtubeVideoId))
+      .unique();
+    if (!exclusion) {
+      await ctx.db.insert("communityYoutubeFeedExclusions", {
+        youtubeVideoId: row.youtubeVideoId,
+      });
     }
     await ctx.db.delete(args.curationId);
     const rest = await ctx.db.query("communityYoutubeCurations").collect();
