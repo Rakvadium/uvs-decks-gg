@@ -9,6 +9,7 @@ import { DialogClose } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { GalleryGuestDeckAuthPrompt } from "@/components/gallery/gallery-guest-deck-auth-prompt";
 import { canAddCardToDeck, useDeckEditor } from "@/lib/deck";
+import { useDeckDetailsOptional } from "@/providers/DeckDetailsProvider";
 import { usePrefersReducedMotion } from "@/lib/reduced-motion";
 import { api } from "../../../../../convex/_generated/api";
 import {
@@ -84,8 +85,10 @@ export function CardDetailsV2({
   const transitionClass = prefersReducedMotion ? "duration-0" : "duration-300 ease-out";
   const heroSizes = "(max-width: 768px) min(92vw, 340px), 340px";
   const { hasDeck } = useDeckEditor();
-  const showDeckControlsBar = hasDeck && canAddCardToDeck(card);
-  const showGuestDeckAuth = !isAuthLoading && !isAuthenticated;
+  const deckDetails = useDeckDetailsOptional();
+  const canEditViewedDeck = deckDetails?.isOwner ?? true;
+  const showDeckControlsBar = canEditViewedDeck && hasDeck && canAddCardToDeck(card);
+  const showGuestDeckAuth = canEditViewedDeck && !isAuthLoading && !isAuthenticated;
   const needsBottomChrome = showDeckControlsBar || showGuestDeckAuth || Boolean(isAdmin);
 
   return (

@@ -21,6 +21,9 @@ All notable changes to this project are recorded here.
 
 ### Fixed
 
+- **Non-owner deck view** — Viewing someone else’s deck no longer shows add/remove or card-details section controls. Quantities stay visible; cards and the starting character still open full details.
+  - **Files:** `src/components/deck-details/card-items/deck-card-stack-item/actions.tsx`, `src/components/deck-details/deck-details-hero-panel/static-image.tsx`, `src/components/universus/card-details/deck-section-controls.tsx`, `src/components/universus/card-details/variants/v2.tsx`.
+
 - **Mobile card details scroll** — Gallery card details dialog on phone-width viewports scrolls through the stacked image and readout again. The recent floating-dialog pass left the column height-bounded with `overflow-hidden` and a `pointer-events-none` gutter, so nothing was a usable scrollport.
   - **Decisions:** Keep the overlay dismiss gutter. Make the mobile content column the scrollport (`overflow-y-auto`, `pointer-events-auto`) and stop overflow-hidden descendants from trapping the swipe. Desktop split is unchanged.
   - **Files:** `src/components/ui/dialog.tsx`, `src/components/universus/card-details/variants/v2.tsx`.

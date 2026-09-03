@@ -5,11 +5,16 @@ import { Hexagon, Layers } from "lucide-react";
 import { useDeckDetailsHeroPanelContext } from "./context";
 
 export function DeckDetailsHeroStaticImage() {
-  const { deck, imageCard, startingCharacter } = useDeckDetailsHeroPanelContext();
+  const { deck, imageCard, startingCharacter, handleImageClick } = useDeckDetailsHeroPanelContext();
   const displayImage = imageCard?.imageUrl || startingCharacter?.imageUrl;
 
   return (
-    <div className="absolute inset-0 z-10 overflow-hidden">
+    <button
+      type="button"
+      aria-label="View starting character details"
+      className="absolute inset-0 z-10 cursor-pointer overflow-hidden"
+      onClick={handleImageClick}
+    >
       {displayImage ? (
         <>
           <Image
@@ -31,6 +36,6 @@ export function DeckDetailsHeroStaticImage() {
           </div>
         </div>
       )}
-    </div>
+    </button>
   );
 }
