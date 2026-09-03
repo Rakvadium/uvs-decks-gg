@@ -37,6 +37,7 @@ import {
 import { cn } from "@/lib/utils";
 import type { Id } from "../../../convex/_generated/dataModel";
 import { useAdminYoutubeCurationModel } from "./hook";
+import { AdminYoutubeChannelsSection } from "./channels-section";
 
 const ACCENT_PRESETS = [
   { label: "Primary", value: "from-primary/20 via-primary/5 to-transparent" },
@@ -58,6 +59,8 @@ type CurationRow = {
   thumbnailUrl?: string;
   watchUrl: string;
   fetchedAt?: number;
+  publishedAt?: number;
+  source?: "manual" | "channel";
   rowStatus: "ok" | "pending" | "error";
   fetchError?: string;
 };
@@ -147,6 +150,9 @@ function SortableCurationRow({
           <p className="font-medium leading-tight line-clamp-2">{titleLine(row)}</p>
           {row.channelTitle ? (
             <p className="text-sm text-muted-foreground line-clamp-1">{row.channelTitle}</p>
+          ) : null}
+          {row.source === "channel" ? (
+            <p className="text-[11px] text-muted-foreground">Synced from channel</p>
           ) : null}
           <p className="text-[11px] text-muted-foreground truncate" title={row.youtubeVideoId}>
             {row.youtubeVideoId}
@@ -241,9 +247,22 @@ function SortableCurationRow({
 export default function AdminYoutubeCurationContent() {
   const {
     data,
+    channels,
     addUrl,
     setAddUrl,
+    channelUrl,
+    setChannelUrl,
+    channelIncludes,
+    setChannelIncludes,
+    channelExcludes,
+    setChannelExcludes,
+    channelPlaylist,
+    setChannelPlaylist,
     onAdd,
+    onAddChannel,
+    onSaveChannelTargeting,
+    onToggleChannelEnabled,
+    onRemoveChannel,
     onUpdateField,
     onDelete,
     onReorder,
@@ -278,7 +297,7 @@ export default function AdminYoutubeCurationContent() {
     <div className="flex h-full flex-col overflow-y-auto">
       <AdminPageHeader
         title="Community YouTube"
-        description="Curate and order featured videos for the community page. Public visitors read from the same cache-powered feed as the homepage."
+        description="Watch creator channels so newest uploads land in Community → UniVersus Content. Manual videos still work; the public stream sorts by publish date."
         backHref="/admin/content"
         backLabel="Content"
         subNav={<AdminContentSubNav />}
@@ -291,6 +310,21 @@ export default function AdminYoutubeCurationContent() {
       />
 
       <div className="mx-auto w-full max-w-5xl space-y-8 py-2">
+        <AdminYoutubeChannelsSection
+          channels={channels}
+          channelUrl={channelUrl}
+          onChannelUrlChange={setChannelUrl}
+          includeValue={channelIncludes}
+          onIncludeChange={setChannelIncludes}
+          excludeValue={channelExcludes}
+          onExcludeChange={setChannelExcludes}
+          playlistValue={channelPlaylist}
+          onPlaylistChange={setChannelPlaylist}
+          onAddChannel={onAddChannel}
+          onToggleEnabled={onToggleChannelEnabled}
+          onRemoveChannel={onRemoveChannel}
+          onSaveTargeting={onSaveChannelTargeting}
+        />
         <div className="rounded-lg border border-border/50 bg-muted/20 p-4">
           <p className="text-sm font-medium mb-3">Add a video</p>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
@@ -315,7 +349,7 @@ export default function AdminYoutubeCurationContent() {
             </Button>
           </div>
           <p className="text-xs text-muted-foreground mt-2">
-            Duplicate video ids are rejected. Titles and thumbnails follow the public YouTube metadata cache (cron + manual refresh).
+            Duplicate video ids are rejected. Removing a synced video keeps it off later channel pulls. Titles and thumbnails follow the public YouTube metadata cache.
           </p>
         </div>
 
