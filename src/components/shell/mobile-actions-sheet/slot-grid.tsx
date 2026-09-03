@@ -54,7 +54,7 @@ export function MobileActionsSlotGrid() {
                 </p>
               </div>
 
-              <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-primary" />
+              <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground motion-safe:transition-transform motion-safe:duration-150 motion-safe:group-hover:translate-x-0.5 group-hover:text-primary" />
             </button>
           );
         })}

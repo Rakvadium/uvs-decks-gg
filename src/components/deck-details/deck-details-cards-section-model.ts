@@ -4,7 +4,6 @@ import { useCallback, useMemo, useState } from "react";
 import { Id } from "../../../convex/_generated/dataModel";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { useDeckDetails } from "@/providers/DeckDetailsProvider";
-import { usePrefersReducedMotion } from "@/lib/reduced-motion";
 import { useCardData } from "@/lib/universus/card-data-provider";
 import type { CachedCard } from "@/lib/universus/card-store";
 import { canAddCardToSection, useDeckEditor } from "@/lib/deck";
@@ -32,7 +31,6 @@ const EMPTY_QUANTITIES: Record<string, number> = {};
 
 export function useDeckCardsSectionModel() {
   const isMobile = useIsMobile();
-  const prefersReducedMotion = usePrefersReducedMotion();
   const { cards: allCards } = useCardData();
   const { addCard } = useDeckEditor();
   const { deck, activeSection, isOwner, setActiveSection } = useDeckDetails();
@@ -230,7 +228,6 @@ export function useDeckCardsSectionModel() {
     listSortDirection,
     selectedListSortValue,
     onSelectSort,
-    prefersReducedMotion,
     hoveredCard,
     hoveredRect,
     onHoverListCard,

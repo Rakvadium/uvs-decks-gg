@@ -30,7 +30,7 @@ type ShellUniversusNavMobileHeaderProps = {
 
 function ShellUniversusNavSidebarInner() {
   const dock = useUniversusMediaDockOptional();
-  const { collapsed, prefersReducedMotion } = useLeftSidebarContext();
+  const { collapsed } = useLeftSidebarContext();
   if (!dock) return null;
 
   const { panelState, toggleLauncher } = dock;
@@ -82,13 +82,7 @@ function ShellUniversusNavSidebarInner() {
     );
   }
 
-  return (
-    <div
-      style={prefersReducedMotion ? undefined : { animationDelay: "220ms" }}
-    >
-      {control}
-    </div>
-  );
+  return control;
 }
 
 function ShellUniversusNavMobileHeaderInner() {

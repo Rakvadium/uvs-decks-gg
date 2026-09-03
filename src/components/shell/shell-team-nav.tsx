@@ -132,7 +132,7 @@ function ShellTeamNavSidebarInner({
   logoPending: boolean;
   isActive: boolean;
 }) {
-  const { collapsed, prefersReducedMotion } = useLeftSidebarContext();
+  const { collapsed } = useLeftSidebarContext();
   const label = "Teams";
   const link = (
     <Link
@@ -167,7 +167,7 @@ function ShellTeamNavSidebarInner({
       </Tooltip>
     );
   }
-  return <div style={prefersReducedMotion ? undefined : { animationDelay: "250ms" }}>{link}</div>;
+  return link;
 }
 
 function ShellTeamNavProfileSheetInner({
