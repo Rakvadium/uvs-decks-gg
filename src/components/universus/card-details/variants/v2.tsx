@@ -90,7 +90,7 @@ export function CardDetailsV2({
 
   return (
     <CardDetailsContentProvider card={displayCard}>
-      <div className="flex w-full max-md:h-auto max-md:flex-none flex-col gap-4 p-3 max-md:!pointer-events-none md:h-[min(85vh,calc(100dvh-2rem))] md:max-h-[min(85vh,calc(100dvh-2rem))] md:min-h-0 md:flex-1 md:flex-row md:items-stretch md:gap-5 md:overflow-hidden md:pb-3 md:pl-3 md:!pointer-events-auto md:pt-12">
+      <div className="flex w-full max-md:h-full max-md:min-h-0 max-md:overflow-y-auto max-md:overscroll-contain max-md:!pointer-events-auto flex-col gap-4 p-3 md:h-[min(85vh,calc(100dvh-2rem))] md:max-h-[min(85vh,calc(100dvh-2rem))] md:min-h-0 md:flex-1 md:flex-row md:items-stretch md:gap-5 md:overflow-hidden md:pb-3 md:pl-3 md:!pointer-events-auto md:pt-12">
         <div
           className={cn(
             "flex w-full shrink-0 flex-col items-center justify-center max-md:pointer-events-none md:h-full md:min-h-0",
@@ -107,7 +107,7 @@ export function CardDetailsV2({
               >
                 {mobileNavigationPrevious}
               </div>
-              <div className="w-full max-w-[260px] max-md:pointer-events-auto md:max-w-[340px]">
+              <div className="w-full max-w-[260px] md:max-w-[340px]">
                 <div className="relative aspect-[2.5/3.5] w-full" style={{ perspective: 1000 }}>
                   {!hasBackFace ? (
                     <div
@@ -187,7 +187,7 @@ export function CardDetailsV2({
                     <button
                       type="button"
                       onClick={onToggleFlip}
-                      className="absolute bottom-0 right-0 z-10 flex items-center gap-2 rounded-none rounded-tl-(--radius-2xl) rounded-br-(--radius-2xl) border border-primary/25 bg-card/95 px-3 py-2 text-muted-foreground shadow-none backdrop-blur-sm transition-colors hover:border-primary/40 hover:text-primary md:bottom-auto md:left-0 md:right-auto md:top-0"
+                      className="absolute bottom-0 right-0 z-10 flex items-center gap-2 rounded-none rounded-tl-(--radius-2xl) rounded-br-(--radius-2xl) border border-primary/25 bg-card/95 px-3 py-2 text-muted-foreground shadow-none backdrop-blur-sm transition-colors hover:border-primary/40 hover:text-primary max-md:pointer-events-auto md:bottom-auto md:left-0 md:right-auto md:top-0"
                     >
                       <RotateCcw
                         className={cn(
@@ -224,7 +224,7 @@ export function CardDetailsV2({
         </div>
 
         <div className="relative flex min-w-0 max-md:flex-none flex-col max-md:!pointer-events-auto md:min-h-0 md:flex-1">
-          <div className="relative flex min-w-0 flex-col overflow-hidden rounded-xl border border-primary/25 bg-card/95 shadow-[0_0_2px_var(--primary)/35,0_0_10px_var(--primary)/42,0_0_22px_var(--primary)/12] backdrop-blur-md md:h-full md:max-h-full md:min-h-0 md:flex-1">
+          <div className="relative flex min-w-0 flex-col overflow-hidden max-md:overflow-visible rounded-xl border border-primary/25 bg-card/95 shadow-[0_0_2px_var(--primary)/35,0_0_10px_var(--primary)/42,0_0_22px_var(--primary)/12] backdrop-blur-md md:h-full md:max-h-full md:min-h-0 md:flex-1">
             <DialogClose asChild>
               <Button
                 type="button"
@@ -237,10 +237,10 @@ export function CardDetailsV2({
               </Button>
             </DialogClose>
             <CardDetailsReadoutSurface
-              className="min-h-0 min-w-0 flex-1"
+              className="min-h-0 min-w-0 flex-1 max-md:overflow-visible"
               scrollableClassName={cn(
                 needsBottomChrome ? "pb-16" : undefined,
-                "max-md:flex-none max-md:max-h-none max-md:overflow-y-visible"
+                "max-md:flex-none max-md:max-h-none max-md:overflow-y-visible max-md:overscroll-auto"
               )}
             >
               <CardDetailsReadoutPanel />
