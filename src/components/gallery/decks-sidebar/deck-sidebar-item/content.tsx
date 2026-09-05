@@ -1,26 +1,38 @@
 "use client";
 
-import { cn } from "@/lib/utils";
+import { Check } from "lucide-react";
+import { DeckGridItem } from "@/components/decks/deck-grid-item";
+import { Button } from "@/components/ui/button";
 import { DeckSidebarItemProvider, useDeckSidebarItemContext } from "./context";
-import { DeckSidebarItemActions } from "./actions";
-import { DeckSidebarItemCounts } from "./counts";
-import { DeckSidebarItemHeader } from "./header";
 import type { DeckData } from "../types";
 
-function DeckSidebarItemContent() {
-  const { isActive } = useDeckSidebarItemContext();
+function SetActiveToggle() {
+  const { handleSetActive, isActive } = useDeckSidebarItemContext();
 
   return (
-    <div
-      className={cn(
-        "space-y-2 rounded-lg border border-border/50 bg-card/50 p-3 transition-colors",
-        isActive && "border-primary/40 bg-primary/5 shadow-[0_0_20px_-12px_var(--primary)]"
-      )}
+    <Button
+      variant={isActive ? "secondary" : "outline"}
+      size="sm"
+      className="h-11 min-w-[5.5rem] px-3"
+      onClick={handleSetActive}
     >
-      <DeckSidebarItemHeader />
-      <DeckSidebarItemCounts />
-      <DeckSidebarItemActions />
-    </div>
+      {isActive ? <Check className="h-3.5 w-3.5" /> : null}
+      {isActive ? "Active" : "Set Active"}
+    </Button>
+  );
+}
+
+function DeckSidebarItemContent() {
+  const { deck, isActive, isOwner, showAuthor } = useDeckSidebarItemContext();
+
+  return (
+    <DeckGridItem
+      deck={deck}
+      design="row"
+      selected={isActive}
+      showAuthor={showAuthor}
+      trailingAction={isOwner ? <SetActiveToggle /> : null}
+    />
   );
 }
 
