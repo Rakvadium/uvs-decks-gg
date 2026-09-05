@@ -1,7 +1,7 @@
 "use client";
 
 import { Surface } from "@/components/ui/card";
-import { PageHeading } from "@/components/ui/typography-headings";
+import { MobileLargeTitle } from "@/components/shell/mobile-large-title";
 import { CommunityMediaFeedSection } from "../sections/media-feed-section";
 import { CommunityTierListsSection } from "../sections/tier-lists-section";
 import { CommunityRightSidebarSlots } from "../community-right-sidebar/slots";
@@ -12,17 +12,11 @@ const sectionClassName =
 
 export function CommunityView() {
   return (
-    <div className="space-y-6 pb-8">
+    <div className="space-y-4 pb-8 md:space-y-6">
       <CommunityRightSidebarSlots />
 
-      <div className="md:hidden space-y-3 border-b border-border/50 pb-4">
-        <PageHeading>
-          Community
-        </PageHeading>
-        <div className="flex min-w-0 items-center gap-2 overflow-x-auto pb-0.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          <CommunityMobileDestinationNav />
-        </div>
-      </div>
+      <MobileLargeTitle>Community</MobileLargeTitle>
+      <CommunityMobileDestinationNav />
 
       <div className="relative">
         <div className="pointer-events-none absolute -top-20 left-1/4 h-72 w-72 rounded-full bg-primary/10 blur-3xl" />

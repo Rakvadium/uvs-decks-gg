@@ -6,6 +6,7 @@ import { useConvexAuth } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 function effectiveStatus(
   accountStatus: "active" | "suspended" | "banned" | "write_restricted" | undefined,
@@ -17,7 +18,7 @@ function effectiveStatus(
   return accountStatus ?? "active";
 }
 
-export function AccountStatusBanner() {
+export function AccountStatusBanner({ className }: { className?: string } = {}) {
   const { isAuthenticated, isLoading } = useConvexAuth();
   const user = useQuery(
     api.user.currentUser,
@@ -43,7 +44,7 @@ export function AccountStatusBanner() {
   }, [user]);
   if (!text) return null;
   return (
-    <div className="border-b border-destructive/30 bg-destructive/5 px-4 py-2 shrink-0">
+    <div className={cn("border-b border-destructive/30 bg-destructive/5 px-4 py-2 shrink-0", className)}>
       <Alert variant="destructive" className="border-destructive/40 bg-destructive/10">
         <AlertCircle className="h-4 w-4" />
         <AlertTitle>Account notice</AlertTitle>

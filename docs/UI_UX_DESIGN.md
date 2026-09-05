@@ -151,5 +151,6 @@ Default frosted chrome: `backdrop-blur-sm`. Use `backdrop-blur-md` / `xl` only f
 - [theme-chrome-guidelines.md](./theme-chrome-guidelines.md) — portable theme / chrome / styling law
 - [theme-and-chrome.md](./theme-and-chrome.md) — this app’s appearance wiring
 - [PRODUCT_VISION.md](./PRODUCT_VISION.md)
-- [floating-header-islands.md](./floating-header-islands.md) for page header slot semantics
+- [floating-header-islands.md](./floating-header-islands.md) for desktop page header slot semantics
+- [mobile-shell.md](./mobile-shell.md) for mobile chrome slot semantics
 - [features/community/TierListSystem.md](./features/community/TierListSystem.md) for community-specific UX rules

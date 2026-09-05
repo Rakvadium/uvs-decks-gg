@@ -42,7 +42,7 @@ Use ShadCN and MagicUI for styling/components when possible.
 - Hub: [docs/README.md](docs/README.md)
 - UI modules: [docs/component-architecture-playbook.md](docs/component-architecture-playbook.md)
 - UI tokens/patterns: [docs/UI_UX_DESIGN.md](docs/UI_UX_DESIGN.md)
-- Header/action placement: [docs/floating-header-islands.md](docs/floating-header-islands.md)
+- Header/action placement: [docs/floating-header-islands.md](docs/floating-header-islands.md) (desktop), [docs/mobile-shell.md](docs/mobile-shell.md) (mobile)
 
 ## Cursor Cloud specific instructions
 

@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import Link from "next/link";
 import { useConvexAuth, useQuery } from "convex/react";
-import { BarChart3, Download, LayoutGrid, Loader2, Shuffle } from "lucide-react";
+import { BarChart3, Download, Grid2x2Plus, Loader2, Shuffle } from "lucide-react";
 import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
 import { Button } from "@/components/ui/button";
@@ -17,8 +17,8 @@ import { FloatingPageLayout } from "@/components/shell/floating-page-bar";
 import { useIsBelowLg } from "@/hooks/useIsMobile";
 import { DeckDetailsFloatingTopBar } from "./deck-details-floating-top-bar";
 import { DeckDetailsMetaTags } from "./deck-details-meta-tags";
-import { DeckDetailsTopBar } from "./deck-details-top-bar";
 import { DeckDetailsTopBarProvider } from "./deck-details-top-bar/context";
+import { DeckDetailsTopBarTitleSection } from "./deck-details-top-bar/title-section";
 import { DeckCardsSection } from "./deck-details-cards-section";
 import { DeckDetailsHeroPanel } from "./deck-details-hero-panel";
 import {
@@ -37,7 +37,7 @@ import { TeamEditableWriteConflictBanner } from "@/components/deck/team-editable
 import { isDeckQuantitiesEmpty } from "./deck-empty";
 
 function DeckDetailsGallerySlotRegistration() {
-  const gallerySlotOptions = useMemo(() => ({ label: "Gallery", icon: LayoutGrid, priority: 0 }), []);
+  const gallerySlotOptions = useMemo(() => ({ label: "Gallery", icon: Grid2x2Plus, priority: 0 }), []);
   useRegisterSlot("right-sidebar", "deck-gallery", GallerySidebar, gallerySlotOptions);
   return null;
 }
@@ -97,10 +97,8 @@ export function DeckDetailsView() {
             <DeckDetailsReadOnlyBanner />
             <DeckDetailsEditDialog />
             {isOwner && <DeckDetailsGallerySlotRegistration />}
-            <div className="sticky top-0 z-30 -mx-3 border-b border-border/50 bg-background/95 px-3 py-2.5 backdrop-blur-md supports-[backdrop-filter]:bg-background/80 md:hidden">
-              <DeckDetailsTopBar />
-            </div>
-            <div className="relative max-md:mt-4 md:mt-0">
+            <DeckDetailsTopBarTitleSection badgesOnly className="md:hidden" />
+            <div className="relative max-md:mt-3 md:mt-0">
               <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-secondary/5 to-accent/5 rounded-xl blur-xl" />
 
               <DeckCardsSectionProvider>

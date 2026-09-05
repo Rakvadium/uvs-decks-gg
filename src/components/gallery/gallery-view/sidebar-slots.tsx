@@ -21,7 +21,9 @@ function GalleryAuthenticatedSidebarSlots() {
   const activeDeckSlotOptions = useMemo(
     () => ({
       label: activeDeckLabel,
+      tabLabel: "Active Deck",
       icon: ActiveDeckIcon,
+      mobileAccessory: true,
       iconFit: "media" as const,
       header: ActiveDeckHeader,
       footer: ActiveDeckFooter,
@@ -48,6 +50,7 @@ function GalleryGuestSidebarSlot() {
     () => ({
       label: "Deck tools",
       icon: GalleryGuestDecksIcon,
+      mobileAccessory: true,
       priority: 0,
     }),
     []

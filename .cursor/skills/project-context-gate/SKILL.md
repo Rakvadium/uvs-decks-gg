@@ -33,7 +33,7 @@ Read `docs/README.md` and `docs/agent-workflow-playbook.md`, then read only what
 | UI feature structure | `docs/component-architecture-playbook.md` |
 | Tokens, borders, radius, motion, labels | `docs/UI_UX_DESIGN.md` |
 | Theme / chrome axes | `docs/theme-and-chrome.md` |
-| Page header actions, search, back, tabs | `docs/floating-header-islands.md` (include page inventory) |
+| Page header actions, search, back, tabs | `docs/floating-header-islands.md` (desktop inventory) and `docs/mobile-shell.md` (mobile inventory) |
 | Community / tier lists | Feature doc if present; else code neighbors only — note gap |
 | Teams | `docs/teams-feature-implementation.md` |
 
@@ -48,14 +48,14 @@ Locate 2–3 existing examples of the same job.
 ### UI / placement
 
 1. Route/feature folders under `src/app` and `src/components`.
-2. Page header/top-bar (floating bar, mobile top bar, shell slots).
+2. Page header/top-bar (desktop floating bar, mobile nav/tab-bar slots).
 3. Sibling page with the same kind of control.
-4. Record placement: floating left/center/right, mobile heading/`top-bar`/sheet, inline, overflow.
+4. Record placement: desktop left/center/right, or mobile slots from `docs/mobile-shell.md`; inline, overflow, sheet.
 5. Copy that placement unless the task explicitly changes IA.
 
-Floating roles: left = context, center = search/filter, right = actions. Empty stays empty.
+Desktop floating roles: left = context, center = search/filter, right = actions. Mobile roles: [mobile-shell.md](../../../docs/mobile-shell.md). Empty stays empty.
 
-Primitives: `src/components/shell/floating-page-bar.tsx`, `src/components/shell/floating-island.tsx`.
+Primitives: `src/components/shell/floating-page-bar.tsx`, `src/components/shell/floating-island.tsx`, `src/components/shell/mobile-nav-bar/`, `src/components/shell/mobile-tab-bar/`.
 
 ### Backend / Convex
 

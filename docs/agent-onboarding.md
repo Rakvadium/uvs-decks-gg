@@ -13,7 +13,7 @@ Minimum investigation:
 
 1. Read the docs that match the task (table below).
 2. Find 2–3 **code neighbors** that already do the same job.
-3. For UI: record where sibling pages put the same control (floating bar slot, mobile top bar, inline, overflow). Copy that placement.
+3. For UI: record where sibling pages put the same control (desktop floating-bar slot, mobile shell slot, inline, overflow). Copy that placement.
 4. Only then edit.
 
 If placement or pattern is still ambiguous, ask — do not invent a new spot for buttons, search, or nav.
@@ -27,7 +27,8 @@ If placement or pattern is still ambiguous, ask — do not invent a new spot for
 | 3 | [component-architecture-playbook.md](./component-architecture-playbook.md) | How to structure UI modules |
 | 4 | [UI_UX_DESIGN.md](./UI_UX_DESIGN.md) | Product UX principles |
 | 5 | [theme-chrome-guidelines.md](./theme-chrome-guidelines.md) | Tokens, chrome, styling ladders |
-| 6 | [floating-header-islands.md](./floating-header-islands.md) | Where page actions/search/tabs belong |
+| 6 | [floating-header-islands.md](./floating-header-islands.md) | Where desktop page actions/search/tabs belong |
+| 6b | [mobile-shell.md](./mobile-shell.md) | Where mobile search/back/actions/tabs belong |
 | 7 | [theme-and-chrome.md](./theme-and-chrome.md) | This app’s appearance wiring |
 
 If you touch community rankings or tier lists, read [features/community/TierListSystem.md](./features/community/TierListSystem.md) and prefer code neighbors under `src/components/community/`.
@@ -48,7 +49,7 @@ Never relocate roles to fill an empty slot. Prefer empty over wrong.
 
 Canonical primitives live under `src/components/shell/floating-page-bar.tsx` and `src/components/shell/floating-island.tsx`.
 
-Mobile keeps its own path (`md:hidden` headings, shell `top-bar`, mobile sheets). Every desktop floating action needs an equivalent mobile affordance.
+Mobile keeps its own slot system ([mobile-shell.md](./mobile-shell.md)). Every desktop floating action needs an equivalent mobile affordance in those slots.
 
 After UI edits, run **`ui-ux-adversary`** and clear must-fix findings before claiming done.
 
@@ -65,7 +66,7 @@ Before you report completion:
 
 - `bun run lint`
 - `bun run build`
-- If UI changed: BEFORE/AFTER snapshots (desktop + mobile), `ui-ux-adversary` with image compare, placement still matches [floating-header-islands.md](./floating-header-islands.md). On the PR, embed both shots from `.github/pr-captures/<issue>/` with raw GitHub URLs — not `cursor.com/artifacts` ([playbook](./agent-workflow-playbook.md) § PR visual embeds).
+- If UI changed: BEFORE/AFTER snapshots (desktop + mobile), `ui-ux-adversary` with image compare, placement still matches [floating-header-islands.md](./floating-header-islands.md) and [mobile-shell.md](./mobile-shell.md). On the PR, embed both shots from `.github/pr-captures/<issue>/` with raw GitHub URLs — not `cursor.com/artifacts` ([playbook](./agent-workflow-playbook.md) § PR visual embeds).
 
 If you change Convex schema or function signatures, ensure Convex codegen and types are consistent with your local workflow.
 

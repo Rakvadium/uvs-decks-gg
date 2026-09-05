@@ -9,6 +9,7 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "test": "bun test tests",
+    "postinstall": "bun scripts/patch-convex-auth-lan-host.ts",
     "import:universus": "bun scripts/import-universus.ts",
     "import:universus:all": "bun scripts/import-universus.ts --all",
     "bulk-upload": "bun scripts/bulk-upload.ts",

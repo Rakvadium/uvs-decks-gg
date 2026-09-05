@@ -38,7 +38,7 @@ Never freestyle a parallel process. Same ritual → semi-predictable outcomes.
 ## Anti-drift laws
 
 1. **Neighbors beat novelty** — copy 2–3 existing examples of the same job.
-2. **Header slots are fixed** — left context / center search / right actions ([floating-header-islands.md](./floating-header-islands.md)).
+2. **Header slots are fixed** — desktop left context / center search / right actions ([floating-header-islands.md](./floating-header-islands.md)); mobile nav + tab-bar slots ([mobile-shell.md](./mobile-shell.md)).
 3. **Tokens over taste** — [theme-chrome-guidelines.md](./theme-chrome-guidelines.md), [UI_UX_DESIGN.md](./UI_UX_DESIGN.md), [theme-and-chrome.md](./theme-and-chrome.md), ShadCN/MagicUI, shell primitives.
 4. **Vision is a veto** — [PRODUCT_VISION.md](./PRODUCT_VISION.md); do not make a surface look like a different product.
 5. **No drive-by polish** — only touch the brief’s file list.
@@ -132,7 +132,7 @@ Rules:
 ```text
 Use ui-ux-adversary on the current diff for routes: <ROUTES>.
 Follow docs/agent-workflow-playbook.md visual verify if BEFORE/AFTER captures exist.
-Be placement-nitpicky against floating-header-islands and neighbor top-bars.
+Be placement-nitpicky against floating-header-islands, mobile-shell, and neighbor chrome.
 Do not implement until I say apply UI fixes.
 ```
 

@@ -1,6 +1,9 @@
+import { ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ShellTeamNav } from "@/components/shell/shell-team-nav";
+import { MOBILE_INSET_DIVIDER, MOBILE_INSET_GROUP, MOBILE_INSET_ROW } from "../mobile-glass";
 import { buildMainNavItemsMobileOrder } from "../main-nav-build";
+import { MobileProfileSectionLabel } from "./section-label";
 import { useMobileProfileSheetContext } from "./context";
 
 export function MobileProfileNavigationSection() {
@@ -8,9 +11,9 @@ export function MobileProfileNavigationSection() {
   const navItems = buildMainNavItemsMobileOrder();
 
   return (
-    <div className="p-4">
-      <p className="chrome-label-case mb-2 text-xs font-medium text-muted-foreground">Navigation</p>
-      <div className="space-y-1">
+    <section>
+      <MobileProfileSectionLabel>Navigate</MobileProfileSectionLabel>
+      <div className={cn(MOBILE_INSET_GROUP, MOBILE_INSET_DIVIDER)}>
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = pathname.includes(`/${item.path}`);
@@ -18,19 +21,19 @@ export function MobileProfileNavigationSection() {
           return (
             <button
               key={item.path}
+              type="button"
               onClick={() => handleNavClick(item.path)}
-              className={cn(
-                "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
-                isActive ? "bg-secondary/15 text-primary" : "text-foreground hover:bg-muted"
-              )}
+              className={cn(MOBILE_INSET_ROW, isActive && "text-primary")}
+              aria-current={isActive ? "page" : undefined}
             >
-              <Icon className={cn("h-5 w-5", isActive && "text-primary")} />
-              <span>{item.label}</span>
+              <Icon className={cn("size-5", isActive ? "text-primary" : "text-muted-foreground")} />
+              <span className="flex-1 font-medium">{item.label}</span>
+              <ChevronRight className="size-4 text-muted-foreground/70" aria-hidden />
             </button>
           );
         })}
         <ShellTeamNav variant="profile-sheet" onAfterNavigate={closeSheet} />
       </div>
-    </div>
+    </section>
   );
 }

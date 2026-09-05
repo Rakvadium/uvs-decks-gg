@@ -4,10 +4,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useConvexAuth, useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
-import { Flag } from "lucide-react";
+import { ChevronRight, Flag } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useLeftSidebarContext } from "./left-sidebar/context";
+import { MOBILE_INSET_ROW } from "./mobile-glass";
 import {
   SHELL_NAV_ITEM_ACTIVE,
   SHELL_NAV_ITEM_IDLE,
@@ -190,20 +191,19 @@ function ShellTeamNavProfileSheetInner({
     <Link
       href={teamHref}
       onClick={() => onAfterNavigate?.()}
-      className={cn(
-        "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
-        isActive ? "bg-secondary/15 text-primary" : "text-foreground hover:bg-muted"
-      )}
+      aria-current={isActive ? "page" : undefined}
+      className={cn(MOBILE_INSET_ROW, isActive && "text-primary")}
     >
       <TeamMark
         displayUrl={hasTeam ? displayUrl : null}
         logoPending={hasTeam && logoPending}
         hasTeam={hasTeam}
         markIsActive={isActive}
-        className="h-5 w-5 rounded-full"
+        className="size-5 rounded-full border-0 bg-transparent"
         imgClassName=""
       />
-      <span>{label}</span>
+      <span className="flex-1 font-medium">{label}</span>
+      <ChevronRight className="size-4 text-muted-foreground/70" aria-hidden />
     </Link>
   );
 }

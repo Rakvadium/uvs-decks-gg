@@ -12,6 +12,7 @@ import {
   useUniversusMediaDockOptional,
 } from "@/providers/UniversusMediaDockProvider";
 import { useLeftSidebarContext } from "./left-sidebar/context";
+import { MobileNavIconButton } from "./mobile-nav-bar/nav-icon-button";
 import {
   SHELL_NAV_ICON_ACTIVE,
   SHELL_NAV_ITEM_ACTIVE,
@@ -24,8 +25,8 @@ type ShellUniversusNavSidebarProps = {
   variant: "sidebar";
 };
 
-type ShellUniversusNavMobileHeaderProps = {
-  variant: "mobile-header";
+type ShellUniversusNavMobileNavProps = {
+  variant: "mobile-nav";
 };
 
 function ShellUniversusNavSidebarInner() {
@@ -85,38 +86,32 @@ function ShellUniversusNavSidebarInner() {
   return control;
 }
 
-function ShellUniversusNavMobileHeaderInner() {
+function ShellUniversusNavMobileNavInner() {
   const { panelState, toggleLauncher } = useUniversusMediaDock();
   const isOpen = panelState === "open";
 
   return (
-    <button
-      type="button"
-      onClick={() => toggleLauncher()}
-      aria-label="UniVersus mini player"
+    <MobileNavIconButton
+      label="UniVersus mini player"
       aria-pressed={isOpen}
-      className={cn(
-        "relative z-10 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border transition-colors",
-        isOpen
-          ? "border-accent/55 bg-accent/20 text-accent"
-          : "border-sidebar-border bg-sidebar-accent text-sidebar-foreground hover:border-accent/40 hover:bg-accent/12 hover:text-accent"
-      )}
+      active={isOpen}
+      onClick={() => toggleLauncher()}
     >
       <Tv
-        className="h-4 w-4"
+        className="size-5"
         aria-hidden
         strokeWidth={isOpen ? 0 : 2}
         fill={isOpen ? "currentColor" : "none"}
       />
-    </button>
+    </MobileNavIconButton>
   );
 }
 
 export function ShellUniversusNav(
-  props: ShellUniversusNavSidebarProps | ShellUniversusNavMobileHeaderProps
+  props: ShellUniversusNavSidebarProps | ShellUniversusNavMobileNavProps
 ) {
   if (props.variant === "sidebar") {
     return <ShellUniversusNavSidebarInner />;
   }
-  return <ShellUniversusNavMobileHeaderInner />;
+  return <ShellUniversusNavMobileNavInner />;
 }

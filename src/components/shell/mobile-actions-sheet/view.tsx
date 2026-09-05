@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 import { MobileActionsSheetProvider } from "./context";
-import { MobileActionsDraggableDrawer } from "./draggable-drawer";
+import { MobileActionsBottomSheet } from "./bottom-sheet";
 
 interface MobileActionsSheetProps {
   children?: ReactNode;
@@ -11,7 +11,8 @@ interface MobileActionsSheetProps {
 export function MobileActionsSheet({ children }: MobileActionsSheetProps) {
   return (
     <MobileActionsSheetProvider>
-      <MobileActionsDraggableDrawer>{children}</MobileActionsDraggableDrawer>
+      {children}
+      <MobileActionsBottomSheet />
     </MobileActionsSheetProvider>
   );
 }
