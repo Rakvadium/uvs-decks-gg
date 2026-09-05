@@ -3,8 +3,25 @@
 import { useLayoutEffect, type RefObject } from "react";
 
 const MOBILE_QUERY = "(max-width: 767px)";
+const KEYBOARD_INSET_THRESHOLD = 40;
 
-export function measureMobileVisualViewport() {
+export type MobileViewportBox = {
+  top: number;
+  left: number;
+  width: number;
+  height: number;
+};
+
+export function readMobileKeyboardInset(
+  innerHeight: number,
+  viewportHeight: number,
+  viewportTop: number
+) {
+  const inset = innerHeight - viewportHeight - viewportTop;
+  return inset > KEYBOARD_INSET_THRESHOLD ? Math.round(inset) : 0;
+}
+
+export function measureMobileVisualViewport(): MobileViewportBox {
   const viewport = window.visualViewport;
   return {
     top: viewport?.offsetTop ?? 0,
@@ -14,9 +31,24 @@ export function measureMobileVisualViewport() {
   };
 }
 
+export function resolveMobileShellViewport(
+  measured: MobileViewportBox,
+  keyboardInset: number,
+  lastStable: MobileViewportBox | null
+): MobileViewportBox {
+  if (keyboardInset <= 0) return measured;
+  if (lastStable) return lastStable;
+  return {
+    top: 0,
+    left: 0,
+    width: measured.width,
+    height: measured.height + keyboardInset + measured.top,
+  };
+}
+
 export function applyMobileVisualViewportFrame(
   node: HTMLElement,
-  viewport: ReturnType<typeof measureMobileVisualViewport> = measureMobileVisualViewport()
+  viewport: MobileViewportBox
 ) {
   node.style.position = "fixed";
   node.style.left = "0";
@@ -51,9 +83,19 @@ export function useMobileVisualViewportFrame(ref: RefObject<HTMLElement | null>)
     let previousBodyOverscroll = body.style.overscrollBehavior;
     let active = false;
     let orientationTimer = 0;
+    let lastStable: MobileViewportBox | null = null;
 
     const sync = () => {
-      if (active) applyMobileVisualViewportFrame(node);
+      if (!active) return;
+      const measured = measureMobileVisualViewport();
+      const keyboardInset = readMobileKeyboardInset(
+        window.innerHeight,
+        measured.height,
+        measured.top
+      );
+      const next = resolveMobileShellViewport(measured, keyboardInset, lastStable);
+      if (keyboardInset <= 0) lastStable = measured;
+      applyMobileVisualViewportFrame(node, next);
     };
 
     const syncSoon = () => {
@@ -75,12 +117,13 @@ export function useMobileVisualViewportFrame(ref: RefObject<HTMLElement | null>)
       body.style.overflow = "hidden";
       html.style.overscrollBehavior = "none";
       body.style.overscrollBehavior = "none";
-      applyMobileVisualViewportFrame(node);
+      sync();
     };
 
     const deactivate = () => {
       if (!active) return;
       active = false;
+      lastStable = null;
       html.style.overflow = previousHtmlOverflow;
       body.style.overflow = previousBodyOverflow;
       html.style.overscrollBehavior = previousHtmlOverscroll;
@@ -94,6 +137,7 @@ export function useMobileVisualViewportFrame(ref: RefObject<HTMLElement | null>)
     };
 
     const onOrientationChange = () => {
+      lastStable = null;
       syncSoon();
       window.clearTimeout(orientationTimer);
       orientationTimer = window.setTimeout(sync, 250);
