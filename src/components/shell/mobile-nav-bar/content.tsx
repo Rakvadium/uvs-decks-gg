@@ -87,7 +87,7 @@ export function MobileNavBar() {
     <header
       ref={headerRef}
       className={cn(
-        "fixed inset-x-0 top-0 z-40 flex flex-col pt-[env(safe-area-inset-top)]",
+        "absolute inset-x-0 top-0 z-40 flex flex-col pt-[env(safe-area-inset-top)]",
         MOBILE_GLASS_BAR,
         MOBILE_GLASS_HAIRLINE_BOTTOM
       )}
