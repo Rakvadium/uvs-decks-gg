@@ -1,21 +1,14 @@
 "use client";
 
-import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
 import { CommunityRankingsView } from "@/components/community/community-rankings-view";
-import { useRegisterSlot } from "@/components/shell/shell-slot-provider";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { TierListBrowserCard } from "./browser-card";
 import { useCommunityTierListsPageContext } from "./context";
 import { CommunityTierListsPageCreateDialog } from "./create-dialog";
 import { CommunityTierListsPageEmptyState } from "./empty-state";
-import { CommunityTierListsPageHeading } from "./heading";
 import { CommunityTierListsPageLoadingState } from "./loading-state";
-import {
-  CommunityTierListsPagePrimaryAction,
-  CommunityTierListsPageTopBar,
-} from "./top-bar";
+import { CommunityTierListsPageMobileScopeControl } from "./top-bar";
 
 export function CommunityTierListsPageView() {
   const {
@@ -32,21 +25,10 @@ export function CommunityTierListsPageView() {
 
   const hasActiveSearch = searchQuery.trim().length > 0;
 
-  useRegisterSlot("top-bar", "community-tier-lists-page", CommunityTierListsPageTopBar);
-
   return (
-    <div className="space-y-6">
-      <div className="md:hidden space-y-3">
-        <Button variant="ghost" size="icon" className="-ml-2" asChild>
-          <Link href="/community" aria-label="Community">
-            <ArrowLeft className="h-4 w-4" />
-          </Link>
-        </Button>
-        <CommunityTierListsPageHeading />
-        <CommunityTierListsPagePrimaryAction className="w-full justify-center" label="New Tier List" />
-      </div>
-
-      <div className="flex-1 pt-2 md:pt-0">
+    <div className="space-y-4 md:space-y-6">
+      <CommunityTierListsPageMobileScopeControl />
+      <div className="flex-1 md:pt-0">
         {activeTab === "rankings" ? (
           <CommunityRankingsView embedded />
         ) : activeTab === "mine" && !isAuthenticated ? (

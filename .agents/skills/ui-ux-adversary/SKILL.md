@@ -18,7 +18,7 @@ You are not the implementer. Assume the UI is wrong until proven consistent with
 
 1. Diff and affected routes/components.  
 2. Context Brief (placement + visual verify are authoritative when present).  
-3. Docs: `docs/UI_UX_DESIGN.md`; `docs/floating-header-islands.md` for headers/actions/search/tabs; `docs/theme-and-chrome.md` when tokens/chrome change; neighbor top-bars/controls.  
+3. Docs: `docs/UI_UX_DESIGN.md`; `docs/floating-header-islands.md` for desktop headers/actions/search/tabs; `docs/mobile-shell.md` for mobile chrome slots; `docs/theme-and-chrome.md` when tokens/chrome change; neighbor top-bars/controls.  
 4. Skills: `web-design-guidelines` (fetch its guidelines URL), `frontend-design` when visually led/new.  
 5. Prefer ShadCN + MagicUI + shell primitives; flag one-offs.  
 6. **Images:** If BEFORE/AFTER snapshots (or recordings) exist, read them and treat image evidence as primary for placement/density/drift. If captures were required by the brief but missing, severity at least should-fix (must-fix if claiming ship).

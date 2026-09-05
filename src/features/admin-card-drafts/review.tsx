@@ -873,8 +873,8 @@ export default function AdminCardDraftReview({
               </div>
               <div className="h-2 overflow-hidden rounded-full bg-muted">
                 <div
-                  className="h-full rounded-full bg-primary transition-[width] duration-300"
-                  style={{ width: `${batchVisionPercent}%` }}
+                  className="h-full w-full origin-left rounded-full bg-primary motion-safe:transition-transform motion-safe:duration-200"
+                  style={{ transform: `scaleX(${Math.min(Math.max(batchVisionPercent, 0), 100) / 100})` }}
                 />
               </div>
               <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">

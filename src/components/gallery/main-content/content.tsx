@@ -45,7 +45,12 @@ function GalleryMainContentBody() {
         ref={setScrollRef}
         className="relative z-0 min-h-0 flex-1 overflow-y-auto overscroll-y-contain [-webkit-overflow-scrolling:touch]"
       >
-        <div className={cn("p-4 pb-6 md:px-6 md:pb-4 md:pt-[4.75rem]")}>
+        <div
+          className={cn(
+            "p-4 pb-6 md:px-6 md:pb-4 md:pt-[4.75rem]",
+            "max-md:pt-[calc(var(--mobile-nav-h,3.5rem)+0.75rem)] max-md:pb-[calc(var(--mobile-tab-h,5rem)+1rem)]"
+          )}
+        >
           {state.viewMode === "card" ? (
             <GalleryGridView
               key={filterKey}

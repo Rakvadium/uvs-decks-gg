@@ -75,7 +75,7 @@ function NavCard({ href, icon: Icon, title, description, accentColor = "primary"
               <div className={`flex h-14 w-14 items-center justify-center rounded-xl border border-current/20 bg-background/50 backdrop-blur-sm ${iconClasses[accentColor]}`} style={{ filter: "var(--chrome-page-nav-card-icon-drop-shadow)" }}>
                 <Icon className="h-7 w-7" />
               </div>
-              <ArrowRight className="h-5 w-5 -translate-x-2 text-muted-foreground opacity-0 transition-[opacity,transform] duration-150 group-hover:translate-x-0 group-hover:opacity-100" />
+              <ArrowRight className="h-5 w-5 -translate-x-2 text-muted-foreground opacity-0 motion-safe:transition-[opacity,transform] motion-safe:duration-150 motion-safe:group-hover:translate-x-0 motion-safe:group-hover:opacity-100" />
             </div>
 
             <div className="space-y-2">

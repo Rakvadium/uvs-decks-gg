@@ -54,7 +54,7 @@ export function DeckNameplateItem() {
   return (
     <Link href={`/decks/${deck._id}`} className="group block">
       <article
-        className="relative flex flex-col transition-transform duration-150 group-hover:-translate-y-0.5"
+        className="relative flex flex-col motion-safe:transition-transform motion-safe:duration-150 motion-safe:group-hover:-translate-y-0.5"
         style={{ gap: TILE_GAP }}
       >
         <div className="relative">
@@ -68,7 +68,7 @@ export function DeckNameplateItem() {
                 alt={displayName}
                 fill
                 sizes="(min-width: 1280px) 22vw, (min-width: 1024px) 30vw, (min-width: 640px) 45vw, 90vw"
-                className="origin-top scale-[1.12] object-cover object-[50%_18%] transition-transform duration-150 group-hover:scale-[1.16]"
+                className="origin-top scale-[1.12] object-cover object-[50%_18%] motion-safe:transition-transform motion-safe:duration-150 motion-safe:group-hover:scale-[1.16]"
                 priority={coverImagePriority}
                 loading={coverImagePriority ? undefined : "lazy"}
               />
@@ -105,7 +105,7 @@ export function DeckNameplateItem() {
           {symbolPath && accentSymbol && symbolColor ? (
             <span
               className={cn(
-                "absolute left-1/2 z-10 block -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-full bg-card transition-transform duration-150 will-change-transform group-hover:scale-105",
+                "absolute left-1/2 z-10 block -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-full bg-card motion-safe:transition-transform motion-safe:duration-150 motion-safe:group-hover:scale-105",
                 symbolColor.text
               )}
               style={{

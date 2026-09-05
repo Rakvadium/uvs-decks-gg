@@ -2,12 +2,9 @@
 
 import { createPortal } from "react-dom";
 import Image from "next/image";
-import * as m from "framer-motion/m";
-import { usePrefersReducedMotion } from "@/lib/reduced-motion";
 import { useGallerySidebarContext } from "./context";
 
 export function DeckDetailsGallerySidebarHoverPreview() {
-  const prefersReducedMotion = usePrefersReducedMotion();
   const { hoveredListCard, isMobile, shellSidebarWidth, viewMode } = useGallerySidebarContext();
 
   if (isMobile || viewMode !== "list" || !hoveredListCard || typeof document === "undefined") return null;
@@ -23,10 +20,7 @@ export function DeckDetailsGallerySidebarHoverPreview() {
   const right = shellSidebarWidth + iconRailWidth + gap;
 
   return createPortal(
-    <m.div
-      initial={false}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: prefersReducedMotion ? 0 : 0.2 }}
+    <div
       className="pointer-events-none fixed z-[100]"
       style={{
         right,
@@ -52,7 +46,7 @@ export function DeckDetailsGallerySidebarHoverPreview() {
           </div>
         )}
       </div>
-    </m.div>,
+    </div>,
     document.body
   );
 }

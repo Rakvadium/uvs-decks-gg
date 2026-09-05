@@ -48,7 +48,7 @@ export function DeckSplashItem() {
             alt={displayName}
             fill
             sizes="(min-width: 1280px) 20vw, (min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
-            className="origin-top scale-[1.48] object-cover object-top transition-transform duration-500 ease-out group-hover:scale-[1.56]"
+            className="origin-top scale-[1.48] object-cover object-top motion-safe:transition-transform motion-safe:duration-150 motion-safe:ease-out motion-safe:group-hover:scale-[1.56]"
             priority={coverImagePriority}
             loading={coverImagePriority ? undefined : "lazy"}
           />
@@ -68,7 +68,7 @@ export function DeckSplashItem() {
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/5" />
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[42%] bg-gradient-to-t from-black via-black/85 to-transparent" />
         <div
-          className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 opacity-70 mix-blend-screen transition-opacity duration-300 group-hover:opacity-100"
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 opacity-70 mix-blend-screen motion-safe:transition-opacity motion-safe:duration-150 motion-safe:group-hover:opacity-100"
           style={{
             background:
               "radial-gradient(80% 60% at 50% 100%, hsl(var(--accent-h) var(--accent-s) var(--accent-l) / 0.35), transparent 70%)",

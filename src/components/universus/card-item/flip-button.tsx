@@ -38,8 +38,8 @@ export function CardFlipButton({
             "rounded-tl-lg rounded-br-lg rounded-tr-none rounded-bl-none",
             "border-r border-b border-border/40",
             frosted
-              ? "bg-background/80 backdrop-blur-sm transition-[opacity,colors,transform,background-color,border-color] duration-200"
-              : "bg-background/95 transition-[opacity,colors] duration-200",
+              ? "bg-background/80 backdrop-blur-sm transition-[opacity,color,background-color,border-color] duration-200"
+              : "bg-background/95 transition-[opacity,color,background-color] duration-200",
             "hover:bg-primary/10 hover:border-primary/40",
             isHovered ? "opacity-100" : "opacity-50"
           )}

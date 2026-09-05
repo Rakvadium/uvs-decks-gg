@@ -17,6 +17,8 @@ function slotRegistrationEqual(a: SlotRegistration, b: SlotRegistration): boolea
     a.component === b.component &&
     a.priority === b.priority &&
     a.label === b.label &&
+    a.tabLabel === b.tabLabel &&
+    a.mobileAccessory === b.mobileAccessory &&
     a.icon === b.icon &&
     a.iconFit === b.iconFit &&
     a.header === b.header &&

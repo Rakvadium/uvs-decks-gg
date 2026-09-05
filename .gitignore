@@ -43,6 +43,7 @@ next-env.d.ts
 /scripts/*
 !/scripts/admin-http.ts
 !/scripts/calibrate-card-ocr.ts
+!/scripts/patch-convex-auth-lan-host.mjs
 !/scripts/seed-card-drafts.ts
 !/scripts/ocr-calibration/
 /scripts/ocr-calibration/*

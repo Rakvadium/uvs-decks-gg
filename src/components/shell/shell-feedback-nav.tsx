@@ -1,7 +1,8 @@
 "use client";
 
-import { MessageSquare } from "lucide-react";
+import { ChevronRight, MessageSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { MOBILE_INSET_ROW } from "./mobile-glass";
 import {
   Tooltip,
   TooltipContent,
@@ -19,12 +20,13 @@ type ShellFeedbackNavSidebarProps = {
   variant: "sidebar";
 };
 
-type ShellFeedbackNavMobileHeaderProps = {
-  variant: "mobile-header";
+type ShellFeedbackNavProfileSheetProps = {
+  variant: "profile-sheet";
+  onAfterOpen?: () => void;
 };
 
 function ShellFeedbackNavSidebarInner() {
-  const { collapsed, prefersReducedMotion } = useLeftSidebarContext();
+  const { collapsed } = useLeftSidebarContext();
   const { openFeedbackDialog } = useFeedbackDialogControl();
   const label = "Feedback";
   const control = (
@@ -58,34 +60,32 @@ function ShellFeedbackNavSidebarInner() {
       </Tooltip>
     );
   }
-  return (
-    <div
-      style={prefersReducedMotion ? undefined : { animationDelay: "200ms" }}
-    >
-      {control}
-    </div>
-  );
+  return control;
 }
 
-function ShellFeedbackNavMobileHeaderInner() {
+function ShellFeedbackNavProfileSheetInner({ onAfterOpen }: { onAfterOpen?: () => void }) {
   const { openFeedbackDialog } = useFeedbackDialogControl();
   return (
     <button
       type="button"
-      onClick={openFeedbackDialog}
-      aria-label="Feedback"
-      className="relative z-10 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-sidebar-border bg-sidebar-accent text-sidebar-foreground transition-colors hover:border-accent/35 hover:bg-accent/10 hover:text-accent"
+      onClick={() => {
+        onAfterOpen?.();
+        openFeedbackDialog();
+      }}
+      className={MOBILE_INSET_ROW}
     >
-      <MessageSquare className="h-4 w-4" aria-hidden />
+      <MessageSquare className="size-5 text-primary" aria-hidden />
+      <span className="flex-1">Send feedback</span>
+      <ChevronRight className="size-4 text-muted-foreground" aria-hidden />
     </button>
   );
 }
 
 export function ShellFeedbackNav(
-  props: ShellFeedbackNavSidebarProps | ShellFeedbackNavMobileHeaderProps
+  props: ShellFeedbackNavSidebarProps | ShellFeedbackNavProfileSheetProps
 ) {
   if (props.variant === "sidebar") {
     return <ShellFeedbackNavSidebarInner />;
   }
-  return <ShellFeedbackNavMobileHeaderInner />;
+  return <ShellFeedbackNavProfileSheetInner onAfterOpen={props.onAfterOpen} />;
 }

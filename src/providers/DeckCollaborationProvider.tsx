@@ -15,6 +15,7 @@ import type { Id } from "../../convex/_generated/dataModel";
 import { useDeckDetails } from "./DeckDetailsProvider";
 import { useUIState } from "./UIStateProvider";
 import { isTeamEditableDeck } from "@/lib/deck/visibility";
+import { randomUuid } from "@/lib/random-uuid";
 
 const STALE_MS = 60_000;
 
@@ -87,7 +88,7 @@ export function DeckCollaborationProvider({ children }: { children: ReactNode })
 
   const [clientSessionId, setClientSessionId] = useState<string | null>(null);
   useEffect(() => {
-    setClientSessionId(crypto.randomUUID());
+    setClientSessionId(randomUuid());
   }, []);
 
   const lastCursorRef = useRef<Cursor>({

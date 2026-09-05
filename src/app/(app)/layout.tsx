@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useState, useMemo, useEffect } from "react";
+import { ReactNode, useState, useMemo, useEffect, type CSSProperties } from "react";
 import dynamic from "next/dynamic";
 import { AuthGuard } from "@/components/auth-guard";
 import {
@@ -15,11 +15,11 @@ import {
   useShellSlotSlots,
   useRegisterSlot,
   MobileShellProvider,
-  MobileHeader,
-  MobileTopBar,
-  MobileBottomNav,
+  MobileNavBar,
+  MobileTabBar,
   MobileProfileSheet,
   MobileActionsSheet,
+  useMobileShell,
 } from "@/components/shell";
 import { usePathname, useParams } from "next/navigation";
 import { useIsMobile } from "@/hooks/useIsMobile";
@@ -27,7 +27,7 @@ import {
   Upload,
   Layers,
   CreditCard,
-  Settings,
+  Shield,
   BookOpen,
   Newspaper,
   Users,
@@ -211,11 +211,72 @@ function AdminSidebarSlot() {
 
 function AdminSidebarSlotRegistration() {
   const slotOptions = useMemo(
-    () => ({ label: "Admin Navigation", icon: Settings }),
+    () => ({ label: "Admin Navigation", icon: Shield }),
     []
   );
   useRegisterSlot("right-sidebar", "admin-nav", AdminSidebarSlot, slotOptions);
   return null;
+}
+
+const MOBILE_SELF_SCROLLING_ROUTES = [
+  /^\/gallery(\/|$)/,
+  /^\/decks(\/|$)/,
+  /^\/collection(\/|$)/,
+  /^\/community(\/|$)/,
+  /^\/settings(\/|$)/,
+  /^\/teams(\/(?!invite(\/|$))|$)/,
+];
+
+function routeScrollsItself(pathname: string): boolean {
+  return MOBILE_SELF_SCROLLING_ROUTES.some((pattern) => pattern.test(pathname));
+}
+
+function MobileShellFrame({
+  pathname,
+  isMobile,
+  children,
+}: {
+  pathname: string;
+  isMobile: boolean;
+  children: ReactNode;
+}) {
+  const { navBarHeight, tabBarHeight } = useMobileShell();
+  const padsContent = !routeScrollsItself(pathname);
+
+  return (
+    <div
+      className="relative flex md:hidden h-[100dvh] min-h-0 w-full flex-col bg-background"
+      style={
+        {
+          "--mobile-nav-h": `${navBarHeight}px`,
+          "--mobile-tab-h": `${tabBarHeight}px`,
+        } as CSSProperties
+      }
+    >
+      <main
+        id={isMobile ? "main-content" : undefined}
+        className="relative flex min-h-0 flex-1 flex-col overflow-hidden bg-background"
+        style={{
+          backgroundImage: "var(--chrome-page-bg)",
+        }}
+      >
+        <div
+          className={cn(
+            "flex min-h-0 w-full flex-1 flex-col",
+            padsContent && "overflow-y-auto pt-[var(--mobile-nav-h)] pb-[calc(var(--mobile-tab-h)+1rem)]"
+          )}
+        >
+          <AccountStatusBanner className={padsContent ? undefined : "pt-[calc(var(--mobile-nav-h)+0.5rem)]"} />
+          {children}
+        </div>
+        <MobileActionsSheet>
+          <MobileNavBar />
+          <MobileTabBar />
+        </MobileActionsSheet>
+      </main>
+      <MobileProfileSheet />
+    </div>
+  );
 }
 
 function ShellLayoutInner({ children }: { children: ReactNode }) {
@@ -298,26 +359,9 @@ function ShellLayoutInner({ children }: { children: ReactNode }) {
 
   const mobileLayout = (
     <MobileShellProvider>
-      <div className="flex md:hidden h-[100dvh] min-h-0 w-full flex-col bg-background relative">
-        <MobileHeader />
-        <main
-          id={isMobile ? "main-content" : undefined}
-          className="max-md:min-h-0 flex min-h-0 flex-1 flex-col overflow-hidden bg-background"
-          style={{
-            backgroundImage: "var(--chrome-page-bg)",
-          }}
-        >
-          <AccountStatusBanner />
-          <div className="flex min-h-0 w-full flex-1 flex-col">{children}</div>
-        </main>
-        <div className="relative z-40 shrink-0 border-t border-sidebar-border bg-sidebar">
-          <MobileActionsSheet>
-            <MobileTopBar pageType={pageType} />
-            <MobileBottomNav />
-          </MobileActionsSheet>
-        </div>
-        <MobileProfileSheet />
-      </div>
+      <MobileShellFrame pathname={pathname} isMobile={isMobile}>
+        {children}
+      </MobileShellFrame>
     </MobileShellProvider>
   );
 

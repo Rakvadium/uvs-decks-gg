@@ -35,8 +35,11 @@ export function StatBar({
       </div>
       <div className="h-2 w-full overflow-hidden rounded-full bg-secondary">
         <div
-          className={cn("h-full rounded-full transition-[width]", color ?? "bg-primary")}
-          style={{ width: `${Math.min(percentage, 100)}%` }}
+          className={cn(
+            "h-full w-full origin-left rounded-full motion-safe:transition-transform motion-safe:duration-200",
+            color ?? "bg-primary"
+          )}
+          style={{ transform: `scaleX(${Math.min(Math.max(percentage, 0), 100) / 100})` }}
         />
       </div>
     </div>

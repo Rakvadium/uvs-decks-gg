@@ -10,9 +10,15 @@ import { useDeckDetailsTopBarContext } from "./context";
 
 interface DeckDetailsTopBarTitleSectionProps {
   compact?: boolean;
+  badgesOnly?: boolean;
+  className?: string;
 }
 
-export function DeckDetailsTopBarTitleSection({ compact = false }: DeckDetailsTopBarTitleSectionProps) {
+export function DeckDetailsTopBarTitleSection({
+  compact = false,
+  badgesOnly = false,
+  className,
+}: DeckDetailsTopBarTitleSectionProps) {
   const {
     deck,
     isOwner,
@@ -28,7 +34,8 @@ export function DeckDetailsTopBarTitleSection({ compact = false }: DeckDetailsTo
   const noopVis = (_value: DeckVisibility) => {};
 
   return (
-    <div className={cn("flex min-w-0 flex-1 flex-col", compact ? "gap-1" : "gap-1.5")}>
+    <div className={cn("flex min-w-0 flex-1 flex-col", compact ? "gap-1" : "gap-1.5", className)}>
+      {badgesOnly ? null : (
       <h1 className="min-w-0">
         <button
           type="button"
@@ -45,6 +52,7 @@ export function DeckDetailsTopBarTitleSection({ compact = false }: DeckDetailsTo
           {deck.name}
         </button>
       </h1>
+      )}
 
       <div className="flex min-w-0 flex-wrap items-center gap-1.5">
         <DeckVisibilityBadgeMenu

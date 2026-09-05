@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { ChevronRight, UserIcon } from "lucide-react";
+import { ChevronRight, Zap } from "lucide-react";
 import { SidebarFooter } from "@/components/shell";
 import { useCardData } from "@/lib/universus/card-data-provider";
 import { cn } from "@/lib/utils";
@@ -16,7 +16,7 @@ export function ActiveDeckIcon({ className }: { className?: string }) {
   if (!startingCharacter?.imageUrl) {
     return (
       <span className={cn("flex size-full items-center justify-center", className)}>
-        <UserIcon className="size-5" />
+        <Zap className="size-5" />
       </span>
     );
   }
@@ -27,7 +27,7 @@ export function ActiveDeckIcon({ className }: { className?: string }) {
         src={startingCharacter.imageUrl}
         alt={startingCharacter.name}
         fill
-        sizes="36px"
+        sizes="56px"
         className="object-cover object-top"
       />
     </span>

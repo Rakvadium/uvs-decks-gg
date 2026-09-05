@@ -50,7 +50,7 @@ Page-level actions. Primary action as a filled `FloatingActionPill` (opens a flo
 
 ## Mobile
 
-The floating bar is desktop-only (`hidden md:block` inside `FloatingPageLayout`). Mobile keeps its own patterns: in-content headings (`md:hidden` blocks), the `top-bar` shell slot, and `MobileTopBar`. Every page that renders a floating bar must keep an equivalent mobile heading/nav path.
+The floating bar is desktop-only (`hidden md:block` inside `FloatingPageLayout`). Phone chrome is a different slot system: [mobile-shell.md](./mobile-shell.md). Every desktop floating action still needs an equivalent mobile affordance, placed by that inventory — not by copying left/center/right onto the phone bar.
 
 ## Page inventory
 
@@ -73,5 +73,5 @@ The floating bar is desktop-only (`hidden md:block` inside `FloatingPageLayout`)
 
 1. Wrap the page in `FloatingPageLayout` and pass a feature-owned `floating-top-bar.tsx` composing `FloatingPageBar`.
 2. Assign content to slots by role using the table above; leave slots empty rather than borrowing roles.
-3. Keep a mobile heading path (`md:hidden` block or `top-bar` slot).
+3. Add the page to [mobile-shell.md](./mobile-shell.md) and place mobile search/actions/back in those slots.
 4. Put the page/entity title in the left pill as the `h1`; skip the description.

@@ -107,8 +107,23 @@ Bare `rounded` and `rounded-sm` are off-ladder: `rounded` is a static 4px that i
 
 ## Motion
 
-- Prefer `transition-colors`, `transition-opacity`, `transition-transform`, or an explicit property list — not `transition-all`.
-- Durations: `duration-150` for hover/chrome feedback; `duration-200` for controls.
+Canonical ladder: [theme-chrome-guidelines.md](./theme-chrome-guidelines.md) § Motion. This app’s wiring:
+
+| Role | Duration | What may change |
+| --- | --- | --- |
+| Hover / press / chrome feedback | `duration-150` | Color, opacity, `transform` |
+| Controls (input, button, focus chrome) | `duration-200` | Color, border, background, `box-shadow` when the shadow token actually changes |
+| Overlay enter / exit | primitive defaults (`duration-200` / `duration-300`) | Opacity + `transform` on dialogs, sheets, menus |
+
+Prefer `transition-colors`, `transition-opacity`, `transition-transform`, or an explicit property list — not `transition-all` and not a bare `transition` class.
+
+**Hover and press** are CSS: `hover:`, `group-hover:`, `active:`, wrapped in `motion-safe:` (and `motion-reduce:` when the resting state must be forced). Animate an inner span/icon, not the `Link` / `button` hit box. Framer Motion (`framer-motion/m` under `LazyMotion`) is for page intros, the tour reel, sidebar open/close, and overlay enter/exit — not a 4px hover nudge.
+
+**One driver.** If JS writes `transform`, do not also `transition` `transform` on that node.
+
+**Reduced motion.** CSS travel uses `motion-safe:` so it is correct on first paint. `usePrefersReducedMotion` (`useSyncExternalStore`) gates JS motion only and must not be the only gate on a hover. Chrome FX, pulses, scanlines, and `animate-pulse` are static under `prefers-reduced-motion` (see `src/styles/base.css`).
+
+**Do not** hover-animate `width`, `height`, `padding`, `margin`, or `filter`; do not leave unused `transform` / `box-shadow` in a transition list; do not leave `will-change` on idle tiles; do not set `animation-delay` with no animation.
 
 ## Typography and casing
 
@@ -136,5 +151,6 @@ Default frosted chrome: `backdrop-blur-sm`. Use `backdrop-blur-md` / `xl` only f
 - [theme-chrome-guidelines.md](./theme-chrome-guidelines.md) — portable theme / chrome / styling law
 - [theme-and-chrome.md](./theme-and-chrome.md) — this app’s appearance wiring
 - [PRODUCT_VISION.md](./PRODUCT_VISION.md)
-- [floating-header-islands.md](./floating-header-islands.md) for page header slot semantics
+- [floating-header-islands.md](./floating-header-islands.md) for desktop page header slot semantics
+- [mobile-shell.md](./mobile-shell.md) for mobile chrome slot semantics
 - [features/community/TierListSystem.md](./features/community/TierListSystem.md) for community-specific UX rules

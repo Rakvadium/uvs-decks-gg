@@ -22,7 +22,7 @@ Honor the user’s scope. If none:
 - Rotate: shell → gallery → decks → community → admin → convex structure
 - Or skim recent churn (`git log --since=14.days --name-only`)
 
-Read only what applies: `docs/UI_UX_DESIGN.md`, `docs/floating-header-islands.md`, `docs/component-architecture-playbook.md`, `docs/SYSTEM_ANALYSIS.md`, and neighbor code.
+Read only what applies: `docs/UI_UX_DESIGN.md`, `docs/floating-header-islands.md`, `docs/mobile-shell.md`, `docs/component-architecture-playbook.md`, `docs/SYSTEM_ANALYSIS.md`, and neighbor code.
 
 For UI surfaces, apply `ui-ux-adversary` *judgment* without implementing.
 

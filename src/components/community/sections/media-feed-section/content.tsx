@@ -285,7 +285,7 @@ export function CommunityMediaFeedSection() {
                         src={video.thumbnailUrl}
                         alt={video.title ?? "Video thumbnail"}
                         fill
-                        className="object-cover transition-transform group-hover:scale-105"
+                        className="object-cover motion-safe:transition-transform motion-safe:duration-150 motion-safe:group-hover:scale-105"
                         sizes="112px"
                       />
                     ) : (

@@ -53,6 +53,7 @@ export function FloatingPageLayout({
       <div
         className={cn(
           "min-h-0 flex-1 overflow-y-auto overflow-x-hidden overscroll-y-contain [-webkit-overflow-scrolling:touch] p-4 md:p-6 md:pt-[4.75rem]",
+          "max-md:pt-[calc(var(--mobile-nav-h,3.5rem)+0.75rem)] max-md:pb-[calc(var(--mobile-tab-h,5rem)+1rem)] max-md:[scroll-padding-top:var(--mobile-nav-h,3.5rem)]",
           contentClassName
         )}
       >

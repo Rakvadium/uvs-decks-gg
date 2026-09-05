@@ -5,7 +5,6 @@ import { TeamEditableWriteConflictBanner } from "@/components/deck/team-editable
 import { useShellSlotActions } from "@/components/shell/shell-slot-provider";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/useIsMobile";
-import { usePrefersReducedMotion } from "@/lib/reduced-motion";
 import type { CachedCard } from "@/lib/universus/card-store";
 import { useActiveDeck } from "@/providers/ActiveDeckProvider";
 import { ActiveDeckCharacterPanel } from "./character-panel";
@@ -15,7 +14,6 @@ export function ActiveDeckSidebar() {
   const { activeDeck, isLoading } = useActiveDeck();
   const { setActiveSidebarAction } = useShellSlotActions();
   const isMobile = useIsMobile();
-  const prefersReducedMotion = usePrefersReducedMotion();
   const [hoveredCard, setHoveredCard] = useState<CachedCard | null>(null);
   const [hoveredRect, setHoveredRect] = useState<DOMRect | null>(null);
 
@@ -81,7 +79,6 @@ export function ActiveDeckSidebar() {
       <CardHoverPreviewPortal
         card={isMobile ? null : hoveredCard}
         rect={isMobile ? null : hoveredRect}
-        prefersReducedMotion={prefersReducedMotion}
         width={220}
       />
 

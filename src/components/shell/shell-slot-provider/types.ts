@@ -11,8 +11,10 @@ export interface SlotRegistration {
   component: ComponentType;
   priority?: number;
   label?: string;
+  tabLabel?: string;
   icon?: SlotIcon;
   iconFit?: SlotIconFit;
+  mobileAccessory?: boolean;
   header?: ComponentType;
   footer?: ComponentType;
 }
@@ -20,7 +22,9 @@ export interface SlotRegistration {
 export interface SlotRegistrationOptions {
   priority?: number;
   label?: string;
+  tabLabel?: string;
   icon?: SlotIcon;
+  mobileAccessory?: boolean;
   iconFit?: SlotIconFit;
   header?: ComponentType;
   footer?: ComponentType;

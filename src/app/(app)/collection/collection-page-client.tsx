@@ -7,7 +7,8 @@ import {
   FloatingPageLayout,
   FloatingPageTitle,
 } from "@/components/shell/floating-page-bar";
-import { PageHeading, SectionHeading } from "@/components/ui/typography-headings";
+import { MobileLargeTitle } from "@/components/shell/mobile-large-title";
+import { SectionHeading } from "@/components/ui/typography-headings";
 
 export default function CollectionPageClient() {
   return (
@@ -20,11 +21,7 @@ export default function CollectionPageClient() {
         />
       }
     >
-      <div className="mb-6 md:hidden">
-        <PageHeading>
-          Collection
-        </PageHeading>
-      </div>
+      <MobileLargeTitle className="mb-4">Collection</MobileLargeTitle>
       <Card className="border-2 border-dashed border-border/80">
         <CardContent className="flex flex-col items-center justify-center py-16">
           <div

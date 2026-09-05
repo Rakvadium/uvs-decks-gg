@@ -49,11 +49,11 @@ export {
   SlotRenderer,
 } from "./shell-slot-provider";
 export { ThemeInjector } from "./theme-injector";
-export { MobileShellProvider, useMobileShell } from "./mobile-shell-context";
-export { MobileHeader } from "./mobile-header";
-export { MobileTopBar } from "./mobile-top-bar";
-export { MobileBottomNav } from "./mobile-bottom-nav";
+export { MobileShellProvider, useMobileShell, useMobileShellOptional } from "./mobile-shell-context";
+export { MobileNavBar } from "./mobile-nav-bar/content";
+export { MobileTabBar } from "./mobile-tab-bar/content";
+export { MobileSearchField } from "./mobile-tab-bar/search-field";
+export { MobileLargeTitle } from "./mobile-large-title";
 export { MobileProfileSheet } from "./mobile-profile-sheet";
 export { MobileActionsSheet } from "./mobile-actions-sheet";
-export { MobileActionsTrigger } from "./mobile-actions-trigger";
 export { MobileFiltersSheet, MobileFiltersButton } from "./mobile-filters-sheet";

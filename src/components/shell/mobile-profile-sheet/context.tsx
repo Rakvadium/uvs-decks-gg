@@ -7,6 +7,7 @@ import { useConvexAuth, useQuery } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import type { Doc } from "../../../../convex/_generated/dataModel";
 import { useAuthDialog } from "@/components/auth/auth-dialog";
+import { suppressSubsequentPointerEvents } from "@/lib/suppress-subsequent-pointer";
 import { useColorScheme, useTheme } from "@/lib/theme";
 import { useMobileShell } from "../mobile-shell-context";
 
@@ -78,8 +79,9 @@ export function MobileProfileSheetProvider({ children }: { children: ReactNode }
   }, [closeSheet, router]);
 
   const handleAuthClick = useCallback(() => {
-    openAuthDialog();
+    suppressSubsequentPointerEvents();
     closeSheet();
+    openAuthDialog();
   }, [openAuthDialog, closeSheet]);
 
   const handleAdminToggle = useCallback(() => {

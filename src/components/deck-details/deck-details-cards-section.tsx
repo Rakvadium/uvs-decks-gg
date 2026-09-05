@@ -17,7 +17,6 @@ function DeckCardsSectionContent() {
       <CardHoverPreviewPortal
         card={model.hoveredCard}
         rect={model.hoveredRect}
-        prefersReducedMotion={model.prefersReducedMotion}
       />
 
       <div className="space-y-3">

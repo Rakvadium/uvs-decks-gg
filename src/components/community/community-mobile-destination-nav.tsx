@@ -21,10 +21,12 @@ export function CommunityMobileDestinationNav({
   const value = communityDestinationFromLocation(pathname, searchParams);
 
   return (
-    <nav className={cn("min-w-0", className)} aria-label="Community destinations">
+    <nav className={cn("min-w-0 md:hidden", className)} aria-label="Community destinations">
       <SegmentedControl
         size="sm"
-        className="w-max min-w-0 max-w-none"
+        stretch
+        className="w-full bg-muted/30"
+        itemClassName="h-10"
         value={value === "hub" ? undefined : value}
         onValueChange={(next) => {
           const dest = COMMUNITY_DESTINATIONS.find((item) => item.value === next);

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { COLOR_SCHEMES } from "@/lib/theme";
 import type { ColorPresetChoice } from "@/lib/theme/appearance-types";
-import { Check, ChevronDown, Moon, Palette, Settings, Sun } from "lucide-react";
+import { Check, ChevronRight, Moon, Palette, Settings, Sun } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,6 +11,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Switch } from "@/components/ui/switch";
+import { cn } from "@/lib/utils";
+import { ShellFeedbackNav } from "@/components/shell/shell-feedback-nav";
+import { MOBILE_INSET_DIVIDER, MOBILE_INSET_GROUP, MOBILE_INSET_ROW } from "../mobile-glass";
+import { MobileProfileSectionLabel } from "./section-label";
 import { useMobileProfileSheetContext } from "./context";
 
 export function MobileProfilePreferencesSection() {
@@ -29,32 +34,26 @@ export function MobileProfilePreferencesSection() {
     : (COLOR_SCHEMES.find((scheme) => scheme.value === colorPreset)?.label ?? "Default");
 
   return (
-    <div className="p-4">
-      <p className="chrome-label-case mb-2 text-xs font-medium text-muted-foreground">
-        Preferences
-      </p>
-      <div className="space-y-1">
-        <button
-          type="button"
-          onClick={handleToggleTheme}
-          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted"
-        >
-          {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-          <span>{isDark ? "Light mode" : "Dark mode"}</span>
-        </button>
+    <section>
+      <MobileProfileSectionLabel>Appearance</MobileProfileSectionLabel>
+      <div className={cn(MOBILE_INSET_GROUP, MOBILE_INSET_DIVIDER)}>
+        <label className={cn(MOBILE_INSET_ROW, "cursor-pointer")}>
+          {isDark ? (
+            <Moon className="size-5 text-muted-foreground" aria-hidden />
+          ) : (
+            <Sun className="size-5 text-muted-foreground" aria-hidden />
+          )}
+          <span className="flex-1 font-medium">Dark mode</span>
+          <Switch checked={isDark} onCheckedChange={handleToggleTheme} aria-label="Toggle dark mode" />
+        </label>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button
-              type="button"
-              className="flex min-h-11 w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted"
-            >
-              <Palette className="h-5 w-5 shrink-0" />
-              <span className="flex-1 text-left">Color preset</span>
-              <span className="max-w-[9rem] truncate text-xs font-normal text-muted-foreground">
-                {selectedLabel}
-              </span>
-              <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
+            <button type="button" className={MOBILE_INSET_ROW}>
+              <Palette className="size-5 shrink-0 text-muted-foreground" aria-hidden />
+              <span className="flex-1 font-medium">Color preset</span>
+              <span className="max-w-[9rem] truncate text-sm text-muted-foreground">{selectedLabel}</span>
+              <ChevronRight className="size-4 shrink-0 text-muted-foreground/70" aria-hidden />
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="min-w-[12rem]">
@@ -83,15 +82,16 @@ export function MobileProfilePreferencesSection() {
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <button
-          type="button"
-          onClick={handleSettingsClick}
-          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted"
-        >
-          <Settings className="h-5 w-5" />
-          <span>Settings</span>
+        <button type="button" onClick={handleSettingsClick} className={MOBILE_INSET_ROW}>
+          <Settings className="size-5 text-muted-foreground" aria-hidden />
+          <span className="flex-1 font-medium">Settings</span>
+          <ChevronRight className="size-4 text-muted-foreground/70" aria-hidden />
         </button>
       </div>
-    </div>
+
+      <div className={cn(MOBILE_INSET_GROUP, MOBILE_INSET_DIVIDER, "mt-5")}>
+        <ShellFeedbackNav variant="profile-sheet" onAfterOpen={closeSheet} />
+      </div>
+    </section>
   );
 }

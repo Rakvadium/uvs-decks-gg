@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useMemo, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useMemo, type ReactNode } from "react";
 import { useMobileShell } from "../mobile-shell-context";
 import {
   useShellSlotActions,
@@ -12,14 +12,14 @@ import {
 interface MobileActionsSheetContextValue {
   isActionsSheetOpen: boolean;
   sidebarSlots: SlotRegistration[];
+  defaultSlot: SlotRegistration | undefined;
   activeSlot: SlotRegistration | undefined;
   ActiveComponent: SlotRegistration["component"] | undefined;
   ActiveHeader: SlotRegistration["header"] | undefined;
   ActiveFooter: SlotRegistration["footer"] | undefined;
-  openSheet: () => void;
+  openSheet: (slotId?: string) => void;
   closeSheet: () => void;
   handleOpenChange: (open: boolean) => void;
-  handleBack: () => void;
   selectSlot: (id: string) => void;
 }
 
@@ -32,8 +32,8 @@ export function MobileActionsSheetProvider({ children }: { children: ReactNode }
   const { setActiveSidebarAction } = useShellSlotActions();
 
   const sidebarSlots = useMemo(() => slots.get("right-sidebar") ?? [], [slots]);
-
-  const activeSlot = sidebarSlots.find((slot) => slot.id === activeActionId);
+  const defaultSlot = sidebarSlots[0];
+  const activeSlot = sidebarSlots.find((slot) => slot.id === activeActionId) ?? defaultSlot;
   const ActiveComponent = activeSlot?.component;
   const ActiveHeader = activeSlot?.header;
   const ActiveFooter = activeSlot?.footer;
@@ -42,18 +42,14 @@ export function MobileActionsSheetProvider({ children }: { children: ReactNode }
     setActionsSheetOpen(false);
   }, [setActionsSheetOpen]);
 
-  const openSheet = useCallback(() => {
-    setActionsSheetOpen(true);
-  }, [setActionsSheetOpen]);
-
-  useEffect(() => {
-    if (!isActionsSheetOpen || activeActionId || sidebarSlots.length !== 1) {
-      return;
-    }
-    const onlySlot = sidebarSlots[0];
-    if (!onlySlot) return;
-    setActiveSidebarAction(onlySlot.id);
-  }, [activeActionId, isActionsSheetOpen, setActiveSidebarAction, sidebarSlots]);
+  const openSheet = useCallback(
+    (slotId?: string) => {
+      const target = slotId ?? defaultSlot?.id ?? null;
+      setActiveSidebarAction(target);
+      setActionsSheetOpen(true);
+    },
+    [defaultSlot?.id, setActionsSheetOpen, setActiveSidebarAction]
+  );
 
   const handleOpenChange = useCallback(
     (open: boolean) => {
@@ -61,21 +57,10 @@ export function MobileActionsSheetProvider({ children }: { children: ReactNode }
         closeSheet();
         return;
       }
-
       openSheet();
     },
     [closeSheet, openSheet]
   );
-
-  const handleBack = useCallback(() => {
-    if (sidebarSlots.length <= 1) {
-      setActiveSidebarAction(null);
-      closeSheet();
-      return;
-    }
-    setActiveSidebarAction(null);
-    openSheet();
-  }, [closeSheet, openSheet, setActiveSidebarAction, sidebarSlots.length]);
 
   const selectSlot = useCallback(
     (id: string) => {
@@ -88,6 +73,7 @@ export function MobileActionsSheetProvider({ children }: { children: ReactNode }
     (): MobileActionsSheetContextValue => ({
       isActionsSheetOpen,
       sidebarSlots,
+      defaultSlot,
       activeSlot,
       ActiveComponent,
       ActiveHeader,
@@ -95,12 +81,12 @@ export function MobileActionsSheetProvider({ children }: { children: ReactNode }
       openSheet,
       closeSheet,
       handleOpenChange,
-      handleBack,
       selectSlot,
     }),
     [
       isActionsSheetOpen,
       sidebarSlots,
+      defaultSlot,
       activeSlot,
       ActiveComponent,
       ActiveHeader,
@@ -108,7 +94,6 @@ export function MobileActionsSheetProvider({ children }: { children: ReactNode }
       openSheet,
       closeSheet,
       handleOpenChange,
-      handleBack,
       selectSlot,
     ]
   );
