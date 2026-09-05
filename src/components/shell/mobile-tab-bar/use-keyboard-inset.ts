@@ -1,12 +1,20 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
-import { readMobileKeyboardInset } from "../use-mobile-visual-viewport";
+import { useSyncExternalStore, type RefObject } from "react";
 
-function readKeyboardInset(): number {
+const KEYBOARD_INSET_THRESHOLD = 40;
+
+export function readBarKeyboardInset(bar: HTMLElement | null) {
   if (typeof window === "undefined" || !window.visualViewport) return 0;
   const viewport = window.visualViewport;
-  return readMobileKeyboardInset(window.innerHeight, viewport.height, viewport.offsetTop);
+  const visibleBottom = viewport.offsetTop + viewport.height;
+  if (!bar) {
+    const inset = window.innerHeight - visibleBottom;
+    return inset > KEYBOARD_INSET_THRESHOLD ? Math.round(inset) : 0;
+  }
+  const currentBottom = Number.parseFloat(bar.style.bottom) || 0;
+  const inset = bar.getBoundingClientRect().bottom + currentBottom - visibleBottom;
+  return inset > KEYBOARD_INSET_THRESHOLD ? Math.round(inset) : 0;
 }
 
 function subscribe(onChange: () => void) {
@@ -14,15 +22,24 @@ function subscribe(onChange: () => void) {
   if (!viewport) return () => {};
   viewport.addEventListener("resize", onChange);
   viewport.addEventListener("scroll", onChange);
+  window.addEventListener("resize", onChange);
   return () => {
     viewport.removeEventListener("resize", onChange);
     viewport.removeEventListener("scroll", onChange);
+    window.removeEventListener("resize", onChange);
   };
 }
 
 const getServerSnapshot = () => 0;
 
-export function useKeyboardInset(enabled: boolean): number {
-  const inset = useSyncExternalStore(subscribe, readKeyboardInset, getServerSnapshot);
+export function useKeyboardInset(
+  enabled: boolean,
+  barRef: RefObject<HTMLElement | null>
+): number {
+  const inset = useSyncExternalStore(
+    subscribe,
+    () => readBarKeyboardInset(barRef.current),
+    getServerSnapshot
+  );
   return enabled ? inset : 0;
 }

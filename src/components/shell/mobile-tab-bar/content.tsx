@@ -181,7 +181,7 @@ function MobileTabBarBody({ tools }: { tools: MobileBottomTools }) {
   const peekInAct = hasPeek && MOBILE_PEEK_PLACEMENT === "act";
   const hasActCapsule = hasSearch || hasActions || peekInAct;
   const searchOpen = isSearchOpen && hasSearch;
-  const keyboardInset = useKeyboardInset(searchOpen);
+  const keyboardInset = useKeyboardInset(searchOpen, containerRef);
 
   useLayoutEffect(() => {
     const element = containerRef.current;
@@ -224,7 +224,7 @@ function MobileTabBarBody({ tools }: { tools: MobileBottomTools }) {
     <div
       ref={containerRef}
       className={cn(
-        "pointer-events-none absolute inset-x-0 z-40 flex flex-col gap-[var(--mobile-tab-row-gap)] px-3 pt-3",
+        "pointer-events-none fixed inset-x-0 z-40 flex flex-col gap-[var(--mobile-tab-row-gap)] px-3 pt-3",
         keyboardInset > 0 ? "pb-2" : MOBILE_SAFE_BOTTOM,
         "motion-safe:transition-[transform,opacity] motion-safe:duration-200",
         isActionsSheetOpen ? "translate-y-full opacity-0" : "translate-y-0 opacity-100"
