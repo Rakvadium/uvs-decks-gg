@@ -1,3 +1,4 @@
+import { useIsMobile } from "@/hooks/useIsMobile";
 import { DeckGridItem } from "../../deck-grid-item";
 import {
   ACTIVE_DECK_CARD_DESIGN,
@@ -14,10 +15,16 @@ const GRID_LAYOUT: Record<DeckCardDesign, { grid: string; cell: string }> = {
     grid: "grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 xl:grid-cols-5",
     cell: "[content-visibility:auto] [contain-intrinsic-size:auto_300px]",
   },
+  row: {
+    grid: "grid grid-cols-1 gap-2",
+    cell: "[content-visibility:auto] [contain-intrinsic-size:auto_104px]",
+  },
 };
 
 export function DecksGrid({ decks, showAuthor }: DecksGridProps) {
-  const layout = GRID_LAYOUT[ACTIVE_DECK_CARD_DESIGN];
+  const isMobile = useIsMobile();
+  const design: DeckCardDesign = isMobile ? "row" : ACTIVE_DECK_CARD_DESIGN;
+  const layout = GRID_LAYOUT[design];
 
   return (
     <div className={layout.grid}>
@@ -25,7 +32,7 @@ export function DecksGrid({ decks, showAuthor }: DecksGridProps) {
         <div key={deck._id} className={layout.cell}>
           <DeckGridItem
             deck={deck}
-            design={ACTIVE_DECK_CARD_DESIGN}
+            design={design}
             showAuthor={showAuthor}
             coverImagePriority={index < 8}
           />

@@ -8,11 +8,13 @@ import {
   type DeckGridItemProps,
 } from "./types";
 import { DeckNameplateItem } from "./variants/nameplate";
+import { DeckRowItem } from "./variants/row";
 import { DeckSplashItem } from "./variants/splash";
 
 const DESIGN_COMPONENTS: Record<DeckCardDesign, () => ReactElement> = {
   nameplate: DeckNameplateItem,
   splash: DeckSplashItem,
+  row: DeckRowItem,
 };
 
 export function DeckGridItem({

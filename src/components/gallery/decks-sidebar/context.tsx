@@ -2,8 +2,6 @@ import { useCallback, useMemo, useState, createContext, useContext, type ReactNo
 import { useMutation } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import { useDeckCatalogData, type DeckTab } from "@/hooks/useDeckCatalogData";
-import { useCardIdMap } from "@/hooks/useCardIdMap";
-import { useCardData } from "@/lib/universus/card-data-provider";
 import { useActiveDeck } from "@/providers/ActiveDeckProvider";
 
 interface DecksSidebarContextValue {
@@ -24,7 +22,6 @@ interface DecksSidebarContextValue {
   isTabLoading: boolean;
   activeDeckId: string | null | undefined;
   setActiveDeck: (deckId: string | null) => void;
-  cardIdMap: ReturnType<typeof useCardIdMap>;
 }
 
 const DecksSidebarContext = createContext<DecksSidebarContextValue | null>(null);
@@ -47,8 +44,6 @@ export function DecksSidebarProvider({ children }: DecksSidebarProviderProps) {
 
   const createDeck = useMutation(api.decks.create);
   const { activeDeckId, setActiveDeck } = useActiveDeck();
-  const { cards } = useCardData();
-  const cardIdMap = useCardIdMap(cards);
 
   const handleCreate = useCallback(async () => {
     const trimmedName = newDeckName.trim();
@@ -84,7 +79,6 @@ export function DecksSidebarProvider({ children }: DecksSidebarProviderProps) {
       isTabLoading,
       activeDeckId,
       setActiveDeck,
-      cardIdMap,
     }),
     [
       activeTab,
@@ -100,7 +94,6 @@ export function DecksSidebarProvider({ children }: DecksSidebarProviderProps) {
       isTabLoading,
       activeDeckId,
       setActiveDeck,
-      cardIdMap,
     ]
   );
 

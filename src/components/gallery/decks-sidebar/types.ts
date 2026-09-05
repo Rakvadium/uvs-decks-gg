@@ -1,3 +1,3 @@
-import type { Doc } from "../../../../convex/_generated/dataModel";
+import type { DeckListItem } from "@/components/decks/deck-grid-item/types";
 
-export type DeckData = Doc<"decks">;
+export type DeckData = DeckListItem;
