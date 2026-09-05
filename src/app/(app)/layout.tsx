@@ -22,6 +22,7 @@ import {
   useMobileShell,
 } from "@/components/shell";
 import { useMobileVisualViewportFrame } from "@/components/shell/use-mobile-visual-viewport";
+import { MobileViewportDebug } from "@/components/shell/mobile-viewport-debug";
 import { usePathname, useParams } from "next/navigation";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import {
@@ -249,6 +250,7 @@ function MobileShellFrame({
   return (
     <div
       ref={frameRef}
+      data-mobile-shell-frame
       className="fixed inset-0 flex min-h-0 w-full flex-col overflow-hidden bg-background md:hidden"
       style={
         {
@@ -277,6 +279,7 @@ function MobileShellFrame({
           <MobileNavBar />
           <MobileTabBar />
         </MobileActionsSheet>
+        <MobileViewportDebug />
       </main>
       <MobileProfileSheet />
     </div>
