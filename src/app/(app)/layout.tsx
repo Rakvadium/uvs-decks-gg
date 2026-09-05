@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useState, useMemo, useEffect, type CSSProperties } from "react";
+import { ReactNode, useMemo, useRef, useState, useEffect, type CSSProperties } from "react";
 import dynamic from "next/dynamic";
 import { AuthGuard } from "@/components/auth-guard";
 import {
@@ -21,6 +21,7 @@ import {
   MobileActionsSheet,
   useMobileShell,
 } from "@/components/shell";
+import { useMobileVisualViewportFrame } from "@/components/shell/use-mobile-visual-viewport";
 import { usePathname, useParams } from "next/navigation";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import {
@@ -241,11 +242,14 @@ function MobileShellFrame({
   children: ReactNode;
 }) {
   const { navBarHeight, tabBarHeight } = useMobileShell();
+  const frameRef = useRef<HTMLDivElement>(null);
   const padsContent = !routeScrollsItself(pathname);
+  useMobileVisualViewportFrame(frameRef);
 
   return (
     <div
-      className="relative flex md:hidden h-[100dvh] min-h-0 w-full flex-col bg-background"
+      ref={frameRef}
+      className="fixed inset-x-0 top-0 flex h-[100dvh] min-h-0 w-full flex-col overflow-hidden bg-background md:hidden"
       style={
         {
           "--mobile-nav-h": `${navBarHeight}px`,
