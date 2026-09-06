@@ -220,7 +220,6 @@ function MobileTabBarBody({ tools }: { tools: MobileBottomTools }) {
   return (
     <div
       ref={containerRef}
-      data-mobile-tab-bar
       className={cn(
         "pointer-events-none absolute inset-x-0 bottom-0 z-40 flex flex-col gap-[var(--mobile-tab-row-gap)] px-3 pt-3",
         searchOpen ? "pb-2" : MOBILE_SAFE_BOTTOM,
