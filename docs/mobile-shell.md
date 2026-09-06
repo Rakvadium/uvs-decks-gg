@@ -82,7 +82,7 @@ Present only when the page has `right-sidebar` slots. In `"act"` placement it is
 Fixed width (`4 × tabWidth`), always the same four tabs in the same order: **Cards, Decks, Community, Profile** (plus Peek after a hairline only in `"tabs"` placement). Icon-only, `aria-label` names them. The capsule never stretches to fill the row; the Act capsule sits to its right and is simply omitted when empty.
 
 - Cards / Decks / Community are hard routes with `aria-current="page"`.
-- Profile (`MobileProfileTab`) shows the avatar when signed in and opens the profile sheet; signed out it is a generic glyph that opens the auth dialog.
+- Profile (`MobileProfileTab`) shows the avatar when signed in and opens the profile sheet; signed out it is the `LogIn` glyph that opens the auth dialog.
 
 ### Act capsule (right)
 
@@ -131,7 +131,7 @@ Nested sheet → dialog needs `suppressSubsequentPointerEvents`.
 | --- | --- | --- | --- | --- | --- |
 | Gallery | Brand | sr-only “Cards” | Media | Active deck (art) · Decks | Search · Filters |
 | Decks list | Mark | Collapsible “Decks” | Media | Active deck (signed in) | Search · New deck |
-| Deck details | Back → Decks | Deck name | — | Gallery · Stats · Simulator · Import/Export | Edit (owner) |
+| Deck details | Back → Decks | Deck name | — | Gallery · Stats · Simulator · Import/Export | Duplicate · Edit (owner) |
 | Community hub | Mark | Collapsible “Community” | Media | Tier Lists panel | — |
 | Tier lists | Back → Community | “Tier Lists” | New list | — | Search (not on Rankings) |
 | Tier list detail | `top-bar` slot (full row) | (in slot) | — | — | — |

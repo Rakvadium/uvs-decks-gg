@@ -1,7 +1,7 @@
 "use client";
 
 import { useConvexAuth, useQuery } from "convex/react";
-import { UserRound } from "lucide-react";
+import { LogIn } from "lucide-react";
 import { api } from "../../../../convex/_generated/api";
 import { useAuthDialog } from "@/components/auth/auth-dialog";
 import { UserAvatar } from "@/components/user-avatar";
@@ -49,7 +49,7 @@ export function MobileProfileTab({ className }: MobileProfileTabProps) {
           fallbackClassName="bg-primary/20 text-[10px] font-bold text-primary"
         />
       ) : (
-        <UserRound
+        <LogIn
           className={cn(
             MOBILE_TAB_ICON_CLASS,
             "shrink-0 motion-safe:transition-transform motion-safe:duration-150 motion-safe:group-active:scale-90"

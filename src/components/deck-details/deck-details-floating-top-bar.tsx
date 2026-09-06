@@ -1,6 +1,6 @@
 "use client";
 
-import { Edit3, Zap } from "lucide-react";
+import { Copy, Edit3, Loader2, Zap } from "lucide-react";
 import {
   FloatingActionPill,
   FloatingBackPill,
@@ -11,8 +11,16 @@ import { cn } from "@/lib/utils";
 import { useDeckDetailsTopBarContext } from "./deck-details-top-bar/context";
 
 export function DeckDetailsFloatingTopBar() {
-  const { deck, isLoading, isOwner, isActiveDeck, setAsActiveDeck, startEditing } =
-    useDeckDetailsTopBarContext();
+  const {
+    deck,
+    isLoading,
+    isOwner,
+    isActiveDeck,
+    isDuplicating,
+    setAsActiveDeck,
+    startEditing,
+    requestDuplicate,
+  } = useDeckDetailsTopBarContext();
 
   if (isLoading || !deck) {
     return null;
@@ -35,8 +43,8 @@ export function DeckDetailsFloatingTopBar() {
         </div>
       }
       right={
-        isOwner ? (
-          <>
+        <>
+          {isOwner ? (
             <FloatingActionPill
               variant="outline"
               onClick={setAsActiveDeck}
@@ -47,12 +55,27 @@ export function DeckDetailsFloatingTopBar() {
               <Zap className={cn("h-3.5 w-3.5", isActiveDeck && "fill-primary text-primary")} />
               <span className="text-xs">{isActiveDeck ? "Active" : "Set Active"}</span>
             </FloatingActionPill>
+          ) : null}
+          <FloatingActionPill
+            variant={isOwner ? "outline" : "default"}
+            onClick={requestDuplicate}
+            disabled={isDuplicating}
+            aria-label="Duplicate deck"
+          >
+            {isDuplicating ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <Copy className="h-3.5 w-3.5" />
+            )}
+            <span className="text-xs">Duplicate</span>
+          </FloatingActionPill>
+          {isOwner ? (
             <FloatingActionPill onClick={() => startEditing()}>
               <Edit3 className="h-3.5 w-3.5" />
               <span className="text-xs">Edit</span>
             </FloatingActionPill>
-          </>
-        ) : null
+          ) : null}
+        </>
       }
     />
   );

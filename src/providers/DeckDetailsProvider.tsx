@@ -2,9 +2,11 @@
 
 import { createContext, useContext, useState, useMemo, ReactNode, useCallback, useEffect } from "react";
 import { useConvexAuth, useQuery, useMutation } from "convex/react";
+import { toast } from "sonner";
 import { api } from "../../convex/_generated/api";
 import { Id } from "../../convex/_generated/dataModel";
 import { useRouter } from "next/navigation";
+import { useAuthDialog } from "@/components/auth/auth-dialog";
 import { useSiloedDeckOptional } from "@/lib/deck";
 import type { DeckTeamSharing, DeckVisibility } from "@/lib/deck/visibility";
 import { deckTeamSharingFromDeck, normalizeDeckVisibility } from "@/lib/deck/visibility";
@@ -53,6 +55,11 @@ interface DeckDetailsContextValue {
   updateDeck: (updates: DeckDetailsUpdate) => Promise<void>;
   isDeleting: boolean;
   deleteDeck: () => Promise<void>;
+  isDuplicating: boolean;
+  isDuplicateConfirmOpen: boolean;
+  setDuplicateConfirmOpen: (open: boolean) => void;
+  requestDuplicate: () => void;
+  confirmDuplicate: () => Promise<void>;
   isActiveDeck: boolean;
   setAsActiveDeck: () => void;
   selectedCardIds: string[];
@@ -81,9 +88,12 @@ export function DeckDetailsProvider({ children, deckId }: DeckDetailsProviderPro
     useState<DeckTeamSharing>("team_viewable");
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isDuplicating, setIsDuplicating] = useState(false);
+  const [isDuplicateConfirmOpen, setDuplicateConfirmOpen] = useState(false);
   const router = useRouter();
 
   const { isAuthenticated } = useConvexAuth();
+  const { openAuthDialog } = useAuthDialog();
   const { activeDeckId, setActiveDeck } = useActiveDeck();
   const siloedDeck = useSiloedDeckOptional();
   const typedDeckId = deckId as Id<"decks">;
@@ -101,6 +111,7 @@ export function DeckDetailsProvider({ children, deckId }: DeckDetailsProviderPro
   );
   const updateDeckMutation = useMutation(api.decks.update);
   const deleteDeckMutation = useMutation(api.decks.deleteDeck);
+  const duplicateDeckMutation = useMutation(api.decks.duplicate);
 
   const selectCard = useCallback((cardId: string) => {
     setSelectedCardIds(prev => prev.includes(cardId) ? prev : [...prev, cardId]);
@@ -213,6 +224,38 @@ export function DeckDetailsProvider({ children, deckId }: DeckDetailsProviderPro
     }
   }, [deleteDeckMutation, typedDeckId, router]);
 
+  const requestDuplicate = useCallback(() => {
+    if (!isAuthenticated) {
+      openAuthDialog();
+      return;
+    }
+    setDuplicateConfirmOpen(true);
+  }, [isAuthenticated, openAuthDialog]);
+
+  const confirmDuplicate = useCallback(async () => {
+    if (!isAuthenticated) {
+      openAuthDialog();
+      return;
+    }
+    setDuplicateConfirmOpen(false);
+    setIsDuplicating(true);
+    try {
+      const newDeckId = await duplicateDeckMutation({ deckId: typedDeckId });
+      setActiveDeck(newDeckId);
+      router.push(`/decks/${newDeckId}`);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not duplicate deck");
+      setIsDuplicating(false);
+    }
+  }, [
+    duplicateDeckMutation,
+    isAuthenticated,
+    openAuthDialog,
+    router,
+    setActiveDeck,
+    typedDeckId,
+  ]);
+
   useEffect(() => {
     if (!deck || isEditing) return;
     setEditName(deck.name);
@@ -252,6 +295,11 @@ export function DeckDetailsProvider({ children, deckId }: DeckDetailsProviderPro
     updateDeck: updateDeckDetails,
     isDeleting,
     deleteDeck: deleteDeckAndExit,
+    isDuplicating,
+    isDuplicateConfirmOpen,
+    setDuplicateConfirmOpen,
+    requestDuplicate,
+    confirmDuplicate,
     isActiveDeck,
     setAsActiveDeck,
     selectedCardIds,
@@ -280,6 +328,10 @@ export function DeckDetailsProvider({ children, deckId }: DeckDetailsProviderPro
     updateDeckDetails,
     isDeleting,
     deleteDeckAndExit,
+    isDuplicating,
+    isDuplicateConfirmOpen,
+    requestDuplicate,
+    confirmDuplicate,
     isActiveDeck,
     setAsActiveDeck,
     selectedCardIds,

@@ -19,6 +19,7 @@ import {
 } from "./lib/deckAccess";
 import { requireCapability } from "./teams/permissions";
 import { attachOwnerUsernames } from "./lib/deckList";
+import { buildDuplicatedDeckFields } from "./lib/duplicateDeck";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { requirePositiveIntegerQuantity } from "./lib/deckQuantity";
 
@@ -506,6 +507,27 @@ export const deleteDeck = mutation({
 
     await ctx.db.delete(args.deckId);
     return null;
+  },
+});
+
+export const duplicate = mutation({
+  args: {
+    deckId: v.id("decks"),
+  },
+  returns: v.id("decks"),
+  handler: async (ctx, args) => {
+    const userId = await requireAuth(ctx);
+    await requireUserCanPostContent(ctx, userId);
+
+    const source = await ctx.db.get(args.deckId);
+    if (!source) throw new Error("Deck not found");
+    const allowed = await canViewDeck(ctx, source, args.deckId);
+    if (!allowed) throw new Error("Deck not found");
+
+    return await ctx.db.insert("decks", {
+      userId,
+      ...buildDuplicatedDeckFields(source),
+    });
   },
 });
 
