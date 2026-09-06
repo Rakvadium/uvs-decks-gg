@@ -9,15 +9,20 @@ import { cn } from "@/lib/utils";
 import { GalleryFilterDialogProvider } from "../filter-dialog/context";
 import { GalleryTopBarFiltersProvider } from "../gallery-top-bar-filters/context";
 import { GalleryMobileFilterNavProvider, useGalleryMobileFilterNav } from "./context";
+import { GalleryMobileFilterDisplayProvider, type GalleryMobileFilterDisplayOverride } from "./display-context";
 import { GalleryMobileFilterFooter } from "./footer";
 import { GalleryMobileFilterHeader } from "./header";
 import { GalleryMobileFilterKeywordsPage, GalleryMobileFilterSetsPage } from "./picker-page";
 import { GalleryMobileFilterRootPage } from "./root-page";
 import { GalleryMobileFilterStatsPage } from "./stats-page";
 
-interface GalleryMobileFilterSheetProps {
+interface GalleryMobileFilterSheetBodyProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+}
+
+interface GalleryMobileFilterSheetProps extends GalleryMobileFilterSheetBodyProps {
+  display?: GalleryMobileFilterDisplayOverride;
 }
 
 function ActivePage() {
@@ -29,7 +34,7 @@ function ActivePage() {
   return <GalleryMobileFilterRootPage />;
 }
 
-function GalleryMobileFilterSheetBody({ open, onOpenChange }: GalleryMobileFilterSheetProps) {
+function GalleryMobileFilterSheetBody({ open, onOpenChange }: GalleryMobileFilterSheetBodyProps) {
   const { page, direction, reset } = useGalleryMobileFilterNav();
   const close = () => onOpenChange(false);
   const { panelRef, resetTranslate, grabberProps } = useGrabberDismiss(close);
@@ -82,16 +87,18 @@ function GalleryMobileFilterSheetBody({ open, onOpenChange }: GalleryMobileFilte
   );
 }
 
-export function GalleryMobileFilterSheet(props: GalleryMobileFilterSheetProps) {
+export function GalleryMobileFilterSheet({ display, ...props }: GalleryMobileFilterSheetProps) {
   const filtersContext = useGalleryFiltersOptional();
   if (!filtersContext) return null;
 
   return (
     <GalleryFilterDialogProvider filtersContext={filtersContext}>
       <GalleryTopBarFiltersProvider>
-        <GalleryMobileFilterNavProvider>
-          <GalleryMobileFilterSheetBody {...props} />
-        </GalleryMobileFilterNavProvider>
+        <GalleryMobileFilterDisplayProvider value={display}>
+          <GalleryMobileFilterNavProvider>
+            <GalleryMobileFilterSheetBody {...props} />
+          </GalleryMobileFilterNavProvider>
+        </GalleryMobileFilterDisplayProvider>
       </GalleryTopBarFiltersProvider>
     </GalleryFilterDialogProvider>
   );
