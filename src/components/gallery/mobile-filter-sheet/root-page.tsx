@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { useGalleryFilterDialogContext } from "../filter-dialog/context";
 import { useGalleryTopBarFiltersContext } from "../gallery-top-bar-filters/context";
 import { useGalleryMobileFilterNav } from "./context";
+import { useGalleryMobileFilterDisplayOverride, type GalleryMobileFilterDisplayMode } from "./display-context";
 import {
   ActiveFilterChip,
   FilterChip,
@@ -264,7 +265,10 @@ function DrillGroup() {
 
 function DisplayGroup() {
   const { state, actions } = useGalleryTopBarFiltersContext();
-  const mode = state.viewMode === "details" ? "list" : state.viewMode;
+  const override = useGalleryMobileFilterDisplayOverride();
+  const galleryMode: GalleryMobileFilterDisplayMode = state.viewMode === "details" ? "list" : state.viewMode;
+  const mode = override ? override.viewMode : galleryMode;
+  const setMode = override ? override.setViewMode : actions.setViewMode;
 
   return (
     <FilterGroup label="Display">
@@ -275,13 +279,13 @@ function DisplayGroup() {
           className="min-w-0 flex-1 bg-muted/30"
           itemClassName={segmentedItemClassName}
           value={mode}
-          onValueChange={(value) => actions.setViewMode(value as "card" | "list")}
+          onValueChange={(value) => setMode(value as GalleryMobileFilterDisplayMode)}
           items={[
             { value: "card", label: "Cards", icon: LayoutGrid },
             { value: "list", label: "List", icon: List },
           ]}
         />
-        {mode === "card" ? (
+        {!override && mode === "card" ? (
           <SegmentedControl
             size="sm"
             className="shrink-0 bg-muted/30"

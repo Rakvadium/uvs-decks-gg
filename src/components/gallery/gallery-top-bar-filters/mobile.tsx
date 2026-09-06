@@ -9,7 +9,7 @@ import { useGalleryFiltersOptional } from "@/providers/GalleryFiltersProvider";
 import { GalleryMobileFilterSheet } from "../mobile-filter-sheet";
 import { GalleryTopBarFiltersProvider, useGalleryTopBarFiltersContext } from "./context";
 
-function searchPlaceholder(mode: "name" | "text" | "all") {
+export function searchPlaceholder(mode: "name" | "text" | "all") {
   if (mode === "name") return "Search by name…";
   if (mode === "text") return "Search card text…";
   return "Search all cards…";

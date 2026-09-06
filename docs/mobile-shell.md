@@ -99,6 +99,7 @@ Optional capsule of `MobileActButton`s registered in `resolveMobileBottomTools`.
 
 - Opens on the **default panel** (first registered slot). No back chevron, no panel grid.
 - **Header:** grabber, panel title (or the slot's `header`), **Done**.
+- **Panel-owned search:** a panel that filters its own list (deck-details Gallery) keeps a single `MobileSearchField` + Filters `MobileActButton` row pinned at the bottom of the panel body, directly above the sheet footer. It reuses the Act capsule's field and button, never a bespoke input.
 - **Footer:** when a page has more than one panel, an icon+label switcher (`role="tablist"`) on the left; the active slot's `footer` actions (Open deck details, Redraw, …) on the right. Panel-specific actions never render inside the panel body on mobile.
 - Register with `useRegisterSlot("right-sidebar", …)` and supply `label`, `icon`, optional `tabLabel` (short switcher text when `label` is dynamic, e.g. a deck name → “Active Deck”), `iconFit: "media"` only for art that should fill the circle, and `header` / `footer` when the panel has them.
 - Priority `0` is the default panel. Deck details defaults to Gallery; gallery and decks default to Active Deck.
@@ -118,7 +119,7 @@ Do not rebuild a second search bar, a second primary-nav row, or a tool-tile row
 | Sheet | Opens from | Holds |
 | --- | --- | --- |
 | Actions sheet | Peek circle | `right-sidebar` panels + footer switcher |
-| Filter sheet | Act → Filters | Mobile gallery filters (root, Sets, Keywords, Stats pages) |
+| Filter sheet | Act → Filters (gallery); Filters button in the deck-details Gallery peek | Mobile gallery filters (root, Sets, Keywords, Stats pages). Inside the Gallery peek its Display group drives the peek's own card/list mode, not the gallery preference |
 | Profile sheet | Go → Profile (signed in) | Account, prefs, full navigation, Feedback, sign out |
 | Auth dialog | Go → Profile (signed out); Sign In in the profile footer | Sign in |
 
