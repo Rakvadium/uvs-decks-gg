@@ -58,7 +58,7 @@ export function DeckDetailsFloatingTopBar() {
           ) : null}
           <FloatingActionPill
             variant={isOwner ? "outline" : "default"}
-            onClick={() => void requestDuplicate()}
+            onClick={requestDuplicate}
             disabled={isDuplicating}
             aria-label="Duplicate deck"
           >

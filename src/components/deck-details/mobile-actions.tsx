@@ -24,7 +24,7 @@ export function DeckDetailsMobileActions() {
         label="Duplicate deck"
         tone={duplicateTone}
         disabled={context.isDuplicating}
-        onClick={() => void context.requestDuplicate()}
+        onClick={context.requestDuplicate}
       >
         {context.isDuplicating ? (
           <Loader2 className={cn(MOBILE_TAB_ICON_CLASS, "animate-spin")} strokeWidth={2.25} />

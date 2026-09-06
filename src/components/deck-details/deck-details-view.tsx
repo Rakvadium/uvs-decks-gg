@@ -32,6 +32,7 @@ import { DeckCardsSectionProvider } from "./deck-details-cards-section-context";
 import { DeckDetailsSectionTabs } from "./deck-details-section-tabs";
 import { DeckDetailsDesktopListSort } from "./deck-list-sort-select";
 import { DeckDetailsViewModeToggle } from "./deck-details-view-mode-toggle";
+import { DeckDetailsDuplicateDialog } from "./deck-details-duplicate-dialog";
 import { DeckDetailsEditDialog } from "./deck-details-edit-dialog";
 import { TeamEditableWriteConflictBanner } from "@/components/deck/team-editable-write-conflict-banner";
 import { isDeckQuantitiesEmpty } from "./deck-empty";
@@ -96,6 +97,7 @@ export function DeckDetailsView() {
             <TeamEditableWriteConflictBanner className="max-md:mb-4" />
             <DeckDetailsReadOnlyBanner />
             <DeckDetailsEditDialog />
+            <DeckDetailsDuplicateDialog />
             {isOwner && <DeckDetailsGallerySlotRegistration />}
             <DeckDetailsTopBarTitleSection badgesOnly className="md:hidden" />
             <div className="relative max-md:mt-3 md:mt-0">

@@ -12,8 +12,8 @@ All notable changes to this project are recorded here.
 
 ### Added
 
-- **Duplicate deck** — Deck details can copy a viewable deck into a new private deck you own (cards, quantities, layouts, format, character, identity, cover). Guests are sent to sign in. After success the copy becomes Active and opens.
-  - **Files:** `convex/decks.ts`, `convex/lib/duplicateDeck.ts`, `src/providers/DeckDetailsProvider.tsx`, `src/components/deck-details/deck-details-floating-top-bar.tsx`, `src/components/deck-details/mobile-actions.tsx`, `docs/floating-header-islands.md`, `docs/mobile-shell.md`.
+- **Duplicate deck** — Deck details can copy a viewable deck into a new private deck you own (cards, quantities, layouts, format, character, identity, cover). Signed-in users confirm first. Guests are sent to sign in. After success the copy becomes Active and opens.
+  - **Files:** `convex/decks.ts`, `convex/lib/duplicateDeck.ts`, `src/providers/DeckDetailsProvider.tsx`, `src/components/deck-details/deck-details-duplicate-dialog.tsx`, `src/components/deck-details/deck-details-floating-top-bar.tsx`, `src/components/deck-details/mobile-actions.tsx`, `docs/floating-header-islands.md`, `docs/mobile-shell.md`.
 
 - **Community YouTube channel watchlist** — Admins add creator channels on `/admin/content/youtube`; the two-hour cron (and admin/public refresh) pulls each channel’s newest uploads into the UniVersus Content stream, sorted by publish date. Per-channel title include/exclude words and an optional playlist keep mixed-game creators on-topic. Removing a synced video excludes it from later pulls.
   - **Files:** `convex/communityYoutubeChannels.ts`, `convex/communityYoutube.ts`, `convex/schema.ts`, `src/features/admin-youtube-curations/*`, `docs/SYSTEM_ANALYSIS.md`.

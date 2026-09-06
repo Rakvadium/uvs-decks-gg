@@ -56,7 +56,10 @@ interface DeckDetailsContextValue {
   isDeleting: boolean;
   deleteDeck: () => Promise<void>;
   isDuplicating: boolean;
-  requestDuplicate: () => Promise<void>;
+  isDuplicateConfirmOpen: boolean;
+  setDuplicateConfirmOpen: (open: boolean) => void;
+  requestDuplicate: () => void;
+  confirmDuplicate: () => Promise<void>;
   isActiveDeck: boolean;
   setAsActiveDeck: () => void;
   selectedCardIds: string[];
@@ -86,6 +89,7 @@ export function DeckDetailsProvider({ children, deckId }: DeckDetailsProviderPro
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isDuplicating, setIsDuplicating] = useState(false);
+  const [isDuplicateConfirmOpen, setDuplicateConfirmOpen] = useState(false);
   const router = useRouter();
 
   const { isAuthenticated } = useConvexAuth();
@@ -220,11 +224,20 @@ export function DeckDetailsProvider({ children, deckId }: DeckDetailsProviderPro
     }
   }, [deleteDeckMutation, typedDeckId, router]);
 
-  const requestDuplicate = useCallback(async () => {
+  const requestDuplicate = useCallback(() => {
     if (!isAuthenticated) {
       openAuthDialog();
       return;
     }
+    setDuplicateConfirmOpen(true);
+  }, [isAuthenticated, openAuthDialog]);
+
+  const confirmDuplicate = useCallback(async () => {
+    if (!isAuthenticated) {
+      openAuthDialog();
+      return;
+    }
+    setDuplicateConfirmOpen(false);
     setIsDuplicating(true);
     try {
       const newDeckId = await duplicateDeckMutation({ deckId: typedDeckId });
@@ -283,7 +296,10 @@ export function DeckDetailsProvider({ children, deckId }: DeckDetailsProviderPro
     isDeleting,
     deleteDeck: deleteDeckAndExit,
     isDuplicating,
+    isDuplicateConfirmOpen,
+    setDuplicateConfirmOpen,
     requestDuplicate,
+    confirmDuplicate,
     isActiveDeck,
     setAsActiveDeck,
     selectedCardIds,
@@ -313,7 +329,9 @@ export function DeckDetailsProvider({ children, deckId }: DeckDetailsProviderPro
     isDeleting,
     deleteDeckAndExit,
     isDuplicating,
+    isDuplicateConfirmOpen,
     requestDuplicate,
+    confirmDuplicate,
     isActiveDeck,
     setAsActiveDeck,
     selectedCardIds,
