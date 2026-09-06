@@ -9,6 +9,7 @@ import {
 import { DeckDetailsGallerySidebarBottomBar } from "./bottom-bar";
 import { DeckDetailsGallerySidebarBody } from "./body";
 import { DeckDetailsGallerySidebarHoverPreview } from "./hover-preview";
+import { DeckDetailsGallerySidebarMobileBar } from "./mobile-bar";
 
 function GallerySidebarUnavailable() {
   return (
@@ -31,21 +32,21 @@ function DeckDetailsGallerySidebarContent() {
 function DeckDetailsGallerySidebarAvailableContent() {
   const { isFilterDialogOpen, setIsFilterDialogOpen, isMobile } = useAvailableGallerySidebarContext();
 
+  if (isMobile) {
+    return (
+      <div className="flex h-full min-h-0 flex-col">
+        <DeckDetailsGallerySidebarBody />
+        <DeckDetailsGallerySidebarMobileBar />
+      </div>
+    );
+  }
+
   return (
     <>
       <DeckDetailsGallerySidebarHoverPreview />
       <div className="flex h-full min-h-0 flex-col">
-        {isMobile ? (
-          <>
-            <DeckDetailsGallerySidebarBody />
-            <DeckDetailsGallerySidebarBottomBar position="bottom" />
-          </>
-        ) : (
-          <>
-            <DeckDetailsGallerySidebarBottomBar position="top" />
-            <DeckDetailsGallerySidebarBody />
-          </>
-        )}
+        <DeckDetailsGallerySidebarBottomBar />
+        <DeckDetailsGallerySidebarBody />
       </div>
       <GalleryFilterDialog open={isFilterDialogOpen} onOpenChange={setIsFilterDialogOpen} />
     </>
