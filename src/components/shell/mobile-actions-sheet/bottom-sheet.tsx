@@ -23,7 +23,7 @@ function readDetents(): Detents {
   if (typeof window === "undefined") {
     return { medium: 480, large: 760 };
   }
-  const viewport = window.innerHeight;
+  const viewport = window.visualViewport?.height ?? window.innerHeight;
   return {
     medium: Math.round(viewport * MEDIUM_RATIO),
     large: Math.round(viewport * LARGE_RATIO),

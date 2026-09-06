@@ -6,7 +6,6 @@ import {
   useLayoutEffect,
   useRef,
   useState,
-  type CSSProperties,
   type KeyboardEvent,
   type ReactNode,
 } from "react";
@@ -31,7 +30,6 @@ import {
 } from "./metrics";
 import { resolveMobileBottomTools, type MobileBottomTools, type MobileSearchState } from "./page-tools";
 import { MobileProfileTab } from "./profile-tab";
-import { useKeyboardInset } from "./use-keyboard-inset";
 
 interface NavItem {
   path: string;
@@ -181,7 +179,6 @@ function MobileTabBarBody({ tools }: { tools: MobileBottomTools }) {
   const peekInAct = hasPeek && MOBILE_PEEK_PLACEMENT === "act";
   const hasActCapsule = hasSearch || hasActions || peekInAct;
   const searchOpen = isSearchOpen && hasSearch;
-  const keyboardInset = useKeyboardInset(searchOpen);
 
   useLayoutEffect(() => {
     const element = containerRef.current;
@@ -224,12 +221,12 @@ function MobileTabBarBody({ tools }: { tools: MobileBottomTools }) {
     <div
       ref={containerRef}
       className={cn(
-        "pointer-events-none absolute inset-x-0 z-40 flex flex-col gap-[var(--mobile-tab-row-gap)] px-3 pt-3",
-        keyboardInset > 0 ? "pb-2" : MOBILE_SAFE_BOTTOM,
+        "pointer-events-none absolute inset-x-0 bottom-0 z-40 flex flex-col gap-[var(--mobile-tab-row-gap)] px-3 pt-3",
+        searchOpen ? "pb-2" : MOBILE_SAFE_BOTTOM,
         "motion-safe:transition-[transform,opacity] motion-safe:duration-200",
         isActionsSheetOpen ? "translate-y-full opacity-0" : "translate-y-0 opacity-100"
       )}
-      style={{ ...MOBILE_TAB_METRIC_VARS, bottom: keyboardInset } as CSSProperties}
+      style={MOBILE_TAB_METRIC_VARS}
       aria-hidden={isActionsSheetOpen || undefined}
     >
       {hasPeek && defaultSlot && MOBILE_PEEK_PLACEMENT === "row" ? (
