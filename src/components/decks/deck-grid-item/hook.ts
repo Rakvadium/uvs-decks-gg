@@ -22,6 +22,8 @@ export function useDeckGridItemModel({
   deck,
   showAuthor = false,
   coverImagePriority = false,
+  selected = false,
+  trailingAction,
 }: DeckGridItemProps) {
   const { cards } = useCardData();
   const { display, viewerUserId } = useProfanityDisplayText();
@@ -65,6 +67,8 @@ export function useDeckGridItemModel({
     deck,
     showAuthor,
     coverImagePriority,
+    selected,
+    trailingAction,
     displayImage: imageCard?.imageUrl || startingCharacter?.imageUrl,
     startingCharacterName: startingCharacter?.name,
     characterHandSize: startingCharacter?.handSize ?? null,
