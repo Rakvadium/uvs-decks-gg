@@ -58,7 +58,7 @@ The floating bar is desktop-only (`hidden md:block` inside `FloatingPageLayout`)
 | --- | --- | --- | --- |
 | Gallery | — | Search island (`FloatingIsland`) | — |
 | Decks list | Tabs (My / Public / Tournament) | Search | New Deck |
-| Deck details | Icon-only back + deck name pill | — | Set Active, Edit |
+| Deck details | Icon-only back + deck name pill | — | Set Active (owner), Duplicate, Edit (owner) |
 | Community hub | Dest tabs (Tier Lists / Rankings / Creators) | — | — |
 | Creators | Icon-only back to Community | — | — |
 | Tier lists browser | Icon-only back + tabs (Rankings / Public / My Lists) | Search (Public / My Lists) | New List |

@@ -47,6 +47,7 @@ import type * as lib_deckAccess from "../lib/deckAccess.js";
 import type * as lib_deckFormatRules from "../lib/deckFormatRules.js";
 import type * as lib_deckList from "../lib/deckList.js";
 import type * as lib_deckQuantity from "../lib/deckQuantity.js";
+import type * as lib_duplicateDeck from "../lib/duplicateDeck.js";
 import type * as lib_moderation_localCommentHeuristic from "../lib/moderation/localCommentHeuristic.js";
 import type * as lib_moderation_providers from "../lib/moderation/providers.js";
 import type * as lib_moderation_textPublish from "../lib/moderation/textPublish.js";
@@ -135,6 +136,7 @@ declare const fullApi: ApiFromModules<{
   "lib/deckFormatRules": typeof lib_deckFormatRules;
   "lib/deckList": typeof lib_deckList;
   "lib/deckQuantity": typeof lib_deckQuantity;
+  "lib/duplicateDeck": typeof lib_duplicateDeck;
   "lib/moderation/localCommentHeuristic": typeof lib_moderation_localCommentHeuristic;
   "lib/moderation/providers": typeof lib_moderation_providers;
   "lib/moderation/textPublish": typeof lib_moderation_textPublish;

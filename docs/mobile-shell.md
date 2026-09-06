@@ -131,7 +131,7 @@ Nested sheet → dialog needs `suppressSubsequentPointerEvents`.
 | --- | --- | --- | --- | --- | --- |
 | Gallery | Brand | sr-only “Cards” | Media | Active deck (art) · Decks | Search · Filters |
 | Decks list | Mark | Collapsible “Decks” | Media | Active deck (signed in) | Search · New deck |
-| Deck details | Back → Decks | Deck name | — | Gallery · Stats · Simulator · Import/Export | Edit (owner) |
+| Deck details | Back → Decks | Deck name | — | Gallery · Stats · Simulator · Import/Export | Duplicate · Edit (owner) |
 | Community hub | Mark | Collapsible “Community” | Media | Tier Lists panel | — |
 | Tier lists | Back → Community | “Tier Lists” | New list | — | Search (not on Rankings) |
 | Tier list detail | `top-bar` slot (full row) | (in slot) | — | — | — |
