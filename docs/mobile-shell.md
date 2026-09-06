@@ -82,7 +82,7 @@ Present only when the page has `right-sidebar` slots. In `"act"` placement it is
 Fixed width (`4 × tabWidth`), always the same four tabs in the same order: **Cards, Decks, Community, Profile** (plus Peek after a hairline only in `"tabs"` placement). Icon-only, `aria-label` names them. The capsule never stretches to fill the row; the Act capsule sits to its right and is simply omitted when empty.
 
 - Cards / Decks / Community are hard routes with `aria-current="page"`.
-- Profile (`MobileProfileTab`) shows the avatar when signed in and opens the profile sheet; signed out it is a generic glyph that opens the auth dialog.
+- Profile (`MobileProfileTab`) shows the avatar when signed in and opens the profile sheet; signed out it is the `LogIn` glyph that opens the auth dialog.
 
 ### Act capsule (right)
 
