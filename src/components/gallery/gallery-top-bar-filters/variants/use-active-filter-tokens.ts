@@ -3,6 +3,7 @@
 import { useMemo } from "react";
 import { useGalleryFilterDialogContext } from "@/components/gallery/filter-dialog/context";
 import type { CardFilters } from "@/providers/UIStateProvider";
+import { STANDARD_FORMAT_KEY } from "../../../../../shared/standard-rotation";
 
 export const STATS_FILTER_KEYS = [
   "difficulty",
@@ -63,6 +64,19 @@ export function useActiveFilterTokens(): ActiveFilterToken[] {
 
   return useMemo(() => {
     const tokens: ActiveFilterToken[] = [];
+
+    if (
+      filters.standardNextRotation === true &&
+      (filters.format ?? meta.defaultFormatKey) === STANDARD_FORMAT_KEY
+    ) {
+      tokens.push({
+        id: "standardNextRotation",
+        label: "Next rotation",
+        values: ["On"],
+        count: 1,
+        clear: () => actions.removeFilterKeys(["standardNextRotation"]),
+      });
+    }
 
     if (filters.format && filters.format !== meta.defaultFormatKey) {
       const formatName =

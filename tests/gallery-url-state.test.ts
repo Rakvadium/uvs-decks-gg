@@ -18,6 +18,7 @@ describe("gallery url state", () => {
         format: "expanded",
         type: ["Character", "Attack"],
         includeInfinity: false,
+        standardNextRotation: true,
         difficulty: { operator: "gte", value: 3 },
       },
     });
@@ -30,6 +31,7 @@ describe("gallery url state", () => {
     expect(written.get("format")).toBe("expanded");
     expect(written.get("type")).toBe("Character,Attack");
     expect(written.get("includeInfinity")).toBe("0");
+    expect(written.get("standardNextRotation")).toBe("1");
     expect(written.get("difficulty")).toBe("gte:3");
     expect(galleryUrlHasState(written)).toBe(true);
 
@@ -42,6 +44,7 @@ describe("gallery url state", () => {
     expect(parsed.filters?.format).toBe("expanded");
     expect(parsed.filters?.type).toEqual(["Character", "Attack"]);
     expect(parsed.filters?.includeInfinity).toBe(false);
+    expect(parsed.filters?.standardNextRotation).toBe(true);
     expect(parsed.filters?.difficulty).toEqual({ operator: "gte", value: 3 });
   });
 

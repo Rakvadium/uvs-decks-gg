@@ -1,6 +1,11 @@
 import { query } from "./_generated/server";
 import { v } from "convex/values";
 import { formatValidator, cardLegalityValidator, setLegalityValidator } from "./validators";
+import {
+  STANDARD_FORMAT_KEY,
+  buildRotationSnapshot,
+  hasRotatedOutOfStandard,
+} from "../shared/standard-rotation";
 
 export const list = query({
   args: {},
@@ -83,21 +88,33 @@ export const isSetLegal = query({
   args: {
     formatKey: v.string(),
     setCode: v.string(),
+    now: v.number(),
   },
   returns: v.boolean(),
   handler: async (ctx, args) => {
+    if (args.formatKey === STANDARD_FORMAT_KEY) {
+      const sets = await ctx.db.query("sets").take(2000);
+      const snapshot = buildRotationSnapshot(sets, args.now);
+      const set = sets.find((row) => row.code === args.setCode);
+      if (set && hasRotatedOutOfStandard(set, snapshot)) {
+        return false;
+      }
+    }
+
     const entries = await ctx.db
       .query("setLegality")
-      .withIndex("by_format", (q) => q.eq("formatKey", args.formatKey))
-      .collect();
-    
-    const entry = entries.find(e => e.setCode === args.setCode);
+      .withIndex("by_format_set", (q) =>
+        q.eq("formatKey", args.formatKey).eq("setCode", args.setCode)
+      )
+      .take(1);
+
+    const entry = entries[0];
     if (!entry) return true;
-    
-    if (entry.rotatesOutAt && entry.rotatesOutAt < Date.now()) {
+
+    if (entry.rotatesOutAt !== undefined && entry.rotatesOutAt < args.now) {
       return false;
     }
-    
+
     return entry.isLegal;
   },
 });

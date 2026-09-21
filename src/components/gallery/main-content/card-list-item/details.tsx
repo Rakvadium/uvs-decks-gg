@@ -1,4 +1,5 @@
 import { Badge } from "@/components/ui/badge";
+import { CardReleaseTags } from "@/components/universus/card-release-tags";
 import { useCardListItemContext } from "./context";
 
 export function CardListItemDetails() {
@@ -21,6 +22,7 @@ export function CardListItemDetails() {
         ) : null}
         {card.setName ? <span className="truncate">{card.setName}</span> : null}
         {card.rarity ? <span>{card.rarity}</span> : null}
+        <CardReleaseTags setCode={card.setCode} className="flex-row items-center" />
       </div>
     </div>
   );

@@ -9,6 +9,7 @@ import { usePrefersReducedMotion } from "@/lib/reduced-motion";
 import { useTcgDraggable } from "@/lib/dnd";
 import { cn } from "@/lib/utils";
 import type { CachedCard } from "@/lib/universus/card-store";
+import { CardReleaseTags } from "@/components/universus/card-release-tags";
 import { CardDeckControlsStandard } from "./card-deck-controls";
 import { useGalleryCardMap } from "./card-map-context";
 
@@ -76,6 +77,7 @@ export function CardDetailsListItem({ card, onOpenCardDetails, imagePriority = f
                     </div>
                   </div>
                 )}
+                <CardReleaseTags setCode={displayCard.setCode} overlay />
               </div>
               {!prefersReducedMotion ? (
                 <div className="absolute -inset-3 -z-10 rounded-2xl bg-gradient-to-r from-primary/10 via-secondary/10 to-primary/10 blur-2xl" />

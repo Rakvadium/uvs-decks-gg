@@ -465,6 +465,15 @@ export const formatErrataValidator = v.object({
   sortOrder: v.number(),
 });
 
+export const setProductKindValidator = v.union(v.literal("booster"), v.literal("other"));
+
+export function assertPrintingYear(year: number | undefined): void {
+  if (year === undefined) return;
+  if (!Number.isInteger(year) || year < 1990 || year > 2100) {
+    throw new Error("Printing year must be a whole number from 1990 to 2100");
+  }
+}
+
 export const setDocValidator = v.object({
   _id: v.id("sets"),
   _creationTime: v.number(),
@@ -477,6 +486,8 @@ export const setDocValidator = v.object({
   legality: v.optional(v.string()),
   isRotating: v.optional(v.boolean()),
   isFuture: v.optional(v.boolean()),
+  productKind: v.optional(v.union(v.literal("booster"), v.literal("other"))),
+  printingYear: v.optional(v.number()),
   spotlightIP: v.optional(v.string()),
   updatedAt: v.optional(v.number()),
   updatedBy: v.optional(v.id("users")),

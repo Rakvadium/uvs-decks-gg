@@ -34,6 +34,7 @@ const BOOL_KEYS = [
   "hasAbilities",
   "isDualFaced",
   "isReleased",
+  "standardNextRotation",
 ] as const;
 
 const NUMBER_KEYS = [

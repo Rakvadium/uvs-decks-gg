@@ -18,6 +18,13 @@ import {
   CachedCard,
 } from "./use-universus-cards";
 import { useSets, CachedSet, parseSetLegality } from "./use-sets";
+import {
+  STANDARD_FORMAT_KEY,
+  buildRotationSnapshot,
+  hasRotatedOutOfStandard,
+  leavesAtNextRotation,
+} from "../../../shared/standard-rotation";
+import { useUtcDayNumber, utcNoonFromDayNumber } from "./use-utc-day";
 import { useFormats, CachedFormat } from "./use-formats";
 import type { CardFilters } from "@/providers/UIStateProvider";
 
@@ -115,17 +122,29 @@ function CardDataProviderInner({ children }: CardDataProviderProps) {
     ]
   );
 
+  const rotationDay = useUtcDayNumber();
+  const rotationSnapshot = useMemo(
+    () => buildRotationSnapshot(setsData.sets, utcNoonFromDayNumber(rotationDay)),
+    [setsData.sets, rotationDay]
+  );
+
   const isSetLegalInFormat = useCallback(
     (setCode: string, formatKey: string): boolean => {
       const set = setsData.getSetByCode(setCode);
       if (!set) return true;
 
       const legalFormats = parseSetLegality(set.legality);
-      if (legalFormats.length === 0) return true;
+      if (legalFormats.length > 0 && !legalFormats.includes(formatKey)) {
+        return false;
+      }
 
-      return legalFormats.includes(formatKey);
+      if (formatKey === STANDARD_FORMAT_KEY && hasRotatedOutOfStandard(set, rotationSnapshot)) {
+        return false;
+      }
+
+      return true;
     },
-    [setsData.getSetByCode]
+    [setsData, rotationSnapshot]
   );
 
   const referenceValue = useMemo((): CardReferenceContextValue => {
@@ -143,13 +162,21 @@ function CardDataProviderInner({ children }: CardDataProviderProps) {
   const catalogValue = useMemo((): CardCatalogContextValue => {
     const getFilteredCards = (filters: CardFilters) => {
       const formatKey = filters.format;
-      return filterCards(cardData.cards, filters, {
+      const filtered = filterCards(cardData.cards, filters, {
         passesFormatLegality: formatKey
           ? (setCode) => !setCode || isSetLegalInFormat(setCode, formatKey)
           : undefined,
         isCardBannedInFormat: formatKey
           ? (cardId) => stableFormatsData.isCardBannedInFormat(formatKey, cardId)
           : undefined,
+      });
+      if (formatKey !== STANDARD_FORMAT_KEY || filters.standardNextRotation !== true) {
+        return filtered;
+      }
+      return filtered.filter((card) => {
+        if (!card.setCode) return false;
+        const set = setsData.getSetByCode(card.setCode);
+        return set !== undefined && leavesAtNextRotation(set, rotationSnapshot);
       });
     };
 
@@ -176,7 +203,7 @@ function CardDataProviderInner({ children }: CardDataProviderProps) {
       getPaginatedCards,
       getFilteredAndSortedCards,
     };
-  }, [cardData, isSetLegalInFormat, stableFormatsData]);
+  }, [cardData, isSetLegalInFormat, rotationSnapshot, setsData, stableFormatsData]);
 
   return (
     <CardReferenceContext.Provider value={referenceValue}>

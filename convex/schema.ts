@@ -81,6 +81,10 @@ export default defineSchema({
     legality: v.optional(v.string()),
     isRotating: v.optional(v.boolean()),
     isFuture: v.optional(v.boolean()),
+    /** Booster sets are the only product that starts a Standard rotation year. */
+    productKind: v.optional(v.union(v.literal("booster"), v.literal("other"))),
+    /** Calendar year the cards were printed. Falls back to the UTC year of releasedAt. */
+    printingYear: v.optional(v.number()),
     spotlightIP: v.optional(v.string()),
     updatedAt: v.optional(v.number()),
     updatedBy: v.optional(v.id("users")),

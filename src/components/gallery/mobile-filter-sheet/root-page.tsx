@@ -8,6 +8,8 @@ import { Switch } from "@/components/ui/switch";
 import { getSymbolPath } from "@/components/universus/symbol-icon/utils";
 import { rarityFilterSelected, toggleCanonicalRarityFilter } from "@/lib/universus/rarity";
 import { cn } from "@/lib/utils";
+import { StandardNextRotationToggle } from "../filter-dialog/standard-next-rotation-toggle";
+import { STANDARD_FORMAT_KEY } from "../../../../shared/standard-rotation";
 import { useGalleryFilterDialogContext } from "../filter-dialog/context";
 import { useGalleryTopBarFiltersContext } from "../gallery-top-bar-filters/context";
 import { useGalleryMobileFilterNav } from "./context";
@@ -94,6 +96,11 @@ function CardGroup() {
               />
             ))}
           </FilterChipRow>
+        </FilterRow>
+      ) : null}
+      {activeFormat === STANDARD_FORMAT_KEY ? (
+        <FilterRow>
+          <StandardNextRotationToggle />
         </FilterRow>
       ) : null}
       {types.length > 0 ? (
