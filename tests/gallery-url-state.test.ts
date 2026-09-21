@@ -45,6 +45,27 @@ describe("gallery url state", () => {
     expect(parsed.filters?.difficulty).toEqual({ operator: "gte", value: 3 });
   });
 
+  test("round-trips includeBanned", () => {
+    const written = writeGalleryUrlState(new URLSearchParams(), {
+      search: "",
+      searchMode: "all",
+      viewMode: "card",
+      sortField: "default",
+      sortDirection: "asc",
+      defaultFormatKey: "standard",
+      filters: {
+        format: "standard",
+        includeBanned: true,
+      },
+    });
+
+    expect(written.get("includeBanned")).toBe("1");
+    expect(written.get("format")).toBeNull();
+
+    const parsed = parseGalleryUrlState(written);
+    expect(parsed.filters?.includeBanned).toBe(true);
+  });
+
   test("omits default search mode and view", () => {
     const written = writeGalleryUrlState(new URLSearchParams(), {
       search: "",

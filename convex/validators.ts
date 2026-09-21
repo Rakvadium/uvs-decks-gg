@@ -465,6 +465,17 @@ export const formatErrataValidator = v.object({
   sortOrder: v.number(),
 });
 
+export const cardTextHistoryValidator = v.object({
+  _id: v.id("cardTextHistory"),
+  _creationTime: v.number(),
+  cardId: v.id("cards"),
+  text: v.string(),
+  recordedAt: v.number(),
+  source: v.optional(
+    v.union(v.literal("admin_edit"), v.literal("import"), v.literal("printed"))
+  ),
+});
+
 export const setDocValidator = v.object({
   _id: v.id("sets"),
   _creationTime: v.number(),

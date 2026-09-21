@@ -573,16 +573,17 @@ export function CardFormDialog({
     }
     setOcrBusy(true);
     try {
-      const [symbolReferenceImageUrl, regions] = await Promise.all([
-        createSymbolReferenceImageUrl(),
-        analyzeCardRegions(source).catch((): CardRegionAnalysis => ({})),
-      ]);
+      const regions = await analyzeCardRegions(source).catch((): CardRegionAnalysis => ({}));
       const extracted = await extractCardFromImage({
         imageUrl: source,
-        symbolReferenceImageUrl,
-        symbolStripImageUrl: regions.symbolStripImageUrl,
         attackZone: regions.attackZone,
         blockZone: regions.blockZone,
+        ...(regions.symbols
+          ? { symbols: regions.symbols }
+          : {
+              symbolReferenceImageUrl: await createSymbolReferenceImageUrl(),
+              symbolStripImageUrl: regions.symbolStripImageUrl,
+            }),
       });
       const next: Partial<CardFormValues> = {};
       let count = 0;
@@ -606,7 +607,7 @@ export function CardFormDialog({
       assign("attackZone", extracted.attackZone);
       assign("blockZone", extracted.blockZone);
       assign("keywords", extracted.keywords);
-      assign("symbols", extracted.symbols);
+      assign("symbols", regions.symbols || extracted.symbols);
       assign("text", extracted.text);
       setValues((prev) => ({ ...prev, ...next }));
       if (count > 0) {

@@ -55,6 +55,7 @@ interface GalleryFiltersActions {
 
 interface GalleryFiltersMeta {
   totalCards: number;
+  formatCardCount: number;
   filteredCount: number;
   filteredCards: CachedCard[];
   filteredListKey: string;
@@ -289,6 +290,13 @@ export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
     return sortCards(filtered, deferredSortOptions);
   }, [getFilteredCards, pipelineFilters, deferredSortOptions]);
 
+  const formatCardCount = useMemo(() => {
+    return getFilteredCards({
+      format: pipelineEffectiveFormat,
+      includeBanned: deferredGalleryFilters.includeBanned,
+    }).length;
+  }, [getFilteredCards, pipelineEffectiveFormat, deferredGalleryFilters.includeBanned]);
+
   const filteredListKey = useMemo(
     () =>
       JSON.stringify({
@@ -311,6 +319,7 @@ export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
     if (filters.set?.length) count++;
     if (galleryFilters.symbols !== undefined && galleryFilters.symbols.length > 0) count++;
     if (galleryFilters.includeInfinity === false) count++;
+    if (galleryFilters.includeBanned === true) count++;
     if (filters.keywords?.length) count++;
     if (filters.difficultyMin !== undefined || filters.difficultyMax !== undefined) count++;
     if (filters.controlMin !== undefined || filters.controlMax !== undefined) count++;
@@ -454,6 +463,7 @@ export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
       },
       meta: {
         totalCards: catalogTotalCards,
+        formatCardCount,
         filteredCount: filteredCards.length,
         filteredCards,
         filteredListKey,
@@ -486,6 +496,7 @@ export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
       handleSetViewMode,
       handleSetCardsPerRow,
       catalogTotalCards,
+      formatCardCount,
       filteredCards,
       filteredListKey,
       uniqueValues,

@@ -521,7 +521,7 @@ export function filterCards(
 
     if (passesFormatLegality && !passesFormatLegality(card.setCode)) continue;
 
-    if (isCardBannedInFormat && isCardBannedInFormat(card._id)) continue;
+    if (isCardBannedInFormat && filters.includeBanned !== true && isCardBannedInFormat(card._id)) continue;
 
     if (hasTypeFilter) {
       if (!card.type || !types!.includes(card.type)) continue;

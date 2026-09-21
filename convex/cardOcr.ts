@@ -2,6 +2,7 @@ import { action } from "./_generated/server";
 import { internal } from "./_generated/api";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { v, type Infer } from "convex/values";
+import { normalizeAbilityText } from "./lib/normalizeAbilityText";
 
 const OCR_MODEL = "gpt-4o";
 
@@ -60,6 +61,9 @@ Keys and formats:
 - stamina: number. This number is inside of a green heart on backup type cards.
 - keywords: pipe-delimited keywords/traits including ratings. Example: "Ranged|EX 2|Powerful 1".
 - text: pipe-delimited rules abilities. Separate each distinct ability with " | ". Keep timing prefixes. If an ability has a bracketed restriction, put the bracket before the colon, e.g. "Form [Once per turn]: Do something" and never "Form: [Once per turn]: Do something".
+- Do NOT transcribe parenthetical reminder text. Reminder boxes are printed in parentheses after keywords or costs (Mill, Drive, Powerful, EX, Stun, Breaker, Echo, etc.). Omit "(Mill 1—Add the top card of your deck to your discard pile.)" and omit Powerful/EX/Stun/Breaker/Echo reminder paragraphs. Those keywords belong in the keywords field, not as extra abilities in text.
+- Each ability has exactly one colon, between the timing+cost header and the effect. Printed "ENHANCE Mill 1: Your rival mills 1." becomes "Enhance Mill 1: Your rival mills 1." — never "Enhance: Mill 1: Your rival mills 1.".
+- The only exception to a second colon is a bulleted choice list, e.g. "Enhance: Choose one:" followed by "•" options (those options may contain colons).
 - In rules text, transcribe printed symbol icons inline using curly-brace tokens:
   - commit icon: {commit}
   - block zone icons: {blockhigh}, {blockmid}, {blocklow}
@@ -93,6 +97,7 @@ export const extractCardFromImage = action({
     imageUrl: v.string(),
     symbolReferenceImageUrl: v.optional(v.string()),
     symbolStripImageUrl: v.optional(v.string()),
+    symbols: v.optional(v.string()),
     attackZone: v.optional(zoneValidator),
     blockZone: v.optional(zoneValidator),
   },
@@ -121,13 +126,19 @@ export const extractCardFromImage = action({
     if (args.attackZone) result.attackZone = args.attackZone;
     if (args.blockZone) result.blockZone = args.blockZone;
 
-    const symbols = await extractResourceSymbols(
-      args.symbolStripImageUrl ?? args.imageUrl,
-      args.symbolReferenceImageUrl,
-      Boolean(args.symbolStripImageUrl)
-    );
-    if (symbols) {
-      result.symbols = symbols;
+    const providedSymbols = args.symbols?.trim();
+    if (providedSymbols) {
+      const normalized = normalizeSymbolList(providedSymbols);
+      if (normalized) result.symbols = normalized;
+    } else if (args.symbolStripImageUrl) {
+      const symbols = await extractResourceSymbols(
+        args.symbolStripImageUrl,
+        args.symbolReferenceImageUrl,
+        true
+      );
+      if (symbols) {
+        result.symbols = symbols;
+      }
     }
 
     return result;
@@ -370,16 +381,12 @@ function coerceExtractedCard(parsed: Record<string, unknown>): ExtractedCard {
   const keywords = asPipeList(parsed.keywords);
   if (keywords) result.keywords = keywords;
   const text = asPipeList(parsed.text);
-  if (text) result.text = normalizeAbilityTimingText(text);
+  if (text) {
+    const normalized = normalizeAbilityText(text);
+    if (normalized) result.text = normalized;
+  }
 
   return result;
-}
-
-function normalizeAbilityTimingText(text: string): string {
-  return text.replace(
-    /\b(Enhance|Response|Form|Blitz|Static)\s*:\s*(\[[^\]]+\])\s*:/gi,
-    (_match, timing: string, restriction: string) => `${timing} ${restriction}:`
-  );
 }
 
 function normalizeSymbolList(symbols: string): string {

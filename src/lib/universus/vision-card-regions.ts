@@ -1,10 +1,17 @@
 import { converter } from "culori";
+import { SYMBOL_BASE_PATH, SYMBOL_MAP } from "@/components/universus/symbol-icon/constants";
+import {
+  matchResourceSymbols,
+  RESOURCE_SYMBOL_NAMES,
+  symbolTemplateVector,
+  type ResourceSymbolTemplate,
+} from "@/lib/universus/match-resource-symbols";
 
 const toHsv = converter("hsv");
 
 const BLOCK_REGION = { x: 0.84, y: 0.04, w: 0.12, h: 0.08 };
 const ATTACK_REGION = { x: 0.84, y: 0.46, w: 0.12, h: 0.08 };
-const SYMBOL_STRIP = { x: 0.02, y: 0.86, w: 0.55, h: 0.1 };
+const SYMBOL_STRIP = { x: 0.0, y: 0.895, w: 0.5, h: 0.1 };
 
 type Zone = "high" | "mid" | "low";
 
@@ -12,7 +19,10 @@ export type CardRegionAnalysis = {
   attackZone?: Zone;
   blockZone?: Zone;
   symbolStripImageUrl?: string;
+  symbols?: string;
 };
+
+let templateCache: ResourceSymbolTemplate[] | null = null;
 
 export async function analyzeCardRegions(imageUrl: string): Promise<CardRegionAnalysis> {
   const response = await fetch(imageUrl);
@@ -40,19 +50,63 @@ export async function analyzeCardRegions(imageUrl: string): Promise<CardRegionAn
     const block = readRegion(ctx, canvas.width, canvas.height, BLOCK_REGION);
     const attack = readRegion(ctx, canvas.width, canvas.height, ATTACK_REGION);
     const strip = readRegion(ctx, canvas.width, canvas.height, SYMBOL_STRIP);
+    const cardPixels = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const templates = await loadResourceSymbolTemplates();
+    const matched = matchResourceSymbols(
+      {
+        width: canvas.width,
+        height: canvas.height,
+        data: cardPixels.data,
+      },
+      templates,
+    );
 
     const blockZone = majorityZone(block.imageData);
     const attackZone = majorityZone(attack.imageData);
     const symbolStripImageUrl = cropSymbolStripDataUrl(canvas, strip);
+    const symbols = matched.length > 0 ? matched.join("|") : undefined;
 
     return {
       ...(attackZone ? { attackZone } : {}),
       ...(blockZone ? { blockZone } : {}),
       ...(symbolStripImageUrl ? { symbolStripImageUrl } : {}),
+      ...(symbols ? { symbols } : {}),
     };
   } finally {
     URL.revokeObjectURL(objectUrl);
   }
+}
+
+async function loadResourceSymbolTemplates(): Promise<ResourceSymbolTemplate[]> {
+  if (templateCache) return templateCache;
+  const templates: ResourceSymbolTemplate[] = [];
+  for (const name of RESOURCE_SYMBOL_NAMES) {
+    const file = SYMBOL_MAP[name];
+    if (!file) continue;
+    const image = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const element = new Image();
+      element.onload = () => resolve(element);
+      element.onerror = () => reject(new Error(`Could not load symbol ${name}`));
+      element.src = `${SYMBOL_BASE_PATH}/${file}`;
+    });
+    const canvas = document.createElement("canvas");
+    canvas.width = image.naturalWidth;
+    canvas.height = image.naturalHeight;
+    const ctx = canvas.getContext("2d", { willReadFrequently: true });
+    if (!ctx) throw new Error("Could not decode symbol templates");
+    ctx.drawImage(image, 0, 0);
+    const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    templates.push({
+      id: name,
+      pixels: symbolTemplateVector({
+        width: canvas.width,
+        height: canvas.height,
+        data: pixels.data,
+      }),
+    });
+  }
+  templateCache = templates;
+  return templates;
 }
 
 function readRegion(

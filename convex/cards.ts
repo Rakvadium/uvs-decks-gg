@@ -9,7 +9,7 @@ import type { QueryCtx } from "./_generated/server";
 import type { Doc, Id } from "./_generated/dataModel";
 import { paginationOptsValidator } from "convex/server";
 import { v } from "convex/values";
-import { cardValidator } from "./validators";
+import { cardValidator, cardTextHistoryValidator } from "./validators";
 import { internal } from "./_generated/api";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { runCatalogAggregateRefresh } from "./cardFacets";
@@ -684,6 +684,25 @@ export const getById = query({
     }
     const imageUrl = toPublicCardImageUrl(card.imageUrl);
     return imageUrl !== card.imageUrl ? { ...card, imageUrl } : card;
+  },
+});
+
+export const listTextHistory = query({
+  args: {
+    cardId: v.id("cards"),
+  },
+  returns: v.array(cardTextHistoryValidator),
+  handler: async (ctx, args) => {
+    const cutoff = await getCatalogReleaseCutoff(ctx);
+    const card = await ctx.db.get(args.cardId);
+    if (!card || !isReleasedCard(card, cutoff)) {
+      return [];
+    }
+    return await ctx.db
+      .query("cardTextHistory")
+      .withIndex("by_cardId_and_recordedAt", (q) => q.eq("cardId", args.cardId))
+      .order("desc")
+      .take(20);
   },
 });
 

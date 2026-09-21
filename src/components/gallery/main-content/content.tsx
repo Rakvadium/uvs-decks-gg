@@ -47,7 +47,7 @@ function GalleryMainContentBody() {
       >
         <div
           className={cn(
-            "p-4 pb-6 md:px-6 md:pb-4 md:pt-[4.75rem]",
+            "p-4 pb-6 md:px-6 md:pb-4 md:pt-[6.5rem]",
             "max-md:pt-[calc(var(--mobile-nav-h,3.5rem)+0.75rem)] max-md:pb-[calc(var(--mobile-tab-h,5rem)+1rem)]"
           )}
         >

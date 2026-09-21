@@ -13,7 +13,13 @@ import { GalleryMobileFilterDisplayProvider, type GalleryMobileFilterDisplayOver
 import { GalleryMobileFilterFooter } from "./footer";
 import { GalleryMobileFilterHeader } from "./header";
 import { GalleryMobileFilterKeywordsPage, GalleryMobileFilterSetsPage } from "./picker-page";
-import { GalleryMobileFilterRootPage } from "./root-page";
+import {
+  GalleryFilterRarityPage,
+  GalleryMobileFilterFormatPage,
+  GalleryMobileFilterRootPage,
+  GalleryMobileFilterSymbolsPage,
+  GalleryMobileFilterTypePage,
+} from "./root-page";
 import { GalleryMobileFilterStatsPage } from "./stats-page";
 
 interface GalleryMobileFilterSheetBodyProps {
@@ -28,9 +34,13 @@ interface GalleryMobileFilterSheetProps extends GalleryMobileFilterSheetBodyProp
 function ActivePage() {
   const { page } = useGalleryMobileFilterNav();
 
+  if (page === "format") return <GalleryMobileFilterFormatPage />;
   if (page === "sets") return <GalleryMobileFilterSetsPage />;
+  if (page === "type") return <GalleryMobileFilterTypePage />;
+  if (page === "symbols") return <GalleryMobileFilterSymbolsPage />;
   if (page === "keywords") return <GalleryMobileFilterKeywordsPage />;
   if (page === "stats") return <GalleryMobileFilterStatsPage />;
+  if (page === "rarity") return <GalleryFilterRarityPage />;
   return <GalleryMobileFilterRootPage />;
 }
 

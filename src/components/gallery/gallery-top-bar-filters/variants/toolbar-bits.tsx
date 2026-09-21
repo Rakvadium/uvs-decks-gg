@@ -88,13 +88,13 @@ export function InlineResultCount({ className }: { className?: string }) {
         "shrink-0 select-none text-[11px] tabular-nums text-muted-foreground",
         className
       )}
-      title={`${meta.filteredCount.toLocaleString()} of ${meta.totalCards.toLocaleString()} cards`}
+      title={`${meta.filteredCount.toLocaleString()} of ${meta.formatCardCount.toLocaleString()} cards`}
     >
       <span className="text-[color:var(--control-dual-mix)]">
         {meta.filteredCount.toLocaleString()}
       </span>
       <span className="mx-0.5 opacity-50">/</span>
-      {meta.totalCards.toLocaleString()}
+      {meta.formatCardCount.toLocaleString()}
     </span>
   );
 }

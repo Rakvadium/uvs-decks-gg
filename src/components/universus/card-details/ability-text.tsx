@@ -1,3 +1,7 @@
+import {
+  indexOfFirstUnprotectedColon,
+  normalizeAbilityText,
+} from "../../../../convex/lib/normalizeAbilityText";
 import { TIMING_COLORS } from "./constants";
 import { InlineSymbolText } from "./inline-symbol-text";
 
@@ -7,10 +11,12 @@ interface AbilityTextProps {
 }
 
 export function AbilityText({ text, showHeading = true }: AbilityTextProps) {
-  const segments = text
+  const segments = normalizeAbilityText(text)
     .split("|")
     .map((segment) => segment.trim())
     .filter(Boolean);
+
+  if (segments.length === 0) return null;
 
   return (
     <div className="space-y-2.5">
@@ -20,7 +26,7 @@ export function AbilityText({ text, showHeading = true }: AbilityTextProps) {
         </span>
       ) : null}
       {segments.map((segment, index) => {
-        const colonIndex = segment.indexOf(":");
+        const colonIndex = indexOfFirstUnprotectedColon(segment);
 
         if (colonIndex === -1) {
           return (

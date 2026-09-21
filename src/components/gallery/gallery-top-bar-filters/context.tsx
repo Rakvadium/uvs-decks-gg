@@ -1,6 +1,7 @@
 "use client";
 
-import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
+import type { GalleryMobileFilterPage } from "@/components/gallery/mobile-filter-sheet/context";
 import { useGalleryFiltersOptional } from "@/providers/GalleryFiltersProvider";
 
 type SearchMode = "name" | "text" | "all";
@@ -24,14 +25,28 @@ interface GalleryTopBarFiltersContextValue {
     hasClearableFilters: boolean;
   };
   isFilterPanelOpen: boolean;
+  filterPanelPage: GalleryMobileFilterPage;
+  setFilterPanelPage: (page: GalleryMobileFilterPage) => void;
   setFilterPanelOpen: (open: boolean) => void;
+  openFilterPanel: (page?: GalleryMobileFilterPage) => void;
 }
 
 const GalleryTopBarFiltersContext = createContext<GalleryTopBarFiltersContextValue | null>(null);
 
 export function GalleryTopBarFiltersProvider({ children }: { children: ReactNode }) {
   const filtersContext = useGalleryFiltersOptional();
-  const [isFilterPanelOpen, setFilterPanelOpen] = useState(false);
+  const [isFilterPanelOpen, setIsFilterPanelOpen] = useState(false);
+  const [filterPanelPage, setFilterPanelPage] = useState<GalleryMobileFilterPage>("root");
+
+  const setFilterPanelOpen = useCallback((open: boolean) => {
+    setIsFilterPanelOpen(open);
+    if (!open) setFilterPanelPage("root");
+  }, []);
+
+  const openFilterPanel = useCallback((page: GalleryMobileFilterPage = "root") => {
+    setFilterPanelPage(page);
+    setIsFilterPanelOpen(true);
+  }, []);
 
   const value = useMemo((): GalleryTopBarFiltersContextValue | null => {
     if (!filtersContext) return null;
@@ -55,9 +70,12 @@ export function GalleryTopBarFiltersProvider({ children }: { children: ReactNode
         hasClearableFilters: filtersContext.meta.hasClearableFilters,
       },
       isFilterPanelOpen,
+      filterPanelPage,
+      setFilterPanelPage,
       setFilterPanelOpen,
+      openFilterPanel,
     };
-  }, [filtersContext, isFilterPanelOpen]);
+  }, [filtersContext, filterPanelPage, isFilterPanelOpen, openFilterPanel, setFilterPanelOpen]);
 
   if (!value) return null;
 

@@ -85,6 +85,14 @@ export function useActiveChips(): ActiveChip[] {
       chips.push({ id: "infinity", label: "No Infinity", remove: () => setIncludeInfinityResults(true) });
     }
 
+    if (filters.includeBanned === true) {
+      chips.push({
+        id: "includeBanned",
+        label: "Include banned",
+        remove: () => actions.updateFilter("includeBanned", undefined),
+      });
+    }
+
     for (const keyword of filters.keywords ?? []) {
       chips.push({ id: `keyword:${keyword}`, label: keyword, remove: () => toggleStringFilter("keywords", keyword) });
     }

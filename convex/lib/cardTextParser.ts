@@ -5,6 +5,7 @@ import {
   type CardOcrTemplate,
   type CardOcrType,
 } from "./cardOcrTemplates";
+import { normalizeAbilityText } from "./normalizeAbilityText";
 
 export type ParsedCardDraft = {
   oracleId?: string;
@@ -230,10 +231,12 @@ function textLines(template: CardOcrTemplate, lines: string[]): string[] {
 function formatRulesText(lines: string[]): string | undefined {
   const joined = lines.join(" ");
   const withSeparators = joined.replace(TIMING_PATTERN, (_match, timing: string) => {
-    return `|${timing}: `;
+    return `|${timing} `;
   });
   const cleaned = compactText(withSeparators.replace(/^\|/, ""));
-  return cleaned.length > 0 ? cleaned : undefined;
+  if (cleaned.length === 0) return undefined;
+  const normalized = normalizeAbilityText(cleaned);
+  return normalized.length > 0 ? normalized : undefined;
 }
 
 export function parseCardText(

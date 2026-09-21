@@ -29,6 +29,8 @@ export type CardReferenceContextValue = {
   getSetByCode: (code: string) => CachedSet | undefined;
   getFormatByKey: (key: string) => CachedFormat | undefined;
   isSetLegalInFormat: (setCode: string, formatKey: string) => boolean;
+  isCardBannedInFormat: (formatKey: string, cardId: string) => boolean;
+  getBannedFormatNames: (cardId: string) => string[];
 };
 
 export type CardCatalogContextValue = UseUniversusCardsResult & {
@@ -55,6 +57,8 @@ const defaultReference: CardReferenceContextValue = {
   getSetByCode: () => undefined,
   getFormatByKey: () => undefined,
   isSetLegalInFormat: () => true,
+  isCardBannedInFormat: () => false,
+  getBannedFormatNames: () => [],
 };
 
 const defaultCatalog: CardCatalogContextValue = {
@@ -111,6 +115,7 @@ function CardDataProviderInner({ children }: CardDataProviderProps) {
       formatsData.getFormatByKey,
       formatsData.isSetLegalInFormat,
       formatsData.isCardBannedInFormat,
+      formatsData.getBannedFormatNames,
       formatsData.isHydrated,
     ]
   );
@@ -137,6 +142,8 @@ function CardDataProviderInner({ children }: CardDataProviderProps) {
       getSetByCode: setsData.getSetByCode,
       getFormatByKey: stableFormatsData.getFormatByKey,
       isSetLegalInFormat,
+      isCardBannedInFormat: stableFormatsData.isCardBannedInFormat,
+      getBannedFormatNames: stableFormatsData.getBannedFormatNames,
     };
   }, [setsData, stableFormatsData, isSetLegalInFormat]);
 

@@ -28,6 +28,7 @@ const BOOL_KEYS = [
   "symbolMatchAll",
   "keywordMatchAll",
   "includeInfinity",
+  "includeBanned",
   "hasAttack",
   "hasBlock",
   "isCharacter",

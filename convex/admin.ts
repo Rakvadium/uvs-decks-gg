@@ -24,11 +24,13 @@ import {
   syncSetCardCountsByCodes,
 } from "./setCardCountSync";
 import { toPublicCardImageUrl } from "./publicCardUrls";
+import { recordCardTextHistoryIfChanged } from "./lib/cardTextHistory";
 import {
   createCardWithDerivedFields,
   deriveCardSearchFields,
   sanitizeCardImportList,
 } from "./lib/cardCreate";
+import { normalizeAbilityText } from "./lib/normalizeAbilityText";
 
 const ADMIN_SET_LIST_MAX = 25_000;
 
@@ -654,6 +656,14 @@ export const updateCard = mutation({
     }
 
     if (Object.keys(filteredUpdates).length > 0) {
+      if ("text" in filteredUpdates) {
+        await recordCardTextHistoryIfChanged(ctx, {
+          cardId: args.cardId,
+          previousText: before.text,
+          nextText: filteredUpdates.text as string | undefined,
+          source: "admin_edit",
+        });
+      }
       filteredUpdates.contentRevisionAt = Date.now();
       await ctx.db.patch(args.cardId, filteredUpdates);
       const after = await ctx.db.get(args.cardId);
@@ -845,6 +855,12 @@ export const updateCardFromJson = mutation({
       throw new Error('Field "_id" in JSON must match the card being edited');
     }
     const row = mergeCardReplaceBodyFromAdminJson(obj, existing);
+    await recordCardTextHistoryIfChanged(ctx, {
+      cardId: args.cardId,
+      previousText: existing.text,
+      nextText: row.text,
+      source: "admin_edit",
+    });
     await ctx.db.replace(args.cardId, {
       ...row,
       contentRevisionAt: Date.now(),
@@ -1004,6 +1020,12 @@ export const insertCardBatch = internalMutation({
             : null;
 
         if (existing) {
+          await recordCardTextHistoryIfChanged(ctx, {
+            cardId: existing._id,
+            previousText: existing.text,
+            nextText: row.text,
+            source: "import",
+          });
           await ctx.db.patch(existing._id, row);
         } else {
           await ctx.db.insert("cards", row);
@@ -1563,6 +1585,18 @@ export const upsertCardsBatch = internalMutation({
         }
 
         const touch = Date.now();
+        const rawText = card.text ?? card.abilities;
+        const text =
+          typeof rawText === "string" ? normalizeAbilityText(rawText) || undefined : rawText;
+        const derived = deriveCardSearchFields({
+          name: card.name,
+          searchName: card.searchName,
+          keywords: card.keywords,
+          text,
+          setName: card.setName,
+          type: card.type,
+          rarity: card.rarity,
+        });
         const cardData = {
           oracleId: card.oracleId,
           name: card.name,
@@ -1582,12 +1616,12 @@ export const upsertCardsBatch = internalMutation({
           stamina: card.stamina,
           attackZone: card.attackZone,
           blockZone: card.blockZone,
-          text: card.text ?? card.abilities,
+          text,
           keywords: card.keywords,
           symbols: card.symbols,
-          searchName: card.searchName ?? card.name.toLowerCase(),
-          searchText: card.searchText,
-          searchAll: card.searchAll,
+          searchName: derived.searchName,
+          searchText: derived.searchText,
+          searchAll: derived.searchAll,
           copyLimit: card.copyLimit,
           setName: card.setName,
           setNumber: card.setNumber,

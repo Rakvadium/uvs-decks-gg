@@ -9,8 +9,11 @@ import { PageHeading } from "@/components/ui/typography-headings";
 import { cn } from "@/lib/utils";
 import { SymbolIcon } from "../symbol-icon";
 import { AbilityText } from "./ability-text";
+import { PreviousAbilityText } from "./previous-ability-text";
 import { useCardDetailsContent } from "./content-context";
 import { KeywordBadge } from "./keyword-badge";
+import { Badge } from "@/components/ui/badge";
+import { useCardReferenceData } from "@/lib/universus/card-data-provider";
 
 const ACCENT = {
   general: UNIVERSUS_COLORS.ACTION,
@@ -158,6 +161,8 @@ export function CardDetailsReadoutSurface({
 export function CardDetailsReadoutPanel() {
   const { card, symbols, keywordAbilities, otherKeywords } =
     useCardDetailsContent();
+  const { getBannedFormatNames } = useCardReferenceData();
+  const bannedFormats = getBannedFormatNames(card._id);
 
   const generalRows: StatRow[] = [];
   if (card.difficulty !== undefined) {
@@ -263,6 +268,11 @@ export function CardDetailsReadoutPanel() {
               ))}
             </div>
           )}
+          {bannedFormats.map((formatName) => (
+            <Badge key={formatName} tone="destructive">
+              Banned in {formatName}
+            </Badge>
+          ))}
         </div>
       </header>
 
@@ -306,6 +316,7 @@ export function CardDetailsReadoutPanel() {
             <span className="h-px flex-1 bg-gradient-to-r from-border/60 via-border/25 to-transparent" />
           </div>
           <AbilityText text={card.text} showHeading={false} />
+          <PreviousAbilityText cardId={card._id} />
         </section>
       )}
     </div>

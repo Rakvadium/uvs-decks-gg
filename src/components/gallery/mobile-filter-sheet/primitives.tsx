@@ -15,21 +15,36 @@ export function FilterGroup({
   trailing,
   children,
   className,
+  fill = false,
+  headerClassName,
 }: {
-  label: string;
+  label?: string;
   trailing?: ReactNode;
   children: ReactNode;
   className?: string;
+  fill?: boolean;
+  headerClassName?: string;
 }) {
+  const showHeader = Boolean(label) || Boolean(trailing);
+
   return (
-    <section className={className}>
-      <div className="mb-1.5 flex items-center justify-between gap-3 px-4">
-        <Kicker size="sm" tone="muted" className="block font-medium">
-          {label}
-        </Kicker>
-        {trailing ? <div className="flex items-center gap-2">{trailing}</div> : null}
-      </div>
-      <div className={cn(MOBILE_INSET_GROUP, MOBILE_INSET_DIVIDER)}>{children}</div>
+    <section className={cn(fill && "flex h-full flex-col", className)}>
+      {showHeader ? (
+        <div
+          className={cn(
+            "mb-1.5 flex flex-wrap items-center justify-between gap-x-3 gap-y-1 px-4",
+            headerClassName
+          )}
+        >
+          {label ? (
+            <Kicker size="sm" tone="muted" className="block font-medium">
+              {label}
+            </Kicker>
+          ) : null}
+          {trailing ? <div className="flex flex-wrap items-center gap-x-2 gap-y-1">{trailing}</div> : null}
+        </div>
+      ) : null}
+      <div className={cn(MOBILE_INSET_GROUP, MOBILE_INSET_DIVIDER, fill && "min-h-0 flex-1")}>{children}</div>
     </section>
   );
 }
@@ -43,16 +58,18 @@ export function FilterDrillRow({
   value,
   count,
   onClick,
+  className,
 }: {
   label: string;
   value: string;
   count?: number;
   onClick: () => void;
+  className?: string;
 }) {
   const hasValue = typeof count === "number" && count > 0;
 
   return (
-    <button type="button" onClick={onClick} className={cn(MOBILE_INSET_ROW, "min-h-12")}>
+    <button type="button" onClick={onClick} className={cn(MOBILE_INSET_ROW, "min-h-12", className)}>
       <span className="flex-1 font-medium">{label}</span>
       <span className={cn("truncate text-sm", hasValue ? "text-primary" : "text-muted-foreground")}>{value}</span>
       <ChevronRight className="size-4 shrink-0 text-muted-foreground/70" aria-hidden />
@@ -90,8 +107,14 @@ export function FilterChip({
   );
 }
 
-export function FilterChipRow({ children }: { children: ReactNode }) {
-  return <div className="flex flex-wrap gap-2">{children}</div>;
+export function FilterChipRow({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
+  return <div className={cn("flex flex-wrap gap-2", className)}>{children}</div>;
 }
 
 export function ActiveFilterChip({ label, onRemove }: { label: string; onRemove: () => void }) {

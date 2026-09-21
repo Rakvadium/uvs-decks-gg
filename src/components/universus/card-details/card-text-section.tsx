@@ -1,5 +1,6 @@
 import { useCardDetailsContent } from "./content-context";
 import { AbilityText } from "./ability-text";
+import { PreviousAbilityText } from "./previous-ability-text";
 
 export function CardDetailsTextSection() {
   const { card } = useCardDetailsContent();
@@ -11,6 +12,7 @@ export function CardDetailsTextSection() {
       <span className="chrome-label-case text-xs text-muted-foreground">Card Text</span>
       <div className="rounded-lg border border-border/50 bg-card/30 p-4 backdrop-blur-sm">
         <AbilityText text={card.text} />
+        <PreviousAbilityText cardId={card._id} />
       </div>
     </div>
   );

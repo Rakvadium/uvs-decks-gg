@@ -608,6 +608,15 @@ export default defineSchema({
     sortOrder: v.number(),
   }).index("by_format_and_sortOrder", ["formatKey", "sortOrder"]),
 
+  cardTextHistory: defineTable({
+    cardId: v.id("cards"),
+    text: v.string(),
+    recordedAt: v.number(),
+    source: v.optional(
+      v.union(v.literal("admin_edit"), v.literal("import"), v.literal("printed"))
+    ),
+  }).index("by_cardId_and_recordedAt", ["cardId", "recordedAt"]),
+
   communityYoutubeCurations: defineTable({
     youtubeVideoId: v.string(),
     label: v.optional(v.string()),

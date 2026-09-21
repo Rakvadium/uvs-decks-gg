@@ -23,6 +23,8 @@ import {
 import { STAT_KEYS, useActiveChips } from "./use-active-chips";
 
 const segmentedItemClassName = "h-10 text-[13px] normal-case tracking-normal";
+const compactChipClassName = "h-7 gap-1 px-2.5 text-xs";
+const compactChipRowClassName = "gap-1.5";
 
 function ActiveChipsStrip() {
   const chips = useActiveChips();
@@ -70,62 +72,161 @@ function SearchGroup() {
   );
 }
 
-function CardGroup() {
-  const { filters, meta, toggleFormat, toggleStringFilter, actions } = useGalleryFilterDialogContext();
-  const activeFormat = filters.format ?? meta.formats[0]?.key;
-  const types = meta.uniqueValues?.types ?? [];
-  const rarities = meta.uniqueValues?.rarities ?? [];
+function IncludeBannedToggle() {
+  const { filters, actions } = useGalleryFilterDialogContext();
 
   return (
-    <FilterGroup label="Card">
-      {meta.formats.length > 0 ? (
-        <FilterRow>
-          <p className="mb-2 text-xs text-muted-foreground">Format</p>
-          <FilterChipRow>
-            {meta.formats.map((format) => (
-              <FilterChip
-                key={format.key}
-                label={format.name}
-                selected={activeFormat === format.key}
-                onClick={() => {
-                  if (activeFormat === format.key) return;
-                  toggleFormat(format.key);
-                }}
-              />
-            ))}
-          </FilterChipRow>
-        </FilterRow>
+    <Label className="flex shrink-0 items-center gap-1.5 text-xs text-muted-foreground">
+      <Switch
+        checked={filters.includeBanned === true}
+        onCheckedChange={(checked) => actions.updateFilter("includeBanned", checked ? true : undefined)}
+        aria-label="Include banned cards"
+      />
+      Include banned
+    </Label>
+  );
+}
+
+function FormatRows({
+  compact = false,
+  bannedPlacement = "below",
+  heading = true,
+}: {
+  compact?: boolean;
+  bannedPlacement?: "below" | "end" | "none";
+  heading?: boolean;
+}) {
+  const { filters, meta, toggleFormat } = useGalleryFilterDialogContext();
+  const activeFormat = filters.format ?? meta.formats[0]?.key;
+
+  if (meta.formats.length === 0) return null;
+
+  return (
+    <FilterRow className={compact ? "py-2" : undefined}>
+      {heading || bannedPlacement === "end" ? (
+        <div
+          className={cn(
+            "mb-2 flex items-center gap-3",
+            compact && "mb-1.5",
+            heading && bannedPlacement === "end" && "justify-between",
+            !heading && bannedPlacement === "end" && "justify-end"
+          )}
+        >
+          {heading ? <p className="text-xs text-muted-foreground">Format</p> : null}
+          {bannedPlacement === "end" ? <IncludeBannedToggle /> : null}
+        </div>
       ) : null}
-      {types.length > 0 ? (
-        <FilterRow>
-          <p className="mb-2 text-xs text-muted-foreground">Type</p>
-          <FilterChipRow>
-            {types.map((type) => (
-              <FilterChip
-                key={type}
-                label={type}
-                selected={filters.type?.includes(type) ?? false}
-                onClick={() => toggleStringFilter("type", type)}
-              />
-            ))}
-          </FilterChipRow>
-        </FilterRow>
+      <FilterChipRow className={compact ? compactChipRowClassName : undefined}>
+        {meta.formats.map((format) => (
+          <FilterChip
+            key={format.key}
+            label={format.name}
+            selected={activeFormat === format.key}
+            className={compact ? compactChipClassName : undefined}
+            onClick={() => {
+              if (activeFormat === format.key) return;
+              toggleFormat(format.key);
+            }}
+          />
+        ))}
+      </FilterChipRow>
+      {bannedPlacement === "below" ? (
+        <div className={cn("mt-3", compact && "mt-2")}>
+          <IncludeBannedToggle />
+        </div>
       ) : null}
-      {rarities.length > 0 ? (
-        <FilterRow>
-          <p className="mb-2 text-xs text-muted-foreground">Rarity</p>
-          <FilterChipRow>
-            {rarities.map((rarity) => (
-              <FilterChip
-                key={rarity}
-                label={rarity}
-                selected={rarityFilterSelected(filters.rarity, rarity)}
-                onClick={() => actions.updateFilter("rarity", toggleCanonicalRarityFilter(filters.rarity, rarity))}
-              />
-            ))}
-          </FilterChipRow>
-        </FilterRow>
-      ) : null}
+    </FilterRow>
+  );
+}
+
+function TypeRows({
+  compact = false,
+  heading = true,
+}: {
+  compact?: boolean;
+  heading?: boolean;
+}) {
+  const { filters, meta, toggleStringFilter } = useGalleryFilterDialogContext();
+  const types = meta.uniqueValues?.types ?? [];
+
+  if (types.length === 0) return null;
+
+  return (
+    <FilterRow className={compact ? "py-2" : undefined}>
+      {heading ? <p className={cn("mb-2 text-xs text-muted-foreground", compact && "mb-1.5")}>Type</p> : null}
+      <FilterChipRow className={compact ? compactChipRowClassName : undefined}>
+        {types.map((type) => (
+          <FilterChip
+            key={type}
+            label={type}
+            selected={filters.type?.includes(type) ?? false}
+            className={compact ? compactChipClassName : undefined}
+            onClick={() => toggleStringFilter("type", type)}
+          />
+        ))}
+      </FilterChipRow>
+    </FilterRow>
+  );
+}
+
+function RarityRows({
+  compact = false,
+  heading = !compact,
+}: {
+  compact?: boolean;
+  heading?: boolean;
+}) {
+  const { filters, meta, actions } = useGalleryFilterDialogContext();
+  const rarities = meta.uniqueValues?.rarities ?? [];
+
+  if (rarities.length === 0) return null;
+
+  return (
+    <FilterRow className={compact ? "py-2" : undefined}>
+      {heading ? <p className={cn("mb-2 text-xs text-muted-foreground", compact && "mb-1.5")}>Rarity</p> : null}
+      <FilterChipRow className={compact ? compactChipRowClassName : undefined}>
+        {rarities.map((rarity) => (
+          <FilterChip
+            key={rarity}
+            label={rarity}
+            selected={rarityFilterSelected(filters.rarity, rarity)}
+            className={compact ? compactChipClassName : undefined}
+            onClick={() => actions.updateFilter("rarity", toggleCanonicalRarityFilter(filters.rarity, rarity))}
+          />
+        ))}
+      </FilterChipRow>
+    </FilterRow>
+  );
+}
+
+function selectionLabel(count: number) {
+  if (count === 0) return "Any";
+  return count === 1 ? "1 selected" : `${count} selected`;
+}
+
+function MobileFilterIndex() {
+  const { filters, meta } = useGalleryFilterDialogContext();
+  const { push } = useGalleryMobileFilterNav();
+  const setCount = filters.set?.length ?? 0;
+  const typeCount = filters.type?.length ?? 0;
+  const symbolCount = filters.symbols?.length ?? 0;
+  const keywordCount = filters.keywords?.length ?? 0;
+  const statCount =
+    STAT_KEYS.filter((key) => filters[key]?.value !== undefined).length +
+    (filters.blockZone?.length ?? 0) +
+    (filters.attackZone?.length ?? 0);
+  const rarityCount = filters.rarity?.length ?? 0;
+  const formatName = meta.formats.find((format) => format.key === (filters.format ?? meta.formats[0]?.key))?.name ?? "Any";
+
+  return (
+    <FilterGroup>
+      <FilterDrillRow label="Format" value={formatName} count={formatName === "Any" ? 0 : 1} onClick={() => push("format")} />
+      <FilterDrillRow label="Sets" value={selectionLabel(setCount)} count={setCount} onClick={() => push("sets")} />
+      <FilterDrillRow label="Type" value={selectionLabel(typeCount)} count={typeCount} onClick={() => push("type")} />
+      <FilterDrillRow label="Symbols" value={selectionLabel(symbolCount)} count={symbolCount} onClick={() => push("symbols")} />
+      <FilterDrillRow label="Keywords" value={selectionLabel(keywordCount)} count={keywordCount} onClick={() => push("keywords")} />
+      <FilterDrillRow label="Stats" value={selectionLabel(statCount)} count={statCount} onClick={() => push("stats")} />
+      <FilterDrillRow label="Rarity" value={selectionLabel(rarityCount)} count={rarityCount} onClick={() => push("rarity")} />
     </FilterGroup>
   );
 }
@@ -135,14 +236,17 @@ function SymbolTile({
   selected,
   shape,
   onClick,
+  size = "md",
 }: {
   symbol: string;
   selected: boolean;
   shape: "circle" | "square";
   onClick: () => void;
+  size?: "sm" | "md" | "lg";
 }) {
   const path = getSymbolPath(symbol);
   const label = symbol.startsWith("attuned:") ? symbol.slice("attuned:".length) : symbol;
+  const px = size === "sm" ? 32 : size === "md" ? 40 : 44;
 
   return (
     <button
@@ -151,15 +255,17 @@ function SymbolTile({
       aria-pressed={selected}
       aria-label={label}
       className={cn(
-        "relative flex size-11 items-center justify-center overflow-hidden border bg-background transition-[transform,box-shadow,border-color] duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring motion-safe:active:scale-90",
+        "relative flex items-center justify-center overflow-hidden border bg-background transition-[transform,box-shadow,border-color] duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring motion-safe:active:scale-90",
+        size === "sm" ? "size-8" : size === "md" ? "size-10" : "size-11",
         shape === "circle" ? "rounded-full" : "rounded-md",
         selected
-          ? "border-primary ring-2 ring-primary/60 ring-offset-2 ring-offset-background shadow-[var(--chrome-filter-tile-shadow-selected)]"
-          : "border-border/50 hover:border-primary/40"
+          ? "border-primary ring-2 ring-primary/60 ring-offset-background shadow-[var(--chrome-filter-tile-shadow-selected)]"
+          : "border-border/50 hover:border-primary/40",
+        selected && (size === "lg" ? "ring-offset-2" : "ring-offset-1")
       )}
     >
       {path ? (
-        <Image src={path} alt="" width={44} height={44} className="size-full object-contain p-1" />
+        <Image src={path} alt="" width={px} height={px} className="size-full object-contain p-1" />
       ) : (
         <span className="text-[10px]">{label}</span>
       )}
@@ -167,7 +273,55 @@ function SymbolTile({
   );
 }
 
-function SymbolsGroup() {
+function SymbolGrid({
+  symbols,
+  selected,
+  shape,
+  size = "lg",
+  layout = "grid",
+  onToggle,
+}: {
+  symbols: string[];
+  selected: string[];
+  shape: "circle" | "square";
+  size?: "sm" | "md" | "lg";
+  layout?: "grid" | "wrap";
+  onToggle: (symbol: string) => void;
+}) {
+  return (
+    <div
+      className={cn(
+        layout === "wrap"
+          ? "flex flex-wrap justify-start gap-2"
+          : cn(
+              "grid grid-cols-6 justify-items-center",
+              size === "sm" ? "w-full gap-y-1" : "mx-auto w-full max-w-sm gap-y-3"
+            )
+      )}
+    >
+      {symbols.map((symbol) => (
+        <SymbolTile
+          key={symbol}
+          symbol={symbol}
+          shape={shape}
+          size={size}
+          selected={selected.includes(symbol)}
+          onClick={() => onToggle(symbol)}
+        />
+      ))}
+    </div>
+  );
+}
+
+function SymbolsGroup({
+  compact = false,
+  spread = false,
+  showSwitches = true,
+}: {
+  compact?: boolean;
+  spread?: boolean;
+  showSwitches?: boolean;
+}) {
   const { filters, meta, toggleStringFilter, setBooleanFilter, setIncludeInfinityResults } =
     useGalleryFilterDialogContext();
   const selected = filters.symbols ?? [];
@@ -177,59 +331,88 @@ function SymbolsGroup() {
 
   if (all.length === 0) return null;
 
+  const toggle = (symbol: string) => toggleStringFilter("symbols", symbol);
+
+  const symbolSwitches = (
+    <>
+      <Label className="flex items-center gap-1.5 text-xs text-muted-foreground">
+        <Switch
+          checked={filters.includeInfinity !== false}
+          onCheckedChange={setIncludeInfinityResults}
+          aria-label="Include Infinity"
+        />
+        Infinity
+      </Label>
+      <Label className="flex items-center gap-1.5 text-xs text-muted-foreground">
+        <Switch
+          checked={filters.symbolMatchAll ?? false}
+          onCheckedChange={(checked) => setBooleanFilter("symbolMatchAll", checked)}
+          aria-label="Match all symbols"
+        />
+        All
+      </Label>
+    </>
+  );
+
+  const embedded = compact || spread;
+
   return (
-    <FilterGroup
-      label="Symbols"
-      trailing={
-        <>
-          <Label className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <Switch
-              checked={filters.includeInfinity !== false}
-              onCheckedChange={setIncludeInfinityResults}
-              aria-label="Include Infinity"
-            />
-            Infinity
-          </Label>
-          <Label className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <Switch
-              checked={filters.symbolMatchAll ?? false}
-              onCheckedChange={(checked) => setBooleanFilter("symbolMatchAll", checked)}
-              aria-label="Match all symbols"
-            />
-            All
-          </Label>
-        </>
-      }
-    >
-      <FilterRow>
-        <div className="grid grid-cols-6 justify-items-center gap-y-3">
-          {standard.map((symbol) => (
-            <SymbolTile
-              key={symbol}
-              symbol={symbol}
-              shape="circle"
-              selected={selected.includes(symbol)}
-              onClick={() => toggleStringFilter("symbols", symbol)}
-            />
-          ))}
-        </div>
-      </FilterRow>
-      {attuned.length > 0 ? (
-        <FilterRow>
-          <p className="mb-2 text-xs text-muted-foreground">Attuned</p>
-          <div className="grid grid-cols-6 justify-items-center gap-y-3">
-            {attuned.map((symbol) => (
-              <SymbolTile
-                key={symbol}
-                symbol={symbol}
+    <FilterGroup label={embedded ? undefined : "Symbols"} trailing={embedded || !showSwitches ? undefined : symbolSwitches}>
+      {embedded ? (
+        <FilterRow className="space-y-2 py-2">
+          {showSwitches ? (
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-xs text-muted-foreground">Standard</p>
+              <div className="flex shrink-0 items-center gap-x-3">{symbolSwitches}</div>
+            </div>
+          ) : (
+            <p className="text-xs text-muted-foreground">Standard</p>
+          )}
+          <SymbolGrid
+            symbols={standard}
+            selected={selected}
+            shape="circle"
+            size={spread ? "md" : "sm"}
+            layout={spread ? "wrap" : "grid"}
+            onToggle={toggle}
+          />
+          {attuned.length > 0 ? (
+            <div>
+              <p className="mb-1 text-xs text-muted-foreground">Attuned</p>
+              <SymbolGrid
+                symbols={attuned}
+                selected={selected}
                 shape="square"
-                selected={selected.includes(symbol)}
-                onClick={() => toggleStringFilter("symbols", symbol)}
+                size={spread ? "md" : "sm"}
+                layout={spread ? "wrap" : "grid"}
+                onToggle={toggle}
               />
-            ))}
-          </div>
+            </div>
+          ) : null}
         </FilterRow>
-      ) : null}
+      ) : (
+        <>
+          <FilterRow>
+            <SymbolGrid
+              symbols={standard}
+              selected={selected}
+              shape="circle"
+              onToggle={toggle}
+            />
+          </FilterRow>
+          {attuned.length > 0 ? (
+            <FilterRow>
+              <p className="mb-2 text-xs text-muted-foreground">Attuned</p>
+              <SymbolGrid
+                symbols={attuned}
+                selected={selected}
+                shape="square"
+                onToggle={toggle}
+              />
+            </FilterRow>
+          ) : null}
+        </>
+      )}
     </FilterGroup>
   );
 }
@@ -239,26 +422,90 @@ function summarize(count: number, noun: string) {
   return `${count} ${noun}${count === 1 ? "" : "s"}`;
 }
 
-function DrillGroup() {
-  const { filters } = useGalleryFilterDialogContext();
+function raritySummary(selected: string[] | undefined) {
+  if (!selected || selected.length === 0) return "Any";
+  return selected.join(", ");
+}
+
+function DrillGroup({ compact = false }: { compact?: boolean }) {
+  const { filters, meta } = useGalleryFilterDialogContext();
   const { push } = useGalleryMobileFilterNav();
   const setCount = filters.set?.length ?? 0;
+  const typeCount = filters.type?.length ?? 0;
+  const symbolCount = filters.symbols?.length ?? 0;
   const keywordCount = filters.keywords?.length ?? 0;
   const statCount =
     STAT_KEYS.filter((key) => filters[key]?.value !== undefined).length +
     (filters.blockZone?.length ?? 0) +
     (filters.attackZone?.length ?? 0);
+  const rarityCount = filters.rarity?.length ?? 0;
+  const rowClassName = compact ? "min-h-10" : undefined;
+  const defaultFormat = meta.formats[0]?.key;
+  const activeFormat = filters.format ?? defaultFormat;
+  const formatName = meta.formats.find((format) => format.key === activeFormat)?.name ?? "Any";
+  const formatValue = filters.includeBanned ? `${formatName} · banned` : formatName;
+  const formatCount =
+    (filters.format && filters.format !== defaultFormat ? 1 : 0) + (filters.includeBanned ? 1 : 0);
 
   return (
-    <FilterGroup label="More">
-      <FilterDrillRow label="Sets" value={summarize(setCount, "set")} count={setCount} onClick={() => push("sets")} />
+    <FilterGroup label={compact ? undefined : "More"}>
+      {compact ? (
+        <FilterDrillRow
+          label="Format"
+          value={formatValue}
+          count={formatCount}
+          className={rowClassName}
+          onClick={() => push("format")}
+        />
+      ) : null}
+      <FilterDrillRow
+        label="Sets"
+        value={summarize(setCount, "set")}
+        count={setCount}
+        className={rowClassName}
+        onClick={() => push("sets")}
+      />
+      {compact ? (
+        <FilterDrillRow
+          label="Type"
+          value={typeCount > 0 ? (filters.type ?? []).join(", ") : "Any"}
+          count={typeCount}
+          className={rowClassName}
+          onClick={() => push("type")}
+        />
+      ) : null}
+      {compact ? (
+        <FilterDrillRow
+          label="Symbols"
+          value={summarize(symbolCount, "symbol")}
+          count={symbolCount}
+          className={rowClassName}
+          onClick={() => push("symbols")}
+        />
+      ) : null}
       <FilterDrillRow
         label="Keywords"
         value={summarize(keywordCount, "keyword")}
         count={keywordCount}
+        className={rowClassName}
         onClick={() => push("keywords")}
       />
-      <FilterDrillRow label="Stats" value={summarize(statCount, "rule")} count={statCount} onClick={() => push("stats")} />
+      <FilterDrillRow
+        label="Stats"
+        value={summarize(statCount, "rule")}
+        count={statCount}
+        className={rowClassName}
+        onClick={() => push("stats")}
+      />
+      {compact ? (
+        <FilterDrillRow
+          label="Rarity"
+          value={raritySummary(filters.rarity)}
+          count={rarityCount}
+          className={rowClassName}
+          onClick={() => push("rarity")}
+        />
+      ) : null}
     </FilterGroup>
   );
 }
@@ -307,11 +554,84 @@ export function GalleryMobileFilterRootPage() {
   return (
     <div className="space-y-5 px-4 pb-4 pt-3">
       <ActiveChipsStrip />
+      <MobileFilterIndex />
       <SearchGroup />
-      <CardGroup />
-      <SymbolsGroup />
-      <DrillGroup />
       <DisplayGroup />
+    </div>
+  );
+}
+
+export function GalleryDesktopFilterRootPage() {
+  return (
+    <div className="space-y-4 px-4 pb-4 pt-3">
+      <ActiveChipsStrip />
+      <DrillGroup compact />
+    </div>
+  );
+}
+
+export function GalleryMobileFilterFormatPage() {
+  return (
+    <div className="px-4 pb-4 pt-3">
+      <FilterGroup>
+        <FormatRows heading={false} />
+      </FilterGroup>
+    </div>
+  );
+}
+
+export function GalleryMobileFilterTypePage() {
+  return (
+    <div className="px-4 pb-4 pt-3">
+      <FilterGroup>
+        <TypeRows heading={false} />
+      </FilterGroup>
+    </div>
+  );
+}
+
+export function GalleryMobileFilterSymbolsPage() {
+  return (
+    <div className="px-4 pb-4 pt-3">
+      <SymbolsGroup />
+    </div>
+  );
+}
+
+export function GalleryDesktopFilterFormatPage() {
+  return (
+    <div className="px-4 pb-4 pt-3">
+      <FilterGroup>
+        <FormatRows compact bannedPlacement="none" heading={false} />
+      </FilterGroup>
+    </div>
+  );
+}
+
+export function GalleryDesktopFilterTypePage() {
+  return (
+    <div className="px-4 pb-4 pt-3">
+      <FilterGroup>
+        <TypeRows compact heading={false} />
+      </FilterGroup>
+    </div>
+  );
+}
+
+export function GalleryDesktopFilterSymbolsPage() {
+  return (
+    <div className="px-4 pb-4 pt-3">
+      <SymbolsGroup spread showSwitches={false} />
+    </div>
+  );
+}
+
+export function GalleryFilterRarityPage() {
+  return (
+    <div className="px-4 pb-4 pt-3">
+      <FilterGroup>
+        <RarityRows heading={false} />
+      </FilterGroup>
     </div>
   );
 }

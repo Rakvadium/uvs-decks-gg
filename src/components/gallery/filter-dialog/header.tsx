@@ -16,7 +16,7 @@ export function GalleryFilterDialogHeader() {
           <div className="min-w-0">
             <SectionHeading size="lg">Filter Cards</SectionHeading>
             <Kicker>
-              {meta.filteredCount.toLocaleString()} of {meta.totalCards.toLocaleString()} cards
+              {meta.filteredCount.toLocaleString()} of {meta.formatCardCount.toLocaleString()} cards
             </Kicker>
           </div>
         </div>

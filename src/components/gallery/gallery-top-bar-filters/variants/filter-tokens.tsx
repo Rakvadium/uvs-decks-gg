@@ -5,17 +5,30 @@ import { FilterX, X } from "lucide-react";
 import { useGalleryFilterDialogContext } from "@/components/gallery/filter-dialog/context";
 import { getSymbolPath } from "@/components/universus/symbol-icon/utils";
 import { getCardTypeChipColor, getKeywordTimingColor } from "@/config/universus";
+import { floatingIslandRingClassName } from "@/components/shell/floating-island";
 import { cn } from "@/lib/utils";
+import type { GalleryMobileFilterPage } from "@/components/gallery/mobile-filter-sheet/context";
 import { useGalleryTopBarFiltersContext } from "../context";
-import { StatsQuickFilterAdornment } from "../stats-quick-filter-adornment";
 import {
   summarizeTokenValues,
   useActiveFilterTokens,
   type ActiveFilterToken,
 } from "./use-active-filter-tokens";
 
+const TOKEN_PAGE: Record<string, GalleryMobileFilterPage> = {
+  format: "format",
+  includeBanned: "format",
+  set: "sets",
+  sets: "sets",
+  type: "type",
+  symbols: "symbols",
+  keywords: "keywords",
+  stats: "stats",
+  rarity: "rarity",
+};
+
 const colorChipClassName =
-  "chrome-label-case inline-flex max-w-[6.5rem] shrink-0 items-center truncate rounded-sm px-1.5 py-px text-[10px] font-bold";
+  "chrome-label-case inline-flex max-w-[6.5rem] shrink-0 items-center truncate rounded-md px-1.5 py-px text-[10px] font-bold";
 
 function TokenColorChips({
   values,
@@ -112,6 +125,14 @@ function TokenSymbolIcons({
 function TokenContent({ token }: { token: ActiveFilterToken }) {
   const { filters } = useGalleryFilterDialogContext();
 
+  if (!token.active) {
+    return (
+      <span className="min-w-0 truncate text-[11px] leading-none text-muted-foreground">
+        {token.values[0] ?? "Any"}
+      </span>
+    );
+  }
+
   if (token.id === "type") {
     return <TokenColorChips values={filters.type ?? []} getColor={getCardTypeChipColor} />;
   }
@@ -129,10 +150,11 @@ function TokenContent({ token }: { token: ActiveFilterToken }) {
     );
   }
 
-  if (token.id === "stats") {
+  if (token.id === "sets" || token.id === "stats" || token.id === "rarity") {
+    const selectedLabel = token.count === 1 ? "1 selected" : `${token.count} selected`;
     return (
-      <span className="flex min-w-0 items-center overflow-hidden [&>span]:flex-nowrap [&>span]:justify-start">
-        <StatsQuickFilterAdornment filters={filters} />
+      <span className="min-w-0 truncate text-[11px] leading-none text-primary">
+        {selectedLabel}
       </span>
     );
   }
@@ -152,16 +174,15 @@ export function FilterTokens({
   centered?: boolean;
 }) {
   const tokens = useActiveFilterTokens();
-  const { setFilterPanelOpen } = useGalleryTopBarFiltersContext();
+  const { openFilterPanel } = useGalleryTopBarFiltersContext();
   const { actions } = useGalleryFilterDialogContext();
-
-  if (tokens.length === 0) return null;
+  const hasActiveToken = tokens.some((token) => token.active);
 
   return (
     <div
       className={cn(
-        "flex w-full min-w-0 flex-wrap items-center gap-1.5",
-        centered && "justify-center",
+        "flex w-full min-w-0 flex-nowrap items-center gap-1.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
+        centered && "[justify-content:safe_center]",
         className
       )}
     >
@@ -169,43 +190,61 @@ export function FilterTokens({
         <span
           key={token.id}
           className={cn(
-            "inline-flex h-6 max-w-[28rem] items-stretch overflow-hidden rounded-md",
-            "border border-[color:var(--control-dual-border-strong)]",
-            "bg-[color-mix(in_oklch,var(--primary)_9%,var(--popover))]",
-            "shadow-[0_2px_8px_rgba(0,0,0,0.35),0_0_14px_-6px_color-mix(in_oklch,var(--secondary)_40%,transparent)]",
-            "animate-in fade-in-0 zoom-in-95 duration-150"
+            "inline-flex max-w-[28rem] shrink-0 rounded-full p-px shadow-[var(--chrome-floating-shadow)] focus-within:shadow-[var(--chrome-floating-shadow-focus)]",
+            floatingIslandRingClassName
+          )}
+        >
+          <span
+            className={cn(
+              "inline-flex min-w-0 items-stretch overflow-hidden rounded-full backdrop-blur-xl",
+              token.active ? "bg-primary/10" : "bg-background/80"
+            )}
+          >
+            <button
+              type="button"
+              data-gallery-filter-panel-trigger=""
+              className={cn(
+                "flex h-6 min-w-0 items-center gap-1.5 px-2.5 transition-colors duration-150 focus-visible:outline-none",
+                token.active ? "hover:bg-primary/20" : "hover:bg-muted/60"
+              )}
+              onClick={() => openFilterPanel(TOKEN_PAGE[token.id] ?? "root")}
+              aria-label={`Edit ${token.label} filter`}
+              title={token.values.join(", ")}
+            >
+              <span className="chrome-label-case shrink-0 select-none text-[10px] font-bold text-muted-foreground">
+                {token.label}
+              </span>
+              <TokenContent token={token} />
+            </button>
+            {token.active ? (
+              <button
+                type="button"
+                className="flex h-6 w-5 shrink-0 items-center justify-center border-l border-border/30 text-muted-foreground transition-colors duration-150 hover:bg-destructive/10 hover:text-destructive focus-visible:outline-none"
+                aria-label={`Clear ${token.label.toLowerCase()} filter`}
+                onClick={token.clear}
+              >
+                <X className="size-3" />
+              </button>
+            ) : null}
+          </span>
+        </span>
+      ))}
+      {hasActiveToken ? (
+        <span
+          className={cn(
+            "inline-flex shrink-0 rounded-full p-px shadow-[var(--chrome-floating-shadow)] focus-within:shadow-[var(--chrome-floating-shadow-focus)]",
+            floatingIslandRingClassName
           )}
         >
           <button
             type="button"
-            className="flex min-w-0 items-center gap-1.5 px-2 transition-colors hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-[color:var(--control-dual-ring)]"
-            onClick={() => setFilterPanelOpen(true)}
-            title={token.values.join(", ")}
+            className="chrome-label-case inline-flex h-6 items-center gap-1 rounded-full bg-background/80 px-2.5 text-[10px] text-muted-foreground backdrop-blur-xl transition-colors duration-150 hover:bg-destructive/10 hover:text-destructive focus-visible:outline-none"
+            onClick={actions.clearAllFilters}
           >
-            <span className="chrome-label-case shrink-0 select-none text-[10px] font-bold text-muted-foreground">
-              {token.label}
-            </span>
-            <TokenContent token={token} />
-          </button>
-          <button
-            type="button"
-            className="flex w-5 shrink-0 items-center justify-center border-l border-[color:var(--control-dual-border)] text-muted-foreground transition-colors hover:bg-destructive/15 hover:text-destructive focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-[color:var(--control-dual-ring)]"
-            aria-label={`Clear ${token.label.toLowerCase()} filter`}
-            onClick={token.clear}
-          >
-            <X className="size-3" />
+            <FilterX className="size-3.5" />
+            Clear all
           </button>
         </span>
-      ))}
-      {tokens.length > 1 ? (
-        <button
-          type="button"
-          className="chrome-label-case inline-flex h-6 items-center gap-1 rounded-md border border-[color:var(--control-dual-border)] bg-popover/95 px-2 text-[10px] text-muted-foreground shadow-[0_2px_8px_rgba(0,0,0,0.35)] transition-colors hover:border-destructive/50 hover:bg-destructive/15 hover:text-destructive focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[color:var(--control-dual-ring)]"
-          onClick={actions.clearAllFilters}
-        >
-          <FilterX className="size-3.5" />
-          Clear all
-        </button>
       ) : null}
     </div>
   );
