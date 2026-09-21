@@ -14,6 +14,7 @@ import {
 } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useCardCatalog, useCardReferenceData } from "@/lib/universus/card-data-provider";
+import { STANDARD_FORMAT_KEY } from "../../shared/standard-rotation";
 import { sortCards } from "@/lib/universus/use-universus-cards";
 import type { CachedCard } from "@/lib/universus/card-store";
 import { useIsMobile } from "@/hooks/useIsMobile";
@@ -306,6 +307,7 @@ export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
   const activeFilterCount = useMemo(() => {
     let count = 0;
     if (galleryFilters.format && galleryFilters.format !== defaultFormat) count++;
+    if (galleryFilters.standardNextRotation === true && effectiveFormat === STANDARD_FORMAT_KEY) count++;
     if (filters.type?.length) count++;
     if (filters.rarity?.length) count++;
     if (filters.set?.length) count++;
@@ -315,7 +317,7 @@ export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
     if (filters.difficultyMin !== undefined || filters.difficultyMax !== undefined) count++;
     if (filters.controlMin !== undefined || filters.controlMax !== undefined) count++;
     return count;
-  }, [filters, galleryFilters, defaultFormat]);
+  }, [filters, galleryFilters, defaultFormat, effectiveFormat]);
 
   const hasClearableFilters = activeFilterCount > 0 || search.trim().length > 0;
 
@@ -358,6 +360,12 @@ export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
         } else {
           nextFilters[key] = value;
         }
+        if (key === "format") {
+          const nextFormat = (typeof value === "string" ? value : undefined) ?? defaultFormat;
+          if (nextFormat !== STANDARD_FORMAT_KEY) {
+            delete nextFilters.standardNextRotation;
+          }
+        }
         setGalleryFilters(nextFilters);
         replaceGalleryUrl({
           search,
@@ -370,6 +378,7 @@ export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
       });
     },
     [
+      defaultFormat,
       galleryFilters,
       setGalleryFilters,
       replaceGalleryUrl,

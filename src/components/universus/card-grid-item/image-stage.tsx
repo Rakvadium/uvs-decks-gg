@@ -3,6 +3,7 @@
 import { CARD_GLOW_REST, CARD_GLOW_HOVER } from "@/components/universus/card-item/glow";
 import { cn } from "@/lib/utils";
 import { useCardGridItemContext } from "./context";
+import { CardReleaseTags } from "@/components/universus/card-release-tags";
 import { CardImageDisplay } from "./image-display";
 
 export function CardGridItemImageStage() {
@@ -92,6 +93,7 @@ export function CardGridItemImageStage() {
             !isDragging && isHovered && !prefersReducedMotion ? "holo-shimmer 3s ease-in-out infinite" : "none",
         }}
       />
+      <CardReleaseTags setCode={isFlipped && backCard ? backCard.setCode : card.setCode} overlay />
     </div>
   );
 }

@@ -1,5 +1,9 @@
 import type { Doc, Id } from "../_generated/dataModel";
 import type { QueryCtx } from "../_generated/server";
+import {
+  buildRotationSnapshot,
+  hasRotatedOutOfStandard,
+} from "../../shared/standard-rotation";
 
 export interface ValidationError {
   code: string;
@@ -239,6 +243,22 @@ async function validateStandard(
   }
 
   const now = Date.now();
+  const catalogSets = await ctx.db.query("sets").take(2000);
+  const rotationSnapshot = buildRotationSnapshot(catalogSets, now);
+  const setsByCode = new Map(catalogSets.map((set) => [set.code, set]));
+
+  const pushIfRotated = (card: Doc<"cards">, section: "main" | "side") => {
+    if (!card.setCode) return;
+    const set = setsByCode.get(card.setCode);
+    if (!set || !hasRotatedOutOfStandard(set, rotationSnapshot)) return;
+    errors.push({
+      code: "ROTATED_OUT",
+      message: `${card.name} has rotated out of Standard`,
+      cardId: card._id,
+      section,
+    });
+  };
+
   const legalityRows = await ctx.db
     .query("cardLegality")
     .withIndex("by_format", (q) => q.eq("formatKey", deck.format!))
@@ -261,6 +281,7 @@ async function validateStandard(
         section: "main",
       });
     }
+    pushIfRotated(card, "main");
   }
 
   for (const cardIdStr of sideIds) {
@@ -275,6 +296,7 @@ async function validateStandard(
         section: "side",
       });
     }
+    pushIfRotated(card, "side");
   }
 
   const mainOracleGroups = buildMainOracleGroups(deck.mainQuantities, cardMap);

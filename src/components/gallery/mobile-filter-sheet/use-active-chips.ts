@@ -3,6 +3,7 @@
 import { useMemo } from "react";
 import { toggleCanonicalRarityFilter } from "@/lib/universus/rarity";
 import type { StatOperator } from "@/providers/UIStateProvider";
+import { STANDARD_FORMAT_KEY } from "../../../../shared/standard-rotation";
 import { useGalleryFilterDialogContext } from "../filter-dialog/context";
 import type { StatFilterKey } from "../filter-dialog/types";
 
@@ -54,6 +55,17 @@ export function useActiveChips(): ActiveChip[] {
   return useMemo(() => {
     const chips: ActiveChip[] = [];
     const defaultFormat = meta.formats[0]?.key;
+
+    if (
+      filters.standardNextRotation === true &&
+      (filters.format ?? defaultFormat) === STANDARD_FORMAT_KEY
+    ) {
+      chips.push({
+        id: "standardNextRotation",
+        label: "Next rotation",
+        remove: () => actions.updateFilter("standardNextRotation", undefined),
+      });
+    }
 
     if (filters.format && filters.format !== defaultFormat) {
       const name = meta.formats.find((format) => format.key === filters.format)?.name ?? filters.format;

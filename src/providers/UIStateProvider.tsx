@@ -32,6 +32,8 @@ export interface CardFilters {
   type?: string[];
   set?: string[];
   format?: string;
+  /** When Standard is selected, keep only cards that leave at the next rotation. */
+  standardNextRotation?: boolean;
   symbols?: string[];
   attuned?: string[];
   symbolMatchAll?: boolean;

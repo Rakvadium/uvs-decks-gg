@@ -15,6 +15,8 @@ import {
   ingestionJobValidator,
   cardLegalityValidator,
   setLegalityValidator,
+  setProductKindValidator,
+  assertPrintingYear,
 } from "./validators";
 import { requireAdmin } from "./utils/validation";
 import { isDocAccountActiveForQuery } from "./lib/accountStatus";
@@ -177,10 +179,13 @@ export const createSet = mutation({
     legality: v.optional(v.string()),
     isRotating: v.optional(v.boolean()),
     isFuture: v.optional(v.boolean()),
+    productKind: v.optional(setProductKindValidator),
+    printingYear: v.optional(v.number()),
   },
   returns: v.id("sets"),
   handler: async (ctx, args) => {
     await requireAdmin(ctx);
+    assertPrintingYear(args.printingYear);
 
     const existing = await ctx.db
       .query("sets")
@@ -212,10 +217,13 @@ export const updateSet = mutation({
     legality: v.optional(v.string()),
     isRotating: v.optional(v.boolean()),
     isFuture: v.optional(v.boolean()),
+    productKind: v.optional(setProductKindValidator),
+    printingYear: v.optional(v.number()),
   },
   returns: v.null(),
   handler: async (ctx, args) => {
     await requireAdmin(ctx);
+    assertPrintingYear(args.printingYear);
 
     const { setId, ...updates } = args;
     const filteredUpdates = Object.fromEntries(
@@ -1502,14 +1510,24 @@ export const upsertSet = internalMutation({
     legality: v.optional(v.string()),
     isRotating: v.optional(v.boolean()),
     isFuture: v.optional(v.boolean()),
+    productKind: v.optional(setProductKindValidator),
+    printingYear: v.optional(v.number()),
+    releasedAt: v.optional(v.number()),
     spotlightIP: v.optional(v.string()),
   },
   returns: v.id("sets"),
   handler: async (ctx, args) => {
+    assertPrintingYear(args.printingYear);
     const existing = await ctx.db
       .query("sets")
       .withIndex("by_code", (q) => q.eq("code", args.code))
       .unique();
+
+    const rotationFields = {
+      ...(args.productKind !== undefined ? { productKind: args.productKind } : {}),
+      ...(args.printingYear !== undefined ? { printingYear: args.printingYear } : {}),
+      ...(args.releasedAt !== undefined ? { releasedAt: args.releasedAt } : {}),
+    };
 
     if (existing) {
       await ctx.db.patch(existing._id, {
@@ -1519,6 +1537,7 @@ export const upsertSet = internalMutation({
         isRotating: args.isRotating,
         isFuture: args.isFuture,
         spotlightIP: args.spotlightIP,
+        ...rotationFields,
       });
       return existing._id;
     }
@@ -1531,6 +1550,7 @@ export const upsertSet = internalMutation({
       isRotating: args.isRotating,
       isFuture: args.isFuture,
       spotlightIP: args.spotlightIP,
+      ...rotationFields,
     });
   },
 });

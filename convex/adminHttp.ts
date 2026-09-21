@@ -37,6 +37,12 @@ export const upsertSet = httpAction(async (ctx, req) => {
       legality: typeof body.legality === "string" ? body.legality : undefined,
       isRotating: typeof body.isRotating === "boolean" ? body.isRotating : undefined,
       isFuture: typeof body.isFuture === "boolean" ? body.isFuture : undefined,
+      productKind:
+        body.productKind === "booster" || body.productKind === "other"
+          ? body.productKind
+          : undefined,
+      printingYear: typeof body.printingYear === "number" ? body.printingYear : undefined,
+      releasedAt: typeof body.releasedAt === "number" ? body.releasedAt : undefined,
       spotlightIP: typeof body.spotlightIP === "string" ? body.spotlightIP : undefined,
     });
     return jsonOk({ id });

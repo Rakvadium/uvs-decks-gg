@@ -13,8 +13,16 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
+import type { SetProductKind } from "../../../../../../shared/standard-rotation";
 
 function useDebounced<T>(value: T, delay: number): T {
   const [d, setD] = useState(value);
@@ -41,6 +49,8 @@ export function AddSetDialog({ open, onOpenChange }: AddSetDialogProps) {
   const [legality, setLegality] = useState("");
   const [isRotating, setIsRotating] = useState(false);
   const [isFuture, setIsFuture] = useState(false);
+  const [productKind, setProductKind] = useState<SetProductKind>("other");
+  const [printingYear, setPrintingYear] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   const dCode = useDebounced(code.trim(), 300);
@@ -60,6 +70,8 @@ export function AddSetDialog({ open, onOpenChange }: AddSetDialogProps) {
       setLegality("");
       setIsRotating(false);
       setIsFuture(false);
+      setProductKind("other");
+      setPrintingYear("");
     }
   }, [open]);
 
@@ -93,6 +105,13 @@ export function AddSetDialog({ open, onOpenChange }: AddSetDialogProps) {
         setSubmitting(false);
         return;
       }
+      const yearText = printingYear.trim();
+      const year = yearText ? Number(yearText) : undefined;
+      if (yearText && (!Number.isInteger(year) || year === undefined)) {
+        toast.error("Printing year must be a whole number");
+        setSubmitting(false);
+        return;
+      }
       let released: number | undefined;
       if (releasedAt) {
         const t = new Date(releasedAt).getTime();
@@ -110,6 +129,8 @@ export function AddSetDialog({ open, onOpenChange }: AddSetDialogProps) {
         legality: legality.trim() || undefined,
         isRotating,
         isFuture,
+        productKind,
+        printingYear: year,
       });
       toast.success("Set created");
       onOpenChange(false);
@@ -176,6 +197,31 @@ export function AddSetDialog({ open, onOpenChange }: AddSetDialogProps) {
               type="date"
               value={releasedAt}
               onChange={(e) => setReleasedAt(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="add-kind">Product</Label>
+            <Select value={productKind} onValueChange={(value) => setProductKind(value as SetProductKind)}>
+              <SelectTrigger id="add-kind" className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="booster">Booster</SelectItem>
+                <SelectItem value="other">Deck or other</SelectItem>
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-muted-foreground">
+              Only the first booster of a year rotates Standard.
+            </p>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="add-year">Printing year (optional)</Label>
+            <Input
+              id="add-year"
+              inputMode="numeric"
+              value={printingYear}
+              onChange={(e) => setPrintingYear(e.target.value)}
+              placeholder="Uses the release date year when empty"
             />
           </div>
           <div className="space-y-2">
