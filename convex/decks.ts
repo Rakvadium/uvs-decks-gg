@@ -5,6 +5,8 @@ import {
   cardLayoutValidator,
   deckCardMutationResultValidator,
   deckSectionValidator,
+  deckSetupPatchValidator,
+  deckSetupValidator,
   deckTeamCollaborationValidator,
   deckVisibilityValidator,
 } from "./validators";
@@ -21,7 +23,12 @@ import { requireCapability } from "./teams/permissions";
 import { attachOwnerUsernames } from "./lib/deckList";
 import { buildDuplicatedDeckFields } from "./lib/duplicateDeck";
 import { getAuthUserId } from "@convex-dev/auth/server";
+import type { Id } from "./_generated/dataModel";
 import { requirePositiveIntegerQuantity } from "./lib/deckQuantity";
+import { deckGameModule } from "./lib/deckGame";
+import { DEFAULT_GAME_ID } from "../shared/games/types";
+import { getSharedGameModule } from "../shared/games/registry";
+import { mergeLegacyDeckSetupArgs } from "../shared/games/uvs/setup";
 
 export const listByUser = query({
   args: {
@@ -139,7 +146,10 @@ export const create = mutation({
     teamId: v.optional(v.id("teams")),
     teamCollaboration: v.optional(deckTeamCollaborationValidator),
     format: v.optional(v.string()),
+    setup: v.optional(deckSetupValidator),
+    /** @deprecated send `setup` (accepted for one release; mapped into `setup`). */
     startingCharacterId: v.optional(v.id("cards")),
+    /** @deprecated send `setup` (accepted for one release; mapped into `setup`). */
     selectedIdentity: v.optional(v.string()),
   },
   returns: v.id("decks"),
@@ -147,8 +157,17 @@ export const create = mutation({
     const userId = await requireAuth(ctx);
     await requireUserCanPostContent(ctx, userId);
 
-    if (args.startingCharacterId) {
-      await requireNotBackFace(ctx, args.startingCharacterId);
+    // TODO(multi-game): take `game` from args once decks are game-scoped.
+    const deckModule = getSharedGameModule(DEFAULT_GAME_ID).deck;
+    const setup = deckModule.applySetupPatch(
+      deckModule.normalizeSetup<Id<"cards">>(undefined),
+      mergeLegacyDeckSetupArgs(args.setup, {
+        startingCharacterId: args.startingCharacterId,
+        selectedIdentity: args.selectedIdentity,
+      }),
+    );
+    for (const cardId of deckModule.setupCardIds(setup)) {
+      await requireNotBackFace(ctx, cardId);
     }
 
     const visibility = args.visibility ?? "private";
@@ -184,8 +203,7 @@ export const create = mutation({
         visibility === "team" ? (args.teamCollaboration ?? "team_viewable") : "none",
       isPublic: syncListingIsPublic(visibility),
       format: args.format,
-      startingCharacterId: args.startingCharacterId,
-      selectedIdentity: args.selectedIdentity,
+      setup,
       mainCardIds: [],
       mainQuantities: {},
       sideCardIds: [],
@@ -206,7 +224,11 @@ export const update = mutation({
     teamId: v.optional(v.union(v.id("teams"), v.null())),
     teamCollaboration: v.optional(deckTeamCollaborationValidator),
     imageCardId: v.optional(v.union(v.id("cards"), v.null())),
+    /** Partial setup: omitted fields keep, `null` fields clear; `setup: null` clears the whole setup. */
+    setup: v.optional(v.union(deckSetupPatchValidator, v.null())),
+    /** @deprecated send `setup` (accepted for one release; mapped into a setup patch). */
     startingCharacterId: v.optional(v.union(v.id("cards"), v.null())),
+    /** @deprecated send `setup` (accepted for one release; mapped into a setup patch). */
     selectedIdentity: v.optional(v.union(v.string(), v.null())),
     format: v.optional(v.union(v.string(), v.null())),
     subFormat: v.optional(v.union(v.string(), v.null())),
@@ -217,8 +239,13 @@ export const update = mutation({
     if (!deck) throw new Error("Deck not found");
     await requireDeckWriteAccess(ctx, deck);
 
-    if (args.startingCharacterId !== undefined && args.startingCharacterId !== null) {
-      await requireNotBackFace(ctx, args.startingCharacterId);
+    const deckModule = deckGameModule(deck).deck;
+    const setupPatch = mergeLegacyDeckSetupArgs(args.setup, {
+      startingCharacterId: args.startingCharacterId,
+      selectedIdentity: args.selectedIdentity,
+    });
+    for (const cardId of deckModule.setupCardIds(setupPatch)) {
+      await requireNotBackFace(ctx, cardId);
     }
 
     const nextVisibility =
@@ -271,23 +298,28 @@ export const update = mutation({
     const { deckId, ...updates } = args;
     const filteredUpdates: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(updates)) {
+      // Setup args are folded into `setupPatch` above.
+      if (key === "setup" || key === "startingCharacterId" || key === "selectedIdentity") continue;
       if (value !== undefined) {
         if (key === "teamId" && value === null) {
           filteredUpdates.teamId = undefined;
         } else if (
-          (key === "format" ||
-            key === "subFormat" ||
-            key === "description" ||
-            key === "selectedIdentity") &&
+          (key === "format" || key === "subFormat" || key === "description") &&
           value === null
         ) {
           filteredUpdates[key] = undefined;
-        } else if ((key === "imageCardId" || key === "startingCharacterId") && value === null) {
+        } else if (key === "imageCardId" && value === null) {
           filteredUpdates[key] = undefined;
         } else {
           filteredUpdates[key] = value;
         }
       }
+    }
+    if (setupPatch !== undefined) {
+      // Writers only write `setup` and clear the deprecated top-level fields.
+      filteredUpdates.setup = deckModule.applySetupPatch(deckModule.normalizeSetup(deck), setupPatch);
+      filteredUpdates.startingCharacterId = undefined;
+      filteredUpdates.selectedIdentity = undefined;
     }
     if (args.visibility !== undefined) {
       filteredUpdates.isPublic = syncListingIsPublic(args.visibility);

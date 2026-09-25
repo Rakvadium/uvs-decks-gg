@@ -14,6 +14,7 @@ import { useQuery, useMutation } from "convex/react";
 import { toast } from "sonner";
 import { api } from "../../../convex/_generated/api";
 import { Id, Doc } from "../../../convex/_generated/dataModel";
+import type { DeckSetupPatch } from "@shared/games/deck";
 import { useCardIndex } from "@/lib/universus/card-data-provider";
 import { canAddCardToSection, canMoveCardToSection } from "./card-eligibility";
 import {
@@ -33,8 +34,8 @@ type DeckUpdate = {
   teamId?: Id<"teams"> | null;
   teamCollaboration?: DeckTeamSharing;
   imageCardId?: Id<"cards"> | null;
-  startingCharacterId?: Id<"cards"> | null;
-  selectedIdentity?: string | null;
+  /** Partial setup: omitted fields keep, `null` fields clear; `null` clears the whole setup. */
+  setup?: DeckSetupPatch<Id<"cards">> | null;
   format?: string | null;
   subFormat?: string | null;
 };

@@ -10,6 +10,7 @@ export function DeckDetailsHeroCharacterImagePicker() {
     characterOpen,
     setCharacterOpen,
     deck,
+    setup,
     imageCard,
     startingCharacter,
     compactEmptyMobile,
@@ -86,7 +87,7 @@ export function DeckDetailsHeroCharacterImagePicker() {
       <DeckCharacterPickerDialog
         open={characterOpen}
         onOpenChange={setCharacterOpen}
-        selectedCharacterId={deck.startingCharacterId}
+        selectedCharacterId={setup.startingCharacterId}
         onSelectCharacter={handleSelectCharacter}
       />
     </>

@@ -10,6 +10,7 @@ import {
   colorSourceValidator,
   userFeedbackKindValidator,
   deckBuilderUiStateV1Validator,
+  deckSetupValidator,
   deckTeamCollaborationValidator,
   deckVisibilityValidator,
   teamMemberStatusValidator,
@@ -191,7 +192,10 @@ export default defineSchema({
     isPublic: v.boolean(),
     format: v.optional(v.string()),
     subFormat: v.optional(v.string()),
+    setup: v.optional(deckSetupValidator),
+    /** @deprecated moved to `setup` (migrations/migrateDeckSetup); drop after the prod backfill. */
     startingCharacterId: v.optional(v.id("cards")),
+    /** @deprecated moved to `setup` (migrations/migrateDeckSetup); drop after the prod backfill. */
     selectedIdentity: v.optional(v.string()),
     imageCardId: v.optional(v.id("cards")),
     mainCardIds: v.array(v.id("cards")),

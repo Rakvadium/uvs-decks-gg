@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { normalizeDeckVisibility } from "@/lib/deck/visibility";
 import { useProfanityDisplayText } from "@/lib/moderation/use-profanity-display-text";
 import { useCardData } from "@/lib/universus/card-data-provider";
+import { useGameModule } from "@/games/game-context";
 import type { DeckGridItemProps } from "./types";
 
 export const MAIN_DECK_TARGET = 60;
@@ -27,6 +28,8 @@ export function useDeckGridItemModel({
 }: DeckGridItemProps) {
   const { cards } = useCardData();
   const { display, viewerUserId } = useProfanityDisplayText();
+  const gameDeck = useGameModule().deck;
+  const setup = gameDeck.normalizeSetup(deck);
 
   const imageCard = useMemo(() => {
     if (!deck.imageCardId) return null;
@@ -34,9 +37,10 @@ export function useDeckGridItemModel({
   }, [deck.imageCardId, cards]);
 
   const startingCharacter = useMemo(() => {
-    if (!deck.startingCharacterId) return null;
-    return cards.find((card) => card._id === deck.startingCharacterId) ?? null;
-  }, [deck.startingCharacterId, cards]);
+    const startingCharacterId = gameDeck.normalizeSetup(deck).startingCharacterId;
+    if (!startingCharacterId) return null;
+    return cards.find((card) => card._id === startingCharacterId) ?? null;
+  }, [gameDeck, deck, cards]);
 
   const counts = useMemo(
     () => ({
@@ -51,7 +55,7 @@ export function useDeckGridItemModel({
     [startingCharacter?.symbols],
   );
 
-  const selectedSymbol = deck.selectedIdentity?.toLowerCase();
+  const selectedSymbol = setup.selectedIdentity?.toLowerCase();
   const accentSymbol =
     selectedSymbol && characterSymbols.includes(selectedSymbol)
       ? selectedSymbol

@@ -15,6 +15,8 @@ import {
 import { usePathname, useRouter } from "next/navigation";
 import { useCardCatalog, useCardReferenceData } from "@/lib/universus/card-data-provider";
 import { sortCards } from "@/lib/universus/use-universus-cards";
+import { countActiveStatRanges } from "@shared/games/filters";
+import { useGameModule } from "@/games/game-context";
 import type { CachedCard } from "@/lib/universus/card-store";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { useLocationSearchParams } from "@/hooks/useLocationSearchParams";
@@ -100,6 +102,7 @@ export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
     setGallerySortDirection,
   } = useUIState();
   const isMobile = useIsMobile();
+  const { filters: filterDefinition } = useGameModule();
   const {
     isLoading,
     isCatalogDataLoading,
@@ -154,8 +157,8 @@ export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
         defaultFormatKey: defaultFormat,
       };
       const liveParams = new URLSearchParams(window.location.search);
-      const nextGalleryQuery = writeGalleryUrlState(new URLSearchParams(), payload).toString();
-      const currentParsed = parseGalleryUrlState(liveParams);
+      const nextGalleryQuery = writeGalleryUrlState(new URLSearchParams(), payload, filterDefinition).toString();
+      const currentParsed = parseGalleryUrlState(liveParams, filterDefinition);
       const currentGalleryQuery = writeGalleryUrlState(new URLSearchParams(), {
         search: currentParsed.search ?? "",
         searchMode: currentParsed.searchMode ?? "all",
@@ -164,10 +167,10 @@ export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
         sortField: currentParsed.sortField ?? "default",
         sortDirection: currentParsed.sortDirection ?? "asc",
         defaultFormatKey: defaultFormat,
-      }).toString();
+      }, filterDefinition).toString();
       if (nextGalleryQuery === currentGalleryQuery) return;
 
-      const written = writeGalleryUrlState(liveParams, payload);
+      const written = writeGalleryUrlState(liveParams, payload, filterDefinition);
       const nextQuery = written.toString();
       skipUrlReadRef.current = true;
       const nextHref = nextQuery ? `${pathname}?${nextQuery}` : pathname;
@@ -177,7 +180,7 @@ export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
         router.replace(nextHref, { scroll: false });
       });
     },
-    [syncUrl, defaultFormat, pathname, router, replaceParams]
+    [syncUrl, defaultFormat, pathname, router, replaceParams, filterDefinition]
   );
 
   useEffect(() => {
@@ -186,12 +189,12 @@ export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
       skipUrlReadRef.current = false;
       return;
     }
-    if (!galleryUrlHasState(searchParams)) {
+    if (!galleryUrlHasState(searchParams, filterDefinition)) {
       setSearchState("");
       setSearchModeState("all");
       return;
     }
-    const parsed = parseGalleryUrlState(searchParams);
+    const parsed = parseGalleryUrlState(searchParams, filterDefinition);
     setSearchState(parsed.search ?? "");
     setSearchModeState(parsed.searchMode ?? "all");
     if (parsed.filters) setGalleryFilters(stripSearchFields(parsed.filters));
@@ -201,6 +204,7 @@ export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
   }, [
     syncUrl,
     searchParams,
+    filterDefinition,
     setGalleryFilters,
     setGalleryViewMode,
     setGallerySortField,
@@ -287,8 +291,8 @@ export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
 
   const filteredCards = useMemo(() => {
     const filtered = getFilteredCards(pipelineFilters);
-    return sortCards(filtered, deferredSortOptions);
-  }, [getFilteredCards, pipelineFilters, deferredSortOptions]);
+    return sortCards(filtered, deferredSortOptions, filterDefinition);
+  }, [getFilteredCards, pipelineFilters, deferredSortOptions, filterDefinition]);
 
   const formatCardCount = useMemo(() => {
     return getFilteredCards({
@@ -321,10 +325,9 @@ export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
     if (galleryFilters.includeInfinity === false) count++;
     if (galleryFilters.includeBanned === true) count++;
     if (filters.keywords?.length) count++;
-    if (filters.difficultyMin !== undefined || filters.difficultyMax !== undefined) count++;
-    if (filters.controlMin !== undefined || filters.controlMax !== undefined) count++;
+    count += countActiveStatRanges(filterDefinition, filters);
     return count;
-  }, [filters, galleryFilters, defaultFormat]);
+  }, [filters, galleryFilters, defaultFormat, filterDefinition]);
 
   const hasClearableFilters = activeFilterCount > 0 || search.trim().length > 0;
 

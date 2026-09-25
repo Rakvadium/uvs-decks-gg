@@ -1,4 +1,5 @@
 import type { Doc } from "../_generated/dataModel";
+import { deckGameModule } from "./deckGame";
 
 export function duplicateDeckName(name: string): string {
   const trimmed = name.trim();
@@ -35,8 +36,8 @@ export function buildDuplicatedDeckFields(source: Doc<"decks">) {
     isPublic: false,
     format: source.format,
     subFormat: source.subFormat,
-    startingCharacterId: source.startingCharacterId,
-    selectedIdentity: source.selectedIdentity,
+    // Copies are written in the new shape only (normalized from `setup` or the legacy fields).
+    setup: deckGameModule(source).deck.normalizeSetup(source),
     imageCardId: source.imageCardId,
     mainCardIds: [...source.mainCardIds],
     mainQuantities: { ...source.mainQuantities },

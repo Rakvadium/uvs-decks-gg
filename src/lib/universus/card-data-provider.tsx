@@ -20,6 +20,7 @@ import {
 import { useSets, CachedSet, parseSetLegality } from "./use-sets";
 import { useFormats, CachedFormat } from "./use-formats";
 import type { CardFilters } from "@/providers/UIStateProvider";
+import { useGameModule } from "@/games/game-context";
 
 export type CardReferenceContextValue = {
   sets: CachedSet[];
@@ -103,6 +104,7 @@ function CardDataProviderInner({ children }: CardDataProviderProps) {
   const cardData = useUniversusCards();
   const setsData = useSets({ serverVersion: cardData.serverVersion });
   const formatsData = useFormats();
+  const { filters: filterDefinition } = useGameModule();
 
   const stableFormatsData = useMemo(
     () => formatsData,
@@ -157,11 +159,11 @@ function CardDataProviderInner({ children }: CardDataProviderProps) {
         isCardBannedInFormat: formatKey
           ? (cardId) => stableFormatsData.isCardBannedInFormat(formatKey, cardId)
           : undefined,
-      });
+      }, filterDefinition);
     };
 
     const getSortedCards = (cards: CachedCard[], options: CardSortOptions) => {
-      return sortCards(cards, options);
+      return sortCards(cards, options, filterDefinition);
     };
 
     const getPaginatedCards = (cards: CachedCard[], page: number, pageSize: number) => {
@@ -173,7 +175,7 @@ function CardDataProviderInner({ children }: CardDataProviderProps) {
       sortOptions: CardSortOptions
     ) => {
       const filtered = getFilteredCards(filters);
-      return sortCards(filtered, sortOptions);
+      return sortCards(filtered, sortOptions, filterDefinition);
     };
 
     return {
@@ -183,7 +185,7 @@ function CardDataProviderInner({ children }: CardDataProviderProps) {
       getPaginatedCards,
       getFilteredAndSortedCards,
     };
-  }, [cardData, isSetLegalInFormat, stableFormatsData]);
+  }, [cardData, isSetLegalInFormat, stableFormatsData, filterDefinition]);
 
   return (
     <CardReferenceContext.Provider value={referenceValue}>
@@ -233,7 +235,11 @@ export function useCardData(): CardDataContextValue {
 
 export function useFilteredCards(filters: CardFilters): CachedCard[] {
   const { cards } = useCardCatalog();
-  return useMemo(() => filterCards(cards, filters), [cards, filters]);
+  const { filters: filterDefinition } = useGameModule();
+  return useMemo(
+    () => filterCards(cards, filters, undefined, filterDefinition),
+    [cards, filters, filterDefinition]
+  );
 }
 
 export function useFilteredAndSortedCards(
@@ -241,8 +247,9 @@ export function useFilteredAndSortedCards(
   sortOptions: CardSortOptions
 ): CachedCard[] {
   const { cards } = useCardCatalog();
+  const { filters: filterDefinition } = useGameModule();
   return useMemo(() => {
-    const filtered = filterCards(cards, filters);
-    return sortCards(filtered, sortOptions);
-  }, [cards, filters, sortOptions]);
+    const filtered = filterCards(cards, filters, undefined, filterDefinition);
+    return sortCards(filtered, sortOptions, filterDefinition);
+  }, [cards, filters, sortOptions, filterDefinition]);
 }

@@ -1,4 +1,8 @@
 import type { CachedCard } from "@/lib/universus/card-store";
+import { zoneRank } from "@shared/games/uvs/zones";
+
+// UVS zone helpers live in the shared UVS game module; re-exported for existing importers.
+export { extractZones, getZoneTone } from "@shared/games/uvs/zones";
 
 export type DeckViewMode = "stacked" | "list";
 export type DeckListSortKey =
@@ -117,26 +121,9 @@ function compareAlphabetical(a: CachedCard, b: CachedCard) {
   return (a.name ?? "").localeCompare(b.name ?? "", undefined, { sensitivity: "base" });
 }
 
-function normalizeZoneValue(zone?: string | null) {
-  if (!zone) return null;
-  const normalized = zone.toLowerCase();
-  if (normalized.startsWith("l")) return 0;
-  if (normalized.startsWith("m")) return 1;
-  if (normalized.startsWith("h")) return 2;
-  return null;
-}
-
-export function getZoneTone(zone?: string | null) {
-  const value = normalizeZoneValue(zone);
-  if (value === 0) return "low";
-  if (value === 1) return "mid";
-  if (value === 2) return "high";
-  return null;
-}
-
 function compareZone(a?: string | null, b?: string | null) {
-  const aValue = normalizeZoneValue(a);
-  const bValue = normalizeZoneValue(b);
+  const aValue = zoneRank(a);
+  const bValue = zoneRank(b);
   const aHas = aValue !== null;
   const bHas = bValue !== null;
   if (aHas && !bHas) return -1;
@@ -217,22 +204,6 @@ export function buildDeckEntriesFromQuantities(
     entries.push({ card, quantity });
   }
   return entries;
-}
-
-export function extractZones(rawZone?: string | null): string[] {
-  if (!rawZone) return [];
-  const tokens = rawZone
-    .toLowerCase()
-    .split(/[\s,/|]+/)
-    .map((token) => token.trim())
-    .filter(Boolean);
-  const zones = new Set<string>();
-  for (const token of tokens) {
-    if (token.startsWith("h")) zones.add("High");
-    if (token.startsWith("m")) zones.add("Mid");
-    if (token.startsWith("l")) zones.add("Low");
-  }
-  return Array.from(zones);
 }
 
 export function toSortedBuckets(record: Record<string, number>) {

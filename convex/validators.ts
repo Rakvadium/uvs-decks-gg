@@ -147,6 +147,25 @@ export const cardLayoutValidator = v.object({
   unassignedCardIds: v.array(v.string()),
 });
 
+/** UVS deck setup (see docs/multi-game.md "Deck setup"; shape mirrors `shared/games/uvs/setup.ts`). */
+export const uvsDeckSetupValidator = v.object({
+  game: v.literal("uvs"),
+  startingCharacterId: v.optional(v.id("cards")),
+  selectedIdentity: v.optional(v.string()),
+});
+
+/** Becomes `v.union(...)` over games in Phase 3. */
+export const deckSetupValidator = uvsDeckSetupValidator;
+
+/** Partial setup update for `decks.update`: omitted keeps, `null` clears, value sets. */
+export const uvsDeckSetupPatchValidator = v.object({
+  game: v.literal("uvs"),
+  startingCharacterId: v.optional(v.union(v.id("cards"), v.null())),
+  selectedIdentity: v.optional(v.union(v.string(), v.null())),
+});
+
+export const deckSetupPatchValidator = uvsDeckSetupPatchValidator;
+
 export const deckValidator = v.object({
   _id: v.id("decks"),
   _creationTime: v.number(),
@@ -157,7 +176,10 @@ export const deckValidator = v.object({
   isPublic: v.boolean(),
   format: v.optional(v.string()),
   subFormat: v.optional(v.string()),
+  setup: v.optional(deckSetupValidator),
+  /** @deprecated read via `normalizeDeckSetup`; kept until the setup backfill has run. */
   startingCharacterId: v.optional(v.id("cards")),
+  /** @deprecated read via `normalizeDeckSetup`; kept until the setup backfill has run. */
   selectedIdentity: v.optional(v.string()),
   imageCardId: v.optional(v.id("cards")),
   mainCardIds: v.array(v.id("cards")),

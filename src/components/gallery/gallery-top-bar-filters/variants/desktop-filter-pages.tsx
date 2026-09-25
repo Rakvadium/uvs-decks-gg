@@ -2,9 +2,15 @@
 
 import { useMemo, useState } from "react";
 import { Search, X } from "lucide-react";
+import {
+  getFilterGroupLayout,
+  type GameFilterGroupLayout,
+  type GameZoneFilterDescriptor,
+} from "@shared/games/filters";
 import { StatInput } from "@/components/gallery/filter-dialog/stat-input";
-import { ZONE_OPTIONS } from "@/components/gallery/filter-dialog/constants";
 import { useGalleryFilterDialogContext } from "@/components/gallery/filter-dialog/context";
+import type { StatFilterKey, StringArrayFilterKey } from "@/components/gallery/filter-dialog/types";
+import { useGameModule } from "@/games/game-context";
 import {
   ActiveFilterChip,
   FilterChip,
@@ -163,15 +169,17 @@ export function GalleryDesktopFilterKeywordsPage() {
   );
 }
 
-function DesktopZoneRule({ filterKey, label }: { filterKey: "blockZone" | "attackZone"; label: string }) {
+function DesktopZoneRule({ zone: descriptor }: { zone: GameZoneFilterDescriptor }) {
   const { filters, toggleStringFilter } = useGalleryFilterDialogContext();
+  const filterKey = descriptor.key as StringArrayFilterKey;
+  const label = descriptor.label;
   const selected = filters[filterKey] ?? [];
 
   return (
     <div className="flex items-center gap-2">
       <span className="w-16 shrink-0 text-[11px] text-muted-foreground">{label}</span>
       <div className="flex h-7 min-w-0 flex-1 overflow-hidden rounded-md border border-border/50 bg-background/50">
-        {ZONE_OPTIONS.map((zone, index) => {
+        {descriptor.options.map((zone, index) => {
           const isSelected = selected.includes(zone);
           return (
             <button
@@ -194,32 +202,33 @@ function DesktopZoneRule({ filterKey, label }: { filterKey: "blockZone" | "attac
   );
 }
 
+function DesktopStatsGroup({ group }: { group: GameFilterGroupLayout }) {
+  return (
+    <FilterGroup label={group.label}>
+      <FilterRow className="space-y-1.5 py-2.5">
+        {group.zones.map((zone) => (
+          <DesktopZoneRule key={zone.key} zone={zone} />
+        ))}
+        {group.stats.map((stat) => (
+          <StatInput key={stat.key} label={stat.label} filterKey={stat.key as StatFilterKey} labelPosition="end" />
+        ))}
+      </FilterRow>
+    </FilterGroup>
+  );
+}
+
 export function GalleryDesktopFilterStatsPage() {
+  const { filters: filterDefinition } = useGameModule();
+  // First group fills the left column; the rest stack in the right column.
+  const [first, ...rest] = useMemo(() => getFilterGroupLayout(filterDefinition), [filterDefinition]);
+
   return (
     <div className="grid grid-cols-2 items-start gap-4 px-4 pb-4 pt-3">
-      <FilterGroup label="General">
-        <FilterRow className="space-y-1.5 py-2.5">
-          <StatInput label="Difficulty" filterKey="difficulty" labelPosition="end" />
-          <StatInput label="Control" filterKey="control" labelPosition="end" />
-          <StatInput label="Health" filterKey="health" labelPosition="end" />
-          <StatInput label="Hand Size" filterKey="handSize" labelPosition="end" />
-          <StatInput label="Stamina" filterKey="stamina" labelPosition="end" />
-        </FilterRow>
-      </FilterGroup>
+      {first ? <DesktopStatsGroup group={first} /> : null}
       <div className="space-y-4">
-        <FilterGroup label="Block">
-          <FilterRow className="space-y-1.5 py-2.5">
-            <DesktopZoneRule filterKey="blockZone" label="Zone" />
-            <StatInput label="Modifier" filterKey="blockModifier" labelPosition="end" />
-          </FilterRow>
-        </FilterGroup>
-        <FilterGroup label="Attack">
-          <FilterRow className="space-y-1.5 py-2.5">
-            <DesktopZoneRule filterKey="attackZone" label="Zone" />
-            <StatInput label="Speed" filterKey="speed" labelPosition="end" />
-            <StatInput label="Damage" filterKey="damage" labelPosition="end" />
-          </FilterRow>
-        </FilterGroup>
+        {rest.map((group) => (
+          <DesktopStatsGroup key={group.id} group={group} />
+        ))}
       </div>
     </div>
   );

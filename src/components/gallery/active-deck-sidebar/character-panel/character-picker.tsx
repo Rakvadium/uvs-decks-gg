@@ -7,7 +7,7 @@ import { useActiveDeckCharacterPanelContext } from "./context";
 
 export function ActiveDeckCharacterPicker() {
   const {
-    activeDeck,
+    setup,
     characterOpen,
     setCharacterOpen,
     startingCharacter,
@@ -79,7 +79,7 @@ export function ActiveDeckCharacterPicker() {
       <DeckCharacterPickerDialog
         open={characterOpen}
         onOpenChange={setCharacterOpen}
-        selectedCharacterId={activeDeck?.startingCharacterId}
+        selectedCharacterId={setup.startingCharacterId}
         onSelectCharacter={handleSelectCharacter}
       />
     </>

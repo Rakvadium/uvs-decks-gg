@@ -1,7 +1,8 @@
 import { query } from "./_generated/server";
 import { v } from "convex/values";
 import {
-  runDeckValidation,
+  deckValidationRules,
+  runGameDeckValidation,
   type ValidationResult,
   type ValidationError,
   type ValidationWarning,
@@ -64,7 +65,7 @@ export const validateDeck = query({
       };
     }
 
-    const { errors, warnings } = await runDeckValidation(ctx, deck, format);
+    const { errors, warnings } = await runGameDeckValidation(ctx, deckValidationRules(deck), deck, format);
 
     return {
       isValid: errors.length === 0,
@@ -98,7 +99,7 @@ export const getDeckValidationSummary = query({
       return { isValid: false, errorCount: 1, warningCount: 0 };
     }
 
-    const { errors, warnings } = await runDeckValidation(ctx, deck, format);
+    const { errors, warnings } = await runGameDeckValidation(ctx, deckValidationRules(deck), deck, format);
 
     return {
       isValid: errors.length === 0,

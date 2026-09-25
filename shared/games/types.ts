@@ -3,6 +3,14 @@
  * Pure TS: safe to import from convex/ (relative path) and src/ (`@shared/*`).
  */
 
+import type { GameFilterDefinition } from "./filters";
+
+export type { GameFilterDefinition } from "./filters";
+
+import type { SharedGameDeckModule } from "./deck";
+
+export type { SharedGameDeckModule } from "./deck";
+
 export const GAME_IDS = ["uvs"] as const;
 
 export type GameId = (typeof GAME_IDS)[number];
@@ -31,4 +39,8 @@ export interface SharedGameModule {
   /** Short label for compact UI, e.g. "UVS". */
   shortName: string;
   theme: GameThemeColors;
+  /** Gallery stat/zone filter descriptors (see `shared/games/filters.ts`). */
+  filters: GameFilterDefinition;
+  /** Deck setup, validation rules, card eligibility, list display, text import/export (see `shared/games/deck.ts`). */
+  deck: SharedGameDeckModule;
 }

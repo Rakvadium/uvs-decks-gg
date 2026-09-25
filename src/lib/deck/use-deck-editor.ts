@@ -2,6 +2,7 @@
 
 import { useCallback, useMemo } from "react";
 import { Doc, Id } from "../../../convex/_generated/dataModel";
+import type { DeckSetupPatch } from "@shared/games/deck";
 import { useActiveDeck } from "@/providers/ActiveDeckProvider";
 import type { DeckVisibility } from "@/lib/deck/visibility";
 import { useSiloedDeckOptional } from "./siloed-deck-context";
@@ -14,8 +15,8 @@ type DeckUpdate = {
   description?: string;
   visibility?: DeckVisibility;
   imageCardId?: Id<"cards"> | null;
-  startingCharacterId?: Id<"cards"> | null;
-  selectedIdentity?: string | null;
+  /** Partial setup: omitted fields keep, `null` fields clear; `null` clears the whole setup. */
+  setup?: DeckSetupPatch<Id<"cards">> | null;
 };
 
 interface DeckEditorContextValue {

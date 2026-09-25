@@ -1,4 +1,6 @@
-import type { CardFilters, GalleryViewMode, StatFilterValue, StatOperator } from "@/providers/UIStateProvider";
+import type { CardFilters, GalleryViewMode, StatFilterValue } from "@/providers/UIStateProvider";
+import { isStatOperator, statRangeParamKeys, type GameFilterDefinition } from "@shared/games/filters";
+import { UVS_FILTER_DEFINITION } from "@shared/games/uvs/filters";
 
 export type GallerySearchMode = "name" | "text" | "all";
 export type GalleryUiViewMode = "card" | "list" | "details";
@@ -12,17 +14,9 @@ export interface GalleryUrlState {
   sortDirection: "asc" | "desc";
 }
 
-const ARRAY_KEYS = [
-  "rarity",
-  "type",
-  "set",
-  "symbols",
-  "attuned",
-  "keywords",
-  "attackZone",
-  "blockZone",
-  "abilityTiming",
-] as const;
+type ArrayKey = { [K in keyof CardFilters]-?: CardFilters[K] extends string[] | undefined ? K : never }[keyof CardFilters];
+type NumberKey = { [K in keyof CardFilters]-?: CardFilters[K] extends number | undefined ? K : never }[keyof CardFilters];
+type StatKey = { [K in keyof CardFilters]-?: CardFilters[K] extends StatFilterValue | undefined ? K : never }[keyof CardFilters];
 
 const BOOL_KEYS = [
   "symbolMatchAll",
@@ -37,50 +31,40 @@ const BOOL_KEYS = [
   "isReleased",
 ] as const;
 
-const NUMBER_KEYS = [
-  "difficultyMin",
-  "difficultyMax",
-  "controlMin",
-  "controlMax",
-  "speedMin",
-  "speedMax",
-  "damageMin",
-  "damageMax",
-  "blockModifierMin",
-  "blockModifierMax",
-  "handSizeMin",
-  "handSizeMax",
-  "healthMin",
-  "healthMax",
-  "staminaMin",
-  "staminaMax",
-] as const;
+interface GalleryParamKeys {
+  arrayKeys: readonly ArrayKey[];
+  numberKeys: readonly NumberKey[];
+  statKeys: readonly StatKey[];
+  all: ReadonlySet<string>;
+}
 
-const STAT_KEYS = [
-  "difficulty",
-  "control",
-  "speed",
-  "damage",
-  "blockModifier",
-  "handSize",
-  "health",
-  "stamina",
-] as const;
+const paramKeysCache = new WeakMap<GameFilterDefinition, GalleryParamKeys>();
 
-const STAT_OPERATORS = new Set<StatOperator>(["eq", "neq", "gt", "lt", "gte", "lte"]);
-
-const GALLERY_PARAM_KEYS = new Set([
-  "q",
-  "sm",
-  "view",
-  "sort",
-  "dir",
-  "format",
-  ...ARRAY_KEYS,
-  ...BOOL_KEYS,
-  ...NUMBER_KEYS,
-  ...STAT_KEYS,
-]);
+/** Param keys (in legacy write order) for a game's filter definition. */
+function getGalleryParamKeys(definition: GameFilterDefinition): GalleryParamKeys {
+  const cached = paramKeysCache.get(definition);
+  if (cached) return cached;
+  const arrayKeys = [
+    "rarity",
+    "type",
+    "set",
+    "symbols",
+    "attuned",
+    "keywords",
+    ...definition.zoneParamOrder,
+    "abilityTiming",
+  ] as ArrayKey[];
+  const numberKeys = statRangeParamKeys(definition) as NumberKey[];
+  const statKeys = [...definition.statParamOrder] as StatKey[];
+  const keys: GalleryParamKeys = {
+    arrayKeys,
+    numberKeys,
+    statKeys,
+    all: new Set(["q", "sm", "view", "sort", "dir", "format", ...arrayKeys, ...BOOL_KEYS, ...numberKeys, ...statKeys]),
+  };
+  paramKeysCache.set(definition, keys);
+  return keys;
+}
 
 function parseCsv(value: string | null): string[] | undefined {
   if (!value) return undefined;
@@ -107,10 +91,10 @@ function parseStat(value: string | null): StatFilterValue | undefined {
   if (!value) return undefined;
   const [operatorRaw, amountRaw] = value.split(":");
   if (!operatorRaw || amountRaw == null || amountRaw === "") return undefined;
-  if (!STAT_OPERATORS.has(operatorRaw as StatOperator)) return undefined;
+  if (!isStatOperator(operatorRaw)) return undefined;
   const amount = Number(amountRaw);
   if (!Number.isFinite(amount)) return undefined;
-  return { operator: operatorRaw as StatOperator, value: amount };
+  return { operator: operatorRaw, value: amount };
 }
 
 function serializeStat(value: StatFilterValue | undefined): string | undefined {
@@ -118,14 +102,22 @@ function serializeStat(value: StatFilterValue | undefined): string | undefined {
   return `${value.operator}:${value.value}`;
 }
 
-export function galleryUrlHasState(params: URLSearchParams): boolean {
+export function galleryUrlHasState(
+  params: URLSearchParams,
+  definition: GameFilterDefinition = UVS_FILTER_DEFINITION
+): boolean {
+  const { all } = getGalleryParamKeys(definition);
   for (const key of params.keys()) {
-    if (GALLERY_PARAM_KEYS.has(key)) return true;
+    if (all.has(key)) return true;
   }
   return false;
 }
 
-export function parseGalleryUrlState(params: URLSearchParams): Partial<GalleryUrlState> {
+export function parseGalleryUrlState(
+  params: URLSearchParams,
+  definition: GameFilterDefinition = UVS_FILTER_DEFINITION
+): Partial<GalleryUrlState> {
+  const { arrayKeys, numberKeys, statKeys } = getGalleryParamKeys(definition);
   const result: Partial<GalleryUrlState> = {};
   const search = params.get("q");
   if (search != null) result.search = search;
@@ -152,7 +144,7 @@ export function parseGalleryUrlState(params: URLSearchParams): Partial<GalleryUr
   const format = params.get("format");
   if (format) filters.format = format;
 
-  for (const key of ARRAY_KEYS) {
+  for (const key of arrayKeys) {
     const value = parseCsv(params.get(key));
     if (value) filters[key] = value;
   }
@@ -162,12 +154,12 @@ export function parseGalleryUrlState(params: URLSearchParams): Partial<GalleryUr
     if (value !== undefined) filters[key] = value;
   }
 
-  for (const key of NUMBER_KEYS) {
+  for (const key of numberKeys) {
     const value = parseNumber(params.get(key));
     if (value !== undefined) filters[key] = value;
   }
 
-  for (const key of STAT_KEYS) {
+  for (const key of statKeys) {
     const value = parseStat(params.get(key));
     if (value) filters[key] = value;
   }
@@ -189,10 +181,12 @@ export function writeGalleryUrlState(
     sortField?: string;
     sortDirection?: "asc" | "desc";
     defaultFormatKey?: string;
-  }
+  },
+  definition: GameFilterDefinition = UVS_FILTER_DEFINITION
 ): URLSearchParams {
+  const { arrayKeys, numberKeys, statKeys, all } = getGalleryParamKeys(definition);
   const next = new URLSearchParams(params.toString());
-  for (const key of GALLERY_PARAM_KEYS) {
+  for (const key of all) {
     next.delete(key);
   }
 
@@ -208,7 +202,7 @@ export function writeGalleryUrlState(
     next.set("format", filters.format);
   }
 
-  for (const key of ARRAY_KEYS) {
+  for (const key of arrayKeys) {
     const value = filters[key];
     if (value && value.length > 0) next.set(key, value.join(","));
   }
@@ -221,12 +215,12 @@ export function writeGalleryUrlState(
     next.set(key, value ? "1" : "0");
   }
 
-  for (const key of NUMBER_KEYS) {
+  for (const key of numberKeys) {
     const value = filters[key];
     if (value !== undefined) next.set(key, String(value));
   }
 
-  for (const key of STAT_KEYS) {
+  for (const key of statKeys) {
     const serialized = serializeStat(filters[key]);
     if (serialized) next.set(key, serialized);
   }

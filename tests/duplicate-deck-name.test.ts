@@ -57,8 +57,14 @@ describe("buildDuplicatedDeckFields", () => {
     expect(copy.teamCollaboration).toBe("none");
     expect(copy.format).toBe("standard");
     expect(copy.subFormat).toBe("constructed");
-    expect(copy.startingCharacterId).toBe(source.startingCharacterId);
-    expect(copy.selectedIdentity).toBe("water");
+    // Legacy setup fields are copied into `setup` (the copy is written in the new shape only).
+    expect(copy.setup).toEqual({
+      game: "uvs",
+      startingCharacterId: source.startingCharacterId,
+      selectedIdentity: "water",
+    });
+    expect(copy).not.toHaveProperty("startingCharacterId");
+    expect(copy).not.toHaveProperty("selectedIdentity");
     expect(copy.imageCardId).toBe(source.imageCardId);
     expect(copy.mainCardIds).toEqual(source.mainCardIds);
     expect(copy.mainCardIds).not.toBe(source.mainCardIds);
@@ -75,5 +81,27 @@ describe("buildDuplicatedDeckFields", () => {
     expect(copy.revision).toBe(0);
     expect(copy).not.toHaveProperty("teamId");
     expect(copy).not.toHaveProperty("userId");
+  });
+
+  test("copies an existing setup (preferred over stale legacy fields)", () => {
+    const source = {
+      _id: "kh7src" as Id<"decks">,
+      _creationTime: 1,
+      userId: "ms7owner" as Id<"users">,
+      name: "New Shape",
+      isPublic: false,
+      setup: { game: "uvs", startingCharacterId: "k17new" as Id<"cards">, selectedIdentity: "fire" },
+      selectedIdentity: "water",
+      mainCardIds: [],
+      mainQuantities: {},
+      sideCardIds: [],
+      sideQuantities: {},
+      referenceCardIds: [],
+      referenceQuantities: {},
+    } as Doc<"decks">;
+
+    const copy = buildDuplicatedDeckFields(source);
+    expect(copy.setup).toEqual({ game: "uvs", startingCharacterId: "k17new" as Id<"cards">, selectedIdentity: "fire" });
+    expect(copy.setup).not.toBe(source.setup);
   });
 });

@@ -5,12 +5,13 @@ import { useCardData } from "@/lib/universus/card-data-provider";
 import { cn } from "@/lib/utils";
 import { useActiveDeck } from "@/providers/ActiveDeckProvider";
 import { useCardIdMap } from "@/hooks/useCardIdMap";
+import { useGameModule } from "@/games/game-context";
 
 export function ActiveDeckIcon({ className }: { className?: string }) {
   const { activeDeck } = useActiveDeck();
   const { cards } = useCardData();
   const cardIdMap = useCardIdMap(cards);
-  const startingCharacterId = activeDeck?.startingCharacterId;
+  const startingCharacterId = useGameModule().deck.normalizeSetup(activeDeck).startingCharacterId;
   const startingCharacter = startingCharacterId ? cardIdMap.get(startingCharacterId) ?? null : null;
 
   if (!startingCharacter?.imageUrl) {

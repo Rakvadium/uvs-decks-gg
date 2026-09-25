@@ -2,6 +2,7 @@ import { Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { CachedCard } from "@/lib/universus/card-store";
 import { useDeckEditor } from "@/lib/deck";
+import { normalizeDeckSetup } from "@shared/games/uvs/setup";
 import { cn } from "@/lib/utils";
 
 interface StartingCharacterButtonProps {
@@ -16,7 +17,7 @@ export function StartingCharacterButton({ card, className, compact }: StartingCh
   const isCharacter = card.type?.toLowerCase() === "character";
   if (!hasDeck || !isCharacter) return null;
 
-  const isStartingCharacter = deck?.startingCharacterId === card._id;
+  const isStartingCharacter = normalizeDeckSetup(deck).startingCharacterId === card._id;
 
   return (
     <Button
@@ -24,7 +25,7 @@ export function StartingCharacterButton({ card, className, compact }: StartingCh
       size={compact ? "sm" : "default"}
       onClick={() =>
         updateDeck({
-          startingCharacterId: isStartingCharacter ? null : card._id,
+          setup: { game: "uvs", startingCharacterId: isStartingCharacter ? null : card._id },
         })
       }
       className={cn(

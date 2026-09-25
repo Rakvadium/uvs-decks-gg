@@ -7,9 +7,9 @@ import { formatUniversusCardType } from "@/config/universus";
 import { useCardIdMap } from "@/hooks/useCardIdMap";
 import { useCardData } from "@/lib/universus/card-data-provider";
 import { useDeckDetailsOptional } from "@/providers/DeckDetailsProvider";
+import { useGameModule } from "@/games/game-context";
 import { deckRevisionNumber, isDeckWriteConflictError, isTeamEditableDeck } from "@/lib/deck/visibility";
 import {
-  SIDEBAR_SIDEBOARD_LIMIT,
   UVS_MAIN_TYPE_ORDER,
   buildCardNameIndex,
   findCardByName,
@@ -33,6 +33,9 @@ export function useImportExportSidebarModel() {
   const [lastImportMessage, setLastImportMessage] = useState<string | null>(null);
 
   const deck = context?.deck ?? null;
+  const gameDeck = useGameModule().deck;
+  const setup = gameDeck.normalizeSetup(deck);
+  const startingCharacterId = setup.startingCharacterId;
   const cardMap = useCardIdMap(cards);
   const cardNameIndex = useMemo(() => buildCardNameIndex(cards), [cards]);
 
@@ -78,9 +81,9 @@ export function useImportExportSidebarModel() {
   }, [deck, cardMap]);
 
   const exportCharacter = useMemo(() => {
-    if (!deck?.startingCharacterId) return null;
-    return cardMap.get(deck.startingCharacterId) ?? null;
-  }, [deck?.startingCharacterId, cardMap]);
+    if (!startingCharacterId) return null;
+    return cardMap.get(startingCharacterId) ?? null;
+  }, [startingCharacterId, cardMap]);
 
   const exportText = useMemo(
     () =>
@@ -195,7 +198,7 @@ export function useImportExportSidebarModel() {
       if (importedCharacterId) {
         await updateDeckMutation({
           deckId,
-          startingCharacterId: importedCharacterId,
+          setup: { game: setup.game, startingCharacterId: importedCharacterId },
         });
       }
 
@@ -209,7 +212,7 @@ export function useImportExportSidebarModel() {
       setLastImportMessage(summary);
       toast.success(summary);
 
-      if (importedSideCount > SIDEBAR_SIDEBOARD_LIMIT) {
+      if (importedSideCount > gameDeck.sideboardLimit) {
         toast.warning("Sideboard has more than 10 cards. A validation warning is shown on deck details.");
       }
     } catch (e) {
@@ -221,7 +224,7 @@ export function useImportExportSidebarModel() {
     } finally {
       setIsImporting(false);
     }
-  }, [deck, importText, cardNameIndex, addCardMutation, removeCardMutation, updateDeckMutation]);
+  }, [deck, setup.game, gameDeck, importText, cardNameIndex, addCardMutation, removeCardMutation, updateDeckMutation]);
 
   return {
     deck,

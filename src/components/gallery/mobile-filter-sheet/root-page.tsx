@@ -2,11 +2,13 @@
 
 import Image from "next/image";
 import { LayoutGrid, List } from "lucide-react";
+import { countActiveStatPageFilters } from "@shared/games/filters";
 import { Label } from "@/components/ui/label";
 import { SegmentedControl } from "@/components/ui/segmented-control";
 import { Switch } from "@/components/ui/switch";
 import { getSymbolPath } from "@/components/universus/symbol-icon/utils";
 import { rarityFilterSelected, toggleCanonicalRarityFilter } from "@/lib/universus/rarity";
+import { useGameModule } from "@/games/game-context";
 import { cn } from "@/lib/utils";
 import { useGalleryFilterDialogContext } from "../filter-dialog/context";
 import { useGalleryTopBarFiltersContext } from "../gallery-top-bar-filters/context";
@@ -20,7 +22,7 @@ import {
   FilterGroup,
   FilterRow,
 } from "./primitives";
-import { STAT_KEYS, useActiveChips } from "./use-active-chips";
+import { useActiveChips } from "./use-active-chips";
 
 const segmentedItemClassName = "h-10 text-[13px] normal-case tracking-normal";
 const compactChipClassName = "h-7 gap-1 px-2.5 text-xs";
@@ -206,15 +208,13 @@ function selectionLabel(count: number) {
 
 function MobileFilterIndex() {
   const { filters, meta } = useGalleryFilterDialogContext();
+  const { filters: filterDefinition } = useGameModule();
   const { push } = useGalleryMobileFilterNav();
   const setCount = filters.set?.length ?? 0;
   const typeCount = filters.type?.length ?? 0;
   const symbolCount = filters.symbols?.length ?? 0;
   const keywordCount = filters.keywords?.length ?? 0;
-  const statCount =
-    STAT_KEYS.filter((key) => filters[key]?.value !== undefined).length +
-    (filters.blockZone?.length ?? 0) +
-    (filters.attackZone?.length ?? 0);
+  const statCount = countActiveStatPageFilters(filterDefinition, filters);
   const rarityCount = filters.rarity?.length ?? 0;
   const formatName = meta.formats.find((format) => format.key === (filters.format ?? meta.formats[0]?.key))?.name ?? "Any";
 
@@ -429,15 +429,13 @@ function raritySummary(selected: string[] | undefined) {
 
 function DrillGroup({ compact = false }: { compact?: boolean }) {
   const { filters, meta } = useGalleryFilterDialogContext();
+  const { filters: filterDefinition } = useGameModule();
   const { push } = useGalleryMobileFilterNav();
   const setCount = filters.set?.length ?? 0;
   const typeCount = filters.type?.length ?? 0;
   const symbolCount = filters.symbols?.length ?? 0;
   const keywordCount = filters.keywords?.length ?? 0;
-  const statCount =
-    STAT_KEYS.filter((key) => filters[key]?.value !== undefined).length +
-    (filters.blockZone?.length ?? 0) +
-    (filters.attackZone?.length ?? 0);
+  const statCount = countActiveStatPageFilters(filterDefinition, filters);
   const rarityCount = filters.rarity?.length ?? 0;
   const rowClassName = compact ? "min-h-10" : undefined;
   const defaultFormat = meta.formats[0]?.key;

@@ -2,15 +2,18 @@ import { useMemo } from "react";
 import { useCardIdMap } from "@/hooks/useCardIdMap";
 import { useCardData } from "@/lib/universus/card-data-provider";
 import { useDeckDetailsOptional } from "@/providers/DeckDetailsProvider";
+import { useGameModule } from "@/games/game-context";
 
 export function useSimulatorDeckState() {
   const context = useDeckDetailsOptional();
   const { cards } = useCardData();
   const cardMap = useCardIdMap(cards);
+  const gameDeck = useGameModule().deck;
 
   const deck = context?.deck ?? null;
-  const startingCharacter = deck?.startingCharacterId ? cardMap.get(deck.startingCharacterId) ?? null : null;
-  const handSize = typeof startingCharacter?.handSize === "number" ? startingCharacter.handSize : 0;
+  const setup = gameDeck.normalizeSetup(deck);
+  const startingCharacter = setup.startingCharacterId ? cardMap.get(setup.startingCharacterId) ?? null : null;
+  const handSize = gameDeck.simulatorHandSize(setup, (id) => cardMap.get(id));
 
   const mainDeckPool = useMemo(() => {
     if (!deck) return [] as string[];

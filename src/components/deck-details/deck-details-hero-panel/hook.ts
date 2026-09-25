@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { useCardIdMap } from "@/hooks/useCardIdMap";
 import { useCardData } from "@/lib/universus/card-data-provider";
 import { useDeckDetails } from "@/providers/DeckDetailsProvider";
+import { useGameModule } from "@/games/game-context";
 import type { Id } from "../../../../convex/_generated/dataModel";
 import { isDeckQuantitiesEmpty } from "../deck-empty";
 
@@ -9,17 +10,18 @@ export function useDeckDetailsHeroPanelModel() {
   const { deck, isOwner, updateDeck } = useDeckDetails();
   const { cards: allCards } = useCardData();
   const cardIdMap = useCardIdMap(allCards);
+  const setup = useGameModule().deck.normalizeSetup(deck);
 
   const [characterOpen, setCharacterOpen] = useState(false);
   const [symbolOpen, setSymbolOpen] = useState(false);
   const [characterDetailsOpen, setCharacterDetailsOpen] = useState(false);
 
-  const startingCharacter = deck?.startingCharacterId ? cardIdMap.get(deck.startingCharacterId) ?? null : null;
+  const startingCharacter = setup.startingCharacterId ? cardIdMap.get(setup.startingCharacterId) ?? null : null;
   const startingCharacterBack = startingCharacter?.backCardId
     ? cardIdMap.get(startingCharacter.backCardId) ?? null
     : null;
   const imageCard = deck?.imageCardId ? cardIdMap.get(deck.imageCardId) ?? null : null;
-  const selectedSymbol = deck?.selectedIdentity ? deck.selectedIdentity.toLowerCase() : null;
+  const selectedSymbol = setup.selectedIdentity ? setup.selectedIdentity.toLowerCase() : null;
 
   const startingCharacterSymbols = startingCharacter?.symbols;
   const characterSymbols = useMemo(() => {
@@ -43,7 +45,7 @@ export function useDeckDetailsHeroPanelModel() {
   const compactEmptyMobile = isDeckEmpty && !hasHeroImage;
 
   const handleSelectCharacter = async (characterId: Id<"cards">) => {
-    await updateDeck({ startingCharacterId: characterId });
+    await updateDeck({ setup: { game: setup.game, startingCharacterId: characterId } });
     setCharacterOpen(false);
   };
 
@@ -54,12 +56,13 @@ export function useDeckDetailsHeroPanelModel() {
   };
 
   const handleSelectSymbol = (symbol: string) => {
-    void updateDeck({ selectedIdentity: symbol });
+    void updateDeck({ setup: { game: setup.game, selectedIdentity: symbol } });
     setSymbolOpen(false);
   };
 
   return {
     deck,
+    setup,
     isOwner,
     characterOpen,
     setCharacterOpen,

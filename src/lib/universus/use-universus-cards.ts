@@ -17,7 +17,13 @@ import {
   isGalleryCatalogCard,
 } from "./card-store";
 import type { CachedCard } from "./card-store";
-import type { CardFilters, StatFilterValue } from "@/providers/UIStateProvider";
+import type { CardFilters } from "@/providers/UIStateProvider";
+import {
+  compileStatZoneFilter,
+  getStatSortComparator,
+  type GameFilterDefinition,
+} from "@shared/games/filters";
+import { UVS_FILTER_DEFINITION } from "@shared/games/uvs/filters";
 import { fetchStaticCatalog } from "./static-catalog";
 import { cardMatchesRarityFilter } from "./rarity";
 
@@ -417,33 +423,11 @@ export function useUniversusCards(): UseUniversusCardsResult {
   );
 }
 
-function matchesStatFilter(cardValue: number | undefined, filter: StatFilterValue | undefined): boolean {
-  if (!filter) return true;
-  if (cardValue === undefined) return false;
-  
-  const { operator, value } = filter;
-  switch (operator) {
-    case "eq":
-      return cardValue === value;
-    case "neq":
-      return cardValue !== value;
-    case "gt":
-      return cardValue > value;
-    case "lt":
-      return cardValue < value;
-    case "gte":
-      return cardValue >= value;
-    case "lte":
-      return cardValue <= value;
-    default:
-      return true;
-  }
-}
-
 export function filterCards(
   cards: CachedCard[],
   filters: CardFilters,
-  formatOpts?: FilterCardsFormatOptions
+  formatOpts?: FilterCardsFormatOptions,
+  filterDefinition: GameFilterDefinition = UVS_FILTER_DEFINITION
 ): CachedCard[] {
   const passesFormatLegality = formatOpts?.passesFormatLegality;
   const isCardBannedInFormat = formatOpts?.isCardBannedInFormat;
@@ -475,29 +459,8 @@ export function filterCards(
   const hasKeywordFilter = Boolean(keywordFilters?.length);
   const keywordMatchAll = filters.keywordMatchAll === true;
 
-  const hasDifficultyRange =
-    filters.difficultyMin !== undefined || filters.difficultyMax !== undefined;
-  const hasControlRange = filters.controlMin !== undefined || filters.controlMax !== undefined;
-  const hasSpeedRange = filters.speedMin !== undefined || filters.speedMax !== undefined;
-  const hasDamageRange = filters.damageMin !== undefined || filters.damageMax !== undefined;
-
-  const attackZonesLower =
-    filters.attackZone && filters.attackZone.length > 0
-      ? filters.attackZone.map((z) => z.toLowerCase())
-      : null;
-  const blockZonesLower =
-    filters.blockZone && filters.blockZone.length > 0
-      ? filters.blockZone.map((z) => z.toLowerCase())
-      : null;
-
-  const statDifficulty = filters.difficulty;
-  const statControl = filters.control;
-  const statSpeed = filters.speed;
-  const statDamage = filters.damage;
-  const statBlockModifier = filters.blockModifier;
-  const statHealth = filters.health;
-  const statHandSize = filters.handSize;
-  const statStamina = filters.stamina;
+  // Stat rules, legacy min/max ranges, and zones come from the game's filter definition.
+  const matchesStatZoneFilters = compileStatZoneFilter(filterDefinition, filters);
 
   const out: CachedCard[] = [];
   for (const card of cards) {
@@ -575,46 +538,7 @@ export function filterCards(
       }
     }
 
-    if (hasDifficultyRange) {
-      if (card.difficulty === undefined) continue;
-      if (filters.difficultyMin !== undefined && card.difficulty < filters.difficultyMin) continue;
-      if (filters.difficultyMax !== undefined && card.difficulty > filters.difficultyMax) continue;
-    }
-
-    if (hasControlRange) {
-      if (card.control === undefined) continue;
-      if (filters.controlMin !== undefined && card.control < filters.controlMin) continue;
-      if (filters.controlMax !== undefined && card.control > filters.controlMax) continue;
-    }
-
-    if (hasSpeedRange) {
-      if (card.speed === undefined) continue;
-      if (filters.speedMin !== undefined && card.speed < filters.speedMin) continue;
-      if (filters.speedMax !== undefined && card.speed > filters.speedMax) continue;
-    }
-
-    if (hasDamageRange) {
-      if (card.damage === undefined) continue;
-      if (filters.damageMin !== undefined && card.damage < filters.damageMin) continue;
-      if (filters.damageMax !== undefined && card.damage > filters.damageMax) continue;
-    }
-
-    if (attackZonesLower) {
-      if (!card.attackZone || !attackZonesLower.includes(card.attackZone.toLowerCase())) continue;
-    }
-
-    if (blockZonesLower) {
-      if (!card.blockZone || !blockZonesLower.includes(card.blockZone.toLowerCase())) continue;
-    }
-
-    if (statDifficulty && !matchesStatFilter(card.difficulty, statDifficulty)) continue;
-    if (statControl && !matchesStatFilter(card.control, statControl)) continue;
-    if (statSpeed && !matchesStatFilter(card.speed, statSpeed)) continue;
-    if (statDamage && !matchesStatFilter(card.damage, statDamage)) continue;
-    if (statBlockModifier && !matchesStatFilter(card.blockModifier, statBlockModifier)) continue;
-    if (statHealth && !matchesStatFilter(card.health, statHealth)) continue;
-    if (statHandSize && !matchesStatFilter(card.handSize, statHandSize)) continue;
-    if (statStamina && !matchesStatFilter(card.stamina, statStamina)) continue;
+    if (matchesStatZoneFilters && !matchesStatZoneFilters(card)) continue;
 
     out.push(card);
   }
@@ -636,7 +560,11 @@ function defaultCardSort(a: CachedCard, b: CachedCard): number {
 
 type SortPairComparator = (a: CachedCard, b: CachedCard) => number;
 
-function getSortPairComparator(field: string, multiplier: number): SortPairComparator {
+function getSortPairComparator(
+  field: string,
+  multiplier: number,
+  filterDefinition: GameFilterDefinition
+): SortPairComparator {
   switch (field) {
     case "name":
       return (a, b) => a.name.localeCompare(b.name) * multiplier;
@@ -652,22 +580,16 @@ function getSortPairComparator(field: string, multiplier: number): SortPairCompa
     case "collectorNumber":
       return (a, b) =>
         (parseInt(a.collectorNumber ?? "0", 10) - parseInt(b.collectorNumber ?? "0", 10)) * multiplier;
-    case "difficulty":
-      return (a, b) => ((a.difficulty ?? 0) - (b.difficulty ?? 0)) * multiplier;
-    case "control":
-      return (a, b) => ((a.control ?? 0) - (b.control ?? 0)) * multiplier;
-    case "speed":
-      return (a, b) => ((a.speed ?? 0) - (b.speed ?? 0)) * multiplier;
-    case "damage":
-      return (a, b) => ((a.damage ?? 0) - (b.damage ?? 0)) * multiplier;
     default:
-      return defaultCardSort;
+      // Sortable stats (e.g. difficulty/control/speed/damage) come from the filter definition.
+      return getStatSortComparator(filterDefinition, field, multiplier) ?? defaultCardSort;
   }
 }
 
 export function sortCards(
   cards: CachedCard[],
-  options: CardSortOptions
+  options: CardSortOptions,
+  filterDefinition: GameFilterDefinition = UVS_FILTER_DEFINITION
 ): CachedCard[] {
   const { field, direction } = options;
 
@@ -683,7 +605,7 @@ export function sortCards(
     return [...cards].sort(defaultCardSort);
   }
   const multiplier = direction === "desc" ? -1 : 1;
-  const compare = getSortPairComparator(field, multiplier);
+  const compare = getSortPairComparator(field, multiplier, filterDefinition);
   return [...cards].sort(compare);
 }
 

@@ -58,14 +58,55 @@ function docs() {
 }
 
 describe("decks.update null handling", () => {
+  // Setup writes go to `setup`; the deprecated top-level fields are always cleared (patched as undefined).
+  const LEGACY_CLEARED = { startingCharacterId: undefined, selectedIdentity: undefined };
+
   test("null startingCharacterId / selectedIdentity clear the fields (patched as undefined)", async () => {
     const { ctx, patches } = makeCtx(docs());
     await handler(ctx, { deckId: "deck1", startingCharacterId: null, selectedIdentity: null });
     expect(patches).toHaveLength(1);
     expect(patches[0]?.id).toBe("deck1");
-    expect(Object.keys(patches[0]!.value).sort()).toEqual(["selectedIdentity", "startingCharacterId"]);
+    expect(Object.keys(patches[0]!.value).sort()).toEqual(["selectedIdentity", "setup", "startingCharacterId"]);
     expect(patches[0]!.value.startingCharacterId).toBeUndefined();
     expect(patches[0]!.value.selectedIdentity).toBeUndefined();
+    expect(patches[0]!.value.setup).toEqual({ game: "uvs" });
+  });
+
+  test("null fields in a setup patch clear them; setup: null clears the whole setup", async () => {
+    const a = makeCtx(docs());
+    await handler(a.ctx, { deckId: "deck1", setup: { game: "uvs", startingCharacterId: null } });
+    expect(a.patches[0]!.value).toEqual({ setup: { game: "uvs", selectedIdentity: "fire" }, ...LEGACY_CLEARED });
+
+    const b = makeCtx(docs());
+    await handler(b.ctx, { deckId: "deck1", setup: null });
+    expect(b.patches[0]!.value).toEqual({ setup: { game: "uvs" }, ...LEGACY_CLEARED });
+  });
+
+  test("setting one setup field keeps the other (read from setup, else legacy fields)", async () => {
+    const legacy = makeCtx(docs());
+    await handler(legacy.ctx, { deckId: "deck1", setup: { game: "uvs", startingCharacterId: "char2" } });
+    expect(legacy.patches[0]!.value).toEqual({
+      setup: { game: "uvs", startingCharacterId: "char2", selectedIdentity: "fire" },
+      ...LEGACY_CLEARED,
+    });
+
+    const migrated = makeCtx({
+      ...docs(),
+      deck1: { ...deck, startingCharacterId: undefined, selectedIdentity: undefined, setup: { game: "uvs", selectedIdentity: "water" } },
+    });
+    await handler(migrated.ctx, { deckId: "deck1", selectedIdentity: "air" });
+    expect(migrated.patches[0]!.value).toEqual({ setup: { game: "uvs", selectedIdentity: "air" }, ...LEGACY_CLEARED });
+  });
+
+  test("explicit setup fields win over legacy args", async () => {
+    const { ctx, patches } = makeCtx(docs());
+    await handler(ctx, {
+      deckId: "deck1",
+      setup: { game: "uvs", selectedIdentity: "water" },
+      selectedIdentity: "air",
+      startingCharacterId: null,
+    });
+    expect(patches[0]!.value).toEqual({ setup: { game: "uvs", selectedIdentity: "water" }, ...LEGACY_CLEARED });
   });
 
   test("null imageCardId / format / subFormat / description also clear", async () => {
@@ -84,7 +125,10 @@ describe("decks.update null handling", () => {
   test("values are passed through, including empty-string identity", async () => {
     const { ctx, patches } = makeCtx(docs());
     await handler(ctx, { deckId: "deck1", startingCharacterId: "char2", selectedIdentity: "" });
-    expect(patches[0]!.value).toEqual({ startingCharacterId: "char2", selectedIdentity: "" });
+    expect(patches[0]!.value).toEqual({
+      setup: { game: "uvs", startingCharacterId: "char2", selectedIdentity: "" },
+      ...LEGACY_CLEARED,
+    });
   });
 
   test("setting a back-face or missing starting character throws", async () => {
@@ -95,6 +139,11 @@ describe("decks.update null handling", () => {
     const b = makeCtx(docs());
     await expect(handler(b.ctx, { deckId: "deck1", startingCharacterId: "nope" })).rejects.toThrow("Card not found");
     expect(a.patches).toEqual([]);
+    const c = makeCtx(docs());
+    await expect(
+      handler(c.ctx, { deckId: "deck1", setup: { game: "uvs", startingCharacterId: "back1" } }),
+    ).rejects.toThrow("Cannot add back-face card directly");
+    expect(c.patches).toEqual([]);
   });
 
   test("auth and ownership are enforced before patching", async () => {

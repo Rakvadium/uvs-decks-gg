@@ -8,10 +8,7 @@ import { useCardData } from "@/lib/universus/card-data-provider";
 import type { CachedCard } from "@/lib/universus/card-store";
 import { canAddCardToSection, useDeckEditor } from "@/lib/deck";
 import { useCardIdMap } from "@/hooks/useCardIdMap";
-import {
-  CARD_TYPE_LABELS,
-  CARD_TYPE_ORDER,
-} from "@/lib/deck/display-config";
+import { useGameModule } from "@/games/game-context";
 import { formatUniversusCardType } from "@/config/universus";
 import { TCG_DND_ACCEPTS_CARD_ONLY, useTcgDroppable } from "@/lib/dnd";
 import {
@@ -25,7 +22,6 @@ import {
   type DeckViewMode,
   type ListSortDirection,
 } from "./deck-list-utils";
-import { SIDEBAR_SIDEBOARD_LIMIT } from "./uvs-import-export";
 
 const EMPTY_QUANTITIES: Record<string, number> = {};
 
@@ -34,6 +30,7 @@ export function useDeckCardsSectionModel() {
   const { cards: allCards } = useCardData();
   const { addCard } = useDeckEditor();
   const { deck, activeSection, isOwner, setActiveSection } = useDeckDetails();
+  const gameDeck = useGameModule().deck;
 
   const [manualViewMode, setManualViewMode] = useState<DeckViewMode | null>(null);
   const [listSortKey, setListSortKey] = useState<DeckListSortKey>("difficulty");
@@ -69,7 +66,8 @@ export function useDeckCardsSectionModel() {
     [deck]
   );
 
-  const isSideboardOverflow = counts.side > SIDEBAR_SIDEBOARD_LIMIT;
+  const sideboardLimit = gameDeck.sideboardLimit;
+  const isSideboardOverflow = counts.side > sideboardLimit;
 
   const sectionCountsForDrop = useMemo(
     () => ({
@@ -112,10 +110,11 @@ export function useDeckCardsSectionModel() {
       groups.set(normalizedType, list);
     }
 
+    const typeOrder = gameDeck.cardTypeOrder;
     const orderedTypes = [
-      ...CARD_TYPE_ORDER,
+      ...typeOrder,
       ...Array.from(groups.keys())
-        .filter((type) => !CARD_TYPE_ORDER.includes(type as (typeof CARD_TYPE_ORDER)[number]))
+        .filter((type) => !typeOrder.includes(type))
         .sort(),
     ];
 
@@ -123,10 +122,10 @@ export function useDeckCardsSectionModel() {
       .filter((type) => groups.has(type))
       .map((type) => ({
         type,
-        label: CARD_TYPE_LABELS[type] ?? type,
+        label: gameDeck.cardTypeLabels[type] ?? type,
         cards: groups.get(type) ?? [],
       }));
-  }, [sortedCards]);
+  }, [sortedCards, gameDeck]);
 
   const listGroups = useMemo(() => {
     const groupMap = new Map<string, DeckListEntry[]>();
@@ -234,6 +233,7 @@ export function useDeckCardsSectionModel() {
     onClearListCardHover,
     counts,
     isSideboardOverflow,
+    sideboardLimit,
     visibleCards,
     groupedCards,
     listGroups,

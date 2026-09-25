@@ -17,15 +17,15 @@ import {
   parseStoredCardsPerRow,
   resolveGalleryCardsPerRowPreference,
 } from "@/lib/gallery/cards-per-row-preference";
+import type { UvsStatZoneFilterFields } from "@shared/games/uvs/filters";
 
-export type StatOperator = "eq" | "neq" | "gt" | "lt" | "gte" | "lte";
+export type { StatOperator, StatFilterValue } from "@shared/games/filters";
 
-export interface StatFilterValue {
-  operator: StatOperator;
-  value: number;
-}
-
-export interface CardFilters {
+/**
+ * Persisted gallery filters (localStorage + Convex `sessions.galleryFilters`). Stat, range
+ * (`${stat}Min`/`${stat}Max`), and zone fields are derived from the UVS filter definition.
+ */
+export interface CardFilters extends UvsStatZoneFilterFields {
   search?: string;
   searchMode?: "name" | "text" | "all";
   rarity?: string[];
@@ -39,35 +39,9 @@ export interface CardFilters {
   includeBanned?: boolean;
   keywords?: string[];
   keywordMatchAll?: boolean;
-  difficultyMin?: number;
-  difficultyMax?: number;
-  controlMin?: number;
-  controlMax?: number;
-  speedMin?: number;
-  speedMax?: number;
-  damageMin?: number;
-  damageMax?: number;
-  blockModifierMin?: number;
-  blockModifierMax?: number;
-  handSizeMin?: number;
-  handSizeMax?: number;
-  healthMin?: number;
-  healthMax?: number;
-  staminaMin?: number;
-  staminaMax?: number;
-  difficulty?: StatFilterValue;
-  control?: StatFilterValue;
-  speed?: StatFilterValue;
-  damage?: StatFilterValue;
-  blockModifier?: StatFilterValue;
-  handSize?: StatFilterValue;
-  health?: StatFilterValue;
-  stamina?: StatFilterValue;
   hasAttack?: boolean;
   hasBlock?: boolean;
   isCharacter?: boolean;
-  attackZone?: string[];
-  blockZone?: string[];
   hasAbilities?: boolean;
   abilityTiming?: string[];
   isDualFaced?: boolean;

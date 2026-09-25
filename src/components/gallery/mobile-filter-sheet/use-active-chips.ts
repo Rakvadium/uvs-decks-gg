@@ -2,31 +2,24 @@
 
 import { useMemo } from "react";
 import { toggleCanonicalRarityFilter } from "@/lib/universus/rarity";
+import { STAT_OPERATOR_OPTIONS, statStandaloneLabel } from "@shared/games/filters";
+import { UVS_STAT_FILTERS } from "@shared/games/uvs/filters";
+import { useGameModule } from "@/games/game-context";
 import type { StatOperator } from "@/providers/UIStateProvider";
 import { useGalleryFilterDialogContext } from "../filter-dialog/context";
-import type { StatFilterKey } from "../filter-dialog/types";
+import type { StatFilterKey, StringArrayFilterKey } from "../filter-dialog/types";
 
-export const OPERATOR_GLYPHS: Record<StatOperator, string> = {
-  eq: "=",
-  neq: "≠",
-  gt: ">",
-  lt: "<",
-  gte: "≥",
-  lte: "≤",
-};
+export const OPERATOR_GLYPHS = Object.fromEntries(
+  STAT_OPERATOR_OPTIONS.map((option) => [option.value, option.glyph])
+) as Record<StatOperator, string>;
 
-export const STAT_LABELS: Record<StatFilterKey, string> = {
-  difficulty: "Difficulty",
-  control: "Control",
-  health: "Health",
-  handSize: "Hand Size",
-  stamina: "Stamina",
-  blockModifier: "Block Mod",
-  speed: "Speed",
-  damage: "Damage",
-};
+/** @deprecated Read labels from `useGameModule().filters.stats` (`statStandaloneLabel`). */
+export const STAT_LABELS = Object.fromEntries(
+  UVS_STAT_FILTERS.map((stat) => [stat.key, statStandaloneLabel(stat)])
+) as Record<StatFilterKey, string>;
 
-export const STAT_KEYS = Object.keys(STAT_LABELS) as StatFilterKey[];
+/** @deprecated Read keys from `useGameModule().filters.stats`. */
+export const STAT_KEYS = UVS_STAT_FILTERS.map((stat) => stat.key) as StatFilterKey[];
 
 export interface ActiveChip {
   id: string;
@@ -50,6 +43,7 @@ export function useActiveChips(): ActiveChip[] {
     setIncludeInfinityResults,
     toggleFormat,
   } = useGalleryFilterDialogContext();
+  const { filters: filterDefinition } = useGameModule();
 
   return useMemo(() => {
     const chips: ActiveChip[] = [];
@@ -97,25 +91,29 @@ export function useActiveChips(): ActiveChip[] {
       chips.push({ id: `keyword:${keyword}`, label: keyword, remove: () => toggleStringFilter("keywords", keyword) });
     }
 
-    for (const zone of filters.blockZone ?? []) {
-      chips.push({ id: `blockZone:${zone}`, label: `Block ${zone}`, remove: () => toggleStringFilter("blockZone", zone) });
+    for (const descriptor of filterDefinition.zones) {
+      const key = descriptor.key as StringArrayFilterKey;
+      for (const zone of filters[key] ?? []) {
+        chips.push({
+          id: `${key}:${zone}`,
+          label: `${descriptor.standaloneLabel} ${zone}`,
+          remove: () => toggleStringFilter(key, zone),
+        });
+      }
     }
 
-    for (const zone of filters.attackZone ?? []) {
-      chips.push({ id: `attackZone:${zone}`, label: `Attack ${zone}`, remove: () => toggleStringFilter("attackZone", zone) });
-    }
-
-    for (const key of STAT_KEYS) {
+    for (const descriptor of filterDefinition.stats) {
+      const key = descriptor.key as StatFilterKey;
       const value = filters[key];
       if (!value || value.value === undefined) continue;
       const operator = OPERATOR_GLYPHS[value.operator] ?? "=";
       chips.push({
         id: `stat:${key}`,
-        label: `${STAT_LABELS[key]} ${operator} ${value.value}`,
+        label: `${statStandaloneLabel(descriptor)} ${operator} ${value.value}`,
         remove: () => setStatFilter(key, undefined),
       });
     }
 
     return chips;
-  }, [actions, filters, meta.formats, setIncludeInfinityResults, setOptions, setStatFilter, toggleFormat, toggleStringFilter]);
+  }, [actions, filterDefinition, filters, meta.formats, setIncludeInfinityResults, setOptions, setStatFilter, toggleFormat, toggleStringFilter]);
 }

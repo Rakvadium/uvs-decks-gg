@@ -2,48 +2,23 @@
 
 import { useMemo } from "react";
 import { useGalleryFilterDialogContext } from "@/components/gallery/filter-dialog/context";
+import { useGameModule } from "@/games/game-context";
 import type { CardFilters } from "@/providers/UIStateProvider";
+import {
+  countActiveStatPageFilters,
+  statPageFilterKeys,
+  type GameFilterDefinition,
+} from "@shared/games/filters";
+import { UVS_FILTER_DEFINITION } from "@shared/games/uvs/filters";
 
-export const STATS_FILTER_KEYS = [
-  "difficulty",
-  "control",
-  "speed",
-  "damage",
-  "blockModifier",
-  "handSize",
-  "health",
-  "stamina",
-  "blockZone",
-  "attackZone",
-] as const satisfies readonly (keyof CardFilters)[];
+/** Filters keys owned by the stats page (stat rules + zones) for the default game. */
+export const STATS_FILTER_KEYS = statPageFilterKeys(UVS_FILTER_DEFINITION) as (keyof CardFilters)[];
 
-const STAT_VALUE_KEYS = [
-  "difficulty",
-  "control",
-  "speed",
-  "damage",
-  "blockModifier",
-  "handSize",
-  "health",
-  "stamina",
-] as const;
-
-export function statsFilterCount(filters: CardFilters): number {
-  let count = 0;
-  for (const key of STAT_VALUE_KEYS) {
-    const statValue = filters[key];
-    if (
-      statValue &&
-      typeof statValue === "object" &&
-      "value" in statValue &&
-      statValue.value !== undefined
-    ) {
-      count += 1;
-    }
-  }
-  count += filters.blockZone?.length ?? 0;
-  count += filters.attackZone?.length ?? 0;
-  return count;
+export function statsFilterCount(
+  filters: CardFilters,
+  definition: GameFilterDefinition = UVS_FILTER_DEFINITION
+): number {
+  return countActiveStatPageFilters(definition, filters);
 }
 
 export function formatSymbolLabel(symbol: string): string {
@@ -61,6 +36,7 @@ export interface ActiveFilterToken {
 
 export function useActiveFilterTokens(): ActiveFilterToken[] {
   const { filters, meta, actions, setOptions } = useGalleryFilterDialogContext();
+  const { filters: filterDefinition } = useGameModule();
 
   return useMemo(() => {
     const tokens: ActiveFilterToken[] = [];
@@ -136,14 +112,14 @@ export function useActiveFilterTokens(): ActiveFilterToken[] {
       clear: () => actions.removeFilterKeys(["keywords", "keywordMatchAll"]),
     });
 
-    const statCount = statsFilterCount(filters);
+    const statCount = statsFilterCount(filters, filterDefinition);
     tokens.push({
       id: "stats",
       label: "Stats",
       values: statCount > 0 ? [`${statCount} selected`] : ["Any"],
       count: statCount,
       active: statCount > 0,
-      clear: () => actions.removeFilterKeys([...STATS_FILTER_KEYS]),
+      clear: () => actions.removeFilterKeys(statPageFilterKeys(filterDefinition) as (keyof CardFilters)[]),
     });
 
     const rarities = filters.rarity ?? [];
@@ -157,7 +133,7 @@ export function useActiveFilterTokens(): ActiveFilterToken[] {
     });
 
     return tokens;
-  }, [filters, meta.defaultFormatKey, meta.formats, actions, setOptions]);
+  }, [filters, filterDefinition, meta.defaultFormatKey, meta.formats, actions, setOptions]);
 }
 
 export function summarizeTokenValues(values: string[], maxVisible = 2): string {

@@ -56,9 +56,28 @@ export const deckSetupValidator = uvsDeckSetupValidator; // becomes v.union(...)
   `setup` (and clear the legacy fields when they patch). Readers go through one normalizer:
   `normalizeDeckSetup(deck)` in `shared/games/uvs/setup.ts`, which prefers `setup` and falls
   back to the legacy fields.
-- Mutation API: `decks.create` / `decks.update` accept `setup` (update: `setup: v.optional(v.union(deckSetupValidator, v.null()))`
-  keeps today's null-clears semantics per field via a partial-setup patch helper).
-- Backfill: `convex/migrations/migrateDeckSetup.ts`.
+- Mutation API: `decks.create` accepts `setup: v.optional(deckSetupValidator)`. `decks.update` accepts
+  `setup: v.optional(v.union(deckSetupPatchValidator, v.null()))` — the patch validator makes each
+  field `id | string | null` so today's null-clears semantics hold per field (`applyDeckSetupPatch`);
+  `setup: null` clears the whole setup. Writers always write a `setup` object (possibly `{ game }`)
+  and unset the legacy fields. The legacy `startingCharacterId` / `selectedIdentity` args are still
+  accepted for one release and folded in by `mergeLegacyDeckSetupArgs` (explicit `setup` fields win).
+- Backfill: `convex/migrations/migrateDeckSetup.ts` — `run` (internalMutation, `cursor`/`batchSize`
+  args, 200 per page, reschedules itself until done; `once: true` for a single page) and `status`
+  (internalQuery over one page; loop on `continueCursor` and sum `pending`). The per-doc transform is
+  `deckSetupMigrationPatch` in `shared/games/uvs/setup.ts`.
+
+### Deck module (`SharedGameModule.deck`, `shared/games/deck.ts`)
+
+`normalizeSetup`, `applySetupPatch`, `setupCardIds`, `validation.{plan,validate}`, `cardTypeOrder`,
+`cardTypeLabels`, `sideboardLimit`, `isMainDeckEligible`, `getCardCopyLimit`, `simulatorHandSize`,
+`extractZones`, `zoneTone`, `text.{mainTypeOrder,parse,format}`. UVS implementations live in
+`shared/games/uvs/{setup,rules/*,card-eligibility,card-types,deck-text,zones,deck}.ts`.
+Validation is two-phase so rules stay pure: `plan(deck, format)` names the cards to load,
+`convex/lib/deckFormatRules.ts` loads them (+ `cardLegality`) and calls `validate(...)`;
+`convex/deckValidation.ts` picks the rules via the deck's game module. Old client paths
+(`src/lib/deck/card-eligibility.ts`, `display-config.ts`, `components/deck-details/uvs-import-export.ts`,
+`deck-list-utils.ts` zone helpers) re-export from `shared/games/uvs/*`.
 
 ## `game` on game-scoped tables
 

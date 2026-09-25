@@ -1,14 +1,7 @@
 import type { CardFilters, StatFilterValue } from "@/providers/UIStateProvider";
+import type { UvsStatFilterKey } from "@shared/games/uvs/filters";
 
-export type StatFilterKey =
-  | "difficulty"
-  | "control"
-  | "speed"
-  | "damage"
-  | "blockModifier"
-  | "handSize"
-  | "health"
-  | "stamina";
+export type StatFilterKey = UvsStatFilterKey;
 
 export type StringArrayFilterKey = Extract<
   {

@@ -2,16 +2,8 @@ import { Layers, BookOpen, Bookmark } from "lucide-react";
 
 export type DeckSection = "main" | "side" | "reference";
 
-export const CARD_TYPE_ORDER = ["Attack", "Foundation", "Action", "Asset", "Backup", "Character"] as const;
-
-export const CARD_TYPE_LABELS: Record<string, string> = {
-  Attack: "Attacks",
-  Foundation: "Foundations",
-  Action: "Actions",
-  Asset: "Assets",
-  Backup: "Backups",
-  Character: "Characters",
-};
+// UVS card-type order/labels live in the shared UVS game module.
+export { CARD_TYPE_LABELS, CARD_TYPE_ORDER } from "@shared/games/uvs/card-types";
 
 export const DECK_SECTION_META = {
   main: { label: "Main", icon: Layers },
