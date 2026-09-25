@@ -16,6 +16,7 @@ import {
 } from "@shared/auth-handoff";
 
 const SIGNED_OUT_GRACE_MS = 750;
+const REDIRECT_RETRY_MS = 1500;
 
 type HandoffClientProps = {
   returnUrl: string;
@@ -35,6 +36,7 @@ export function HandoffClient({ returnUrl, state, silent, flow }: HandoffClientP
   const createHandoff = useMutation(api.authHandoff.create);
   const startedRef = useRef(false);
   const [failure, setFailure] = useState<string | null>(null);
+  const [redirectTo, setRedirectTo] = useState<string | null>(null);
 
   const target = useMemo(() => parseHandoffReturnUrl(returnUrl), [returnUrl]);
   const validationError =
@@ -63,8 +65,10 @@ export function HandoffClient({ returnUrl, state, silent, flow }: HandoffClientP
     if (!isAuthenticated) {
       // Right after a sign-in the client can briefly report signed-out before the new token
       // is confirmed; wait before treating it as a real signed-out state.
+      // Don't set startedRef here: if /sign-in bounces straight back (middleware sees the new
+      // session cookie before the client does), this same instance must still mint the code
+      // once the client reports authenticated.
       const timer = window.setTimeout(() => {
-        startedRef.current = true;
         if (silent) {
           loginRequired();
           return;
@@ -82,7 +86,7 @@ export function HandoffClient({ returnUrl, state, silent, flow }: HandoffClientP
           throw new Error("Unexpected redirect origin");
         }
         setSignedInHint();
-        window.location.replace(redirectUrl);
+        setRedirectTo(redirectUrl);
       })
       .catch((error: unknown) => {
         console.error(error);
@@ -93,6 +97,26 @@ export function HandoffClient({ returnUrl, state, silent, flow }: HandoffClientP
         setFailure("Could not complete sign-in. Please try again.");
       });
   }, [createHandoff, flow, isAuthenticated, isLoading, returnUrl, router, silent, state, target, validationError]);
+
+  // A script navigation started while the page is still hydrating can be dropped, so wait for
+  // `load`, then retry once in case the first attempt was cancelled.
+  useEffect(() => {
+    if (!redirectTo) return;
+    let retry: number | undefined;
+    const go = () => {
+      window.location.replace(redirectTo);
+      retry = window.setTimeout(() => window.location.replace(redirectTo), REDIRECT_RETRY_MS);
+    };
+    if (document.readyState === "complete") {
+      go();
+    } else {
+      window.addEventListener("load", go, { once: true });
+    }
+    return () => {
+      window.removeEventListener("load", go);
+      window.clearTimeout(retry);
+    };
+  }, [redirectTo]);
 
   const error = validationError ?? failure;
   return (
@@ -108,6 +132,13 @@ export function HandoffClient({ returnUrl, state, silent, flow }: HandoffClientP
         >
           Go home
         </Link>
+      ) : redirectTo ? (
+        <a
+          href={redirectTo}
+          className="text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+        >
+          Continue
+        </a>
       ) : null}
     </AuthStatusScreen>
   );
