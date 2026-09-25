@@ -1,6 +1,7 @@
 import "server-only";
 import { headers } from "next/headers";
-import { DEFAULT_GAME_ID, isGameId, type GameId } from "@shared/games/types";
+import { getSharedGameModule } from "@shared/games/registry";
+import { DEFAULT_GAME_ID, isGameId, PLATFORM_BRAND, type Brand, type GameId } from "@shared/games/types";
 import { resolveHost, type HostInfo, type HostKind } from "@shared/hosts";
 import { GAME_HEADER, HOST_KIND_HEADER } from "./route-request";
 
@@ -30,4 +31,10 @@ export async function getRequestGame(): Promise<RequestGame> {
     return { game, hostKind: hostKind as HostKind, host, protocol };
   }
   return { game: host.game ?? DEFAULT_GAME_ID, hostKind: host.kind, host, protocol };
+}
+
+/** Brand for the current host: the platform brand on the apex, else the game's brand. */
+export async function getRequestBrand(): Promise<Brand> {
+  const { game, hostKind } = await getRequestGame();
+  return hostKind === "apex" ? PLATFORM_BRAND : getSharedGameModule(game).brand;
 }
