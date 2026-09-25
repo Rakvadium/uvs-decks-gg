@@ -392,14 +392,17 @@ builders, `sanitizeSameOriginPath`, code checks, hint cookie) live in `shared/au
    origin with `isAllowedHandoffOrigin`, stores `sha256(code)` of a 32-byte random code in
    `authHandoffCodes { codeHash, userId, origin, state?, expiresAt, usedAt? }`
    (`by_codeHash`, `by_expiresAt`), TTL 60s. Cron `authHandoff.cleanupExpired` (10 min) deletes
-   expired rows.
+   expired rows in batches of 200 and reschedules itself while a full batch was deleted.
 4. Game `/auth/callback`: reads then immediately strips the query (`history.replaceState`),
    checks `state` against sessionStorage (removed either way; login-CSRF guard), calls
-   `signIn("handoff", { code, origin: location.origin })`, then `router.replace(next)` (sanitized).
+   `signIn("handoff", { code, origin: location.origin, state })`, then `router.replace(next)` (sanitized).
    `/auth/*` responses send `Referrer-Policy: no-referrer` (next.config headers + page metadata).
 5. `convex/auth.ts` adds `ConvexCredentials({ id: "handoff" })`; `authorize` runs internal
-   `authHandoff.consume` (hash match, unused, unexpired, origin match; marks `usedAt`, also burns
-   codes presented after expiry or to the wrong origin; failed redemptions are not rate-limited because the only key would be the caller-supplied origin, which would let anyone lock out a game host) and
+   `authHandoff.consume` (hash match, unused, unexpired, origin match, and — when the code was
+   minted with a `state` — exact `state` match, so state is checked server-side as well as against
+   sessionStorage; marks `usedAt`, also burns codes presented after expiry or with the wrong
+   origin/state. Origin binding is best-effort: `origin` is client-supplied, so it only stops a
+   well-behaved client on another host from redeeming the code, not an attacker holding it; failed redemptions are not rate-limited because the only key would be the caller-supplied origin, which would let anyone lock out a game host) and
    returns `{ userId }`.
 6. Silent SSO (`src/components/auth/silent-sso.tsx`, mounted in `Providers`): apex sets
    `tcgd_signed_in=1; Domain=.{root}; Path=/; SameSite=Lax; Max-Age=30d[; Secure]`

@@ -591,15 +591,17 @@ export const deleteDeck = mutation({
 
 export const duplicate = mutation({
   args: {
+    game: v.optional(gameIdValidator),
     deckId: v.id("decks"),
   },
   returns: v.id("decks"),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     const userId = await requireAuth(ctx);
     await requireUserCanPostContent(ctx, userId);
 
     const source = await ctx.db.get(args.deckId);
-    if (!source) throw new Error("Deck not found");
+    if (!isDocInGame(source, args.game)) throw new Error("Deck not found");
     const allowed = await canViewDeck(ctx, source, args.deckId);
     if (!allowed) throw new Error("Deck not found");
 

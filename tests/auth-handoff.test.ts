@@ -182,6 +182,18 @@ describe("codes and state", () => {
     expect(checkHandoffCode(record, origin, 1_000)).toBe("expired");
     expect(checkHandoffCode(record, "https://evil.tcgdecks.gg", 999)).toBe("origin_mismatch");
   });
+
+  test("checkHandoffCode requires the minted state when present", () => {
+    const origin = "https://uvs.tcgdecks.gg";
+    const state = "abcdefghijklmnop";
+    const record = { origin, state, expiresAt: 1_000 };
+    expect(checkHandoffCode(record, origin, 999, state)).toBe("ok");
+    expect(checkHandoffCode(record, origin, 999)).toBe("state_mismatch");
+    expect(checkHandoffCode(record, origin, 999, null)).toBe("state_mismatch");
+    expect(checkHandoffCode(record, origin, 999, "abcdefghijklmnoq")).toBe("state_mismatch");
+    // Codes minted without state don't require one.
+    expect(checkHandoffCode({ origin, expiresAt: 1_000 }, origin, 999, state)).toBe("ok");
+  });
 });
 
 describe("signed-in hint cookie", () => {

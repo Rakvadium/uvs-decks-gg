@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { DEFAULT_ROOT_DOMAINS, GAME_SCOPED_PREFIXES } from "@shared/hosts";
+import { DEFAULT_ROOT_DOMAINS, GAME_SCOPED_PREFIXES, resolveHost } from "@shared/hosts";
 import {
   GAME_HEADER,
   HOST_KIND_HEADER,
@@ -8,6 +8,7 @@ import {
   authenticatedAuthEntryRedirect,
   isApexPath,
   routeRequest,
+  trustedRequestGame,
   type RouteRequestInput,
 } from "@/lib/routing/route-request";
 
@@ -266,5 +267,35 @@ describe("authenticatedAuthEntryRedirect", () => {
     for (const path of AUTH_ENTRY_PATHS) {
       expect(isApexPath(path)).toBe(true);
     }
+  });
+});
+
+describe("trustedRequestGame", () => {
+  const game = resolveHost("uvs.tcgdecks.gg", ROOTS);
+  const apex = resolveHost("tcgdecks.gg", ROOTS);
+  const standalone = resolveHost("example.com", ROOTS);
+
+  test("accepts headers consistent with the host", () => {
+    expect(trustedRequestGame(game, "uvs", "game")).toEqual({ game: "uvs", hostKind: "game" });
+    expect(trustedRequestGame(apex, "uvs", "apex")).toEqual({ game: "uvs", hostKind: "apex" });
+    expect(trustedRequestGame(standalone, "uvs", "standalone")).toEqual({
+      game: "uvs",
+      hostKind: "standalone",
+    });
+  });
+
+  test("falls back to the host on missing, invalid or inconsistent headers", () => {
+    expect(trustedRequestGame(game, null, null)).toEqual({ game: "uvs", hostKind: "game" });
+    expect(trustedRequestGame(game, "bogus", "game")).toEqual({ game: "uvs", hostKind: "game" });
+    expect(trustedRequestGame(game, "uvs", "apex")).toEqual({ game: "uvs", hostKind: "game" });
+    expect(trustedRequestGame(apex, "uvs", "game")).toEqual({ game: "uvs", hostKind: "apex" });
+    expect(trustedRequestGame(standalone, "uvs", "game")).toEqual({
+      game: "uvs",
+      hostKind: "standalone",
+    });
+    expect(trustedRequestGame(standalone, "uvs", "bogus")).toEqual({
+      game: "uvs",
+      hostKind: "standalone",
+    });
   });
 });

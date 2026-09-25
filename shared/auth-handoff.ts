@@ -150,17 +150,28 @@ export function buildHandoffCallbackUrl(
 
 export interface HandoffCodeRecordLike {
   origin: string;
+  state?: string;
   expiresAt: number;
   usedAt?: number;
 }
 
-export type HandoffCodeCheck = "ok" | "not_found" | "used" | "expired" | "origin_mismatch";
+export type HandoffCodeCheck =
+  | "ok"
+  | "not_found"
+  | "used"
+  | "expired"
+  | "origin_mismatch"
+  | "state_mismatch";
 
-/** Whether a stored code may be redeemed by `origin` at `now`. */
+/**
+ * Whether a stored code may be redeemed by `origin` with `state` at `now`. When the code was
+ * minted with a `state`, the redeemer must present the exact same value.
+ */
 export function checkHandoffCode(
   record: HandoffCodeRecordLike | null | undefined,
   origin: string,
   now: number,
+  state?: string | null,
 ): HandoffCodeCheck {
   if (!record) {
     return "not_found";
@@ -173,6 +184,9 @@ export function checkHandoffCode(
   }
   if (record.origin !== origin) {
     return "origin_mismatch";
+  }
+  if (record.state !== undefined && record.state !== state) {
+    return "state_mismatch";
   }
   return "ok";
 }

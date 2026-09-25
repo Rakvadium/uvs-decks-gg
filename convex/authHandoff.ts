@@ -6,7 +6,7 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { MINUTE, RateLimiter } from "@convex-dev/rate-limiter";
 import { ConvexError, v } from "convex/values";
-import { components } from "./_generated/api";
+import { components, internal } from "./_generated/api";
 import { internalMutation, mutation } from "./_generated/server";
 import {
   buildHandoffCallbackUrl,
@@ -66,9 +66,12 @@ export const create = mutation({
   },
 });
 
-/** Redeem a code for `origin`. Single use; returns the user id or null. */
+/**
+ * Redeem a code for `origin` (+ `state` when the code was minted with one). Single use;
+ * returns the user id or null.
+ */
 export const consume = internalMutation({
-  args: { code: v.string(), origin: v.string() },
+  args: { code: v.string(), origin: v.string(), state: v.optional(v.string()) },
   returns: v.union(v.id("users"), v.null()),
   handler: async (ctx, args) => {
     if (!isValidHandoffCode(args.code) || !isAllowedHandoffOrigin(args.origin)) {
@@ -80,10 +83,10 @@ export const consume = internalMutation({
       .withIndex("by_codeHash", (q) => q.eq("codeHash", codeHash))
       .unique();
     const now = Date.now();
-    const result = checkHandoffCode(record, args.origin, now);
+    const result = checkHandoffCode(record, args.origin, now, args.state);
     if (result !== "ok" || !record) {
       if (record && result !== "used") {
-        // Burn codes presented to the wrong origin or after expiry.
+        // Burn codes presented to the wrong origin/state or after expiry.
         await ctx.db.patch(record._id, { usedAt: now });
       }
       return null;
@@ -105,6 +108,10 @@ export const cleanupExpired = internalMutation({
       .take(CLEANUP_BATCH);
     for (const row of expired) {
       await ctx.db.delete(row._id);
+    }
+    if (expired.length === CLEANUP_BATCH) {
+      // More may remain: keep draining in fresh transactions.
+      await ctx.scheduler.runAfter(0, internal.authHandoff.cleanupExpired, {});
     }
     return null;
   },

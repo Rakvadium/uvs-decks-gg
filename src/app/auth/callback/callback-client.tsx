@@ -65,7 +65,8 @@ export function CallbackClient() {
       return;
     }
 
-    const args = { code, origin: window.location.origin };
+    // `state` is re-checked server-side against the value the code was minted with.
+    const args = { code, origin: window.location.origin, ...(state ? { state } : {}) };
     const run = async () => {
       try {
         let result;

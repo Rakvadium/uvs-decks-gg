@@ -243,7 +243,7 @@ export function DeckDetailsProvider({ children, deckId }: DeckDetailsProviderPro
     setDuplicateConfirmOpen(false);
     setIsDuplicating(true);
     try {
-      const newDeckId = await duplicateDeckMutation({ deckId: typedDeckId });
+      const newDeckId = await duplicateDeckMutation({ game, deckId: typedDeckId });
       setActiveDeck(newDeckId);
       router.push(`/decks/${newDeckId}`);
     } catch (error) {
@@ -252,6 +252,7 @@ export function DeckDetailsProvider({ children, deckId }: DeckDetailsProviderPro
     }
   }, [
     duplicateDeckMutation,
+    game,
     isAuthenticated,
     openAuthDialog,
     router,

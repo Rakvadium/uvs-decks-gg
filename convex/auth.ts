@@ -5,7 +5,11 @@ import { ConvexError } from "convex/values";
 import { z } from "zod";
 import { internal } from "./_generated/api";
 import { ResendOTPPasswordReset } from "./ResendOTPPasswordReset";
-import { HANDOFF_PROVIDER_ID, isValidHandoffCode } from "../shared/auth-handoff";
+import {
+  HANDOFF_PROVIDER_ID,
+  isValidHandoffCode,
+  isValidHandoffState,
+} from "../shared/auth-handoff";
 import { isAllowedHandoffOrigin } from "../shared/hosts";
 
 const SignUpProfileSchema = z.object({
@@ -56,11 +60,14 @@ export default passwordProvider;
 const handoffProvider = ConvexCredentials({
   id: HANDOFF_PROVIDER_ID,
   authorize: async (params, ctx) => {
-    const { code, origin } = params;
+    const { code, origin, state } = params;
     if (!isValidHandoffCode(code) || typeof origin !== "string" || !isAllowedHandoffOrigin(origin)) {
       return null;
     }
-    const userId = await ctx.runMutation(internal.authHandoff.consume, { code, origin });
+    if (state !== undefined && !isValidHandoffState(state)) {
+      return null;
+    }
+    const userId = await ctx.runMutation(internal.authHandoff.consume, { code, origin, state });
     return userId ? { userId } : null;
   },
 });

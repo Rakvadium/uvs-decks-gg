@@ -12,6 +12,7 @@ import {
   PRIMARY_ROOT_DOMAIN,
   resolveHost,
   ROOT_DOMAINS,
+  type HostInfo,
   type HostKind,
 } from "@shared/hosts";
 
@@ -82,6 +83,30 @@ export const AUTH_ENTRY_PATHS: readonly string[] = ["/sign-in", "/sign-up", "/ag
 export function authenticatedAuthEntryRedirect(search: string | null | undefined): string {
   const next = new URLSearchParams(search ?? "").get("next");
   return sanitizeSameOriginPath(next, "/home");
+}
+
+/**
+ * Game + host kind for a request, given the `Host` resolution and the middleware headers.
+ * The headers are only trusted when consistent with `host` (same host kind; same game on game
+ * hosts; the default game on the apex; the default or host game on standalone), otherwise the
+ * `Host` resolution wins.
+ */
+export function trustedRequestGame(
+  host: HostInfo,
+  gameHeader: string | null | undefined,
+  hostKindHeader: string | null | undefined,
+): { game: GameId; hostKind: HostKind } {
+  const fallback = { game: host.game ?? DEFAULT_GAME_ID, hostKind: host.kind };
+  if (!isGameId(gameHeader) || hostKindHeader !== host.kind) {
+    return fallback;
+  }
+  const consistent =
+    host.kind === "game"
+      ? gameHeader === host.game
+      : host.kind === "apex"
+        ? gameHeader === DEFAULT_GAME_ID
+        : gameHeader === DEFAULT_GAME_ID || gameHeader === host.game;
+  return consistent ? { game: gameHeader, hostKind: host.kind } : fallback;
 }
 
 function gameHeaders(hostKind: HostKind, game: GameId): Record<string, string> {

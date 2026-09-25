@@ -6,7 +6,7 @@ import { deckSetupMigrationPatch } from "../../shared/games/uvs/setup";
 /**
  * Backfill: move legacy `decks.startingCharacterId` / `decks.selectedIdentity` into `decks.setup`
  * and unset the legacy fields. Paginated and self-rescheduling; idempotent (decks that already
- * have `setup` and no legacy fields are skipped).
+ * have `setup` and no legacy fields are skipped, as are non-UVS decks).
  *
  * Start with `migrations/migrateDeckSetup:run` (no args). Check with `migrations/migrateDeckSetup:status`.
  */

@@ -4,6 +4,8 @@
  * Pure TS (no Convex/React deps); card ids are generic so callers keep their `Id<"cards">` typing.
  */
 
+import { DEFAULT_GAME_ID } from "../types";
+
 export interface UvsDeckSetup<TCardId extends string = string> {
   game: "uvs";
   startingCharacterId?: TCardId;
@@ -118,11 +120,13 @@ export function deckSetupCardIds<TCardId extends string>(
 
 /**
  * Backfill transform for `migrations/migrateDeckSetup`: returns the patch that moves legacy
- * fields into `setup` (and unsets them), or `null` when the deck is already migrated.
+ * fields into `setup` (and unsets them), or `null` when the deck is already migrated or is not a
+ * UVS deck (`game` missing means legacy UVS).
  */
 export function deckSetupMigrationPatch<TCardId extends string>(
-  deck: UvsDeckSetupSource<TCardId>,
+  deck: UvsDeckSetupSource<TCardId> & { game?: string | null },
 ): { setup: UvsDeckSetup<TCardId>; startingCharacterId: undefined; selectedIdentity: undefined } | null {
+  if ((deck.game ?? DEFAULT_GAME_ID) !== "uvs") return null;
   const hasLegacy = deck.startingCharacterId !== undefined || deck.selectedIdentity !== undefined;
   if (deck.setup !== undefined && deck.setup !== null && !hasLegacy) return null;
   return {

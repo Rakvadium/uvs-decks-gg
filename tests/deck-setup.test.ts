@@ -130,6 +130,15 @@ describe("deckSetupMigrationPatch", () => {
     expect(deckSetupMigrationPatch({ setup: once.setup })).toBeNull();
   });
 
+  test("non-UVS decks are skipped; missing game means UVS", () => {
+    expect(deckSetupMigrationPatch({ game: "other", selectedIdentity: "fire" })).toBeNull();
+    expect(deckSetupMigrationPatch({ game: "uvs", selectedIdentity: "fire" })?.setup).toEqual({
+      game: "uvs",
+      selectedIdentity: "fire",
+    });
+    expect(deckSetupMigrationPatch({ game: null, selectedIdentity: "fire" })).not.toBeNull();
+  });
+
   test("setup plus leftover legacy fields: keeps setup, clears legacy", () => {
     expect(
       deckSetupMigrationPatch({ setup: { game: "uvs", selectedIdentity: "water" }, selectedIdentity: "fire" }),
