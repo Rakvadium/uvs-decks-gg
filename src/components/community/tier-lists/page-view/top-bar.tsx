@@ -6,7 +6,6 @@ import { SegmentedControl } from "@/components/ui/segmented-control";
 import { MobileNavIconButton } from "@/components/shell/mobile-nav-bar/nav-icon-button";
 import { MobileSearchField } from "@/components/shell/mobile-tab-bar/search-field";
 import { useOptionalCommunityTierListsPageContext } from "./context";
-import { BROWSER_TABS } from "./hook";
 
 export function CommunityTierListsPageMobileNavAction() {
   const context = useOptionalCommunityTierListsPageContext();
@@ -27,9 +26,9 @@ export function CommunityTierListsPageTabs() {
   const context = useOptionalCommunityTierListsPageContext();
   if (!context) return null;
 
-  const { activeTab, setActiveTab, publicLists, myLists } = context;
+  const { activeTab, setActiveTab, publicLists, myLists, browserTabs } = context;
 
-  const items = BROWSER_TABS.map((tab) => ({
+  const items = browserTabs.map((tab) => ({
     value: tab.id,
     label: <span>{tab.label}</span>,
     icon: tab.icon,
@@ -79,7 +78,7 @@ export function CommunityTierListsPageMobileScopeControl() {
   const context = useOptionalCommunityTierListsPageContext();
   if (!context) return null;
 
-  const { activeTab, setActiveTab, publicLists, myLists } = context;
+  const { activeTab, setActiveTab, publicLists, myLists, browserTabs } = context;
 
   return (
     <SegmentedControl
@@ -89,7 +88,7 @@ export function CommunityTierListsPageMobileScopeControl() {
       itemClassName="h-10"
       value={activeTab}
       onValueChange={(value) => setActiveTab(value as typeof activeTab)}
-      items={BROWSER_TABS.map((tab) => ({
+      items={browserTabs.map((tab) => ({
         value: tab.id,
         label: <span>{tab.label}</span>,
         icon: tab.icon,

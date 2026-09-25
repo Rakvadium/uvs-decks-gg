@@ -2,6 +2,7 @@ import type { SharedGameModule } from "../types";
 import { UVS_FILTER_DEFINITION } from "./filters";
 import { UVS_DECK_MODULE } from "./deck";
 import { UVS_DEFAULT_FORMATS } from "./formats";
+import { UVS_DECK_TEXT_PLACEHOLDER } from "./deck-text";
 
 export const UVS_SHARED_GAME_MODULE = {
   id: "uvs",
@@ -22,4 +23,24 @@ export const UVS_SHARED_GAME_MODULE = {
   filters: UVS_FILTER_DEFINITION,
   deck: UVS_DECK_MODULE,
   defaultFormats: UVS_DEFAULT_FORMATS,
+  // Everything the app shipped before multi-game.
+  features: {
+    collection: true,
+    deckStats: true,
+    drawSimulator: true,
+    deckImportExport: { formatLabel: "UVS Ultra", placeholder: UVS_DECK_TEXT_PLACEHOLDER },
+    deckValidation: true,
+    sideboard: true,
+    referenceSection: true,
+    tierLists: true,
+    rankings: true,
+    creators: true,
+    communityMedia: {
+      dockLabel: "UniVersus",
+      feedHeading: "UniVersus Content",
+      youtubeChannelUrl: "https://www.youtube.com/@UniVersusCCG",
+      youtubeChannelLabel: "UniVersus on YouTube",
+    },
+    cardOcrDrafts: true,
+  },
 } as const satisfies SharedGameModule;

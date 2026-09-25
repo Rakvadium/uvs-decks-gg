@@ -7,10 +7,8 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import {
-  useUniversusMediaDock,
-  useUniversusMediaDockOptional,
-} from "@/providers/UniversusMediaDockProvider";
+import { useGameFeatures } from "@/games/game-context";
+import { useUniversusMediaDockOptional } from "@/providers/UniversusMediaDockProvider";
 import { useLeftSidebarContext } from "./left-sidebar/context";
 import { MobileNavIconButton } from "./mobile-nav-bar/nav-icon-button";
 import {
@@ -31,12 +29,13 @@ type ShellUniversusNavMobileNavProps = {
 
 function ShellUniversusNavSidebarInner() {
   const dock = useUniversusMediaDockOptional();
+  const { communityMedia } = useGameFeatures();
   const { collapsed } = useLeftSidebarContext();
-  if (!dock) return null;
+  if (!dock || !communityMedia) return null;
 
   const { panelState, toggleLauncher } = dock;
   const isOpen = panelState === "open";
-  const label = "UniVersus";
+  const label = communityMedia.dockLabel;
 
   const control = (
     <button
@@ -87,12 +86,16 @@ function ShellUniversusNavSidebarInner() {
 }
 
 function ShellUniversusNavMobileNavInner() {
-  const { panelState, toggleLauncher } = useUniversusMediaDock();
+  const dock = useUniversusMediaDockOptional();
+  const { communityMedia } = useGameFeatures();
+  if (!dock || !communityMedia) return null;
+
+  const { panelState, toggleLauncher } = dock;
   const isOpen = panelState === "open";
 
   return (
     <MobileNavIconButton
-      label="UniVersus mini player"
+      label={`${communityMedia.dockLabel} mini player`}
       aria-pressed={isOpen}
       active={isOpen}
       onClick={() => toggleLauncher()}

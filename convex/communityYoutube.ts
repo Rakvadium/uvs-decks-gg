@@ -13,6 +13,9 @@ import { internal } from "./_generated/api";
 import type { Doc, Id } from "./_generated/dataModel";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { extractYoutubeVideoId } from "../shared/extract-youtube-video-id";
+import { getSharedGameModule } from "../shared/games/registry";
+import { resolveGame } from "./lib/gameScope";
+import { gameIdValidator } from "./validators";
 import { requireAdmin } from "./utils/validation";
 
 const CACHE_TTL_MS = 6 * 60 * 60 * 1000;
@@ -601,9 +604,11 @@ export const requestAdminFeedRefresh = action({
 });
 
 export const getFeed = query({
-  args: {},
-  handler: async (ctx) => {
-    const curations = await ctx.db.query("communityYoutubeCurations").collect();
+  // Curations are one global (UniVersus) list; games without `features.communityMedia` get an empty feed.
+  args: { game: v.optional(gameIdValidator) },
+  handler: async (ctx, args) => {
+    const hasMedia = getSharedGameModule(resolveGame(args.game)).features.communityMedia !== false;
+    const curations = hasMedia ? await ctx.db.query("communityYoutubeCurations").collect() : [];
 
     if (curations.length === 0) {
       return {

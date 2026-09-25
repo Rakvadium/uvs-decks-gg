@@ -3,15 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useImportExportSidebarContext } from "./context";
 import { useDeckDetailsOptional } from "@/providers/DeckDetailsProvider";
-
-const IMPORT_PLACEHOLDER = `[b]Character[/b]
-1 Character Name
-
-[b]Foundation[/b]
-...`;
+import { useDeckImportExportFeature } from "./feature";
 
 export function ImportExportSidebarImportSection() {
   const deckDetails = useDeckDetailsOptional();
+  const { formatLabel, placeholder } = useDeckImportExportFeature();
   const {
     deck,
     importText,
@@ -26,12 +22,12 @@ export function ImportExportSidebarImportSection() {
   return (
     <div className="space-y-2">
       <span className="chrome-label-case text-[10px] text-muted-foreground">
-        Import from UVS Ultra
+        Import from {formatLabel}
       </span>
       <Textarea
         value={importText}
         onChange={(event) => setImportText(event.target.value)}
-        placeholder={IMPORT_PLACEHOLDER}
+        placeholder={placeholder}
         className="min-h-[180px] text-[11px] leading-relaxed"
       />
       <Button

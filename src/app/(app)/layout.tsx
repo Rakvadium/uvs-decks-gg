@@ -10,6 +10,7 @@ import {
   DeckDetailsProvider,
 } from "@/providers";
 import { UniversusMediaDockProvider } from "@/providers/UniversusMediaDockProvider";
+import { useGameFeatures } from "@/games/game-context";
 import {
   ShellSlotProvider,
   useShellSlotSlots,
@@ -89,9 +90,11 @@ function AdminSidebarContent() {
   const setCardsHref = setCode
     ? `/admin/sets/${encodeURIComponent(setCode)}/cards`
     : null;
-  const setReviewHref = setCode
-    ? `/admin/sets/${encodeURIComponent(setCode)}/review`
-    : null;
+  const { cardOcrDrafts } = useGameFeatures();
+  const setReviewHref =
+    setCode && cardOcrDrafts
+      ? `/admin/sets/${encodeURIComponent(setCode)}/review`
+      : null;
   const setImportHref = setCode
     ? `/admin/sets/${encodeURIComponent(setCode)}/import`
     : null;
@@ -121,7 +124,7 @@ function AdminSidebarContent() {
         </Link>
       </div>
 
-      {showSetNav && setOverviewHref && setCardsHref && setReviewHref && setImportHref ? (
+      {showSetNav && setOverviewHref && setCardsHref && setImportHref ? (
         <div className="rounded-md border bg-muted/20 p-2 space-y-1">
           <Link
             href="/admin/sets"
@@ -145,13 +148,15 @@ function AdminSidebarContent() {
             <CreditCard className="h-4 w-4" />
             Cards
           </Link>
-          <Link
-            href={setReviewHref}
-            className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm hover:bg-muted ${pathname === setReviewHref ? "bg-muted font-medium" : ""}`}
-          >
-            <ClipboardCheck className="h-4 w-4" />
-            Review
-          </Link>
+          {setReviewHref ? (
+            <Link
+              href={setReviewHref}
+              className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm hover:bg-muted ${pathname === setReviewHref ? "bg-muted font-medium" : ""}`}
+            >
+              <ClipboardCheck className="h-4 w-4" />
+              Review
+            </Link>
+          ) : null}
           <Link
             href={setImportHref}
             className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm hover:bg-muted ${pathname === setImportHref ? "bg-muted font-medium" : ""}`}

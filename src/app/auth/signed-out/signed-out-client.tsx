@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { AuthStatusScreen } from "@/components/auth/auth-status-screen";
 import { clearSignedInHint } from "@/lib/auth/handoff-client";
+import { leavePage } from "@/lib/navigation/leave-page";
 import { parseHandoffReturnUrl } from "@shared/auth-handoff";
 
 /**
@@ -23,7 +24,7 @@ export function SignedOutClient({ returnUrl }: { returnUrl: string }) {
       .catch((error: unknown) => console.error(error))
       .finally(() => {
         clearSignedInHint();
-        window.location.replace(destination);
+        leavePage(destination, { replace: true });
       });
   }, [returnUrl, signOut]);
 

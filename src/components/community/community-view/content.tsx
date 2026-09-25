@@ -1,6 +1,7 @@
 "use client";
 
 import { Surface } from "@/components/ui/card";
+import { useGameFeatures } from "@/games/game-context";
 import { MobileLargeTitle } from "@/components/shell/mobile-large-title";
 import { CommunityMediaFeedSection } from "../sections/media-feed-section";
 import { CommunityTierListsSection } from "../sections/tier-lists-section";
@@ -11,9 +12,11 @@ const sectionClassName =
   "rounded-3xl border-border/50 bg-card/80 p-5 py-5 backdrop-blur-sm md:p-6";
 
 export function CommunityView() {
+  const { communityMedia, tierLists } = useGameFeatures();
+
   return (
     <div className="space-y-4 pb-8 md:space-y-6">
-      <CommunityRightSidebarSlots />
+      {tierLists ? <CommunityRightSidebarSlots /> : null}
 
       <MobileLargeTitle>Community</MobileLargeTitle>
       <CommunityMobileDestinationNav />
@@ -24,13 +27,25 @@ export function CommunityView() {
         <div className="pointer-events-none absolute inset-0 grid-pattern opacity-20" />
 
         <div className="relative grid gap-6">
-          <Surface className={sectionClassName}>
-            <CommunityMediaFeedSection />
-          </Surface>
+          {communityMedia ? (
+            <Surface className={sectionClassName}>
+              <CommunityMediaFeedSection media={communityMedia} />
+            </Surface>
+          ) : null}
 
-          <Surface className={sectionClassName}>
-            <CommunityTierListsSection />
-          </Surface>
+          {tierLists ? (
+            <Surface className={sectionClassName}>
+              <CommunityTierListsSection />
+            </Surface>
+          ) : null}
+
+          {!communityMedia && !tierLists ? (
+            <Surface className={sectionClassName}>
+              <p className="py-8 text-center text-sm text-muted-foreground">
+                Community features for this game are coming soon.
+              </p>
+            </Surface>
+          ) : null}
         </div>
       </div>
     </div>

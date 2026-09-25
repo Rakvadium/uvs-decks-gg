@@ -8,6 +8,7 @@ import { api } from "../../../../convex/_generated/api";
 import { AuthStatusScreen } from "@/components/auth/auth-status-screen";
 import { useHostKind } from "@/games/game-context";
 import { clearSignedInHint, setSignedInHint } from "@/lib/auth/handoff-client";
+import { leavePage } from "@/lib/navigation/leave-page";
 import {
   buildHandoffCallbackUrl,
   isValidHandoffState,
@@ -53,12 +54,13 @@ export function HandoffClient({ returnUrl, state, silent, flow }: HandoffClientP
 
     const loginRequired = () => {
       clearSignedInHint();
-      window.location.replace(
+      leavePage(
         buildHandoffCallbackUrl(target.origin, {
           error: LOGIN_REQUIRED_ERROR,
           state,
           next: target.path,
         }),
+        { replace: true },
       );
     };
 
@@ -104,8 +106,8 @@ export function HandoffClient({ returnUrl, state, silent, flow }: HandoffClientP
     if (!redirectTo) return;
     let retry: number | undefined;
     const go = () => {
-      window.location.replace(redirectTo);
-      retry = window.setTimeout(() => window.location.replace(redirectTo), REDIRECT_RETRY_MS);
+      leavePage(redirectTo, { replace: true });
+      retry = window.setTimeout(() => leavePage(redirectTo, { replace: true }), REDIRECT_RETRY_MS);
     };
     if (document.readyState === "complete") {
       go();

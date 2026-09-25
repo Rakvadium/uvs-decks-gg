@@ -46,7 +46,12 @@ export default convexAuthNextjsMiddleware(async (request, { convexAuth }) => {
   if (decision.type === "redirect") {
     return applyDecision(request, decision);
   }
-  if (isPublicPage(request) && await convexAuth.isAuthenticated()) {
+  // Page navigations only: Convex Auth posts its `invalidateCache` server action to the current
+  // page right after sign-in; redirecting that POST (e.g. `/sign-in` → `/home` → game host,
+  // cross-origin) makes the fetch fail and the client sign-in reject.
+  const isPageNavigation =
+    (request.method === "GET" || request.method === "HEAD") && !request.headers.has("next-action");
+  if (isPageNavigation && isPublicPage(request) && await convexAuth.isAuthenticated()) {
     // Same-origin path only (sanitized), so this can't become an open redirect.
     const target = new URL(authenticatedAuthEntryRedirect(request.nextUrl.search), request.url);
     return NextResponse.redirect(target);

@@ -3,9 +3,14 @@ import { TierListFeed } from "@/components/community/tier-lists/feed";
 import { TierListsFeatureBoundary } from "@/components/community/tier-lists/feature-boundary";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { isGameFeatureEnabled } from "@shared/games/features";
+import { useGameFeatures } from "@/games/game-context";
 import { CommunitySectionHeader } from "../shared/section-header";
 
 export function CommunityTierListsSection() {
+  const features = useGameFeatures();
+  const showRankings = isGameFeatureEnabled(features, "rankings");
+
   return (
     <TierListsFeatureBoundary
       fallback={
@@ -21,11 +26,13 @@ export function CommunityTierListsSection() {
                 This community module is temporarily unavailable, but the rest of the community page is still live.
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <Button variant="outline" asChild>
-                <Link href="/community/creators">Explore creator updates</Link>
-              </Button>
-            </CardContent>
+            {features.creators ? (
+              <CardContent>
+                <Button variant="outline" asChild>
+                  <Link href="/community/creators">Explore creator updates</Link>
+                </Button>
+              </CardContent>
+            ) : null}
           </Card>
         </section>
       }
@@ -36,9 +43,11 @@ export function CommunityTierListsSection() {
           description="Public rankings from the community, ready for likes, comments, and side-by-side debate."
           limit={4}
           action={
-            <Button variant="outline" asChild>
-              <Link href="/community/tier-lists?tab=rankings">View Community Rankings</Link>
-            </Button>
+            showRankings ? (
+              <Button variant="outline" asChild>
+                <Link href="/community/tier-lists?tab=rankings">View Community Rankings</Link>
+              </Button>
+            ) : undefined
           }
         />
       </section>

@@ -6,6 +6,7 @@ import { DEFAULT_GAME_ID, type Brand, type GameId } from "@shared/games/types";
 import type { HostInfo, HostKind } from "@shared/hosts";
 import { buildGameSwitcherModel, type GameSwitcherModel } from "./game-links";
 import { getClientGameModule } from "./registry";
+import type { GameFeatures } from "@shared/games/features";
 import type { ClientGameModule } from "./types";
 
 interface GameContextValue {
@@ -59,6 +60,11 @@ export function useGameId(): GameId {
 
 export function useGameModule(): ClientGameModule {
   return use(GameContext).module;
+}
+
+/** The current game's feature manifest (`SharedGameModule.features`). */
+export function useGameFeatures(): GameFeatures {
+  return use(GameContext).module.features;
 }
 
 export function useHostKind(): HostKind {

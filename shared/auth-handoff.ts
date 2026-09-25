@@ -200,13 +200,31 @@ export function hintCookieRoot(
   return info.kind === "standalone" ? null : info.root;
 }
 
-/** `Set-Cookie`-style string for `document.cookie` (set or clear). */
+const HINT_VALUE_PATTERN = /^[A-Za-z0-9_-]{1,64}$/;
+/**
+ * Hint value written on sign-out / `login_required` instead of deleting the cookie, so a game
+ * host still holding a not-yet-expired JWT doesn't "backfill" the hint for a gone session.
+ */
+export const SIGNED_OUT_HINT_VALUE = "0";
+
+/**
+ * `Set-Cookie`-style string for `document.cookie` (set or clear). `value` identifies the apex
+ * session the hint was written for (a random token), so per-tab "silent SSO tried" markers can
+ * be invalidated when a new session appears; legacy cookies carry `1`.
+ */
 export function buildSignedInHintCookie(
   root: string,
-  options: { secure: boolean; clear?: boolean },
+  options: { secure: boolean; clear?: boolean; signedOut?: boolean; value?: string },
 ): string {
+  const value = options.clear
+    ? ""
+    : options.signedOut
+      ? SIGNED_OUT_HINT_VALUE
+      : options.value && HINT_VALUE_PATTERN.test(options.value)
+        ? options.value
+        : "1";
   const parts = [
-    `${SIGNED_IN_HINT_COOKIE}=${options.clear ? "" : "1"}`,
+    `${SIGNED_IN_HINT_COOKIE}=${value}`,
     // `.localhost` roots are not on the public suffix list, so a Domain attribute works there.
     `Domain=.${root}`,
     "Path=/",
@@ -219,8 +237,98 @@ export function buildSignedInHintCookie(
   return parts.join("; ");
 }
 
+function rawHintValue(cookieHeader: string | null | undefined): string | null {
+  for (const part of (cookieHeader ?? "").split(";")) {
+    const trimmed = part.trim();
+    const eq = trimmed.indexOf("=");
+    if (eq === -1 || trimmed.slice(0, eq) !== SIGNED_IN_HINT_COOKIE) continue;
+    const value = trimmed.slice(eq + 1);
+    if (HINT_VALUE_PATTERN.test(value)) {
+      return value;
+    }
+  }
+  return null;
+}
+
+/** The hint cookie's signed-in value (well-formed, not the signed-out marker), or null. */
+export function readSignedInHintValue(cookieHeader: string | null | undefined): string | null {
+  const value = rawHintValue(cookieHeader);
+  return value === SIGNED_OUT_HINT_VALUE ? null : value;
+}
+
+/** Whether the hint was never written in this browser (no signed-in or signed-out marker). */
+export function isSignedInHintAbsent(cookieHeader: string | null | undefined): boolean {
+  return rawHintValue(cookieHeader) === null;
+}
+
 export function hasSignedInHint(cookieHeader: string | null | undefined): boolean {
-  return (cookieHeader ?? "")
-    .split(";")
-    .some((part) => part.trim() === `${SIGNED_IN_HINT_COOKIE}=1`);
+  return readSignedInHintValue(cookieHeader) !== null;
+}
+
+/**
+ * Pending login-CSRF `state` values for this tab (sessionStorage JSON: state → createdAt).
+ * A set rather than a single slot so a second handoff (silent SSO, another click) started
+ * before the first returns can't invalidate it.
+ */
+export const HANDOFF_STATE_TTL_MS = 15 * 60_000;
+const MAX_PENDING_STATES = 8;
+
+export function parsePendingStates(raw: string | null | undefined, now: number): Record<string, number> {
+  if (!raw) return {};
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(raw);
+  } catch {
+    // Legacy single-slot value.
+    return isValidHandoffState(raw) ? { [raw]: now } : {};
+  }
+  const result: Record<string, number> = {};
+  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return result;
+  for (const [state, createdAt] of Object.entries(parsed as Record<string, unknown>)) {
+    if (
+      isValidHandoffState(state) &&
+      typeof createdAt === "number" &&
+      createdAt <= now &&
+      now - createdAt < HANDOFF_STATE_TTL_MS
+    ) {
+      result[state] = createdAt;
+    }
+  }
+  return result;
+}
+
+/** Add `state` (dropping expired and the oldest beyond the cap); returns the new raw value. */
+export function addPendingState(raw: string | null | undefined, state: string, now: number): string {
+  const states = parsePendingStates(raw, now);
+  states[state] = now;
+  const kept = Object.entries(states)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, MAX_PENDING_STATES);
+  return JSON.stringify(Object.fromEntries(kept));
+}
+
+/**
+ * Remove `state` if pending. `raw` is the new stored value (null when nothing is left).
+ */
+export function takePendingState(
+  raw: string | null | undefined,
+  state: unknown,
+  now: number,
+): { matched: boolean; raw: string | null } {
+  const states = parsePendingStates(raw, now);
+  const matched = isValidHandoffState(state) && Object.hasOwn(states, state);
+  if (matched) {
+    delete states[state];
+  }
+  return { matched, raw: Object.keys(states).length > 0 ? JSON.stringify(states) : null };
+}
+
+/** Paths whose page drives an auth redirect itself (no silent SSO, no unsaved-changes prompt). */
+export function isAuthFlowPath(pathname: string): boolean {
+  return (
+    pathname.startsWith("/auth/") ||
+    ["/sign-in", "/sign-up", "/agent-login"].some(
+      (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
+    )
+  );
 }

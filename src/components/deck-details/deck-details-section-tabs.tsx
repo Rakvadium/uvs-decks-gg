@@ -8,6 +8,7 @@ import {
   DECK_SECTION_MOBILE_TAB_LABELS as MOBILE_TAB_LABELS,
   type DeckSection,
 } from "@/lib/deck/display-config";
+import { useEnabledDeckSections, visibleDeckSections } from "@/lib/deck/use-deck-sections";
 import { useDeckCardsSectionContext } from "./deck-details-cards-section-context";
 
 export function DeckDetailsSectionTabs({
@@ -19,7 +20,7 @@ export function DeckDetailsSectionTabs({
   const isMobile = useIsMobile();
   const stackedFull = layout === "stacked-full" || isMobile;
 
-  const sections = ["main", "side", "reference"] as DeckSection[];
+  const sections = visibleDeckSections(useEnabledDeckSections(), (section) => model.counts[section]);
 
   return (
     <SegmentedControl

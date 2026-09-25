@@ -22,6 +22,12 @@ placeholder client module `src/games/cyberpunk/index.ts`, which reuses the UVS `
 | `formats.ts` | `CYBERPUNK_DEFAULT_FORMATS` (seeded by `admin.seedFormats({ game: "cyberpunk" })`) |
 | `deck.ts` | `CYBERPUNK_DECK_MODULE` (`sideboardLimit 0`, `simulatorHandSize` 6, no zones) |
 
+`index.ts` also declares the feature manifest (`features`, see [../multi-game.md](../multi-game.md)
+"Feature manifest"): stats / simulator / collection / tier lists / rankings / deck validation on;
+import/export as "Plain text" (`CYBERPUNK_DECK_TEXT_PLACEHOLDER` in `deck-text.ts`); no sideboard,
+reference section, creator program, curated community media (no media dock, no hub video feed) or
+admin OCR draft review.
+
 Generic rule helpers shared by both games live in `shared/games/rules-common.ts`
 (`shared/games/uvs/rules/common.ts` re-exports them).
 
@@ -160,7 +166,8 @@ top-bar tokens and active chips read `facets` to show Colors / Tags and hide Sym
 - `CardDetailsDialog` / `CardDetailsContent`: art or text frame, readout (type / color / sellable /
   rarity chips, Cost / Power / RAM, keywords, rules text with `{Play}`-style tokens as badges and
   reminder text muted, tags, set + collector, artist, per-format legality), main-deck -/+ bar or the
-  module's `CardSetupAction` for Legends.
+  module's `CardSetupAction` for Legends. The dialog sizes to its content like the UVS one (readout
+  panel stretches to the art height, capped at `min(85vh, 100dvh - 2rem)`, then scrolls).
 - Symbols are color pips (`getSymbolPath` → `null`); `getCardTypeColor` / `formatCardType` /
   `getSymbolColor` in `config.ts` (hex derived from `CYBERPUNK_COLOR_SWATCHES`).
 - Remote card images need their host in `next.config.ts` `images.remotePatterns`.

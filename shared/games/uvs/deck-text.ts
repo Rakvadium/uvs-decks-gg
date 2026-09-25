@@ -14,6 +14,13 @@ export type ParsedUvsUltraDeck = {
   side: UvsUltraDeckLine[];
 };
 
+/** Import textarea placeholder (UVS Ultra format). */
+export const UVS_DECK_TEXT_PLACEHOLDER = `[b]Character[/b]
+1 Character Name
+
+[b]Foundation[/b]
+...`;
+
 export const UVS_MAIN_TYPE_ORDER = ["Foundation", "Attack", "Asset", "Action", "Backup"] as const;
 const UVS_HEADING_BY_TYPE: Record<(typeof UVS_MAIN_TYPE_ORDER)[number], string> = {
   Foundation: "Foundation",

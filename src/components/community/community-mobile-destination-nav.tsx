@@ -3,9 +3,10 @@
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { SegmentedControl } from "@/components/ui/segmented-control";
 import { cn } from "@/lib/utils";
+import { useGameFeatures } from "@/games/game-context";
 import {
-  COMMUNITY_DESTINATIONS,
   communityDestinationFromLocation,
+  communityDestinationsFor,
 } from "./community-destinations";
 
 type CommunityMobileDestinationNavProps = {
@@ -19,6 +20,8 @@ export function CommunityMobileDestinationNav({
   const searchParams = useSearchParams();
   const router = useRouter();
   const value = communityDestinationFromLocation(pathname, searchParams);
+  const destinations = communityDestinationsFor(useGameFeatures());
+  if (destinations.length === 0) return null;
 
   return (
     <nav className={cn("min-w-0 md:hidden", className)} aria-label="Community destinations">
@@ -29,10 +32,10 @@ export function CommunityMobileDestinationNav({
         itemClassName="h-10"
         value={value === "hub" ? undefined : value}
         onValueChange={(next) => {
-          const dest = COMMUNITY_DESTINATIONS.find((item) => item.value === next);
+          const dest = destinations.find((item) => item.value === next);
           if (dest) router.push(dest.href);
         }}
-        items={COMMUNITY_DESTINATIONS.map((item) => ({
+        items={destinations.map((item) => ({
           value: item.value,
           label: <span>{item.label}</span>,
           icon: item.icon,

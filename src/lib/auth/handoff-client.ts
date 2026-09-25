@@ -3,17 +3,20 @@
  * Pure URL/cookie logic lives in `@shared/auth-handoff`; this file touches window/document.
  */
 import {
+  addPendingState,
   buildHandoffStartUrl,
   buildSignedInHintCookie,
   HANDOFF_STATE_STORAGE_KEY,
-  hasSignedInHint,
   hintCookieRoot,
-  isValidHandoffState,
+  isSignedInHintAbsent as isHintAbsent,
   randomToken,
+  readSignedInHintValue,
   sanitizeSameOriginPath,
   SSO_TRIED_STORAGE_KEY,
+  takePendingState,
 } from "@shared/auth-handoff";
 import { apexOrigin, resolveHost } from "@shared/hosts";
+import { leavePage } from "@/lib/navigation/leave-page";
 
 /** Apex origin for a game/apex location (`{protocol}//{root}[:port]`), or null when standalone. */
 export function apexOriginFor(location: { host: string; protocol: string }): string | null {
@@ -40,19 +43,39 @@ function safeSessionStorage(): Storage | null {
   }
 }
 
-/** Generate a fresh login-CSRF `state` and remember it for this tab. */
+/** Generate a fresh login-CSRF `state` and add it to this tab's pending set. */
 export function createHandoffState(): string {
   const state = randomToken(24);
-  safeSessionStorage()?.setItem(HANDOFF_STATE_STORAGE_KEY, state);
+  const storage = safeSessionStorage();
+  storage?.setItem(
+    HANDOFF_STATE_STORAGE_KEY,
+    addPendingState(storage.getItem(HANDOFF_STATE_STORAGE_KEY), state, Date.now()),
+  );
   return state;
 }
 
-/** Compare `state` with the stored one; the stored value is removed either way. */
+/** Whether `state` is pending for this tab; a match is removed (single use). */
 export function consumeHandoffState(state: unknown): boolean {
   const storage = safeSessionStorage();
-  const expected = storage?.getItem(HANDOFF_STATE_STORAGE_KEY) ?? null;
-  storage?.removeItem(HANDOFF_STATE_STORAGE_KEY);
-  return isValidHandoffState(state) && expected !== null && expected === state;
+  if (!storage) return false;
+  const { matched, raw } = takePendingState(
+    storage.getItem(HANDOFF_STATE_STORAGE_KEY),
+    state,
+    Date.now(),
+  );
+  if (raw === null) {
+    storage.removeItem(HANDOFF_STATE_STORAGE_KEY);
+  } else {
+    storage.setItem(HANDOFF_STATE_STORAGE_KEY, raw);
+  }
+  return matched;
+}
+
+let handoffInFlight = false;
+
+/** True once this page has started navigating to the apex for a handoff. */
+export function isHandoffInFlight(): boolean {
+  return handoffInFlight;
 }
 
 /** `{apex}/auth/handoff?return={origin}{path}&state=…` for the current game host, or null. */
@@ -78,37 +101,57 @@ export function startHandoff(
   if (!url) {
     return false;
   }
-  window.location.assign(url);
+  if (!options.silent) {
+    // An explicit sign-in supersedes silent SSO for this hint.
+    markSilentSsoTried();
+  }
+  handoffInFlight = true;
+  leavePage(url);
   return true;
 }
 
-function writeHintCookie(clear: boolean): void {
+function writeHintCookie(options: { signedOut?: boolean; value?: string }): void {
   const root = hintCookieRoot(window.location.host);
   if (!root) {
     return;
   }
   document.cookie = buildSignedInHintCookie(root, {
     secure: window.location.protocol === "https:",
-    clear,
+    ...options,
   });
 }
 
+/**
+ * Make sure the cross-subdomain hint exists. Keeps an existing value (same session); a new
+ * random value marks a new session so game hosts that already gave up retry silent SSO.
+ */
 export function setSignedInHint(): void {
-  writeHintCookie(false);
+  if (readSignedInHintValue(document.cookie) !== null) return;
+  writeHintCookie({ value: randomToken(12) });
 }
 
+/** Mark the apex session as gone (a signed-out marker, not a deletion; see `SIGNED_OUT_HINT_VALUE`). */
 export function clearSignedInHint(): void {
-  writeHintCookie(true);
+  writeHintCookie({ signedOut: true });
 }
 
-export function readSignedInHint(): boolean {
-  return hasSignedInHint(document.cookie);
+/** True when no hint (signed in or out) was ever written for this root in this browser. */
+export function isSignedInHintAbsent(): boolean {
+  return isHintAbsent(document.cookie);
 }
 
+/** Current hint value (null when absent). */
+export function readSignedInHint(): string | null {
+  return readSignedInHintValue(document.cookie);
+}
+
+/** Whether silent SSO was already attempted in this tab for the current hint value. */
 export function hasTriedSilentSso(): boolean {
-  return safeSessionStorage()?.getItem(SSO_TRIED_STORAGE_KEY) === "1";
+  const tried = safeSessionStorage()?.getItem(SSO_TRIED_STORAGE_KEY) ?? null;
+  return tried !== null && tried === (readSignedInHint() ?? "");
 }
 
+/** Remember that this tab tried (or no longer needs) silent SSO for the current hint value. */
 export function markSilentSsoTried(): void {
-  safeSessionStorage()?.setItem(SSO_TRIED_STORAGE_KEY, "1");
+  safeSessionStorage()?.setItem(SSO_TRIED_STORAGE_KEY, readSignedInHint() ?? "");
 }

@@ -11,6 +11,10 @@ import type { SharedGameDeckModule } from "./deck";
 
 export type { SharedGameDeckModule } from "./deck";
 
+import type { GameFeatures } from "./features";
+
+export type { GameFeatures } from "./features";
+
 export const GAME_IDS = ["uvs", "cyberpunk"] as const;
 
 export type GameId = (typeof GAME_IDS)[number];
@@ -78,4 +82,6 @@ export interface SharedGameModule {
   deck: SharedGameDeckModule;
   /** Formats seeded by `admin.seedFormats` (existing rows are kept; `standard` rules are re-synced). */
   defaultFormats: readonly GameFormatSeed[];
+  /** Which larger features/actions this game ships (see `shared/games/features.ts`). */
+  features: GameFeatures;
 }

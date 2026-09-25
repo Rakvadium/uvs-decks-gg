@@ -6,6 +6,7 @@ import { useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { useHostKind } from "@/games/game-context";
 import { clearSignedInHint, currentApexOrigin } from "./handoff-client";
+import { leavePage } from "@/lib/navigation/leave-page";
 
 /**
  * Sign out for the current host. Game/apex hosts revoke every session of the user (all
@@ -35,7 +36,7 @@ export function useAppSignOut(): () => Promise<"redirecting" | "done"> {
     const apex = hostKind === "game" ? currentApexOrigin() : null;
     if (apex) {
       const returnUrl = `${window.location.origin}/`;
-      window.location.assign(`${apex}/auth/signed-out?return=${encodeURIComponent(returnUrl)}`);
+      leavePage(`${apex}/auth/signed-out?return=${encodeURIComponent(returnUrl)}`);
       return "redirecting";
     }
     return "done";

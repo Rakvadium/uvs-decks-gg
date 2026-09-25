@@ -108,7 +108,8 @@ export function CardDetailsDialog({
       >
         <DialogTitle className="sr-only">{displayCard.name} - Card Details</DialogTitle>
 
-        <div className="flex w-full flex-col gap-4 p-3 max-md:h-full max-md:min-h-0 max-md:overflow-y-auto max-md:overscroll-contain md:h-[min(85vh,calc(100dvh-2rem))] md:flex-row md:items-stretch md:gap-5 md:overflow-hidden md:pt-12">
+        {/* Sized to content like the UVS dialog (flex-1 + max-h, no fixed height); the readout scrolls past the cap. */}
+        <div className="flex w-full flex-col gap-4 p-3 max-md:h-full max-md:min-h-0 max-md:overflow-y-auto max-md:overscroll-contain md:max-h-[min(85vh,calc(100dvh-2rem))] md:min-h-0 md:flex-1 md:flex-row md:items-stretch md:gap-5 md:overflow-hidden md:pt-12">
           <div className="flex w-full shrink-0 flex-col items-center md:w-[340px] md:justify-center">
             <div className="flex w-full items-center justify-center gap-3">
               <div className={cn("shrink-0 justify-center md:hidden", prevButton ? "flex w-10" : "hidden")}>{prevButton}</div>

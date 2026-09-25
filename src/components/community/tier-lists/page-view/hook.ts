@@ -14,7 +14,8 @@ import {
   type CommunityTierRankingScope,
 } from "../../../../../shared/app-config";
 import { buildCardMap, createCanonicalRankedTiers, createDefaultTiers } from "../utils";
-import { useGameId } from "@/games/game-context";
+import { isGameFeatureEnabled } from "@shared/games/features";
+import { useGameFeatures, useGameId } from "@/games/game-context";
 
 export type TierListBrowserTab = "public" | "mine" | "rankings";
 
@@ -24,8 +25,8 @@ export const BROWSER_TABS = [
   { id: "mine", label: "My Lists", icon: FolderOpen },
 ] as const;
 
-function resolveBrowserTab(value: string | null): TierListBrowserTab {
-  if (value === "mine" || value === "rankings") {
+function resolveBrowserTab(value: string | null, rankingsEnabled: boolean): TierListBrowserTab {
+  if (value === "mine" || (value === "rankings" && rankingsEnabled)) {
     return value;
   }
 
@@ -72,7 +73,12 @@ export function useCommunityTierListsPageModel() {
   const saveTierList = useMutation(api.tierLists.save);
   const { cards } = useCardData();
 
-  const tabFromUrl = resolveBrowserTab(searchParams.get("tab"));
+  const rankingsEnabled = isGameFeatureEnabled(useGameFeatures(), "rankings");
+  const browserTabs = useMemo(
+    () => BROWSER_TABS.filter((tab) => tab.id !== "rankings" || rankingsEnabled),
+    [rankingsEnabled]
+  );
+  const tabFromUrl = resolveBrowserTab(searchParams.get("tab"), rankingsEnabled);
   const [activeTab, setActiveTabState] = useState<TierListBrowserTab>(tabFromUrl);
   const [searchQuery, setSearchQuery] = useState("");
   const deferredSearchQuery = useDeferredValue(searchQuery);
@@ -215,6 +221,7 @@ export function useCommunityTierListsPageModel() {
   };
 
   return {
+    browserTabs,
     activeTab,
     setActiveTab,
     searchQuery,

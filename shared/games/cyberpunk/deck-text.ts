@@ -16,6 +16,16 @@
 import type { DeckTextFormatParams, DeckTextLine, ParsedDeckText } from "../deck";
 import { CYBERPUNK_CARD_TYPE_ORDER } from "./card-types";
 
+/** Import textarea placeholder (the format `formatCyberpunkDeckText` writes). */
+export const CYBERPUNK_DECK_TEXT_PLACEHOLDER = `Legends
+1 Legend Name
+1 Legend Name
+1 Legend Name
+
+Deck
+3 Card Name
+...`;
+
 type Section = "legends" | "main" | "side";
 
 const HEADINGS: Record<string, Section> = {

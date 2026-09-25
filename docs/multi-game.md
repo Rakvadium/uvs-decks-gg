@@ -124,6 +124,36 @@ Validation is two-phase so rules stay pure: `plan(deck, format)` names the cards
 (`src/lib/deck/card-eligibility.ts`, `display-config.ts`, `components/deck-details/uvs-import-export.ts`,
 `deck-list-utils.ts` zone helpers) re-export from `shared/games/uvs/*`.
 
+## Feature manifest (`SharedGameModule.features`, `shared/games/features.ts`)
+
+Larger features/actions are toggled per game with pure data on the shared module, so server
+code (route layouts, Convex) and client code (`useGameFeatures()` / `useGameModule().features`,
+`src/games/game-context.tsx`) read the same switches. Every module must declare every key
+(`GAME_FEATURE_KEYS`; `tests/game-features.test.ts`). Helpers: `isGameFeatureEnabled(features, key)`
+(object values count as on; `rankings` also needs `tierLists`), `enabledDeckSections(features)`.
+Route guard: `requireGameFeature(params, key)` (`src/lib/routing/game-feature-route.ts`) in a
+`[game]` layout/page renders the 404 page for a disabled feature. Convex functions of disabled
+features keep working (gating is UX, not a security boundary), except the media queries below.
+
+| Key | UVS | Cyberpunk | Gated in |
+| --- | --- | --- | --- |
+| `collection` | on | on | Main nav (`buildMainNavItems(features)`, left sidebar + mobile profile sheet); `[game]/collection/layout.tsx` guard |
+| `deckStats` | on | on | Deck details right-sidebar "Stats" slot (`deck-details-view.tsx`) |
+| `drawSimulator` | on | on | Deck details right-sidebar "Simulator" slot |
+| `deckImportExport` | `{ formatLabel: "UVS Ultra", placeholder }` | `{ formatLabel: "Plain text", placeholder }` (`CYBERPUNK_DECK_TEXT_PLACEHOLDER`) | "Import/Export" slot; panel labels "Export to / Import from {formatLabel}" + textarea placeholder (`deck-details-sidebar-import-export/feature.ts`) |
+| `deckValidation` | on | on | `DeckFormatLegalityBadge` (renders nothing when off) |
+| `sideboard` | on | off | Deck section tabs, gallery active-deck sections, "Move To" targets (`useEnabledDeckSections`, `src/lib/deck/use-deck-sections.ts`); a disabled section that still holds cards (legacy data) stays visible so the cards can be moved out |
+| `referenceSection` | on | off | Same as `sideboard` |
+| `tierLists` | on | on | Community "Tier Lists" tab, hub tier lists section, community right-sidebar panel; `[game]/community/tier-lists/layout.tsx` guard |
+| `rankings` | on | on | Community "Rankings" tab, tier lists page "Rankings" tab (`?tab=rankings` falls back to Public), hub "View Community Rankings" button; `[game]/community/rankings/page.tsx` guard |
+| `creators` | on | off | Community "Creators" tab, "Creator program" / "Explore creator updates" links; `[game]/community/creators/layout.tsx` guard |
+| `communityMedia` | `{ dockLabel: "UniVersus", feedHeading, youtubeChannelUrl, youtubeChannelLabel }` | `false` | `UniversusMediaDockProvider` (no provider/dock when off, so the left-sidebar "UniVersus" toggle and mobile nav mini-player button hide); community hub video feed section. `communityYoutube.getFeed` / `communityLive.getLiveStatus` take `game` and return an empty feed / `null` when off (curations are one global UniVersus list) |
+| `cardOcrDrafts` | on | off | Admin set "Review" tab (`AdminSetSectionTabs`) + admin sidebar link; `[game]/admin/sets/[code]/review/layout.tsx` guard |
+
+The community hub shows the media feed and tier lists sections per flag, and a short
+"coming soon" card when a game has neither. Not per game (global): teams / team deck sharing,
+settings, feedback, admin users/moderation/content.
+
 ## `game` on game-scoped tables
 
 `game: v.optional(gameIdValidator)` is added to: `cards`, `sets`, `cardDrafts`, `formats`,
@@ -377,7 +407,8 @@ Implementation (Phase 2 routing step):
   - Desktop: left sidebar, directly under the wordmark (`LeftSidebarBrand` → `SidebarGameSwitcher`
     → divider → nav). It's a sidebar-item-styled `DropdownMenu` trigger (badge + game name +
     chevrons; badge-only with a tooltip when collapsed). The "UniVersus" item near the bottom of
-    the sidebar is the media dock toggle (`ShellUniversusNav`) and is unrelated.
+    the sidebar is the media dock toggle (`ShellUniversusNav`, label `features.communityMedia.dockLabel`;
+    hidden for games without `communityMedia`) and is unrelated.
   - Mobile: a "Game" section at the top of the profile sheet (the sheet holds "full navigation"
     per `mobile-shell.md`), above "Navigate". The Go capsule stays fixed. Signed-out users reach
     other games from the apex picker.
@@ -393,8 +424,9 @@ builders, `sanitizeSameOriginPath`, code checks, hint cookie) live in `shared/au
 (tested in `tests/auth-handoff.test.ts`); browser helpers in `src/lib/auth/handoff-client.ts`.
 
 1. Game host, signed out, any "Sign in"/"Sign up" (`openAuthDialog` in `AuthDialogProvider`,
-   `/sign-in`, `/sign-up`) → `startHandoff(path, { flow })`: random `state` →
-   `sessionStorage["tcgd:handoff-state"]` → `{apex}/auth/handoff?return={origin}{path}&state=…[&flow=signUp]`.
+   `/sign-in`, `/sign-up`) → `startHandoff(path, { flow })`: random `state` added to the tab's pending set
+   `sessionStorage["tcgd:handoff-state"]` (JSON `state → createdAt`, TTL 15 min, max 8, so a
+   concurrent silent/explicit handoff can't invalidate another) → `{apex}/auth/handoff?return={origin}{path}&state=…[&flow=signUp]`.
    Apex/standalone keep the local dialog.
 2. Apex `/auth/handoff` (`src/app/auth/handoff`): validates `return` (`parseHandoffReturnUrl`)
    and `state` client-side. Signed out → `/sign-in?next=/auth/handoff?…` (or `/sign-up`). Signed
@@ -409,8 +441,11 @@ builders, `sanitizeSameOriginPath`, code checks, hint cookie) live in `shared/au
    (`by_codeHash`, `by_expiresAt`), TTL 60s. Cron `authHandoff.cleanupExpired` (10 min) deletes
    expired rows in batches of 200 and reschedules itself while a full batch was deleted.
 4. Game `/auth/callback`: reads then immediately strips the query (`history.replaceState`),
-   checks `state` against sessionStorage (removed either way; login-CSRF guard), calls
-   `signIn("handoff", { code, origin: location.origin, state })`, then `router.replace(next)` (sanitized).
+   takes `state` from the pending set (single use; login-CSRF guard), calls
+   `signIn("handoff", { code, origin: location.origin, state })`, marks silent SSO tried, then
+   `router.replace(next)` (sanitized). The redemption is a module-level promise per page load,
+   so a remount (StrictMode double effects, provider re-render) joins it instead of re-reading
+   the stripped URL and showing "invalid or already used".
    `/auth/*` responses send `Referrer-Policy: no-referrer` (next.config headers + page metadata).
 5. `convex/auth.ts` adds `ConvexCredentials({ id: "handoff" })`; `authorize` runs internal
    `authHandoff.consume` (hash match, unused, unexpired, origin match, and — when the code was
@@ -419,18 +454,31 @@ builders, `sanitizeSameOriginPath`, code checks, hint cookie) live in `shared/au
    origin/state. Origin binding is best-effort: `origin` is client-supplied, so it only stops a
    well-behaved client on another host from redeeming the code, not an attacker holding it; failed redemptions are not rate-limited because the only key would be the caller-supplied origin, which would let anyone lock out a game host) and
    returns `{ userId }`.
-6. Silent SSO (`src/components/auth/silent-sso.tsx`, mounted in `Providers`): apex sets
-   `tcgd_signed_in=1; Domain=.{root}; Path=/; SameSite=Lax; Max-Age=30d[; Secure]`
-   (informational only). A game host that is signed out, sees the cookie, and hasn't tried this
-   tab session (`sessionStorage["tcgd:sso-tried"]`) marks it tried and redirects to
-   `/auth/handoff?...&silent=1`; apex with `silent=1` and no session (or a failed `create`)
-   clears the cookie and redirects back with `error=login_required`.
+6. Silent SSO (`src/components/auth/silent-sso.tsx`, mounted in `Providers`): the hint
+   `tcgd_signed_in=<random>; Domain=.{root}; Path=/; SameSite=Lax; Max-Age=30d[; Secure]`
+   (informational only) is set by `/auth/handoff` and by `SilentSso` whenever the apex is signed
+   in (any page but `/auth/*`, so dialog sign-ins on the apex count), and backfilled by a signed-in
+   game host when no hint was ever written (older sessions). Sign-out and `login_required`
+   write the marker value `0` instead of deleting it, so a game host with a still-valid JWT for a
+   revoked session doesn't re-create it. A signed-out game host (not on an auth page, no handoff
+   in flight, after a 600 ms grace) that sees a hint value it hasn't tried in this tab
+   (`sessionStorage["tcgd:sso-tried"]` holds the tried value, so a new apex session retries)
+   marks it tried and redirects to `/auth/handoff?...&silent=1`; apex with `silent=1` and no
+   session (or a failed `create`) writes `0` and redirects back with `error=login_required`.
+   Switching games is a plain link; the target host's `SilentSso` picks up the apex session.
 7. Sign out (`useAppSignOut`, both shell call sites): game/apex hosts call
    `authHandoff.signOutEverywhere` (deletes all the user's `authSessions` + their
    `authRefreshTokens`), then `signOut()`, clear `tcgd_signed_in`, and (game hosts) visit
    `{apex}/auth/signed-out?return={origin}/` so the apex clears its cookies too. Standalone:
    local `signOut()` only. Access JWTs already issued stay valid until expiry (~1h) — accepted.
    `/auth/signed-out` is a GET that signs the apex out (logout-CSRF) — accepted, low impact.
+   Unload prompts: Convex's `unsavedChangesWarning` is off; `src/lib/navigation/leave-page.ts`
+   re-implements it (in-flight Convex requests) and, in the capture phase, swallows
+   `beforeunload` for navigations started via `leavePage` (all auth redirects) and on auth-flow
+   pages, which also silences `@convex-dev/auth`'s "token refresh in progress" prompt.
+   The middleware's "authenticated on `/sign-in|/sign-up|/agent-login`" redirect only applies
+   to GET/HEAD page loads, not Convex Auth's post-sign-in `invalidateCache` server action (a
+   redirected action POST to `/home` → game host failed cross-origin and broke apex sign-in).
 8. Sign-up and password reset UIs only render on apex/standalone; game-host `/sign-in` and
    `/sign-up` hand off to the apex (which lands on its own `/sign-in|/sign-up?next=/auth/handoff?...`).
 9. `/agent-login` on a game host generates `state`, then redirects to the apex `/agent-login`

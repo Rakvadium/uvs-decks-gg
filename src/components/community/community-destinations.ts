@@ -1,4 +1,5 @@
 import { BarChart3, Home, ListOrdered, Sparkles, type LucideIcon } from "lucide-react";
+import { isGameFeatureEnabled, type GameFeatureKey, type GameFeatures } from "@shared/games/features";
 
 export type CommunityDestinationValue = "hub" | "tier-lists" | "rankings" | "creators";
 
@@ -21,6 +22,19 @@ export const COMMUNITY_DESTINATIONS: readonly CommunityDestination[] = [
   { value: "rankings", label: "Rankings", href: "/community/tier-lists?tab=rankings", icon: BarChart3 },
   { value: "creators", label: "Creators", href: "/community/creators", icon: Sparkles },
 ] as const;
+
+const DESTINATION_FEATURE: Record<CommunityDestination["value"], GameFeatureKey> = {
+  "tier-lists": "tierLists",
+  rankings: "rankings",
+  creators: "creators",
+};
+
+/** Community destination tabs a game ships (`features` gate each tab). */
+export function communityDestinationsFor(features: GameFeatures): CommunityDestination[] {
+  return COMMUNITY_DESTINATIONS.filter((item) =>
+    isGameFeatureEnabled(features, DESTINATION_FEATURE[item.value]),
+  );
+}
 
 export const COMMUNITY_DESKTOP_DESTINATIONS = [
   COMMUNITY_HUB_DESTINATION,

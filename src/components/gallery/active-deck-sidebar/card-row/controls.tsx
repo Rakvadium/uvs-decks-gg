@@ -68,17 +68,21 @@ export function ActiveDeckCardRowControls() {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuLabel>Move To</DropdownMenuLabel>
-          {moveTargets.map((target) => (
-            <DropdownMenuItem
-              key={`${card._id}-move-${target}`}
-              onClick={() => moveCard(card._id, sectionKey, target)}
-              disabled={!canMoveToSection(target)}
-            >
-              Move To {SECTION_META[target].label}
-            </DropdownMenuItem>
-          ))}
-          <DropdownMenuSeparator />
+          {moveTargets.length > 0 ? (
+            <>
+              <DropdownMenuLabel>Move To</DropdownMenuLabel>
+              {moveTargets.map((target) => (
+                <DropdownMenuItem
+                  key={`${card._id}-move-${target}`}
+                  onClick={() => moveCard(card._id, sectionKey, target)}
+                  disabled={!canMoveToSection(target)}
+                >
+                  Move To {SECTION_META[target].label}
+                </DropdownMenuItem>
+              ))}
+              <DropdownMenuSeparator />
+            </>
+          ) : null}
           <DropdownMenuItem
             onClick={() => removeCard(card._id, sectionKey)}
             disabled={count <= 0}

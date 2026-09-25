@@ -10,8 +10,14 @@ import { AuthDialogProvider } from "@/components/auth/auth-dialog";
 import { SilentSso } from "@/components/auth/silent-sso";
 import { CardDataProvider } from "@/lib/universus/card-data-provider";
 import { ColorSchemeProvider } from "@/providers/ColorSchemeProvider";
+import { installUnsavedChangesWarning } from "@/lib/navigation/leave-page";
 
-const convex = new ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
+// Convex's own warning fires for any in-flight request, including background mutations during
+// auth redirects; ours skips intentional navigations (see leave-page.ts).
+const convex = new ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_URL!, {
+  unsavedChangesWarning: false,
+});
+installUnsavedChangesWarning(convex);
 
 export function Providers({ children }: { children: ReactNode }) {
   return (

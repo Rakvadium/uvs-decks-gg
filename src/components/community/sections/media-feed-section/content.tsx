@@ -12,18 +12,23 @@ import { cn } from "@/lib/utils";
 import { useChromeMode } from "@/lib/theme";
 import { chromeUsesScanlines } from "@/lib/theme/chrome-behavior";
 import { SectionHeading } from "@/components/ui/typography-headings";
+import type { GameCommunityMediaFeature } from "@shared/games/features";
+import { useGameFeatures } from "@/games/game-context";
 import { useCommunityMediaFeedModel } from "./hook";
 import { YoutubeEmbed } from "./youtube-embed";
 
-function MediaFeedSectionChrome() {
+function MediaFeedSectionChrome({ media }: { media: GameCommunityMediaFeature }) {
+  const { creators } = useGameFeatures();
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 md:hidden">
       <SectionHeading size="lg">
-        UniVersus Content
+        {media.feedHeading}
       </SectionHeading>
-      <Button variant="outline" size="sm" asChild>
-        <Link href="/community/creators">Creator program</Link>
-      </Button>
+      {creators ? (
+        <Button variant="outline" size="sm" asChild>
+          <Link href="/community/creators">Creator program</Link>
+        </Button>
+      ) : null}
     </div>
   );
 }
@@ -67,7 +72,8 @@ function MediaFeedSkeleton() {
   );
 }
 
-export function CommunityMediaFeedSection() {
+/** Community hub video feed; only rendered for games with `features.communityMedia`. */
+export function CommunityMediaFeedSection({ media }: { media: GameCommunityMediaFeature }) {
   const chrome = useChromeMode();
   const scanlineClass = chromeUsesScanlines(chrome) ? "scanlines" : "";
   const { feed } = useCommunityMediaFeedModel();
@@ -86,7 +92,7 @@ export function CommunityMediaFeedSection() {
   if (feed === undefined) {
     return (
       <section id="universus-content" className="space-y-5 scroll-mt-24">
-        <MediaFeedSectionChrome />
+        <MediaFeedSectionChrome media={media} />
         <MediaFeedSkeleton />
         <AttributionFooter />
       </section>
@@ -96,7 +102,7 @@ export function CommunityMediaFeedSection() {
   if (feed.feedKind === "empty" || feed.items.length === 0) {
     return (
       <section id="universus-content" className="space-y-5 scroll-mt-24">
-        <MediaFeedSectionChrome />
+        <MediaFeedSectionChrome media={media} />
         <Card className="border-border/50 bg-background/50 shadow-none">
           <CardContent className="flex flex-col items-center gap-2 py-12 text-center">
             <p className="text-sm text-muted-foreground">
@@ -104,11 +110,11 @@ export function CommunityMediaFeedSection() {
             </p>
             <Button variant="outline" size="sm" asChild>
               <a
-                href="https://www.youtube.com/@UniVersusCCG"
+                href={media.youtubeChannelUrl}
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                UniVersus on YouTube
+                {media.youtubeChannelLabel}
                 <ArrowUpRight className="ml-1 inline h-3.5 w-3.5" />
               </a>
             </Button>
@@ -130,7 +136,7 @@ export function CommunityMediaFeedSection() {
 
   return (
     <section id="universus-content" className="space-y-5 scroll-mt-24">
-      <MediaFeedSectionChrome />
+      <MediaFeedSectionChrome media={media} />
 
       {feed.feedKind === "pending_all" ? (
         <p className="text-xs text-muted-foreground">
@@ -178,7 +184,7 @@ export function CommunityMediaFeedSection() {
               <YoutubeEmbed
                 key={activeVideo.youtubeVideoId}
                 videoId={activeVideo.youtubeVideoId}
-                title={activeVideo.title ?? "UniVersus community video"}
+                title={activeVideo.title ?? `${media.dockLabel} community video`}
               />
             )}
 

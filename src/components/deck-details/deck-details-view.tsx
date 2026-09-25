@@ -12,6 +12,7 @@ import { DeckDetailsSharePanel } from "@/components/deck-details/deck-details-sh
 import { DeckDetailsPrivateLinkPanel } from "@/components/deck-details/deck-details-private-link-panel";
 import { DeckDetailsReadOnlyBanner } from "@/components/deck-details/deck-details-read-only-banner";
 import { useDeckDetails } from "@/providers/DeckDetailsProvider";
+import { useGameFeatures } from "@/games/game-context";
 import { useRegisterSlot } from "@/components/shell/shell-slot-provider";
 import { FloatingPageLayout } from "@/components/shell/floating-page-bar";
 import { useIsBelowLg } from "@/hooks/useIsMobile";
@@ -43,6 +44,28 @@ function DeckDetailsGallerySlotRegistration() {
   return null;
 }
 
+// Deck tools are registered in this order (stats, simulator, import/export); each is a game feature.
+function DeckDetailsStatsSlotRegistration() {
+  const options = useMemo(() => ({ label: "Stats", icon: BarChart3, priority: 1 }), []);
+  useRegisterSlot("right-sidebar", "deck-stats", StatsSidebar, options);
+  return null;
+}
+
+function DeckDetailsSimulatorSlotRegistration() {
+  const options = useMemo(
+    () => ({ label: "Simulator", icon: Shuffle, footer: HandSimulatorSidebarFooter, priority: 1 }),
+    []
+  );
+  useRegisterSlot("right-sidebar", "deck-simulator", HandSimulatorSidebar, options);
+  return null;
+}
+
+function DeckDetailsImportExportSlotRegistration() {
+  const options = useMemo(() => ({ label: "Import/Export", icon: Download, priority: 1 }), []);
+  useRegisterSlot("right-sidebar", "deck-import-export", ImportExportSidebar, options);
+  return null;
+}
+
 export function DeckDetailsView() {
   const { deckId, deck, isLoading, isOwner } = useDeckDetails();
   const { isAuthenticated } = useConvexAuth();
@@ -57,19 +80,13 @@ export function DeckDetailsView() {
   const isDeckEmpty = isDeckQuantitiesEmpty(deck);
   const prioritizeCardsChrome = isDeckEmpty && isBelowLg;
 
-  const statsSlotOptions = useMemo(() => ({ label: "Stats", icon: BarChart3, priority: 1 }), []);
-  const simulatorSlotOptions = useMemo(
-    () => ({ label: "Simulator", icon: Shuffle, footer: HandSimulatorSidebarFooter, priority: 1 }),
-    []
-  );
-  const importExportSlotOptions = useMemo(() => ({ label: "Import/Export", icon: Download, priority: 1 }), []);
-
-  useRegisterSlot("right-sidebar", "deck-stats", StatsSidebar, statsSlotOptions);
-  useRegisterSlot("right-sidebar", "deck-simulator", HandSimulatorSidebar, simulatorSlotOptions);
-  useRegisterSlot("right-sidebar", "deck-import-export", ImportExportSidebar, importExportSlotOptions);
+  const features = useGameFeatures();
 
   return (
     <DeckDetailsTopBarProvider>
+      {features.deckStats ? <DeckDetailsStatsSlotRegistration /> : null}
+      {features.drawSimulator ? <DeckDetailsSimulatorSlotRegistration /> : null}
+      {features.deckImportExport ? <DeckDetailsImportExportSlotRegistration /> : null}
       {isLoading || (!deck && pendingInvite === undefined) ? (
         <div className="flex h-full items-center justify-center">
           <div className="flex flex-col items-center gap-4">

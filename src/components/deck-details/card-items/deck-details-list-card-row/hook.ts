@@ -2,8 +2,9 @@ import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { useGameModule } from "@/games/game-context";
 import { canAddCardToSection, canMoveCardToSection, useDeckEditor } from "@/lib/deck";
-import { DECK_SECTION_KEYS, type DeckSection } from "@/lib/deck/display-config";
+import { type DeckSection } from "@/lib/deck/display-config";
 import { useTcgDraggable } from "@/lib/dnd";
+import { useEnabledDeckSections } from "@/lib/deck/use-deck-sections";
 import { useDeckDetailsOptional } from "@/providers/DeckDetailsProvider";
 import { useDeckCardsSectionContext } from "../../deck-details-cards-section-context";
 import { useCardDetailsDialogTrigger, useDeckSectionCounts } from "../hooks";
@@ -34,9 +35,10 @@ export function useDeckDetailsListCardRowModel({ entry }: DeckDetailsListCardRow
     rules: gameDeck,
   });
 
+  const enabledSections = useEnabledDeckSections();
   const moveTargets = useMemo(
-    () => DECK_SECTION_KEYS.filter((key) => key !== sectionKey),
-    [sectionKey]
+    () => enabledSections.filter((key) => key !== sectionKey),
+    [enabledSections, sectionKey]
   );
 
   const dragPreviewImageRef = useRef<HTMLImageElement | null>(null);

@@ -5,14 +5,21 @@ import {
   buildSignedInHintCookie,
   bytesToBase64Url,
   checkHandoffCode,
+  addPendingState,
+  HANDOFF_STATE_TTL_MS,
   hasSignedInHint,
   hintCookieRoot,
+  isAuthFlowPath,
+  isSignedInHintAbsent,
   isValidHandoffCode,
   isValidHandoffState,
   parseHandoffReturnUrl,
+  parsePendingStates,
   randomToken,
+  readSignedInHintValue,
   sanitizeSameOriginPath,
   sha256Hex,
+  takePendingState,
 } from "@shared/auth-handoff";
 import { DEFAULT_ROOT_DOMAINS } from "@shared/hosts";
 import { apexOriginFor } from "@/lib/auth/handoff-client";
@@ -220,5 +227,94 @@ describe("signed-in hint cookie", () => {
     expect(hasSignedInHint("tcgd_signed_in=")).toBe(false);
     expect(hasSignedInHint("xtcgd_signed_in=1")).toBe(false);
     expect(hasSignedInHint(undefined)).toBe(false);
+    expect(hasSignedInHint("tcgd_signed_in=Ab_c-9")).toBe(true);
+  });
+
+  test("hint value", () => {
+    expect(buildSignedInHintCookie("tcgdecks.localhost", { secure: false, value: "abc123" })).toBe(
+      "tcgd_signed_in=abc123; Domain=.tcgdecks.localhost; Path=/; SameSite=Lax; Max-Age=2592000",
+    );
+    // Malformed values fall back to the legacy `1`.
+    expect(buildSignedInHintCookie("tcgdecks.localhost", { secure: false, value: "a;b" })).toStartWith(
+      "tcgd_signed_in=1;",
+    );
+    expect(readSignedInHintValue("a=1; tcgd_signed_in=xyz; b=2")).toBe("xyz");
+    expect(readSignedInHintValue("tcgd_signed_in=1")).toBe("1");
+    expect(readSignedInHintValue("tcgd_signed_in=")).toBeNull();
+    expect(readSignedInHintValue("tcgd_signed_in=a%20b")).toBeNull();
+    expect(readSignedInHintValue(null)).toBeNull();
+  });
+
+  test("signed-out marker", () => {
+    expect(buildSignedInHintCookie("tcgdecks.localhost", { secure: false, signedOut: true })).toBe(
+      "tcgd_signed_in=0; Domain=.tcgdecks.localhost; Path=/; SameSite=Lax; Max-Age=2592000",
+    );
+    expect(readSignedInHintValue("tcgd_signed_in=0")).toBeNull();
+    expect(hasSignedInHint("tcgd_signed_in=0")).toBe(false);
+    expect(isSignedInHintAbsent("tcgd_signed_in=0")).toBe(false);
+    expect(isSignedInHintAbsent("tcgd_signed_in=abc")).toBe(false);
+    expect(isSignedInHintAbsent("other=1")).toBe(true);
+    expect(isSignedInHintAbsent("tcgd_signed_in=")).toBe(true);
+  });
+});
+
+describe("pending handoff states", () => {
+  const A = "a".repeat(32);
+  const B = "b".repeat(32);
+  const now = 1_000_000_000;
+
+  test("a second state does not invalidate the first", () => {
+    const raw = addPendingState(addPendingState(null, A, now), B, now + 1);
+    const first = takePendingState(raw, A, now + 2);
+    expect(first.matched).toBe(true);
+    const second = takePendingState(first.raw, B, now + 3);
+    expect(second.matched).toBe(true);
+    expect(second.raw).toBeNull();
+  });
+
+  test("single use", () => {
+    const raw = addPendingState(null, A, now);
+    const first = takePendingState(raw, A, now);
+    expect(first.matched).toBe(true);
+    expect(takePendingState(first.raw, A, now).matched).toBe(false);
+  });
+
+  test("unknown, invalid and expired states don't match", () => {
+    const raw = addPendingState(null, A, now);
+    expect(takePendingState(raw, B, now).matched).toBe(false);
+    expect(takePendingState(raw, B, now).raw).toBe(raw);
+    expect(takePendingState(raw, "short", now).matched).toBe(false);
+    expect(takePendingState(raw, null, now).matched).toBe(false);
+    expect(takePendingState(raw, A, now + HANDOFF_STATE_TTL_MS).matched).toBe(false);
+  });
+
+  test("parse tolerates garbage and the legacy single-slot value", () => {
+    expect(parsePendingStates("not json", now)).toEqual({});
+    expect(parsePendingStates("[1,2]", now)).toEqual({});
+    expect(parsePendingStates(JSON.stringify({ [A]: "x", bad: now }), now)).toEqual({});
+    expect(parsePendingStates(A, now)).toEqual({ [A]: now });
+  });
+
+  test("keeps at most 8, newest first", () => {
+    let raw: string | null = null;
+    const states = Array.from({ length: 10 }, (_, i) => `${String(i).padStart(2, "0")}${"x".repeat(30)}`);
+    states.forEach((state, i) => {
+      raw = addPendingState(raw, state, now + i);
+    });
+    const kept = Object.keys(parsePendingStates(raw, now + 10));
+    expect(kept).toHaveLength(8);
+    expect(kept).not.toContain(states[0]);
+    expect(kept).toContain(states[9]);
+  });
+});
+
+describe("isAuthFlowPath", () => {
+  test("auth pages", () => {
+    for (const path of ["/auth/callback", "/auth/handoff", "/sign-in", "/sign-up", "/agent-login"]) {
+      expect(isAuthFlowPath(path)).toBe(true);
+    }
+    for (const path of ["/", "/decks", "/sign-install", "/authors", "/settings"]) {
+      expect(isAuthFlowPath(path)).toBe(false);
+    }
   });
 });

@@ -1,6 +1,9 @@
 import { v } from "convex/values";
 import { action, internalMutation, internalQuery, query } from "./_generated/server";
 import { internal } from "./_generated/api";
+import { getSharedGameModule } from "../shared/games/registry";
+import { resolveGame } from "./lib/gameScope";
+import { gameIdValidator } from "./validators";
 
 const CACHE_KEY = "singleton" as const;
 const MIN_REFRESH_MS = 55_000;
@@ -26,9 +29,11 @@ const liveStatusValidator = v.object({
 });
 
 export const getLiveStatus = query({
-  args: {},
+  // Live status is for the global (UniVersus) channels; games without `features.communityMedia` get `null`.
+  args: { game: v.optional(gameIdValidator) },
   returns: v.union(v.null(), liveStatusValidator),
-  handler: async (ctx) => {
+  handler: async (ctx, args) => {
+    if (getSharedGameModule(resolveGame(args.game)).features.communityMedia === false) return null;
     const row = await ctx.db
       .query("communityLiveStatusCache")
       .withIndex("by_key", (q) => q.eq("key", CACHE_KEY))

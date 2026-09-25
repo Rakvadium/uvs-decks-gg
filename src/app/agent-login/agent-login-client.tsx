@@ -9,6 +9,7 @@ import { clearAuthCookies, isRefreshTokenParseError } from "@/components/auth/au
 import { sanitizeAgentLoginNextPath } from "@/lib/agent-auth-shared";
 import { useHostKind } from "@/games/game-context";
 import { createHandoffState, currentApexOrigin } from "@/lib/auth/handoff-client";
+import { leavePage } from "@/lib/navigation/leave-page";
 import { buildHandoffStartUrl } from "@shared/auth-handoff";
 
 type AgentLoginClientProps = {
@@ -66,8 +67,9 @@ export function AgentLoginClient({ token, nextPath, enabled }: AgentLoginClientP
         state,
       );
       setStatus("Redirecting to the main site…");
-      window.location.replace(
+      leavePage(
         `${apex}/agent-login?${new URLSearchParams({ token, next: handoffPath }).toString()}`,
+        { replace: true },
       );
       return;
     }
