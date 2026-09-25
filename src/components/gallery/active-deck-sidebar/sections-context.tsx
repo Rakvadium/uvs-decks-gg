@@ -59,13 +59,15 @@ export function ActiveDeckSectionsProvider({
   } = useActiveDeck();
   const { cards: allCards } = useCardData();
   const cardMap = useCardIdMap(allCards);
-  const { formatCardType } = useGameModule().ui;
+  const gameModule = useGameModule();
+  const { formatCardType } = gameModule.ui;
+  const { cardTypeOrder, cardTypeLabels } = gameModule.deck;
 
   const groupsBySection = useMemo<SectionsByKey>(
     () => ({
-      main: buildSectionGroups(activeDeck?.mainQuantities ?? {}, cardMap, formatCardType),
-      side: buildSectionGroups(activeDeck?.sideQuantities ?? {}, cardMap, formatCardType),
-      reference: buildSectionGroups(activeDeck?.referenceQuantities ?? {}, cardMap, formatCardType),
+      main: buildSectionGroups(activeDeck?.mainQuantities ?? {}, cardMap, formatCardType, cardTypeOrder, cardTypeLabels),
+      side: buildSectionGroups(activeDeck?.sideQuantities ?? {}, cardMap, formatCardType, cardTypeOrder, cardTypeLabels),
+      reference: buildSectionGroups(activeDeck?.referenceQuantities ?? {}, cardMap, formatCardType, cardTypeOrder, cardTypeLabels),
     }),
     [
       activeDeck?.mainQuantities,
@@ -73,6 +75,8 @@ export function ActiveDeckSectionsProvider({
       activeDeck?.sideQuantities,
       cardMap,
       formatCardType,
+      cardTypeOrder,
+      cardTypeLabels,
     ]
   );
 

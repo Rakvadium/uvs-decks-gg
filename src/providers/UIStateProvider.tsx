@@ -18,6 +18,8 @@ import {
   resolveGalleryCardsPerRowPreference,
 } from "@/lib/gallery/cards-per-row-preference";
 import type { UvsStatZoneFilterFields } from "@shared/games/uvs/filters";
+import type { CyberpunkStatFilterFields } from "@shared/games/cyberpunk/filters";
+import type { FacetFilterFields } from "@shared/games/filters";
 import type { GameId } from "@shared/games/types";
 import { useGameId } from "@/games/game-context";
 import {
@@ -30,10 +32,13 @@ import {
 export type { StatOperator, StatFilterValue } from "@shared/games/filters";
 
 /**
- * Persisted gallery filters (localStorage + Convex `sessions.galleryFilters`). Stat, range
- * (`${stat}Min`/`${stat}Max`), and zone fields are derived from the UVS filter definition.
+ * Persisted gallery filters (localStorage + Convex `sessions.galleryFilters`, stored per game).
+ * Stat, range (`${stat}Min`/`${stat}Max`), and zone fields are derived from each game's filter
+ * definition (UVS + Cyberpunk); `colors` / `tags` are facet pickers (`FacetFilterFields`).
  */
-export interface CardFilters extends UvsStatZoneFilterFields {
+type GameFilterFields = UvsStatZoneFilterFields & CyberpunkStatFilterFields & FacetFilterFields;
+
+export interface CardFilters extends GameFilterFields {
   search?: string;
   searchMode?: "name" | "text" | "all";
   rarity?: string[];

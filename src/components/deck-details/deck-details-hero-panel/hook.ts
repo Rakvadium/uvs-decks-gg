@@ -1,89 +1,34 @@
-import { useMemo, useState } from "react";
+import { useCallback } from "react";
 import { useCardIdMap } from "@/hooks/useCardIdMap";
 import { useCardData } from "@/lib/universus/card-data-provider";
 import { useDeckDetails } from "@/providers/DeckDetailsProvider";
 import { useGameModule } from "@/games/game-context";
-import type { Id } from "../../../../convex/_generated/dataModel";
-import { isDeckQuantitiesEmpty } from "../deck-empty";
-import { uvsSetupFields } from "@shared/games/uvs/setup";
+import { mainDeckTarget } from "@/games/main-deck-target";
+import type { ClientDeckSetupPatch } from "@/games/types";
+import { isDeckQuantitiesEmpty, quantityTotal } from "../deck-empty";
 
 export function useDeckDetailsHeroPanelModel() {
   const { deck, isOwner, updateDeck } = useDeckDetails();
   const { cards: allCards } = useCardData();
   const cardIdMap = useCardIdMap(allCards);
-  // TODO(phase3-ui): UVS setup UI (starting character + symbol); the Cyberpunk Legend UI replaces it in wave B.
-  const setup = uvsSetupFields(useGameModule().deck.normalizeSetup(deck));
+  const gameModule = useGameModule();
+  const setup = gameModule.deck.normalizeSetup(deck);
 
-  const [characterOpen, setCharacterOpen] = useState(false);
-  const [symbolOpen, setSymbolOpen] = useState(false);
-  const [characterDetailsOpen, setCharacterDetailsOpen] = useState(false);
-
-  const startingCharacter = setup.startingCharacterId ? cardIdMap.get(setup.startingCharacterId) ?? null : null;
-  const startingCharacterBack = startingCharacter?.backCardId
-    ? cardIdMap.get(startingCharacter.backCardId) ?? null
-    : null;
-  const imageCard = deck?.imageCardId ? cardIdMap.get(deck.imageCardId) ?? null : null;
-  const selectedSymbol = setup.selectedIdentity ? setup.selectedIdentity.toLowerCase() : null;
-
-  const startingCharacterSymbols = startingCharacter?.symbols;
-  const characterSymbols = useMemo(() => {
-    if (!startingCharacterSymbols) return [];
-
-    const rawSymbols = startingCharacterSymbols
-      .split(/[,|]/)
-      .map((symbol) => symbol.trim().toLowerCase())
-      .filter(Boolean);
-
-    return [...new Set(rawSymbols)];
-  }, [startingCharacterSymbols]);
-
-  const mainCount = useMemo(() => {
-    if (!deck) return 0;
-    return Object.values(deck.mainQuantities).reduce((sum, quantity) => sum + quantity, 0);
-  }, [deck]);
-
-  const isDeckEmpty = isDeckQuantitiesEmpty(deck);
-  const hasHeroImage = Boolean(imageCard?.imageUrl || startingCharacter?.imageUrl);
-  const compactEmptyMobile = isDeckEmpty && !hasHeroImage;
-
-  const handleSelectCharacter = async (characterId: Id<"cards">) => {
-    await updateDeck({ setup: { game: "uvs", startingCharacterId: characterId } });
-    setCharacterOpen(false);
-  };
-
-  const handleImageClick = () => {
-    if (startingCharacter) {
-      setCharacterDetailsOpen(true);
-    }
-  };
-
-  const handleSelectSymbol = (symbol: string) => {
-    void updateDeck({ setup: { game: "uvs", selectedIdentity: symbol } });
-    setSymbolOpen(false);
-  };
+  const getCard = useCallback((id: string) => cardIdMap.get(id), [cardIdMap]);
+  const onChange = useCallback(
+    (patch: ClientDeckSetupPatch) => updateDeck({ setup: patch }),
+    [updateDeck],
+  );
 
   return {
     deck,
-    setup,
     isOwner,
-    characterOpen,
-    setCharacterOpen,
-    symbolOpen,
-    setSymbolOpen,
-    characterDetailsOpen,
-    setCharacterDetailsOpen,
-    startingCharacter,
-    startingCharacterBack,
-    imageCard,
-    selectedSymbol,
-    characterSymbols,
-    mainCount,
-    isDeckEmpty,
-    compactEmptyMobile,
-    handleSelectCharacter,
-    handleSelectSymbol,
-    handleImageClick,
+    setup,
+    getCard,
+    onChange,
+    coverCard: deck?.imageCardId ? cardIdMap.get(deck.imageCardId) ?? null : null,
+    mainCount: quantityTotal(deck?.mainQuantities),
+    readyTarget: mainDeckTarget(gameModule),
+    isDeckEmpty: isDeckQuantitiesEmpty(deck),
   };
 }
-
-export type DeckDetailsHeroPanelModel = ReturnType<typeof useDeckDetailsHeroPanelModel>;

@@ -2,12 +2,9 @@
 
 import { useDeckDetails } from "@/providers/DeckDetailsProvider";
 import { cn } from "@/lib/utils";
-import { DeckDetailsHeroPanelProvider, useDeckDetailsHeroPanelContext } from "./context";
-import { DeckDetailsHeroCharacterImagePicker } from "./character-image-picker";
-import { DeckDetailsHeroReadyBadge } from "./ready-badge";
-import { DeckDetailsHeroStaticImage } from "./static-image";
-import { DeckDetailsHeroSymbolSelector } from "./symbol-selector";
 import { useGameModule } from "@/games/game-context";
+import { useDeckDetailsHeroPanelModel } from "./hook";
+import { DeckDetailsHeroReadyBadge } from "./ready-badge";
 
 function DeckDetailsHeroPanelEmptyState({ compactMobile }: { compactMobile?: boolean }) {
   return (
@@ -20,48 +17,30 @@ function DeckDetailsHeroPanelEmptyState({ compactMobile }: { compactMobile?: boo
   );
 }
 
+/** Deck setup in the deck details side column, rendered by the game module (`ui.DeckSetupPanel`). */
 function DeckDetailsHeroPanelContent() {
-  const { CardDetailsDialog } = useGameModule().ui;
-  const {
-    characterDetailsOpen,
-    setCharacterDetailsOpen,
-    deck,
-    isOwner,
-    startingCharacter,
-    startingCharacterBack,
-    compactEmptyMobile,
-  } = useDeckDetailsHeroPanelContext();
+  const { DeckSetupPanel } = useGameModule().ui;
+  const { deck, isOwner, setup, getCard, onChange, coverCard, mainCount, readyTarget, isDeckEmpty } =
+    useDeckDetailsHeroPanelModel();
 
   if (!deck) {
     return <DeckDetailsHeroPanelEmptyState compactMobile />;
   }
 
   return (
-    <>
-      <div
-        className={cn(
-          "relative mx-auto w-full max-w-[260px] shrink-0 overflow-hidden rounded-lg bg-card shadow-[0_0_0_1px_var(--primary)/15,0_0_8px_var(--primary)/30] lg:mx-0 lg:w-48",
-          compactEmptyMobile ? "aspect-auto h-24 max-lg:max-w-none" : "aspect-[2.5/3.5]",
-        )}
-      >
-        {isOwner ? (
-          <>
-            <DeckDetailsHeroCharacterImagePicker />
-            <DeckDetailsHeroSymbolSelector />
-          </>
-        ) : (
-          <DeckDetailsHeroStaticImage />
-        )}
-        <DeckDetailsHeroReadyBadge />
-      </div>
-
-      <CardDetailsDialog
-        card={startingCharacter}
-        backCard={startingCharacterBack}
-        open={characterDetailsOpen}
-        onOpenChange={setCharacterDetailsOpen}
-      />
-    </>
+    <DeckSetupPanel
+      variant="hero"
+      setup={setup}
+      getCard={getCard}
+      onChange={isOwner ? onChange : undefined}
+      readOnly={!isOwner}
+      mainQuantities={deck.mainQuantities}
+      coverCard={coverCard}
+      deckName={deck.name}
+      deckDescription={deck.description}
+      deckEmpty={isDeckEmpty}
+      overlay={<DeckDetailsHeroReadyBadge mainCount={mainCount} target={readyTarget} />}
+    />
   );
 }
 
@@ -72,9 +51,5 @@ export function DeckDetailsHeroPanel() {
     return <DeckDetailsHeroPanelEmptyState />;
   }
 
-  return (
-    <DeckDetailsHeroPanelProvider>
-      <DeckDetailsHeroPanelContent />
-    </DeckDetailsHeroPanelProvider>
-  );
+  return <DeckDetailsHeroPanelContent />;
 }

@@ -13,6 +13,8 @@ const PAGE_TITLES: Record<GalleryMobileFilterPage, string> = {
   type: "Type",
   symbols: "Symbols",
   keywords: "Keywords",
+  colors: "Colors",
+  tags: "Tags",
   stats: "Stats",
   rarity: "Rarity",
 };

@@ -18,7 +18,9 @@ export type PieChartColorStrategy =
   | "characterNumeric"
   | "actionNumeric"
   | "foundationNumeric"
-  | "attackNumeric";
+  | "attackNumeric"
+  // Any other `numericShades` key a game defines.
+  | (string & {});
 
 export function resolvePieBucketColor(
   strategy: PieChartColorStrategy,

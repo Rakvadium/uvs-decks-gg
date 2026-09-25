@@ -9,6 +9,7 @@ export {
 export type {
   CardSectionCountSummary,
   DeckAddableCard,
+  DeckCardRules,
   DeckSection,
   DeckSectionCounts,
 } from "@shared/games/uvs/card-eligibility";

@@ -8,7 +8,10 @@ import type { SectionGroup } from "./types";
 export function buildSectionGroups(
   quantities: Record<string, number>,
   cardMap: Map<string, CachedCard>,
-  formatCardType: (type?: string) => string | undefined
+  formatCardType: (type?: string) => string | undefined,
+  /** Group order + labels (`module.deck.cardTypeOrder` / `cardTypeLabels`); defaults to UVS. */
+  typeOrder: readonly string[] = CARD_TYPE_ORDER,
+  typeLabels: Readonly<Record<string, string>> = CARD_TYPE_LABELS
 ): SectionGroup[] {
   const groups = new Map<string, Array<{ card: CachedCard; count: number }>>();
 
@@ -35,9 +38,9 @@ export function buildSectionGroups(
   }
 
   const orderedTypes = [
-    ...CARD_TYPE_ORDER,
+    ...typeOrder,
     ...Array.from(groups.keys())
-      .filter((type) => !CARD_TYPE_ORDER.includes(type as (typeof CARD_TYPE_ORDER)[number]))
+      .filter((type) => !typeOrder.includes(type))
       .sort(),
   ];
 
@@ -49,7 +52,7 @@ export function buildSectionGroups(
 
       return {
         type,
-        label: CARD_TYPE_LABELS[type] ?? type,
+        label: typeLabels[type] ?? type,
         total,
         cards,
       };

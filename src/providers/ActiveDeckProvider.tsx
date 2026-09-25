@@ -24,7 +24,8 @@ import {
   isDeckWriteConflictError,
   isTeamEditableDeck,
 } from "@/lib/deck/visibility";
-import { useGameId } from "@/games/game-context";
+import { useGameId, useGameModule } from "@/games/game-context";
+import { offerSetupAdd } from "@/lib/deck/setup-add-fallback";
 
 type Deck = Doc<"decks">;
 type DeckSection = "main" | "side" | "reference";
@@ -92,6 +93,7 @@ export function ActiveDeckProvider({ children }: ActiveDeckProviderProps) {
   const cardIndex = useCardIndex();
 
   const game = useGameId();
+  const gameModule = useGameModule();
   const activeDeck = useQuery(
     api.decks.getById,
     activeDeckId ? { game, deckId: activeDeckId as Id<"decks"> } : "skip"
@@ -148,9 +150,10 @@ export function ActiveDeckProvider({ children }: ActiveDeckProviderProps) {
         section,
         counts: sectionCounts,
         quantity,
+        rules: gameModule.deck,
       });
     },
-    [cardIndex, sectionCounts]
+    [cardIndex, sectionCounts, gameModule]
   );
 
   const canMoveToSection = useCallback(
@@ -163,9 +166,10 @@ export function ActiveDeckProvider({ children }: ActiveDeckProviderProps) {
         toSection,
         counts: sectionCounts,
         quantity,
+        rules: gameModule.deck,
       });
     },
-    [cardIndex, sectionCounts]
+    [cardIndex, sectionCounts, gameModule]
   );
 
   const setActiveDeck = useCallback(
@@ -213,7 +217,16 @@ export function ActiveDeckProvider({ children }: ActiveDeckProviderProps) {
     (cardId: Id<"cards">, section: DeckSection = "main", quantity?: number) => {
       if (!activeDeckId) return;
       if (!activeDeck) return;
-      if (!canAddToSection(cardId, section, quantity)) return;
+      if (!canAddToSection(cardId, section, quantity)) {
+        offerSetupAdd({
+          card: cardIndex?.byId.get(cardId.toString()),
+          module: gameModule,
+          deck: activeDeck,
+          getCard: (id) => cardIndex?.byId.get(id),
+          applySetup: (setup) => updateDeckMutation({ deckId: activeDeckId as Id<"decks">, setup }),
+        });
+        return;
+      }
       const payload: Parameters<typeof addCardMutation>[0] = {
         deckId: activeDeckId as Id<"decks">,
         cardId,
@@ -232,7 +245,7 @@ export function ActiveDeckProvider({ children }: ActiveDeckProviderProps) {
           }
         });
     },
-    [activeDeckId, activeDeck, addCardMutation, canAddToSection]
+    [activeDeckId, activeDeck, addCardMutation, canAddToSection, cardIndex, gameModule, updateDeckMutation]
   );
 
   const removeCard = useCallback(

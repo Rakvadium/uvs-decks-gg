@@ -1,23 +1,12 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
+import { BarDistributionChart } from "./bar-chart";
 import { PieDistributionChart } from "./distribution-chart";
 import { StatsSidebarProvider, useStatsSidebarContext } from "./context";
 
 function StatsSidebarContent() {
-  const {
-    deck,
-    mainTotal,
-    attackCardsTotal,
-    typeDistribution,
-    difficultyDistribution,
-    checkValueDistribution,
-    blockModifierDistribution,
-    blockZoneDistribution,
-    attackZoneDistribution,
-    attackSpeedDistribution,
-    attackDamageDistribution,
-  } = useStatsSidebarContext();
+  const { deck, mainTotal, charts } = useStatsSidebarContext();
 
   if (!deck) {
     return <div className="p-4 text-xs text-muted-foreground">Deck stats unavailable.</div>;
@@ -37,54 +26,20 @@ function StatsSidebarContent() {
         </div>
       ) : (
         <div className="space-y-3">
-          <PieDistributionChart
-            title="Card Type Ratios"
-            buckets={typeDistribution}
-            total={mainTotal}
-            colorStrategy="cardTypeLabels"
-          />
-          <PieDistributionChart
-            title="Difficulty"
-            buckets={difficultyDistribution}
-            total={mainTotal}
-            colorStrategy="characterNumeric"
-          />
-          <PieDistributionChart
-            title="Check Value"
-            buckets={checkValueDistribution}
-            total={mainTotal}
-            colorStrategy="actionNumeric"
-          />
-          <PieDistributionChart
-            title="Block Mods"
-            buckets={blockModifierDistribution}
-            total={mainTotal}
-            colorStrategy="foundationNumeric"
-          />
-          <PieDistributionChart
-            title="Block Zones"
-            buckets={blockZoneDistribution}
-            total={mainTotal}
-            colorStrategy="zoneLabels"
-          />
-          <PieDistributionChart
-            title="Attack Zones"
-            buckets={attackZoneDistribution}
-            total={attackCardsTotal}
-            colorStrategy="zoneLabels"
-          />
-          <PieDistributionChart
-            title="Attack Speed"
-            buckets={attackSpeedDistribution}
-            total={attackCardsTotal}
-            colorStrategy="attackNumeric"
-          />
-          <PieDistributionChart
-            title="Attack Damage"
-            buckets={attackDamageDistribution}
-            total={attackCardsTotal}
-            colorStrategy="attackNumeric"
-          />
+          {charts.map(({ chart, buckets, total }) =>
+            chart.kind === "numeric" && chart.display === "bars" ? (
+              <BarDistributionChart key={chart.id} title={chart.title} buckets={buckets} total={total} />
+            ) : (
+              <PieDistributionChart
+                key={chart.id}
+                title={chart.title}
+                buckets={buckets}
+                total={total}
+                colorStrategy={chart.colorStrategy}
+                labelColors={chart.labelColors}
+              />
+            )
+          )}
         </div>
       )}
     </div>

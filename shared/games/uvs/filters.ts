@@ -10,6 +10,7 @@ import type {
   StatRangeFilterFields,
   ZoneFilterFields,
 } from "../filters";
+import { UVS_KEYWORD_LIST } from "./keywords";
 
 export const UVS_FILTER_GROUPS = [
   { id: "general", label: "General" },
@@ -66,6 +67,7 @@ export const UVS_FILTER_DEFINITION: GameFilterDefinition = {
   zones: UVS_ZONE_FILTERS,
   statParamOrder: UVS_STAT_FILTER_KEYS,
   zoneParamOrder: UVS_ZONE_FILTER_KEYS,
+  keywordOptions: UVS_KEYWORD_LIST,
 };
 
 /** Stat, range, and zone fields of the persisted `CardFilters` shape. */

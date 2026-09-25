@@ -9,6 +9,7 @@ export {
 } from "./card-eligibility";
 export type {
   DeckAddableCard,
+  DeckCardRules,
   DeckSection,
   DeckSectionCounts,
   CardSectionCountSummary,

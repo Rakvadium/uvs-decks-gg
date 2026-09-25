@@ -9,6 +9,8 @@ export type GalleryMobileFilterPage =
   | "type"
   | "symbols"
   | "keywords"
+  | "colors"
+  | "tags"
   | "stats"
   | "rarity";
 

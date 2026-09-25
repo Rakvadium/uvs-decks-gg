@@ -24,7 +24,8 @@ import {
   isDeckWriteConflictError,
   isTeamEditableDeck,
 } from "@/lib/deck/visibility";
-import { useGameId } from "@/games/game-context";
+import { useGameId, useGameModule } from "@/games/game-context";
+import { offerSetupAdd } from "./setup-add-fallback";
 
 type Deck = Doc<"decks">;
 type DeckSection = "main" | "side" | "reference";
@@ -69,6 +70,7 @@ interface SiloedDeckProviderProps {
 
 export function SiloedDeckProvider({ children, deckId }: SiloedDeckProviderProps) {
   const game = useGameId();
+  const gameModule = useGameModule();
   const deckData = useQuery(
     api.decks.getById,
     { game, deckId: deckId as Id<"decks"> }
@@ -126,9 +128,10 @@ export function SiloedDeckProvider({ children, deckId }: SiloedDeckProviderProps
         section,
         counts: sectionCounts,
         quantity,
+        rules: gameModule.deck,
       });
     },
-    [cardIndex, sectionCounts]
+    [cardIndex, sectionCounts, gameModule]
   );
 
   const canMoveToSection = useCallback(
@@ -141,15 +144,25 @@ export function SiloedDeckProvider({ children, deckId }: SiloedDeckProviderProps
         toSection,
         counts: sectionCounts,
         quantity,
+        rules: gameModule.deck,
       });
     },
-    [cardIndex, sectionCounts]
+    [cardIndex, sectionCounts, gameModule]
   );
 
   const addCard = useCallback(
     async (cardId: Id<"cards">, section: DeckSection = "main") => {
       if (!deck) return;
-      if (!canAddToSection(cardId, section)) return;
+      if (!canAddToSection(cardId, section)) {
+        offerSetupAdd({
+          card: cardIndex?.byId.get(cardId.toString()),
+          module: gameModule,
+          deck,
+          getCard: (id) => cardIndex?.byId.get(id),
+          applySetup: (setup) => updateDeckMutation({ deckId: deckId as Id<"decks">, setup }),
+        });
+        return;
+      }
       const payload: Parameters<typeof addCardMutation>[0] = {
         deckId: deckId as Id<"decks">,
         cardId,
@@ -168,7 +181,7 @@ export function SiloedDeckProvider({ children, deckId }: SiloedDeckProviderProps
         }
       }
     },
-    [deck, deckId, addCardMutation, canAddToSection]
+    [deck, deckId, addCardMutation, canAddToSection, cardIndex, gameModule, updateDeckMutation]
   );
 
   const removeCard = useCallback(

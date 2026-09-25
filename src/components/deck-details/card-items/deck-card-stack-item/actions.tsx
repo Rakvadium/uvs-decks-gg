@@ -2,6 +2,7 @@
 
 import { CardDeckControls } from "@/components/card/deck-controls";
 import { canAddCardToSection, useDeckEditor } from "@/lib/deck";
+import { useGameModule } from "@/games/game-context";
 import { useDeckDetailsOptional } from "@/providers/DeckDetailsProvider";
 import { useDeckCardsSectionContext } from "../../deck-details-cards-section-context";
 import { useDeckSectionCounts } from "../hooks";
@@ -18,6 +19,7 @@ export function DeckCardStackItemActions({ card, quantity, isHovered }: DeckCard
   const { activeSection } = useDeckCardsSectionContext();
   const { addCard, removeCard } = useDeckEditor();
   const sectionCounts = useDeckSectionCounts();
+  const gameDeck = useGameModule().deck;
 
   if (deckDetails?.isOwner !== true) {
     return (
@@ -36,6 +38,7 @@ export function DeckCardStackItemActions({ card, quantity, isHovered }: DeckCard
     cardId: card._id,
     section: activeSection,
     counts: sectionCounts,
+    rules: gameDeck,
   });
 
   return (

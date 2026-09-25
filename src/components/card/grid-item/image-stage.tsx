@@ -1,11 +1,17 @@
 "use client";
 
+import type { ComponentType } from "react";
 import { CARD_GLOW_REST, CARD_GLOW_HOVER } from "@/components/card/glow";
+import type { GameCardImageDisplayProps } from "@/games/types";
+import type { CachedCard } from "@/lib/universus/card-store";
 import { cn } from "@/lib/utils";
 import { useCardGridItemContext } from "./context";
-import { CardImageDisplay } from "./image-display";
 
-export function CardGridItemImageStage() {
+/** Props a game's grid face renderer gets: the image props plus the face's card. */
+export type CardGridItemFaceProps = GameCardImageDisplayProps & { card: CachedCard };
+
+/** Front/back face stage with hover overlays; `FaceImage` is the game's card image renderer. */
+export function CardGridItemImageStage({ FaceImage }: { FaceImage: ComponentType<CardGridItemFaceProps> }) {
   const {
     card,
     backCard,
@@ -30,7 +36,8 @@ export function CardGridItemImageStage() {
     >
       {!hasBackFace ? (
         <div className="absolute inset-0 overflow-hidden rounded-xl">
-          <CardImageDisplay
+          <FaceImage
+            card={card}
             imageUrl={card.imageUrl}
             name={card.name}
             imgRef={dragPreviewImageRef}
@@ -48,7 +55,8 @@ export function CardGridItemImageStage() {
               isFlipped ? "pointer-events-none opacity-0" : "opacity-100"
             )}
           >
-            <CardImageDisplay
+            <FaceImage
+              card={card}
               imageUrl={card.imageUrl}
               name={card.name}
               imgRef={!isFlipped ? dragPreviewImageRef : undefined}
@@ -65,7 +73,8 @@ export function CardGridItemImageStage() {
               !isFlipped ? "pointer-events-none opacity-0" : "opacity-100"
             )}
           >
-            <CardImageDisplay
+            <FaceImage
+              card={backCard!}
               imageUrl={backCard!.imageUrl}
               name={backCard!.name}
               imgRef={isFlipped ? dragPreviewImageRef : undefined}

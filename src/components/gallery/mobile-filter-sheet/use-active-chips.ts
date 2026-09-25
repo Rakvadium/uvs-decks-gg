@@ -7,6 +7,7 @@ import { useGameModule } from "@/games/game-context";
 import type { StatOperator } from "@/providers/UIStateProvider";
 import { useGalleryFilterDialogContext } from "../filter-dialog/context";
 import type { StatFilterKey, StringArrayFilterKey } from "../filter-dialog/types";
+import { colorFacetLabel } from "./color-facet-chips";
 
 export const OPERATOR_GLYPHS = Object.fromEntries(
   STAT_OPERATOR_OPTIONS.map((option) => [option.value, option.glyph])
@@ -62,6 +63,14 @@ export function useActiveChips(): ActiveChip[] {
       chips.push({ id: `set:${code}`, label: name, remove: () => toggleStringFilter("set", code) });
     }
 
+    for (const color of filters.colors ?? []) {
+      chips.push({
+        id: `color:${color}`,
+        label: colorFacetLabel(filterDefinition.facets.colors, color),
+        remove: () => toggleStringFilter("colors", color),
+      });
+    }
+
     for (const symbol of filters.symbols ?? []) {
       chips.push({ id: `symbol:${symbol}`, label: symbolLabel(symbol), remove: () => toggleStringFilter("symbols", symbol) });
     }
@@ -80,6 +89,10 @@ export function useActiveChips(): ActiveChip[] {
 
     for (const keyword of filters.keywords ?? []) {
       chips.push({ id: `keyword:${keyword}`, label: keyword, remove: () => toggleStringFilter("keywords", keyword) });
+    }
+
+    for (const tag of filters.tags ?? []) {
+      chips.push({ id: `tag:${tag}`, label: tag, remove: () => toggleStringFilter("tags", tag) });
     }
 
     for (const descriptor of filterDefinition.zones) {

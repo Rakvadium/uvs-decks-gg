@@ -113,6 +113,11 @@ export interface GameFilterDefinition {
   statParamOrder: readonly string[];
   /** URL write order for zone params (legacy; must list every zone key). */
   zoneParamOrder: readonly string[];
+  /**
+   * Fixed keyword picker options (UVS: its curated keyword list). Omitted = the distinct keywords
+   * found in the catalog (`cards.keywords`, pipe-delimited, `Name: n` suffixes dropped).
+   */
+  keywordOptions?: readonly string[];
 }
 
 export interface GameFilterGroupLayout {
@@ -242,6 +247,64 @@ export function compileStatZoneFilter(
     if (!rule) continue;
     const field = stat.cardField;
     checks.push((card) => matchesStatFilter(readNumber(card, field), rule));
+  }
+
+  if (checks.length === 0) return null;
+  return (card) => {
+    for (const check of checks) {
+      if (!check(card)) return false;
+    }
+    return true;
+  };
+}
+
+/** Facet array fields of the persisted filters shape (`filters.colors` / `filters.tags`). */
+export interface FacetFilterFields {
+  /** Selected colors (`cards.color`, lowercase option values); a card matches any. */
+  colors?: string[];
+  /** Selected tags (`cards.tags`, pipe-delimited); a card matches any (case-insensitive). */
+  tags?: string[];
+}
+
+/** Trimmed, non-empty parts of a pipe-delimited card field (`"A|B "` → `["A", "B"]`). */
+export function splitPipeList(value: string | null | undefined): string[] {
+  if (!value) return [];
+  const out: string[] = [];
+  for (const part of value.split("|")) {
+    const trimmed = part.trim();
+    if (trimmed) out.push(trimmed);
+  }
+  return out;
+}
+
+/**
+ * Compiles the color/tag facet part of `filters` into a card predicate, or `null` when none is
+ * active. Only facets the definition declares (`facets.colors`, `facets.tags`) apply.
+ */
+export function compileFacetFilter(
+  definition: GameFilterDefinition,
+  filters: object,
+): ((card: object) => boolean) | null {
+  const record = filters as FilterRecord;
+  const checks: Array<(card: object) => boolean> = [];
+
+  const colors = record.colors as string[] | undefined;
+  if (definition.facets.colors && colors && colors.length > 0) {
+    const wanted = new Set(colors.map((c) => c.trim().toLowerCase()));
+    checks.push((card) => {
+      const value = (card as FilterRecord).color;
+      return typeof value === "string" && wanted.has(value.trim().toLowerCase());
+    });
+  }
+
+  const tags = record.tags as string[] | undefined;
+  if (definition.facets.tags && tags && tags.length > 0) {
+    const wanted = new Set(tags.map((t) => t.trim().toLowerCase()));
+    checks.push((card) => {
+      const value = (card as FilterRecord).tags;
+      if (typeof value !== "string") return false;
+      return splitPipeList(value).some((tag) => wanted.has(tag.toLowerCase()));
+    });
   }
 
   if (checks.length === 0) return null;

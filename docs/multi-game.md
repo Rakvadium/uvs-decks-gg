@@ -50,14 +50,18 @@ update this doc in the same change.
 | Member | Purpose (UVS impl) |
 | --- | --- |
 | `CardDetailsDialog`, `CardDetailsContent` | Card details modal / inline details panel |
-| `CardGridItem` | Gallery/deck grid card tile (deck actions, flip, drag) |
+| `CardGridItem` | Gallery/deck grid card tile (deck actions, flip, drag); both games render the shared `CardGridItemShell` (`src/components/card/grid-item/`) with their own face + details dialog |
 | `CardImageDisplay` | Card image with "No Image" fallback |
 | `SymbolIcon`, `SymbolBadge`, `getSymbolPath`, `getSymbolColor` | Symbol/identity images and chip colors |
-| `SetupCardPickerDialog` | Deck setup card picker (UVS: starting character) |
+| `DeckSetupPanel` | Deck setup UI, `variant` `hero` (deck details column) / `sidebar` (gallery active deck) / `compact` (deck tiles; UVS renders nothing). Props: `setup`, `getCard`, `onChange(patch)`, `readOnly`, `mainQuantities`, `coverCard`, `overlay`, … (UVS: starting character + identity; Cyberpunk: 3 Legend slots + RAM budget) |
+| `SetupCardPickerDialog` | Deck setup card picker: `setup` + `onChange(patch)`, optional `slotIndex` (UVS: starting character; Cyberpunk: Legend picker) |
+| `CardSetupAction` | Card details toggle that puts a card in the setup (UVS: Set As Starting Character; Cyberpunk: Set As Legend) |
+| `deckSetup` | Pure helpers + copy: `emptySetupLabel`, simulator hints, `importPatch(parsed, findCards)`, `resolveSetupAdd(card, setup, getCard)` (Legend added to main → "Add as Legend" toast via `offerSetupAdd`, `src/lib/deck/setup-add-fallback.ts`) |
 | `StatsQuickFilterAdornment` | Compact active stat-filter chips |
 | `getCardTypeColor`, `getKeywordColor` | Filter token chip colors |
 | `formatCardType` | Normalizes raw card types before grouping/labels |
 | `deckStats` | Deck stats pie palette (`cardTypeColors`, `zoneColors`, `numericShades`) |
+| `deckStatsCharts` | Deck stats sidebar charts (`cardType` / `numeric` (+ `display: "bars"` curve) / `labels`; optional `filter`, `labelColors`) |
 
 - Prop contracts (`GameCardGridItemProps`, …) live next to `ClientGameUi` and use `CachedCard`;
   each game's components must satisfy them (`UVS_CLIENT_UI ... satisfies ClientGameUi` in `src/games/uvs/ui.ts`).
@@ -87,7 +91,9 @@ Phase 3: `DeckSetup` / `DeckSetupPatch` (`shared/games/deck.ts`) are unions disc
 setup functions accept the union: `normalizeSetup` ignores a foreign setup (returns its own empty
 setup), `applySetupPatch` throws on a foreign patch, `setupCardIds` / `setupPreviewCardId` return
 nothing for one. `decks.create`/`update` use `resolveDeckSetupPatchArgs` (`shared/games/deck-setup.ts`).
-UVS-only UI reads `uvsSetupFields(setup)` until each game has its own setup UI.
+Generic setup UI goes through `ui.DeckSetupPanel` / `ui.deckSetup`; card addability passes
+`rules: module.deck` to `canAddCardToSection` / `canMoveCardToSection` (default: UVS rules). Deck tiles and the
+hero "Ready" badge use `mainDeckTarget(module)` (`src/games/main-deck-target.ts`, default format `minDeckSize`).
 
 - `decks.setup: v.optional(deckSetupValidator)`.
 - Legacy top-level `startingCharacterId` / `selectedIdentity` stay in the schema as

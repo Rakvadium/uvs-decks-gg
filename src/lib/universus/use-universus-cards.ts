@@ -19,12 +19,13 @@ import {
 import type { CachedCard } from "./card-store";
 import type { CardFilters } from "@/providers/UIStateProvider";
 import {
+  compileFacetFilter,
   compileStatZoneFilter,
   getStatSortComparator,
   type GameFilterDefinition,
 } from "@shared/games/filters";
 import { fetchStaticCatalog } from "./static-catalog";
-import { useGameId } from "@/games/game-context";
+import { useGameId, useGameModule } from "@/games/game-context";
 import { cardMatchesRarityFilter } from "./rarity";
 import type { GameId } from "@shared/games/types";
 
@@ -110,6 +111,7 @@ export function useUniversusCards(): UseUniversusCardsResult {
   const dataEpochRef = useRef(0);
   const convex = useConvex();
   const game = useGameId();
+  const { filters: filterDefinition } = useGameModule();
   const isHydrated = useIsClient();
   
   const serverVersionData = useQuery(api.cards.getCardDataVersion, { game });
@@ -139,7 +141,7 @@ export function useUniversusCards(): UseUniversusCardsResult {
         setCachedVersion(metadata.version);
         const cardIndex = buildCardIndex(cachedCards, companions);
         setIndex(cardIndex);
-        setUniqueValues(getUniqueValues(cachedCards));
+        setUniqueValues(getUniqueValues(cachedCards, filterDefinition));
         setLoadProgress(100);
         setIsLoading(false);
         dataEpochRef.current += 1;
@@ -150,7 +152,7 @@ export function useUniversusCards(): UseUniversusCardsResult {
       console.error("Failed to load from cache:", err);
       return { hasCache: false, version: null };
     }
-  }, [convex, game]);
+  }, [convex, game, filterDefinition]);
 
   const galleryTotalEstimate = serverVersionData?.cardCount ?? 0;
   const forceConvexCatalogSync =
@@ -261,7 +263,7 @@ export function useUniversusCards(): UseUniversusCardsResult {
         setCachedVersion(version);
         const cardIndex = buildCardIndex(gallery, companions);
         setIndex(cardIndex);
-        setUniqueValues(getUniqueValues(gallery));
+        setUniqueValues(getUniqueValues(gallery, filterDefinition));
         setLoadProgress(100);
         setIsLoading(false);
         setError(null);
@@ -276,7 +278,7 @@ export function useUniversusCards(): UseUniversusCardsResult {
         syncInProgress.current = false;
       }
     },
-    [game]
+    [game, filterDefinition]
   );
 
   const refreshCache = useCallback(async () => {
@@ -466,6 +468,8 @@ export function filterCards(
 
   // Stat rules, legacy min/max ranges, and zones come from the game's filter definition.
   const matchesStatZoneFilters = compileStatZoneFilter(filterDefinition, filters);
+  // Color / tag facets (games whose definition declares them).
+  const matchesFacetFilters = compileFacetFilter(filterDefinition, filters);
 
   const out: CachedCard[] = [];
   for (const card of cards) {
@@ -544,6 +548,8 @@ export function filterCards(
     }
 
     if (matchesStatZoneFilters && !matchesStatZoneFilters(card)) continue;
+
+    if (matchesFacetFilters && !matchesFacetFilters(card)) continue;
 
     out.push(card);
   }

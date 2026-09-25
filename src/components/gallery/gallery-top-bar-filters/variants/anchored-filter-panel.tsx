@@ -19,9 +19,11 @@ import {
   GalleryFilterRarityPage,
 } from "@/components/gallery/mobile-filter-sheet/root-page";
 import {
+  GalleryDesktopFilterColorsPage,
   GalleryDesktopFilterKeywordsPage,
   GalleryDesktopFilterSetsPage,
   GalleryDesktopFilterStatsPage,
+  GalleryDesktopFilterTagsPage,
 } from "./desktop-filter-pages";
 import { floatingIslandRingClassName } from "@/components/shell/floating-island";
 import { cn } from "@/lib/utils";
@@ -34,6 +36,8 @@ const PAGE_TITLES: Record<GalleryMobileFilterPage, string> = {
   type: "Type",
   symbols: "Symbols",
   keywords: "Keywords",
+  colors: "Colors",
+  tags: "Tags",
   stats: "Stats",
   rarity: "Rarity",
 };
@@ -49,6 +53,8 @@ function ActivePage() {
   if (page === "type") return <GalleryDesktopFilterTypePage />;
   if (page === "symbols") return <GalleryDesktopFilterSymbolsPage />;
   if (page === "keywords") return <GalleryDesktopFilterKeywordsPage />;
+  if (page === "colors") return <GalleryDesktopFilterColorsPage />;
+  if (page === "tags") return <GalleryDesktopFilterTagsPage />;
   if (page === "stats") return <GalleryDesktopFilterStatsPage />;
   if (page === "rarity") return <GalleryFilterRarityPage />;
   return <GalleryDesktopFilterRootPage />;
@@ -185,7 +191,7 @@ function AnchoredFilterPanelBody({
   onClose: () => void;
 }) {
   const { page, direction } = useGalleryMobileFilterNav();
-  const scrollsInside = page === "sets";
+  const scrollsInside = page === "sets" || page === "tags";
 
   return (
     <div

@@ -1,51 +1,22 @@
 "use client";
 
-import { ActiveDeckCharacterPanelProvider, useActiveDeckCharacterPanelContext } from "./context";
-import { ActiveDeckCharacterPicker } from "./character-picker";
-import { ActiveDeckCharacterSummary } from "./summary";
-import { ActiveDeckCharacterSymbolSelector } from "./symbol-selector";
 import { useGameModule } from "@/games/game-context";
+import { useActiveDeckCharacterPanelModel } from "./hook";
 
-function ActiveDeckCharacterPanelContent() {
-  const { CardDetailsDialog } = useGameModule().ui;
-  const {
-    characterDetailsOpen,
-    setCharacterDetailsOpen,
-    startingCharacter,
-    startingCharacterBack,
-  } = useActiveDeckCharacterPanelContext();
-
-  return (
-    <>
-      <div className="overflow-hidden rounded-lg border border-border/50 bg-card/50">
-        <div className="flex items-stretch justify-between">
-          <div className="min-w-0 flex flex-1 items-stretch">
-            <div className="relative">
-              <ActiveDeckCharacterPicker />
-              <ActiveDeckCharacterSymbolSelector />
-            </div>
-
-            <div className="min-w-0 flex-1 p-3">
-              <ActiveDeckCharacterSummary />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <CardDetailsDialog
-        card={startingCharacter}
-        backCard={startingCharacterBack}
-        open={characterDetailsOpen}
-        onOpenChange={setCharacterDetailsOpen}
-      />
-    </>
-  );
-}
-
+/** Active deck setup (UVS: starting character; Cyberpunk: Legends), rendered by the game module. */
 export function ActiveDeckCharacterPanel() {
+  const { DeckSetupPanel } = useGameModule().ui;
+  const { activeDeck, setup, getCard, onChange } = useActiveDeckCharacterPanelModel();
+
   return (
-    <ActiveDeckCharacterPanelProvider>
-      <ActiveDeckCharacterPanelContent />
-    </ActiveDeckCharacterPanelProvider>
+    <DeckSetupPanel
+      variant="sidebar"
+      setup={setup}
+      getCard={getCard}
+      onChange={onChange}
+      mainQuantities={activeDeck?.mainQuantities}
+      deckName={activeDeck?.name}
+      deckDescription={activeDeck?.description}
+    />
   );
 }

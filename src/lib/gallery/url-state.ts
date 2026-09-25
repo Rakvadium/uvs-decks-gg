@@ -52,6 +52,9 @@ function getGalleryParamKeys(definition: GameFilterDefinition): GalleryParamKeys
     "keywords",
     ...definition.zoneParamOrder,
     "abilityTiming",
+    // Facet params only exist for games that declare the facet (UVS URLs are unchanged).
+    ...(definition.facets.colors ? ["colors"] : []),
+    ...(definition.facets.tags ? ["tags"] : []),
   ] as ArrayKey[];
   const numberKeys = statRangeParamKeys(definition) as NumberKey[];
   const statKeys = [...definition.statParamOrder] as StatKey[];

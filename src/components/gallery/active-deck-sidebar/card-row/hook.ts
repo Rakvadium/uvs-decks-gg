@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { canAddCardToSection, canMoveCardToSection } from "@/lib/deck";
 import { useIsMobile } from "@/hooks/useIsMobile";
+import { useGameModule } from "@/games/game-context";
 import {
   DECK_SECTION_KEYS,
   type DeckSection,
@@ -21,6 +22,7 @@ export function useActiveDeckCardRowModel({ card, count, sectionKey }: ActiveDec
     removeCard,
     sectionCounts,
   } = useActiveDeckSectionsContext();
+  const gameDeck = useGameModule().deck;
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const dragBlockRef = useRef(false);
@@ -30,6 +32,7 @@ export function useActiveDeckCardRowModel({ card, count, sectionKey }: ActiveDec
     cardId: card._id,
     section: sectionKey,
     counts: sectionCounts,
+    rules: gameDeck,
   });
 
   const moveTargets = useMemo(
@@ -74,6 +77,7 @@ export function useActiveDeckCardRowModel({ card, count, sectionKey }: ActiveDec
       fromSection: sectionKey,
       toSection: target,
       counts: sectionCounts,
+      rules: gameDeck,
     });
   };
 

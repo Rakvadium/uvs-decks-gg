@@ -7,7 +7,6 @@ import { Badge } from "@/components/ui/badge";
 import { Kicker, SectionHeading } from "@/components/ui/typography-headings";
 import { cn } from "@/lib/utils";
 import { useDeckGridItemContext } from "../context";
-import { MAIN_DECK_TARGET } from "../hook";
 import { VisibilityGlyph } from "./shared";
 
 const TILE_SURFACE =
@@ -19,6 +18,8 @@ export function DeckRowItem() {
     displayImage,
     displayName,
     startingCharacterName,
+    emptySetupLabel,
+    mainTarget,
     visibility,
     coverImagePriority,
     counts,
@@ -70,7 +71,7 @@ export function DeckRowItem() {
               {displayName}
             </SectionHeading>
             <span className="mt-0.5 flex min-w-0 items-center gap-1.5 text-xs text-muted-foreground">
-              <span className="truncate">{startingCharacterName ?? "No character selected"}</span>
+              <span className="truncate">{startingCharacterName ?? emptySetupLabel}</span>
               {showAuthor ? (
                 <>
                   <span aria-hidden className="text-border">
@@ -91,7 +92,7 @@ export function DeckRowItem() {
               <Layers className="h-3 w-3 text-muted-foreground" />
               <span className="text-xs font-bold leading-none tabular-nums">
                 {counts.main}
-                <span className="font-medium text-muted-foreground">/{MAIN_DECK_TARGET}</span>
+                <span className="font-medium text-muted-foreground">/{mainTarget}</span>
               </span>
               {counts.side > 0 ? (
                 <span className="inline-flex items-center gap-0.5 border-l border-border/40 pl-1.5 text-xs leading-none tabular-nums text-muted-foreground">

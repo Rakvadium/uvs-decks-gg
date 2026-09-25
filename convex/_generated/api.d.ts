@@ -11,6 +11,7 @@
 import type * as ResendOTPPasswordReset from "../ResendOTPPasswordReset.js";
 import type * as accountStatusExpiry from "../accountStatusExpiry.js";
 import type * as admin from "../admin.js";
+import type * as adminCardImagesHttp from "../adminCardImagesHttp.js";
 import type * as adminHttp from "../adminHttp.js";
 import type * as adminUsers from "../adminUsers.js";
 import type * as auth from "../auth.js";
@@ -110,6 +111,7 @@ declare const fullApi: ApiFromModules<{
   ResendOTPPasswordReset: typeof ResendOTPPasswordReset;
   accountStatusExpiry: typeof accountStatusExpiry;
   admin: typeof admin;
+  adminCardImagesHttp: typeof adminCardImagesHttp;
   adminHttp: typeof adminHttp;
   adminUsers: typeof adminUsers;
   auth: typeof auth;

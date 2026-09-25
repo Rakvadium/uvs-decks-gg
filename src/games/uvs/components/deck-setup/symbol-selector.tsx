@@ -1,23 +1,28 @@
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { useActiveDeckCharacterPanelContext } from "./context";
-import { useGameModule } from "@/games/game-context";
+import { SymbolBadge } from "../symbol-icon/symbol-badge";
+import { SymbolIcon } from "../symbol-icon/symbol-icon";
 
-export function ActiveDeckCharacterSymbolSelector() {
-  const { SymbolBadge, SymbolIcon } = useGameModule().ui;
-  const {
-    characterSymbols,
-    selectedSymbol,
-    setSymbolOpen,
-    symbolOpen,
-    handleSelectSymbol,
-    startingCharacter,
-  } = useActiveDeckCharacterPanelContext();
+interface UvsSetupSymbolSelectorProps {
+  characterSymbols: string[];
+  selectedSymbol: string | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSelectSymbol: (symbol: string) => void;
+}
 
-  if (!startingCharacter || characterSymbols.length === 0) return null;
+/** Identity symbol corner button + popover (hero and sidebar share the same markup). */
+export function UvsSetupSymbolSelector({
+  characterSymbols,
+  selectedSymbol,
+  open,
+  onOpenChange,
+  onSelectSymbol,
+}: UvsSetupSymbolSelectorProps) {
+  if (characterSymbols.length === 0) return null;
 
   return (
-    <Popover open={symbolOpen} onOpenChange={setSymbolOpen}>
+    <Popover open={open} onOpenChange={onOpenChange}>
       <PopoverTrigger asChild>
         <button
           type="button"
@@ -40,7 +45,7 @@ export function ActiveDeckCharacterSymbolSelector() {
               key={symbol}
               symbol={symbol}
               selected={selectedSymbol === symbol}
-              onClick={() => handleSelectSymbol(symbol)}
+              onClick={() => onSelectSymbol(symbol)}
             />
           ))}
         </div>

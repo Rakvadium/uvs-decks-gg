@@ -12,9 +12,14 @@ import { GalleryMobileFilterNavProvider, useGalleryMobileFilterNav } from "./con
 import { GalleryMobileFilterDisplayProvider, type GalleryMobileFilterDisplayOverride } from "./display-context";
 import { GalleryMobileFilterFooter } from "./footer";
 import { GalleryMobileFilterHeader } from "./header";
-import { GalleryMobileFilterKeywordsPage, GalleryMobileFilterSetsPage } from "./picker-page";
+import {
+  GalleryMobileFilterKeywordsPage,
+  GalleryMobileFilterSetsPage,
+  GalleryMobileFilterTagsPage,
+} from "./picker-page";
 import {
   GalleryFilterRarityPage,
+  GalleryMobileFilterColorsPage,
   GalleryMobileFilterFormatPage,
   GalleryMobileFilterRootPage,
   GalleryMobileFilterSymbolsPage,
@@ -39,6 +44,8 @@ function ActivePage() {
   if (page === "type") return <GalleryMobileFilterTypePage />;
   if (page === "symbols") return <GalleryMobileFilterSymbolsPage />;
   if (page === "keywords") return <GalleryMobileFilterKeywordsPage />;
+  if (page === "colors") return <GalleryMobileFilterColorsPage />;
+  if (page === "tags") return <GalleryMobileFilterTagsPage />;
   if (page === "stats") return <GalleryMobileFilterStatsPage />;
   if (page === "rarity") return <GalleryFilterRarityPage />;
   return <GalleryMobileFilterRootPage />;
@@ -48,7 +55,7 @@ function GalleryMobileFilterSheetBody({ open, onOpenChange }: GalleryMobileFilte
   const { page, direction, reset } = useGalleryMobileFilterNav();
   const close = () => onOpenChange(false);
   const { panelRef, resetTranslate, grabberProps } = useGrabberDismiss(close);
-  const scrollsInside = page === "sets" || page === "keywords";
+  const scrollsInside = page === "sets" || page === "keywords" || page === "tags";
 
   useEffect(() => {
     if (!open) {

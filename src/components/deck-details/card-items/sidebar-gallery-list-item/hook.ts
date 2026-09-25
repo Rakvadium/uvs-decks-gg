@@ -1,6 +1,7 @@
 import { useCallback, useRef } from "react";
 import { canAddCardToSection, useDeckEditor } from "@/lib/deck";
 import { useTcgDraggable } from "@/lib/dnd";
+import { useGameModule } from "@/games/game-context";
 import { useCardDetailsDialogTrigger, useDeckSectionCounts, useDragClickGuard } from "../hooks";
 import type { SidebarGalleryListItemProps } from "./types";
 
@@ -8,6 +9,7 @@ export function useSidebarGalleryListItemModel(props: SidebarGalleryListItemProp
   const { card, backCard, onHoverCard, onClearHover } = props;
   const { addCard, getCardCount, removeCard } = useDeckEditor();
   const sectionCounts = useDeckSectionCounts();
+  const gameDeck = useGameModule().deck;
   const { isDialogOpen, setIsDialogOpen, openDialog, handleKeyDownOpen } = useCardDetailsDialogTrigger();
 
   const dragPreviewImageRef = useRef<HTMLImageElement | null>(null);
@@ -30,6 +32,7 @@ export function useSidebarGalleryListItemModel(props: SidebarGalleryListItemProp
     cardId: card._id,
     section: "main",
     counts: sectionCounts,
+    rules: gameDeck,
   });
 
   return {

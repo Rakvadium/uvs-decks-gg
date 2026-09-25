@@ -1,6 +1,12 @@
-import type { DeckAddableCard, DeckSection } from "../deck";
+import type { DeckAddableCard, DeckSection, SharedGameDeckModule } from "../deck";
 
 export type { DeckAddableCard, DeckSection };
+
+/**
+ * Per-game card rules the section helpers apply (pass `module.deck`). Defaults to UVS so existing
+ * callers keep their behavior.
+ */
+export type DeckCardRules = Pick<SharedGameDeckModule, "isMainDeckEligible" | "getCardCopyLimit">;
 
 /** UVS: only cards with numeric difficulty and check (control) may be put in a deck. */
 export function canAddCardToDeck(card: DeckAddableCard | null | undefined): boolean {
@@ -40,18 +46,24 @@ export function getCardSectionCounts(cardId: string, counts: DeckSectionCounts):
   return { main, side, reference, mainSide, total };
 }
 
+const UVS_CARD_RULES: DeckCardRules = {
+  isMainDeckEligible: canAddCardToDeck,
+  getCardCopyLimit,
+};
+
 export function canAddCardToSection(params: {
   card: DeckAddableCard | null | undefined;
   cardId: string;
   section: DeckSection;
   counts: DeckSectionCounts;
   quantity?: number;
+  rules?: DeckCardRules;
 }): boolean {
-  const { card, cardId, section, counts, quantity } = params;
-  if (!canAddCardToDeck(card)) return false;
+  const { card, cardId, section, counts, quantity, rules = UVS_CARD_RULES } = params;
+  if (!rules.isMainDeckEligible(card)) return false;
   if (section === "reference") return true;
 
-  const limit = getCardCopyLimit(card);
+  const limit = rules.getCardCopyLimit(card);
   const { mainSide } = getCardSectionCounts(cardId, counts);
   const addQuantity = Math.max(1, quantity ?? 1);
   return mainSide + addQuantity <= limit;
@@ -64,14 +76,15 @@ export function canMoveCardToSection(params: {
   toSection: DeckSection;
   counts: DeckSectionCounts;
   quantity?: number;
+  rules?: DeckCardRules;
 }): boolean {
-  const { card, cardId, fromSection, toSection, counts, quantity } = params;
+  const { card, cardId, fromSection, toSection, counts, quantity, rules = UVS_CARD_RULES } = params;
   if (fromSection === toSection) return true;
-  if (!canAddCardToDeck(card)) return false;
+  if (!rules.isMainDeckEligible(card)) return false;
   if (toSection === "reference") return true;
   if (fromSection !== "reference") return true;
 
-  const limit = getCardCopyLimit(card);
+  const limit = rules.getCardCopyLimit(card);
   const { mainSide } = getCardSectionCounts(cardId, counts);
   const moveQuantity = Math.max(1, quantity ?? 1);
   return mainSide + moveQuantity <= limit;

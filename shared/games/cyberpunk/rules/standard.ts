@@ -28,6 +28,23 @@ function nameKey(name: string): string {
   return name.trim().toLowerCase();
 }
 
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+/**
+ * A Legend's name without its version subtitle ("V: Streetkid" / "V, Streetkid" → "v"), so two
+ * versions of the same character count as the same name.
+ */
+export function cyberpunkLegendNameKey(card: Pick<DeckRuleCard, "name" | "subname">): string {
+  const subname = card.subname?.trim();
+  if (subname) {
+    const stripped = card.name.replace(new RegExp(`\\s*[:,—–-]\\s*${escapeRegExp(subname)}\\s*$`, "i"), "");
+    if (stripped.trim()) return nameKey(stripped);
+  }
+  return nameKey(card.name);
+}
+
 /** Printings of one card share `oracleId`; without one, cards with the same name are grouped. */
 export function cyberpunkCopyGroupKey(card: Pick<DeckRuleCard, "oracleId" | "name">): string {
   const oracle = card.oracleId?.trim();
@@ -97,7 +114,7 @@ export function validateCyberpunk<TCard extends DeckRuleCard>(
       });
       continue;
     }
-    const key = nameKey(legend.name);
+    const key = cyberpunkLegendNameKey(legend);
     if (seenLegendNames.has(key)) {
       errors.push({
         code: "DUPLICATE_LEGEND_NAME",

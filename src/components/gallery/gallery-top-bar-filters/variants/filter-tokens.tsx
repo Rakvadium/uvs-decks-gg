@@ -13,6 +13,10 @@ import {
   type ActiveFilterToken,
 } from "./use-active-filter-tokens";
 import { useGameModule } from "@/games/game-context";
+import {
+  ColorFacetSwatch,
+  colorFacetLabel,
+} from "@/components/gallery/mobile-filter-sheet/color-facet-chips";
 
 const TOKEN_PAGE: Record<string, GalleryMobileFilterPage> = {
   format: "format",
@@ -22,6 +26,8 @@ const TOKEN_PAGE: Record<string, GalleryMobileFilterPage> = {
   type: "type",
   symbols: "symbols",
   keywords: "keywords",
+  colors: "colors",
+  tags: "tags",
   stats: "stats",
   rarity: "rarity",
 };
@@ -122,6 +128,29 @@ function TokenSymbolIcons({
   );
 }
 
+function TokenColorSwatches({ values }: { values: string[] }) {
+  const options = useGameModule().filters.facets.colors;
+
+  return (
+    <span className="flex shrink-0 items-center gap-1">
+      {values.map((value) => {
+        const swatch = options?.find((option) => option.value === value)?.swatch;
+        const label = colorFacetLabel(options, value);
+        return swatch ? (
+          <span key={value} title={label} className="flex items-center">
+            <ColorFacetSwatch swatch={swatch} />
+            <span className="sr-only">{label}</span>
+          </span>
+        ) : (
+          <span key={value} className="text-[11px] leading-none text-primary">
+            {label}
+          </span>
+        );
+      })}
+    </span>
+  );
+}
+
 function TokenContent({ token }: { token: ActiveFilterToken }) {
   const { getCardTypeColor, getKeywordColor } = useGameModule().ui;
   const { filters } = useGalleryFilterDialogContext();
@@ -142,6 +171,10 @@ function TokenContent({ token }: { token: ActiveFilterToken }) {
     return <TokenColorChips values={filters.keywords ?? []} getColor={getKeywordColor} />;
   }
 
+  if (token.id === "colors") {
+    return <TokenColorSwatches values={filters.colors ?? []} />;
+  }
+
   if (token.id === "symbols") {
     return (
       <TokenSymbolIcons
@@ -151,7 +184,7 @@ function TokenContent({ token }: { token: ActiveFilterToken }) {
     );
   }
 
-  if (token.id === "sets" || token.id === "stats" || token.id === "rarity") {
+  if (token.id === "sets" || token.id === "stats" || token.id === "rarity" || token.id === "tags") {
     const selectedLabel = token.count === 1 ? "1 selected" : `${token.count} selected`;
     return (
       <span className="min-w-0 truncate text-[11px] leading-none text-primary">

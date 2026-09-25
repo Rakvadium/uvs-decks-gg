@@ -31,7 +31,7 @@ export type CardNameIndex<TCard extends NamedCard> = {
   normalized: Map<string, TCard[]>;
 };
 
-function normalizeCardLookupKey(name: string) {
+export function normalizeCardLookupKey(name: string) {
   return name
     .toLowerCase()
     .normalize("NFKD")

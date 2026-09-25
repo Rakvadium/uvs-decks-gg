@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { canAddCardToSection, useDeckEditor } from "@/lib/deck";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useDeckEditor } from "@/lib/deck";
+import { useGameModule } from "@/games/game-context";
 import { useTcgDraggable } from "@/lib/dnd";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { usePrefersReducedMotion } from "@/lib/reduced-motion";
@@ -30,8 +31,8 @@ export function useCardGridItem({
     removeCard,
     mainCounts,
     sideCounts,
-    referenceCounts,
   } = useDeckEditor();
+  const { deck: deckRules } = useGameModule();
   const dragPreviewImageRef = useRef<HTMLImageElement | null>(null);
   const { isDragging, dragHandleProps } = useTcgDraggable({
     card,
@@ -42,17 +43,11 @@ export function useCardGridItem({
   const dragBlockRef = useRef(false);
   const deckCount = getCardCount(card._id);
 
-  const sectionCounts = useMemo(
-    () => ({ mainCounts, sideCounts, referenceCounts }),
-    [mainCounts, sideCounts, referenceCounts]
-  );
-
-  const canAddToDeck = canAddCardToSection({
-    card,
-    cardId: card._id,
-    section: "main",
-    counts: sectionCounts,
-  });
+  // Main-deck add: the game's eligibility + copy limit over main + side (UVS: same rules as
+  // `canAddCardToSection(..., "main")`).
+  const mainSideCount = (mainCounts[card._id] ?? 0) + (sideCounts[card._id] ?? 0);
+  const canAddToDeck =
+    deckRules.isMainDeckEligible(card) && mainSideCount + 1 <= deckRules.getCardCopyLimit(card);
 
   const hasBackCardId = Boolean(card.backCardId);
   const hasBackCardData = Boolean(backCard);

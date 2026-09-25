@@ -140,6 +140,31 @@ section); lines before any heading are main deck. `ParsedDeckText.setupCards` ho
   no zones; facets `colors` (4 options with swatches) and `tags`; UVS symbols / zones / keywords /
   card flags hidden.
 
+Filter state (`CardFilters`, stored per game) adds `colors: string[]` (lowercase option values) and
+`tags: string[]` (`FacetFilterFields`) plus the `cost`/`power`/`ram` rule + `Min`/`Max` range keys
+(`CyberpunkStatFilterFields`). URL params `colors=red,blue`, `tags=Merc`, `cost=lte:3`, `costMin=1`
+are only read/written for games whose definition declares the facet, so UVS URLs are unchanged.
+`filterCards` applies them via `compileFacetFilter` (any-of, case-insensitive; tags split on `|`);
+`sortCards` sorts by the sortable stats. Picker values: `getUniqueValues(cards, definition)` returns
+catalog `tags` / `colors`; `keywords` come from `definition.keywordOptions` (UVS curated list) or,
+when omitted (Cyberpunk), from the catalog. The filter dialog, desktop filter panel, mobile sheet,
+top-bar tokens and active chips read `facets` to show Colors / Tags and hide Symbols / Keywords.
+
+## Client UI (`src/games/cyberpunk/ui.ts`)
+
+- `CardGridItem` = the shared `CardGridItemShell` (`src/components/card/grid-item/**`: frame, flip,
+  drag, deck +/- via `module.deck.isMainDeckEligible` / `getCardCopyLimit`) with the Cyberpunk face.
+- `CardImageDisplay` renders the image, or `CyberpunkCardTextFrame` when `imageUrl` is missing /
+  not absolute (color stripe, cost hex, RAM chip, name/subname, type + color, rules excerpt, tags,
+  Eddie coin, PWR). Pass `card` (optional extra prop) for the full frame; name-only otherwise.
+- `CardDetailsDialog` / `CardDetailsContent`: art or text frame, readout (type / color / sellable /
+  rarity chips, Cost / Power / RAM, keywords, rules text with `{Play}`-style tokens as badges and
+  reminder text muted, tags, set + collector, artist, per-format legality), main-deck -/+ bar or the
+  module's `CardSetupAction` for Legends.
+- Symbols are color pips (`getSymbolPath` → `null`); `getCardTypeColor` / `formatCardType` /
+  `getSymbolColor` in `config.ts` (hex derived from `CYBERPUNK_COLOR_SWATCHES`).
+- Remote card images need their host in `next.config.ts` `images.remotePatterns`.
+
 ## Card data source
 
 Card data is imported from the official site's card database (cyberpunktcg.com/cards embeds
@@ -153,12 +178,9 @@ then `rebuild-catalog-aggregates` with `{ "game": "cyberpunk" }`). Seed the form
 
 ## Open items for wave B (UI)
 
-- Real `ui` for `src/games/cyberpunk` (text-frame card rendering when there is no image, Legend
-  picker for 3 slots, color/tag facet pickers reading `filters.facets`, cost/power/RAM stats,
-  deck stats palette).
-- UVS-only setup UI still renders for every game via `uvsSetupFields(...)` (hero panel, active deck
-  character panel, import/export) — replace with per-game setup UI.
-- Import/export UI must pass `setupCards` (Legends) to `text.format` and read `parsed.setupCards`.
-- `CardFilters` / URL state / `sessions.galleryFilters` only know UVS keys; add `color`, `tags`,
-  `cost`/`power`/`ram` stat keys.
+- Done (wave B2, `src/games/cyberpunk/components/deck/**`): Legend slots + picker (Legend cards only,
+  search, color filter, duplicate names / full slots disabled), RAM budget summary per color
+  (`ram-budget-model.ts`), "Set As Legend" card action, Legend avatars on deck tiles, stats (cost curve,
+  colors, card types), import/export via `setupCards` (`deckSetup.importPatch`), Legend → main deck
+  offers "Add as Legend". Tests: `tests/cyberpunk-deck-setup-ui.test.ts`.
 - Admin card form / draft review don't expose the new columns yet.

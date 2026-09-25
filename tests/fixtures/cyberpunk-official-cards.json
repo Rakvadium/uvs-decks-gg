@@ -1,0 +1,265 @@
+[
+  {
+    "id": "81a8dec7-9541-4020-93e1-7d798a57dcbc",
+    "external_id": "cb-v-streetkid",
+    "name": "V",
+    "subname": "Streetkid",
+    "display_name": "V: Streetkid",
+    "slug": "v-streetkid",
+    "canonical_name": "V — Streetkid",
+    "canonical_base_name": "V",
+    "rules_text": "{Call} Trash 3. Then, add 1 BRAINDANCE Program from your trash to your hand.\n{Go Solo} (Pay this Legend's cost to play it as a ready Unit. It can attack this turn. If it leaves the field, remove it from the game.)",
+    "official_rules_text_en": "{Call} Trash 3. Then, add 1 BRAINDANCE Program from your trash to your hand.\n{Go Solo} (Pay this Legend's cost to play it as a ready Unit. It can attack this turn. If it leaves the field, remove it from the game.)",
+    "printed_rules_text": "{Call} Trash 3. Then, add 1 BRAINDANCE Program from your trash to your hand.\n{Go Solo} (Pay this Legend's cost to play it as a ready Unit. It can attack this turn. If it leaves the field, remove it from the game.)",
+    "official_rules_text": "{Call} Trash 3. Then, add 1 BRAINDANCE Program from your trash to your hand.\n{Go Solo} (Pay this Legend's cost to play it as a ready Unit. It can attack this turn. If it leaves the field, remove it from the game.)",
+    "language": "en",
+    "flavor_text": null,
+    "printing_id": "3fc63c58-5954-4744-a5af-047bfc5cb159",
+    "set": {
+      "code": "welcometonightcityretail",
+      "name": "Welcome to Night City — Retail"
+    },
+    "rarity": "Rare",
+    "image_url": "https://dstcynss47vun.cloudfront.net/prod/cyberpunk/portal/3fc63c58-5954-4744-a5af-047bfc5cb159/render-mq9zzfnq.webp?Expires=1790368300&Key-Pair-Id=K3SGRHESIHQPEW&Signature=P5cyykLY817WukozvME2EG9E141l2U4Ndl6fow9V3NtKVIfQXdGQg-9Aygg5WWRpLbDiliZ~8rIWaZUxz4lHwOOOT8aenKiOtWIuYe8Q7etV8tVfHPhBDrieWZNS1Lgu6PygNYgxb1X-~NKNvUm~aSgVNxTbWi1ipSh3dBfVRfFDI9uQtWBjFo1rTE1Ey-0wYK-22-72giO5a9dhYQyiskGOl7A6hZ7cioMmtPlJw8g-Cl4IFcc9dD8a5JmwrOOENpqbHTQl1YAwDqsQDAIj3Oh2USup3zPeR10uq5PAztH5axK~tIZoJE4sEfnDaglRTCUVVP8s3wTlBWHXp8u-rA__",
+    "source_image_url": "https://dstcynss47vun.cloudfront.net/prod/cyberpunk/portal/3fc63c58-5954-4744-a5af-047bfc5cb159/render-mq9zzfnq.webp",
+    "color": "Red",
+    "card_type": "Legend",
+    "is_eddiable": true,
+    "classifications": [
+      "Merc"
+    ],
+    "keywords": [],
+    "cost": 5,
+    "power": 6,
+    "ram": 2,
+    "artist": "Olgierd Ciszak",
+    "print_number": "005a",
+    "printings": [
+      {
+        "id": "3fc63c58-5954-4744-a5af-047bfc5cb159",
+        "collector_number": "005a",
+        "image_url": "https://dstcynss47vun.cloudfront.net/prod/cyberpunk/portal/3fc63c58-5954-4744-a5af-047bfc5cb159/render-mq9zzfnq.webp?Expires=1&Signature=fixture",
+        "source_image_url": "https://dstcynss47vun.cloudfront.net/prod/cyberpunk/portal/3fc63c58-5954-4744-a5af-047bfc5cb159/render-mq9zzfnq.webp",
+        "set": {
+          "code": "welcometonightcityretail",
+          "name": "Welcome to Night City — Retail"
+        },
+        "rarity": "Rare",
+        "finish": null,
+        "artist": "Olgierd Ciszak",
+        "language": "en",
+        "localized_name": null,
+        "printed_rules_text": "{Call} Trash 3. Then, add 1 BRAINDANCE Program from your trash to your hand.\n{Go Solo} (Pay this Legend's cost to play it as a ready Unit. It can attack this turn. If it leaves the field, remove it from the game.)",
+        "official_rules_text": "{Call} Trash 3. Then, add 1 BRAINDANCE Program from your trash to your hand.\n{Go Solo} (Pay this Legend's cost to play it as a ready Unit. It can attack this turn. If it leaves the field, remove it from the game.)"
+      },
+      {
+        "id": "79119e83-b50b-4a79-8a6c-f496d9ed7ef6",
+        "collector_number": "β005a",
+        "image_url": "https://dstcynss47vun.cloudfront.net/prod/cyberpunk/portal/79119e83-b50b-4a79-8a6c-f496d9ed7ef6/render-mpu5tt66.webp?Expires=1&Signature=fixture",
+        "source_image_url": "https://dstcynss47vun.cloudfront.net/prod/cyberpunk/portal/79119e83-b50b-4a79-8a6c-f496d9ed7ef6/render-mpu5tt66.webp",
+        "set": {
+          "code": "welcometonightcitybeta",
+          "name": "Welcome to Night City — Beta"
+        },
+        "rarity": "Rare",
+        "finish": null,
+        "artist": "Olgierd Ciszak",
+        "language": "en",
+        "localized_name": null,
+        "printed_rules_text": "{Call} Trash 3. Then, add 1 BRAINDANCE Program from your trash to your hand.\n{Go Solo} (Pay this Legend's cost to play it as a ready Unit. It can attack this turn. If it leaves the field, remove it from the game.)",
+        "official_rules_text": "{Call} Trash 3. Then, add 1 BRAINDANCE Program from your trash to your hand.\n{Go Solo} (Pay this Legend's cost to play it as a ready Unit. It can attack this turn. If it leaves the field, remove it from the game.)"
+      },
+      {
+        "id": "1c3de235-c8a3-4d05-8f8a-7e9c12b799b2",
+        "collector_number": "005a",
+        "image_url": "https://dstcynss47vun.cloudfront.net/prod/cyberpunk/portal/1c3de235-c8a3-4d05-8f8a-7e9c12b799b2/render-3f02ba0a-4a45-4fcc-a529-74e37f8c4bdd.webp?Expires=1&Signature=fixture",
+        "source_image_url": "https://dstcynss47vun.cloudfront.net/prod/cyberpunk/portal/1c3de235-c8a3-4d05-8f8a-7e9c12b799b2/render-3f02ba0a-4a45-4fcc-a529-74e37f8c4bdd.webp",
+        "set": {
+          "code": "welcometonightcityretail-fr",
+          "name": "Welcome to Night City — Retail — FR"
+        },
+        "rarity": "Rare",
+        "finish": null,
+        "artist": "Olgierd Ciszak",
+        "language": "fr",
+        "localized_name": "V — Gosse Des Rues",
+        "printed_rules_text": "{Call} Jetez 3. Puis, ajoutez un Programme BRAINDANCE de votre défausse à votre main.\n{Go Solo} (Payez le coût de cette Légende pour la jouer comme une Unité préparée. Elle peut attaquer ce tour-ci. Si elle quitte le terrain, retirez-la de la partie.)",
+        "official_rules_text": null
+      }
+    ],
+    "selected_printing_id": "3fc63c58-5954-4744-a5af-047bfc5cb159",
+    "legalities": {
+      "standard": "legal"
+    },
+    "legality": "legal"
+  },
+  {
+    "id": "28198e04-60e2-4f81-9786-903a9a947d7a",
+    "external_id": "cb-mantis-blades",
+    "name": "Mantis Blades",
+    "subname": null,
+    "display_name": "Mantis Blades",
+    "slug": "mantis-blades",
+    "canonical_name": "Mantis Blades",
+    "canonical_base_name": "Mantis Blades",
+    "rules_text": "(Equip to a friendly Unit or face-up Legend.)\n\"One cut, one kill.\"",
+    "official_rules_text_en": "(Equip to a friendly Unit or face-up Legend.)\n\"One cut, one kill.\"",
+    "printed_rules_text": "(Equip to a friendly Unit or face-up Legend.)\n\"One cut, one kill.\"",
+    "official_rules_text": "(Equip to a friendly Unit or face-up Legend.)\n\"One cut, one kill.\"",
+    "language": "en",
+    "flavor_text": null,
+    "printing_id": "7ffa8ba4-f187-4ba0-a719-fa8ebf45a03b",
+    "set": {
+      "code": "welcometonightcityretail",
+      "name": "Welcome to Night City — Retail"
+    },
+    "rarity": "Common",
+    "image_url": "https://dstcynss47vun.cloudfront.net/prod/cyberpunk/portal/7ffa8ba4-f187-4ba0-a719-fa8ebf45a03b/render-mpvmwraw.webp?Expires=1790368300&Key-Pair-Id=K3SGRHESIHQPEW&Signature=PtNODXMz6H1oc4Tq9dLiaNS-lhI6yLgvxkp3EzEGVxO4uPdw~3I3eipPLVv2Uw-HflT54X~ANFlGNzqUqzK~XW2YQdK7ulRF0JjIqZmOMMYATLtTtcWu2TybYlR7aEGygzKz6O0pgThyg8sUSPkJ4yEu3ZRgWkDxFteIV0oEoTheny2-ZSt7J6LsrwypSiYt-MsR4KxDVGLa0KL25-32~KR47Zj3ZvdEZWU9tK8JKVCBPQVBnlYZu0S0ZMiUZ46HgaaJT-ZYBbcO590zRezfr5BQ5~XONbqnJBNyczbyowEF9P-7BfQ6nl5pQ0aCWIdoUjrk-eapwKLGuAWn6uRYVw__",
+    "source_image_url": "https://dstcynss47vun.cloudfront.net/prod/cyberpunk/portal/7ffa8ba4-f187-4ba0-a719-fa8ebf45a03b/render-mpvmwraw.webp",
+    "color": "Red",
+    "card_type": "Gear",
+    "is_eddiable": true,
+    "classifications": [
+      "Cyberware"
+    ],
+    "keywords": [],
+    "cost": 1,
+    "power": 2,
+    "ram": 1,
+    "artist": "Ricardo Padierne Silvera",
+    "print_number": "025",
+    "printings": [
+      {
+        "id": "7ffa8ba4-f187-4ba0-a719-fa8ebf45a03b",
+        "collector_number": "025",
+        "image_url": "https://dstcynss47vun.cloudfront.net/prod/cyberpunk/portal/7ffa8ba4-f187-4ba0-a719-fa8ebf45a03b/render-mpvmwraw.webp?Expires=1&Signature=fixture",
+        "source_image_url": "https://dstcynss47vun.cloudfront.net/prod/cyberpunk/portal/7ffa8ba4-f187-4ba0-a719-fa8ebf45a03b/render-mpvmwraw.webp",
+        "set": {
+          "code": "welcometonightcityretail",
+          "name": "Welcome to Night City — Retail"
+        },
+        "rarity": "Common",
+        "finish": null,
+        "artist": "Ricardo Padierne Silvera",
+        "language": "en",
+        "localized_name": null,
+        "printed_rules_text": "(Equip to a friendly Unit or face-up Legend.)\n\"One cut, one kill.\"",
+        "official_rules_text": "(Equip to a friendly Unit or face-up Legend.)\n\"One cut, one kill.\""
+      },
+      {
+        "id": "84278f23-7323-47d2-b639-23edd76f87ae",
+        "collector_number": "β025",
+        "image_url": "https://dstcynss47vun.cloudfront.net/prod/cyberpunk/portal/84278f23-7323-47d2-b639-23edd76f87ae/render-mpvjtx4h.webp?Expires=1&Signature=fixture",
+        "source_image_url": "https://dstcynss47vun.cloudfront.net/prod/cyberpunk/portal/84278f23-7323-47d2-b639-23edd76f87ae/render-mpvjtx4h.webp",
+        "set": {
+          "code": "welcometonightcitybeta",
+          "name": "Welcome to Night City — Beta"
+        },
+        "rarity": "Common",
+        "finish": null,
+        "artist": "Ricardo Padierne Silvera",
+        "language": "en",
+        "localized_name": null,
+        "printed_rules_text": "(Equip to a friendly Unit or face-up Legend.)\n\"One cut, one kill.\"",
+        "official_rules_text": "(Equip to a friendly Unit or face-up Legend.)\n\"One cut, one kill.\""
+      },
+      {
+        "id": "776e4925-c3fe-4486-889b-47508bfe2281",
+        "collector_number": "025",
+        "image_url": "https://dstcynss47vun.cloudfront.net/prod/cyberpunk/portal/776e4925-c3fe-4486-889b-47508bfe2281/render-091fcf51-4d69-4ba1-b76a-7f9f9fd36e0d.webp?Expires=1&Signature=fixture",
+        "source_image_url": "https://dstcynss47vun.cloudfront.net/prod/cyberpunk/portal/776e4925-c3fe-4486-889b-47508bfe2281/render-091fcf51-4d69-4ba1-b76a-7f9f9fd36e0d.webp",
+        "set": {
+          "code": "welcometonightcityretail-fr",
+          "name": "Welcome to Night City — Retail — FR"
+        },
+        "rarity": "Common",
+        "finish": null,
+        "artist": "Ricardo Padierne Silvera",
+        "language": "fr",
+        "localized_name": "Lames Mantis",
+        "printed_rules_text": "(Équipez à une Unité alliée ou une Légende alliée face visible.)\n« Un coup de lame, un mort. »",
+        "official_rules_text": null
+      }
+    ],
+    "selected_printing_id": "7ffa8ba4-f187-4ba0-a719-fa8ebf45a03b",
+    "legalities": {
+      "standard": "legal"
+    },
+    "legality": "legal"
+  },
+  {
+    "id": "4acee220-f0ae-4bdc-85c9-f8e70ba99673",
+    "external_id": "cb-rebecca-having-a-moment",
+    "name": "Rebecca",
+    "subname": "Having a Moment",
+    "display_name": "Rebecca: Having a Moment",
+    "slug": "rebecca-having-a-moment",
+    "canonical_name": "Rebecca — Having a Moment",
+    "canonical_base_name": "Rebecca",
+    "rules_text": null,
+    "official_rules_text_en": null,
+    "printed_rules_text": null,
+    "official_rules_text": null,
+    "language": "en",
+    "flavor_text": null,
+    "printing_id": "71a35836-e604-4d98-ab56-58bfb4581033",
+    "set": {
+      "code": "PRM01",
+      "name": "Set 1 Promos"
+    },
+    "rarity": "Nova Rare",
+    "image_url": "https://dstcynss47vun.cloudfront.net/prod/cyberpunk/portal/71a35836-e604-4d98-ab56-58bfb4581033/render-msyihf1e.webp?Expires=1790368300&Key-Pair-Id=K3SGRHESIHQPEW&Signature=eUzet~cWP-27TT6IgYyrdQXCb-cDzS58nIdf-EhOcA416BBuMVPiZREV8sWi4EHDde4q6-DBRntyc~OvAUUJY9rENAZbVZc9wslLXKE1n2B4BaN5wUsmyWMkW95VCPj8AmvDuS~T6iKzCdQosXgBXvNk1NRtnjUoBZP9LjKC8opYvJFxghCxqOcmjI5xsdRS4lRi1DuUCAdSj0swECGhhmafP79iEuZw~-t9GiZ5pa20PHSuUC75Ztn9irlgctpPvyDZVJvZPRLF4-HzcRlguA2Z9jLn7PpXekjYMpKEmxDyWF366KOslQhIF2b9NvPbHMIXSIwjdMh8cXwyV1IJGQ__",
+    "source_image_url": "https://dstcynss47vun.cloudfront.net/prod/cyberpunk/portal/71a35836-e604-4d98-ab56-58bfb4581033/render-msyihf1e.webp",
+    "color": "Red",
+    "card_type": "Legend",
+    "is_eddiable": false,
+    "classifications": [],
+    "keywords": [],
+    "cost": null,
+    "power": null,
+    "ram": null,
+    "artist": "Narupiti Harunsong",
+    "print_number": "005",
+    "printings": [
+      {
+        "id": "71a35836-e604-4d98-ab56-58bfb4581033",
+        "collector_number": "005",
+        "image_url": "https://dstcynss47vun.cloudfront.net/prod/cyberpunk/portal/71a35836-e604-4d98-ab56-58bfb4581033/render-msyihf1e.webp?Expires=1&Signature=fixture",
+        "source_image_url": "https://dstcynss47vun.cloudfront.net/prod/cyberpunk/portal/71a35836-e604-4d98-ab56-58bfb4581033/render-msyihf1e.webp",
+        "set": {
+          "code": "PRM01",
+          "name": "Set 1 Promos"
+        },
+        "rarity": "Nova Rare",
+        "finish": null,
+        "artist": "Narupiti Harunsong",
+        "language": "en",
+        "localized_name": null,
+        "printed_rules_text": null,
+        "official_rules_text": null
+      },
+      {
+        "id": "f625d2ac-3007-48f4-82b3-b521fc11a172",
+        "collector_number": "007",
+        "image_url": "https://dstcynss47vun.cloudfront.net/prod/cyberpunk/portal/f625d2ac-3007-48f4-82b3-b521fc11a172/render-msyii4oh.webp?Expires=1&Signature=fixture",
+        "source_image_url": "https://dstcynss47vun.cloudfront.net/prod/cyberpunk/portal/f625d2ac-3007-48f4-82b3-b521fc11a172/render-msyii4oh.webp",
+        "set": {
+          "code": "PRM01",
+          "name": "Set 1 Promos"
+        },
+        "rarity": "Nova Rare",
+        "finish": null,
+        "artist": "Pandart Studio",
+        "language": "en",
+        "localized_name": null,
+        "printed_rules_text": null,
+        "official_rules_text": null
+      }
+    ],
+    "selected_printing_id": "71a35836-e604-4d98-ab56-58bfb4581033",
+    "legalities": {
+      "standard": "not-legal"
+    },
+    "legality": "not-legal"
+  }
+]

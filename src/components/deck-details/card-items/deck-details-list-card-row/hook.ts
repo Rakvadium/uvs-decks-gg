@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useIsMobile } from "@/hooks/useIsMobile";
+import { useGameModule } from "@/games/game-context";
 import { canAddCardToSection, canMoveCardToSection, useDeckEditor } from "@/lib/deck";
 import { DECK_SECTION_KEYS, type DeckSection } from "@/lib/deck/display-config";
 import { useTcgDraggable } from "@/lib/dnd";
@@ -15,6 +16,7 @@ export function useDeckDetailsListCardRowModel({ entry }: DeckDetailsListCardRow
   const { activeSection, onHoverListCard, onClearListCardHover } = useDeckCardsSectionContext();
   const { addCard, moveCard, removeCard } = useDeckEditor();
   const sectionCounts = useDeckSectionCounts();
+  const gameDeck = useGameModule().deck;
 
   const { card, quantity: count, backCard: entryBack } = entry;
   const backCard = entryBack ?? null;
@@ -29,6 +31,7 @@ export function useDeckDetailsListCardRowModel({ entry }: DeckDetailsListCardRow
     cardId: card._id,
     section: sectionKey,
     counts: sectionCounts,
+    rules: gameDeck,
   });
 
   const moveTargets = useMemo(
@@ -72,9 +75,10 @@ export function useDeckDetailsListCardRowModel({ entry }: DeckDetailsListCardRow
         fromSection: sectionKey,
         toSection: target,
         counts: sectionCounts,
+        rules: gameDeck,
       });
     },
-    [card, count, sectionKey, sectionCounts]
+    [card, count, sectionKey, sectionCounts, gameDeck]
   );
 
   const handlePointerEnter = useCallback(

@@ -1,7 +1,9 @@
 import type { CardFilters, StatFilterValue } from "@/providers/UIStateProvider";
 import type { UvsStatFilterKey } from "@shared/games/uvs/filters";
+import type { CyberpunkStatFilterKey } from "@shared/games/cyberpunk/filters";
 
-export type StatFilterKey = UvsStatFilterKey;
+/** Every game's stat rule keys (each game's UI only renders its own definition's stats). */
+export type StatFilterKey = UvsStatFilterKey | CyberpunkStatFilterKey;
 
 export type StringArrayFilterKey = Extract<
   {

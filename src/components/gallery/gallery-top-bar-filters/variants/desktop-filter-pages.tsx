@@ -17,6 +17,7 @@ import {
   FilterGroup,
   FilterRow,
 } from "@/components/gallery/mobile-filter-sheet/primitives";
+import { ColorFacetChips } from "@/components/gallery/mobile-filter-sheet/color-facet-chips";
 import { cn } from "@/lib/utils";
 
 const compactChipClassName = "h-7 w-[100px] justify-center gap-1 px-2 text-xs";
@@ -165,6 +166,80 @@ export function GalleryDesktopFilterKeywordsPage() {
       ) : (
         <p className="py-8 text-center text-sm text-muted-foreground">No keywords match</p>
       )}
+    </div>
+  );
+}
+
+export function GalleryDesktopFilterColorsPage() {
+  const { filters, toggleStringFilter } = useGalleryFilterDialogContext();
+  const options = useGameModule().filters.facets.colors ?? [];
+
+  return (
+    <div className="px-4 pb-4 pt-3">
+      <FilterGroup>
+        <FilterRow className="py-2">
+          <ColorFacetChips
+            options={options}
+            selected={filters.colors ?? []}
+            onToggle={(value) => toggleStringFilter("colors", value)}
+            chipClassName="h-7 gap-1 px-2.5 text-xs"
+            rowClassName="gap-1.5"
+          />
+        </FilterRow>
+      </FilterGroup>
+    </div>
+  );
+}
+
+export function GalleryDesktopFilterTagsPage() {
+  const { filters, meta, toggleStringFilter } = useGalleryFilterDialogContext();
+  const [query, setQuery] = useState("");
+  const selected = filters.tags ?? [];
+  const tags = meta.uniqueValues?.tags;
+
+  const visible = useMemo(() => {
+    const all = tags ?? [];
+    const q = query.trim().toLowerCase();
+    if (!q) return all;
+    return all.filter((tag) => tag.toLowerCase().includes(q));
+  }, [tags, query]);
+
+  return (
+    <div className="flex h-full min-h-0 flex-col">
+      <div className="shrink-0 space-y-2 px-4 pb-2 pt-3">
+        <DesktopFilterSearch
+          value={query}
+          onChange={setQuery}
+          placeholder="Search tags…"
+          name="gallery-desktop-filter-tags"
+        />
+        {selected.length > 0 ? (
+          <div className="-mx-4 flex gap-1.5 overflow-x-auto px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {selected.map((tag) => (
+              <ActiveFilterChip key={tag} label={tag} onRemove={() => toggleStringFilter("tags", tag)} />
+            ))}
+          </div>
+        ) : null}
+      </div>
+      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-4">
+        {visible.length > 0 ? (
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(7.5rem,1fr))] gap-1.5">
+            {visible.map((tag) => (
+              <FilterChip
+                key={tag}
+                label={tag}
+                selected={selected.includes(tag)}
+                className="h-7 w-full justify-center gap-1 px-2 text-xs"
+                onClick={() => toggleStringFilter("tags", tag)}
+              />
+            ))}
+          </div>
+        ) : (
+          <p className="py-8 text-center text-sm text-muted-foreground">
+            {tags && tags.length > 0 ? "No tags match" : "No tags in this catalog yet"}
+          </p>
+        )}
+      </div>
     </div>
   );
 }

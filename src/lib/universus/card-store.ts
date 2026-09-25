@@ -2,6 +2,8 @@ import type { Doc } from "../../../convex/_generated/dataModel";
 import type { GameId } from "@shared/games/types";
 import { catalogDbName, deleteLegacyDatabaseOnce } from "@/lib/storage-keys";
 import { dedupeRarityOptions } from "./rarity";
+import { UVS_KEYWORD_LIST } from "@shared/games/uvs/keywords";
+import { splitPipeList, type GameFilterDefinition } from "@shared/games/filters";
 
 export type CachedCard = Doc<"cards">;
 
@@ -11,48 +13,7 @@ export function isGalleryCatalogCard(card: Pick<CachedCard, "isFrontFace" | "isV
   return card.isFrontFace !== false && card.isVariant !== true;
 }
 
-export const KEYWORD_LIST = [
-  "Ally",
-  "Breaker",
-  "Charge",
-  "Combo",
-  "Deflect",
-  "Desperation",
-  "Diplomacy",
-  "EX",
-  "Echo",
-  "Elusive",
-  "Flash",
-  "Frenzy",
-  "Fury",
-  "Gauge",
-  "Item",
-  "Kick",
-  "Multiple",
-  "Only",
-  "Pizza",
-  "Powerful",
-  "Punch",
-  "Ranged",
-  "Reversal",
-  "Safe",
-  "Scheme",
-  "Shift",
-  "Slam",
-  "Spell",
-  "Stance",
-  "Stun",
-  "Taunt",
-  "Tech",
-  "Tension",
-  "Terrain",
-  "Throw",
-  "Titan",
-  "Unique",
-  "Vestige",
-  "Weapon",
-  "XP",
-] as const;
+export const KEYWORD_LIST = UVS_KEYWORD_LIST;
 
 export type Keyword = (typeof KEYWORD_LIST)[number];
 
@@ -259,7 +220,7 @@ export function buildCardIndex(
   return index;
 }
 
-export function getUniqueValues(cards: CachedCard[]): {
+export interface CatalogUniqueValues {
   types: string[];
   rarities: string[];
   setCodes: string[];
@@ -267,11 +228,33 @@ export function getUniqueValues(cards: CachedCard[]): {
   setNumbers: number[];
   keywords: string[];
   symbols: string[];
-} {
+  /** Distinct `cards.tags` values (pipe-delimited), sorted. Empty for games without tags. */
+  tags: string[];
+  /** Distinct normalized (lowercase) `cards.color` values, sorted. */
+  colors: string[];
+}
+
+/** Keyword name without a trailing value (`"Breaker: 2"` / `"Breaker 2"` → `"Breaker"`). */
+function keywordName(keyword: string): string {
+  return keyword.replace(/[:\s]+\d+$/, "").trim();
+}
+
+/**
+ * Picker values for the gallery filters. `keywords` come from the game's fixed
+ * `filterDefinition.keywordOptions` when set, else from the catalog.
+ */
+export function getUniqueValues(
+  cards: CachedCard[],
+  filterDefinition?: Pick<GameFilterDefinition, "keywordOptions">
+): CatalogUniqueValues {
   const types = new Set<string>();
   const rarities = new Set<string>();
   const setData = new Map<string, { name: string; number: number }>();
   const symbols = new Set<string>();
+  const tags = new Map<string, string>();
+  const colors = new Set<string>();
+  const fixedKeywords = filterDefinition ? filterDefinition.keywordOptions : UVS_KEYWORD_LIST;
+  const catalogKeywords = fixedKeywords ? null : new Map<string, string>();
 
   for (const card of cards) {
     if (card.type) types.add(card.type);
@@ -287,10 +270,25 @@ export function getUniqueValues(cards: CachedCard[]): {
     if (card.symbols) {
       card.symbols.split("|").forEach(s => symbols.add(s.trim()));
     }
+    if (card.tags) {
+      for (const tag of splitPipeList(card.tags)) {
+        const key = tag.toLowerCase();
+        if (!tags.has(key)) tags.set(key, tag);
+      }
+    }
+    const color = card.color?.trim().toLowerCase();
+    if (color) colors.add(color);
+    if (catalogKeywords && card.keywords) {
+      for (const raw of splitPipeList(card.keywords)) {
+        const name = keywordName(raw);
+        if (name && !catalogKeywords.has(name.toLowerCase())) catalogKeywords.set(name.toLowerCase(), name);
+      }
+    }
   }
 
   const sortedSets = Array.from(setData.entries())
     .sort((a, b) => (b[1].number ?? 0) - (a[1].number ?? 0));
+  const byLabel = (a: string, b: string) => a.localeCompare(b, undefined, { sensitivity: "base" });
 
   return {
     types: Array.from(types).filter(t => t !== "Special").sort(),
@@ -298,8 +296,10 @@ export function getUniqueValues(cards: CachedCard[]): {
     setCodes: sortedSets.map(([code]) => code),
     setNames: sortedSets.map(([, data]) => data.name),
     setNumbers: sortedSets.map(([, data]) => data.number),
-    keywords: [...KEYWORD_LIST],
+    keywords: fixedKeywords ? [...fixedKeywords] : Array.from(catalogKeywords!.values()).sort(byLabel),
     symbols: Array.from(symbols).sort(),
+    tags: Array.from(tags.values()).sort(byLabel),
+    colors: Array.from(colors).sort(),
   };
 }
 

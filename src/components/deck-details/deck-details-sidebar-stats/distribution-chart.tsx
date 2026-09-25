@@ -12,6 +12,8 @@ interface PieDistributionChartProps {
   buckets: DistributionBucket[];
   total: number;
   colorStrategy?: PieChartColorStrategy;
+  /** Fixed colors keyed by bucket label (win over `colorStrategy`). */
+  labelColors?: Readonly<Record<string, string>>;
 }
 
 export function PieDistributionChart({
@@ -19,8 +21,11 @@ export function PieDistributionChart({
   buckets,
   total,
   colorStrategy = "default",
+  labelColors,
 }: PieDistributionChartProps) {
   const palette = useGameModule().ui.deckStats;
+  const bucketColor = (label: string, index: number) =>
+    labelColors?.[label] ?? resolvePieBucketColor(colorStrategy, label, index, palette);
   const chartTotal = total > 0 ? total : buckets.reduce((sum, bucket) => sum + bucket.value, 0);
   const nonZeroBuckets = buckets.filter((bucket) => bucket.value > 0);
 
@@ -48,14 +53,14 @@ export function PieDistributionChart({
 
     const stops: string[] = [];
     for (const [index, bucket] of visibleBuckets.entries()) {
-      const color = resolvePieBucketColor(colorStrategy, bucket.label, index, palette);
+      const color = labelColors?.[bucket.label] ?? resolvePieBucketColor(colorStrategy, bucket.label, index, palette);
       const start = edges[index]!;
       const end = edges[index + 1]!;
       stops.push(`${color} ${start.toFixed(4)}% ${end.toFixed(4)}%`);
     }
 
     return `conic-gradient(from 359.92deg, ${stops.join(", ")})`;
-  }, [chartTotal, visibleBuckets, colorStrategy, palette]);
+  }, [chartTotal, visibleBuckets, colorStrategy, palette, labelColors]);
 
   return (
     <div className="space-y-2 rounded-lg border border-border/50 bg-card/30 p-3">
@@ -80,7 +85,7 @@ export function PieDistributionChart({
           <div className="space-y-1.5">
             {visibleBuckets.map((bucket, index) => {
               const ratio = chartTotal > 0 ? (bucket.value / chartTotal) * 100 : 0;
-              const color = resolvePieBucketColor(colorStrategy, bucket.label, index, palette);
+              const color = bucketColor(bucket.label, index);
 
               return (
                 <div key={`${title}-${bucket.label}`} className="flex items-center justify-between gap-2 text-[10px]">

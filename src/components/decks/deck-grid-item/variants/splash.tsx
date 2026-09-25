@@ -5,18 +5,20 @@ import Link from "next/link";
 import { BookOpen, Hexagon, Layers, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useDeckGridItemContext } from "../context";
-import { MAIN_DECK_TARGET } from "../hook";
 import { ProgressRing, VisibilityGlyph } from "./shared";
 import { accentCssVars, symbolAccentFor } from "./splash-accent";
 import { useGameModule } from "@/games/game-context";
 
 export function DeckSplashItem() {
-  const { SymbolIcon } = useGameModule().ui;
+  const { SymbolIcon, DeckSetupPanel } = useGameModule().ui;
   const {
     deck,
     displayImage,
     displayName,
     startingCharacterName,
+    mainTarget,
+    setup,
+    getSetupCard,
     characterSymbols,
     accentSymbol,
     visibility,
@@ -87,7 +89,9 @@ export function DeckSplashItem() {
               ) : null}
             </span>
           ) : (
-            <span />
+            <span>
+              <DeckSetupPanel variant="compact" readOnly setup={setup} getCard={getSetupCard} />
+            </span>
           )}
           <VisibilityGlyph
             deck={deck}
@@ -139,7 +143,7 @@ export function DeckSplashItem() {
                   {isReady ? "Ready" : "Building"}
                 </span>
                 <span className="mt-0.5 text-[10px] tabular-nums text-white/55">
-                  {counts.main}/{MAIN_DECK_TARGET}
+                  {counts.main}/{mainTarget}
                   {counts.side > 0 ? (
                     <span className="ml-1.5 inline-flex items-center gap-0.5">
                       <BookOpen className="h-2.5 w-2.5" />

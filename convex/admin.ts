@@ -163,6 +163,11 @@ export const releaseCards = action({
     previousVersion: number | null;
     catalogUrl: string;
   }> => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      throw new Error("Not authenticated");
+    }
+    await ctx.runMutation(internal.admin.ensureAdminForAction, { userId });
     const result: {
       version: number;
       cardCount: number;
@@ -535,6 +540,18 @@ export const seedFormats = mutation({
   handler: async (ctx, rawArgs) => {
     const args = withResolvedGame(rawArgs);
     await requireAdmin(ctx);
+    return await seedGameFormats(ctx, args.game);
+  },
+});
+
+/** Ops/CLI variant of `seedFormats` (`npx convex run admin:seedFormatsInternal '{game:"cyberpunk"}'`). */
+export const seedFormatsInternal = internalMutation({
+  args: { game: gameIdValidator },
+  returns: v.object({
+    created: v.number(),
+    skipped: v.number(),
+  }),
+  handler: async (ctx, args) => {
     return await seedGameFormats(ctx, args.game);
   },
 });

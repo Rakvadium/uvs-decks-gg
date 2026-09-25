@@ -76,7 +76,21 @@ export const uploadCardImage = httpAction(async (ctx, req) => {
   try {
     const objectKey = `cards/${relativeKey}`;
     assertAllowedR2ObjectKey(objectKey);
-    await r2.store(ctx, bytes, { key: objectKey, type: "image/webp" });
+    // Re-imports replace the image (the R2 component refuses to store over existing metadata).
+    if (await r2.getMetadata(ctx, objectKey)) {
+      try {
+        await r2.deleteObject(ctx, objectKey);
+      } catch (e) {
+        // Metadata can outlive a missing object after an interrupted upload; store below retries.
+        console.warn(`upload-card-image: delete ${objectKey} failed`, e);
+      }
+    }
+    try {
+      await r2.store(ctx, bytes, { key: objectKey, type: "image/webp" });
+    } catch (e) {
+      if (!(e instanceof Error && e.message.includes("Metadata already exists"))) throw e;
+      return jsonOk({ key: relativeKey, bytes: bytes.length, replaced: false });
+    }
     return jsonOk({ key: relativeKey, bytes: bytes.length });
   } catch (e) {
     return jsonError(500, e instanceof Error ? e.message : "Upload failed");

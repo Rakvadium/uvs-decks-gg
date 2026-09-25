@@ -113,6 +113,7 @@ export const cleanupOldCatalogBlobs = internalMutation({
   },
 });
 
+/** Publishes a catalog without an auth check: callers (the public action, ops CLI) authorize. */
 export const releaseCatalogInternal = internalAction({
   args: { game: gameIdValidator },
   returns: releaseResultValidator,
@@ -122,12 +123,6 @@ export const releaseCatalogInternal = internalAction({
     previousVersion: number | null;
     catalogUrl: string;
   }> => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
-      throw new Error("Not authenticated");
-    }
-    await ctx.runMutation(internal.admin.ensureAdminForAction, { userId });
-
     const prepared: {
       nextVersion: number;
       previousVersion: number | null;
@@ -180,7 +175,14 @@ export const releaseCatalog = action({
       cardCount: number;
       previousVersion: number | null;
       catalogUrl: string;
-    } = await ctx.runAction(internal.catalogRelease.releaseCatalogInternal, { game: resolveGame(args.game) });
+    } = await (async () => {
+      const userId = await getAuthUserId(ctx);
+      if (!userId) {
+        throw new Error("Not authenticated");
+      }
+      await ctx.runMutation(internal.admin.ensureAdminForAction, { userId });
+      return await ctx.runAction(internal.catalogRelease.releaseCatalogInternal, { game: resolveGame(args.game) });
+    })();
     return result;
   },
 });

@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import type { DeckRuleCard, DeckRuleDeck, DeckRuleFormat, DeckRuleLegality } from "@shared/games/deck";
 import { getSharedGameModule } from "@shared/games/registry";
-import { cyberpunkCopyGroupKey, cyberpunkRamBudget } from "@shared/games/cyberpunk/rules";
+import { cyberpunkCopyGroupKey, cyberpunkLegendNameKey, cyberpunkRamBudget } from "@shared/games/cyberpunk/rules";
 import { CYBERPUNK_DEFAULT_FORMATS } from "@shared/games/cyberpunk/formats";
 
 const rules = getSharedGameModule("cyberpunk").deck.validation;
@@ -112,6 +112,23 @@ describe("cyberpunk rules: legends", () => {
     expect(codes(out.errors)).toEqual(["DUPLICATE_LEGEND_NAME"]);
     expect(out.errors[0]?.cardId).toBe("l1b");
     expect(codes(run({ legendIds: ["l1", "l2", "l1"] }).errors)).toEqual(["DUPLICATE_LEGEND_NAME"]);
+  });
+
+  test("two versions of the same character count as the same legend name", () => {
+    const streetkid: DeckRuleCard = { ...legend("v1", "red", 2, "V: Streetkid"), subname: "Streetkid" };
+    const corpo: DeckRuleCard = { ...legend("v2", "blue", 2, "V — Corpo Rat"), subname: "Corpo Rat" };
+    const out = run({ legends: [streetkid, corpo, L3] });
+    expect(codes(out.errors)).toEqual(["DUPLICATE_LEGEND_NAME"]);
+    expect(out.errors[0]?.cardId).toBe("v2");
+  });
+
+  test("cyberpunkLegendNameKey strips the version subtitle only", () => {
+    expect(cyberpunkLegendNameKey({ name: "V: Streetkid", subname: "Streetkid" })).toBe("v");
+    expect(cyberpunkLegendNameKey({ name: "V, Streetkid", subname: "streetkid" })).toBe("v");
+    expect(cyberpunkLegendNameKey({ name: "Goro Takemura — Hands Unclean", subname: "Hands Unclean" })).toBe("goro takemura");
+    expect(cyberpunkLegendNameKey({ name: "Jackie Welles" })).toBe("jackie welles");
+    expect(cyberpunkLegendNameKey({ name: "Streetkid", subname: "Streetkid" })).toBe("streetkid");
+    expect(cyberpunkLegendNameKey({ name: "A (B)", subname: "(B)" })).toBe("a (b)");
   });
 
   test("legend without a color warns and provides no RAM", () => {

@@ -7,7 +7,6 @@ import { Badge } from "@/components/ui/badge";
 import { Kicker, SectionHeading } from "@/components/ui/typography-headings";
 import { cn } from "@/lib/utils";
 import { useDeckGridItemContext } from "../context";
-import { MAIN_DECK_TARGET } from "../hook";
 import { VisibilityGlyph } from "./shared";
 import { useGameModule } from "@/games/game-context";
 
@@ -32,12 +31,16 @@ function notchStyle(edge: "top" | "bottom") {
 }
 
 export function DeckNameplateItem() {
-  const { getSymbolPath, getSymbolColor } = useGameModule().ui;
+  const { getSymbolPath, getSymbolColor, DeckSetupPanel } = useGameModule().ui;
   const {
     deck,
     displayImage,
     displayName,
     startingCharacterName,
+    emptySetupLabel,
+    mainTarget,
+    setup,
+    getSetupCard,
     accentSymbol,
     visibility,
     coverImagePriority,
@@ -89,7 +92,7 @@ export function DeckNameplateItem() {
                 <Layers className="h-3 w-3 text-muted-foreground" />
                 <span className="text-xs font-bold leading-none tabular-nums">
                   {counts.main}
-                  <span className="font-medium text-muted-foreground">/{MAIN_DECK_TARGET}</span>
+                  <span className="font-medium text-muted-foreground">/{mainTarget}</span>
                 </span>
                 {counts.side > 0 ? (
                   <span className="inline-flex items-center gap-0.5 border-l border-border/40 pl-1.5 text-[10px] leading-none tabular-nums text-muted-foreground">
@@ -100,6 +103,14 @@ export function DeckNameplateItem() {
               </span>
               <VisibilityGlyph deck={deck} visibility={visibility} className="h-6 w-6" />
             </div>
+
+            <DeckSetupPanel
+              variant="compact"
+              readOnly
+              setup={setup}
+              getCard={getSetupCard}
+              className="absolute bottom-2.5 left-2.5"
+            />
           </div>
 
           {symbolPath && accentSymbol && symbolColor ? (
@@ -148,7 +159,7 @@ export function DeckNameplateItem() {
             {displayName}
           </SectionHeading>
           <p className="mt-0.5 flex min-w-0 items-center justify-center gap-1.5 text-xs text-muted-foreground">
-            <span className="truncate">{startingCharacterName ?? "No character selected"}</span>
+            <span className="truncate">{startingCharacterName ?? emptySetupLabel}</span>
             {showAuthor ? (
               <>
                 <span aria-hidden className="text-border">

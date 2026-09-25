@@ -41,6 +41,8 @@ export interface DeckRuleCard {
   control?: number | null;
   /** Cyberpunk: color (`red` | `green` | `blue` | `yellow`); Legends provide RAM of this color. */
   color?: string;
+  /** Cyberpunk: card subtitle (a Legend's version, e.g. "Streetkid" in "V: Streetkid"). */
+  subname?: string;
   /** Cyberpunk: RAM requirement (cards) / RAM provided (Legends). */
   ram?: number | null;
   cost?: number | null;

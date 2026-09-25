@@ -134,3 +134,20 @@ export function GalleryMobileFilterKeywordsPage() {
     />
   );
 }
+
+export function GalleryMobileFilterTagsPage() {
+  const { filters, meta, toggleStringFilter } = useGalleryFilterDialogContext();
+  const tags = meta.uniqueValues?.tags;
+  const options = useMemo((): PickerOption[] => (tags ?? []).map((tag) => ({ value: tag, label: tag })), [tags]);
+
+  return (
+    <PickerList
+      options={options}
+      selected={filters.tags ?? []}
+      onToggle={(tag) => toggleStringFilter("tags", tag)}
+      searchPlaceholder="Search tags"
+      emptyMessage={options.length > 0 ? "No tags match" : "No tags in this catalog yet"}
+      name="gallery-filter-tags"
+    />
+  );
+}

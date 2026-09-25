@@ -325,6 +325,8 @@ export function GalleryFiltersProvider({ children }: { children: ReactNode }) {
     if (galleryFilters.includeInfinity === false) count++;
     if (galleryFilters.includeBanned === true) count++;
     if (filters.keywords?.length) count++;
+    if (filters.colors?.length) count++;
+    if (filters.tags?.length) count++;
     count += countActiveStatRanges(filterDefinition, filters);
     return count;
   }, [filters, galleryFilters, defaultFormat, filterDefinition]);

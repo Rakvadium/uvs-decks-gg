@@ -168,18 +168,21 @@ export function useDeckCardsSectionModel() {
     (item: { card: CachedCard }) => {
       if (!deck) return;
       if (
+        gameModule.deck.isMainDeckEligible(item.card) &&
         !canAddCardToSection({
           card: item.card,
           cardId: item.card._id,
           section: activeSection,
           counts: sectionCountsForDrop,
+          rules: gameModule.deck,
         })
       ) {
         return;
       }
+      // Ineligible cards still go to `addCard`, which offers the deck setup instead (Legends).
       addCard(item.card._id as Id<"cards">, activeSection);
     },
-    [activeSection, addCard, deck, sectionCountsForDrop]
+    [activeSection, addCard, deck, sectionCountsForDrop, gameModule]
   );
 
   const { isOver: isDeckDropOver, canDrop: canDropToActiveSection, droppableProps: deckDropProps } = useTcgDroppable({

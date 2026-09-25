@@ -22,6 +22,7 @@ import {
   FilterRow,
 } from "./primitives";
 import { useActiveChips } from "./use-active-chips";
+import { ColorFacetChips, colorFacetLabel } from "./color-facet-chips";
 
 const segmentedItemClassName = "h-10 text-[13px] normal-case tracking-normal";
 const compactChipClassName = "h-7 gap-1 px-2.5 text-xs";
@@ -213,17 +214,30 @@ function MobileFilterIndex() {
   const typeCount = filters.type?.length ?? 0;
   const symbolCount = filters.symbols?.length ?? 0;
   const keywordCount = filters.keywords?.length ?? 0;
+  const colorCount = filters.colors?.length ?? 0;
+  const tagCount = filters.tags?.length ?? 0;
   const statCount = countActiveStatPageFilters(filterDefinition, filters);
   const rarityCount = filters.rarity?.length ?? 0;
   const formatName = meta.formats.find((format) => format.key === (filters.format ?? meta.formats[0]?.key))?.name ?? "Any";
+  const { facets } = filterDefinition;
 
   return (
     <FilterGroup>
       <FilterDrillRow label="Format" value={formatName} count={formatName === "Any" ? 0 : 1} onClick={() => push("format")} />
       <FilterDrillRow label="Sets" value={selectionLabel(setCount)} count={setCount} onClick={() => push("sets")} />
       <FilterDrillRow label="Type" value={selectionLabel(typeCount)} count={typeCount} onClick={() => push("type")} />
-      <FilterDrillRow label="Symbols" value={selectionLabel(symbolCount)} count={symbolCount} onClick={() => push("symbols")} />
-      <FilterDrillRow label="Keywords" value={selectionLabel(keywordCount)} count={keywordCount} onClick={() => push("keywords")} />
+      {facets.colors ? (
+        <FilterDrillRow label="Colors" value={selectionLabel(colorCount)} count={colorCount} onClick={() => push("colors")} />
+      ) : null}
+      {facets.symbols ? (
+        <FilterDrillRow label="Symbols" value={selectionLabel(symbolCount)} count={symbolCount} onClick={() => push("symbols")} />
+      ) : null}
+      {facets.keywords ? (
+        <FilterDrillRow label="Keywords" value={selectionLabel(keywordCount)} count={keywordCount} onClick={() => push("keywords")} />
+      ) : null}
+      {facets.tags ? (
+        <FilterDrillRow label="Tags" value={selectionLabel(tagCount)} count={tagCount} onClick={() => push("tags")} />
+      ) : null}
       <FilterDrillRow label="Stats" value={selectionLabel(statCount)} count={statCount} onClick={() => push("stats")} />
       <FilterDrillRow label="Rarity" value={selectionLabel(rarityCount)} count={rarityCount} onClick={() => push("rarity")} />
     </FilterGroup>
@@ -435,8 +449,11 @@ function DrillGroup({ compact = false }: { compact?: boolean }) {
   const typeCount = filters.type?.length ?? 0;
   const symbolCount = filters.symbols?.length ?? 0;
   const keywordCount = filters.keywords?.length ?? 0;
+  const colorCount = filters.colors?.length ?? 0;
+  const tagCount = filters.tags?.length ?? 0;
   const statCount = countActiveStatPageFilters(filterDefinition, filters);
   const rarityCount = filters.rarity?.length ?? 0;
+  const { facets } = filterDefinition;
   const rowClassName = compact ? "min-h-10" : undefined;
   const defaultFormat = meta.formats[0]?.key;
   const activeFormat = filters.format ?? defaultFormat;
@@ -472,7 +489,20 @@ function DrillGroup({ compact = false }: { compact?: boolean }) {
           onClick={() => push("type")}
         />
       ) : null}
-      {compact ? (
+      {compact && facets.colors ? (
+        <FilterDrillRow
+          label="Colors"
+          value={
+            colorCount > 0
+              ? (filters.colors ?? []).map((value) => colorFacetLabel(facets.colors, value)).join(", ")
+              : "Any"
+          }
+          count={colorCount}
+          className={rowClassName}
+          onClick={() => push("colors")}
+        />
+      ) : null}
+      {compact && facets.symbols ? (
         <FilterDrillRow
           label="Symbols"
           value={summarize(symbolCount, "symbol")}
@@ -481,13 +511,24 @@ function DrillGroup({ compact = false }: { compact?: boolean }) {
           onClick={() => push("symbols")}
         />
       ) : null}
-      <FilterDrillRow
-        label="Keywords"
-        value={summarize(keywordCount, "keyword")}
-        count={keywordCount}
-        className={rowClassName}
-        onClick={() => push("keywords")}
-      />
+      {facets.keywords ? (
+        <FilterDrillRow
+          label="Keywords"
+          value={summarize(keywordCount, "keyword")}
+          count={keywordCount}
+          className={rowClassName}
+          onClick={() => push("keywords")}
+        />
+      ) : null}
+      {facets.tags ? (
+        <FilterDrillRow
+          label="Tags"
+          value={summarize(tagCount, "tag")}
+          count={tagCount}
+          className={rowClassName}
+          onClick={() => push("tags")}
+        />
+      ) : null}
       <FilterDrillRow
         label="Stats"
         value={summarize(statCount, "rule")}
@@ -620,6 +661,26 @@ export function GalleryDesktopFilterSymbolsPage() {
   return (
     <div className="px-4 pb-4 pt-3">
       <SymbolsGroup spread showSwitches={false} />
+    </div>
+  );
+}
+
+/** Color facet page (games whose definition declares `facets.colors`). */
+export function GalleryMobileFilterColorsPage() {
+  const { filters, toggleStringFilter } = useGalleryFilterDialogContext();
+  const options = useGameModule().filters.facets.colors ?? [];
+
+  return (
+    <div className="px-4 pb-4 pt-3">
+      <FilterGroup>
+        <FilterRow>
+          <ColorFacetChips
+            options={options}
+            selected={filters.colors ?? []}
+            onToggle={(value) => toggleStringFilter("colors", value)}
+          />
+        </FilterRow>
+      </FilterGroup>
     </div>
   );
 }
