@@ -22,8 +22,9 @@ import { isAllowedHandoffOrigin } from "../shared/hosts";
 
 const handoffRateLimiter = new RateLimiter(components.rateLimiter, {
   authHandoffCreate: { kind: "token bucket", rate: 30, period: MINUTE, capacity: 10 },
-  // Codes are 256-bit random, so this only bounds noisy failures per origin.
-  authHandoffConsumeFailure: { kind: "token bucket", rate: 120, period: MINUTE, capacity: 120 },
+  // No limit on failed redemptions: the only available key is the caller-supplied origin, so a
+  // shared bucket would let anyone lock out every sign-in to a game host. Codes are 256-bit
+  // random, so guessing is not a concern.
 });
 
 const CLEANUP_BATCH = 200;
@@ -73,13 +74,6 @@ export const consume = internalMutation({
     if (!isValidHandoffCode(args.code) || !isAllowedHandoffOrigin(args.origin)) {
       return null;
     }
-    const failureKey = args.origin;
-    const budget = await handoffRateLimiter.check(ctx, "authHandoffConsumeFailure", {
-      key: failureKey,
-    });
-    if (!budget.ok) {
-      return null;
-    }
     const codeHash = await sha256Hex(args.code);
     const record = await ctx.db
       .query("authHandoffCodes")
@@ -92,7 +86,6 @@ export const consume = internalMutation({
         // Burn codes presented to the wrong origin or after expiry.
         await ctx.db.patch(record._id, { usedAt: now });
       }
-      await handoffRateLimiter.limit(ctx, "authHandoffConsumeFailure", { key: failureKey });
       return null;
     }
     await ctx.db.patch(record._id, { usedAt: now });

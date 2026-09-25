@@ -399,7 +399,7 @@ builders, `sanitizeSameOriginPath`, code checks, hint cookie) live in `shared/au
    `/auth/*` responses send `Referrer-Policy: no-referrer` (next.config headers + page metadata).
 5. `convex/auth.ts` adds `ConvexCredentials({ id: "handoff" })`; `authorize` runs internal
    `authHandoff.consume` (hash match, unused, unexpired, origin match; marks `usedAt`, also burns
-   codes presented after expiry or to the wrong origin; failures rate-limited per origin) and
+   codes presented after expiry or to the wrong origin; failed redemptions are not rate-limited because the only key would be the caller-supplied origin, which would let anyone lock out a game host) and
    returns `{ userId }`.
 6. Silent SSO (`src/components/auth/silent-sso.tsx`, mounted in `Providers`): apex sets
    `tcgd_signed_in=1; Domain=.{root}; Path=/; SameSite=Lax; Max-Age=30d[; Secure]`
