@@ -327,7 +327,7 @@ builders, `sanitizeSameOriginPath`, code checks, hint cookie) live in `shared/au
 2. Apex `/auth/handoff` (`src/app/auth/handoff`): validates `return` (`parseHandoffReturnUrl`)
    and `state` client-side. Signed out → `/sign-in?next=/auth/handoff?…` (or `/sign-up`). Signed
    in → `authHandoff.create({ returnUrl, state })` → sets the hint cookie →
-   `location.replace({returnOrigin}/auth/callback?code&state&next={path})`.
+   `location.replace({returnOrigin}/auth/callback?handoff_code&state&next={path})` — the param is not `code` because Convex Auth consumes `?code=` itself.
    After apex sign-in, `AuthRouteEntry` and the middleware "authenticated on
    `/sign-in|/sign-up|/agent-login`" redirect honor a sanitized same-origin `next`
    (`authenticatedAuthEntryRedirect`), else `/home`.

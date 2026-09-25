@@ -13,6 +13,7 @@ import {
   startHandoff,
 } from "@/lib/auth/handoff-client";
 import {
+  HANDOFF_CODE_PARAM,
   HANDOFF_PROVIDER_ID,
   isValidHandoffCode,
   LOGIN_REQUIRED_ERROR,
@@ -39,7 +40,7 @@ export function CallbackClient() {
     const params = new URLSearchParams(window.location.search);
     window.history.replaceState(window.history.state, "", window.location.pathname);
 
-    const code = params.get("code");
+    const code = params.get(HANDOFF_CODE_PARAM);
     const state = params.get("state");
     const next = sanitizeSameOriginPath(params.get("next"), "/");
     const stateMatches = consumeHandoffState(state);

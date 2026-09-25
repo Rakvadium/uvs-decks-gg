@@ -15,6 +15,8 @@ import {
   parseHandoffReturnUrl,
 } from "@shared/auth-handoff";
 
+const SIGNED_OUT_GRACE_MS = 750;
+
 type HandoffClientProps = {
   returnUrl: string;
   state: string;
@@ -46,7 +48,6 @@ export function HandoffClient({ returnUrl, state, silent, flow }: HandoffClientP
 
   useEffect(() => {
     if (validationError || !target || isLoading || startedRef.current) return;
-    startedRef.current = true;
 
     const loginRequired = () => {
       clearSignedInHint();
@@ -60,15 +61,21 @@ export function HandoffClient({ returnUrl, state, silent, flow }: HandoffClientP
     };
 
     if (!isAuthenticated) {
-      if (silent) {
-        loginRequired();
-        return;
-      }
-      const here = `${window.location.pathname}${window.location.search}`;
-      router.replace(`/${flow === "signUp" ? "sign-up" : "sign-in"}?next=${encodeURIComponent(here)}`);
-      return;
+      // Right after a sign-in the client can briefly report signed-out before the new token
+      // is confirmed; wait before treating it as a real signed-out state.
+      const timer = window.setTimeout(() => {
+        startedRef.current = true;
+        if (silent) {
+          loginRequired();
+          return;
+        }
+        const here = `${window.location.pathname}${window.location.search}`;
+        router.replace(`/${flow === "signUp" ? "sign-up" : "sign-in"}?next=${encodeURIComponent(here)}`);
+      }, SIGNED_OUT_GRACE_MS);
+      return () => window.clearTimeout(timer);
     }
 
+    startedRef.current = true;
     createHandoff({ returnUrl, state })
       .then(({ redirectUrl }) => {
         if (new URL(redirectUrl).origin !== target.origin) {

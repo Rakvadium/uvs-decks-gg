@@ -121,7 +121,8 @@ describe("URL builders", () => {
     );
     expect(url.origin).toBe("https://uvs.tcgdecks.gg");
     expect(url.pathname).toBe("/auth/callback");
-    expect(url.searchParams.get("code")).toBe("c");
+    expect(url.searchParams.get("handoff_code")).toBe("c");
+    expect(url.searchParams.has("code")).toBe(false);
     expect(url.searchParams.get("state")).toBe("st");
     expect(url.searchParams.get("next")).toBe("/");
     expect(

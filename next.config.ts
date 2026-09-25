@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Dev-only: multi-host testing on the apex and game subdomains (docs/multi-game.md).
+  allowedDevOrigins: ["tcgdecks.localhost", "*.tcgdecks.localhost"],
   async headers() {
     // Auth handoff URLs carry one-time codes / state; never send them as Referer.
     return [

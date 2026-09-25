@@ -123,14 +123,20 @@ export function buildHandoffStartUrl(
   return `${apex}/auth/handoff?${params.toString()}`;
 }
 
-/** `{origin}/auth/callback?code|error&state&next` */
+/**
+ * Query param carrying the one-time code. Not `code`: Convex Auth's middleware and client
+ * treat `?code=` as their own verification code and consume it.
+ */
+export const HANDOFF_CODE_PARAM = "handoff_code";
+
+/** `{origin}/auth/callback?handoff_code|error&state&next` */
 export function buildHandoffCallbackUrl(
   origin: string,
   params: { code?: string; error?: string; state?: string | null; next: string },
 ): string {
   const search = new URLSearchParams();
   if (params.code) {
-    search.set("code", params.code);
+    search.set(HANDOFF_CODE_PARAM, params.code);
   }
   if (params.error) {
     search.set("error", params.error);
