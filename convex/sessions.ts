@@ -11,7 +11,7 @@ import {
   themePreferenceValidator,
 } from "./validators";
 import { nextSessionGameState, resolveSessionGameState } from "./lib/sessionGameState";
-import { isDocInGame } from "./lib/gameScope";
+import { isDocInGame, resolveGame, withResolvedGame } from "./lib/gameScope";
 
 const HEX_COLOR = /^#([0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/;
 
@@ -68,9 +68,10 @@ function validateAppearanceCustom(custom: {
  * (from `gameState[game]`, falling back to the legacy top-level fields for the default game).
  */
 export const getSession = query({
-  args: { game: gameIdValidator },
+  args: { game: v.optional(gameIdValidator) },
   returns: v.union(sessionValidator, v.null()),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     const userId = await getAuthUserId(ctx);
     if (!userId) {
       return null;
@@ -134,9 +135,10 @@ export const ensureAppearanceMigrated = mutation({
 });
 
 export const getActiveDeckId = query({
-  args: { game: gameIdValidator },
+  args: { game: v.optional(gameIdValidator) },
   returns: v.union(v.id("decks"), v.null()),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     const userId = await getAuthUserId(ctx);
     if (!userId) {
       return null;
@@ -153,11 +155,12 @@ export const getActiveDeckId = query({
 
 export const setActiveDeck = mutation({
   args: {
-    game: gameIdValidator,
+    game: v.optional(gameIdValidator),
     deckId: v.optional(v.id("decks")),
   },
   returns: v.null(),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     const userId = await getAuthUserId(ctx);
     if (!userId) {
       return null;
@@ -203,8 +206,8 @@ export const setActiveDeck = mutation({
 export const updateSession = mutation({
   args: {
     /**
-     * Scopes `galleryFilters` / `rightSidebarAction` (stored in `gameState[game]`); required with
-     * them. Appearance fields (`theme`, `chrome`, `colorSource`) are global and need no game.
+     * Scopes `galleryFilters` / `rightSidebarAction` (stored in `gameState[game]`); defaults to
+     * DEFAULT_GAME_ID when omitted (rolling-deploy compat; clients always pass it). Appearance fields (`theme`, `chrome`, `colorSource`) are global and need no game.
      */
     game: v.optional(gameIdValidator),
     galleryFilters: v.optional(v.any()),
@@ -231,10 +234,8 @@ export const updateSession = mutation({
 
     const updates: Record<string, unknown> = { lastActiveAt: Date.now() };
     if (args.galleryFilters !== undefined || args.rightSidebarAction !== undefined) {
-      if (args.game === undefined) {
-        throw new Error("game is required when updating galleryFilters or rightSidebarAction");
-      }
-      updates.gameState = nextSessionGameState(existingSession, args.game, {
+      // Old clients (open during a rolling deploy) omit `game`: they are default-game clients.
+      updates.gameState = nextSessionGameState(existingSession, resolveGame(args.game), {
         galleryFilters: args.galleryFilters,
         rightSidebarAction: args.rightSidebarAction,
       });

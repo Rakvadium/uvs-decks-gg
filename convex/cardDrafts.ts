@@ -19,7 +19,7 @@ import {
 import { requireAdmin } from "./utils/validation";
 import { createCardWithDerivedFields } from "./lib/cardCreate";
 import { DEFAULT_GAME_ID, type GameId } from "../shared/games/types";
-import { docGame } from "./lib/gameScope";
+import { docGame, findSetByCode, withResolvedGame } from "./lib/gameScope";
 
 type CardDraftEditable = Infer<typeof cardDraftEditableValidator>;
 
@@ -192,10 +192,7 @@ async function insertDraftsFromStorageIds(
     throw new Error(`Upload at most ${DRAFT_UPLOAD_BATCH_MAX} draft images at once`);
   }
   const now = Date.now();
-  const set = await ctx.db
-    .query("sets")
-    .withIndex("by_game_and_code", (q) => q.eq("game", args.game).eq("code", args.setCode))
-    .unique();
+  const set = await findSetByCode(ctx, args.game, args.setCode);
   const ids: Id<"cardDrafts">[] = [];
   for (let i = 0; i < args.drafts.length; i++) {
     const draft = args.drafts[i];
@@ -238,13 +235,14 @@ async function insertDraftsFromStorageIds(
 
 export const createDraftsFromStorageIds = mutation({
   args: {
-    game: gameIdValidator,
+    game: v.optional(gameIdValidator),
     setCode: v.string(),
     setName: v.string(),
     drafts: v.array(draftUploadInputValidator),
   },
   returns: v.array(v.id("cardDrafts")),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     await requireAdmin(ctx);
     return await insertDraftsFromStorageIds(ctx, args);
   },
@@ -266,12 +264,13 @@ export const createDraftsFromStorageIdsInternal = internalMutation({
 
 export const listDraftsBySet = query({
   args: {
-    game: gameIdValidator,
+    game: v.optional(gameIdValidator),
     setCode: v.string(),
     status: v.optional(cardDraftStatusValidator),
   },
   returns: v.array(cardDraftReviewRowValidator),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     await requireAdmin(ctx);
     const status = args.status ?? "pending";
     const rows = await ctx.db
@@ -479,10 +478,7 @@ export const finalizeApproveDraft = internalMutation({
       throw new Error("Only pending drafts can be approved");
     }
     const game = docGame(existing);
-    const set = await ctx.db
-      .query("sets")
-      .withIndex("by_game_and_code", (q) => q.eq("game", game).eq("code", existing.setCode))
-      .unique();
+    const set = await findSetByCode(ctx, game, existing.setCode);
     const card = draftToCardInput(existing.draft, {
       setCode: existing.setCode,
       setName: existing.setName,

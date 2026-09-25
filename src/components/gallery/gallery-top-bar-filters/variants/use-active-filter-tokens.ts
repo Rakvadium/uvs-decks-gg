@@ -9,14 +9,10 @@ import {
   statPageFilterKeys,
   type GameFilterDefinition,
 } from "@shared/games/filters";
-import { UVS_FILTER_DEFINITION } from "@shared/games/uvs/filters";
-
-/** Filters keys owned by the stats page (stat rules + zones) for the default game. */
-export const STATS_FILTER_KEYS = statPageFilterKeys(UVS_FILTER_DEFINITION) as (keyof CardFilters)[];
 
 export function statsFilterCount(
   filters: CardFilters,
-  definition: GameFilterDefinition = UVS_FILTER_DEFINITION
+  definition: GameFilterDefinition
 ): number {
   return countActiveStatPageFilters(definition, filters);
 }

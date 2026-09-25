@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test";
+import { UVS_FILTER_DEFINITION } from "../shared/games/uvs/filters";
 import {
   galleryUrlHasState,
   parseGalleryUrlState,
@@ -20,7 +21,7 @@ describe("gallery url state", () => {
         includeInfinity: false,
         difficulty: { operator: "gte", value: 3 },
       },
-    });
+    }, UVS_FILTER_DEFINITION);
 
     expect(written.get("q")).toBe("ryu");
     expect(written.get("sm")).toBe("name");
@@ -31,9 +32,9 @@ describe("gallery url state", () => {
     expect(written.get("type")).toBe("Character,Attack");
     expect(written.get("includeInfinity")).toBe("0");
     expect(written.get("difficulty")).toBe("gte:3");
-    expect(galleryUrlHasState(written)).toBe(true);
+    expect(galleryUrlHasState(written, UVS_FILTER_DEFINITION)).toBe(true);
 
-    const parsed = parseGalleryUrlState(written);
+    const parsed = parseGalleryUrlState(written, UVS_FILTER_DEFINITION);
     expect(parsed.search).toBe("ryu");
     expect(parsed.searchMode).toBe("name");
     expect(parsed.viewMode).toBe("list");
@@ -57,12 +58,12 @@ describe("gallery url state", () => {
         format: "standard",
         includeBanned: true,
       },
-    });
+    }, UVS_FILTER_DEFINITION);
 
     expect(written.get("includeBanned")).toBe("1");
     expect(written.get("format")).toBeNull();
 
-    const parsed = parseGalleryUrlState(written);
+    const parsed = parseGalleryUrlState(written, UVS_FILTER_DEFINITION);
     expect(parsed.filters?.includeBanned).toBe(true);
   });
 
@@ -75,8 +76,8 @@ describe("gallery url state", () => {
       sortDirection: "asc",
       defaultFormatKey: "standard",
       filters: { format: "standard" },
-    });
+    }, UVS_FILTER_DEFINITION);
     expect(written.toString()).toBe("");
-    expect(galleryUrlHasState(written)).toBe(false);
+    expect(galleryUrlHasState(written, UVS_FILTER_DEFINITION)).toBe(false);
   });
 });

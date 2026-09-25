@@ -7,16 +7,13 @@ import {
   type ValidationError,
   type ValidationWarning,
 } from "./lib/deckFormatRules";
-import { docGame } from "./lib/gameScope";
+import { docGame, findFormatByKey } from "./lib/gameScope";
 import type { QueryCtx } from "./_generated/server";
 import type { GameId } from "../shared/games/types";
 
 /** The deck's format within the deck's game. */
 async function getDeckFormat(ctx: QueryCtx, formatKey: string, game: GameId) {
-  return await ctx.db
-    .query("formats")
-    .withIndex("by_game_and_key", (q) => q.eq("game", game).eq("key", formatKey))
-    .unique();
+  return await findFormatByKey(ctx, game, formatKey);
 }
 
 export type { ValidationResult, ValidationError, ValidationWarning };

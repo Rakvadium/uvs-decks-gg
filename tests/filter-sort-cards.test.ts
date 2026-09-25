@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test";
+import { UVS_FILTER_DEFINITION } from "../shared/games/uvs/filters";
 import { filterCards, paginateCards, sortCards } from "../src/lib/universus/use-universus-cards";
 import type { CachedCard } from "../src/lib/universus/card-store";
 import type { CardFilters, StatFilterValue } from "../src/providers/UIStateProvider";
@@ -21,7 +22,7 @@ function ids(cards: CachedCard[]) {
 }
 
 function run(cards: CachedCard[], filters: CardFilters) {
-  return ids(filterCards(cards, filters));
+  return ids(filterCards(cards, filters, undefined, UVS_FILTER_DEFINITION));
 }
 
 describe("filterCards basics", () => {
@@ -32,7 +33,7 @@ describe("filterCards basics", () => {
 
   test("returns a new array", () => {
     const cards = [card("a")];
-    expect(filterCards(cards, {})).not.toBe(cards);
+    expect(filterCards(cards, {}, undefined, UVS_FILTER_DEFINITION)).not.toBe(cards);
   });
 });
 
@@ -66,16 +67,16 @@ describe("text search", () => {
 describe("format options", () => {
   test("passesFormatLegality filters by setCode", () => {
     const cards = [card("a", { setCode: "old" }), card("b", { setCode: "new" })];
-    const out = filterCards(cards, {}, { passesFormatLegality: (s) => s === "new" });
+    const out = filterCards(cards, {}, { passesFormatLegality: (s) => s === "new" }, UVS_FILTER_DEFINITION);
     expect(ids(out)).toEqual(["b"]);
   });
 
   test("bans apply regardless of filters.format; includeBanned disables", () => {
     const cards = [card("a"), card("banned")];
     const isCardBannedInFormat = (id: string) => id === "banned";
-    expect(ids(filterCards(cards, {}, { isCardBannedInFormat }))).toEqual(["a"]);
-    expect(ids(filterCards(cards, { includeBanned: true }, { isCardBannedInFormat }))).toEqual(["a", "banned"]);
-    expect(ids(filterCards(cards, { includeBanned: true }))).toEqual(["a", "banned"]);
+    expect(ids(filterCards(cards, {}, { isCardBannedInFormat }, UVS_FILTER_DEFINITION))).toEqual(["a"]);
+    expect(ids(filterCards(cards, { includeBanned: true }, { isCardBannedInFormat }, UVS_FILTER_DEFINITION))).toEqual(["a", "banned"]);
+    expect(ids(filterCards(cards, { includeBanned: true }, undefined, UVS_FILTER_DEFINITION))).toEqual(["a", "banned"]);
   });
 });
 
@@ -247,16 +248,16 @@ describe("sortCards", () => {
   const c = card("c", { name: "Charlie", setNumber: 2, collectorNumber: "1", difficulty: 2, speed: 4, damage: 1 });
 
   test("empty and single inputs", () => {
-    expect(sortCards([], { field: "name", direction: "asc" })).toEqual([]);
+    expect(sortCards([], { field: "name", direction: "asc" }, UVS_FILTER_DEFINITION)).toEqual([]);
     const single = [a];
-    const out = sortCards(single, { field: "name", direction: "asc" });
+    const out = sortCards(single, { field: "name", direction: "asc" }, UVS_FILTER_DEFINITION);
     expect(out).toEqual([a]);
     expect(out).not.toBe(single);
   });
 
   test("default: setNumber desc, then collectorNumber asc (numeric)", () => {
-    expect(ids(sortCards([a, b, c], { field: "default", direction: "desc" }))).toEqual(["c", "b", "a"]);
-    expect(ids(sortCards([a, b, c], { field: "unknown", direction: "desc" }))).toEqual(["c", "b", "a"]);
+    expect(ids(sortCards([a, b, c], { field: "default", direction: "desc" }, UVS_FILTER_DEFINITION))).toEqual(["c", "b", "a"]);
+    expect(ids(sortCards([a, b, c], { field: "unknown", direction: "desc" }, UVS_FILTER_DEFINITION))).toEqual(["c", "b", "a"]);
   });
 
   test.each([
@@ -273,7 +274,7 @@ describe("sortCards", () => {
     ["speed", "asc", ["b", "a", "c"]],
     ["damage", "desc", ["a", "c", "b"]],
   ] as const)("%s %s", (field, direction, expected) => {
-    expect(ids(sortCards([a, b, c], { field, direction }))).toEqual([...expected]);
+    expect(ids(sortCards([a, b, c], { field, direction }, UVS_FILTER_DEFINITION))).toEqual([...expected]);
   });
 });
 

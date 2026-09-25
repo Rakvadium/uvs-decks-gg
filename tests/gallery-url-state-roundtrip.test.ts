@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test";
+import { UVS_FILTER_DEFINITION } from "../shared/games/uvs/filters";
 import {
   fromGalleryViewMode,
   galleryUrlHasState,
@@ -19,8 +20,8 @@ const baseState = {
 };
 
 function roundTrip(filters: CardFilters) {
-  const written = writeGalleryUrlState(new URLSearchParams(), { ...baseState, filters });
-  return { written, parsed: parseGalleryUrlState(written) };
+  const written = writeGalleryUrlState(new URLSearchParams(), { ...baseState, filters }, UVS_FILTER_DEFINITION);
+  return { written, parsed: parseGalleryUrlState(written, UVS_FILTER_DEFINITION) };
 }
 
 describe("gallery url state: every filter key round-trips", () => {
@@ -161,7 +162,7 @@ describe("gallery url state: write details", () => {
       sortField: "difficulty",
       sortDirection: "desc",
       filters: {},
-    });
+    }, UVS_FILTER_DEFINITION);
     expect(written.toString()).toBe("q=ryu&sm=text&view=details&sort=difficulty&dir=desc");
   });
 
@@ -172,7 +173,7 @@ describe("gallery url state: write details", () => {
       searchMode: "all",
       viewMode: "card",
       filters: { format: "standard" },
-    });
+    }, UVS_FILTER_DEFINITION);
     expect(written.get("format")).toBe("standard");
   });
 
@@ -185,48 +186,48 @@ describe("gallery url state: write details", () => {
     const written = writeGalleryUrlState(new URLSearchParams("keep=1&type=Old&difficulty=eq:1"), {
       ...baseState,
       filters: {},
-    });
+    }, UVS_FILTER_DEFINITION);
     expect(written.toString()).toBe("keep=1");
   });
 });
 
 describe("gallery url state: parse details", () => {
   test("grid view alias maps to card; invalid values are dropped", () => {
-    expect(parseGalleryUrlState(new URLSearchParams("view=grid")).viewMode).toBe("card");
-    const parsed = parseGalleryUrlState(new URLSearchParams("view=tiles&sm=fuzzy&dir=up"));
+    expect(parseGalleryUrlState(new URLSearchParams("view=grid"), UVS_FILTER_DEFINITION).viewMode).toBe("card");
+    const parsed = parseGalleryUrlState(new URLSearchParams("view=tiles&sm=fuzzy&dir=up"), UVS_FILTER_DEFINITION);
     expect(parsed).toEqual({});
   });
 
   test("empty q is kept as empty string", () => {
-    expect(parseGalleryUrlState(new URLSearchParams("q=")).search).toBe("");
+    expect(parseGalleryUrlState(new URLSearchParams("q="), UVS_FILTER_DEFINITION).search).toBe("");
   });
 
   test("csv trims and drops empties", () => {
-    expect(parseGalleryUrlState(new URLSearchParams("type= A , ,B")).filters?.type).toEqual(["A", "B"]);
-    expect(parseGalleryUrlState(new URLSearchParams("type=,,")).filters).toBeUndefined();
+    expect(parseGalleryUrlState(new URLSearchParams("type= A , ,B"), UVS_FILTER_DEFINITION).filters?.type).toEqual(["A", "B"]);
+    expect(parseGalleryUrlState(new URLSearchParams("type=,,"), UVS_FILTER_DEFINITION).filters).toBeUndefined();
   });
 
   test("bools accept 1/true/0/false only", () => {
-    const parsed = parseGalleryUrlState(new URLSearchParams("hasAttack=true&hasBlock=0&isCharacter=yes"));
+    const parsed = parseGalleryUrlState(new URLSearchParams("hasAttack=true&hasBlock=0&isCharacter=yes"), UVS_FILTER_DEFINITION);
     expect(parsed.filters).toEqual({ hasAttack: true, hasBlock: false });
   });
 
   test("numbers reject empty and non-finite", () => {
-    const parsed = parseGalleryUrlState(new URLSearchParams("difficultyMin=&controlMin=abc&speedMin=Infinity&damageMin=2"));
+    const parsed = parseGalleryUrlState(new URLSearchParams("difficultyMin=&controlMin=abc&speedMin=Infinity&damageMin=2"), UVS_FILTER_DEFINITION);
     expect(parsed.filters).toEqual({ damageMin: 2 });
   });
 
   test("stats reject bad operators/amounts; extra segments are ignored", () => {
     const parsed = parseGalleryUrlState(
-      new URLSearchParams("difficulty=foo:1&control=eq:&speed=eq:x&damage=gte&health=lt:3:9"),
+      new URLSearchParams("difficulty=foo:1&control=eq:&speed=eq:x&damage=gte&health=lt:3:9"), UVS_FILTER_DEFINITION,
     );
     expect(parsed.filters).toEqual({ health: { operator: "lt", value: 3 } });
   });
 
   test("galleryUrlHasState only reacts to gallery keys", () => {
-    expect(galleryUrlHasState(new URLSearchParams("foo=1"))).toBe(false);
-    expect(galleryUrlHasState(new URLSearchParams("stamina=eq:1"))).toBe(true);
-    expect(galleryUrlHasState(new URLSearchParams("format="))).toBe(true);
+    expect(galleryUrlHasState(new URLSearchParams("foo=1"), UVS_FILTER_DEFINITION)).toBe(false);
+    expect(galleryUrlHasState(new URLSearchParams("stamina=eq:1"), UVS_FILTER_DEFINITION)).toBe(true);
+    expect(galleryUrlHasState(new URLSearchParams("format="), UVS_FILTER_DEFINITION)).toBe(true);
   });
 });
 

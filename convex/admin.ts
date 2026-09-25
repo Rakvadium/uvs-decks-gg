@@ -36,9 +36,18 @@ import { normalizeAbilityText } from "./lib/normalizeAbilityText";
 import { DEFAULT_GAME_ID, type GameId } from "../shared/games/types";
 import {
   byCreationTime,
+  collectInGame,
   docGame,
+  findCardBySetAndNumber,
+  findFormatByKey,
+  findInGame,
+  findSetByCode,
+  findSetLegality,
+  gameTagPatch,
   getCardDataVersionDoc,
   isDocInGame,
+  resolveGame,
+  withResolvedGame,
 } from "./lib/gameScope";
 
 const ADMIN_SET_LIST_MAX = 25_000;
@@ -48,6 +57,21 @@ async function requireCardInGame(ctx: QueryCtx, cardId: Id<"cards">, game: GameI
   const card = await ctx.db.get(cardId);
   if (!isDocInGame(card, game)) {
     throw new Error("Card not found in this game");
+  }
+}
+
+/** Throws unless each face link (`backCardId` / `frontCardId`) points at a card of `game`. */
+async function requireLinkedFacesInGame(
+  ctx: QueryCtx,
+  links: { backCardId?: Id<"cards">; frontCardId?: Id<"cards"> },
+  game: GameId,
+) {
+  for (const linkedId of [links.backCardId, links.frontCardId]) {
+    if (!linkedId) continue;
+    const linked = await ctx.db.get(linkedId);
+    if (!isDocInGame(linked, game)) {
+      throw new Error("Linked face card must belong to the same game");
+    }
   }
 }
 
@@ -73,11 +97,12 @@ async function loadFormatReferences(ctx: QueryCtx, game: GameId, formatKey: stri
 
 export const listCardsBySetCode = query({
   args: {
-    game: gameIdValidator,
+    game: v.optional(gameIdValidator),
     setCode: v.string(),
   },
   returns: v.array(cardValidator),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     await requireAdmin(ctx);
     return await ctx.db
       .query("cards")
@@ -124,7 +149,7 @@ export const getCardDeleteWarnings = query({
 });
 
 export const releaseCards = action({
-  args: { game: gameIdValidator },
+  args: { game: v.optional(gameIdValidator) },
   returns: v.object({
     version: v.number(),
     cardCount: v.number(),
@@ -142,7 +167,7 @@ export const releaseCards = action({
       cardCount: number;
       previousVersion: number | null;
       catalogUrl: string;
-    } = await ctx.runAction(internal.catalogRelease.releaseCatalogInternal, { game: args.game });
+    } = await ctx.runAction(internal.catalogRelease.releaseCatalogInternal, { game: resolveGame(args.game) });
     return result;
   },
 });
@@ -152,7 +177,7 @@ const UNRELEASED_SCAN_PAGE = 500;
 
 export const listUnreleasedCards = query({
   args: {
-    game: gameIdValidator,
+    game: v.optional(gameIdValidator),
     setCode: v.optional(v.string()),
   },
   returns: v.object({
@@ -163,7 +188,8 @@ export const listUnreleasedCards = query({
     truncated: v.boolean(),
     noPublishedCatalogYet: v.boolean(),
   }),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     await requireAdmin(ctx);
 
     const versionDoc = await getCardDataVersionDoc(ctx, args.game);
@@ -212,7 +238,7 @@ export const listUnreleasedCards = query({
 
 export const createSet = mutation({
   args: {
-    game: gameIdValidator,
+    game: v.optional(gameIdValidator),
     code: v.string(),
     name: v.string(),
     releasedAt: v.optional(v.number()),
@@ -224,13 +250,11 @@ export const createSet = mutation({
     isFuture: v.optional(v.boolean()),
   },
   returns: v.id("sets"),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     await requireAdmin(ctx);
 
-    const existing = await ctx.db
-      .query("sets")
-      .withIndex("by_game_and_code", (q) => q.eq("game", args.game).eq("code", args.code))
-      .unique();
+    const existing = await findSetByCode(ctx, args.game, args.code);
     if (existing) {
       throw new Error(`Set with code "${args.code}" already exists`);
     }
@@ -294,7 +318,7 @@ export const deleteSet = mutation({
 
 export const createFormat = mutation({
   args: {
-    game: gameIdValidator,
+    game: v.optional(gameIdValidator),
     key: v.string(),
     name: v.string(),
     description: v.optional(v.string()),
@@ -311,13 +335,11 @@ export const createFormat = mutation({
     }))),
   },
   returns: v.id("formats"),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     await requireAdmin(ctx);
 
-    const existing = await ctx.db
-      .query("formats")
-      .withIndex("by_game_and_key", (q) => q.eq("game", args.game).eq("key", args.key))
-      .unique();
+    const existing = await findFormatByKey(ctx, args.game, args.key);
     if (existing) {
       throw new Error(`Format with key "${args.key}" already exists`);
     }
@@ -504,12 +526,13 @@ export const deleteFormat = mutation({
 });
 
 export const seedFormats = mutation({
-  args: { game: gameIdValidator },
+  args: { game: v.optional(gameIdValidator) },
   returns: v.object({
     created: v.number(),
     skipped: v.number(),
   }),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     await requireAdmin(ctx);
     const defaultFormats = [
       {
@@ -554,12 +577,13 @@ export const seedFormats = mutation({
     let skipped = 0;
 
     for (const format of defaultFormats) {
-      const existing = await ctx.db
-        .query("formats")
-        .withIndex("by_game_and_key", (q) => q.eq("game", args.game).eq("key", format.key))
-        .unique();
+      const existing = await findFormatByKey(ctx, args.game, format.key);
 
       if (existing) {
+        const tag = gameTagPatch(existing, args.game);
+        if (tag) {
+          await ctx.db.patch(existing._id, tag);
+        }
         if (format.key === "standard") {
           await ctx.db.patch(existing._id, {
             sideboardRule: format.sideboardRule,
@@ -583,11 +607,12 @@ export const seedFormats = mutation({
 
 export const createCard = mutation({
   args: {
-    game: gameIdValidator,
+    game: v.optional(gameIdValidator),
     card: cardInputValidator,
   },
   returns: v.id("cards"),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     await requireAdmin(ctx);
     return await createCardWithDerivedFields(ctx, args.game, args.card);
   },
@@ -639,6 +664,7 @@ export const updateCard = mutation({
     if (!before) {
       throw new Error("Card not found");
     }
+    await requireLinkedFacesInGame(ctx, args.updates, docGame(before));
 
     const filteredUpdates: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(args.updates)) {
@@ -896,6 +922,7 @@ export const updateCardFromJson = mutation({
       throw new Error('Field "_id" in JSON must match the card being edited');
     }
     const row = mergeCardReplaceBodyFromAdminJson(obj, existing);
+    await requireLinkedFacesInGame(ctx, row, docGame(existing));
     await recordCardTextHistoryIfChanged(ctx, {
       cardId: args.cardId,
       game: docGame(existing),
@@ -949,6 +976,7 @@ export const createCardVariantFromJson = mutation({
       throw new Error('Remove "_creationTime" from JSON');
     }
     const row = mergeCardReplaceBodyFromAdminJson(obj, template);
+    await requireLinkedFacesInGame(ctx, row, docGame(template));
     if (row.oracleId !== template.oracleId) {
       throw new Error("oracleId must match the template card so printings stay linked");
     }
@@ -1057,15 +1085,7 @@ export const insertCardBatch = internalMutation({
 
         const existing =
           card.setCode && card.collectorNumber
-            ? await ctx.db
-                .query("cards")
-                .withIndex("by_game_and_setCode_and_collectorNumber", (q) =>
-                  q
-                    .eq("game", args.game)
-                    .eq("setCode", card.setCode!)
-                    .eq("collectorNumber", card.collectorNumber!)
-                )
-                .first()
+            ? await findCardBySetAndNumber(ctx, args.game, card.setCode, card.collectorNumber)
             : null;
 
         if (existing) {
@@ -1173,7 +1193,7 @@ export const ensureAdminForAction = internalMutation({
 
 export const bulkImportCards = action({
   args: {
-    game: gameIdValidator,
+    game: v.optional(gameIdValidator),
     format: v.union(v.literal("json")),
     data: v.string(),
     defaultSetCode: v.optional(v.string()),
@@ -1183,7 +1203,8 @@ export const bulkImportCards = action({
     jobId: v.id("ingestionJobs"),
     totalRecords: v.number(),
   }),
-  handler: async (ctx, args): Promise<{ jobId: Id<"ingestionJobs">; totalRecords: number }> => {
+  handler: async (ctx, rawArgs): Promise<{ jobId: Id<"ingestionJobs">; totalRecords: number }> => {
+    const args = withResolvedGame(rawArgs);
     let parsed: unknown;
     if (args.format === "json") {
       try {
@@ -1296,11 +1317,12 @@ export const getIngestionJob = query({
 
 export const listMyRecentIngestionJobs = query({
   args: {
-    game: gameIdValidator,
+    game: v.optional(gameIdValidator),
     limit: v.optional(v.number()),
   },
   returns: v.array(ingestionJobValidator),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     await requireAdmin(ctx);
     const userId = await getAuthUserId(ctx);
     if (!userId) {
@@ -1337,9 +1359,10 @@ export const logAdminAudit = internalMutation({
 });
 
 export const getCardCount = query({
-  args: { game: gameIdValidator },
+  args: { game: v.optional(gameIdValidator) },
   returns: v.number(),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     await requireAdmin(ctx);
     const version = await getCardDataVersionDoc(ctx, args.game);
     return version?.cardCount ?? 0;
@@ -1395,7 +1418,7 @@ export const importCardsBatch = internalMutation({
 
 export const importUniversusCards = action({
   args: {
-    game: gameIdValidator,
+    game: v.optional(gameIdValidator),
     cardsJson: v.string(),
   },
   returns: v.object({
@@ -1403,7 +1426,8 @@ export const importUniversusCards = action({
     inserted: v.number(),
     failed: v.number(),
   }),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     const userId = await getAuthUserId(ctx);
     if (!userId) {
       throw new Error("Not authenticated");
@@ -1448,7 +1472,7 @@ export const importUniversusCards = action({
 
 export const importCardsOnly = action({
   args: {
-    game: gameIdValidator,
+    game: v.optional(gameIdValidator),
     cards: v.array(cardInputValidator),
   },
   returns: v.object({
@@ -1456,7 +1480,8 @@ export const importCardsOnly = action({
     failed: v.number(),
     errors: v.optional(v.array(v.string())),
   }),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     const userId = await getAuthUserId(ctx);
     if (!userId) {
       throw new Error("Not authenticated");
@@ -1595,13 +1620,11 @@ export const upsertSet = internalMutation({
   returns: v.id("sets"),
   handler: async (ctx, args) => {
     const game = args.game ?? DEFAULT_GAME_ID;
-    const existing = await ctx.db
-      .query("sets")
-      .withIndex("by_game_and_code", (q) => q.eq("game", game).eq("code", args.code))
-      .unique();
+    const existing = await findSetByCode(ctx, game, args.code);
 
     if (existing) {
       await ctx.db.patch(existing._id, {
+        ...gameTagPatch(existing, game),
         name: args.name,
         setNumber: args.setNumber,
         legality: args.legality,
@@ -1702,15 +1725,7 @@ export const upsertCardsBatch = internalMutation({
         };
 
         const existing = card.setCode && card.collectorNumber
-          ? await ctx.db
-              .query("cards")
-              .withIndex("by_game_and_setCode_and_collectorNumber", (q) =>
-                q
-                  .eq("game", game)
-                  .eq("setCode", card.setCode!)
-                  .eq("collectorNumber", card.collectorNumber!)
-              )
-              .first()
+          ? await findCardBySetAndNumber(ctx, game, card.setCode, card.collectorNumber)
           : null;
 
         if (card.setCode) {
@@ -1753,19 +1768,23 @@ export const linkCardFaces = internalMutation({
 
     for (const link of args.links) {
       try {
-        const frontCard = await ctx.db
-          .query("cards")
-          .withIndex("by_game_and_oracleId", (q) =>
-            q.eq("game", game).eq("oracleId", link.frontOracleId)
-          )
-          .first();
+        const frontCard = await findInGame(game, (value) =>
+          ctx.db
+            .query("cards")
+            .withIndex("by_game_and_oracleId", (q) =>
+              q.eq("game", value).eq("oracleId", link.frontOracleId)
+            )
+            .first()
+        );
 
-        const backCard = await ctx.db
-          .query("cards")
-          .withIndex("by_game_and_oracleId", (q) =>
-            q.eq("game", game).eq("oracleId", link.backOracleId)
-          )
-          .first();
+        const backCard = await findInGame(game, (value) =>
+          ctx.db
+            .query("cards")
+            .withIndex("by_game_and_oracleId", (q) =>
+              q.eq("game", value).eq("oracleId", link.backOracleId)
+            )
+            .first()
+        );
 
         if (!frontCard || !backCard) {
           failed++;
@@ -1873,11 +1892,12 @@ export const deleteSetsBatch = internalMutation({
 });
 
 export const clearAllSets = action({
-  args: { game: gameIdValidator },
+  args: { game: v.optional(gameIdValidator) },
   returns: v.object({
     deletedCount: v.number(),
   }),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     const userId = await getAuthUserId(ctx);
     if (!userId) {
       throw new Error("Not authenticated");
@@ -1923,9 +1943,10 @@ const BULK_CARD_LEGALITY_MAX = 500;
 const SEARCH_CARDS_LEGALITY_MAX = 40;
 
 export const listSetLegalityByFormat = query({
-  args: { game: gameIdValidator, formatKey: v.string() },
+  args: { game: v.optional(gameIdValidator), formatKey: v.string() },
   returns: v.array(setLegalityValidator),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     await requireAdmin(ctx);
     return await ctx.db
       .query("setLegality")
@@ -1937,9 +1958,10 @@ export const listSetLegalityByFormat = query({
 });
 
 export const listCardLegalityByFormat = query({
-  args: { game: gameIdValidator, formatKey: v.string() },
+  args: { game: v.optional(gameIdValidator), formatKey: v.string() },
   returns: v.array(cardLegalityValidator),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     await requireAdmin(ctx);
     return await ctx.db
       .query("cardLegality")
@@ -1951,7 +1973,7 @@ export const listCardLegalityByFormat = query({
 });
 
 export const listCardLegalityByFormatEnriched = query({
-  args: { game: gameIdValidator, formatKey: v.string() },
+  args: { game: v.optional(gameIdValidator), formatKey: v.string() },
   returns: v.array(
     v.object({
       _id: v.id("cardLegality"),
@@ -1965,7 +1987,8 @@ export const listCardLegalityByFormatEnriched = query({
       cardSetCode: v.optional(v.string()),
     })
   ),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     await requireAdmin(ctx);
     const rows = await ctx.db
       .query("cardLegality")
@@ -2005,7 +2028,7 @@ export const listCardLegalityByFormatEnriched = query({
 
 export const searchCardsForLegalityAdmin = query({
   args: {
-    game: gameIdValidator,
+    game: v.optional(gameIdValidator),
     query: v.string(),
     searchTier: v.optional(
       v.union(v.literal("name"), v.literal("keywords"), v.literal("all"))
@@ -2013,7 +2036,8 @@ export const searchCardsForLegalityAdmin = query({
     limit: v.optional(v.number()),
   },
   returns: v.array(cardValidator),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     await requireAdmin(ctx);
     const tier = args.searchTier ?? "name";
     const lim = Math.min(
@@ -2050,7 +2074,7 @@ export const searchCardsForLegalityAdmin = query({
 });
 
 export const exportFormatLegalityBundle = query({
-  args: { game: gameIdValidator, formatKey: v.string() },
+  args: { game: v.optional(gameIdValidator), formatKey: v.string() },
   returns: v.object({
     formatKey: v.string(),
     cardLegality: v.array(
@@ -2069,7 +2093,8 @@ export const exportFormatLegalityBundle = query({
       })
     ),
   }),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     await requireAdmin(ctx);
     const [cardRows, setRows] = await Promise.all([
       ctx.db
@@ -2104,23 +2129,20 @@ export const exportFormatLegalityBundle = query({
 
 export const upsertSetLegality = mutation({
   args: {
-    game: gameIdValidator,
+    game: v.optional(gameIdValidator),
     formatKey: v.string(),
     setCode: v.string(),
     isLegal: v.boolean(),
     rotatesOutAt: v.optional(v.number()),
   },
   returns: v.id("setLegality"),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     await requireAdmin(ctx);
-    const existing = await ctx.db
-      .query("setLegality")
-      .withIndex("by_game_and_format_set", (q) =>
-        q.eq("game", args.game).eq("formatKey", args.formatKey).eq("setCode", args.setCode)
-      )
-      .unique();
+    const existing = await findSetLegality(ctx, args.game, args.formatKey, args.setCode);
     if (existing) {
       await ctx.db.patch(existing._id, {
+        ...gameTagPatch(existing, args.game),
         isLegal: args.isLegal,
         rotatesOutAt: args.rotatesOutAt,
       });
@@ -2138,7 +2160,7 @@ export const upsertSetLegality = mutation({
 
 export const upsertCardLegality = mutation({
   args: {
-    game: gameIdValidator,
+    game: v.optional(gameIdValidator),
     formatKey: v.string(),
     cardId: v.id("cards"),
     status: cardLegalityStatusValue,
@@ -2146,7 +2168,8 @@ export const upsertCardLegality = mutation({
     effectiveDate: v.optional(v.number()),
   },
   returns: v.union(v.id("cardLegality"), v.null()),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     await requireAdmin(ctx);
     await requireCardInGame(ctx, args.cardId, args.game);
     // `cardId` implies the game, so the (format, card) row is already game-unique.
@@ -2166,6 +2189,7 @@ export const upsertCardLegality = mutation({
 
     if (existing) {
       await ctx.db.patch(existing._id, {
+        ...gameTagPatch(existing, args.game),
         status: args.status,
         copyLimitOverride: args.copyLimitOverride,
         effectiveDate: args.effectiveDate,
@@ -2186,7 +2210,7 @@ export const upsertCardLegality = mutation({
 
 export const bulkUpsertCardLegality = mutation({
   args: {
-    game: gameIdValidator,
+    game: v.optional(gameIdValidator),
     formatKey: v.string(),
     entries: v.array(cardLegalityUpsertEntry),
   },
@@ -2194,7 +2218,8 @@ export const bulkUpsertCardLegality = mutation({
     applied: v.number(),
     skipped: v.number(),
   }),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     await requireAdmin(ctx);
     if (args.entries.length > BULK_CARD_LEGALITY_MAX) {
       throw new Error(
@@ -2223,6 +2248,7 @@ export const bulkUpsertCardLegality = mutation({
 
         if (existing) {
           await ctx.db.patch(existing._id, {
+            ...gameTagPatch(existing, args.game),
             status: entry.status,
             copyLimitOverride: entry.copyLimitOverride,
             effectiveDate: entry.effectiveDate,
@@ -2248,7 +2274,7 @@ export const bulkUpsertCardLegality = mutation({
 
 export const importFormatLegalityBundle = mutation({
   args: {
-    game: gameIdValidator,
+    game: v.optional(gameIdValidator),
     formatKey: v.string(),
     cardLegality: v.optional(v.array(cardLegalityUpsertEntry)),
     setLegality: v.optional(v.array(setLegalityUpsertEntry)),
@@ -2259,7 +2285,8 @@ export const importFormatLegalityBundle = mutation({
     cardRowsWritten: v.number(),
     setRowsWritten: v.number(),
   }),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     await requireAdmin(ctx);
     const cardIn = args.cardLegality ?? [];
     const setIn = args.setLegality ?? [];
@@ -2273,12 +2300,14 @@ export const importFormatLegalityBundle = mutation({
     let setRowsWritten = 0;
 
     if (args.replaceCardLegality) {
-      const existing = await ctx.db
-        .query("cardLegality")
-        .withIndex("by_game_and_format", (q) =>
-          q.eq("game", args.game).eq("formatKey", args.formatKey)
-        )
-        .collect();
+      const existing = await collectInGame(args.game, (value) =>
+        ctx.db
+          .query("cardLegality")
+          .withIndex("by_game_and_format", (q) =>
+            q.eq("game", value).eq("formatKey", args.formatKey)
+          )
+          .collect()
+      );
       for (const row of existing) {
         await ctx.db.delete(row._id);
       }
@@ -2316,6 +2345,7 @@ export const importFormatLegalityBundle = mutation({
 
           if (existing) {
             await ctx.db.patch(existing._id, {
+              ...gameTagPatch(existing, args.game),
               status: entry.status,
               copyLimitOverride: entry.copyLimitOverride,
               effectiveDate: entry.effectiveDate,
@@ -2338,12 +2368,14 @@ export const importFormatLegalityBundle = mutation({
     }
 
     if (args.replaceSetLegality) {
-      const existing = await ctx.db
-        .query("setLegality")
-        .withIndex("by_game_and_format", (q) =>
-          q.eq("game", args.game).eq("formatKey", args.formatKey)
-        )
-        .collect();
+      const existing = await collectInGame(args.game, (value) =>
+        ctx.db
+          .query("setLegality")
+          .withIndex("by_game_and_format", (q) =>
+            q.eq("game", value).eq("formatKey", args.formatKey)
+          )
+          .collect()
+      );
       for (const row of existing) {
         await ctx.db.delete(row._id);
       }
@@ -2359,14 +2391,10 @@ export const importFormatLegalityBundle = mutation({
       }
     } else {
       for (const entry of setIn) {
-        const existing = await ctx.db
-          .query("setLegality")
-          .withIndex("by_game_and_format_set", (q) =>
-            q.eq("game", args.game).eq("formatKey", args.formatKey).eq("setCode", entry.setCode)
-          )
-          .unique();
+        const existing = await findSetLegality(ctx, args.game, args.formatKey, entry.setCode);
         if (existing) {
           await ctx.db.patch(existing._id, {
+            ...gameTagPatch(existing, args.game),
             isLegal: entry.isLegal,
             rotatesOutAt: entry.rotatesOutAt,
           });
@@ -2388,7 +2416,7 @@ export const importFormatLegalityBundle = mutation({
 });
 
 export const getCardDataVersion = query({
-  args: { game: gameIdValidator },
+  args: { game: v.optional(gameIdValidator) },
   returns: v.union(
     v.object({
       version: v.number(),
@@ -2400,7 +2428,8 @@ export const getCardDataVersion = query({
     }),
     v.null()
   ),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     await requireAdmin(ctx);
     const versionDoc = await getCardDataVersionDoc(ctx, args.game);
     if (!versionDoc) return null;

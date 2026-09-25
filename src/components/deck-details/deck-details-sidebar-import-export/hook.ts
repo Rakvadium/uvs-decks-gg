@@ -9,7 +9,6 @@ import { useDeckDetailsOptional } from "@/providers/DeckDetailsProvider";
 import { useGameModule } from "@/games/game-context";
 import { deckRevisionNumber, isDeckWriteConflictError, isTeamEditableDeck } from "@/lib/deck/visibility";
 import {
-  UVS_MAIN_TYPE_ORDER,
   buildCardNameIndex,
   findCardByName,
   formatUvsUltraDeckExport,
@@ -35,6 +34,7 @@ export function useImportExportSidebarModel() {
   const gameModule = useGameModule();
   const gameDeck = gameModule.deck;
   const { formatCardType } = gameModule.ui;
+  const { mainTypeOrder } = gameDeck.text;
   const setup = gameDeck.normalizeSetup(deck);
   const startingCharacterId = setup.startingCharacterId;
   const cardMap = useCardIdMap(cards);
@@ -52,17 +52,17 @@ export function useImportExportSidebarModel() {
       if (!card) continue;
 
       const type = formatCardType(card.type) ?? card.type ?? "Other";
-      if (!UVS_MAIN_TYPE_ORDER.includes(type as (typeof UVS_MAIN_TYPE_ORDER)[number])) continue;
+      if (!mainTypeOrder.includes(type)) continue;
 
       entries.push({
         name: card.name,
         quantity,
-        type: type as (typeof UVS_MAIN_TYPE_ORDER)[number],
+        type: type as UvsUltraDeckLine["type"],
       });
     }
 
     return entries;
-  }, [deck, cardMap, formatCardType]);
+  }, [deck, cardMap, formatCardType, mainTypeOrder]);
 
   const exportSideEntries = useMemo(() => {
     if (!deck) return [] as UvsUltraDeckLine[];

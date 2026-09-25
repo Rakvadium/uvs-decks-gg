@@ -10,7 +10,7 @@ import { getAuthUserId } from "@convex-dev/auth/server";
 import { runCatalogAggregateRefresh } from "./cardFacets";
 import { CATALOG_STATIC_SCHEMA_VERSION, catalogObjectKeysToDelete } from "./publicCardUrls";
 import { gameIdValidator } from "./validators";
-import { getCardDataVersionDoc } from "./lib/gameScope";
+import { getCardDataVersionDoc, resolveGame } from "./lib/gameScope";
 
 const CATALOG_VERSIONS_TO_RETAIN = 5;
 
@@ -167,7 +167,7 @@ export const releaseCatalogInternal = internalAction({
 });
 
 export const releaseCatalog = action({
-  args: { game: gameIdValidator },
+  args: { game: v.optional(gameIdValidator) },
   returns: releaseResultValidator,
   handler: async (ctx, args): Promise<{
     version: number;
@@ -180,7 +180,7 @@ export const releaseCatalog = action({
       cardCount: number;
       previousVersion: number | null;
       catalogUrl: string;
-    } = await ctx.runAction(internal.catalogRelease.releaseCatalogInternal, { game: args.game });
+    } = await ctx.runAction(internal.catalogRelease.releaseCatalogInternal, { game: resolveGame(args.game) });
     return result;
   },
 });

@@ -7,6 +7,7 @@ import { Loader2, Search, XIcon } from "lucide-react";
 import { UNIVERSUS_FILTER_SYMBOLS, UNIVERSUS_SYMBOL_DISPLAY, formatUniversusCardType, type UniversusSymbol } from "@/games/uvs/config";
 import { useCardData } from "@/lib/universus/card-data-provider";
 import { filterCards } from "@/lib/universus/use-universus-cards";
+import { UVS_FILTER_DEFINITION } from "@shared/games/uvs/filters";
 import { useCardIdMap } from "@/hooks/useCardIdMap";
 import { useInfiniteSlice } from "@/hooks/useInfiniteSlice";
 import { CardGridItem } from "./card-grid-item/content";
@@ -75,7 +76,7 @@ export function DeckCharacterPickerDialog({
       searchMode: "name",
       symbols: selectedSymbols.length > 0 ? selectedSymbols : undefined,
       symbolMatchAll: selectedSymbols.length > 1 ? true : undefined,
-    });
+    }, undefined, UVS_FILTER_DEFINITION);
     return filtered.sort((a, b) => {
       const setNumA = a.setNumber ?? 0;
       const setNumB = b.setNumber ?? 0;

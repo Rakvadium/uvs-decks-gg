@@ -30,7 +30,7 @@ import {
   TIER_LIST_POOL_ALL_TYPES,
 } from "../shared/tier-list-pool";
 import type { GameId } from "../shared/games/types";
-import { docGame, isDocInGame } from "./lib/gameScope";
+import { docGame, isDocInGame, withResolvedGame } from "./lib/gameScope";
 
 const tierListSaveItemValidator = v.object({
   cardId: v.id("cards"),
@@ -213,11 +213,12 @@ async function getLikedState(
 
 export const listPublicFeed = query({
   args: {
-    game: gameIdValidator,
+    game: v.optional(gameIdValidator),
     limit: v.optional(v.number()),
   },
   returns: v.array(tierListFeedEntryValidator),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     const viewerId = await getAuthUserId(ctx);
     const limit = Math.min(Math.max(args.limit ?? 12, 1), 24);
     const tierLists = await ctx.db
@@ -250,11 +251,12 @@ export const listPublicFeed = query({
 
 export const listMine = query({
   args: {
-    game: gameIdValidator,
+    game: v.optional(gameIdValidator),
     limit: v.optional(v.number()),
   },
   returns: v.array(tierListValidator),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     const userId = await getAuthUserId(ctx);
     if (!userId) {
       return [];
@@ -273,11 +275,12 @@ export const listMine = query({
 
 export const getEditable = query({
   args: {
-    game: gameIdValidator,
+    game: v.optional(gameIdValidator),
     tierListId: v.id("tierLists"),
   },
   returns: v.union(tierListEditableValidator, v.null()),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     const userId = await getAuthUserId(ctx);
     if (!userId) {
       return null;
@@ -302,11 +305,12 @@ export const getEditable = query({
 
 export const getDetail = query({
   args: {
-    game: gameIdValidator,
+    game: v.optional(gameIdValidator),
     tierListId: v.id("tierLists"),
   },
   returns: v.union(tierListDetailValidator, v.null()),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     const viewerId = await getAuthUserId(ctx);
     const tierList = await ctx.db.get(args.tierListId);
 
@@ -368,7 +372,7 @@ export const getDetail = query({
 
 export const save = mutation({
   args: {
-    game: gameIdValidator,
+    game: v.optional(gameIdValidator),
     tierListId: v.optional(v.id("tierLists")),
     title: v.string(),
     description: v.optional(v.string()),
@@ -389,7 +393,8 @@ export const save = mutation({
   returns: v.object({
     tierListId: v.id("tierLists"),
   }),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     const userId = await requireAuth(ctx);
     await requireUserCanPostContent(ctx, userId);
     const normalizedTitle = sanitizeText(args.title, 80) ?? "Untitled Tier List";
@@ -421,6 +426,12 @@ export const save = mutation({
 
     const validLaneKeys = new Set<string>(["pool", ...normalizedTiers.map((tier) => tier.id)]);
     const normalizedItems = normalizeItems(args.items, validLaneKeys);
+    // Items (and the preview/featured ids derived from them) must be cards of this game.
+    const uniqueCardIds = [...new Set(normalizedItems.map((item) => item.cardId))];
+    const cards = await Promise.all(uniqueCardIds.map((cardId) => ctx.db.get(cardId)));
+    if (cards.some((card) => !isDocInGame(card, args.game))) {
+      throw new Error("Card not found in this game");
+    }
     const assignedItems = normalizedItems.filter((item) => item.laneKey !== "pool");
     const previewSource = assignedItems.length > 0 ? assignedItems : normalizedItems;
     const previewCardIds = previewSource.slice(0, 4).map((item) => item.cardId);

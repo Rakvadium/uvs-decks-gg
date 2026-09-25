@@ -3,7 +3,6 @@
 import { useMemo } from "react";
 import { toggleCanonicalRarityFilter } from "@/lib/universus/rarity";
 import { STAT_OPERATOR_OPTIONS, statStandaloneLabel } from "@shared/games/filters";
-import { UVS_STAT_FILTERS } from "@shared/games/uvs/filters";
 import { useGameModule } from "@/games/game-context";
 import type { StatOperator } from "@/providers/UIStateProvider";
 import { useGalleryFilterDialogContext } from "../filter-dialog/context";
@@ -12,14 +11,6 @@ import type { StatFilterKey, StringArrayFilterKey } from "../filter-dialog/types
 export const OPERATOR_GLYPHS = Object.fromEntries(
   STAT_OPERATOR_OPTIONS.map((option) => [option.value, option.glyph])
 ) as Record<StatOperator, string>;
-
-/** @deprecated Read labels from `useGameModule().filters.stats` (`statStandaloneLabel`). */
-export const STAT_LABELS = Object.fromEntries(
-  UVS_STAT_FILTERS.map((stat) => [stat.key, statStandaloneLabel(stat)])
-) as Record<StatFilterKey, string>;
-
-/** @deprecated Read keys from `useGameModule().filters.stats`. */
-export const STAT_KEYS = UVS_STAT_FILTERS.map((stat) => stat.key) as StatFilterKey[];
 
 export interface ActiveChip {
   id: string;

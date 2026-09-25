@@ -1,6 +1,5 @@
 import type { CardFilters, GalleryViewMode, StatFilterValue } from "@/providers/UIStateProvider";
 import { isStatOperator, statRangeParamKeys, type GameFilterDefinition } from "@shared/games/filters";
-import { UVS_FILTER_DEFINITION } from "@shared/games/uvs/filters";
 
 export type GallerySearchMode = "name" | "text" | "all";
 export type GalleryUiViewMode = "card" | "list" | "details";
@@ -104,7 +103,7 @@ function serializeStat(value: StatFilterValue | undefined): string | undefined {
 
 export function galleryUrlHasState(
   params: URLSearchParams,
-  definition: GameFilterDefinition = UVS_FILTER_DEFINITION
+  definition: GameFilterDefinition
 ): boolean {
   const { all } = getGalleryParamKeys(definition);
   for (const key of params.keys()) {
@@ -115,7 +114,7 @@ export function galleryUrlHasState(
 
 export function parseGalleryUrlState(
   params: URLSearchParams,
-  definition: GameFilterDefinition = UVS_FILTER_DEFINITION
+  definition: GameFilterDefinition
 ): Partial<GalleryUrlState> {
   const { arrayKeys, numberKeys, statKeys } = getGalleryParamKeys(definition);
   const result: Partial<GalleryUrlState> = {};
@@ -182,7 +181,7 @@ export function writeGalleryUrlState(
     sortDirection?: "asc" | "desc";
     defaultFormatKey?: string;
   },
-  definition: GameFilterDefinition = UVS_FILTER_DEFINITION
+  definition: GameFilterDefinition
 ): URLSearchParams {
   const { arrayKeys, numberKeys, statKeys, all } = getGalleryParamKeys(definition);
   const next = new URLSearchParams(params.toString());

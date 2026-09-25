@@ -31,7 +31,7 @@ import { deckGameModule } from "./lib/deckGame";
 import type { GameId } from "../shared/games/types";
 import { getSharedGameModule } from "../shared/games/registry";
 import { mergeLegacyDeckSetupArgs } from "../shared/games/uvs/setup";
-import { docGame, isDocInGame } from "./lib/gameScope";
+import { docGame, isDocInGame, withResolvedGame } from "./lib/gameScope";
 
 /** Rejects cards from another game (decks only reference cards of their own game). */
 async function requireCardInGame(ctx: Pick<QueryCtx, "db">, cardId: Id<"cards">, game: GameId) {
@@ -51,13 +51,14 @@ function requireSetupGame(setup: { game: GameId } | null | undefined, game: Game
 
 export const listByUser = query({
   args: {
-    game: gameIdValidator,
+    game: v.optional(gameIdValidator),
     userId: v.id("users"),
     search: v.optional(v.string()),
     visibility: v.optional(deckVisibilityValidator),
   },
   returns: v.array(deckValidator),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     const viewer = await getAuthUserId(ctx);
     // Per-user lists are small; filtering (instead of a game index) keeps pre-backfill decks visible.
     let decks = (
@@ -97,11 +98,12 @@ export const listByUser = query({
 
 export const listPublic = query({
   args: {
-    game: gameIdValidator,
+    game: v.optional(gameIdValidator),
     search: v.optional(v.string()),
   },
   returns: v.array(deckValidator),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     let decks = await ctx.db
       .query("decks")
       .withIndex("by_game_and_isPublic", (q) => q.eq("game", args.game).eq("isPublic", true))
@@ -126,11 +128,12 @@ export const listPublic = query({
 
 export const listTournament = query({
   args: {
-    game: gameIdValidator,
+    game: v.optional(gameIdValidator),
     search: v.optional(v.string()),
   },
   returns: v.array(deckValidator),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     let decks = await ctx.db
       .query("decks")
       .withIndex("by_game_and_visibility", (q) =>
@@ -153,11 +156,12 @@ export const listTournament = query({
 
 export const getById = query({
   args: {
-    game: gameIdValidator,
+    game: v.optional(gameIdValidator),
     deckId: v.id("decks"),
   },
   returns: v.union(deckValidator, v.null()),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     const deck = await ctx.db.get(args.deckId);
     // A deck is only visible on its own game's host.
     if (!isDocInGame(deck, args.game)) return null;
@@ -169,7 +173,7 @@ export const getById = query({
 
 export const create = mutation({
   args: {
-    game: gameIdValidator,
+    game: v.optional(gameIdValidator),
     name: v.string(),
     description: v.optional(v.string()),
     visibility: v.optional(deckVisibilityValidator),
@@ -183,7 +187,8 @@ export const create = mutation({
     selectedIdentity: v.optional(v.string()),
   },
   returns: v.id("decks"),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     const userId = await requireAuth(ctx);
     await requireUserCanPostContent(ctx, userId);
 
@@ -284,6 +289,9 @@ export const update = mutation({
     for (const cardId of deckModule.setupCardIds(setupPatch)) {
       await requireNotBackFace(ctx, cardId);
       await requireCardInGame(ctx, cardId, game);
+    }
+    if (args.imageCardId) {
+      await requireCardInGame(ctx, args.imageCardId, game);
     }
 
     const nextVisibility =

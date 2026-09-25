@@ -23,7 +23,6 @@ import {
   getStatSortComparator,
   type GameFilterDefinition,
 } from "@shared/games/filters";
-import { UVS_FILTER_DEFINITION } from "@shared/games/uvs/filters";
 import { fetchStaticCatalog } from "./static-catalog";
 import { useGameId } from "@/games/game-context";
 import { cardMatchesRarityFilter } from "./rarity";
@@ -432,8 +431,8 @@ export function useUniversusCards(): UseUniversusCardsResult {
 export function filterCards(
   cards: CachedCard[],
   filters: CardFilters,
-  formatOpts?: FilterCardsFormatOptions,
-  filterDefinition: GameFilterDefinition = UVS_FILTER_DEFINITION
+  formatOpts: FilterCardsFormatOptions | undefined,
+  filterDefinition: GameFilterDefinition
 ): CachedCard[] {
   const passesFormatLegality = formatOpts?.passesFormatLegality;
   const isCardBannedInFormat = formatOpts?.isCardBannedInFormat;
@@ -595,7 +594,7 @@ function getSortPairComparator(
 export function sortCards(
   cards: CachedCard[],
   options: CardSortOptions,
-  filterDefinition: GameFilterDefinition = UVS_FILTER_DEFINITION
+  filterDefinition: GameFilterDefinition
 ): CachedCard[] {
   const { field, direction } = options;
 

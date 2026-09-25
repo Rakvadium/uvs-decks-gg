@@ -19,6 +19,7 @@ import {
   getCardDataVersionDoc,
   getCardFacetSnapshotDoc,
   isDocInGame,
+  withResolvedGame,
 } from "./lib/gameScope";
 
 const LIST_CATALOG_PAGE = 200;
@@ -197,7 +198,7 @@ async function listCatalogCardsNoSearch(
 
 export const list = query({
   args: {
-    game: gameIdValidator,
+    game: v.optional(gameIdValidator),
     search: v.optional(v.string()),
     rarity: v.optional(v.array(v.string())),
     type: v.optional(v.array(v.string())),
@@ -207,7 +208,8 @@ export const list = query({
     limit: v.optional(v.number()),
   },
   returns: v.array(cardValidator),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     const cutoff = await getCatalogReleaseCutoff(ctx, args.game);
     if (args.search && args.search.trim().length > 0) {
       let cards = await ctx.db
@@ -249,11 +251,12 @@ export const list = query({
 
 export const listReleased = query({
   args: {
-    game: gameIdValidator,
+    game: v.optional(gameIdValidator),
     limit: v.optional(v.number()),
   },
   returns: v.array(cardValidator),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     const cap = Math.min(args.limit ?? 10_000, 25_000);
     const cutoff = await getCatalogReleaseCutoff(ctx, args.game);
     const out: Doc<"cards">[] = [];
@@ -283,7 +286,7 @@ export const listReleased = query({
 
 export const listReleasedPaginated = query({
   args: {
-    game: gameIdValidator,
+    game: v.optional(gameIdValidator),
     cursor: v.union(v.string(), v.null()),
     limit: v.optional(v.number()),
   },
@@ -292,7 +295,8 @@ export const listReleasedPaginated = query({
     cursor: v.string(),
     isDone: v.boolean(),
   }),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     const limit = Math.min(
       Math.max(args.limit ?? LIST_RELEASED_PAGE_DEFAULT, 1),
       LIST_RELEASED_PAGE_MAX
@@ -354,11 +358,12 @@ export const listGalleryCatalogPageForPublish = internalQuery({
 
 export const batchGetCardsByIds = query({
   args: {
-    game: gameIdValidator,
+    game: v.optional(gameIdValidator),
     ids: v.array(v.id("cards")),
   },
   returns: v.array(cardValidator),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     const cutoff = await getCatalogReleaseCutoff(ctx, args.game);
     const seen = new Set<string>();
     const out: Doc<"cards">[] = [];
@@ -377,7 +382,7 @@ export const batchGetCardsByIds = query({
 
 export const galleryIndexedSearchSpike = query({
   args: {
-    game: gameIdValidator,
+    game: v.optional(gameIdValidator),
     searchText: v.optional(v.string()),
     setCode: v.optional(v.string()),
     type: v.optional(v.string()),
@@ -391,7 +396,8 @@ export const galleryIndexedSearchSpike = query({
     limit: v.optional(v.number()),
   },
   returns: v.array(cardValidator),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     const limit = Math.min(Math.max(args.limit ?? 50, 1), 200);
     const cutoff = await getCatalogReleaseCutoff(ctx, args.game);
     const prefixArg = args.namePrefixInSet;
@@ -456,7 +462,7 @@ export const galleryIndexedSearchSpike = query({
 
 export const searchCards = query({
   args: {
-    game: gameIdValidator,
+    game: v.optional(gameIdValidator),
     query: v.string(),
     searchTier: v.union(v.literal("name"), v.literal("keywords"), v.literal("all")),
     type: v.optional(v.string()),
@@ -464,7 +470,8 @@ export const searchCards = query({
     limit: v.optional(v.number()),
   },
   returns: v.array(cardValidator),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     const cutoff = await getCatalogReleaseCutoff(ctx, args.game);
     const tierConfig = {
       name: "search_tier1_name" as const,
@@ -504,9 +511,10 @@ export const searchCards = query({
 });
 
 export const getBackCard = query({
-  args: { game: gameIdValidator, cardId: v.id("cards") },
+  args: { game: v.optional(gameIdValidator), cardId: v.id("cards") },
   returns: v.union(cardValidator, v.null()),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     const cutoff = await getCatalogReleaseCutoff(ctx, args.game);
     const card = await getCardInGame(ctx, args.cardId, args.game);
     if (!card?.backCardId || !isReleasedCard(card, cutoff)) return null;
@@ -517,9 +525,10 @@ export const getBackCard = query({
 });
 
 export const getFrontCard = query({
-  args: { game: gameIdValidator, cardId: v.id("cards") },
+  args: { game: v.optional(gameIdValidator), cardId: v.id("cards") },
   returns: v.union(cardValidator, v.null()),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     const cutoff = await getCatalogReleaseCutoff(ctx, args.game);
     const card = await getCardInGame(ctx, args.cardId, args.game);
     if (!card?.frontCardId || !isReleasedCard(card, cutoff)) return null;
@@ -531,7 +540,7 @@ export const getFrontCard = query({
 
 export const listPaginated = query({
   args: {
-    game: gameIdValidator,
+    game: v.optional(gameIdValidator),
     paginationOpts: paginationOptsValidator,
     search: v.optional(v.string()),
     rarity: v.optional(v.array(v.string())),
@@ -544,7 +553,8 @@ export const listPaginated = query({
     isDone: v.boolean(),
     continueCursor: v.string(),
   }),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     const numItems = Math.min(args.paginationOpts.numItems, 50);
     const paginationOpts = { ...args.paginationOpts, numItems };
     const cutoff = await getCatalogReleaseCutoff(ctx, args.game);
@@ -613,14 +623,16 @@ export const listPaginated = query({
         args.setName.map((setName) =>
           ctx.db
             .query("cards")
-            .withIndex("by_setName", (q) => q.eq("setName", setName))
+            .withIndex("by_game_and_setName", (q) =>
+              q.eq("game", args.game).eq("setName", setName)
+            )
             .take(SET_NAME_INDEX_MAX)
         )
       );
 
       let filtered = allCardsArrays
         .flat()
-        .filter((card) => isDocInGame(card, args.game) && isGalleryCatalogCard(card, cutoff));
+        .filter((card) => isGalleryCatalogCard(card, cutoff));
 
       if (args.rarity && args.rarity.length > 0) {
         filtered = filtered.filter(
@@ -676,11 +688,12 @@ export const listPaginated = query({
 
 export const getCardVariants = query({
   args: {
-    game: gameIdValidator,
+    game: v.optional(gameIdValidator),
     oracleId: v.string(),
   },
   returns: v.array(cardValidator),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     const cutoff = await getCatalogReleaseCutoff(ctx, args.game);
     const cards = await ctx.db
       .query("cards")
@@ -711,11 +724,12 @@ export const getCardVariants = query({
 
 export const getById = query({
   args: {
-    game: gameIdValidator,
+    game: v.optional(gameIdValidator),
     cardId: v.id("cards"),
   },
   returns: v.union(cardValidator, v.null()),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     const cutoff = await getCatalogReleaseCutoff(ctx, args.game);
     const card = await getCardInGame(ctx, args.cardId, args.game);
     if (!card || !isReleasedCard(card, cutoff)) {
@@ -728,11 +742,12 @@ export const getById = query({
 
 export const listTextHistory = query({
   args: {
-    game: gameIdValidator,
+    game: v.optional(gameIdValidator),
     cardId: v.id("cards"),
   },
   returns: v.array(cardTextHistoryValidator),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     const cutoff = await getCatalogReleaseCutoff(ctx, args.game);
     const card = await getCardInGame(ctx, args.cardId, args.game);
     if (!card || !isReleasedCard(card, cutoff)) {
@@ -747,27 +762,30 @@ export const listTextHistory = query({
 });
 
 export const getRarities = query({
-  args: { game: gameIdValidator },
+  args: { game: v.optional(gameIdValidator) },
   returns: v.array(v.string()),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     const row = await getCardFacetSnapshotDoc(ctx, args.game);
     return row?.rarities ?? [];
   },
 });
 
 export const getTypes = query({
-  args: { game: gameIdValidator },
+  args: { game: v.optional(gameIdValidator) },
   returns: v.array(v.string()),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     const row = await getCardFacetSnapshotDoc(ctx, args.game);
     return row?.types ?? [];
   },
 });
 
 export const getSets = query({
-  args: { game: gameIdValidator },
+  args: { game: v.optional(gameIdValidator) },
   returns: v.array(v.string()),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     const row = await getCardFacetSnapshotDoc(ctx, args.game);
     return row?.setCodes ?? [];
   },
@@ -775,13 +793,14 @@ export const getSets = query({
 
 export const listBySet = query({
   args: {
-    game: gameIdValidator,
+    game: v.optional(gameIdValidator),
     setCode: v.string(),
     search: v.optional(v.string()),
     limit: v.optional(v.number()),
   },
   returns: v.array(cardValidator),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     const limit = args.limit ?? 200;
     const cutoff = await getCatalogReleaseCutoff(ctx, args.game);
 
@@ -811,11 +830,12 @@ export const listBySet = query({
 
 export const getByIds = query({
   args: {
-    game: gameIdValidator,
+    game: v.optional(gameIdValidator),
     cardIds: v.array(v.id("cards")),
   },
   returns: v.array(cardValidator),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     const cutoff = await getCatalogReleaseCutoff(ctx, args.game);
     const cards = await Promise.all(
       args.cardIds.map((id) => getCardInGame(ctx, id, args.game))
@@ -829,13 +849,14 @@ export const getByIds = query({
 
 export const listCharacters = query({
   args: {
-    game: gameIdValidator,
+    game: v.optional(gameIdValidator),
     search: v.optional(v.string()),
     characterType: v.optional(v.string()),
     limit: v.optional(v.number()),
   },
   returns: v.array(cardValidator),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     const cardType = args.characterType ?? "Character";
     const charLimit = Math.min(args.limit ?? 2_000, 10_000);
     const cutoff = await getCatalogReleaseCutoff(ctx, args.game);
@@ -886,7 +907,7 @@ export const listCharacters = query({
 
 export const listCharactersPaginated = query({
   args: {
-    game: gameIdValidator,
+    game: v.optional(gameIdValidator),
     paginationOpts: paginationOptsValidator,
     search: v.optional(v.string()),
     symbol: v.optional(v.string()),
@@ -896,7 +917,8 @@ export const listCharactersPaginated = query({
     isDone: v.boolean(),
     continueCursor: v.string(),
   }),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     const numItems = Math.min(Math.max(args.paginationOpts.numItems, 1), 20);
     const search = args.search?.trim() || undefined;
     const symbol = args.symbol?.trim().toLowerCase() || undefined;
@@ -992,7 +1014,7 @@ export const listCharactersPaginated = query({
 });
 
 export const getCardDataVersion = query({
-  args: { game: gameIdValidator },
+  args: { game: v.optional(gameIdValidator) },
   returns: v.union(
     v.object({
       version: v.number(),
@@ -1004,7 +1026,8 @@ export const getCardDataVersion = query({
     }),
     v.null()
   ),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     const versionDoc = await getCardDataVersionDoc(ctx, args.game);
     if (!versionDoc) return null;
     return {
@@ -1020,7 +1043,7 @@ export const getCardDataVersion = query({
 
 export const listAllCardsChunked = query({
   args: {
-    game: gameIdValidator,
+    game: v.optional(gameIdValidator),
     cursor: v.union(v.string(), v.null()),
     chunkSize: v.optional(v.number()),
   },
@@ -1030,7 +1053,8 @@ export const listAllCardsChunked = query({
     isDone: v.boolean(),
     totalEstimate: v.number(),
   }),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     const chunkSize = Math.min(
       Math.max(args.chunkSize ?? 500, 1),
       LIST_RELEASED_PAGE_MAX
@@ -1060,7 +1084,7 @@ export const listAllCardsChunked = query({
 
 export const getInitialCards = query({
   args: {
-    game: gameIdValidator,
+    game: v.optional(gameIdValidator),
     limit: v.optional(v.number()),
   },
   returns: v.object({
@@ -1069,7 +1093,8 @@ export const getInitialCards = query({
     version: v.union(v.number(), v.null()),
     totalEstimate: v.number(),
   }),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     const limit = args.limit ?? 100;
     const cutoff = await getCatalogReleaseCutoff(ctx, args.game);
     

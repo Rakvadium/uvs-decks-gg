@@ -154,6 +154,7 @@ export default defineSchema({
     .index("by_game_and_setCode_and_name", ["game", "setCode", "name"])
     .index("by_game_and_type_and_name", ["game", "type", "name"])
     .index("by_game_and_oracleId", ["game", "oracleId"])
+    .index("by_game_and_setName", ["game", "setName"])
     .index("by_setCode_and_collectorNumber", ["setCode", "collectorNumber"])
     .index("by_setCode_and_name", ["setCode", "name"])
     .index("by_setName", ["setName"])

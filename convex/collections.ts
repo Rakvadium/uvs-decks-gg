@@ -4,7 +4,7 @@ import type { Id } from "./_generated/dataModel";
 import { cardValidator, collectionEntryValidator, gameIdValidator } from "./validators";
 import { requireAuth, requireUserCanPostContent } from "./utils/validation";
 import type { GameId } from "../shared/games/types";
-import { isDocInGame } from "./lib/gameScope";
+import { isDocInGame, withResolvedGame } from "./lib/gameScope";
 
 /** The user's collection rows for one game. */
 async function listCollectionEntries(ctx: QueryCtx, userId: Id<"users">, game: GameId) {
@@ -24,7 +24,7 @@ async function requireCollectionOwner(ctx: QueryCtx, userId: Id<"users">) {
 
 export const listByUser = query({
   args: {
-    game: gameIdValidator,
+    game: v.optional(gameIdValidator),
     userId: v.id("users"),
     search: v.optional(v.string()),
     rarity: v.optional(v.array(v.string())),
@@ -43,7 +43,8 @@ export const listByUser = query({
       card: v.union(cardValidator, v.null()),
     })
   ),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     await requireCollectionOwner(ctx, args.userId);
 
     const entries = await listCollectionEntries(ctx, args.userId, args.game);
@@ -86,12 +87,13 @@ export const listByUser = query({
 
 export const getByUserAndCard = query({
   args: {
-    game: gameIdValidator,
+    game: v.optional(gameIdValidator),
     userId: v.id("users"),
     cardId: v.id("cards"),
   },
   returns: v.union(collectionEntryValidator, v.null()),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     await requireCollectionOwner(ctx, args.userId);
     // `cardId` already implies the game; the check keeps other games' cards out of this host.
     const entry = await ctx.db
@@ -106,14 +108,15 @@ export const getByUserAndCard = query({
 
 export const addToCollection = mutation({
   args: {
-    game: gameIdValidator,
+    game: v.optional(gameIdValidator),
     cardId: v.id("cards"),
     quantity: v.optional(v.number()),
     condition: v.optional(v.string()),
     isFoil: v.optional(v.boolean()),
   },
   returns: v.id("collections"),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     const userId = await requireAuth(ctx);
     await requireUserCanPostContent(ctx, userId);
 
@@ -192,7 +195,7 @@ export const removeFromCollection = mutation({
 
 export const getCollectionStats = query({
   args: {
-    game: gameIdValidator,
+    game: v.optional(gameIdValidator),
     userId: v.id("users"),
   },
   returns: v.object({
@@ -201,7 +204,8 @@ export const getCollectionStats = query({
     byRarity: v.record(v.string(), v.number()),
     bySet: v.record(v.string(), v.number()),
   }),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     await requireCollectionOwner(ctx, args.userId);
 
     const entries = await listCollectionEntries(ctx, args.userId, args.game);

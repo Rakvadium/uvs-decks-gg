@@ -68,3 +68,132 @@ export async function getCardFacetSnapshotDoc(
   }
   return null;
 }
+
+/**
+ * Looks up an existing doc of `game` by trying each `gameValuesWithLegacy(game)` index value in
+ * order (tagged first, then untagged legacy rows for the default game). Writers use it before
+ * insert so ingest before the backfill updates the legacy row instead of inserting a duplicate
+ * (which a later `.unique()` would trip over); pair with `gameTagPatch` to tag the row found.
+ */
+export async function findInGame<T>(
+  game: GameId,
+  lookup: (value: GameId | undefined) => Promise<T | null>,
+): Promise<T | null> {
+  for (const value of gameValuesWithLegacy(game)) {
+    const doc = await lookup(value);
+    if (doc !== null && doc !== undefined) return doc;
+  }
+  return null;
+}
+
+/** Like `findInGame`, but concatenates every index value's rows (tagged first, then legacy). */
+export async function collectInGame<T>(
+  game: GameId,
+  lookup: (value: GameId | undefined) => Promise<T[]>,
+): Promise<T[]> {
+  const rows: T[] = [];
+  for (const value of gameValuesWithLegacy(game)) {
+    rows.push(...(await lookup(value)));
+  }
+  return rows;
+}
+
+/** Patch that tags a legacy (untagged) doc with `game`; `null` when it is already tagged. */
+export function gameTagPatch(doc: { game?: GameId }, game: GameId): { game: GameId } | null {
+  return doc.game === undefined ? { game } : null;
+}
+
+/**
+ * `.unique()` replacement for lookups that may see duplicates written before the backfill:
+ * returns the first row and logs instead of throwing.
+ */
+export async function firstLoggingDuplicates<T>(
+  query: { take: (n: number) => Promise<T[]> },
+  label: string,
+): Promise<T | null> {
+  const rows = await query.take(2);
+  if (rows.length > 1) {
+    console.warn(`Duplicate rows for ${label}; using the first`);
+  }
+  return rows[0] ?? null;
+}
+
+/** Set of `game` by code, legacy-aware (see `findInGame`). */
+export async function findSetByCode(
+  ctx: DbCtx,
+  game: GameId,
+  code: string,
+): Promise<Doc<"sets"> | null> {
+  return await findInGame(game, (value) =>
+    firstLoggingDuplicates(
+      ctx.db.query("sets").withIndex("by_game_and_code", (q) => q.eq("game", value).eq("code", code)),
+      `sets ${game}/${code}`,
+    ),
+  );
+}
+
+/** Format of `game` by key, legacy-aware (see `findInGame`). */
+export async function findFormatByKey(
+  ctx: DbCtx,
+  game: GameId,
+  key: string,
+): Promise<Doc<"formats"> | null> {
+  return await findInGame(game, (value) =>
+    firstLoggingDuplicates(
+      ctx.db.query("formats").withIndex("by_game_and_key", (q) => q.eq("game", value).eq("key", key)),
+      `formats ${game}/${key}`,
+    ),
+  );
+}
+
+/** Card of `game` by set code + collector number, legacy-aware (see `findInGame`). */
+export async function findCardBySetAndNumber(
+  ctx: DbCtx,
+  game: GameId,
+  setCode: string,
+  collectorNumber: string,
+): Promise<Doc<"cards"> | null> {
+  return await findInGame(game, (value) =>
+    ctx.db
+      .query("cards")
+      .withIndex("by_game_and_setCode_and_collectorNumber", (q) =>
+        q.eq("game", value).eq("setCode", setCode).eq("collectorNumber", collectorNumber),
+      )
+      .first(),
+  );
+}
+
+/** Set legality row of `game` for (format, set), legacy-aware (see `findInGame`). */
+export async function findSetLegality(
+  ctx: DbCtx,
+  game: GameId,
+  formatKey: string,
+  setCode: string,
+): Promise<Doc<"setLegality"> | null> {
+  return await findInGame(game, (value) =>
+    firstLoggingDuplicates(
+      ctx.db
+        .query("setLegality")
+        .withIndex("by_game_and_format_set", (q) =>
+          q.eq("game", value).eq("formatKey", formatKey).eq("setCode", setCode),
+        ),
+      `setLegality ${game}/${formatKey}/${setCode}`,
+    ),
+  );
+}
+
+/**
+ * Rolling-deploy compatibility: public functions take `game: v.optional(gameIdValidator)` so
+ * frontends built before multi-game (tabs open during a deploy) keep working; a missing value is
+ * the default game. Clients always pass `game`. Tighten to required in the follow-up change.
+ */
+export function resolveGame(game: GameId | undefined): GameId {
+  return game ?? DEFAULT_GAME_ID;
+}
+
+/** `args` with `game` resolved via `resolveGame` (keeps `args.game` typed as `GameId`). */
+export function withResolvedGame<T extends { game?: GameId }>(
+  args: T,
+): Omit<T, "game"> & { game: GameId } {
+  return { ...args, game: resolveGame(args.game) };
+}

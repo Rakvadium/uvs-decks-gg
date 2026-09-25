@@ -6,12 +6,18 @@ import {
   gameIdValidator,
   setLegalityValidator,
 } from "./validators";
-import { byCreationTime, isDocInGame } from "./lib/gameScope";
+import {
+  byCreationTime,
+  findFormatByKey,
+  isDocInGame,
+  withResolvedGame,
+} from "./lib/gameScope";
 
 export const list = query({
-  args: { game: gameIdValidator },
+  args: { game: v.optional(gameIdValidator) },
   returns: v.array(formatValidator),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     return await ctx.db
       .query("formats")
       .withIndex("by_game_and_key", (q) => q.eq("game", args.game))
@@ -22,22 +28,21 @@ export const list = query({
 
 export const getByKey = query({
   args: {
-    game: gameIdValidator,
+    game: v.optional(gameIdValidator),
     key: v.string(),
   },
   returns: v.union(formatValidator, v.null()),
-  handler: async (ctx, args) => {
-    return await ctx.db
-      .query("formats")
-      .withIndex("by_game_and_key", (q) => q.eq("game", args.game).eq("key", args.key))
-      .unique();
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
+    return await findFormatByKey(ctx, args.game, args.key);
   },
 });
 
 export const getDefault = query({
-  args: { game: gameIdValidator },
+  args: { game: v.optional(gameIdValidator) },
   returns: v.union(formatValidator, v.null()),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     const formats = await ctx.db
       .query("formats")
       .withIndex("by_game_and_key", (q) => q.eq("game", args.game))
@@ -50,11 +55,12 @@ export const getDefault = query({
 
 export const getCardLegalityByFormat = query({
   args: {
-    game: gameIdValidator,
+    game: v.optional(gameIdValidator),
     formatKey: v.string(),
   },
   returns: v.array(cardLegalityValidator),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     return await ctx.db
       .query("cardLegality")
       .withIndex("by_game_and_format", (q) =>
@@ -66,12 +72,13 @@ export const getCardLegalityByFormat = query({
 
 export const getCardLegality = query({
   args: {
-    game: gameIdValidator,
+    game: v.optional(gameIdValidator),
     cardId: v.id("cards"),
     formatKey: v.string(),
   },
   returns: v.union(cardLegalityValidator, v.null()),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     const entries = await ctx.db
       .query("cardLegality")
       .withIndex("by_card", (q) => q.eq("cardId", args.cardId))
@@ -85,11 +92,12 @@ export const getCardLegality = query({
 
 export const getSetLegalityByFormat = query({
   args: {
-    game: gameIdValidator,
+    game: v.optional(gameIdValidator),
     formatKey: v.string(),
   },
   returns: v.array(setLegalityValidator),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     return await ctx.db
       .query("setLegality")
       .withIndex("by_game_and_format", (q) =>
@@ -101,12 +109,13 @@ export const getSetLegalityByFormat = query({
 
 export const isSetLegal = query({
   args: {
-    game: gameIdValidator,
+    game: v.optional(gameIdValidator),
     formatKey: v.string(),
     setCode: v.string(),
   },
   returns: v.boolean(),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     const entry = await ctx.db
       .query("setLegality")
       .withIndex("by_game_and_format_set", (q) =>

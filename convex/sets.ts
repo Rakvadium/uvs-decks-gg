@@ -4,12 +4,18 @@ import { gameIdValidator, setDocValidator } from "./validators";
 import { requireAdmin } from "./utils/validation";
 import { countListCardsForSetCode, syncSetCardCountByCode } from "./setCardCountSync";
 import { DEFAULT_GAME_ID } from "../shared/games/types";
-import { byCreationTime, isDocInGame } from "./lib/gameScope";
+import {
+  byCreationTime,
+  findSetByCode,
+  isDocInGame,
+  withResolvedGame,
+} from "./lib/gameScope";
 
 export const list = query({
-  args: { game: gameIdValidator },
+  args: { game: v.optional(gameIdValidator) },
   returns: v.array(setDocValidator),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     return await ctx.db
       .query("sets")
       .withIndex("by_game_and_code", (q) => q.eq("game", args.game))
@@ -20,34 +26,34 @@ export const list = query({
 
 export const getByCode = query({
   args: {
-    game: gameIdValidator,
+    game: v.optional(gameIdValidator),
     code: v.string(),
   },
   returns: v.union(setDocValidator, v.null()),
-  handler: async (ctx, args) => {
-    return await ctx.db
-      .query("sets")
-      .withIndex("by_game_and_code", (q) => q.eq("game", args.game).eq("code", args.code))
-      .unique();
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
+    return await findSetByCode(ctx, args.game, args.code);
   },
 });
 
 export const getById = query({
   args: {
-    game: gameIdValidator,
+    game: v.optional(gameIdValidator),
     setId: v.id("sets"),
   },
   returns: v.union(setDocValidator, v.null()),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     const set = await ctx.db.get(args.setId);
     return isDocInGame(set, args.game) ? set : null;
   },
 });
 
 export const getMostRecent = query({
-  args: { game: gameIdValidator },
+  args: { game: v.optional(gameIdValidator) },
   returns: v.union(setDocValidator, v.null()),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     const sets = await ctx.db
       .query("sets")
       .withIndex("by_game_and_setNumber", (q) => q.eq("game", args.game))
@@ -58,7 +64,7 @@ export const getMostRecent = query({
 });
 
 export const listWithCardCountAudit = query({
-  args: { game: gameIdValidator },
+  args: { game: v.optional(gameIdValidator) },
   returns: v.array(
     v.object({
       set: setDocValidator,
@@ -66,7 +72,8 @@ export const listWithCardCountAudit = query({
       mismatch: v.boolean(),
     })
   ),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     await requireAdmin(ctx);
     const allSets = await ctx.db
       .query("sets")
@@ -89,24 +96,22 @@ export const listWithCardCountAudit = query({
 });
 
 export const isSetCodeAvailable = query({
-  args: { game: gameIdValidator, code: v.string() },
+  args: { game: v.optional(gameIdValidator), code: v.string() },
   returns: v.boolean(),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     await requireAdmin(ctx);
     const trimmed = args.code.trim();
     if (trimmed === "") {
       return true;
     }
-    const existing = await ctx.db
-      .query("sets")
-      .withIndex("by_game_and_code", (q) => q.eq("game", args.game).eq("code", trimmed))
-      .unique();
+    const existing = await findSetByCode(ctx, args.game, trimmed);
     return existing === null;
   },
 });
 
 export const getSetCardCountAudit = query({
-  args: { game: gameIdValidator, code: v.string() },
+  args: { game: v.optional(gameIdValidator), code: v.string() },
   returns: v.union(
     v.object({
       set: setDocValidator,
@@ -115,12 +120,10 @@ export const getSetCardCountAudit = query({
     }),
     v.null()
   ),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     await requireAdmin(ctx);
-    const set = await ctx.db
-      .query("sets")
-      .withIndex("by_game_and_code", (q) => q.eq("game", args.game).eq("code", args.code))
-      .unique();
+    const set = await findSetByCode(ctx, args.game, args.code);
     if (!set) {
       return null;
     }

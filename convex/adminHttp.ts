@@ -192,16 +192,33 @@ export const createDrafts = httpAction(async (ctx, req) => {
 export const rebuildCatalogAggregates = httpAction(async (ctx, req) => {
   try {
     assertAdminApiKeyFromRequest(req);
-    // Body is optional here (older scripts POST without one); `{ "game": "…" }` scopes the rebuild.
-    let game: GameId = DEFAULT_GAME_ID;
+  } catch (e) {
+    return jsonError(401, e instanceof Error ? e.message : "Unauthorized");
+  }
+
+  // Body is optional here (older scripts POST without one); `{ "game": "…" }` scopes the rebuild.
+  // Bad JSON / unknown game is a client error (400), not an auth failure.
+  let game: GameId = DEFAULT_GAME_ID;
+  try {
     const text = await req.text();
     if (text.trim()) {
-      game = readGame(asRecord(JSON.parse(text)));
+      let parsed: unknown;
+      try {
+        parsed = JSON.parse(text);
+      } catch {
+        throw new Error("Invalid JSON body");
+      }
+      game = readGame(asRecord(parsed));
     }
+  } catch (e) {
+    return jsonError(400, e instanceof Error ? e.message : "Bad request");
+  }
+
+  try {
     await ctx.runMutation(internal.cardFacets.rebuildCardFacetSnapshot, { game });
     await ctx.runMutation(internal.sets.reconcileAllSetCardCounts, { game });
     return jsonOk({ ok: true });
   } catch (e) {
-    return jsonError(401, e instanceof Error ? e.message : "Unauthorized");
+    return jsonError(500, e instanceof Error ? e.message : "Rebuild failed");
   }
 });

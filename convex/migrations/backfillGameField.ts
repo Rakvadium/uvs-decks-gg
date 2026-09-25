@@ -3,12 +3,15 @@ import type { PaginationOptions, PaginationResult } from "convex/server";
 import { internal } from "../_generated/api";
 import type { Id } from "../_generated/dataModel";
 import { internalMutation, internalQuery, type QueryCtx } from "../_generated/server";
+import { GAME_IDS } from "../../shared/games/types";
 import { GAME_SCOPED_TABLES, gameBackfillPatch, type GameScopedTable } from "../lib/gameBackfill";
 
 /**
  * Backfill: set `game: "uvs"` (DEFAULT_GAME_ID) on every doc of the game-scoped tables that has
  * no `game` yet (docs/multi-game.md). Paginated (one table per invocation, 200 docs per page),
  * self-rescheduling until the table is done, idempotent (tagged docs are skipped).
+ * When the `tierLists` table finishes, `communityRankings.recomputeAllScopes` is scheduled for
+ * every game so the ranking cache is rebuilt from tagged tier lists.
  *
  *   npx convex run migrations/backfillGameField:runAll            # every table
  *   npx convex run migrations/backfillGameField:run '{"table":"cards"}'
@@ -85,6 +88,14 @@ export const run = internalMutation({
         cursor: page.continueCursor,
         batchSize,
       });
+    }
+
+    // Once every tier list is tagged, rebuild each game's community ranking cache from the
+    // tagged data (recomputeScope also clears any untagged cache rows).
+    if (page.isDone && args.table === "tierLists") {
+      for (const game of GAME_IDS) {
+        await ctx.scheduler.runAfter(0, internal.communityRankings.recomputeAllScopes, { game });
+      }
     }
 
     console.log(

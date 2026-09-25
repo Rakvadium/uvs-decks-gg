@@ -126,8 +126,11 @@ through a scoped parent (`tierListItems`, `deckLikes`, `deckViews`, `deckShares`
   Search indexes add `game` to `filterFields`.
 - Singletons become per-game rows: `cardDataVersion` gets `by_game`; `cardFacetSnapshot`
   key stays `"default"` but is looked up `by_game_and_key`.
-- Public queries/mutations over game-scoped data take `game: gameIdValidator` (required).
-  Global ones (users, teams, settings) don't.
+- Public queries/mutations/actions over game-scoped data take `game: v.optional(gameIdValidator)`
+  and resolve it with `withResolvedGame(args)` / `resolveGame(args.game)` (`convex/lib/gameScope.ts`;
+  missing = `DEFAULT_GAME_ID`) so frontends built before multi-game (tabs open during a rolling
+  deploy) keep working. Clients always pass `game` explicitly. **Tighten to required in the
+  follow-up change.** Global ones (users, teams, settings) don't take `game`.
 - `sessions` (per user) moves game-specific UI state into `gameState: v.optional(v.record(v.string(), v.object({ activeDeckId?, galleryFilters?, rightSidebarAction? })))`
   keyed by GameId, falling back to the legacy top-level fields for `uvs`.
 - Backfill: `convex/migrations/backfillGameField.ts` — **paginated** (`.paginate()` + scheduler
@@ -137,13 +140,17 @@ through a scoped parent (`tierListItems`, `deckLikes`, `deckViews`, `deckShares`
 Implementation (Phase 2 data-scoping step):
 
 - Helpers: `convex/lib/gameScope.ts` (`docGame`, `isDocInGame`, `byCreationTime`,
-  `gameValuesWithLegacy`, `getCardDataVersionDoc`, `getCardFacetSnapshotDoc`),
+  `gameValuesWithLegacy`, `getCardDataVersionDoc`, `getCardFacetSnapshotDoc`, legacy-aware
+  lookups `findInGame` / `collectInGame` / `gameTagPatch` / `firstLoggingDuplicates` and
+  `findSetByCode` / `findFormatByKey` / `findCardBySetAndNumber` / `findSetLegality`,
+  `resolveGame` / `withResolvedGame`),
   `convex/lib/gameBackfill.ts` (`GAME_SCOPED_TABLES`, `gameBackfillPatch`),
   `convex/lib/sessionGameState.ts` (`resolveSessionGameState`, `nextSessionGameState`).
   Return validators in `convex/validators.ts` carry `game: v.optional(gameIdValidator)`.
-  Tests: `tests/multi-game-scoping.test.ts`.
+  Tests: `tests/multi-game-scoping.test.ts`, `tests/game-scope-lookup.test.ts`.
 - Indexes added (old ones kept): `cards.by_game`, `by_game_and_setCode_and_collectorNumber`,
-  `by_game_and_setCode_and_name`, `by_game_and_type_and_name`, `by_game_and_oracleId`;
+  `by_game_and_setCode_and_name`, `by_game_and_type_and_name`, `by_game_and_oracleId`,
+  `by_game_and_setName` (`cards.listPaginated` set-name filter);
   `sets.by_game_and_code`, `by_game_and_setNumber`; `cardDrafts.by_game_and_setCode_and_status_and_sortIndex`;
   `formats.by_game_and_key`; `cardLegality.by_game_and_format`; `setLegality.by_game_and_format`,
   `by_game_and_format_set`; `formatErrata.by_game_and_format_and_sortOrder`;
@@ -159,9 +166,22 @@ Implementation (Phase 2 data-scoping step):
   deploy and `backfillGameField:runAll` (run it right after deploying). Exceptions that keep
   working before the backfill: singletons (`cardDataVersion`, `cardFacetSnapshot`: the `game`
   row, else the untagged row for `uvs`; writers patch that row and tag it), the facet rebuild
-  (also scans untagged cards for `uvs`), `communityRankings.recomputeScope` (also clears untagged
-  cache rows for `uvs`), and small per-user / by-id reads that filter with `isDocInGame`
-  (`decks.listByUser`, by-id `getById`/`getDetail`/…).
+  (also scans untagged cards for `uvs`), `communityRankings.recomputeScope` (for `uvs` it clears
+  untagged cache rows **and** rebuilds from tagged + untagged public tier lists, so a save before
+  the backfill doesn't wipe rankings), and small per-user / by-id reads that filter with
+  `isDocInGame` (`decks.listByUser`, by-id `getById`/`getDetail`/…).
+- Writers/upserts that look up an existing row by a natural key (`admin.upsertSet`, `createSet`,
+  `createFormat`, `seedFormats`, `upsertCardsBatch`, `insertCardBatch`, `linkCardFaces`,
+  `upsertSetLegality`, `importFormatLegalityBundle`, `cardDrafts` set lookups,
+  `setCardCountSync`) use the legacy-aware helpers: for `uvs` they also find the untagged row,
+  update it instead of inserting a duplicate, and tag it (`gameTagPatch`). Replace-mode legality
+  imports delete tagged and untagged rows. By-key reads that used `.unique()` (`sets.getByCode`,
+  `formats.getByKey`, deck validation's format lookup, …) go through the same helpers, which
+  return the first row and log duplicates instead of throwing.
+- When the `tierLists` backfill finishes, `backfillGameField:run` schedules
+  `communityRankings.recomputeAllScopes` for every game (global + every set scope with a public
+  ranked list or an existing snapshot), so the ranking cache is rebuilt from tagged data. It is
+  safe to run manually (`npx convex run communityRankings:recomputeAllScopes '{"game":"uvs"}'`).
 - Whole-table `.collect()`s switched to a game index (`sets.list`, `formats.list`, …) re-sort
   with `byCreationTime` so ordering matches the old table scan.
 - By-id reads (`cards.getById`, `decks.getById`, `tierLists.getDetail`, `sets.getById`, …) take
@@ -177,14 +197,19 @@ Implementation (Phase 2 data-scoping step):
 - Internal/admin HTTP endpoints (`convex/adminHttp.ts`: upsert-set, upsert-cards-batch,
   link-card-faces, create-drafts, rebuild-catalog-aggregates) accept an optional JSON `game`
   (default `DEFAULT_GAME_ID`, unknown ids rejected), so existing ingest scripts keep working.
+  `rebuild-catalog-aggregates` answers 401 only for auth failures; bad JSON / unknown game is 400.
   Matching internal mutations (`admin.upsertSet`, `upsertCardsBatch`, `linkCardFaces`,
   `cardDrafts.createDraftsFromStorageIdsInternal`, `cardFacets.rebuildCardFacetSnapshot`,
   `sets.reconcileAllSetCardCounts`, `cards.updateCardDataVersion`/`initializeCardDataVersion`,
   `seedDummyDecks.seed`) take optional `game` with the same default.
+- Cross-game references are rejected: `tierLists.save` items (and the derived preview/featured
+  ids), `decks.update` `imageCardId`, and admin face links (`updateCard` / `updateCardFromJson` /
+  `createCardVariantFromJson` `backCardId`/`frontCardId`) must be cards of the same game.
 - Sessions: `getSession`, `getActiveDeckId`, `setActiveDeck` take `game`. `getSession` returns
   the resolved per-game `activeDeckId`/`galleryFilters`/`rightSidebarAction` at top level
-  (never `gameState`). `updateSession` takes optional `game` (required only with
-  `galleryFilters`/`rightSidebarAction`; appearance fields are global). Once `gameState[game]`
+  (never `gameState`). `updateSession` takes optional `game` (scopes
+  `galleryFilters`/`rightSidebarAction`, defaulting to `DEFAULT_GAME_ID` when omitted; appearance
+  fields are global). Once `gameState[game]`
   exists it is authoritative; the first write for `uvs` seeds it from the legacy fields.
 - Not scoped (on purpose): team deck lists (`teams/teamDecks.ts`, global team hub), admin user
   moderation counts (`adminUsers.ts`), child tables, maintenance actions
@@ -417,4 +442,6 @@ builders, `sanitizeSameOriginPath`, code checks, hint cookie) live in `shared/au
    both Vercel (Next inlines it at build time) and the Convex deployment env
    (`isAllowedHandoffOrigin` reads it server-side). A mismatch breaks the auth handoff.
 7. Verify the Resend sender domain.
-8. Follow-up change: make `game`/`setup` required, drop legacy deck fields and old indexes.
+8. Follow-up change: make `game`/`setup` required (schema fields **and** the public function
+   `game` args, which are optional only for rolling-deploy compatibility), drop legacy deck fields,
+   old indexes and the legacy-aware lookup fallbacks.
