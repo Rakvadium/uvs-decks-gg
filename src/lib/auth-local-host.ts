@@ -68,7 +68,7 @@ export function isAuthLocalHost(host?: string): boolean {
   }
 
   const hostname = hostnameFromHostHeader(raw);
-  if (LOCAL_HOST_NAMES.has(hostname)) {
+  if (LOCAL_HOST_NAMES.has(hostname) || hostname.endsWith(".localhost")) {
     return true;
   }
 

@@ -1,5 +1,9 @@
 import { v } from "convex/values";
 import type { Doc } from "./_generated/dataModel";
+import { GAME_IDS } from "../shared/games/types";
+
+/** Built from the shared `GAME_IDS` so adding a game only touches `shared/games/types.ts`. */
+export const gameIdValidator = v.union(...GAME_IDS.map((id) => v.literal(id)));
 
 export const deckVisibilityValidator = v.union(
   v.literal("private"),
