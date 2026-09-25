@@ -28,6 +28,23 @@ export interface GameThemeColors {
   accent: string;
 }
 
+/** Product brand shown in the wordmark and page titles. */
+export interface Brand {
+  /** Wordmark parts: lead, accented middle, suffix (e.g. `["UVS", "DECKS", ".GG"]`). */
+  wordmark: readonly [lead: string, accent: string, suffix: string];
+  /** Plain-text brand, used for `<title>` and aria labels (e.g. `"UVSDECKS.GG"`). */
+  title: string;
+  /** Default meta description. */
+  description: string;
+}
+
+/** Platform brand used on the apex host (`tcgdecks.gg`). */
+export const PLATFORM_BRAND: Brand = {
+  wordmark: ["TCG", "DECKS", ".GG"],
+  title: "TCGDECKS.GG",
+  description: "Deck building, card galleries, and community tools for trading card games. One account across every game.",
+};
+
 /**
  * Game-specific data/logic shared by server and client. Intentionally minimal for now;
  * later phases add deck setup, validation, filters, import/export, etc.
@@ -39,6 +56,8 @@ export interface SharedGameModule {
   /** Short label for compact UI, e.g. "UVS". */
   shortName: string;
   theme: GameThemeColors;
+  /** Brand on this game's hosts (game subdomain + standalone). */
+  brand: Brand;
   /** Gallery stat/zone filter descriptors (see `shared/games/filters.ts`). */
   filters: GameFilterDefinition;
   /** Deck setup, validation rules, card eligibility, list display, text import/export (see `shared/games/deck.ts`). */

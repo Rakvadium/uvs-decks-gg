@@ -304,7 +304,8 @@ Implementation (Phase 2 routing step):
   Matcher unchanged (skips `_next` and any path with a dot).
 - **Server helper** `getRequestGame()` (`src/lib/routing/request-game.ts`) reads the headers
   (falls back to `resolveHost(host)`); used by the root layout (wraps `Providers` in
-  `GameProvider`) and the root page (apex → minimal game picker linking to
+  `GameProvider`, passing the resolved `host` + `x-forwarded-proto` for cross-host links; derives
+  metadata via `generateMetadata`) and the root page (apex → game picker linking to
   `gameOrigin(game, root)/gallery`; otherwise `redirect("/gallery")`).
 - **`src/app/(app)/[game]/layout.tsx`** `notFound()`s unless `isGameId(params.game)`.
   `[game]/admin/layout.tsx` re-exports `(app)/admin/layout.tsx` so game-scoped admin pages keep
@@ -312,6 +313,37 @@ Implementation (Phase 2 routing step):
   sidebar and `getPageType` in `(app)/layout.tsx` are unchanged; `useParams()` now also has `game`.
 - Absolute links built from `window.location.origin` (private deck links, team invites) are
   same-host and unchanged.
+
+## Brand, game switcher, apex picker (Phase 2 UI step)
+
+- **Brand:** `SharedGameModule.brand = { wordmark: [lead, accent, suffix], title, description }`
+  (UVS: `["UVS", "DECKS", ".GG"]`, `UVSDECKS.GG`); `PLATFORM_BRAND` (`TCGDECKS.GG`) in
+  `shared/games/types.ts`. `getHostBrand(hostKind, game)` (`shared/games/registry.ts`) picks the
+  platform brand on the apex, else the game's (game + standalone hosts). The root layout's
+  `generateMetadata` builds the title default/template (`%s | {brand.title}`) and description from
+  it; the client reads it with `useBrand()`. `AppBrandWordmark` / `AppBrandRailWordmark` /
+  `AppBrandLink` (aria-label) render the brand parts. Per-page descriptions that still say
+  "UVSDECKS.GG"/"UniVersus" are UVS copy and change when a second game ships.
+- **Game switcher:** `buildGameSwitcherModel(host, game, protocol)` (`src/games/game-links.ts`,
+  tests `tests/game-switcher.test.ts`) → current game, one entry per `GAME_IDS` game (current =
+  host-relative `/gallery`, others = `gameUrl(id, "/gallery")`), and `allGamesHref` = apex `/`.
+  It returns `null` on standalone and apex hosts, so the switcher only renders on game hosts
+  (standalone serves one game and can't link across hosts; the apex has its own picker).
+  `GameProvider` exposes it as `useGameSwitcher()`. Components: `src/components/shell/game-switcher/`
+  (`GameBadge` — short name tinted with the module's `theme.primary`; `menu-content.tsx`;
+  `sidebar.tsx`; `profile-sheet-section.tsx`).
+- **Placement:** the floating-header and mobile-shell docs have no slot for a cross-game switch,
+  so it goes in persistent shell chrome, not page bars:
+  - Desktop: left sidebar, directly under the wordmark (`LeftSidebarBrand` → `SidebarGameSwitcher`
+    → divider → nav). It's a sidebar-item-styled `DropdownMenu` trigger (badge + game name +
+    chevrons; badge-only with a tooltip when collapsed). The "UniVersus" item near the bottom of
+    the sidebar is the media dock toggle (`ShellUniversusNav`) and is unrelated.
+  - Mobile: a "Game" section at the top of the profile sheet (the sheet holds "full navigation"
+    per `mobile-shell.md`), above "Navigate". The Go capsule stays fixed. Signed-out users reach
+    other games from the apex picker.
+- **Apex picker** (`src/app/page.tsx`): platform wordmark + one `Card` per registered game (theme
+  gradient stripe, `GameBadge`, name, brand, "Open {short}" → `gameOrigin(id)/gallery`) and a
+  dashed "More games coming" tile so a single game still fills a 2-column grid.
 
 ## Central auth host (handoff)
 
@@ -367,10 +399,22 @@ builders, `sanitizeSameOriginPath`, code checks, hint cookie) live in `shared/au
 
 ## Rollout / ops (human)
 
-1. Deploy with optional fields. 2. Run `migrations/migrateDeckSetup:run` and
-`migrations/backfillGameField:runAll` in prod (check each table with
-`migrations/backfillGameField:status '{"table":"cards"}'`, looping on `continueCursor` until `pending` sums to 0).
-3. Publish a catalog (writes the per-game key).
-4. DNS: `tcgdecks.gg`, `*.tcgdecks.gg` on Vercel; `uvsdecks.gg` stays attached for the
-redirect. 5. Verify the Resend sender domain. 6. Follow-up change: make `game`/`setup`
-required, drop legacy deck fields and old indexes.
+1. Deploy with optional fields.
+2. Run migrations in prod: `migrations/migrateDeckSetup:run` and
+   `migrations/backfillGameField:runAll` (check each table with
+   `migrations/backfillGameField:status '{"table":"cards"}'`, and `migrations/migrateDeckSetup:status`,
+   looping on `continueCursor` until `pending` sums to 0). Game-indexed `uvs` lists are empty until
+   the backfill finishes, so run it right after the deploy.
+3. Publish a catalog **after** the backfill (publishing reads cards `by_game`; writes
+   `catalog/{game}/v{n}.json.gz` and the per-game `cardDataVersion` row).
+4. **R2 bucket CORS** must allow the new origins: `https://tcgdecks.gg`, `https://*.tcgdecks.gg`,
+   and dev `http://*.tcgdecks.localhost:8090` (keep the existing origins). Until then the static
+   catalog fetch from R2 fails CORS on the new hosts and the client falls back to the (slower)
+   paginated Convex sync.
+5. **Vercel domains:** add `tcgdecks.gg` and `*.tcgdecks.gg` (wildcard needs Vercel DNS /
+   nameservers); keep `uvsdecks.gg` (+ `www`) attached so middleware can 301 it.
+6. **`NEXT_PUBLIC_ROOT_DOMAINS`:** leave unset for the defaults, or set the **same** comma list in
+   both Vercel (Next inlines it at build time) and the Convex deployment env
+   (`isAllowedHandoffOrigin` reads it server-side). A mismatch breaks the auth handoff.
+7. Verify the Resend sender domain.
+8. Follow-up change: make `game`/`setup` required, drop legacy deck fields and old indexes.

@@ -120,7 +120,7 @@ Do not rebuild a second search bar, a second primary-nav row, or a tool-tile row
 | --- | --- | --- |
 | Actions sheet | Peek circle | `right-sidebar` panels + footer switcher |
 | Filter sheet | Act → Filters (gallery); Filters button in the deck-details Gallery peek | Mobile gallery filters (root, Sets, Keywords, Stats pages). Inside the Gallery peek its Display group drives the peek's own card/list mode, not the gallery preference |
-| Profile sheet | Go → Profile (signed in) | Account, prefs, full navigation, Feedback, sign out |
+| Profile sheet | Go → Profile (signed in) | Account, game switcher (game hosts only; see [multi-game.md](./multi-game.md)), prefs, full navigation, Feedback, sign out |
 | Auth dialog | Go → Profile (signed out); Sign In in the profile footer | Sign in |
 
 Nested sheet → dialog needs `suppressSubsequentPointerEvents`.

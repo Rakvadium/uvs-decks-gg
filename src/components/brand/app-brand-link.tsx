@@ -1,4 +1,7 @@
+"use client"
+
 import Link from "next/link"
+import { useBrand } from "@/games/game-context"
 import { cn } from "@/lib/utils"
 import { AppBrandMark } from "./mark"
 import { AppBrandWordmark } from "./wordmark"
@@ -24,6 +27,7 @@ export function AppBrandLink({
   className,
 }: AppBrandLinkProps) {
   const isRail = wordmarkLayout === "rail"
+  const brand = useBrand()
 
   return (
     <Link
@@ -35,7 +39,7 @@ export function AppBrandLink({
           : "items-center gap-3",
         className
       )}
-      aria-label="UVSDECKS.GG"
+      aria-label={brand.title}
     >
       <AppBrandMark
         className={cn(

@@ -1,6 +1,7 @@
 "use client"
 
 import { useLayoutEffect, useRef } from "react"
+import { useBrand } from "@/games/game-context"
 import { cn } from "@/lib/utils"
 
 function FitWidthLine({
@@ -80,6 +81,8 @@ type AppBrandRailWordmarkProps = {
 }
 
 export function AppBrandRailWordmark({ className }: AppBrandRailWordmarkProps) {
+  const [lead, accent, suffix] = useBrand().wordmark
+
   return (
     <div
       className={cn(
@@ -88,13 +91,13 @@ export function AppBrandRailWordmark({ className }: AppBrandRailWordmarkProps) {
       )}
     >
       <FitWidthLine className="chrome-label-case font-bold text-sidebar-foreground">
-        UVS
+        {lead}
       </FitWidthLine>
       <FitWidthLine className="chrome-label-case font-bold text-accent">
-        DECKS
+        {accent}
       </FitWidthLine>
       <span className="chrome-label-case mt-0.5 self-center text-[16px] font-bold leading-none text-sidebar-foreground/70">
-        GG
+        {suffix.replace(/^\./, "")}
       </span>
     </div>
   )

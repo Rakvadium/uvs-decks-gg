@@ -2,6 +2,7 @@
 
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
+import { ProfileSheetGameSection } from "../game-switcher/profile-sheet-section";
 import { MOBILE_SHEET_GRABBER, MOBILE_SHEET_PANEL } from "../mobile-glass";
 import { MobileProfileAdminSection } from "./admin-section";
 import { MobileProfileSheetProvider, useMobileProfileSheetContext } from "./context";
@@ -41,6 +42,7 @@ function MobileProfileSheetContent() {
           <MobileProfileSheetHeader />
 
           <div className="min-h-0 flex-1 space-y-5 overflow-y-auto overscroll-contain px-4 pb-4">
+            <ProfileSheetGameSection onNavigate={closeSheet} />
             <MobileProfileNavigationSection />
             <MobileProfilePreferencesSection />
             {isAdmin ? <MobileProfileAdminSection /> : null}

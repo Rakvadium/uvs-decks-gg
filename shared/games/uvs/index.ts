@@ -12,6 +12,12 @@ export const UVS_SHARED_GAME_MODULE = {
     secondary: "262 83% 58%",
     accent: "142 76% 36%",
   },
+  brand: {
+    wordmark: ["UVS", "DECKS", ".GG"],
+    title: "UVSDECKS.GG",
+    description:
+      "Build UniVersus decks, browse the card gallery, and explore community tier lists on UVSDECKS.GG.",
+  },
   filters: UVS_FILTER_DEFINITION,
   deck: UVS_DECK_MODULE,
 } as const satisfies SharedGameModule;

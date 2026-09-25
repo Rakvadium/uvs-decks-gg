@@ -1,5 +1,8 @@
+"use client"
+
 import { cn } from "@/lib/utils"
 import { Kicker } from "@/components/ui/typography-headings"
+import { useBrand } from "@/games/game-context"
 import { AppBrandRailWordmark } from "./rail-wordmark"
 
 type AppBrandWordmarkProps = {
@@ -13,6 +16,8 @@ export function AppBrandWordmark({
   className,
   size = "md",
 }: AppBrandWordmarkProps) {
+  const [lead, accent, suffix] = useBrand().wordmark
+
   if (layout === "rail") {
     return <AppBrandRailWordmark className={className} />
   }
@@ -26,8 +31,8 @@ export function AppBrandWordmark({
           className
         )}
       >
-        UVS<span className="text-accent">DECKS</span>
-        <span className="text-sidebar-foreground/70">.GG</span>
+        {lead}<span className="text-accent">{accent}</span>
+        <span className="text-sidebar-foreground/70">{suffix}</span>
       </Kicker>
     )
   }
@@ -40,10 +45,10 @@ export function AppBrandWordmark({
           size === "sm" ? "text-sm" : "text-lg"
         )}
       >
-        UVS<span className="text-accent">DECKS</span>
+        {lead}<span className="text-accent">{accent}</span>
       </Kicker>
       <span className="chrome-label-case -mt-1 text-[10px] text-sidebar-foreground/70">
-        .GG
+        {suffix}
       </span>
     </div>
   )
