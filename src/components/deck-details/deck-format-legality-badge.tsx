@@ -6,6 +6,7 @@ import type { Id } from "../../../convex/_generated/dataModel";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+import { useGameId } from "@/games/game-context";
 
 type DeckFormatLegalityBadgeProps = {
   deckId: Id<"decks">;
@@ -22,7 +23,8 @@ export function DeckFormatLegalityBadge({
   className,
   compact,
 }: DeckFormatLegalityBadgeProps) {
-  const formatDoc = useQuery(api.formats.getByKey, formatKey ? { key: formatKey } : "skip");
+  const game = useGameId();
+  const formatDoc = useQuery(api.formats.getByKey, formatKey ? { game, key: formatKey } : "skip");
   const validation = useQuery(api.deckValidation.validateDeck, { deckId });
 
   const formatLabel = !formatKey?.trim()

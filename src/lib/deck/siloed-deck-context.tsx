@@ -24,6 +24,7 @@ import {
   isDeckWriteConflictError,
   isTeamEditableDeck,
 } from "@/lib/deck/visibility";
+import { useGameId } from "@/games/game-context";
 
 type Deck = Doc<"decks">;
 type DeckSection = "main" | "side" | "reference";
@@ -67,9 +68,10 @@ interface SiloedDeckProviderProps {
 }
 
 export function SiloedDeckProvider({ children, deckId }: SiloedDeckProviderProps) {
+  const game = useGameId();
   const deckData = useQuery(
     api.decks.getById,
-    { deckId: deckId as Id<"decks"> }
+    { game, deckId: deckId as Id<"decks"> }
   );
   const cardIndex = useCardIndex();
 

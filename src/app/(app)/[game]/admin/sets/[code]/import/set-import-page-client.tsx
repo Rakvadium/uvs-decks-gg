@@ -8,13 +8,15 @@ import AdminImportPageClient from "../../../import/import-page-client";
 import { AdminSetBreadcrumbs } from "../../admin-set-breadcrumbs";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useGameId } from "@/games/game-context";
 
 export default function AdminSetImportPageClient() {
   const params = useParams();
   const searchParams = useSearchParams();
   const router = useRouter();
   const code = typeof params.code === "string" ? params.code : "";
-  const set = useQuery(api.sets.getByCode, code ? { code } : "skip");
+  const game = useGameId();
+  const set = useQuery(api.sets.getByCode, code ? { game, code } : "skip");
   const listSearch = searchParams.get("search");
   const listQuery =
     listSearch !== null && listSearch !== "" ? `?search=${encodeURIComponent(listSearch)}` : "";

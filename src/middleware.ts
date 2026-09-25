@@ -1,8 +1,13 @@
-import { convexAuthNextjsMiddleware, createRouteMatcher, nextjsMiddlewareRedirect } from "@convex-dev/auth/nextjs/server";
+import { convexAuthNextjsMiddleware, createRouteMatcher } from "@convex-dev/auth/nextjs/server";
 import { NextResponse, type NextRequest } from "next/server";
-import { routeRequest, type RouteDecision } from "@/lib/routing/route-request";
+import {
+  AUTH_ENTRY_PATHS,
+  authenticatedAuthEntryRedirect,
+  routeRequest,
+  type RouteDecision,
+} from "@/lib/routing/route-request";
 
-const isPublicPage = createRouteMatcher(["/sign-in", "/sign-up", "/agent-login"]);
+const isPublicPage = createRouteMatcher([...AUTH_ENTRY_PATHS]);
 const AUTH_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 30;
 
 function forwardedHeaders(request: NextRequest, extra: Record<string, string>): Headers {
@@ -42,7 +47,9 @@ export default convexAuthNextjsMiddleware(async (request, { convexAuth }) => {
     return applyDecision(request, decision);
   }
   if (isPublicPage(request) && await convexAuth.isAuthenticated()) {
-    return nextjsMiddlewareRedirect(request, "/home");
+    // Same-origin path only (sanitized), so this can't become an open redirect.
+    const target = new URL(authenticatedAuthEntryRedirect(request.nextUrl.search), request.url);
+    return NextResponse.redirect(target);
   }
   return applyDecision(request, decision);
 }, {

@@ -10,6 +10,7 @@ import {
   tierListCommentValidator,
   tierListItemValidator,
   tierListValidator,
+  gameIdValidator,
   publicUserFromDocument,
   userValidator,
 } from "./validators";
@@ -28,6 +29,8 @@ import {
   normalizeTierListPoolScopes,
   TIER_LIST_POOL_ALL_TYPES,
 } from "../shared/tier-list-pool";
+import type { GameId } from "../shared/games/types";
+import { docGame, isDocInGame } from "./lib/gameScope";
 
 const tierListSaveItemValidator = v.object({
   cardId: v.id("cards"),
@@ -103,17 +106,20 @@ function normalizeTiers(
 }
 
 type RankingScopeRef = {
+  game: GameId;
   scopeType: "global" | "set_scope";
   scopeKey: string;
 };
 
 function getEligibleRankingScopeRefs({
+  game,
   isPublic,
   rankingScope,
   rankingScopeKey,
   selectedSetCodes,
   tiers,
 }: {
+  game: GameId;
   isPublic: boolean;
   rankingScope?: CommunityTierRankingScope;
   rankingScopeKey?: string;
@@ -129,6 +135,7 @@ function getEligibleRankingScopeRefs({
   if (resolvedRankingScope === COMMUNITY_TIER_RANKING.scopes.global) {
     return [
       {
+        game,
         scopeType: "global" as const,
         scopeKey: COMMUNITY_TIER_RANKING.globalScopeKey,
       },
@@ -141,6 +148,7 @@ function getEligibleRankingScopeRefs({
 
   return [
     {
+      game,
       scopeType: "set_scope" as const,
       scopeKey: rankingScopeKey,
     },
@@ -153,7 +161,7 @@ async function recomputeAffectedRankingScopes(
 ) {
   const deduped = new Map<string, RankingScopeRef>();
   for (const scope of scopes) {
-    deduped.set(`${scope.scopeType}:${scope.scopeKey}`, scope);
+    deduped.set(`${scope.game}:${scope.scopeType}:${scope.scopeKey}`, scope);
   }
 
   for (const scope of deduped.values()) {
@@ -205,6 +213,7 @@ async function getLikedState(
 
 export const listPublicFeed = query({
   args: {
+    game: gameIdValidator,
     limit: v.optional(v.number()),
   },
   returns: v.array(tierListFeedEntryValidator),
@@ -213,7 +222,9 @@ export const listPublicFeed = query({
     const limit = Math.min(Math.max(args.limit ?? 12, 1), 24);
     const tierLists = await ctx.db
       .query("tierLists")
-      .withIndex("by_isPublic_and_updatedAt", (q) => q.eq("isPublic", true))
+      .withIndex("by_game_and_isPublic_and_updatedAt", (q) =>
+        q.eq("game", args.game).eq("isPublic", true)
+      )
       .order("desc")
       .take(limit);
 
@@ -239,6 +250,7 @@ export const listPublicFeed = query({
 
 export const listMine = query({
   args: {
+    game: gameIdValidator,
     limit: v.optional(v.number()),
   },
   returns: v.array(tierListValidator),
@@ -251,7 +263,9 @@ export const listMine = query({
     const limit = Math.min(Math.max(args.limit ?? 10, 1), 30);
     return await ctx.db
       .query("tierLists")
-      .withIndex("by_user_and_updatedAt", (q) => q.eq("userId", userId))
+      .withIndex("by_user_and_game_and_updatedAt", (q) =>
+        q.eq("userId", userId).eq("game", args.game)
+      )
       .order("desc")
       .take(limit);
   },
@@ -259,6 +273,7 @@ export const listMine = query({
 
 export const getEditable = query({
   args: {
+    game: gameIdValidator,
     tierListId: v.id("tierLists"),
   },
   returns: v.union(tierListEditableValidator, v.null()),
@@ -269,7 +284,7 @@ export const getEditable = query({
     }
 
     const tierList = await ctx.db.get(args.tierListId);
-    if (!tierList || tierList.userId !== userId) {
+    if (!isDocInGame(tierList, args.game) || tierList.userId !== userId) {
       return null;
     }
 
@@ -287,6 +302,7 @@ export const getEditable = query({
 
 export const getDetail = query({
   args: {
+    game: gameIdValidator,
     tierListId: v.id("tierLists"),
   },
   returns: v.union(tierListDetailValidator, v.null()),
@@ -294,7 +310,8 @@ export const getDetail = query({
     const viewerId = await getAuthUserId(ctx);
     const tierList = await ctx.db.get(args.tierListId);
 
-    if (!tierList) {
+    // A tier list is only visible on its own game's host.
+    if (!isDocInGame(tierList, args.game)) {
       return null;
     }
 
@@ -351,6 +368,7 @@ export const getDetail = query({
 
 export const save = mutation({
   args: {
+    game: gameIdValidator,
     tierListId: v.optional(v.id("tierLists")),
     title: v.string(),
     description: v.optional(v.string()),
@@ -423,14 +441,18 @@ export const save = mutation({
       if (existing.userId !== userId) {
         throw new Error("Not authorized");
       }
+      if (docGame(existing) !== args.game) {
+        throw new Error("Tier list not found");
+      }
       previousExisting = existing;
       previousCommentCount = existing.commentCount;
       previousLikeCount = existing.likeCount;
-      previousScopeRefs = getEligibleRankingScopeRefs(existing);
+      previousScopeRefs = getEligibleRankingScopeRefs({ ...existing, game: docGame(existing) });
     }
 
     if (!tierListId) {
       tierListId = await ctx.db.insert("tierLists", {
+        game: args.game,
         userId,
         title: normalizedTitle,
         isPublic: args.isPublic,
@@ -456,6 +478,7 @@ export const save = mutation({
         throw new Error("Tier list not found");
       }
       await ctx.db.replace(existingTierListId, {
+        game: args.game,
         userId,
         title: normalizedTitle,
         isPublic: args.isPublic,
@@ -495,6 +518,7 @@ export const save = mutation({
     }
 
     const nextScopeRefs = getEligibleRankingScopeRefs({
+      game: args.game,
       isPublic: args.isPublic,
       rankingScope: args.rankingScope,
       rankingScopeKey: normalizedRankingScopeKey,
@@ -633,7 +657,7 @@ export const remove = mutation({
       throw new Error("Not authorized");
     }
 
-    const previousScopeRefs = getEligibleRankingScopeRefs(tierList);
+    const previousScopeRefs = getEligibleRankingScopeRefs({ ...tierList, game: docGame(tierList) });
 
     for await (const item of ctx.db.query("tierListItems").withIndex("by_tierList", (q) => q.eq("tierListId", args.tierListId))) {
       await ctx.db.delete(item._id);

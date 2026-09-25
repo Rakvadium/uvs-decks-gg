@@ -3,7 +3,15 @@ import { getAuthUserId } from "@convex-dev/auth/server";
 import { v } from "convex/values";
 import { migrateLegacySessionFields } from "./lib/appearanceMigration";
 import { canViewDeck } from "./lib/deckAccess";
-import { chromeVariantValidator, colorSourceValidator, sessionValidator, themePreferenceValidator } from "./validators";
+import {
+  chromeVariantValidator,
+  colorSourceValidator,
+  gameIdValidator,
+  sessionValidator,
+  themePreferenceValidator,
+} from "./validators";
+import { nextSessionGameState, resolveSessionGameState } from "./lib/sessionGameState";
+import { isDocInGame } from "./lib/gameScope";
 
 const HEX_COLOR = /^#([0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/;
 
@@ -55,16 +63,32 @@ function validateAppearanceCustom(custom: {
   }
 }
 
+/**
+ * The session with `activeDeckId` / `galleryFilters` / `rightSidebarAction` resolved for `game`
+ * (from `gameState[game]`, falling back to the legacy top-level fields for the default game).
+ */
 export const getSession = query({
-  args: {},
+  args: { game: gameIdValidator },
   returns: v.union(sessionValidator, v.null()),
-  handler: async (ctx) => {
+  handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) {
       return null;
     }
 
-    return await ctx.db.query("sessions").withIndex("by_user", (q) => q.eq("userId", userId)).first();
+    const session = await ctx.db
+      .query("sessions")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .first();
+    if (!session) {
+      return null;
+    }
+    const view: Partial<typeof session> = { ...session };
+    delete view.gameState;
+    delete view.activeDeckId;
+    delete view.galleryFilters;
+    delete view.rightSidebarAction;
+    return { ...(view as typeof session), ...resolveSessionGameState(session, args.game) };
   },
 });
 
@@ -110,9 +134,9 @@ export const ensureAppearanceMigrated = mutation({
 });
 
 export const getActiveDeckId = query({
-  args: {},
+  args: { game: gameIdValidator },
   returns: v.union(v.id("decks"), v.null()),
-  handler: async (ctx) => {
+  handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) {
       return null;
@@ -123,12 +147,13 @@ export const getActiveDeckId = query({
       .withIndex("by_user", (q) => q.eq("userId", userId))
       .first();
 
-    return session?.activeDeckId ?? null;
+    return resolveSessionGameState(session, args.game).activeDeckId ?? null;
   },
 });
 
 export const setActiveDeck = mutation({
   args: {
+    game: gameIdValidator,
     deckId: v.optional(v.id("decks")),
   },
   returns: v.null(),
@@ -140,7 +165,7 @@ export const setActiveDeck = mutation({
 
     if (args.deckId) {
       const deck = await ctx.db.get(args.deckId);
-      if (!deck) {
+      if (!deck || !isDocInGame(deck, args.game)) {
         return null;
       }
       const allowed = await canViewDeck(ctx, deck, args.deckId);
@@ -154,15 +179,19 @@ export const setActiveDeck = mutation({
       .withIndex("by_user", (q) => q.eq("userId", userId))
       .first();
 
+    // Omitted `deckId` clears the game's active deck.
+    const gameState = nextSessionGameState(existingSession, args.game, {
+      activeDeckId: args.deckId ?? null,
+    });
     if (existingSession) {
       await ctx.db.patch(existingSession._id, {
-        activeDeckId: args.deckId,
+        gameState,
         lastActiveAt: Date.now(),
       });
     } else {
       await ctx.db.insert("sessions", {
         userId,
-        activeDeckId: args.deckId,
+        gameState,
         lastActiveAt: Date.now(),
       });
     }
@@ -173,6 +202,11 @@ export const setActiveDeck = mutation({
 
 export const updateSession = mutation({
   args: {
+    /**
+     * Scopes `galleryFilters` / `rightSidebarAction` (stored in `gameState[game]`); required with
+     * them. Appearance fields (`theme`, `chrome`, `colorSource`) are global and need no game.
+     */
+    game: v.optional(gameIdValidator),
     galleryFilters: v.optional(v.any()),
     rightSidebarAction: v.optional(v.string()),
     theme: themePreferenceValidator,
@@ -196,11 +230,14 @@ export const updateSession = mutation({
       .first();
 
     const updates: Record<string, unknown> = { lastActiveAt: Date.now() };
-    if (args.galleryFilters !== undefined) {
-      updates.galleryFilters = args.galleryFilters;
-    }
-    if (args.rightSidebarAction !== undefined) {
-      updates.rightSidebarAction = args.rightSidebarAction;
+    if (args.galleryFilters !== undefined || args.rightSidebarAction !== undefined) {
+      if (args.game === undefined) {
+        throw new Error("game is required when updating galleryFilters or rightSidebarAction");
+      }
+      updates.gameState = nextSessionGameState(existingSession, args.game, {
+        galleryFilters: args.galleryFilters,
+        rightSidebarAction: args.rightSidebarAction,
+      });
     }
     if (args.theme !== undefined) {
       updates.theme = args.theme;
@@ -218,7 +255,12 @@ export const updateSession = mutation({
       await ctx.db.insert("sessions", {
         userId,
         lastActiveAt: Date.now(),
-        ...args,
+        theme: args.theme,
+        chrome: args.chrome,
+        colorSource: args.colorSource,
+        ...(updates.gameState
+          ? { gameState: updates.gameState as ReturnType<typeof nextSessionGameState> }
+          : {}),
       });
     }
 

@@ -3,6 +3,7 @@ import { useMutation } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import { useDeckCatalogData, type DeckTab } from "@/hooks/useDeckCatalogData";
 import { useActiveDeck } from "@/providers/ActiveDeckProvider";
+import { useGameId } from "@/games/game-context";
 
 interface DecksSidebarContextValue {
   activeTab: DeckTab;
@@ -42,6 +43,7 @@ export function DecksSidebarProvider({ children }: DecksSidebarProviderProps) {
     activeTab
   );
 
+  const game = useGameId();
   const createDeck = useMutation(api.decks.create);
   const { activeDeckId, setActiveDeck } = useActiveDeck();
 
@@ -51,14 +53,14 @@ export function DecksSidebarProvider({ children }: DecksSidebarProviderProps) {
 
     setIsCreating(true);
     try {
-      const newDeckId = await createDeck({ name: trimmedName });
+      const newDeckId = await createDeck({ game, name: trimmedName });
       setActiveDeck(newDeckId);
       setNewDeckName("");
       setIsCreateOpen(false);
     } finally {
       setIsCreating(false);
     }
-  }, [createDeck, newDeckName, setActiveDeck]);
+  }, [createDeck, game, newDeckName, setActiveDeck]);
 
   const value = useMemo(
     () => ({

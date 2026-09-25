@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { useQuery } from "convex/react";
 import { api } from "../../../../../../../convex/_generated/api";
 import type { AdminSetRow } from "./types";
+import { useGameId } from "@/games/game-context";
 
 function startOfDayMs(dateStr: string): number {
   const d = new Date(dateStr);
@@ -36,7 +37,8 @@ function sortDefaultRows(a: AdminSetRow, b: AdminSetRow): number {
 }
 
 export function useAdminSetsListModel() {
-  const rows = useQuery(api.sets.listWithCardCountAudit, {});
+  const game = useGameId();
+  const rows = useQuery(api.sets.listWithCardCountAudit, { game });
 
   const [q, setQ] = useState("");
   const [includeReleased, setIncludeReleased] = useState(true);

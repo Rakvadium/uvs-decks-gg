@@ -14,9 +14,12 @@ import {
   cardDraftStatusValidator,
   cardDraftValidator,
   cardInputValidator,
+  gameIdValidator,
 } from "./validators";
 import { requireAdmin } from "./utils/validation";
 import { createCardWithDerivedFields } from "./lib/cardCreate";
+import { DEFAULT_GAME_ID, type GameId } from "../shared/games/types";
+import { docGame } from "./lib/gameScope";
 
 type CardDraftEditable = Infer<typeof cardDraftEditableValidator>;
 
@@ -174,6 +177,7 @@ export const generateDraftUploadUrl = mutation({
 async function insertDraftsFromStorageIds(
   ctx: { db: MutationCtx["db"] },
   args: {
+    game: GameId;
     setCode: string;
     setName: string;
     drafts: Array<{
@@ -190,7 +194,7 @@ async function insertDraftsFromStorageIds(
   const now = Date.now();
   const set = await ctx.db
     .query("sets")
-    .withIndex("by_code", (q) => q.eq("code", args.setCode))
+    .withIndex("by_game_and_code", (q) => q.eq("game", args.game).eq("code", args.setCode))
     .unique();
   const ids: Id<"cardDrafts">[] = [];
   for (let i = 0; i < args.drafts.length; i++) {
@@ -202,6 +206,7 @@ async function insertDraftsFromStorageIds(
     const collectorNumber = cleanString(draft.collectorNumber) ?? inferCollectorNumber(draft.fileName);
     const fileDraft = draftFieldsFromFileName(draft.fileName);
     const draftId = await ctx.db.insert("cardDrafts", {
+      game: args.game,
       setCode: args.setCode,
       setName: args.setName,
       collectorNumber,
@@ -233,6 +238,7 @@ async function insertDraftsFromStorageIds(
 
 export const createDraftsFromStorageIds = mutation({
   args: {
+    game: gameIdValidator,
     setCode: v.string(),
     setName: v.string(),
     drafts: v.array(draftUploadInputValidator),
@@ -246,18 +252,21 @@ export const createDraftsFromStorageIds = mutation({
 
 export const createDraftsFromStorageIdsInternal = internalMutation({
   args: {
+    /** Admin HTTP callers may omit it (defaults to DEFAULT_GAME_ID). */
+    game: v.optional(gameIdValidator),
     setCode: v.string(),
     setName: v.string(),
     drafts: v.array(draftUploadInputValidator),
   },
   returns: v.array(v.id("cardDrafts")),
   handler: async (ctx, args) => {
-    return await insertDraftsFromStorageIds(ctx, args);
+    return await insertDraftsFromStorageIds(ctx, { ...args, game: args.game ?? DEFAULT_GAME_ID });
   },
 });
 
 export const listDraftsBySet = query({
   args: {
+    game: gameIdValidator,
     setCode: v.string(),
     status: v.optional(cardDraftStatusValidator),
   },
@@ -267,8 +276,8 @@ export const listDraftsBySet = query({
     const status = args.status ?? "pending";
     const rows = await ctx.db
       .query("cardDrafts")
-      .withIndex("by_setCode_and_status_and_sortIndex", (q) =>
-        q.eq("setCode", args.setCode).eq("status", status)
+      .withIndex("by_game_and_setCode_and_status_and_sortIndex", (q) =>
+        q.eq("game", args.game).eq("setCode", args.setCode).eq("status", status)
       )
       .take(500);
     const result: Infer<typeof cardDraftReviewRowValidator>[] = [];
@@ -469,9 +478,10 @@ export const finalizeApproveDraft = internalMutation({
     if (existing.status !== "pending") {
       throw new Error("Only pending drafts can be approved");
     }
+    const game = docGame(existing);
     const set = await ctx.db
       .query("sets")
-      .withIndex("by_code", (q) => q.eq("code", existing.setCode))
+      .withIndex("by_game_and_code", (q) => q.eq("game", game).eq("code", existing.setCode))
       .unique();
     const card = draftToCardInput(existing.draft, {
       setCode: existing.setCode,
@@ -481,7 +491,7 @@ export const finalizeApproveDraft = internalMutation({
       setNumber: existing.draft.setNumber ?? set?.setNumber,
       legality: set?.legality,
     });
-    const cardId = await createCardWithDerivedFields(ctx, card);
+    const cardId = await createCardWithDerivedFields(ctx, game, card);
     await ctx.db.patch(args.draftId, {
       status: "approved",
       approvedCardId: cardId,

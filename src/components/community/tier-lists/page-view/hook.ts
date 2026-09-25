@@ -14,6 +14,7 @@ import {
   type CommunityTierRankingScope,
 } from "../../../../../shared/app-config";
 import { buildCardMap, createCanonicalRankedTiers, createDefaultTiers } from "../utils";
+import { useGameId } from "@/games/game-context";
 
 export type TierListBrowserTab = "public" | "mine" | "rankings";
 
@@ -65,8 +66,9 @@ export function useCommunityTierListsPageModel() {
   const searchParams = useSearchParams();
   const { isAuthenticated } = useConvexAuth();
   const { openAuthDialog } = useAuthDialog();
-  const publicLists = useQuery(api.tierLists.listPublicFeed, { limit: 48 });
-  const myLists = useQuery(api.tierLists.listMine, isAuthenticated ? { limit: 48 } : "skip");
+  const game = useGameId();
+  const publicLists = useQuery(api.tierLists.listPublicFeed, { game, limit: 48 });
+  const myLists = useQuery(api.tierLists.listMine, isAuthenticated ? { game, limit: 48 } : "skip");
   const saveTierList = useMutation(api.tierLists.save);
   const { cards } = useCardData();
 
@@ -189,6 +191,7 @@ export function useCommunityTierListsPageModel() {
         order,
       }));
       const result = await saveTierList({
+        game,
         title: newListName.trim() || "Untitled Tier List",
         isPublic: false,
         rankingScope: newRankingScope,

@@ -17,6 +17,7 @@ import {
 } from "@/components/admin";
 import { toast } from "sonner";
 import { getConvexErrorMessage, toastConvexError } from "@/lib/convex-error-toast";
+import { useGameId } from "@/games/game-context";
 
 type AdminImportPageClientProps = {
   setCode: string;
@@ -43,6 +44,7 @@ export default function AdminImportPageClient({
   const [bulkJobId, setBulkJobId] = useState<Id<"ingestionJobs"> | null>(null);
   const [bulkBusy, setBulkBusy] = useState(false);
 
+  const game = useGameId();
   const importCards = useAction(api.admin.importUniversusCards);
   const previewBulkImportCards = useMutation(api.admin.previewBulkImportCards);
   const bulkImportCards = useAction(api.admin.bulkImportCards);
@@ -56,7 +58,7 @@ export default function AdminImportPageClient({
     setResult(null);
 
     try {
-      const res = await importCards({ cardsJson: jsonData });
+      const res = await importCards({ game, cardsJson: jsonData });
       const msg = `Successfully imported ${res.inserted} cards (${res.failed} failed) out of ${res.totalCards} total.`;
       setResult({ success: true, message: msg });
       toast.success(msg);
@@ -103,6 +105,7 @@ export default function AdminImportPageClient({
     setBulkJobId(null);
     try {
       const { jobId } = await bulkImportCards({
+        game,
         format: "json",
         data: bulkJson,
         defaultSetCode: setCode,

@@ -6,6 +6,7 @@ import type {
   GameDeckValidationRules,
 } from "../../shared/games/deck";
 import { deckGameModule } from "./deckGame";
+import { docGame } from "./gameScope";
 
 // Game-specific rules live in `shared/games/<game>/rules`; this file only loads their data.
 
@@ -45,7 +46,9 @@ export async function runGameDeckValidation(
 
   const legality = await ctx.db
     .query("cardLegality")
-    .withIndex("by_format", (q) => q.eq("formatKey", deck.format!))
+    .withIndex("by_game_and_format", (q) =>
+      q.eq("game", docGame(deck)).eq("formatKey", deck.format!)
+    )
     .collect();
 
   return rules.validate({ deck, format, cards, setupCards, legality, now: Date.now() });

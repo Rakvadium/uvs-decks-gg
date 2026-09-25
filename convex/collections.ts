@@ -1,8 +1,18 @@
 import { query, mutation, type QueryCtx } from "./_generated/server";
 import { v } from "convex/values";
 import type { Id } from "./_generated/dataModel";
-import { cardValidator, collectionEntryValidator } from "./validators";
+import { cardValidator, collectionEntryValidator, gameIdValidator } from "./validators";
 import { requireAuth, requireUserCanPostContent } from "./utils/validation";
+import type { GameId } from "../shared/games/types";
+import { isDocInGame } from "./lib/gameScope";
+
+/** The user's collection rows for one game. */
+async function listCollectionEntries(ctx: QueryCtx, userId: Id<"users">, game: GameId) {
+  return await ctx.db
+    .query("collections")
+    .withIndex("by_user_and_game", (q) => q.eq("userId", userId).eq("game", game))
+    .collect();
+}
 
 async function requireCollectionOwner(ctx: QueryCtx, userId: Id<"users">) {
   const viewer = await requireAuth(ctx);
@@ -14,6 +24,7 @@ async function requireCollectionOwner(ctx: QueryCtx, userId: Id<"users">) {
 
 export const listByUser = query({
   args: {
+    game: gameIdValidator,
     userId: v.id("users"),
     search: v.optional(v.string()),
     rarity: v.optional(v.array(v.string())),
@@ -28,16 +39,14 @@ export const listByUser = query({
       quantity: v.number(),
       condition: v.optional(v.string()),
       isFoil: v.optional(v.boolean()),
+      game: v.optional(gameIdValidator),
       card: v.union(cardValidator, v.null()),
     })
   ),
   handler: async (ctx, args) => {
     await requireCollectionOwner(ctx, args.userId);
 
-    const entries = await ctx.db
-      .query("collections")
-      .withIndex("by_user", (q) => q.eq("userId", args.userId))
-      .collect();
+    const entries = await listCollectionEntries(ctx, args.userId, args.game);
 
     const entriesWithCards = await Promise.all(
       entries.map(async (entry) => {
@@ -77,23 +86,27 @@ export const listByUser = query({
 
 export const getByUserAndCard = query({
   args: {
+    game: gameIdValidator,
     userId: v.id("users"),
     cardId: v.id("cards"),
   },
   returns: v.union(collectionEntryValidator, v.null()),
   handler: async (ctx, args) => {
     await requireCollectionOwner(ctx, args.userId);
-    return await ctx.db
+    // `cardId` already implies the game; the check keeps other games' cards out of this host.
+    const entry = await ctx.db
       .query("collections")
       .withIndex("by_user_and_card", (q) =>
         q.eq("userId", args.userId).eq("cardId", args.cardId)
       )
       .first();
+    return isDocInGame(entry, args.game) ? entry : null;
   },
 });
 
 export const addToCollection = mutation({
   args: {
+    game: gameIdValidator,
     cardId: v.id("cards"),
     quantity: v.optional(v.number()),
     condition: v.optional(v.string()),
@@ -105,7 +118,7 @@ export const addToCollection = mutation({
     await requireUserCanPostContent(ctx, userId);
 
     const card = await ctx.db.get(args.cardId);
-    if (!card) throw new Error("Card not found");
+    if (!isDocInGame(card, args.game)) throw new Error("Card not found");
     if (card.isFrontFace === false) {
       throw new Error("Cannot add back-face card to collection. Add the front face instead.");
     }
@@ -120,11 +133,13 @@ export const addToCollection = mutation({
     if (existing) {
       await ctx.db.patch(existing._id, {
         quantity: existing.quantity + (args.quantity ?? 1),
+        game: args.game,
       });
       return existing._id;
     }
 
     return await ctx.db.insert("collections", {
+      game: args.game,
       userId,
       cardId: args.cardId,
       quantity: args.quantity ?? 1,
@@ -177,6 +192,7 @@ export const removeFromCollection = mutation({
 
 export const getCollectionStats = query({
   args: {
+    game: gameIdValidator,
     userId: v.id("users"),
   },
   returns: v.object({
@@ -188,10 +204,7 @@ export const getCollectionStats = query({
   handler: async (ctx, args) => {
     await requireCollectionOwner(ctx, args.userId);
 
-    const entries = await ctx.db
-      .query("collections")
-      .withIndex("by_user", (q) => q.eq("userId", args.userId))
-      .collect();
+    const entries = await listCollectionEntries(ctx, args.userId, args.game);
 
     let totalCards = 0;
     const byRarity: Record<string, number> = {};

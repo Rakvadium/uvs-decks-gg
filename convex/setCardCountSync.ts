@@ -1,4 +1,5 @@
 import type { MutationCtx, QueryCtx } from "./_generated/server";
+import type { GameId } from "../shared/games/types";
 
 function isListGalleryCard(card: {
   isFrontFace?: boolean;
@@ -9,6 +10,7 @@ function isListGalleryCard(card: {
 
 export async function countListCardsForSetCode(
   ctx: QueryCtx | MutationCtx,
+  game: GameId,
   setCode: string
 ): Promise<number> {
   if (!setCode) {
@@ -16,13 +18,16 @@ export async function countListCardsForSetCode(
   }
   const cards = await ctx.db
     .query("cards")
-    .withIndex("by_setCode_and_collectorNumber", (q) => q.eq("setCode", setCode))
+    .withIndex("by_game_and_setCode_and_collectorNumber", (q) =>
+      q.eq("game", game).eq("setCode", setCode)
+    )
     .collect();
   return cards.filter((c) => isListGalleryCard(c)).length;
 }
 
 export async function syncSetCardCountByCode(
   ctx: MutationCtx,
+  game: GameId,
   setCode: string | undefined
 ): Promise<void> {
   if (!setCode) {
@@ -30,12 +35,12 @@ export async function syncSetCardCountByCode(
   }
   const setDoc = await ctx.db
     .query("sets")
-    .withIndex("by_code", (q) => q.eq("code", setCode))
+    .withIndex("by_game_and_code", (q) => q.eq("game", game).eq("code", setCode))
     .unique();
   if (!setDoc) {
     return;
   }
-  const n = await countListCardsForSetCode(ctx, setCode);
+  const n = await countListCardsForSetCode(ctx, game, setCode);
   if (setDoc.cardCount === n) {
     return;
   }
@@ -44,13 +49,14 @@ export async function syncSetCardCountByCode(
 
 export async function syncSetCardCountsByCodes(
   ctx: MutationCtx,
+  game: GameId,
   setCodes: Iterable<string>
 ): Promise<void> {
   const seen = new Set<string>();
   for (const c of setCodes) {
     if (c && !seen.has(c)) {
       seen.add(c);
-      await syncSetCardCountByCode(ctx, c);
+      await syncSetCardCountByCode(ctx, game, c);
     }
   }
 }

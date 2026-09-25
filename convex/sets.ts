@@ -1,49 +1,56 @@
 import { query, internalMutation } from "./_generated/server";
 import { v } from "convex/values";
-import { setDocValidator } from "./validators";
+import { gameIdValidator, setDocValidator } from "./validators";
 import { requireAdmin } from "./utils/validation";
 import { countListCardsForSetCode, syncSetCardCountByCode } from "./setCardCountSync";
+import { DEFAULT_GAME_ID } from "../shared/games/types";
+import { byCreationTime, isDocInGame } from "./lib/gameScope";
 
 export const list = query({
-  args: {},
+  args: { game: gameIdValidator },
   returns: v.array(setDocValidator),
-  handler: async (ctx) => {
+  handler: async (ctx, args) => {
     return await ctx.db
       .query("sets")
-      .collect();
+      .withIndex("by_game_and_code", (q) => q.eq("game", args.game))
+      .collect()
+      .then(byCreationTime);
   },
 });
 
 export const getByCode = query({
   args: {
+    game: gameIdValidator,
     code: v.string(),
   },
   returns: v.union(setDocValidator, v.null()),
   handler: async (ctx, args) => {
     return await ctx.db
       .query("sets")
-      .withIndex("by_code", (q) => q.eq("code", args.code))
+      .withIndex("by_game_and_code", (q) => q.eq("game", args.game).eq("code", args.code))
       .unique();
   },
 });
 
 export const getById = query({
   args: {
+    game: gameIdValidator,
     setId: v.id("sets"),
   },
   returns: v.union(setDocValidator, v.null()),
   handler: async (ctx, args) => {
-    return await ctx.db.get(args.setId);
+    const set = await ctx.db.get(args.setId);
+    return isDocInGame(set, args.game) ? set : null;
   },
 });
 
 export const getMostRecent = query({
-  args: {},
+  args: { game: gameIdValidator },
   returns: v.union(setDocValidator, v.null()),
-  handler: async (ctx) => {
+  handler: async (ctx, args) => {
     const sets = await ctx.db
       .query("sets")
-      .withIndex("by_setNumber")
+      .withIndex("by_game_and_setNumber", (q) => q.eq("game", args.game))
       .order("desc")
       .take(1);
     return sets[0] ?? null;
@@ -51,7 +58,7 @@ export const getMostRecent = query({
 });
 
 export const listWithCardCountAudit = query({
-  args: {},
+  args: { game: gameIdValidator },
   returns: v.array(
     v.object({
       set: setDocValidator,
@@ -59,16 +66,20 @@ export const listWithCardCountAudit = query({
       mismatch: v.boolean(),
     })
   ),
-  handler: async (ctx) => {
+  handler: async (ctx, args) => {
     await requireAdmin(ctx);
-    const allSets = await ctx.db.query("sets").collect();
+    const allSets = await ctx.db
+      .query("sets")
+      .withIndex("by_game_and_code", (q) => q.eq("game", args.game))
+      .collect()
+      .then(byCreationTime);
     const out: {
       set: (typeof allSets)[number];
       actualListCardCount: number;
       mismatch: boolean;
     }[] = [];
     for (const s of allSets) {
-      const actualListCardCount = await countListCardsForSetCode(ctx, s.code);
+      const actualListCardCount = await countListCardsForSetCode(ctx, args.game, s.code);
       const mismatch =
         s.cardCount !== undefined && s.cardCount !== actualListCardCount;
       out.push({ set: s, actualListCardCount, mismatch });
@@ -78,7 +89,7 @@ export const listWithCardCountAudit = query({
 });
 
 export const isSetCodeAvailable = query({
-  args: { code: v.string() },
+  args: { game: gameIdValidator, code: v.string() },
   returns: v.boolean(),
   handler: async (ctx, args) => {
     await requireAdmin(ctx);
@@ -88,14 +99,14 @@ export const isSetCodeAvailable = query({
     }
     const existing = await ctx.db
       .query("sets")
-      .withIndex("by_code", (q) => q.eq("code", trimmed))
+      .withIndex("by_game_and_code", (q) => q.eq("game", args.game).eq("code", trimmed))
       .unique();
     return existing === null;
   },
 });
 
 export const getSetCardCountAudit = query({
-  args: { code: v.string() },
+  args: { game: gameIdValidator, code: v.string() },
   returns: v.union(
     v.object({
       set: setDocValidator,
@@ -108,12 +119,12 @@ export const getSetCardCountAudit = query({
     await requireAdmin(ctx);
     const set = await ctx.db
       .query("sets")
-      .withIndex("by_code", (q) => q.eq("code", args.code))
+      .withIndex("by_game_and_code", (q) => q.eq("game", args.game).eq("code", args.code))
       .unique();
     if (!set) {
       return null;
     }
-    const actualListCardCount = await countListCardsForSetCode(ctx, set.code);
+    const actualListCardCount = await countListCardsForSetCode(ctx, args.game, set.code);
     const stored = set.cardCount;
     const mismatch = stored !== undefined && stored !== actualListCardCount;
     return { set, actualListCardCount, mismatch };
@@ -121,12 +132,16 @@ export const getSetCardCountAudit = query({
 });
 
 export const reconcileAllSetCardCounts = internalMutation({
-  args: {},
+  args: { game: v.optional(gameIdValidator) },
   returns: v.null(),
-  handler: async (ctx) => {
-    const all = await ctx.db.query("sets").collect();
+  handler: async (ctx, args) => {
+    const game = args.game ?? DEFAULT_GAME_ID;
+    const all = await ctx.db
+      .query("sets")
+      .withIndex("by_game_and_code", (q) => q.eq("game", game))
+      .collect();
     for (const s of all) {
-      await syncSetCardCountByCode(ctx, s.code);
+      await syncSetCardCountByCode(ctx, game, s.code);
     }
     return null;
   },

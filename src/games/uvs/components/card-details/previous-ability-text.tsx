@@ -10,9 +10,11 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { AbilityText } from "./ability-text";
+import { useGameId } from "@/games/game-context";
 
 export function PreviousAbilityText({ cardId }: { cardId: Id<"cards"> }) {
-  const history = useQuery(api.cards.listTextHistory, { cardId });
+  const game = useGameId();
+  const history = useQuery(api.cards.listTextHistory, { game, cardId });
 
   if (!history || history.length === 0) {
     return null;

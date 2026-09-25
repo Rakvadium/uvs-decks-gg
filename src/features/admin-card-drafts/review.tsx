@@ -54,6 +54,7 @@ import { parseZoneDisplay } from "@/games/uvs/components/card-details/parsers";
 import { CheckCircle2, Circle, Loader2, MoreHorizontal, XCircle } from "lucide-react";
 import { toast } from "sonner";
 import { toastConvexError } from "@/lib/convex-error-toast";
+import { useGameId } from "@/games/game-context";
 
 type AdminCardDraftReviewProps = {
   setCode: string;
@@ -330,7 +331,9 @@ export default function AdminCardDraftReview({
   breadcrumbs,
   searchSuffix = "",
 }: AdminCardDraftReviewProps) {
+  const game = useGameId();
   const drafts = useQuery(api.cardDrafts.listDraftsBySet, {
+    game,
     setCode,
     status: "pending",
   });
@@ -675,6 +678,7 @@ export default function AdminCardDraftReview({
         }
         for (let i = 0; i < uploads.length; i += DRAFT_BATCH_SIZE) {
           await createDrafts({
+            game,
             setCode,
             setName,
             drafts: uploads.slice(i, i + DRAFT_BATCH_SIZE),
@@ -688,7 +692,7 @@ export default function AdminCardDraftReview({
         if (fileInputRef.current) fileInputRef.current.value = "";
       }
     },
-    [createDrafts, generateUploadUrl, setCode, setName]
+    [createDrafts, game, generateUploadUrl, setCode, setName]
   );
 
   const saveActiveDraft = useCallback(async () => {

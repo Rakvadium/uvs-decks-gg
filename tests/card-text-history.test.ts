@@ -15,18 +15,21 @@ describe("recordCardTextHistoryIfChanged", () => {
 
     const skippedEmpty = await recordCardTextHistoryIfChanged(ctx as never, {
       cardId: "card1" as never,
+      game: "uvs",
       previousText: undefined,
       nextText: "Enhance: New.",
       source: "admin_edit",
     });
     const skippedSame = await recordCardTextHistoryIfChanged(ctx as never, {
       cardId: "card1" as never,
+      game: "uvs",
       previousText: "Enhance: Same.",
       nextText: "Enhance: Same.",
       source: "admin_edit",
     });
     const wrote = await recordCardTextHistoryIfChanged(ctx as never, {
       cardId: "card1" as never,
+      game: "uvs",
       previousText: "Enhance: Old.",
       nextText: "Enhance: New.",
       source: "admin_edit",
@@ -42,6 +45,7 @@ describe("recordCardTextHistoryIfChanged", () => {
         text: "Enhance: Old.",
         recordedAt: 123,
         source: "admin_edit",
+        game: "uvs",
       },
     ]);
   });

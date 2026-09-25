@@ -4,6 +4,7 @@ import type { Id } from "../_generated/dataModel";
 import { cardInputValidator } from "../validators";
 import { syncSetCardCountByCode } from "../setCardCountSync";
 import { normalizeAbilityText } from "./normalizeAbilityText";
+import type { GameId } from "../../shared/games/types";
 
 export type CardInput = Infer<typeof cardInputValidator>;
 
@@ -99,6 +100,7 @@ export function deriveCardSearchFields(card: {
 
 export async function createCardWithDerivedFields(
   ctx: MutationCtx,
+  game: GameId,
   card: CardInput,
   now = Date.now()
 ): Promise<Id<"cards">> {
@@ -120,7 +122,8 @@ export async function createCardWithDerivedFields(
     searchText,
     searchAll,
     contentRevisionAt: now,
+    game,
   });
-  await syncSetCardCountByCode(ctx, card.setCode);
+  await syncSetCardCountByCode(ctx, game, card.setCode);
   return id;
 }

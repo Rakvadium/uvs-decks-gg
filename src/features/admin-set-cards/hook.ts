@@ -5,6 +5,7 @@ import { useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { useInfiniteSlice } from "@/hooks/useInfiniteSlice";
 import { loadAdminSetCardsCache, saveAdminSetCardsCache, type AdminSetCardRow } from "./cache";
+import { useGameId } from "@/games/game-context";
 
 export type AdminSetCardsSort = "collector_asc" | "collector_desc" | "name_asc" | "name_desc";
 
@@ -24,8 +25,9 @@ export function useAdminSetCardsModel(
   setCode: string,
   opts?: { infiniteScrollRoot?: "self" | "viewport" }
 ) {
-  const versionDoc = useQuery(api.admin.getCardDataVersion, {});
-  const liveCards = useQuery(api.admin.listCardsBySetCode, { setCode });
+  const game = useGameId();
+  const versionDoc = useQuery(api.admin.getCardDataVersion, { game });
+  const liveCards = useQuery(api.admin.listCardsBySetCode, { game, setCode });
   const [bootstrapped, setBootstrapped] = useState<AdminSetCardRow[] | null>(null);
   const [bootSetCode, setBootSetCode] = useState<string | null>(null);
 

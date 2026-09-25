@@ -5,9 +5,11 @@ import { useQuery } from "convex/react";
 import { api } from "../../../../../convex/_generated/api";
 import { useCardData } from "@/lib/universus/card-data-provider";
 import { buildCardMap } from "../utils";
+import { useGameId } from "@/games/game-context";
 
 export function useCommunityTierListFeed(limit: number) {
-  const feed = useQuery(api.tierLists.listPublicFeed, { limit });
+  const game = useGameId();
+  const feed = useQuery(api.tierLists.listPublicFeed, { game, limit });
   const { cards } = useCardData();
 
   return useMemo(

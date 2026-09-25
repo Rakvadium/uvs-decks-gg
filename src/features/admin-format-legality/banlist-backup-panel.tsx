@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
+import { useGameId } from "@/games/game-context";
 
 type BanlistBackupPanelProps = {
   formatKey: string;
@@ -32,7 +33,8 @@ type BundleShape = {
 };
 
 export function BanlistBackupPanel({ formatKey }: BanlistBackupPanelProps) {
-  const bundle = useQuery(api.admin.exportFormatLegalityBundle, { formatKey });
+  const game = useGameId();
+  const bundle = useQuery(api.admin.exportFormatLegalityBundle, { game, formatKey });
   const importBundle = useMutation(api.admin.importFormatLegalityBundle);
   const bulkCards = useMutation(api.admin.bulkUpsertCardLegality);
   const [jsonText, setJsonText] = useState("");
@@ -80,6 +82,7 @@ export function BanlistBackupPanel({ formatKey }: BanlistBackupPanelProps) {
     setBusy(true);
     try {
       const r = await importBundle({
+        game,
         formatKey,
         cardLegality: cardLegality?.map((e) => ({
           cardId: e.cardId as Id<"cards">,
@@ -141,6 +144,7 @@ export function BanlistBackupPanel({ formatKey }: BanlistBackupPanelProps) {
     setBusy(true);
     try {
       const r = await bulkCards({
+        game,
         formatKey,
         entries: clean.map((e) => ({
           cardId: e.cardId as Id<"cards">,

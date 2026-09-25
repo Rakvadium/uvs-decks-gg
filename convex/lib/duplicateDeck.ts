@@ -1,5 +1,6 @@
 import type { Doc } from "../_generated/dataModel";
 import { deckGameModule } from "./deckGame";
+import { docGame } from "./gameScope";
 
 export function duplicateDeckName(name: string): string {
   const trimmed = name.trim();
@@ -47,5 +48,7 @@ export function buildDuplicatedDeckFields(source: Doc<"decks">) {
     referenceQuantities: { ...source.referenceQuantities },
     cardLayouts: cloneCardLayouts(source.cardLayouts),
     revision: 0,
+    // Copies stay in the source deck's game.
+    game: docGame(source),
   };
 }

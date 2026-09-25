@@ -4,10 +4,12 @@ import { useRouter } from "next/navigation";
 import { api } from "../../../../../convex/_generated/api";
 import { useActiveDeck } from "@/providers/ActiveDeckProvider";
 import { useDecks } from "@/providers/DecksProvider";
+import { useGameId } from "@/games/game-context";
 
 export function useDeckCreateDialogModel() {
   const { state, actions } = useDecks();
   const { setActiveDeck } = useActiveDeck();
+  const game = useGameId();
   const createDeck = useMutation(api.decks.create);
   const router = useRouter();
   const [newDeckName, setNewDeckName] = useState("");
@@ -18,7 +20,7 @@ export function useDeckCreateDialogModel() {
 
     setIsCreating(true);
     try {
-      const newDeckId = await createDeck({ name: newDeckName });
+      const newDeckId = await createDeck({ game, name: newDeckName });
       setActiveDeck(newDeckId);
       setNewDeckName("");
       actions.closeCreateDialog();
@@ -26,7 +28,7 @@ export function useDeckCreateDialogModel() {
     } finally {
       setIsCreating(false);
     }
-  }, [actions, createDeck, newDeckName, router, setActiveDeck]);
+  }, [actions, createDeck, game, newDeckName, router, setActiveDeck]);
 
   const handleOpenChange = useCallback(
     (open: boolean) => {

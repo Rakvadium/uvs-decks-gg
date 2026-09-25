@@ -4,6 +4,8 @@ import {
   GAME_HEADER,
   HOST_KIND_HEADER,
   NOT_FOUND_REWRITE_PATH,
+  AUTH_ENTRY_PATHS,
+  authenticatedAuthEntryRedirect,
   isApexPath,
   routeRequest,
   type RouteRequestInput,
@@ -237,5 +239,32 @@ describe("routeRequest: standalone", () => {
     expect(route({ host: "localhost:8090", pathname: "/uvsx/decks" })).toMatchObject({
       type: "next",
     });
+  });
+});
+
+describe("authenticatedAuthEntryRedirect", () => {
+  test("defaults to /home", () => {
+    expect(authenticatedAuthEntryRedirect("")).toBe("/home");
+    expect(authenticatedAuthEntryRedirect(undefined)).toBe("/home");
+    expect(authenticatedAuthEntryRedirect("?foo=bar")).toBe("/home");
+  });
+
+  test("honors a same-origin next (e.g. the apex handoff)", () => {
+    const next = "/auth/handoff?return=https%3A%2F%2Fuvs.tcgdecks.gg%2Fdecks&state=abcdefghijklmnop";
+    expect(authenticatedAuthEntryRedirect(`?next=${encodeURIComponent(next)}`)).toBe(next);
+    expect(authenticatedAuthEntryRedirect("?next=%2Fgallery")).toBe("/gallery");
+  });
+
+  test.each(["//evil.com", "/\\evil.com", "https://evil.com", "javascript:alert(1)"])(
+    "rejects next=%p",
+    (next) => {
+      expect(authenticatedAuthEntryRedirect(`?next=${encodeURIComponent(next)}`)).toBe("/home");
+    },
+  );
+
+  test("auth entry pages are apex paths", () => {
+    for (const path of AUTH_ENTRY_PATHS) {
+      expect(isApexPath(path)).toBe(true);
+    }
   });
 });

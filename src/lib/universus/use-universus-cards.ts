@@ -27,6 +27,7 @@ import { UVS_FILTER_DEFINITION } from "@shared/games/uvs/filters";
 import { fetchStaticCatalog } from "./static-catalog";
 import { useGameId } from "@/games/game-context";
 import { cardMatchesRarityFilter } from "./rarity";
+import type { GameId } from "@shared/games/types";
 
 export type { CachedCard } from "./card-store";
 
@@ -74,7 +75,8 @@ const COMPANION_ID_CHUNK = 200;
 
 async function fetchCompanionCardsForGallery(
   gallery: CachedCard[],
-  convex: ConvexReactClient
+  convex: ConvexReactClient,
+  game: GameId
 ): Promise<CachedCard[]> {
   const ids = [
     ...new Set(
@@ -87,7 +89,7 @@ async function fetchCompanionCardsForGallery(
   const out: CachedCard[] = [];
   for (let i = 0; i < ids.length; i += COMPANION_ID_CHUNK) {
     const chunk = ids.slice(i, i + COMPANION_ID_CHUNK);
-    const batch = await convex.query(api.cards.batchGetCardsByIds, { ids: chunk });
+    const batch = await convex.query(api.cards.batchGetCardsByIds, { game, ids: chunk });
     out.push(...batch);
   }
   return out;
@@ -111,7 +113,7 @@ export function useUniversusCards(): UseUniversusCardsResult {
   const game = useGameId();
   const isHydrated = useIsClient();
   
-  const serverVersionData = useQuery(api.cards.getCardDataVersion, {});
+  const serverVersionData = useQuery(api.cards.getCardDataVersion, { game });
   const serverVersion = serverVersionData?.version ?? null;
   const isCheckingVersion = serverVersionData === undefined;
 
@@ -129,7 +131,7 @@ export function useUniversusCards(): UseUniversusCardsResult {
         }
         let companions: CachedCard[] = [];
         try {
-          companions = await fetchCompanionCardsForGallery(cachedCards, convex);
+          companions = await fetchCompanionCardsForGallery(cachedCards, convex, game);
         } catch (e) {
           console.error("Failed to load companion card faces:", e);
         }
@@ -169,6 +171,7 @@ export function useUniversusCards(): UseUniversusCardsResult {
     while (!isDone) {
       const result: { cards: CachedCard[]; cursor: string | null; isDone: boolean } =
         await convex.query(api.cards.listReleasedPaginated, {
+          game,
           cursor,
           limit: GALLERY_CATALOG_SYNC_PAGE_SIZE,
         });
@@ -193,9 +196,9 @@ export function useUniversusCards(): UseUniversusCardsResult {
       setLoadProgress(progress);
     }
 
-    const companions = await fetchCompanionCardsForGallery(gallery, convex);
+    const companions = await fetchCompanionCardsForGallery(gallery, convex, game);
     return { gallery, companions };
-  }, [convex, galleryTotalEstimate]);
+  }, [convex, game, galleryTotalEstimate]);
 
   const fetchCatalog = useCallback(async (): Promise<{
     gallery: CachedCard[];
@@ -218,7 +221,7 @@ export function useUniversusCards(): UseUniversusCardsResult {
           catalogSha256,
         });
         setLoadProgress(90);
-        const companions = await fetchCompanionCardsForGallery(gallery, convex);
+        const companions = await fetchCompanionCardsForGallery(gallery, convex, game);
         setLoadProgress(100);
         return { gallery, companions };
       } catch (err) {
@@ -230,6 +233,7 @@ export function useUniversusCards(): UseUniversusCardsResult {
   }, [
     convex,
     fetchFromConvex,
+    game,
     forceConvexCatalogSync,
     serverVersionData?.catalogSha256,
     serverVersionData?.catalogUrl,

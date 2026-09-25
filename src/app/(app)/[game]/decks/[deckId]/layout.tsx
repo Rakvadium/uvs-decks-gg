@@ -3,14 +3,15 @@ import type { ReactNode } from "react";
 import { fetchQuery } from "convex/nextjs";
 import { api } from "../../../../../../convex/_generated/api";
 import type { Id } from "../../../../../../convex/_generated/dataModel";
+import { DEFAULT_GAME_ID, isGameId } from "@shared/games/types";
 
 type Props = {
   children: ReactNode;
-  params: Promise<{ deckId: string }>;
+  params: Promise<{ game: string; deckId: string }>;
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { deckId } = await params;
+  const { game, deckId } = await params;
   if (!process.env.NEXT_PUBLIC_CONVEX_URL) {
     return {
       title: "Deck",
@@ -19,6 +20,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
   try {
     const deck = await fetchQuery(api.decks.getById, {
+      // `[game]/layout.tsx` already 404s unknown games.
+      game: isGameId(game) ? game : DEFAULT_GAME_ID,
       deckId: deckId as Id<"decks">,
     });
     if (!deck) {

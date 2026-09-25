@@ -13,6 +13,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
+import { useGameId } from "@/games/game-context";
 
 const CardDetailsV2 = lazy(() =>
   import("./variants/v2").then((module) => ({ default: module.CardDetailsV2 }))
@@ -107,9 +108,10 @@ export function CardDetailsDialog({
   }, [open, hasNavigation, goToPrev, goToNext]);
 
   const printingBackId = printingSelection?.backCardId;
+  const game = useGameId();
   const convexBackCard = useQuery(
     api.cards.getById,
-    open && printingBackId ? { cardId: printingBackId } : "skip"
+    open && printingBackId ? { game, cardId: printingBackId } : "skip"
   );
 
   if (!baseCurrentCard) return null;

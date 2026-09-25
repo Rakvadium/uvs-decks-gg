@@ -6,6 +6,7 @@ import { useQuery } from "convex/react";
 import { api } from "../../../../../convex/_generated/api";
 import type { CachedCard } from "@/lib/universus/card-store";
 import { cn } from "@/lib/utils";
+import { useGameId } from "@/games/game-context";
 
 interface OraclePrintingsCarouselProps {
   oracleId: string | undefined;
@@ -20,9 +21,10 @@ export function OraclePrintingsCarousel({
   onSelectPrinting,
   className,
 }: OraclePrintingsCarouselProps) {
+  const game = useGameId();
   const printings = useQuery(
     api.cards.getCardVariants,
-    oracleId ? { oracleId } : "skip"
+    oracleId ? { game, oracleId } : "skip"
   );
 
   const items = useMemo(() => printings ?? [], [printings]);

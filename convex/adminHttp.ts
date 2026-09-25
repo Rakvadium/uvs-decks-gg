@@ -5,6 +5,7 @@ import {
   jsonError,
   jsonOk,
 } from "./lib/adminApiAuth";
+import { DEFAULT_GAME_ID, isGameId, type GameId } from "../shared/games/types";
 
 async function readJson(req: Request): Promise<unknown> {
   try {
@@ -12,6 +13,20 @@ async function readJson(req: Request): Promise<unknown> {
   } catch {
     throw new Error("Invalid JSON body");
   }
+}
+
+/**
+ * Optional `game` in admin HTTP bodies; omitted means DEFAULT_GAME_ID so existing ingest scripts
+ * keep working. Unknown values are rejected.
+ */
+function readGame(body: Record<string, unknown>): GameId {
+  if (body.game === undefined || body.game === null) {
+    return DEFAULT_GAME_ID;
+  }
+  if (typeof body.game !== "string" || !isGameId(body.game)) {
+    throw new Error("game must be a known game id");
+  }
+  return body.game;
 }
 
 function asRecord(value: unknown): Record<string, unknown> {
@@ -31,6 +46,7 @@ export const upsertSet = httpAction(async (ctx, req) => {
       return jsonError(400, "code and name are required strings");
     }
     const id = await ctx.runMutation(internal.admin.upsertSet, {
+      game: readGame(body),
       code,
       name,
       setNumber: typeof body.setNumber === "number" ? body.setNumber : undefined,
@@ -108,6 +124,7 @@ export const upsertCardsBatch = httpAction(async (ctx, req) => {
       .map(pickUpsertCard)
       .filter((card): card is Record<string, unknown> => card !== null);
     const result = await ctx.runMutation(internal.admin.upsertCardsBatch, {
+      game: readGame(body),
       cards: cards as never,
     });
     return jsonOk(result);
@@ -128,6 +145,7 @@ export const linkCardFaces = httpAction(async (ctx, req) => {
       return jsonError(400, "links must be an array");
     }
     const result = await ctx.runMutation(internal.admin.linkCardFaces, {
+      game: readGame(body),
       links: body.links as never,
     });
     return jsonOk(result);
@@ -159,6 +177,7 @@ export const createDrafts = httpAction(async (ctx, req) => {
     const ids = await ctx.runMutation(
       internal.cardDrafts.createDraftsFromStorageIdsInternal,
       {
+        game: readGame(body),
         setCode: body.setCode,
         setName: body.setName,
         drafts: body.drafts as never,
@@ -173,8 +192,14 @@ export const createDrafts = httpAction(async (ctx, req) => {
 export const rebuildCatalogAggregates = httpAction(async (ctx, req) => {
   try {
     assertAdminApiKeyFromRequest(req);
-    await ctx.runMutation(internal.cardFacets.rebuildCardFacetSnapshot, {});
-    await ctx.runMutation(internal.sets.reconcileAllSetCardCounts, {});
+    // Body is optional here (older scripts POST without one); `{ "game": "…" }` scopes the rebuild.
+    let game: GameId = DEFAULT_GAME_ID;
+    const text = await req.text();
+    if (text.trim()) {
+      game = readGame(asRecord(JSON.parse(text)));
+    }
+    await ctx.runMutation(internal.cardFacets.rebuildCardFacetSnapshot, { game });
+    await ctx.runMutation(internal.sets.reconcileAllSetCardCounts, { game });
     return jsonOk({ ok: true });
   } catch (e) {
     return jsonError(401, e instanceof Error ? e.message : "Unauthorized");

@@ -2,6 +2,7 @@
  * Host/path → routing decision for middleware (see docs/multi-game.md "Hosts and routing").
  * Pure: no Next.js imports so it can be unit-tested directly.
  */
+import { sanitizeSameOriginPath } from "@shared/auth-handoff";
 import { DEFAULT_GAME_ID, isGameId, type GameId } from "@shared/games/types";
 import {
   apexOrigin,
@@ -69,6 +70,18 @@ export function isApexPath(pathname: string): boolean {
   return APEX_PREFIXES.some(
     (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
   );
+}
+
+/** Pages that bounce already-authenticated users onward (middleware). */
+export const AUTH_ENTRY_PATHS: readonly string[] = ["/sign-in", "/sign-up", "/agent-login"];
+
+/**
+ * Where an authenticated request to an auth entry page goes: the `next` query param when it is
+ * a same-origin path (e.g. `/auth/handoff?…` on the apex), else `/home`.
+ */
+export function authenticatedAuthEntryRedirect(search: string | null | undefined): string {
+  const next = new URLSearchParams(search ?? "").get("next");
+  return sanitizeSameOriginPath(next, "/home");
 }
 
 function gameHeaders(hostKind: HostKind, game: GameId): Record<string, string> {

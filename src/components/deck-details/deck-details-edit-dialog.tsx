@@ -30,6 +30,7 @@ import {
 } from "@/lib/deck/visibility";
 import { useDeckDetailsTopBarContext } from "./deck-details-top-bar/context";
 import { DeckDetailsTopBarDeleteAction } from "./deck-details-top-bar/delete-action";
+import { useGameId } from "@/games/game-context";
 
 const FORMAT_NONE = "__format_none__";
 const SUBFORMAT_NONE = "__subformat_none__";
@@ -96,7 +97,8 @@ export function DeckDetailsEditDialog() {
     canSetTeamVisibility,
   } = useDeckDetailsTopBarContext();
 
-  const formats = useQuery(api.formats.list);
+  const game = useGameId();
+  const formats = useQuery(api.formats.list, { game });
 
   const dialogOpen = Boolean(isOwner && isEditing);
 

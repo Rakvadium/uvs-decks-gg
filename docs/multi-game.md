@@ -134,11 +134,72 @@ through a scoped parent (`tierListItems`, `deckLikes`, `deckViews`, `deckShares`
   self-rescheduling, one table per invocation), idempotent, returns counts. Existing migrations
   `collect()` whole tables; do not copy that for `cards`/`decks`.
 
+Implementation (Phase 2 data-scoping step):
+
+- Helpers: `convex/lib/gameScope.ts` (`docGame`, `isDocInGame`, `byCreationTime`,
+  `gameValuesWithLegacy`, `getCardDataVersionDoc`, `getCardFacetSnapshotDoc`),
+  `convex/lib/gameBackfill.ts` (`GAME_SCOPED_TABLES`, `gameBackfillPatch`),
+  `convex/lib/sessionGameState.ts` (`resolveSessionGameState`, `nextSessionGameState`).
+  Return validators in `convex/validators.ts` carry `game: v.optional(gameIdValidator)`.
+  Tests: `tests/multi-game-scoping.test.ts`.
+- Indexes added (old ones kept): `cards.by_game`, `by_game_and_setCode_and_collectorNumber`,
+  `by_game_and_setCode_and_name`, `by_game_and_type_and_name`, `by_game_and_oracleId`;
+  `sets.by_game_and_code`, `by_game_and_setNumber`; `cardDrafts.by_game_and_setCode_and_status_and_sortIndex`;
+  `formats.by_game_and_key`; `cardLegality.by_game_and_format`; `setLegality.by_game_and_format`,
+  `by_game_and_format_set`; `formatErrata.by_game_and_format_and_sortOrder`;
+  `decks.by_game_and_isPublic`, `by_game_and_visibility`; `collections.by_user_and_game`;
+  `tierLists.by_user_and_game_and_updatedAt`, `by_game_and_isPublic_and_updatedAt`,
+  `by_game_and_isPublic_and_rankingScope_and_updatedAt`,
+  `by_game_and_isPublic_and_rankingScope_and_scopeKey_and_updatedAt`;
+  `communityCardRankings.by_game_and_scope`, `by_game_and_scope_and_adjustedScore`;
+  `communityTierSnapshots.by_game_and_scope`, `by_game_and_scopeType_and_lastComputedAt`;
+  `cardDataVersion.by_game`; `cardFacetSnapshot.by_game_and_key`. All four `cards` search
+  indexes filter on `game`.
+- Reads through a game index do **not** see untagged docs, so `uvs` lists are empty between the
+  deploy and `backfillGameField:runAll` (run it right after deploying). Exceptions that keep
+  working before the backfill: singletons (`cardDataVersion`, `cardFacetSnapshot`: the `game`
+  row, else the untagged row for `uvs`; writers patch that row and tag it), the facet rebuild
+  (also scans untagged cards for `uvs`), `communityRankings.recomputeScope` (also clears untagged
+  cache rows for `uvs`), and small per-user / by-id reads that filter with `isDocInGame`
+  (`decks.listByUser`, by-id `getById`/`getDetail`/…).
+- Whole-table `.collect()`s switched to a game index (`sets.list`, `formats.list`, …) re-sort
+  with `byCreationTime` so ordering matches the old table scan.
+- By-id reads (`cards.getById`, `decks.getById`, `tierLists.getDetail`, `sets.getById`, …) take
+  `game` and return `null` for another game's doc. Mutations on an existing doc by id (deck
+  card edits, `tierLists.toggleLike`, `admin.updateCard`, …) don't take `game`; they use the doc's
+  own game (`docGame(doc)`). Decks reject cards/setup of another game; `decks.create` takes
+  `game` and builds `setup` from that game's module (`setup.game === deck.game`);
+  `decks.duplicate` copies `game`; deck validation uses `deck.game ?? DEFAULT_GAME_ID`
+  (`convex/lib/deckGame.ts`), formats `by_game_and_key`, legality `by_game_and_format`.
+- `cardLegality` (format, card) lookups keep `by_format_card`: the card id already implies the
+  game (writers check `requireCardInGame`). `collections` per-card lookups keep `by_user_and_card`
+  for the same reason.
+- Internal/admin HTTP endpoints (`convex/adminHttp.ts`: upsert-set, upsert-cards-batch,
+  link-card-faces, create-drafts, rebuild-catalog-aggregates) accept an optional JSON `game`
+  (default `DEFAULT_GAME_ID`, unknown ids rejected), so existing ingest scripts keep working.
+  Matching internal mutations (`admin.upsertSet`, `upsertCardsBatch`, `linkCardFaces`,
+  `cardDrafts.createDraftsFromStorageIdsInternal`, `cardFacets.rebuildCardFacetSnapshot`,
+  `sets.reconcileAllSetCardCounts`, `cards.updateCardDataVersion`/`initializeCardDataVersion`,
+  `seedDummyDecks.seed`) take optional `game` with the same default.
+- Sessions: `getSession`, `getActiveDeckId`, `setActiveDeck` take `game`. `getSession` returns
+  the resolved per-game `activeDeckId`/`galleryFilters`/`rightSidebarAction` at top level
+  (never `gameState`). `updateSession` takes optional `game` (required only with
+  `galleryFilters`/`rightSidebarAction`; appearance fields are global). Once `gameState[game]`
+  exists it is authoritative; the first write for `uvs` seeds it from the legacy fields.
+- Not scoped (on purpose): team deck lists (`teams/teamDecks.ts`, global team hub), admin user
+  moderation counts (`adminUsers.ts`), child tables, maintenance actions
+  (`cards.updateImageUrlsRemoveLeadingZeros*`, `admin.migrateCardField*`) and old migrations.
+
 ## Catalog, storage keys
 
 - R2 catalog: `catalog/{game}/v{n}.json.gz` (`catalogObjectKeyForVersion(game, version)`).
   The `cardDataVersion` row stores the full object key, so old `catalog/v{n}` rows keep working
   until the next publish. Cleanup deletes per game.
+  Implementation: `catalogRelease.releaseCatalog` / `admin.releaseCards` take `game`;
+  `prepareRelease`, `uploadCatalogBlob`, `finalizeRelease`, `cleanupOldCatalogBlobs` are per game.
+  Cleanup deletes only `catalogObjectKeysToDelete(game, n)`: `catalog/{game}/v{n}` plus, for
+  `uvs`, the legacy `catalog/v{n}` (version numbers continue from the legacy row, so old blobs age
+  out normally). Publishing reads cards `by_game`, so run the backfill before the first publish.
 - Card images stay under `cards/` (keys are already set-code based).
 - IndexedDB: `tcgdecks-{game}-cards`, `tcgdecks-{game}-sets`. Old `universus-*` DBs are
   ignored (catalog re-downloads once) and deleted best-effort.
@@ -163,7 +224,8 @@ Implementation (Phase 2 routing step) — helpers in `src/lib/storage-keys.ts`
 - IndexedDB: `card-store.ts` / `set-store.ts` functions take `game` first; `useUniversusCards` /
   `useSets` read it via `useGameId()`. The first store open per page load calls
   `indexedDB.deleteDatabase("universus-cards" | "universus-sets")` (best effort). The Convex
-  catalog/sets queries themselves are not game-scoped yet.
+  catalog/sets queries (`cards.getCardDataVersion`, `listReleasedPaginated`,
+  `batchGetCardsByIds`, `sets.list`, `formats.*`) take `game` from `useGameId()`.
 
 ## Hosts and routing
 
@@ -254,35 +316,51 @@ Implementation (Phase 2 routing step):
 ## Central auth host (handoff)
 
 Convex Auth cookies are per-host and its Next.js middleware can't set a cookie `Domain`, so
-subdomains get their own sessions via a one-time handoff from the apex.
+subdomains get their own sessions via a one-time handoff from the apex. Pure pieces (URL
+builders, `sanitizeSameOriginPath`, code checks, hint cookie) live in `shared/auth-handoff.ts`
+(tested in `tests/auth-handoff.test.ts`); browser helpers in `src/lib/auth/handoff-client.ts`.
 
-1. Game host, signed out, user clicks Sign in → generate `state` (store in `sessionStorage`) →
-   navigate to `{apex}/auth/handoff?return={origin}{path}&state={state}`.
-2. Apex `/auth/handoff`: if signed out → `/sign-in?next=/auth/handoff?...`. If signed in →
-   mutation `authHandoff.create({ returnUrl, state })` → redirect
-   `{returnOrigin}/auth/callback?code&state&next={path}`.
-3. `authHandoff.create` validates `returnUrl` origin with `isAllowedHandoffOrigin` from
-   `shared/hosts.ts` (`https://{game}.tcgdecks.gg`, dev `http://{game}.tcgdecks.localhost:8090`),
-   stores `sha256(code)` in `authHandoffCodes { codeHash, userId, origin, expiresAt, usedAt? }`
-   (`by_codeHash`), TTL 60s. A cron/cleanup removes expired rows.
-4. Game `/auth/callback`: check `state` against sessionStorage, strip query from the URL
-   (`history.replaceState`), call `signIn("handoff", { code, origin: location.origin })`,
-   then `router.replace(next)`.
-5. `convex/auth.ts` adds `ConvexCredentials({ id: "handoff", authorize })`; `authorize` runs
-   an internal mutation that consumes the code (hash match, not used, not expired, origin match)
-   and returns `{ userId }`.
-6. Silent SSO: after apex sign-in, set cookie `tcgd_signed_in=1; Domain=.{root}; Path=/; SameSite=Lax`
+1. Game host, signed out, any "Sign in"/"Sign up" (`openAuthDialog` in `AuthDialogProvider`,
+   `/sign-in`, `/sign-up`) → `startHandoff(path, { flow })`: random `state` →
+   `sessionStorage["tcgd:handoff-state"]` → `{apex}/auth/handoff?return={origin}{path}&state=…[&flow=signUp]`.
+   Apex/standalone keep the local dialog.
+2. Apex `/auth/handoff` (`src/app/auth/handoff`): validates `return` (`parseHandoffReturnUrl`)
+   and `state` client-side. Signed out → `/sign-in?next=/auth/handoff?…` (or `/sign-up`). Signed
+   in → `authHandoff.create({ returnUrl, state })` → sets the hint cookie →
+   `location.replace({returnOrigin}/auth/callback?code&state&next={path})`.
+   After apex sign-in, `AuthRouteEntry` and the middleware "authenticated on
+   `/sign-in|/sign-up|/agent-login`" redirect honor a sanitized same-origin `next`
+   (`authenticatedAuthEntryRedirect`), else `/home`.
+3. `authHandoff.create` (auth required, rate-limited per user) validates the `returnUrl`
+   origin with `isAllowedHandoffOrigin`, stores `sha256(code)` of a 32-byte random code in
+   `authHandoffCodes { codeHash, userId, origin, state?, expiresAt, usedAt? }`
+   (`by_codeHash`, `by_expiresAt`), TTL 60s. Cron `authHandoff.cleanupExpired` (10 min) deletes
+   expired rows.
+4. Game `/auth/callback`: reads then immediately strips the query (`history.replaceState`),
+   checks `state` against sessionStorage (removed either way; login-CSRF guard), calls
+   `signIn("handoff", { code, origin: location.origin })`, then `router.replace(next)` (sanitized).
+   `/auth/*` responses send `Referrer-Policy: no-referrer` (next.config headers + page metadata).
+5. `convex/auth.ts` adds `ConvexCredentials({ id: "handoff" })`; `authorize` runs internal
+   `authHandoff.consume` (hash match, unused, unexpired, origin match; marks `usedAt`, also burns
+   codes presented after expiry or to the wrong origin; failures rate-limited per origin) and
+   returns `{ userId }`.
+6. Silent SSO (`src/components/auth/silent-sso.tsx`, mounted in `Providers`): apex sets
+   `tcgd_signed_in=1; Domain=.{root}; Path=/; SameSite=Lax; Max-Age=30d[; Secure]`
    (informational only). A game host that is signed out, sees the cookie, and hasn't tried this
-   tab session (`sessionStorage`) redirects to `/auth/handoff?...&silent=1`; apex with `silent=1`
-   and no session redirects back with `error=login_required` and clears the cookie.
-7. Sign out everywhere: mutation `authSessions.signOutEverywhere` deletes all of the user's
-   `authSessions` + `authRefreshTokens`; client then calls `signOut()`, clears `tcgd_signed_in`,
-   and (on game hosts) visits `{apex}/auth/signed-out` so the apex clears its cookies too.
-   Access JWTs already issued stay valid until expiry (~1h) — accepted.
+   tab session (`sessionStorage["tcgd:sso-tried"]`) marks it tried and redirects to
+   `/auth/handoff?...&silent=1`; apex with `silent=1` and no session (or a failed `create`)
+   clears the cookie and redirects back with `error=login_required`.
+7. Sign out (`useAppSignOut`, both shell call sites): game/apex hosts call
+   `authHandoff.signOutEverywhere` (deletes all the user's `authSessions` + their
+   `authRefreshTokens`), then `signOut()`, clear `tcgd_signed_in`, and (game hosts) visit
+   `{apex}/auth/signed-out?return={origin}/` so the apex clears its cookies too. Standalone:
+   local `signOut()` only. Access JWTs already issued stay valid until expiry (~1h) — accepted.
+   `/auth/signed-out` is a GET that signs the apex out (logout-CSRF) — accepted, low impact.
 8. Sign-up and password reset UIs only render on apex/standalone; game-host `/sign-in` and
-   `/sign-up` redirect to the apex with `next=/auth/handoff?...`.
-9. `/agent-login` on a game host redirects to the apex `/agent-login` with
-   `next=/auth/handoff?return=...`; standalone behaves as today.
+   `/sign-up` hand off to the apex (which lands on its own `/sign-in|/sign-up?next=/auth/handoff?...`).
+9. `/agent-login` on a game host generates `state`, then redirects to the apex `/agent-login`
+   with `next=/auth/handoff?return=...&state=...` (only when `isAgentAuthEnabled()`);
+   standalone behaves as today.
 10. `@convex-dev/auth` treats only exact `localhost` as local; the postinstall patch and
     `src/lib/auth-local-host.ts` also accept `*.localhost`. The patch marker is a versioned
     comment (`tcgdecks-local-host-vN`); bump it whenever the replacement body changes.
@@ -290,7 +368,9 @@ subdomains get their own sessions via a one-time handoff from the apex.
 ## Rollout / ops (human)
 
 1. Deploy with optional fields. 2. Run `migrations/migrateDeckSetup:run` and
-`migrations/backfillGameField:runAll` in prod. 3. Publish a catalog (writes the per-game key).
+`migrations/backfillGameField:runAll` in prod (check each table with
+`migrations/backfillGameField:status '{"table":"cards"}'`, looping on `continueCursor` until `pending` sums to 0).
+3. Publish a catalog (writes the per-game key).
 4. DNS: `tcgdecks.gg`, `*.tcgdecks.gg` on Vercel; `uvsdecks.gg` stays attached for the
 redirect. 5. Verify the Resend sender domain. 6. Follow-up change: make `game`/`setup`
 required, drop legacy deck fields and old indexes.

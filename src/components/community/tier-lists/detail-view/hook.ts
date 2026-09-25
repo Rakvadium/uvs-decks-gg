@@ -34,6 +34,7 @@ import {
   serializeLaneMap,
   tierListCardMatchesPool,
 } from "../utils";
+import { useGameId } from "@/games/game-context";
 
 type TierListDraftSnapshot = {
   title: string;
@@ -47,7 +48,8 @@ type TierListDraftSnapshot = {
 
 export function useCommunityTierListDetailModel(tierListId: string) {
   const router = useRouter();
-  const detail = useQuery(api.tierLists.getDetail, { tierListId: tierListId as Id<"tierLists"> });
+  const game = useGameId();
+  const detail = useQuery(api.tierLists.getDetail, { game, tierListId: tierListId as Id<"tierLists"> });
   const saveTierList = useMutation(api.tierLists.save);
   const deleteTierList = useMutation(api.tierLists.remove);
   const { cards } = useCardCatalog();
@@ -259,6 +261,7 @@ export function useCommunityTierListDetailModel(tierListId: string) {
       isSavingRef.current = true;
       setIsSaving(true);
       await saveTierList({
+        game,
         tierListId: detail.tierList._id,
         title: snapshot.title,
         isPublic: snapshot.isPublic,

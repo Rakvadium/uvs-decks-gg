@@ -14,11 +14,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { useGameId } from "@/games/game-context";
 
 export function AdminDashboardClient() {
-  const sets = useQuery(api.sets.list);
-  const formats = useQuery(api.formats.list);
-  const catalog = useQuery(api.admin.getCardDataVersion, {});
+  const game = useGameId();
+  const sets = useQuery(api.sets.list, { game });
+  const formats = useQuery(api.formats.list, { game });
+  const catalog = useQuery(api.admin.getCardDataVersion, { game });
 
   const lastPublish =
     catalog != null

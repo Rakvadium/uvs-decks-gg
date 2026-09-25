@@ -11,9 +11,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Info } from "lucide-react";
+import { useGameId } from "@/games/game-context";
 
 export function AdminImportLegacyGate() {
-  const sets = useQuery(api.sets.list);
+  const game = useGameId();
+  const sets = useQuery(api.sets.list, { game });
   const router = useRouter();
   const [code, setCode] = useState("");
 

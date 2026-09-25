@@ -244,7 +244,7 @@ export function UIStateProvider({ children }: UIStateProviderProps) {
   const isHydrated = typeof window !== "undefined";
   const { isAuthenticated, isLoading: authLoading } = useConvexAuth();
 
-  const serverActiveDeckId = useQuery(api.sessions.getActiveDeckId, isAuthenticated ? {} : "skip");
+  const serverActiveDeckId = useQuery(api.sessions.getActiveDeckId, isAuthenticated ? { game } : "skip");
   const setActiveDeckMutation = useMutation(api.sessions.setActiveDeck);
 
   useEffect(() => {
@@ -356,11 +356,12 @@ export function UIStateProvider({ children }: UIStateProviderProps) {
       setUIState((prev) => ({ ...prev, activeDeckId: deckId }));
       if (isAuthenticated) {
         setActiveDeckMutation({
+          game,
           deckId: deckId ? (deckId as Id<"decks">) : undefined,
         });
       }
     },
-    [setActiveDeckMutation, isAuthenticated]
+    [setActiveDeckMutation, isAuthenticated, game]
   );
 
   const setGalleryViewMode = useCallback((mode: GalleryViewMode) => {

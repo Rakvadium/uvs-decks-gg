@@ -6,12 +6,14 @@ import { useQuery } from "convex/react";
 import { api } from "../../../../../../../../convex/_generated/api";
 import AdminCardDraftReview from "@/features/admin-card-drafts/review";
 import { AdminSetBreadcrumbs } from "../../admin-set-breadcrumbs";
+import { useGameId } from "@/games/game-context";
 
 export default function AdminSetReviewPageClient() {
   const params = useParams();
   const searchParams = useSearchParams();
   const code = typeof params.code === "string" ? params.code : "";
-  const set = useQuery(api.sets.getByCode, code ? { code } : "skip");
+  const game = useGameId();
+  const set = useQuery(api.sets.getByCode, code ? { game, code } : "skip");
   const listSearch = searchParams.get("search");
   const listQuery =
     listSearch !== null && listSearch !== "" ? `?search=${encodeURIComponent(listSearch)}` : "";

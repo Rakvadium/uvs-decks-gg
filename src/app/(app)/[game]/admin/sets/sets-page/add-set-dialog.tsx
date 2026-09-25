@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
+import { useGameId } from "@/games/game-context";
 
 function useDebounced<T>(value: T, delay: number): T {
   const [d, setD] = useState(value);
@@ -44,9 +45,10 @@ export function AddSetDialog({ open, onOpenChange }: AddSetDialogProps) {
   const [submitting, setSubmitting] = useState(false);
 
   const dCode = useDebounced(code.trim(), 300);
+  const game = useGameId();
   const codeCheck = useQuery(
     api.sets.isSetCodeAvailable,
-    open && dCode.length > 0 ? { code: dCode } : "skip"
+    open && dCode.length > 0 ? { game, code: dCode } : "skip"
   );
 
   useEffect(() => {
@@ -101,6 +103,7 @@ export function AddSetDialog({ open, onOpenChange }: AddSetDialogProps) {
         }
       }
       await createSet({
+        game,
         code: trimmed,
         name: name.trim(),
         setNumber: sn,

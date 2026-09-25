@@ -24,6 +24,7 @@ import {
   isDeckWriteConflictError,
   isTeamEditableDeck,
 } from "@/lib/deck/visibility";
+import { useGameId } from "@/games/game-context";
 
 type Deck = Doc<"decks">;
 type DeckSection = "main" | "side" | "reference";
@@ -90,9 +91,10 @@ export function ActiveDeckProvider({ children }: ActiveDeckProviderProps) {
   const activeDeckId = uiState.activeDeckId;
   const cardIndex = useCardIndex();
 
+  const game = useGameId();
   const activeDeck = useQuery(
     api.decks.getById,
-    activeDeckId ? { deckId: activeDeckId as Id<"decks"> } : "skip"
+    activeDeckId ? { game, deckId: activeDeckId as Id<"decks"> } : "skip"
   );
 
   const addCardMutation = useMutation(api.decks.addCard);

@@ -82,6 +82,7 @@ export const cardValidator = v.object({
   contentRevisionAt: v.optional(v.number()),
   revealedAt: v.optional(v.number()),
   isRevealHidden: v.optional(v.boolean()),
+  game: v.optional(gameIdValidator),
 });
 
 export const userValidator = v.object({
@@ -192,6 +193,7 @@ export const deckValidator = v.object({
   teamId: v.optional(v.id("teams")),
   teamCollaboration: v.optional(deckTeamCollaborationValidator),
   revision: v.optional(v.number()),
+  game: v.optional(gameIdValidator),
   ownerUsername: v.optional(v.string()),
 });
 
@@ -246,6 +248,7 @@ export const tierListValidator = v.object({
       v.literal("rejected")
     )
   ),
+  game: v.optional(gameIdValidator),
 });
 
 export const tierListItemValidator = v.object({
@@ -270,6 +273,7 @@ export const communityCardRankingValidator = v.object({
   topLaneRate: v.number(),
   bottomLaneRate: v.number(),
   lastComputedAt: v.number(),
+  game: v.optional(gameIdValidator),
 });
 
 export const communityTierSnapshotValidator = v.object({
@@ -290,6 +294,7 @@ export const communityTierSnapshotValidator = v.object({
   })),
   insufficientDataCardIds: v.array(v.id("cards")),
   lastComputedAt: v.number(),
+  game: v.optional(gameIdValidator),
 });
 
 export const tierListLikeValidator = v.object({
@@ -328,6 +333,7 @@ export const collectionEntryValidator = v.object({
   quantity: v.number(),
   condition: v.optional(v.string()),
   isFoil: v.optional(v.boolean()),
+  game: v.optional(gameIdValidator),
 });
 
 export const deckSectionValidator = v.union(
@@ -437,6 +443,13 @@ export const sessionValidator = v.object({
   lastActiveAt: v.number(),
 });
 
+/** Per-game session UI state (`sessions.gameState[game]`). */
+export const sessionGameStateEntryValidator = v.object({
+  activeDeckId: v.optional(v.id("decks")),
+  galleryFilters: v.optional(v.any()),
+  rightSidebarAction: v.optional(v.string()),
+});
+
 export const subFormatValidator = v.object({
   key: v.string(),
   name: v.string(),
@@ -456,6 +469,7 @@ export const formatValidator = v.object({
   requiresStartingCharacter: v.boolean(),
   requiresIdentity: v.boolean(),
   subFormats: v.optional(v.array(subFormatValidator)),
+  game: v.optional(gameIdValidator),
 });
 
 export const cardLegalityValidator = v.object({
@@ -470,6 +484,7 @@ export const cardLegalityValidator = v.object({
   ),
   copyLimitOverride: v.optional(v.number()),
   effectiveDate: v.optional(v.number()),
+  game: v.optional(gameIdValidator),
 });
 
 export const setLegalityValidator = v.object({
@@ -479,6 +494,7 @@ export const setLegalityValidator = v.object({
   setCode: v.string(),
   isLegal: v.boolean(),
   rotatesOutAt: v.optional(v.number()),
+  game: v.optional(gameIdValidator),
 });
 
 export const formatErrataValidator = v.object({
@@ -489,6 +505,7 @@ export const formatErrataValidator = v.object({
   body: v.string(),
   url: v.optional(v.string()),
   sortOrder: v.number(),
+  game: v.optional(gameIdValidator),
 });
 
 export const cardTextHistoryValidator = v.object({
@@ -500,6 +517,7 @@ export const cardTextHistoryValidator = v.object({
   source: v.optional(
     v.union(v.literal("admin_edit"), v.literal("import"), v.literal("printed"))
   ),
+  game: v.optional(gameIdValidator),
 });
 
 export const setDocValidator = v.object({
@@ -517,6 +535,7 @@ export const setDocValidator = v.object({
   spotlightIP: v.optional(v.string()),
   updatedAt: v.optional(v.number()),
   updatedBy: v.optional(v.id("users")),
+  game: v.optional(gameIdValidator),
 });
 
 export const cardInputValidator = v.object({
@@ -615,6 +634,7 @@ export const cardDraftValidator = v.object({
   updatedAt: v.number(),
   reviewedBy: v.optional(v.id("users")),
   approvalError: v.optional(v.string()),
+  game: v.optional(gameIdValidator),
 });
 
 export const cardDraftReviewRowValidator = v.object({
@@ -637,6 +657,7 @@ export const cardDraftReviewRowValidator = v.object({
   updatedAt: v.number(),
   reviewedBy: v.optional(v.id("users")),
   approvalError: v.optional(v.string()),
+  game: v.optional(gameIdValidator),
 });
 
 export const ingestionJobValidator = v.object({
@@ -655,6 +676,7 @@ export const ingestionJobValidator = v.object({
   errorMessages: v.optional(v.array(v.string())),
   startedAt: v.number(),
   completedAt: v.optional(v.number()),
+  game: v.optional(gameIdValidator),
 });
 
 export const cardDataVersionValidator = v.object({
@@ -667,6 +689,7 @@ export const cardDataVersionValidator = v.object({
   catalogSha256: v.optional(v.string()),
   catalogSchemaVersion: v.optional(v.number()),
   catalogObjectKey: v.optional(v.string()),
+  game: v.optional(gameIdValidator),
 });
 
 export const teamRoleValidator = v.union(

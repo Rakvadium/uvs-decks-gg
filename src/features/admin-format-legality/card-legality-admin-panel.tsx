@@ -24,6 +24,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { toast } from "sonner";
+import { useGameId } from "@/games/game-context";
 
 type CardLegalityAdminPanelProps = {
   formatKey: string;
@@ -44,7 +45,9 @@ export function CardLegalityAdminPanel({
   formatKey,
   focusCardId,
 }: CardLegalityAdminPanelProps) {
+  const game = useGameId();
   const enriched = useQuery(api.admin.listCardLegalityByFormatEnriched, {
+    game,
     formatKey,
   });
   const upsert = useMutation(api.admin.upsertCardLegality);
@@ -62,7 +65,7 @@ export function CardLegalityAdminPanel({
   const searchResults = useQuery(
     api.admin.searchCardsForLegalityAdmin,
     debouncedQ.length > 0
-      ? { query: debouncedQ, searchTier: tier, limit: 40 }
+      ? { game, query: debouncedQ, searchTier: tier, limit: 40 }
       : "skip"
   );
 
@@ -88,6 +91,7 @@ export function CardLegalityAdminPanel({
   ) => {
     try {
       await upsert({
+        game,
         formatKey,
         cardId,
         status,

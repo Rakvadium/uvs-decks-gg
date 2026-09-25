@@ -9,6 +9,7 @@ import {
   deckSetupValidator,
   deckTeamCollaborationValidator,
   deckVisibilityValidator,
+  gameIdValidator,
 } from "./validators";
 import { requireAdmin, requireAuth, requireNotBackFace, requireUserCanPostContent } from "./utils/validation";
 import {
@@ -24,14 +25,33 @@ import { attachOwnerUsernames } from "./lib/deckList";
 import { buildDuplicatedDeckFields } from "./lib/duplicateDeck";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import type { Id } from "./_generated/dataModel";
+import type { QueryCtx } from "./_generated/server";
 import { requirePositiveIntegerQuantity } from "./lib/deckQuantity";
 import { deckGameModule } from "./lib/deckGame";
-import { DEFAULT_GAME_ID } from "../shared/games/types";
+import type { GameId } from "../shared/games/types";
 import { getSharedGameModule } from "../shared/games/registry";
 import { mergeLegacyDeckSetupArgs } from "../shared/games/uvs/setup";
+import { docGame, isDocInGame } from "./lib/gameScope";
+
+/** Rejects cards from another game (decks only reference cards of their own game). */
+async function requireCardInGame(ctx: Pick<QueryCtx, "db">, cardId: Id<"cards">, game: GameId) {
+  const card = await ctx.db.get(cardId);
+  if (!card) throw new Error("Card not found");
+  if (!isDocInGame(card, game)) {
+    throw new Error("Card belongs to a different game than the deck");
+  }
+}
+
+/** Rejects a setup (patch) tagged for a different game than the deck. */
+function requireSetupGame(setup: { game: GameId } | null | undefined, game: GameId) {
+  if (setup && setup.game !== game) {
+    throw new Error(`Deck setup is for "${setup.game}" but the deck is a "${game}" deck`);
+  }
+}
 
 export const listByUser = query({
   args: {
+    game: gameIdValidator,
     userId: v.id("users"),
     search: v.optional(v.string()),
     visibility: v.optional(deckVisibilityValidator),
@@ -39,10 +59,13 @@ export const listByUser = query({
   returns: v.array(deckValidator),
   handler: async (ctx, args) => {
     const viewer = await getAuthUserId(ctx);
-    let decks = await ctx.db
-      .query("decks")
-      .withIndex("by_user", (q) => q.eq("userId", args.userId))
-      .collect();
+    // Per-user lists are small; filtering (instead of a game index) keeps pre-backfill decks visible.
+    let decks = (
+      await ctx.db
+        .query("decks")
+        .withIndex("by_user", (q) => q.eq("userId", args.userId))
+        .collect()
+    ).filter((deck) => isDocInGame(deck, args.game));
 
     if (viewer !== args.userId) {
       decks = decks.filter((deck) => {
@@ -74,13 +97,14 @@ export const listByUser = query({
 
 export const listPublic = query({
   args: {
+    game: gameIdValidator,
     search: v.optional(v.string()),
   },
   returns: v.array(deckValidator),
   handler: async (ctx, args) => {
     let decks = await ctx.db
       .query("decks")
-      .withIndex("by_isPublic", (q) => q.eq("isPublic", true))
+      .withIndex("by_game_and_isPublic", (q) => q.eq("game", args.game).eq("isPublic", true))
       .collect();
 
     if (args.search) {
@@ -102,13 +126,16 @@ export const listPublic = query({
 
 export const listTournament = query({
   args: {
+    game: gameIdValidator,
     search: v.optional(v.string()),
   },
   returns: v.array(deckValidator),
   handler: async (ctx, args) => {
     let decks = await ctx.db
       .query("decks")
-      .withIndex("by_visibility", (q) => q.eq("visibility", "tournament"))
+      .withIndex("by_game_and_visibility", (q) =>
+        q.eq("game", args.game).eq("visibility", "tournament")
+      )
       .collect();
 
     if (args.search) {
@@ -126,12 +153,14 @@ export const listTournament = query({
 
 export const getById = query({
   args: {
+    game: gameIdValidator,
     deckId: v.id("decks"),
   },
   returns: v.union(deckValidator, v.null()),
   handler: async (ctx, args) => {
     const deck = await ctx.db.get(args.deckId);
-    if (!deck) return null;
+    // A deck is only visible on its own game's host.
+    if (!isDocInGame(deck, args.game)) return null;
     const allowed = await canViewDeck(ctx, deck, args.deckId);
     if (!allowed) return null;
     return deck;
@@ -140,6 +169,7 @@ export const getById = query({
 
 export const create = mutation({
   args: {
+    game: gameIdValidator,
     name: v.string(),
     description: v.optional(v.string()),
     visibility: v.optional(deckVisibilityValidator),
@@ -157,17 +187,21 @@ export const create = mutation({
     const userId = await requireAuth(ctx);
     await requireUserCanPostContent(ctx, userId);
 
-    // TODO(multi-game): take `game` from args once decks are game-scoped.
-    const deckModule = getSharedGameModule(DEFAULT_GAME_ID).deck;
+    const deckModule = getSharedGameModule(args.game).deck;
+    const setupPatch = mergeLegacyDeckSetupArgs(args.setup, {
+      startingCharacterId: args.startingCharacterId,
+      selectedIdentity: args.selectedIdentity,
+    });
+    requireSetupGame(setupPatch, args.game);
+    // `setup.game` always matches the deck's `game` (normalizeSetup starts from the game's empty setup).
     const setup = deckModule.applySetupPatch(
       deckModule.normalizeSetup<Id<"cards">>(undefined),
-      mergeLegacyDeckSetupArgs(args.setup, {
-        startingCharacterId: args.startingCharacterId,
-        selectedIdentity: args.selectedIdentity,
-      }),
+      setupPatch,
     );
+    requireSetupGame(setup, args.game);
     for (const cardId of deckModule.setupCardIds(setup)) {
       await requireNotBackFace(ctx, cardId);
+      await requireCardInGame(ctx, cardId, args.game);
     }
 
     const visibility = args.visibility ?? "private";
@@ -194,6 +228,7 @@ export const create = mutation({
     }
 
     return await ctx.db.insert("decks", {
+      game: args.game,
       userId,
       name: args.name,
       description: args.description,
@@ -240,12 +275,15 @@ export const update = mutation({
     await requireDeckWriteAccess(ctx, deck);
 
     const deckModule = deckGameModule(deck).deck;
+    const game = docGame(deck);
     const setupPatch = mergeLegacyDeckSetupArgs(args.setup, {
       startingCharacterId: args.startingCharacterId,
       selectedIdentity: args.selectedIdentity,
     });
+    requireSetupGame(setupPatch, game);
     for (const cardId of deckModule.setupCardIds(setupPatch)) {
       await requireNotBackFace(ctx, cardId);
+      await requireCardInGame(ctx, cardId, game);
     }
 
     const nextVisibility =
@@ -373,6 +411,7 @@ export const addCard = mutation({
     assertTeamEditableCardWriteRevision(deck, args.expectedRevision);
 
     await requireNotBackFace(ctx, args.cardId);
+    await requireCardInGame(ctx, args.cardId, docGame(deck));
 
     const cardIdStr = args.cardId.toString();
     const addQuantity = requirePositiveIntegerQuantity(args.quantity);

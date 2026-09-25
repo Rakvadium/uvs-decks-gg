@@ -18,24 +18,26 @@ import { Button } from "@/components/ui/button";
 import { AdminPageHeader } from "@/components/admin";
 import { Database, Plus } from "lucide-react";
 import { toast } from "sonner";
+import { useGameId } from "@/games/game-context";
 
 export default function AdminFormatsPageClient() {
   const router = useRouter();
-  const formats = useQuery(api.formats.list);
+  const game = useGameId();
+  const formats = useQuery(api.formats.list, { game });
   const seedFormats = useMutation(api.admin.seedFormats);
   const [isSeeding, setIsSeeding] = useState(false);
 
   const handleSeedFormats = useCallback(async () => {
     setIsSeeding(true);
     try {
-      const result = await seedFormats({});
+      const result = await seedFormats({ game });
       toast.success(`Created ${result.created} format(s). Skipped ${result.skipped} (already present; Standard is re-synced when skipped).`);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Seed failed");
     } finally {
       setIsSeeding(false);
     }
-  }, [seedFormats]);
+  }, [game, seedFormats]);
 
   const rows = formats
     ? [...formats].sort((a, b) => {

@@ -82,9 +82,9 @@ export function useSets(options: UseSetsOptions = {}): UseSetsResult {
   }, [game]);
 
   const fetchFromConvex = useCallback(async (): Promise<CachedSet[]> => {
-    const result = await convex.query(api.sets.list, {});
+    const result = await convex.query(api.sets.list, { game });
     return result;
-  }, [convex]);
+  }, [convex, game]);
 
   const syncFromConvex = useCallback(async (serverSets: CachedSet[], version: number) => {
     if (syncInProgress.current) return;

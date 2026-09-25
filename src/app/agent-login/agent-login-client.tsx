@@ -7,10 +7,15 @@ import { useAuthActions } from "@convex-dev/auth/react";
 import { useConvexAuth } from "convex/react";
 import { clearAuthCookies, isRefreshTokenParseError } from "@/components/auth/auth-recovery";
 import { sanitizeAgentLoginNextPath } from "@/lib/agent-auth-shared";
+import { useHostKind } from "@/games/game-context";
+import { createHandoffState, currentApexOrigin } from "@/lib/auth/handoff-client";
+import { buildHandoffStartUrl } from "@shared/auth-handoff";
 
 type AgentLoginClientProps = {
   token: string;
   nextPath: string;
+  /** Server-side `isAgentAuthEnabled()` (dev only). */
+  enabled: boolean;
 };
 
 type AgentCredentials = {
@@ -19,13 +24,14 @@ type AgentCredentials = {
   username: string;
 };
 
-export function AgentLoginClient({ token, nextPath }: AgentLoginClientProps) {
+export function AgentLoginClient({ token, nextPath, enabled }: AgentLoginClientProps) {
   const router = useRouter();
   const { signIn } = useAuthActions();
   const { isAuthenticated, isLoading } = useConvexAuth();
   const [status, setStatus] = useState("Preparing agent session…");
   const [error, setError] = useState<string | null>(null);
   const startedRef = useRef(false);
+  const hostKind = useHostKind();
 
   useEffect(() => {
     if (isLoading) return;
@@ -43,6 +49,29 @@ export function AgentLoginClient({ token, nextPath }: AgentLoginClientProps) {
     }
 
     startedRef.current = true;
+
+    // Game hosts: sign in on the apex, then hand the session back through /auth/handoff.
+    // `state` is generated here so the game host's /auth/callback can verify it.
+    if (hostKind === "game") {
+      const apex = currentApexOrigin();
+      if (!enabled || !apex) {
+        setError("Agent login is only available in local development");
+        setStatus("Agent login failed");
+        return;
+      }
+      const state = createHandoffState();
+      const handoffPath = buildHandoffStartUrl(
+        "",
+        `${window.location.origin}${sanitizeAgentLoginNextPath(nextPath)}`,
+        state,
+      );
+      setStatus("Redirecting to the main site…");
+      window.location.replace(
+        `${apex}/agent-login?${new URLSearchParams({ token, next: handoffPath }).toString()}`,
+      );
+      return;
+    }
+
     let cancelled = false;
 
     async function establishSession(credentials: AgentCredentials) {
@@ -126,7 +155,7 @@ export function AgentLoginClient({ token, nextPath }: AgentLoginClientProps) {
     return () => {
       cancelled = true;
     };
-  }, [isAuthenticated, isLoading, nextPath, router, signIn, token]);
+  }, [enabled, hostKind, isAuthenticated, isLoading, nextPath, router, signIn, token]);
 
   return (
     <main className="flex min-h-[100dvh] items-center justify-center bg-background px-6">

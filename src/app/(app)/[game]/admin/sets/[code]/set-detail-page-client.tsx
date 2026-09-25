@@ -20,17 +20,19 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
+import { useGameId } from "@/games/game-context";
 
 export default function AdminSetDetailPageClient() {
   const params = useParams();
   const searchParams = useSearchParams();
   const code = typeof params.code === "string" ? params.code : "";
-  const set = useQuery(api.sets.getByCode, code ? { code } : "skip");
+  const game = useGameId();
+  const set = useQuery(api.sets.getByCode, code ? { game, code } : "skip");
   const audit = useQuery(
     api.sets.getSetCardCountAudit,
-    code ? { code } : "skip"
+    code ? { game, code } : "skip"
   );
-  const catalogVersion = useQuery(api.admin.getCardDataVersion, {});
+  const catalogVersion = useQuery(api.admin.getCardDataVersion, { game });
   const updateSet = useMutation(api.admin.updateSet);
   const listSearch = searchParams.get("search");
   const listQuery =

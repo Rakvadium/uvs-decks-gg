@@ -6,12 +6,14 @@ import { useQuery } from "convex/react";
 import { api } from "../../../../../../../convex/_generated/api";
 import { AdminPageHeader } from "@/components/admin";
 import { AdminFormatDetailWorkspace } from "@/features/admin-format-legality/content";
+import { useGameId } from "@/games/game-context";
 
 export default function AdminFormatDetailPageClient() {
   const params = useParams();
   const rawKey = typeof params.key === "string" ? params.key : "";
   const key = rawKey ? decodeURIComponent(rawKey) : "";
-  const format = useQuery(api.formats.getByKey, key ? { key } : "skip");
+  const game = useGameId();
+  const format = useQuery(api.formats.getByKey, key ? { game, key } : "skip");
 
   if (!key) {
     return (

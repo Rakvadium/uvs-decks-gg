@@ -8,7 +8,9 @@ import {
 import { internal } from "./_generated/api";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { runCatalogAggregateRefresh } from "./cardFacets";
-import { CATALOG_STATIC_SCHEMA_VERSION } from "./publicCardUrls";
+import { CATALOG_STATIC_SCHEMA_VERSION, catalogObjectKeysToDelete } from "./publicCardUrls";
+import { gameIdValidator } from "./validators";
+import { getCardDataVersionDoc } from "./lib/gameScope";
 
 const CATALOG_VERSIONS_TO_RETAIN = 5;
 
@@ -20,14 +22,14 @@ const releaseResultValidator = v.object({
 });
 
 export const prepareRelease = internalQuery({
-  args: {},
+  args: { game: gameIdValidator },
   returns: v.object({
     nextVersion: v.number(),
     previousVersion: v.union(v.number(), v.null()),
     releaseAt: v.number(),
   }),
-  handler: async (ctx) => {
-    const existing = await ctx.db.query("cardDataVersion").first();
+  handler: async (ctx, args) => {
+    const existing = await getCardDataVersionDoc(ctx, args.game);
     const previousVersion = existing?.version ?? null;
     const nextVersion = previousVersion === null ? 1 : previousVersion + 1;
     return {
@@ -40,6 +42,7 @@ export const prepareRelease = internalQuery({
 
 export const finalizeRelease = internalMutation({
   args: {
+    game: gameIdValidator,
     version: v.number(),
     releaseAt: v.number(),
     catalogUrl: v.string(),
@@ -55,9 +58,10 @@ export const finalizeRelease = internalMutation({
     catalogUrl: v.string(),
   }),
   handler: async (ctx, args) => {
-    const { galleryCount } = await runCatalogAggregateRefresh(ctx);
+    const { galleryCount } = await runCatalogAggregateRefresh(ctx, args.game);
     const cardCount = args.cardCount ?? galleryCount;
-    const existing = await ctx.db.query("cardDataVersion").first();
+    // Default game falls back to the legacy untagged row; patching it tags it with `game`.
+    const existing = await getCardDataVersionDoc(ctx, args.game);
     const previousVersion = existing?.version ?? null;
 
     const fields = {
@@ -68,6 +72,7 @@ export const finalizeRelease = internalMutation({
       catalogSha256: args.catalogSha256,
       catalogObjectKey: args.catalogObjectKey,
       catalogSchemaVersion: args.catalogSchemaVersion,
+      game: args.game,
     };
 
     if (existing) {
@@ -77,6 +82,7 @@ export const finalizeRelease = internalMutation({
     }
 
     await ctx.scheduler.runAfter(0, internal.catalogRelease.cleanupOldCatalogBlobs, {
+      game: args.game,
       keepLatest: CATALOG_VERSIONS_TO_RETAIN,
     });
 
@@ -89,27 +95,28 @@ export const finalizeRelease = internalMutation({
   },
 });
 
+/** Deletes the catalog blob that fell out of the retention window, for this game only. */
 export const cleanupOldCatalogBlobs = internalMutation({
   args: {
+    game: gameIdValidator,
     keepLatest: v.number(),
   },
   returns: v.null(),
   handler: async (ctx, args) => {
-    const versionDoc = await ctx.db.query("cardDataVersion").first();
+    const versionDoc = await getCardDataVersionDoc(ctx, args.game);
     if (!versionDoc) return null;
     const versionToDelete = versionDoc.version - args.keepLatest;
-    if (versionToDelete < 1) return null;
-    await ctx.scheduler.runAfter(0, internal.catalogPublish.deleteCatalogObject, {
-      objectKey: `catalog/v${versionToDelete}.json.gz`,
-    });
+    for (const objectKey of catalogObjectKeysToDelete(args.game, versionToDelete)) {
+      await ctx.scheduler.runAfter(0, internal.catalogPublish.deleteCatalogObject, { objectKey });
+    }
     return null;
   },
 });
 
 export const releaseCatalogInternal = internalAction({
-  args: {},
+  args: { game: gameIdValidator },
   returns: releaseResultValidator,
-  handler: async (ctx): Promise<{
+  handler: async (ctx, args): Promise<{
     version: number;
     cardCount: number;
     previousVersion: number | null;
@@ -125,7 +132,7 @@ export const releaseCatalogInternal = internalAction({
       nextVersion: number;
       previousVersion: number | null;
       releaseAt: number;
-    } = await ctx.runQuery(internal.catalogRelease.prepareRelease, {});
+    } = await ctx.runQuery(internal.catalogRelease.prepareRelease, { game: args.game });
 
     const uploaded: {
       catalogUrl: string;
@@ -134,6 +141,7 @@ export const releaseCatalogInternal = internalAction({
       catalogSchemaVersion: number;
       cardCount: number;
     } = await ctx.runAction(internal.catalogPublish.uploadCatalogBlob, {
+      game: args.game,
       version: prepared.nextVersion,
       releaseAt: prepared.releaseAt,
     });
@@ -144,6 +152,7 @@ export const releaseCatalogInternal = internalAction({
       previousVersion: number | null;
       catalogUrl: string;
     } = await ctx.runMutation(internal.catalogRelease.finalizeRelease, {
+      game: args.game,
       version: prepared.nextVersion,
       releaseAt: prepared.releaseAt,
       catalogUrl: uploaded.catalogUrl,
@@ -158,9 +167,9 @@ export const releaseCatalogInternal = internalAction({
 });
 
 export const releaseCatalog = action({
-  args: {},
+  args: { game: gameIdValidator },
   returns: releaseResultValidator,
-  handler: async (ctx): Promise<{
+  handler: async (ctx, args): Promise<{
     version: number;
     cardCount: number;
     previousVersion: number | null;
@@ -171,7 +180,7 @@ export const releaseCatalog = action({
       cardCount: number;
       previousVersion: number | null;
       catalogUrl: string;
-    } = await ctx.runAction(internal.catalogRelease.releaseCatalogInternal, {});
+    } = await ctx.runAction(internal.catalogRelease.releaseCatalogInternal, { game: args.game });
     return result;
   },
 });

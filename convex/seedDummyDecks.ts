@@ -1,5 +1,7 @@
 import { internalMutation } from "./_generated/server";
 import { v } from "convex/values";
+import { gameIdValidator } from "./validators";
+import { DEFAULT_GAME_ID } from "../shared/games/types";
 
 const DUMMY_PREFIX = "[DUMMY]";
 
@@ -44,15 +46,19 @@ const DESCRIPTIONS = [
 ];
 
 export const seed = internalMutation({
-  args: { count: v.optional(v.number()) },
+  args: { count: v.optional(v.number()), game: v.optional(gameIdValidator) },
   returns: v.number(),
   handler: async (ctx, args) => {
     const count = Math.min(Math.max(args.count ?? 30, 1), 100);
+    const game = args.game ?? DEFAULT_GAME_ID;
 
     const user = await ctx.db.query("users").first();
     if (!user) throw new Error("No users found to own dummy decks");
 
-    const sampled = await ctx.db.query("cards").take(400);
+    const sampled = await ctx.db
+      .query("cards")
+      .withIndex("by_game", (q) => q.eq("game", game))
+      .take(400);
     const usable = sampled.filter((card) => card.imageUrl);
     if (usable.length < 10) throw new Error("Not enough cards with images to seed decks");
 
@@ -80,6 +86,7 @@ export const seed = internalMutation({
       const imageCard = imagePool[Math.floor(Math.random() * imagePool.length)];
 
       await ctx.db.insert("decks", {
+        game,
         userId: user._id,
         name: `${DUMMY_PREFIX} ${adjective} ${archetype} ${i + 1}`,
         description,

@@ -106,6 +106,15 @@ Optional: `&next=/gallery` (relative paths only).
 
 The page calls `POST /api/agent-auth`, signs in with Convex password auth, and creates the agent user on first use. The route is **disabled** unless `NODE_ENV=development` and `VERCEL` is not `1`. Do not set these env vars on Vercel or production hosts.
 
+**Game hosts** (`http://uvs.tcgdecks.localhost:8090/agent-login?token=…&next=/gallery`): the game
+host generates a handoff `state` (sessionStorage), then redirects to the apex
+`http://tcgdecks.localhost:8090/agent-login?token=…&next=/auth/handoff?return=…&state=…`. The
+apex signs the agent in with the password flow, `/auth/handoff` mints a one-time code and the
+game host's `/auth/callback` redeems it (see docs/multi-game.md "Central auth host"). Once the
+apex is signed in, other game hosts pick up the session via silent SSO. Bare `localhost:8090`
+(standalone) behaves as above with no handoff. Requires the `authHandoff` Convex functions to be
+deployed to the dev deployment (`bunx convex dev`).
+
 ## 7. What not to do
 
 - Do not edit before a Context Brief from `project-context-gate`.

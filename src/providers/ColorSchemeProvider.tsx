@@ -24,6 +24,7 @@ import {
 } from "@/lib/theme/appearance-types";
 import { buildSemanticCssVars } from "@/lib/theme/generateSemanticCssVars";
 import { resolveAppearanceCustomPair } from "@/lib/theme/resolve-appearance-custom";
+import { useGameId } from "@/games/game-context";
 
 type ResolvedTheme = "light" | "dark";
 
@@ -219,7 +220,8 @@ function mergeDraftCustom(
 
 export function ColorSchemeProvider({ children }: { children: ReactNode }) {
   const { isAuthenticated, isLoading: authLoading } = useConvexAuth();
-  const session = useQuery(api.sessions.getSession, isAuthenticated ? {} : "skip");
+  const game = useGameId();
+  const session = useQuery(api.sessions.getSession, isAuthenticated ? { game } : "skip");
   const updateSession = useMutation(api.sessions.updateSession);
   const ensureMigrated = useMutation(api.sessions.ensureAppearanceMigrated);
 

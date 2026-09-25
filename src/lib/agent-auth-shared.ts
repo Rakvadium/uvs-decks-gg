@@ -1,8 +1,9 @@
+import { sanitizeSameOriginPath } from "@shared/auth-handoff";
+
+/**
+ * Same-origin path to continue to after agent login (default `/home`). Allows query strings,
+ * e.g. `/auth/handoff?return=…&state=…` on the apex.
+ */
 export function sanitizeAgentLoginNextPath(next: unknown): string {
-  if (typeof next !== "string") return "/home";
-  const trimmed = next.trim();
-  if (!trimmed.startsWith("/") || trimmed.startsWith("//") || trimmed.includes("://")) {
-    return "/home";
-  }
-  return trimmed;
+  return sanitizeSameOriginPath(next, "/home");
 }

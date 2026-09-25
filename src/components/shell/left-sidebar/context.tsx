@@ -4,6 +4,7 @@ import { useAuthActions } from "@convex-dev/auth/react";
 import { useConvexAuth, useQuery } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import { useAuthDialog } from "@/components/auth/auth-dialog";
+import { useAppSignOut } from "@/lib/auth/use-app-sign-out";
 import { usePrefersReducedMotion } from "@/lib/reduced-motion";
 import { useColorScheme, useTheme } from "@/lib/theme";
 import { buildMainNavItems } from "./constants";
@@ -43,6 +44,7 @@ export function LeftSidebarProvider({ collapsed, onToggle, children }: LeftSideb
   const isOnAdminPage = pathname.startsWith("/admin");
 
   const authActions = useAuthActions();
+  const appSignOut = useAppSignOut();
   const { isAuthenticated, isLoading } = useConvexAuth();
   const { isDark, toggleTheme } = useTheme();
   const {
@@ -64,9 +66,9 @@ export function LeftSidebarProvider({ collapsed, onToggle, children }: LeftSideb
 
   const handleSignOut = useCallback(async () => {
     if (!authActions?.signOut) return;
-    await authActions.signOut();
+    if ((await appSignOut()) === "redirecting") return;
     router.push("/");
-  }, [authActions, router]);
+  }, [appSignOut, authActions, router]);
 
   const navItems = useMemo(() => buildMainNavItems(), []);
 

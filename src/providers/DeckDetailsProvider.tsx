@@ -12,6 +12,7 @@ import { useSiloedDeckOptional } from "@/lib/deck";
 import type { DeckTeamSharing, DeckVisibility } from "@/lib/deck/visibility";
 import { deckTeamSharingFromDeck, normalizeDeckVisibility } from "@/lib/deck/visibility";
 import { useActiveDeck } from "./ActiveDeckProvider";
+import { useGameId } from "@/games/game-context";
 
 type DeckSection = "main" | "side" | "reference";
 type DeckDetailsUpdate = {
@@ -100,7 +101,8 @@ export function DeckDetailsProvider({ children, deckId }: DeckDetailsProviderPro
   const typedDeckId = deckId as Id<"decks">;
   const currentUser = useQuery(api.user.currentUser);
   const myTeam = useQuery(api.teams.permissions.getMyTeam, isAuthenticated ? {} : "skip");
-  const queriedDeck = useQuery(api.decks.getById, siloedDeck ? "skip" : { deckId: typedDeckId });
+  const game = useGameId();
+  const queriedDeck = useQuery(api.decks.getById, siloedDeck ? "skip" : { game, deckId: typedDeckId });
   const deck = siloedDeck?.deck ?? queriedDeck;
   const isDeckLoading = siloedDeck ? siloedDeck.isLoading : queriedDeck === undefined;
   const isOwner = Boolean(deck && currentUser && deck.userId === currentUser._id);

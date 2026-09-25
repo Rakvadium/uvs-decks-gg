@@ -7,6 +7,7 @@ import { useConvexAuth, useQuery } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import type { Doc } from "../../../../convex/_generated/dataModel";
 import { useAuthDialog } from "@/components/auth/auth-dialog";
+import { useAppSignOut } from "@/lib/auth/use-app-sign-out";
 import { suppressSubsequentPointerEvents } from "@/lib/suppress-subsequent-pointer";
 import { useColorScheme, useTheme } from "@/lib/theme";
 import { useMobileShell } from "../mobile-shell-context";
@@ -39,6 +40,7 @@ export function MobileProfileSheetProvider({ children }: { children: ReactNode }
   const pathname = usePathname();
   const router = useRouter();
   const authActions = useAuthActions();
+  const appSignOut = useAppSignOut();
   const { isAuthenticated, isLoading } = useConvexAuth();
   const { isDark, toggleTheme } = useTheme();
   const {
@@ -58,12 +60,12 @@ export function MobileProfileSheetProvider({ children }: { children: ReactNode }
   }, [setProfileSheetOpen]);
 
   const handleSignOut = useCallback(async () => {
-    if (authActions?.signOut) {
-      await authActions.signOut();
-      closeSheet();
-      router.push("/");
-    }
-  }, [authActions, closeSheet, router]);
+    if (!authActions?.signOut) return;
+    const outcome = await appSignOut();
+    closeSheet();
+    if (outcome === "redirecting") return;
+    router.push("/");
+  }, [appSignOut, authActions, closeSheet, router]);
 
   const handleNavClick = useCallback(
     (path: string) => {
