@@ -3,7 +3,6 @@ import { useMutation } from "convex/react";
 import { toast } from "sonner";
 import { api } from "../../../../convex/_generated/api";
 import type { Id } from "../../../../convex/_generated/dataModel";
-import { formatUniversusCardType } from "@/config/universus";
 import { useCardIdMap } from "@/hooks/useCardIdMap";
 import { useCardData } from "@/lib/universus/card-data-provider";
 import { useDeckDetailsOptional } from "@/providers/DeckDetailsProvider";
@@ -33,7 +32,9 @@ export function useImportExportSidebarModel() {
   const [lastImportMessage, setLastImportMessage] = useState<string | null>(null);
 
   const deck = context?.deck ?? null;
-  const gameDeck = useGameModule().deck;
+  const gameModule = useGameModule();
+  const gameDeck = gameModule.deck;
+  const { formatCardType } = gameModule.ui;
   const setup = gameDeck.normalizeSetup(deck);
   const startingCharacterId = setup.startingCharacterId;
   const cardMap = useCardIdMap(cards);
@@ -50,7 +51,7 @@ export function useImportExportSidebarModel() {
       const card = cardMap.get(cardId);
       if (!card) continue;
 
-      const type = formatUniversusCardType(card.type) ?? card.type ?? "Other";
+      const type = formatCardType(card.type) ?? card.type ?? "Other";
       if (!UVS_MAIN_TYPE_ORDER.includes(type as (typeof UVS_MAIN_TYPE_ORDER)[number])) continue;
 
       entries.push({
@@ -61,7 +62,7 @@ export function useImportExportSidebarModel() {
     }
 
     return entries;
-  }, [deck, cardMap]);
+  }, [deck, cardMap, formatCardType]);
 
   const exportSideEntries = useMemo(() => {
     if (!deck) return [] as UvsUltraDeckLine[];

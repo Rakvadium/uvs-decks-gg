@@ -1,11 +1,11 @@
 import { Hexagon, Layers, UserRoundPen } from "lucide-react";
-import { DeckCharacterPickerDialog } from "@/components/deck/shared";
-import { CardImageDisplay } from "@/components/universus/card-grid-item/image-display";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { useDeckDetailsHeroPanelContext } from "./context";
+import { useGameModule } from "@/games/game-context";
 
 export function DeckDetailsHeroCharacterImagePicker() {
+  const { CardImageDisplay, SetupCardPickerDialog } = useGameModule().ui;
   const {
     characterOpen,
     setCharacterOpen,
@@ -84,7 +84,7 @@ export function DeckDetailsHeroCharacterImagePicker() {
         </TooltipContent>
       </Tooltip>
 
-      <DeckCharacterPickerDialog
+      <SetupCardPickerDialog
         open={characterOpen}
         onOpenChange={setCharacterOpen}
         selectedCharacterId={setup.startingCharacterId}

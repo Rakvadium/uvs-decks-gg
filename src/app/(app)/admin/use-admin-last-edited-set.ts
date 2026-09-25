@@ -1,26 +1,13 @@
 "use client";
 
-import { useMemo, useSyncExternalStore } from "react";
+import { useCallback, useMemo, useSyncExternalStore } from "react";
 import type { Doc } from "../../../../convex/_generated/dataModel";
+import { useGameId } from "@/games/game-context";
 import {
   ADMIN_LAST_SET_CHANGED_EVENT,
-  ADMIN_LAST_SET_CODE_KEY,
+  adminLastSetCodeKey,
   readAdminLastSetCode,
 } from "./admin-prefs-storage";
-
-function subscribe(onChange: () => void) {
-  if (typeof window === "undefined") return () => {};
-  const onStorage = (e: StorageEvent) => {
-    if (e.key === ADMIN_LAST_SET_CODE_KEY || e.key === null) onChange();
-  };
-  const onCustom = () => onChange();
-  window.addEventListener("storage", onStorage);
-  window.addEventListener(ADMIN_LAST_SET_CHANGED_EVENT, onCustom);
-  return () => {
-    window.removeEventListener("storage", onStorage);
-    window.removeEventListener(ADMIN_LAST_SET_CHANGED_EVENT, onCustom);
-  };
-}
 
 function getServerSnapshot() {
   return null as string | null;
@@ -29,11 +16,26 @@ function getServerSnapshot() {
 export function useAdminLastEditedSet(
   sets: Doc<"sets">[] | undefined,
 ): { code: string; name: string; href: string } | null {
-  const storedCode = useSyncExternalStore(
-    subscribe,
-    readAdminLastSetCode,
-    getServerSnapshot,
+  const game = useGameId();
+  const subscribe = useCallback(
+    (onChange: () => void) => {
+      if (typeof window === "undefined") return () => {};
+      const key = adminLastSetCodeKey(game);
+      const onStorage = (e: StorageEvent) => {
+        if (e.key === key || e.key === null) onChange();
+      };
+      const onCustom = () => onChange();
+      window.addEventListener("storage", onStorage);
+      window.addEventListener(ADMIN_LAST_SET_CHANGED_EVENT, onCustom);
+      return () => {
+        window.removeEventListener("storage", onStorage);
+        window.removeEventListener(ADMIN_LAST_SET_CHANGED_EVENT, onCustom);
+      };
+    },
+    [game],
   );
+  const getSnapshot = useCallback(() => readAdminLastSetCode(game), [game]);
+  const storedCode = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
   return useMemo(() => {
     if (!sets || sets.length === 0) return null;

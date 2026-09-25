@@ -25,7 +25,8 @@ update this doc in the same change.
 | `shared/hosts.ts` | Host → `{ kind: "game" \| "apex" \| "standalone", game }` resolution and cross-host URL builders | middleware, src, convex |
 | `src/games/types.ts` | `ClientGameModule` (extends shared module with React components/hooks) | src |
 | `src/games/registry.ts` | `CLIENT_GAME_MODULES`, `getClientGameModule(id)` | src |
-| `src/games/uvs/**` | UVS React components (card rendering, character picker, stat filter inputs, …) | src |
+| `src/games/uvs/**` | UVS React components (`components/**`: card rendering, symbols, character picker, stat filter adornment), `config.ts` (keywords, symbols, colors, `UNIVERSUS_CONFIG`), `ui.ts` (the `ui` contract impl), `deck-stats.ts` | src |
+| `src/components/card/**` | Game-agnostic card pieces: `CardNavigationProvider`/`useCardNavigation`, `CardFlipButton`, `CardDeckControls`, `CARD_GLOW_*`, `galleryCardImageSizes` | src |
 | `src/games/game-context.tsx` | `GameProvider`, `useGameId()`, `useGameModule()`, `useHostKind()` | src |
 
 - `src/` imports shared code via the tsconfig alias **`@shared/*` → `./shared/*`**.
@@ -37,6 +38,35 @@ update this doc in the same change.
   New shared code must not import them.
 - Game-agnostic shared components get game behavior through `useGameModule()` (client) or
   `getSharedGameModule(game)` (server), never by importing UVS modules directly.
+
+## Client UI contract (`ClientGameModule.ui`, `src/games/types.ts`)
+
+`ClientGameModule extends SharedGameModule` with `ui: ClientGameUi`. Generic components under
+`src/components/**` / `src/providers/**` read game UI from `useGameModule().ui` and never import
+`@/games/uvs/**`, `@/components/universus/*` or `@/config/universus` (those old paths are wrappers only).
+
+| Member | Purpose (UVS impl) |
+| --- | --- |
+| `CardDetailsDialog`, `CardDetailsContent` | Card details modal / inline details panel |
+| `CardGridItem` | Gallery/deck grid card tile (deck actions, flip, drag) |
+| `CardImageDisplay` | Card image with "No Image" fallback |
+| `SymbolIcon`, `SymbolBadge`, `getSymbolPath`, `getSymbolColor` | Symbol/identity images and chip colors |
+| `SetupCardPickerDialog` | Deck setup card picker (UVS: starting character) |
+| `StatsQuickFilterAdornment` | Compact active stat-filter chips |
+| `getCardTypeColor`, `getKeywordColor` | Filter token chip colors |
+| `formatCardType` | Normalizes raw card types before grouping/labels |
+| `deckStats` | Deck stats pie palette (`cardTypeColors`, `zoneColors`, `numericShades`) |
+
+- Prop contracts (`GameCardGridItemProps`, …) live next to `ClientGameUi` and use `CachedCard`;
+  each game's components must satisfy them (`UVS_CLIENT_UI ... satisfies ClientGameUi` in `src/games/uvs/ui.ts`).
+- Module objects are static constants, so `const { CardGridItem } = useGameModule().ui;` inside a
+  component yields a stable component identity (no remounts). Call it at the top of the component
+  like any hook; pure helpers that are not components/hooks take the function as a parameter
+  (e.g. `buildSectionGroups(..., formatCardType)`).
+- Theme: `ThemeInjector` reads `useGameModule().theme`.
+- Keep `ui` components as `export function` declarations: the registry imports every game's `ui`,
+  and game components import generic providers that call `useGameModule()`, so hoisted function
+  exports keep those import cycles safe (a `const X = memo(...)` export could hit the TDZ).
 
 ## Deck setup (replaces `startingCharacterId` / `selectedIdentity`)
 
@@ -115,6 +145,26 @@ through a scoped parent (`tierListItems`, `deckLikes`, `deckViews`, `deckShares`
 - localStorage: `tcgdecks:{game}:{key}` for game-scoped UI state, `tcgdecks:{key}` for global.
   On first read, fall back to the legacy `uvs-decks-*` key (for `uvs` only) and migrate it.
 
+Implementation (Phase 2 routing step) — helpers in `src/lib/storage-keys.ts`
+(`gameStorageKey`, `globalStorageKey`, `appEventName`, `catalogDbName`, `legacyGameKey`,
+`readStorageWithLegacy`, `deleteLegacyDatabaseOnce`; tests in `tests/storage-keys.test.ts`):
+
+| Key | Scope | Legacy key migrated on first read |
+| --- | --- | --- |
+| `activeDeckId`, `galleryFilters`, `galleryFormat`, `gallerySets`, `gallerySortField`, `gallerySortDirection`, `rightSidebarAction` (UIStateProvider) | game | `uvs-decks:{key}` (uvs only) |
+| `galleryViewMode`, `galleryCardsPerRow` (+ old `…Open`/`…Closed`) (UIStateProvider) | global | `uvs-decks:{key}` |
+| `tcgdecks:left-sidebar-collapsed` (`(app)/layout.tsx`) | global | `uvs-decks-left-sidebar-collapsed` |
+| `tcgdecks:right-sidebar-width` (`shell-slot-provider/types.ts`) | global | `uvs-decks-right-sidebar-width` |
+| `tcgdecks:{game}:admin-last-set-code` (`admin/admin-prefs-storage.ts`) | game | `uvs-decks-admin-last-set-code` (uvs only) |
+
+- Window events: `tcgdecks:admin-last-set-changed`, `tcgdecks:deck-details-simulator-redraw`.
+- localStorage is per origin, so the migration only helps on hosts that already had the legacy
+  keys (standalone/localhost/previews); `uvsdecks.gg` users start fresh on `uvs.tcgdecks.gg`.
+- IndexedDB: `card-store.ts` / `set-store.ts` functions take `game` first; `useUniversusCards` /
+  `useSets` read it via `useGameId()`. The first store open per page load calls
+  `indexedDB.deleteDatabase("universus-cards" | "universus-sets")` (best effort). The Convex
+  catalog/sets queries themselves are not game-scoped yet.
+
 ## Hosts and routing
 
 `shared/hosts.ts`:
@@ -147,7 +197,8 @@ Implementation notes (Phase 1 foundation):
   port for real roots (`http`/`https`, any port, for `.localhost` roots).
 - `GameProvider({ game, hostKind })` also exposes `useHostKind()`. Outside a provider the hooks
   return the default game / `"standalone"`, so components can adopt them before routing lands.
-- Next 16 deprecates `src/middleware.ts` in favor of `proxy.ts`; the routing step may rename it.
+- Next 16 deprecates `src/middleware.ts` in favor of `proxy.ts`; the routing step kept
+  `middleware.ts` (see below).
 
 - **Standalone** behaves exactly like today: default game, local sign-in, no handoff.
   This keeps `localhost:8090`, LAN testing, CI, and Vercel previews working.
@@ -168,6 +219,37 @@ Internal links stay host-relative (`/decks/123`); only cross-game/apex links use
 
 The middleware sets request header `x-tcg-host-kind` and `x-tcg-game`; the root layout reads
 them and renders `GameProvider`. Direct requests to `/uvs/...` are 404 (rewrites only).
+
+Implementation (Phase 2 routing step):
+
+- **Decision logic** is the pure `routeRequest({ host, pathname, search, protocol })` in
+  `src/lib/routing/route-request.ts` → `{ type: "next" | "rewrite" | "redirect" | "notFound" }`
+  (tests: `tests/route-request.test.ts`). Order: legacy host → 301; apex unknown subdomain → 307
+  to `{apex}/`; apex allowed path (`/`, `/sign-in`, `/sign-up`, `/agent-login`, `/auth[/…]`,
+  `/api[/…]`) → next, anything else (incl. `/tour`) → 307 to `{DEFAULT_GAME}.{root}` + path +
+  query; game/standalone: first segment is a GameId → notFound, `isGameScopedPath` → rewrite to
+  `/{game}{path}{query}`, else next. Apex requests carry `x-tcg-game: {DEFAULT_GAME_ID}` +
+  `x-tcg-host-kind: apex`.
+- **`src/middleware.ts`** stays a `middleware.ts` (Next 16 logs a deprecation warning).
+  `convexAuthNextjsMiddleware` is typed for `NextMiddleware`/edge; renaming to `proxy.ts`
+  (Node runtime) is a separate, low-value change, so it was deferred. The handler runs *inside*
+  `convexAuthNextjsMiddleware`, so `/api/auth` POSTs are still proxied to Convex before routing
+  runs and token refresh cookies still propagate. Redirect decisions return first; then the
+  existing "authenticated on /sign-in|/sign-up|/agent-login → /home" rule; then rewrite/next with
+  `NextResponse.rewrite|next(…, { request: { headers } })` (headers copied from the request so
+  refreshed auth cookies survive; our `x-tcg-*` values overwrite client-supplied ones).
+  `notFound` rewrites to `/__tcg-not-found`, which matches no page → root not-found UI, 404.
+  Matcher unchanged (skips `_next` and any path with a dot).
+- **Server helper** `getRequestGame()` (`src/lib/routing/request-game.ts`) reads the headers
+  (falls back to `resolveHost(host)`); used by the root layout (wraps `Providers` in
+  `GameProvider`) and the root page (apex → minimal game picker linking to
+  `gameOrigin(game, root)/gallery`; otherwise `redirect("/gallery")`).
+- **`src/app/(app)/[game]/layout.tsx`** `notFound()`s unless `isGameId(params.game)`.
+  `[game]/admin/layout.tsx` re-exports `(app)/admin/layout.tsx` so game-scoped admin pages keep
+  the admin role gate. `usePathname()` returns the user-visible (unprefixed) path, so the admin
+  sidebar and `getPageType` in `(app)/layout.tsx` are unchanged; `useParams()` now also has `game`.
+- Absolute links built from `window.location.origin` (private deck links, team invites) are
+  same-host and unchanged.
 
 ## Central auth host (handoff)
 

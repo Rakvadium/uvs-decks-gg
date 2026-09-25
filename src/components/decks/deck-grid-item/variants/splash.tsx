@@ -3,14 +3,15 @@
 import Image from "next/image";
 import Link from "next/link";
 import { BookOpen, Hexagon, Layers, User } from "lucide-react";
-import { SymbolIcon } from "@/components/universus/symbol-icon";
 import { cn } from "@/lib/utils";
 import { useDeckGridItemContext } from "../context";
 import { MAIN_DECK_TARGET } from "../hook";
 import { ProgressRing, VisibilityGlyph } from "./shared";
 import { accentCssVars, symbolAccentFor } from "./splash-accent";
+import { useGameModule } from "@/games/game-context";
 
 export function DeckSplashItem() {
+  const { SymbolIcon } = useGameModule().ui;
   const {
     deck,
     displayImage,

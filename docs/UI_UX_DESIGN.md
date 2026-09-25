@@ -62,7 +62,7 @@ State is expressed with semantic tokens, never Tailwind palette hues:
 | Informational | `info`, `info-foreground` | `Badge tone="info"`, `Alert variant="info"` |
 | Error / destructive | `destructive` | `Badge tone="destructive"`, `Alert variant="destructive"`, `Button variant="destructive"` |
 
-Inline usage follows the primary ladder: `bg-warning/10`, `border-warning/40`, `text-warning`. Domain colors (card symbols, stat tints) live in `src/config/universus.ts` and are not status colors.
+Inline usage follows the primary ladder: `bg-warning/10`, `border-warning/40`, `text-warning`. Domain colors (card symbols, stat tints) live in `src/games/uvs/config.ts` and are not status colors.
 
 ## Elevation
 

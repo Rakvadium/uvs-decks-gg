@@ -18,7 +18,7 @@ import {
   UNIVERSUS_KEYWORDS,
   UNIVERSUS_SYMBOLS,
   UNIVERSUS_ZONES,
-} from "@/config/universus";
+} from "@/games/uvs/config";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -47,7 +47,7 @@ import {
 } from "@/components/ui/popover";
 import { toast } from "sonner";
 import { toastConvexError } from "@/lib/convex-error-toast";
-import { parseZoneDisplay } from "@/components/universus/card-details/parsers";
+import { parseZoneDisplay } from "@/games/uvs/components/card-details/parsers";
 import { createSymbolReferenceImageUrl } from "@/lib/universus/vision-reference-images";
 import {
   analyzeCardRegions,

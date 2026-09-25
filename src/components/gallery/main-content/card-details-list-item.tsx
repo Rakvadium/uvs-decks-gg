@@ -2,15 +2,14 @@ import { useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { FileText, Hexagon, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { CardDetailsContent } from "@/components/universus/card-details/content";
-import { CardDetailsDialog } from "@/components/universus/card-details/dialog";
-import { useCardNavigation } from "@/components/universus/card-details/navigation-context";
+import { useCardNavigation } from "@/components/card/navigation-context";
 import { usePrefersReducedMotion } from "@/lib/reduced-motion";
 import { useTcgDraggable } from "@/lib/dnd";
 import { cn } from "@/lib/utils";
 import type { CachedCard } from "@/lib/universus/card-store";
 import { CardDeckControlsStandard } from "./card-deck-controls";
 import { useGalleryCardMap } from "./card-map-context";
+import { useGameModule } from "@/games/game-context";
 
 interface CardDetailsListItemProps {
   card: CachedCard;
@@ -19,6 +18,7 @@ interface CardDetailsListItemProps {
 }
 
 export function CardDetailsListItem({ card, onOpenCardDetails, imagePriority = false }: CardDetailsListItemProps) {
+  const { CardDetailsContent, CardDetailsDialog } = useGameModule().ui;
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isFlipped, setIsFlipped] = useState(false);
   const prefersReducedMotion = usePrefersReducedMotion();

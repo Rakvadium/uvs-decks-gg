@@ -3,7 +3,6 @@
 import { useCallback, useState } from "react";
 import type { BuilderTier } from "../types";
 import { TCG_DND_ACCEPTS_CARD_ONLY, type DragItem, useTcgDroppable } from "@/lib/dnd";
-import { CardGridItem } from "@/components/universus/card-grid-item";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,6 +11,7 @@ import { useProfanityDisplayText } from "@/lib/moderation/use-profanity-display-
 import { useCommunityTierListDetailContext } from "./context";
 import { Check, Pencil, Trash2 } from "lucide-react";
 import { SectionHeading } from "@/components/ui/typography-headings";
+import { useGameModule } from "@/games/game-context";
 
 const TCG_DND_ACCEPTS_NONE: DragItem["type"][] = [];
 
@@ -24,6 +24,7 @@ function withAlpha(color: string, alpha: string) {
 }
 
 export function CommunityTierListLaneRow({ tier }: { tier: BuilderTier }) {
+  const { CardGridItem } = useGameModule().ui;
   const {
     laneMap,
     cardMap,

@@ -2,13 +2,14 @@
 
 import { useCallback } from "react";
 import { cn } from "@/lib/utils";
-import { CardDetailsDialog } from "@/components/universus/card-details/dialog";
 import { ActiveDeckCardRowControls } from "./controls";
 import { ActiveDeckCardRowProvider, useActiveDeckCardRowContext } from "./context";
 import { ActiveDeckCardRowThumbnail } from "./thumbnail";
 import type { ActiveDeckCardRowProps } from "./types";
+import { useGameModule } from "@/games/game-context";
 
 function ActiveDeckCardRowContent() {
+  const { CardDetailsDialog } = useGameModule().ui;
   const {
     card,
     backCard,

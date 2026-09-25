@@ -18,6 +18,14 @@ import {
   resolveGalleryCardsPerRowPreference,
 } from "@/lib/gallery/cards-per-row-preference";
 import type { UvsStatZoneFilterFields } from "@shared/games/uvs/filters";
+import type { GameId } from "@shared/games/types";
+import { useGameId } from "@/games/game-context";
+import {
+  gameStorageKey,
+  globalStorageKey,
+  legacyGameKey,
+  readStorageWithLegacy,
+} from "@/lib/storage-keys";
 
 export type { StatOperator, StatFilterValue } from "@shared/games/filters";
 
@@ -78,10 +86,34 @@ interface UIStateContextValue {
 
 const UIStateContext = createContext<UIStateContextValue | null>(null);
 
-const STORAGE_KEY_PREFIX = "uvs-decks";
+/** Legacy (pre multi-game) prefix: `uvs-decks:{key}`. */
+const LEGACY_STORAGE_KEY_PREFIX = "uvs-decks";
 
-function getStorageKey(key: string): string {
-  return `${STORAGE_KEY_PREFIX}:${key}`;
+/**
+ * Per-game UI state (`tcgdecks:{game}:{key}`). Everything else (view mode, cards per row) is a
+ * global preference (`tcgdecks:{key}`).
+ */
+const GAME_SCOPED_UI_KEYS = new Set([
+  "activeDeckId",
+  "galleryFilters",
+  "rightSidebarAction",
+  "galleryFormat",
+  "gallerySets",
+  "gallerySortField",
+  "gallerySortDirection",
+]);
+
+function getStorageKey(game: GameId, key: string): string {
+  return GAME_SCOPED_UI_KEYS.has(key) ? gameStorageKey(game, key) : globalStorageKey(key);
+}
+
+function getLegacyStorageKey(game: GameId, key: string): string | null {
+  const legacyKey = `${LEGACY_STORAGE_KEY_PREFIX}:${key}`;
+  return GAME_SCOPED_UI_KEYS.has(key) ? legacyGameKey(game, legacyKey) : legacyKey;
+}
+
+function readItem(game: GameId, key: string): string | null {
+  return readStorageWithLegacy(getStorageKey(game, key), getLegacyStorageKey(game, key));
 }
 
 function normalizePersistedGalleryFilters(raw: CardFilters | undefined): CardFilters | undefined {
@@ -95,27 +127,27 @@ function normalizePersistedGalleryFilters(raw: CardFilters | undefined): CardFil
   return next;
 }
 
-function loadPersistedUIState(): UIState {
+function loadPersistedUIState(game: GameId): UIState {
   if (typeof window === "undefined") {
     return {};
   }
   try {
-    const activeDeckId = localStorage.getItem(getStorageKey("activeDeckId")) ?? undefined;
-    const filtersRaw = localStorage.getItem(getStorageKey("galleryFilters"));
+    const activeDeckId = readItem(game, "activeDeckId") ?? undefined;
+    const filtersRaw = readItem(game, "galleryFilters");
     const galleryFilters =
       filtersRaw !== null ? normalizePersistedGalleryFilters(JSON.parse(filtersRaw)) : undefined;
-    const galleryViewMode = (localStorage.getItem(getStorageKey("galleryViewMode")) as GalleryViewMode) ?? undefined;
+    const galleryViewMode = (readItem(game, "galleryViewMode") as GalleryViewMode) ?? undefined;
     const galleryCardsPerRow = resolveGalleryCardsPerRowPreference({
-      single: parseStoredCardsPerRow(localStorage.getItem(getStorageKey("galleryCardsPerRow"))),
-      open: parseStoredCardsPerRow(localStorage.getItem(getStorageKey("galleryCardsPerRowOpen"))),
-      closed: parseStoredCardsPerRow(localStorage.getItem(getStorageKey("galleryCardsPerRowClosed"))),
+      single: parseStoredCardsPerRow(readItem(game, "galleryCardsPerRow")),
+      open: parseStoredCardsPerRow(readItem(game, "galleryCardsPerRowOpen")),
+      closed: parseStoredCardsPerRow(readItem(game, "galleryCardsPerRowClosed")),
     });
-    const rightSidebarAction = localStorage.getItem(getStorageKey("rightSidebarAction")) ?? undefined;
-    const galleryFormat = localStorage.getItem(getStorageKey("galleryFormat")) ?? undefined;
-    const gallerySetsRaw = localStorage.getItem(getStorageKey("gallerySets"));
+    const rightSidebarAction = readItem(game, "rightSidebarAction") ?? undefined;
+    const galleryFormat = readItem(game, "galleryFormat") ?? undefined;
+    const gallerySetsRaw = readItem(game, "gallerySets");
     const gallerySets = gallerySetsRaw ? JSON.parse(gallerySetsRaw) : undefined;
-    const gallerySortField = localStorage.getItem(getStorageKey("gallerySortField")) ?? undefined;
-    const gallerySortDirection = (localStorage.getItem(getStorageKey("gallerySortDirection")) as "asc" | "desc") ?? undefined;
+    const gallerySortField = readItem(game, "gallerySortField") ?? undefined;
+    const gallerySortDirection = (readItem(game, "gallerySortDirection") as "asc" | "desc") ?? undefined;
 
     return {
       activeDeckId,
@@ -133,61 +165,61 @@ function loadPersistedUIState(): UIState {
   }
 }
 
-function persistUIState(state: UIState) {
+function persistUIState(state: UIState, game: GameId) {
   if (typeof window === "undefined") return;
   try {
     if (state.activeDeckId) {
-      localStorage.setItem(getStorageKey("activeDeckId"), state.activeDeckId);
+      localStorage.setItem(getStorageKey(game, "activeDeckId"), state.activeDeckId);
     } else {
-      localStorage.removeItem(getStorageKey("activeDeckId"));
+      localStorage.removeItem(getStorageKey(game, "activeDeckId"));
     }
 
     if (state.galleryFilters) {
-      localStorage.setItem(getStorageKey("galleryFilters"), JSON.stringify(state.galleryFilters));
+      localStorage.setItem(getStorageKey(game, "galleryFilters"), JSON.stringify(state.galleryFilters));
     } else {
-      localStorage.removeItem(getStorageKey("galleryFilters"));
+      localStorage.removeItem(getStorageKey(game, "galleryFilters"));
     }
 
     if (state.galleryViewMode) {
-      localStorage.setItem(getStorageKey("galleryViewMode"), state.galleryViewMode);
+      localStorage.setItem(getStorageKey(game, "galleryViewMode"), state.galleryViewMode);
     } else {
-      localStorage.removeItem(getStorageKey("galleryViewMode"));
+      localStorage.removeItem(getStorageKey(game, "galleryViewMode"));
     }
 
     if (typeof state.galleryCardsPerRow === "number" && !Number.isNaN(state.galleryCardsPerRow)) {
-      localStorage.setItem(getStorageKey("galleryCardsPerRow"), state.galleryCardsPerRow.toString());
+      localStorage.setItem(getStorageKey(game, "galleryCardsPerRow"), state.galleryCardsPerRow.toString());
     }
-    localStorage.removeItem(getStorageKey("galleryCardsPerRowOpen"));
-    localStorage.removeItem(getStorageKey("galleryCardsPerRowClosed"));
+    localStorage.removeItem(getStorageKey(game, "galleryCardsPerRowOpen"));
+    localStorage.removeItem(getStorageKey(game, "galleryCardsPerRowClosed"));
 
     if (state.rightSidebarAction) {
-      localStorage.setItem(getStorageKey("rightSidebarAction"), state.rightSidebarAction);
+      localStorage.setItem(getStorageKey(game, "rightSidebarAction"), state.rightSidebarAction);
     } else {
-      localStorage.removeItem(getStorageKey("rightSidebarAction"));
+      localStorage.removeItem(getStorageKey(game, "rightSidebarAction"));
     }
 
     if (state.galleryFormat) {
-      localStorage.setItem(getStorageKey("galleryFormat"), state.galleryFormat);
+      localStorage.setItem(getStorageKey(game, "galleryFormat"), state.galleryFormat);
     } else {
-      localStorage.removeItem(getStorageKey("galleryFormat"));
+      localStorage.removeItem(getStorageKey(game, "galleryFormat"));
     }
 
     if (state.gallerySets && state.gallerySets.length > 0) {
-      localStorage.setItem(getStorageKey("gallerySets"), JSON.stringify(state.gallerySets));
+      localStorage.setItem(getStorageKey(game, "gallerySets"), JSON.stringify(state.gallerySets));
     } else {
-      localStorage.removeItem(getStorageKey("gallerySets"));
+      localStorage.removeItem(getStorageKey(game, "gallerySets"));
     }
 
     if (state.gallerySortField) {
-      localStorage.setItem(getStorageKey("gallerySortField"), state.gallerySortField);
+      localStorage.setItem(getStorageKey(game, "gallerySortField"), state.gallerySortField);
     } else {
-      localStorage.removeItem(getStorageKey("gallerySortField"));
+      localStorage.removeItem(getStorageKey(game, "gallerySortField"));
     }
 
     if (state.gallerySortDirection) {
-      localStorage.setItem(getStorageKey("gallerySortDirection"), state.gallerySortDirection);
+      localStorage.setItem(getStorageKey(game, "gallerySortDirection"), state.gallerySortDirection);
     } else {
-      localStorage.removeItem(getStorageKey("gallerySortDirection"));
+      localStorage.removeItem(getStorageKey(game, "gallerySortDirection"));
     }
   } catch {
   }
@@ -201,8 +233,9 @@ interface UIStateProviderProps {
 }
 
 export function UIStateProvider({ children }: UIStateProviderProps) {
+  const game = useGameId();
   const [uiState, setUIState] = useState<UIState>(() =>
-    typeof window === "undefined" ? {} : loadPersistedUIState()
+    typeof window === "undefined" ? {} : loadPersistedUIState(game)
   );
   const latestUIStateRef = useRef(uiState);
   latestUIStateRef.current = uiState;
@@ -222,18 +255,18 @@ export function UIStateProvider({ children }: UIStateProviderProps) {
       }
       queueMicrotask(() => {
         setUIState((prev) => ({ ...prev, activeDeckId: nextActiveDeckId }));
-        if (serverActiveDeckId) localStorage.setItem(getStorageKey("activeDeckId"), serverActiveDeckId);
-        else localStorage.removeItem(getStorageKey("activeDeckId"));
+        if (serverActiveDeckId) localStorage.setItem(getStorageKey(game, "activeDeckId"), serverActiveDeckId);
+        else localStorage.removeItem(getStorageKey(game, "activeDeckId"));
       });
     }
-  }, [isHydrated, isAuthenticated, authLoading, serverActiveDeckId, uiState.activeDeckId]);
+  }, [isHydrated, isAuthenticated, authLoading, serverActiveDeckId, uiState.activeDeckId, game]);
 
   useEffect(() => {
     if (isHydrated && !isAuthenticated && !authLoading && uiState.activeDeckId) {
       setUIState((prev) => ({ ...prev, activeDeckId: undefined }));
-      localStorage.removeItem(getStorageKey("activeDeckId"));
+      localStorage.removeItem(getStorageKey(game, "activeDeckId"));
     }
-  }, [isHydrated, isAuthenticated, authLoading, uiState.activeDeckId]);
+  }, [isHydrated, isAuthenticated, authLoading, uiState.activeDeckId, game]);
 
   const cancelScheduledPersist = useCallback(() => {
     if (debounceRef.current !== null) {
@@ -253,8 +286,8 @@ export function UIStateProvider({ children }: UIStateProviderProps) {
 
   const flushPersistUIState = useCallback(() => {
     cancelScheduledPersist();
-    persistUIState(latestUIStateRef.current);
-  }, [cancelScheduledPersist]);
+    persistUIState(latestUIStateRef.current, game);
+  }, [cancelScheduledPersist, game]);
 
   useEffect(() => {
     if (!isHydrated) return;
@@ -263,7 +296,7 @@ export function UIStateProvider({ children }: UIStateProviderProps) {
       debounceRef.current = null;
       const run = () => {
         idleRef.current = null;
-        persistUIState(latestUIStateRef.current);
+        persistUIState(latestUIStateRef.current, game);
       };
       if (typeof requestIdleCallback !== "undefined") {
         idleRef.current = {
@@ -280,7 +313,7 @@ export function UIStateProvider({ children }: UIStateProviderProps) {
     return () => {
       cancelScheduledPersist();
     };
-  }, [isHydrated, uiState, cancelScheduledPersist]);
+  }, [isHydrated, uiState, cancelScheduledPersist, game]);
 
   useEffect(() => {
     if (!isHydrated) return;
@@ -306,9 +339,9 @@ export function UIStateProvider({ children }: UIStateProviderProps) {
     if (!isHydrated) return;
     return () => {
       cancelScheduledPersist();
-      persistUIState(latestUIStateRef.current);
+      persistUIState(latestUIStateRef.current, game);
     };
-  }, [isHydrated, cancelScheduledPersist]);
+  }, [isHydrated, cancelScheduledPersist, game]);
 
   const updateUIState = useCallback((updates: Partial<UIState>) => {
     setUIState((prev) => ({ ...prev, ...updates }));

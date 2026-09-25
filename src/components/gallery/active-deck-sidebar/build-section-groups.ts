@@ -1,4 +1,3 @@
-import { formatUniversusCardType } from "@/config/universus";
 import {
   CARD_TYPE_LABELS,
   CARD_TYPE_ORDER,
@@ -8,7 +7,8 @@ import type { SectionGroup } from "./types";
 
 export function buildSectionGroups(
   quantities: Record<string, number>,
-  cardMap: Map<string, CachedCard>
+  cardMap: Map<string, CachedCard>,
+  formatCardType: (type?: string) => string | undefined
 ): SectionGroup[] {
   const groups = new Map<string, Array<{ card: CachedCard; count: number }>>();
 
@@ -18,7 +18,7 @@ export function buildSectionGroups(
     const card = cardMap.get(cardId);
     if (!card) continue;
 
-    const normalizedType = formatUniversusCardType(card.type) ?? card.type ?? "Other";
+    const normalizedType = formatCardType(card.type) ?? card.type ?? "Other";
     const list = groups.get(normalizedType) ?? [];
     list.push({ card, count });
     groups.set(normalizedType, list);

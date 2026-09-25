@@ -2,7 +2,7 @@ import {
   ATTUNED_SYMBOL_MAP,
   SYMBOL_BASE_PATH,
   SYMBOL_MAP,
-} from "@/components/universus/symbol-icon/constants";
+} from "@/games/uvs/components/symbol-icon/constants";
 
 const REFERENCE_RESOURCE_SYMBOLS = [
   "air",

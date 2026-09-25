@@ -1,12 +1,13 @@
 "use client";
 
-import { CardDetailsDialog } from "@/components/universus/card-details/dialog";
 import { ActiveDeckCharacterPanelProvider, useActiveDeckCharacterPanelContext } from "./context";
 import { ActiveDeckCharacterPicker } from "./character-picker";
 import { ActiveDeckCharacterSummary } from "./summary";
 import { ActiveDeckCharacterSymbolSelector } from "./symbol-selector";
+import { useGameModule } from "@/games/game-context";
 
 function ActiveDeckCharacterPanelContent() {
+  const { CardDetailsDialog } = useGameModule().ui;
   const {
     characterDetailsOpen,
     setCharacterDetailsOpen,

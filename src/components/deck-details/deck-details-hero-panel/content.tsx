@@ -1,6 +1,5 @@
 "use client";
 
-import { CardDetailsDialog } from "@/components/universus/card-details/dialog";
 import { useDeckDetails } from "@/providers/DeckDetailsProvider";
 import { cn } from "@/lib/utils";
 import { DeckDetailsHeroPanelProvider, useDeckDetailsHeroPanelContext } from "./context";
@@ -8,6 +7,7 @@ import { DeckDetailsHeroCharacterImagePicker } from "./character-image-picker";
 import { DeckDetailsHeroReadyBadge } from "./ready-badge";
 import { DeckDetailsHeroStaticImage } from "./static-image";
 import { DeckDetailsHeroSymbolSelector } from "./symbol-selector";
+import { useGameModule } from "@/games/game-context";
 
 function DeckDetailsHeroPanelEmptyState({ compactMobile }: { compactMobile?: boolean }) {
   return (
@@ -21,6 +21,7 @@ function DeckDetailsHeroPanelEmptyState({ compactMobile }: { compactMobile?: boo
 }
 
 function DeckDetailsHeroPanelContent() {
+  const { CardDetailsDialog } = useGameModule().ui;
   const {
     characterDetailsOpen,
     setCharacterDetailsOpen,

@@ -1,10 +1,11 @@
 "use client";
 
 import { Hexagon, Layers } from "lucide-react";
-import { CardImageDisplay } from "@/components/universus/card-grid-item/image-display";
 import { useDeckDetailsHeroPanelContext } from "./context";
+import { useGameModule } from "@/games/game-context";
 
 export function DeckDetailsHeroStaticImage() {
+  const { CardImageDisplay } = useGameModule().ui;
   const { deck, imageCard, startingCharacter, handleImageClick } = useDeckDetailsHeroPanelContext();
   const displayImage = imageCard?.imageUrl || startingCharacter?.imageUrl;
 

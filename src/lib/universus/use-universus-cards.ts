@@ -25,6 +25,7 @@ import {
 } from "@shared/games/filters";
 import { UVS_FILTER_DEFINITION } from "@shared/games/uvs/filters";
 import { fetchStaticCatalog } from "./static-catalog";
+import { useGameId } from "@/games/game-context";
 import { cardMatchesRarityFilter } from "./rarity";
 
 export type { CachedCard } from "./card-store";
@@ -107,6 +108,7 @@ export function useUniversusCards(): UseUniversusCardsResult {
   const initialLoadDone = useRef(false);
   const dataEpochRef = useRef(0);
   const convex = useConvex();
+  const game = useGameId();
   const isHydrated = useIsClient();
   
   const serverVersionData = useQuery(api.cards.getCardDataVersion, {});
@@ -116,13 +118,13 @@ export function useUniversusCards(): UseUniversusCardsResult {
   const loadFromCache = useCallback(async (): Promise<{ hasCache: boolean; version: number | null }> => {
     try {
       const [cachedCards, metadata] = await Promise.all([
-        getCachedCards(),
-        getCacheMetadata(),
+        getCachedCards(game),
+        getCacheMetadata(game),
       ]);
 
       if (cachedCards.length > 0 && metadata) {
         if (metadata.schemaVersion !== CARD_CACHE_SCHEMA_VERSION) {
-          await clearCardCache();
+          await clearCardCache(game);
           return { hasCache: false, version: null };
         }
         let companions: CachedCard[] = [];
@@ -147,7 +149,7 @@ export function useUniversusCards(): UseUniversusCardsResult {
       console.error("Failed to load from cache:", err);
       return { hasCache: false, version: null };
     }
-  }, [convex]);
+  }, [convex, game]);
 
   const galleryTotalEstimate = serverVersionData?.cardCount ?? 0;
   const forceConvexCatalogSync =
@@ -243,8 +245,8 @@ export function useUniversusCards(): UseUniversusCardsResult {
         const now = Date.now();
         const merged = [...gallery, ...companions];
 
-        await setCachedCards(gallery);
-        await setCacheMetadata({
+        await setCachedCards(game, gallery);
+        await setCacheMetadata(game, {
           version,
           updatedAt: now,
           cardCount: gallery.length,
@@ -271,13 +273,13 @@ export function useUniversusCards(): UseUniversusCardsResult {
         syncInProgress.current = false;
       }
     },
-    []
+    [game]
   );
 
   const refreshCache = useCallback(async () => {
     if (serverVersion === null) return;
 
-    await clearCardCache();
+    await clearCardCache(game);
     setCachedVersion(null);
     setCards([]);
     setIndex(null);
@@ -288,7 +290,7 @@ export function useUniversusCards(): UseUniversusCardsResult {
 
     const { gallery, companions } = await fetchCatalog();
     await syncCatalog(gallery, companions, serverVersion);
-  }, [fetchCatalog, syncCatalog, serverVersion]);
+  }, [fetchCatalog, syncCatalog, serverVersion, game]);
 
   useEffect(() => {
     if (!isHydrated) return;

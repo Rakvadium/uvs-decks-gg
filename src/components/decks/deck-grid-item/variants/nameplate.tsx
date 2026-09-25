@@ -5,12 +5,11 @@ import Link from "next/link";
 import { BookOpen, Hexagon, Layers, User } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Kicker, SectionHeading } from "@/components/ui/typography-headings";
-import { getSymbolPath } from "@/components/universus/symbol-icon/utils";
-import { getSymbolColor } from "@/config/universus";
 import { cn } from "@/lib/utils";
 import { useDeckGridItemContext } from "../context";
 import { MAIN_DECK_TARGET } from "../hook";
 import { VisibilityGlyph } from "./shared";
+import { useGameModule } from "@/games/game-context";
 
 const SYMBOL_SIZE = 44;
 const SYMBOL_RING = 2;
@@ -33,6 +32,7 @@ function notchStyle(edge: "top" | "bottom") {
 }
 
 export function DeckNameplateItem() {
+  const { getSymbolPath, getSymbolColor } = useGameModule().ui;
   const {
     deck,
     displayImage,

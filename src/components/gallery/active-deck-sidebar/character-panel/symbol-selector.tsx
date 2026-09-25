@@ -1,9 +1,10 @@
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { SymbolBadge, SymbolIcon } from "@/components/universus/symbol-icon";
 import { cn } from "@/lib/utils";
 import { useActiveDeckCharacterPanelContext } from "./context";
+import { useGameModule } from "@/games/game-context";
 
 export function ActiveDeckCharacterSymbolSelector() {
+  const { SymbolBadge, SymbolIcon } = useGameModule().ui;
   const {
     characterSymbols,
     selectedSymbol,

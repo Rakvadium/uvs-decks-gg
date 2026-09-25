@@ -1,6 +1,6 @@
 "use client";
 
-import { CardDeckControls } from "@/components/universus/card-item/deck-controls";
+import { CardDeckControls } from "@/components/card/deck-controls";
 import { canAddCardToSection, useDeckEditor } from "@/lib/deck";
 import { useDeckDetailsOptional } from "@/providers/DeckDetailsProvider";
 import { useDeckCardsSectionContext } from "../../deck-details-cards-section-context";

@@ -53,7 +53,7 @@ Calm-family chromes resolve both to `none` (label spacing `0.01em`); expressive-
 
 ### Status colors
 
-`--success`, `--warning`, `--info` (+ `-foreground`) are defined once in `base.css` for light and dark and exposed as `bg-success`, `text-warning`, `border-info/40`, etc. Palettes may override them per `data-color-theme`. Use these instead of `green-*` / `amber-*` / `emerald-*` / `orange-*` for state. Domain colors (stat tint, symbol chips in `src/config/universus.ts`) are not status colors and keep their own maps.
+`--success`, `--warning`, `--info` (+ `-foreground`) are defined once in `base.css` for light and dark and exposed as `bg-success`, `text-warning`, `border-info/40`, etc. Palettes may override them per `data-color-theme`. Use these instead of `green-*` / `amber-*` / `emerald-*` / `orange-*` for state. Domain colors (stat tint, symbol chips in `src/games/uvs/config.ts`) are not status colors and keep their own maps.
 
 ### Floating chrome shadow
 

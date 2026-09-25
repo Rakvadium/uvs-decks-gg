@@ -33,7 +33,9 @@ export interface SlotRegistrationOptions {
 export const MIN_SIDEBAR_WIDTH = 320;
 export const MAX_SIDEBAR_WIDTH = 480;
 export const DEFAULT_SIDEBAR_WIDTH = 400;
-export const SIDEBAR_WIDTH_KEY = "uvs-decks-right-sidebar-width";
+/** Global preference (`tcgdecks:{key}`); `LEGACY_SIDEBAR_WIDTH_KEY` is migrated on first read. */
+export const SIDEBAR_WIDTH_KEY = "tcgdecks:right-sidebar-width";
+export const LEGACY_SIDEBAR_WIDTH_KEY = "uvs-decks-right-sidebar-width";
 
 export interface ShellSlotState {
   slots: Map<SlotArea, SlotRegistration[]>;

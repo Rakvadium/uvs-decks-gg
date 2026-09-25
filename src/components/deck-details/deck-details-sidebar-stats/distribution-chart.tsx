@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { useGameModule } from "@/games/game-context";
 import { type PieChartColorStrategy, resolvePieBucketColor } from "./constants";
 
 interface DistributionBucket {
@@ -19,6 +20,7 @@ export function PieDistributionChart({
   total,
   colorStrategy = "default",
 }: PieDistributionChartProps) {
+  const palette = useGameModule().ui.deckStats;
   const chartTotal = total > 0 ? total : buckets.reduce((sum, bucket) => sum + bucket.value, 0);
   const nonZeroBuckets = buckets.filter((bucket) => bucket.value > 0);
 
@@ -46,14 +48,14 @@ export function PieDistributionChart({
 
     const stops: string[] = [];
     for (const [index, bucket] of visibleBuckets.entries()) {
-      const color = resolvePieBucketColor(colorStrategy, bucket.label, index);
+      const color = resolvePieBucketColor(colorStrategy, bucket.label, index, palette);
       const start = edges[index]!;
       const end = edges[index + 1]!;
       stops.push(`${color} ${start.toFixed(4)}% ${end.toFixed(4)}%`);
     }
 
     return `conic-gradient(from 359.92deg, ${stops.join(", ")})`;
-  }, [chartTotal, visibleBuckets, colorStrategy]);
+  }, [chartTotal, visibleBuckets, colorStrategy, palette]);
 
   return (
     <div className="space-y-2 rounded-lg border border-border/50 bg-card/30 p-3">
@@ -78,7 +80,7 @@ export function PieDistributionChart({
           <div className="space-y-1.5">
             {visibleBuckets.map((bucket, index) => {
               const ratio = chartTotal > 0 ? (bucket.value / chartTotal) * 100 : 0;
-              const color = resolvePieBucketColor(colorStrategy, bucket.label, index);
+              const color = resolvePieBucketColor(colorStrategy, bucket.label, index, palette);
 
               return (
                 <div key={`${title}-${bucket.label}`} className="flex items-center justify-between gap-2 text-[10px]">

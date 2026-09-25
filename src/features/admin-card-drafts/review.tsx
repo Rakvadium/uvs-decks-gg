@@ -18,7 +18,7 @@ import {
   UNIVERSUS_CARD_TYPES,
   UNIVERSUS_FILTER_SYMBOLS,
   UNIVERSUS_ZONES,
-} from "@/config/universus";
+} from "@/games/uvs/config";
 import {
   AdminPageHeader,
   AdminSetSectionTabs,
@@ -50,7 +50,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { SymbolGrid } from "@/components/gallery/filter-dialog/symbols-picker-panel";
-import { parseZoneDisplay } from "@/components/universus/card-details/parsers";
+import { parseZoneDisplay } from "@/games/uvs/components/card-details/parsers";
 import { CheckCircle2, Circle, Loader2, MoreHorizontal, XCircle } from "lucide-react";
 import { toast } from "sonner";
 import { toastConvexError } from "@/lib/convex-error-toast";

@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Outfit } from "next/font/google";
 import { ConvexAuthNextjsServerProvider } from "@convex-dev/auth/nextjs/server";
+import { GameProvider } from "@/games/game-context";
+import { getRequestGame } from "@/lib/routing/request-game";
 import { Providers } from "./providers";
 import "./globals.css";
 
@@ -30,11 +32,12 @@ export const metadata: Metadata = {
     "Build UniVersus decks, browse the card gallery, and explore community tier lists on UVSDECKS.GG.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const { game, hostKind } = await getRequestGame();
   return (
     <ConvexAuthNextjsServerProvider>
     <html
@@ -45,7 +48,9 @@ export default function RootLayout({
       className={outfit.variable}
     >
       <body className={`${outfit.className} subpixel-antialiased`}>
-        <Providers>{children}</Providers>
+        <GameProvider game={game} hostKind={hostKind}>
+          <Providers>{children}</Providers>
+        </GameProvider>
       </body>
     </html>
     </ConvexAuthNextjsServerProvider>

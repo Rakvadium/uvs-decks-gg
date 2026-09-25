@@ -9,7 +9,6 @@ import type { CachedCard } from "@/lib/universus/card-store";
 import { canAddCardToSection, useDeckEditor } from "@/lib/deck";
 import { useCardIdMap } from "@/hooks/useCardIdMap";
 import { useGameModule } from "@/games/game-context";
-import { formatUniversusCardType } from "@/config/universus";
 import { TCG_DND_ACCEPTS_CARD_ONLY, useTcgDroppable } from "@/lib/dnd";
 import {
   LIST_SORT_SELECT_OPTIONS,
@@ -30,7 +29,9 @@ export function useDeckCardsSectionModel() {
   const { cards: allCards } = useCardData();
   const { addCard } = useDeckEditor();
   const { deck, activeSection, isOwner, setActiveSection } = useDeckDetails();
-  const gameDeck = useGameModule().deck;
+  const gameModule = useGameModule();
+  const gameDeck = gameModule.deck;
+  const { formatCardType } = gameModule.ui;
 
   const [manualViewMode, setManualViewMode] = useState<DeckViewMode | null>(null);
   const [listSortKey, setListSortKey] = useState<DeckListSortKey>("difficulty");
@@ -104,7 +105,7 @@ export function useDeckCardsSectionModel() {
   const groupedCards = useMemo(() => {
     const groups = new Map<string, CachedCard[]>();
     for (const card of sortedCards) {
-      const normalizedType = formatUniversusCardType(card.type) ?? card.type ?? "Other";
+      const normalizedType = formatCardType(card.type) ?? card.type ?? "Other";
       const list = groups.get(normalizedType) ?? [];
       list.push(card);
       groups.set(normalizedType, list);
@@ -125,7 +126,7 @@ export function useDeckCardsSectionModel() {
         label: gameDeck.cardTypeLabels[type] ?? type,
         cards: groups.get(type) ?? [],
       }));
-  }, [sortedCards, gameDeck]);
+  }, [sortedCards, gameDeck, formatCardType]);
 
   const listGroups = useMemo(() => {
     const groupMap = new Map<string, DeckListEntry[]>();
@@ -134,7 +135,7 @@ export function useDeckCardsSectionModel() {
     }
 
     for (const card of visibleCards) {
-      const normalizedType = formatUniversusCardType(card.type) ?? card.type ?? "Other";
+      const normalizedType = formatCardType(card.type) ?? card.type ?? "Other";
       const typeKey = groupMap.has(normalizedType) ? normalizedType : "Other";
       const quantity = currentQuantities[card._id.toString()] ?? 0;
       const backCard = card.backCardId ? cardIdMap.get(card.backCardId) : undefined;
@@ -161,7 +162,7 @@ export function useDeckCardsSectionModel() {
       left: buildGroups("left"),
       right: buildGroups("right"),
     };
-  }, [visibleCards, currentQuantities, cardIdMap, listSortKey, listSortDirection]);
+  }, [visibleCards, currentQuantities, cardIdMap, listSortKey, listSortDirection, formatCardType]);
 
   const handleDropToActiveSection = useCallback(
     (item: { card: CachedCard }) => {

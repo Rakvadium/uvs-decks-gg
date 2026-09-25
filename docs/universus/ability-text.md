@@ -24,7 +24,7 @@ Examples:
 - `Enhance {commit}: This attack gets +2 damage.`
 - `Response [Once per turn]: After you mill 1 or more Psycho cards, add 1 of them to your hand.`
 
-Keywords with ratings (`Powerful 2`, `EX 2`, `Stun 2`) belong in `keywords`, not as extra `text` abilities. The details panel already shows those keywords with hover reminder copy from [`src/config/universus.ts`](../../src/config/universus.ts).
+Keywords with ratings (`Powerful 2`, `EX 2`, `Stun 2`) belong in `keywords`, not as extra `text` abilities. The details panel already shows those keywords with hover reminder copy from [`src/games/uvs/config.ts`](../../src/games/uvs/config.ts).
 
 ## Reminder text is not an ability
 
@@ -59,7 +59,7 @@ Same pattern for `Drive`, `Flip`, `Sacrifice`, and `Enhance: [Once per turn]: â€
 | `convex/cardOcr.ts` GPT prompt | Instructs Vision Autofill not to transcribe reminder boxes or double-colon timings |
 | `normalizeAbilityText` | Strips reminders, collapses extra colons, used on OCR coerce, plain-text parse, import, upsert, and display |
 | `convex/lib/cardCreate.ts` / `convex/admin.ts` | Normalizes `text` on import and `/admin/upsert-cards-batch` so search fields match |
-| `src/components/universus/card-details/ability-text.tsx` | Display safety net for catalog rows that were stored before the normalizer |
+| `src/games/uvs/components/card-details/ability-text.tsx` | Display safety net for catalog rows that were stored before the normalizer |
 
 After changing stored `text` in bulk, upsert the cards and publish a catalog release so search and the details JSON match the readout.
 

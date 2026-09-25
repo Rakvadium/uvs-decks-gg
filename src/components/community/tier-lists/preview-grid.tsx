@@ -1,6 +1,6 @@
 import type { CachedCard } from "@/lib/universus/card-store";
-import { CardImageDisplay } from "@/components/universus/card-grid-item/image-display";
 import { cn } from "@/lib/utils";
+import { useGameModule } from "@/games/game-context";
 
 interface TierListPreviewGridProps {
   cards: CachedCard[];
@@ -13,6 +13,7 @@ export function TierListPreviewGrid({
   className,
   emptyLabel = "Slot",
 }: TierListPreviewGridProps) {
+  const { CardImageDisplay } = useGameModule().ui;
   return (
     <div className={cn("grid grid-cols-4 gap-2", className)}>
       {cards.length > 0

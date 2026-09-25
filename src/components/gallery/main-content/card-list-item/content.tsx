@@ -1,15 +1,16 @@
 "use client";
 
-import { CardDetailsDialog } from "@/components/universus/card-details/dialog";
-import { useCardNavigation } from "@/components/universus/card-details/navigation-context";
+import { useCardNavigation } from "@/components/card/navigation-context";
 import { cn } from "@/lib/utils";
 import { CardDeckControlsCompact } from "../card-deck-controls";
 import { CardListItemProvider, useCardListItemContext } from "./context";
 import { CardListItemDetails } from "./details";
 import { CardListItemThumbnail } from "./thumbnail";
 import type { CardListItemProps } from "./types";
+import { useGameModule } from "@/games/game-context";
 
 function CardListItemContent({ embedDetailsDialog }: { embedDetailsDialog: boolean }) {
+  const { CardDetailsDialog } = useGameModule().ui;
   const {
     backCard,
     card,

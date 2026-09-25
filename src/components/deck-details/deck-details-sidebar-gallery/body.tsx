@@ -1,9 +1,10 @@
 import { Button } from "@/components/ui/button";
-import { CardGridItem } from "@/components/universus/card-grid-item";
 import { SidebarGalleryListItem } from "../deck-details-card-items";
 import { useAvailableGallerySidebarContext } from "./context";
+import { useGameModule } from "@/games/game-context";
 
 export function DeckDetailsGallerySidebarBody() {
+  const { CardGridItem } = useGameModule().ui;
   const {
     cardIdMap,
     hasMore,

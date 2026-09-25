@@ -1,5 +1,5 @@
 import { converter } from "culori";
-import { SYMBOL_BASE_PATH, SYMBOL_MAP } from "@/components/universus/symbol-icon/constants";
+import { SYMBOL_BASE_PATH, SYMBOL_MAP } from "@/games/uvs/components/symbol-icon/constants";
 import {
   matchResourceSymbols,
   RESOURCE_SYMBOL_NAMES,

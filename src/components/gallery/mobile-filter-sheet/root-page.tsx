@@ -6,7 +6,6 @@ import { countActiveStatPageFilters } from "@shared/games/filters";
 import { Label } from "@/components/ui/label";
 import { SegmentedControl } from "@/components/ui/segmented-control";
 import { Switch } from "@/components/ui/switch";
-import { getSymbolPath } from "@/components/universus/symbol-icon/utils";
 import { rarityFilterSelected, toggleCanonicalRarityFilter } from "@/lib/universus/rarity";
 import { useGameModule } from "@/games/game-context";
 import { cn } from "@/lib/utils";
@@ -244,6 +243,7 @@ function SymbolTile({
   onClick: () => void;
   size?: "sm" | "md" | "lg";
 }) {
+  const { getSymbolPath } = useGameModule().ui;
   const path = getSymbolPath(symbol);
   const label = symbol.startsWith("attuned:") ? symbol.slice("attuned:".length) : symbol;
   const px = size === "sm" ? 32 : size === "md" ? 40 : 44;

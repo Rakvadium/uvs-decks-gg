@@ -3,8 +3,6 @@
 import Image from "next/image";
 import { FilterX, X } from "lucide-react";
 import { useGalleryFilterDialogContext } from "@/components/gallery/filter-dialog/context";
-import { getSymbolPath } from "@/components/universus/symbol-icon/utils";
-import { getCardTypeChipColor, getKeywordTimingColor } from "@/config/universus";
 import { floatingIslandRingClassName } from "@/components/shell/floating-island";
 import { cn } from "@/lib/utils";
 import type { GalleryMobileFilterPage } from "@/components/gallery/mobile-filter-sheet/context";
@@ -14,6 +12,7 @@ import {
   useActiveFilterTokens,
   type ActiveFilterToken,
 } from "./use-active-filter-tokens";
+import { useGameModule } from "@/games/game-context";
 
 const TOKEN_PAGE: Record<string, GalleryMobileFilterPage> = {
   format: "format",
@@ -78,6 +77,7 @@ function TokenSymbolIcons({
   excludesInfinity: boolean;
   maxVisible?: number;
 }) {
+  const { getSymbolPath } = useGameModule().ui;
   const shown = symbols.slice(0, maxVisible);
   const rest = symbols.length - shown.length;
 
@@ -123,6 +123,7 @@ function TokenSymbolIcons({
 }
 
 function TokenContent({ token }: { token: ActiveFilterToken }) {
+  const { getCardTypeColor, getKeywordColor } = useGameModule().ui;
   const { filters } = useGalleryFilterDialogContext();
 
   if (!token.active) {
@@ -134,11 +135,11 @@ function TokenContent({ token }: { token: ActiveFilterToken }) {
   }
 
   if (token.id === "type") {
-    return <TokenColorChips values={filters.type ?? []} getColor={getCardTypeChipColor} />;
+    return <TokenColorChips values={filters.type ?? []} getColor={getCardTypeColor} />;
   }
 
   if (token.id === "keywords") {
-    return <TokenColorChips values={filters.keywords ?? []} getColor={getKeywordTimingColor} />;
+    return <TokenColorChips values={filters.keywords ?? []} getColor={getKeywordColor} />;
   }
 
   if (token.id === "symbols") {

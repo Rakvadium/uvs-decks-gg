@@ -129,7 +129,7 @@ bunx tsc --noEmit
 - `src/components/shell/shell-slot-provider/`
 - `src/components/deck-details/deck-details-cards-content/`
 - `src/components/gallery/decks-sidebar/deck-sidebar-item/`
-- `src/components/universus/symbol-icon/`
+- `src/games/uvs/components/symbol-icon/`
 - `src/components/decks/decks-view/content-states/`
 
 ## Anti-Patterns to Avoid

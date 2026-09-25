@@ -1,1 +1,1 @@
-export * from "./universus";
+export * from "@/games/uvs/config";

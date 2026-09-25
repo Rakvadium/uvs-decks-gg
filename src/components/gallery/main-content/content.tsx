@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import { CardDetailsDialog } from "@/components/universus/card-details/dialog";
 import type { CachedCard } from "@/lib/universus/card-store";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { useGalleryFilters } from "@/providers/GalleryFiltersProvider";
@@ -14,8 +13,10 @@ import { GalleryInitializationState } from "./initial-loading-state";
 import { GalleryListView } from "./list-view";
 import { GalleryMainScrollRootProvider, useGalleryMainScrollSetRef } from "./gallery-main-scroll-root";
 import { LoadingProgress } from "./loading-progress";
+import { useGameModule } from "@/games/game-context";
 
 function GalleryMainContentBody() {
+  const { CardDetailsDialog } = useGameModule().ui;
   const { state, meta } = useGalleryFilters();
   const { getBackCard } = useGalleryCardMap();
   const [detailsCard, setDetailsCard] = useState<CachedCard | null>(null);

@@ -1,0 +1,254 @@
+"use client";
+
+import { lazy, Suspense, useCallback, useEffect, useState } from "react";
+import { createPortal } from "react-dom";
+import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { useQuery } from "convex/react";
+import type { CachedCard } from "@/lib/universus/card-store";
+import { api } from "../../../../../convex/_generated/api";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
+
+const CardDetailsV2 = lazy(() =>
+  import("./variants/v2").then((module) => ({ default: module.CardDetailsV2 }))
+);
+
+function CardDetailsPanelFallback() {
+  return (
+    <div className="flex min-h-[min(400px,60vh)] w-full items-center justify-center p-8">
+      <div
+        className="h-9 w-9 animate-spin rounded-full border-2 border-primary border-t-transparent"
+        aria-hidden
+      />
+    </div>
+  );
+}
+
+interface CardDetailsDialogProps {
+  card: CachedCard | null;
+  backCard?: CachedCard | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  cards?: CachedCard[];
+  getBackCard?: (card: CachedCard) => CachedCard | null | undefined;
+}
+
+export function CardDetailsDialog({
+  card,
+  backCard,
+  open,
+  onOpenChange,
+  cards,
+  getBackCard,
+}: CardDetailsDialogProps) {
+  const [isFlipped, setIsFlipped] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(-1);
+  const [printingSelection, setPrintingSelection] = useState<CachedCard | null>(null);
+  const [adminCardPatches, setAdminCardPatches] = useState<Record<string, CachedCard>>({});
+
+  useEffect(() => {
+    if (!open) {
+      setAdminCardPatches({});
+      setPrintingSelection(null);
+    }
+  }, [open]);
+  useEffect(() => {
+    setPrintingSelection(null);
+  }, [currentIndex, card?._id]);
+  useEffect(() => {
+    if (!open || !card || !cards?.length) {
+      setCurrentIndex(-1);
+      return;
+    }
+    const idx = cards.findIndex((c) => c._id === card._id);
+    setCurrentIndex(idx);
+  }, [open, card, cards]);
+
+  useEffect(() => {
+    setIsFlipped(false);
+  }, [currentIndex, printingSelection?._id]);
+
+  const galleryRowCard = cards && currentIndex >= 0 ? cards[currentIndex] : card;
+  const baseCurrentCard = printingSelection ?? galleryRowCard;
+  const canGoPrev = Boolean(cards && currentIndex > 0);
+  const canGoNext = Boolean(cards && currentIndex >= 0 && currentIndex < cards.length - 1);
+  const hasNavigation = Boolean(cards && cards.length > 1 && currentIndex >= 0);
+
+  const goToPrev = useCallback(() => {
+    if (!canGoPrev) return;
+    setCurrentIndex((i) => i - 1);
+  }, [canGoPrev]);
+
+  const goToNext = useCallback(() => {
+    if (!canGoNext) return;
+    setCurrentIndex((i) => i + 1);
+  }, [canGoNext]);
+
+  useEffect(() => {
+    if (!open || !hasNavigation) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        goToPrev();
+      } else if (e.key === "ArrowRight") {
+        e.preventDefault();
+        goToNext();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [open, hasNavigation, goToPrev, goToNext]);
+
+  const printingBackId = printingSelection?.backCardId;
+  const convexBackCard = useQuery(
+    api.cards.getById,
+    open && printingBackId ? { cardId: printingBackId } : "skip"
+  );
+
+  if (!baseCurrentCard) return null;
+
+  const currentCard = adminCardPatches[baseCurrentCard._id] ?? baseCurrentCard;
+  const galleryBack =
+    cards && currentIndex >= 0 && getBackCard
+      ? getBackCard(cards[currentIndex]) ?? undefined
+      : backCard;
+  const baseBackCard = printingSelection
+    ? printingSelection.backCardId
+      ? convexBackCard === null || convexBackCard === undefined
+        ? undefined
+        : convexBackCard
+      : undefined
+    : galleryBack;
+  const currentBackCard = baseBackCard
+    ? (adminCardPatches[baseBackCard._id] ?? baseBackCard)
+    : undefined;
+
+  const displayCard = isFlipped && currentBackCard ? currentBackCard : currentCard;
+  const navigationButtonClassName = (enabled: boolean) =>
+    cn(
+      "flex h-10 w-10 items-center justify-center rounded-full border transition-colors",
+      enabled
+        ? "bg-card/95 text-primary shadow-[var(--chrome-dialog-nav-shadow-enabled)] border-[var(--chrome-dialog-nav-border-enabled)] hover:bg-primary/20 hover:border-primary/50"
+        : "bg-card/50 text-muted-foreground/30 border-border/30 cursor-not-allowed"
+    );
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent
+        size="lg"
+        presentation="plain"
+        showCloseButton={false}
+        className="max-h-[90vh] overflow-hidden p-0 md:pb-0 md:w-[65vw] md:min-w-[65vw] md:max-w-[65vw] lg:w-[min(78vw,1180px)] lg:min-w-[min(78vw,1180px)] lg:max-w-[min(78vw,1180px)] xl:w-[min(82vw,1280px)] xl:min-w-[min(82vw,1280px)] xl:max-w-[min(82vw,1280px)]"
+        onPointerDownOutside={(e) => {
+          const target = e.target as HTMLElement;
+          if (target.closest("[data-card-dialog-nav]")) {
+            e.preventDefault();
+          }
+        }}
+      >
+        <DialogTitle className="sr-only">{displayCard.name} - Card Details</DialogTitle>
+
+        {open ? (
+          <Suspense fallback={<CardDetailsPanelFallback />}>
+            <CardDetailsV2
+              card={currentCard}
+              displayCard={displayCard}
+              backCard={currentBackCard ?? null}
+              hasBack={Boolean(currentBackCard)}
+              isFlipped={isFlipped}
+              onToggleFlip={() => setIsFlipped((v) => !v)}
+              mobileNavigationPrevious={
+                hasNavigation ? (
+                  <button
+                    type="button"
+                    onClick={goToPrev}
+                    disabled={!canGoPrev}
+                    className={navigationButtonClassName(Boolean(canGoPrev))}
+                    aria-label="Previous card"
+                  >
+                    <ChevronLeft className="h-5 w-5" />
+                  </button>
+                ) : null
+              }
+              mobileNavigationNext={
+                hasNavigation ? (
+                  <button
+                    type="button"
+                    onClick={goToNext}
+                    disabled={!canGoNext}
+                    className={navigationButtonClassName(Boolean(canGoNext))}
+                    aria-label="Next card"
+                  >
+                    <ChevronRight className="h-5 w-5" />
+                  </button>
+                ) : null
+              }
+              onAdminCardSaved={(saved) =>
+                setAdminCardPatches((prev) => ({ ...prev, [saved._id]: saved }))
+              }
+              onSelectPrinting={(c) => setPrintingSelection(c)}
+              onVariantCreated={(c) => setPrintingSelection(c)}
+            />
+          </Suspense>
+        ) : null}
+      </DialogContent>
+
+      {open && typeof document !== "undefined" &&
+        createPortal(
+          <DialogClose
+            data-card-dialog-nav
+            className={cn(
+              "pointer-events-auto fixed z-[60] md:hidden",
+              "top-[max(0.75rem,env(safe-area-inset-top))] right-3",
+              navigationButtonClassName(true)
+            )}
+            aria-label="Close"
+          >
+            <X className="h-5 w-5" />
+          </DialogClose>,
+          document.body
+        )}
+
+      {hasNavigation && open && typeof document !== "undefined" &&
+        createPortal(
+          <div
+            data-card-dialog-nav
+            className="pointer-events-none fixed inset-0 z-[60] hidden items-center justify-between px-4 md:flex md:px-8"
+          >
+            <button
+              type="button"
+              onClick={goToPrev}
+              disabled={!canGoPrev}
+              className={cn(
+                "pointer-events-auto z-[60] md:h-12 md:w-12",
+                navigationButtonClassName(Boolean(canGoPrev))
+              )}
+              aria-label="Previous card"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+            <button
+              type="button"
+              onClick={goToNext}
+              disabled={!canGoNext}
+              className={cn(
+                "pointer-events-auto z-[60] md:h-12 md:w-12",
+                navigationButtonClassName(Boolean(canGoNext))
+              )}
+              aria-label="Next card"
+            >
+              <ChevronRight className="h-5 w-5" />
+            </button>
+          </div>,
+          document.body
+        )}
+    </Dialog>
+  );
+}

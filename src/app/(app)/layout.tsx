@@ -39,6 +39,7 @@ import Link from "next/link";
 import { TcgDndProvider } from "@/lib/dnd";
 import { SiloedDeckProvider } from "@/lib/deck";
 import { cn } from "@/lib/utils";
+import { globalStorageKey, readStorageWithLegacy } from "@/lib/storage-keys";
 import { GalleryFiltersProvider } from "@/providers/GalleryFiltersProvider";
 import { DecksProvider } from "@/providers/DecksProvider";
 import { CommunityTierListsPageProvider } from "@/components/community/tier-lists/page-view/context";
@@ -57,7 +58,8 @@ function loadRightSidebarShell() {
 
 const RightSidebar = dynamic(() => loadRightSidebarShell(), { ssr: false });
 
-const LEFT_SIDEBAR_KEY = "uvs-decks-left-sidebar-collapsed";
+const LEFT_SIDEBAR_KEY = globalStorageKey("left-sidebar-collapsed");
+const LEGACY_LEFT_SIDEBAR_KEY = "uvs-decks-left-sidebar-collapsed";
 
 const SHOW_DESKTOP_RIGHT_SIDEBAR = true;
 const SHOW_DESKTOP_LEFT_SIDEBAR = true;
@@ -289,7 +291,7 @@ function ShellLayoutInner({ children }: { children: ReactNode }) {
   const isMobile = useIsMobile();
   const [leftSidebarCollapsed, setLeftSidebarCollapsed] = useState(() => {
     if (typeof window === "undefined") return false;
-    const stored = window.localStorage.getItem(LEFT_SIDEBAR_KEY);
+    const stored = readStorageWithLegacy(LEFT_SIDEBAR_KEY, LEGACY_LEFT_SIDEBAR_KEY);
     return stored === "true";
   });
   const shellSlots = useShellSlotSlots();

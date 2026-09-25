@@ -1,4 +1,6 @@
 import type { Doc } from "../../../convex/_generated/dataModel";
+import type { GameId } from "@shared/games/types";
+import { catalogDbName, deleteLegacyDatabaseOnce } from "@/lib/storage-keys";
 import { dedupeRarityOptions } from "./rarity";
 
 export type CachedCard = Doc<"cards">;
@@ -62,27 +64,31 @@ export interface CardCacheMetadata {
   schemaVersion?: number;
 }
 
-const DB_NAME = "universus-cards";
+const LEGACY_DB_NAME = "universus-cards";
 const STORE_NAME = "cards";
 const METADATA_KEY = "cache-metadata";
 const CARDS_KEY = "cards-data";
 
-let cardStorePromise: Promise<ReturnType<typeof import("idb-keyval").createStore>> | null = null;
+const cardStorePromises = new Map<GameId, Promise<ReturnType<typeof import("idb-keyval").createStore>>>();
 
-async function getCardStore() {
+async function getCardStore(game: GameId) {
   if (typeof window === "undefined") return null;
   
-  if (!cardStorePromise) {
-    cardStorePromise = import("idb-keyval").then(({ createStore }) => {
-      return createStore(DB_NAME, STORE_NAME);
+  let storePromise = cardStorePromises.get(game);
+  if (!storePromise) {
+    // Pre multi-game DB; the catalog re-downloads into the per-game DB instead.
+    deleteLegacyDatabaseOnce(LEGACY_DB_NAME);
+    storePromise = import("idb-keyval").then(({ createStore }) => {
+      return createStore(catalogDbName(game, "cards"), STORE_NAME);
     });
+    cardStorePromises.set(game, storePromise);
   }
-  
-  return cardStorePromise;
+
+  return storePromise;
 }
 
-export async function getCacheMetadata(): Promise<CardCacheMetadata | null> {
-  const store = await getCardStore();
+export async function getCacheMetadata(game: GameId): Promise<CardCacheMetadata | null> {
+  const store = await getCardStore(game);
   if (!store) return null;
   
   try {
@@ -94,8 +100,8 @@ export async function getCacheMetadata(): Promise<CardCacheMetadata | null> {
   }
 }
 
-export async function setCacheMetadata(metadata: CardCacheMetadata): Promise<void> {
-  const store = await getCardStore();
+export async function setCacheMetadata(game: GameId, metadata: CardCacheMetadata): Promise<void> {
+  const store = await getCardStore(game);
   if (!store) return;
   
   try {
@@ -106,8 +112,8 @@ export async function setCacheMetadata(metadata: CardCacheMetadata): Promise<voi
   }
 }
 
-export async function getCachedCards(): Promise<CachedCard[]> {
-  const store = await getCardStore();
+export async function getCachedCards(game: GameId): Promise<CachedCard[]> {
+  const store = await getCardStore(game);
   if (!store) return [];
   
   try {
@@ -119,8 +125,8 @@ export async function getCachedCards(): Promise<CachedCard[]> {
   }
 }
 
-export async function setCachedCards(cards: CachedCard[]): Promise<void> {
-  const store = await getCardStore();
+export async function setCachedCards(game: GameId, cards: CachedCard[]): Promise<void> {
+  const store = await getCardStore(game);
   if (!store) return;
   
   try {
@@ -131,13 +137,13 @@ export async function setCachedCards(cards: CachedCard[]): Promise<void> {
   }
 }
 
-export async function appendCachedCards(newCards: CachedCard[]): Promise<CachedCard[]> {
-  const store = await getCardStore();
+export async function appendCachedCards(game: GameId, newCards: CachedCard[]): Promise<CachedCard[]> {
+  const store = await getCardStore(game);
   if (!store) return newCards;
   
   try {
     const { set } = await import("idb-keyval");
-    const existingCards = await getCachedCards();
+    const existingCards = await getCachedCards(game);
     const existingIds = new Set(existingCards.map(c => c._id));
     const uniqueNewCards = newCards.filter(c => !existingIds.has(c._id));
     const allCards = [...existingCards, ...uniqueNewCards];
@@ -149,8 +155,8 @@ export async function appendCachedCards(newCards: CachedCard[]): Promise<CachedC
   }
 }
 
-export async function clearCardCache(): Promise<void> {
-  const store = await getCardStore();
+export async function clearCardCache(game: GameId): Promise<void> {
+  const store = await getCardStore(game);
   if (!store) return;
   
   try {
@@ -162,21 +168,21 @@ export async function clearCardCache(): Promise<void> {
   }
 }
 
-export async function isCacheValid(serverVersion: number | null): Promise<boolean> {
+export async function isCacheValid(game: GameId, serverVersion: number | null): Promise<boolean> {
   if (serverVersion === null) return false;
-  const metadata = await getCacheMetadata();
+  const metadata = await getCacheMetadata(game);
   if (!metadata) return false;
   return metadata.version === serverVersion;
 }
 
-export async function getCacheStats(): Promise<{
+export async function getCacheStats(game: GameId): Promise<{
   hasCache: boolean;
   version: number | null;
   cardCount: number;
   lastSyncAt: number | null;
 }> {
-  const metadata = await getCacheMetadata();
-  const cards = await getCachedCards();
+  const metadata = await getCacheMetadata(game);
+  const cards = await getCachedCards(game);
   
   return {
     hasCache: metadata !== null && cards.length > 0,

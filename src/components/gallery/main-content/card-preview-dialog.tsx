@@ -7,13 +7,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { SectionHeading } from "@/components/ui/typography-headings";
-import { CardNavigationProvider } from "@/components/universus/card-details/navigation-context";
-import { CardGridItem } from "@/components/universus/card-grid-item";
-import { CardDetailsDialog } from "@/components/universus/card-details/dialog";
-import { CARD_GLOW_REST } from "@/components/universus/card-item/glow";
+import { CardNavigationProvider } from "@/components/card/navigation-context";
+import { CARD_GLOW_REST } from "@/components/card/glow";
 import { useCardData } from "@/lib/universus/card-data-provider";
 import type { CachedCard } from "@/lib/universus/card-store";
 import { cn } from "@/lib/utils";
+import { useGameModule } from "@/games/game-context";
 
 interface CardPreviewSectionProps {
   title: string;
@@ -87,6 +86,7 @@ function HeroCardMockup() {
 
 
 function StackedCardMockup({ card }: { card: CachedCard }) {
+  const { CardDetailsDialog } = useGameModule().ui;
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const quantity = 4;
   const stackOffset = 2;
@@ -167,6 +167,7 @@ interface CardPreviewDialogProps {
 }
 
 export function CardPreviewDialog({ open, onOpenChange }: CardPreviewDialogProps) {
+  const { CardGridItem } = useGameModule().ui;
   const { cards } = useCardData();
 
   const demoCards = useMemo(() => {

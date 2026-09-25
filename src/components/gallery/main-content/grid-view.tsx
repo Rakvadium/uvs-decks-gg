@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useRef } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { CardGridItem } from "@/components/universus/card-grid-item";
-import { galleryCardImageSizes } from "@/components/universus/card-grid-item/image-sizes";
-import { CardNavigationProvider } from "@/components/universus/card-details/navigation-context";
+import { galleryCardImageSizes } from "@/components/card/image-sizes";
+import { CardNavigationProvider } from "@/components/card/navigation-context";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import type { CachedCard } from "@/lib/universus/card-store";
 import { useGalleryCardMap } from "./card-map-context";
@@ -15,6 +14,7 @@ import {
   useScrollMargin,
 } from "./gallery-virtualizer";
 import { NoCardsFound } from "./no-cards-found";
+import { useGameModule } from "@/games/game-context";
 
 interface GalleryGridViewProps {
   cards: CachedCard[];
@@ -23,6 +23,7 @@ interface GalleryGridViewProps {
 }
 
 export function GalleryGridView({ cards, cardsPerRow, onOpenCardDetails }: GalleryGridViewProps) {
+  const { CardGridItem } = useGameModule().ui;
   const isMobile = useIsMobile();
   const scrollElement = useGalleryMainScrollElement();
   const listRef = useRef<HTMLDivElement>(null);

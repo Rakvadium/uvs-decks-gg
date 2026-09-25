@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { formatUniversusCardType } from "@/config/universus";
+import { useGameModule } from "@/games/game-context";
 import { useCardIdMap } from "@/hooks/useCardIdMap";
 import { useCardData } from "@/lib/universus/card-data-provider";
 import type { CachedCard } from "@/lib/universus/card-store";
@@ -51,6 +51,7 @@ function buildZoneDistribution(
 
 export function useStatsSidebarModel() {
   const context = useDeckDetailsOptional();
+  const { formatCardType } = useGameModule().ui;
   const { cards } = useCardData();
   const deck = context?.deck ?? null;
   const cardMap = useCardIdMap(cards);
@@ -62,8 +63,8 @@ export function useStatsSidebarModel() {
 
   const attackEntries = useMemo(
     () =>
-      mainEntries.filter((entry) => formatUniversusCardType(entry.card.type) === "Attack"),
-    [mainEntries]
+      mainEntries.filter((entry) => formatCardType(entry.card.type) === "Attack"),
+    [mainEntries, formatCardType]
   );
 
   const mainTotal = useMemo(
@@ -80,12 +81,12 @@ export function useStatsSidebarModel() {
     const record: Record<string, number> = {};
 
     for (const entry of mainEntries) {
-      const type = formatUniversusCardType(entry.card.type) ?? entry.card.type ?? "Other";
+      const type = formatCardType(entry.card.type) ?? entry.card.type ?? "Other";
       record[type] = (record[type] ?? 0) + entry.quantity;
     }
 
     return toSortedBuckets(record);
-  }, [mainEntries]);
+  }, [mainEntries, formatCardType]);
 
   const difficultyDistribution = useMemo(
     () => buildNumericDistribution(mainEntries, (card) => card.difficulty),

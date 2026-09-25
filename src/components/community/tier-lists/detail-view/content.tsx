@@ -2,7 +2,7 @@
 
 import { FloatingPageLayout } from "@/components/shell/floating-page-bar";
 import { useRegisterSlot } from "@/components/shell/shell-slot-provider";
-import { CardNavigationProvider } from "@/components/universus/card-details/navigation-context";
+import { CardNavigationProvider } from "@/components/card/navigation-context";
 import { cn } from "@/lib/utils";
 import { CommunityTierListDetailBoard } from "./board";
 import { useCommunityTierListDetailContext } from "./context";

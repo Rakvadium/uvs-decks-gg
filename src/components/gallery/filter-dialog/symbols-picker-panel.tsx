@@ -4,8 +4,8 @@ import Image from "next/image";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator"
-import { getSymbolPath } from "@/components/universus/symbol-icon/utils";
 import { cn } from "@/lib/utils";
+import { useGameModule } from "@/games/game-context";
 
 function SymbolButton({
   symbol,
@@ -18,6 +18,7 @@ function SymbolButton({
   shape: "circle" | "square";
   onClick: () => void;
 }) {
+  const { getSymbolPath } = useGameModule().ui;
   const path = getSymbolPath(symbol);
 
   return (

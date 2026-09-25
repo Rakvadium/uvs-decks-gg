@@ -1,3 +1,2 @@
-export const CARD_GLOW_REST = "var(--chrome-card-image-glow-rest)";
-
-export const CARD_GLOW_HOVER = "var(--chrome-card-image-glow-hover)";
+// Compatibility wrapper: implementation moved to src/components/card/glow.ts.
+export * from "@/components/card/glow";

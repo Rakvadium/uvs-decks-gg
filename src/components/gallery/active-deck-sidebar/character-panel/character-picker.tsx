@@ -1,11 +1,12 @@
 import Image from "next/image";
 import { Hexagon, Layers, UserRoundPen } from "lucide-react";
-import { DeckCharacterPickerDialog } from "@/components/deck/shared";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { useActiveDeckCharacterPanelContext } from "./context";
+import { useGameModule } from "@/games/game-context";
 
 export function ActiveDeckCharacterPicker() {
+  const { SetupCardPickerDialog } = useGameModule().ui;
   const {
     setup,
     characterOpen,
@@ -76,7 +77,7 @@ export function ActiveDeckCharacterPicker() {
         </Tooltip>
       </div>
 
-      <DeckCharacterPickerDialog
+      <SetupCardPickerDialog
         open={characterOpen}
         onOpenChange={setCharacterOpen}
         selectedCharacterId={setup.startingCharacterId}
