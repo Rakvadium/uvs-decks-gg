@@ -39,6 +39,7 @@ describe("resolveHost", () => {
   test("game hosts", () => {
     expect(resolveHost("uvs.tcgdecks.gg", ROOTS)).toEqual({ kind: "game", game: "uvs", root: "tcgdecks.gg", port: null });
     expect(resolveHost("UVS.TCGDecks.GG:443", ROOTS)).toEqual({ kind: "game", game: "uvs", root: "tcgdecks.gg", port: "443" });
+    expect(resolveHost("cyberpunk.tcgdecks.gg", ROOTS)).toEqual({ kind: "game", game: "cyberpunk", root: "tcgdecks.gg", port: null });
     expect(resolveHost("uvs.tcgdecks.localhost:8090", ROOTS)).toEqual({
       kind: "game",
       game: "uvs",
@@ -56,7 +57,7 @@ describe("resolveHost", () => {
   });
 
   test("unknown or nested subdomains resolve to apex with unknownSubdomain", () => {
-    for (const host of ["foo.tcgdecks.gg", "cyberpunk.tcgdecks.gg", "a.uvs.tcgdecks.gg", "www.uvs.tcgdecks.gg", "foo.tcgdecks.localhost:8090"]) {
+    for (const host of ["foo.tcgdecks.gg", "pokemon.tcgdecks.gg", "a.uvs.tcgdecks.gg", "www.uvs.tcgdecks.gg", "foo.tcgdecks.localhost:8090"]) {
       expect(resolveHost(host, ROOTS)).toMatchObject({ kind: "apex", game: null, unknownSubdomain: true });
     }
   });

@@ -7,10 +7,12 @@ import {
   type GameId,
   type SharedGameModule,
 } from "./types";
+import { CYBERPUNK_SHARED_GAME_MODULE } from "./cyberpunk";
 import { UVS_SHARED_GAME_MODULE } from "./uvs";
 
 export const SHARED_GAME_MODULES: Record<GameId, SharedGameModule> = {
   uvs: UVS_SHARED_GAME_MODULE,
+  cyberpunk: CYBERPUNK_SHARED_GAME_MODULE,
 };
 
 export function getSharedGameModule(id: GameId): SharedGameModule {

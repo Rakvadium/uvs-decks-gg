@@ -11,7 +11,8 @@ export function ActiveDeckIcon({ className }: { className?: string }) {
   const { activeDeck } = useActiveDeck();
   const { cards } = useCardData();
   const cardIdMap = useCardIdMap(cards);
-  const startingCharacterId = useGameModule().deck.normalizeSetup(activeDeck).startingCharacterId;
+  const gameDeck = useGameModule().deck;
+  const startingCharacterId = gameDeck.setupPreviewCardId(gameDeck.normalizeSetup(activeDeck));
   const startingCharacter = startingCharacterId ? cardIdMap.get(startingCharacterId) ?? null : null;
 
   if (!startingCharacter?.imageUrl) {

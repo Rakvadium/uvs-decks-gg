@@ -4,6 +4,7 @@
  * Pure TS (no Convex/React deps); card ids are generic so callers keep their `Id<"cards">` typing.
  */
 
+import type { DeckSetup, DeckSetupPatch, DeckSetupSource } from "../deck";
 import { DEFAULT_GAME_ID } from "../types";
 
 export interface UvsDeckSetup<TCardId extends string = string> {
@@ -22,14 +23,8 @@ export interface UvsDeckSetupPatch<TCardId extends string = string> {
   selectedIdentity?: string | null;
 }
 
-/** Anything shaped like a deck row: new `setup` plus the deprecated legacy fields. */
-export interface UvsDeckSetupSource<TCardId extends string = string> {
-  setup?: UvsDeckSetup<TCardId> | null;
-  /** @deprecated use `setup` */
-  startingCharacterId?: TCardId | null;
-  /** @deprecated use `setup` */
-  selectedIdentity?: string | null;
-}
+/** Anything shaped like a deck row: new `setup` (any game) plus the deprecated legacy fields. */
+export type UvsDeckSetupSource<TCardId extends string = string> = DeckSetupSource<TCardId>;
 
 /** Legacy mutation args still accepted by `decks.create` / `decks.update` for one release. */
 export interface UvsLegacyDeckSetupArgs<TCardId extends string = string> {
@@ -44,12 +39,14 @@ function emptySetup<TCardId extends string>(): UvsDeckSetup<TCardId> {
 /**
  * The single read path for deck setup: prefers `deck.setup` (as a whole) and falls back to the
  * legacy top-level fields. Always returns a fresh object without `undefined`/`null` keys.
+ * Another game's `setup` normalizes to the empty UVS setup.
  */
 export function normalizeDeckSetup<TCardId extends string>(
   deck: UvsDeckSetupSource<TCardId> | null | undefined,
 ): UvsDeckSetup<TCardId> {
   const out = emptySetup<TCardId>();
   if (!deck) return out;
+  if (deck.setup && deck.setup.game !== "uvs") return out;
   const source = deck.setup ?? deck;
   if (source.startingCharacterId !== undefined && source.startingCharacterId !== null) {
     out.startingCharacterId = source.startingCharacterId;
@@ -65,12 +62,15 @@ export function normalizeDeckSetup<TCardId extends string>(
  * `patch === undefined` returns a copy of `current`.
  */
 export function applyDeckSetupPatch<TCardId extends string>(
-  current: UvsDeckSetup<TCardId>,
-  patch: UvsDeckSetupPatch<TCardId> | null | undefined,
+  current: DeckSetup<TCardId>,
+  patch: DeckSetupPatch<TCardId> | null | undefined,
 ): UvsDeckSetup<TCardId> {
   if (patch === null) return emptySetup<TCardId>();
   const next = normalizeDeckSetup<TCardId>({ setup: current });
   if (patch === undefined) return next;
+  if (patch.game !== "uvs") {
+    throw new Error(`Cannot apply a "${patch.game}" setup patch to a UniVersus deck`);
+  }
   if (patch.startingCharacterId === null) {
     delete next.startingCharacterId;
   } else if (patch.startingCharacterId !== undefined) {
@@ -112,10 +112,28 @@ export function mergeLegacyDeckSetupArgs<TCardId extends string>(
 
 /** Card ids referenced by a setup or setup patch (e.g. to reject back faces). */
 export function deckSetupCardIds<TCardId extends string>(
-  setup: UvsDeckSetup<TCardId> | UvsDeckSetupPatch<TCardId> | null | undefined,
+  setup: DeckSetup<TCardId> | DeckSetupPatch<TCardId> | null | undefined,
 ): TCardId[] {
-  const id = setup?.startingCharacterId;
+  if (!setup || setup.game !== "uvs") return [];
+  const id = setup.startingCharacterId;
   return id !== undefined && id !== null ? [id] : [];
+}
+
+/** Deck preview art: the starting character. */
+export function uvsSetupPreviewCardId<TCardId extends string>(
+  setup: DeckSetup<TCardId> | null | undefined,
+): TCardId | undefined {
+  return setup?.game === "uvs" ? setup.startingCharacterId : undefined;
+}
+
+/**
+ * UVS fields of any game's setup (empty for other games). For UVS-only UI that still renders on
+ * every game until the per-game setup UI lands.
+ */
+export function uvsSetupFields<TCardId extends string>(
+  setup: DeckSetup<TCardId> | null | undefined,
+): { startingCharacterId?: TCardId; selectedIdentity?: string } {
+  return setup?.game === "uvs" ? setup : {};
 }
 
 /**

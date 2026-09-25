@@ -51,6 +51,7 @@ import type * as lib_deckGame from "../lib/deckGame.js";
 import type * as lib_deckList from "../lib/deckList.js";
 import type * as lib_deckQuantity from "../lib/deckQuantity.js";
 import type * as lib_duplicateDeck from "../lib/duplicateDeck.js";
+import type * as lib_formatSeed from "../lib/formatSeed.js";
 import type * as lib_gameBackfill from "../lib/gameBackfill.js";
 import type * as lib_gameScope from "../lib/gameScope.js";
 import type * as lib_moderation_localCommentHeuristic from "../lib/moderation/localCommentHeuristic.js";
@@ -149,6 +150,7 @@ declare const fullApi: ApiFromModules<{
   "lib/deckList": typeof lib_deckList;
   "lib/deckQuantity": typeof lib_deckQuantity;
   "lib/duplicateDeck": typeof lib_duplicateDeck;
+  "lib/formatSeed": typeof lib_formatSeed;
   "lib/gameBackfill": typeof lib_gameBackfill;
   "lib/gameScope": typeof lib_gameScope;
   "lib/moderation/localCommentHeuristic": typeof lib_moderation_localCommentHeuristic;

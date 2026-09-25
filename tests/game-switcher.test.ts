@@ -11,6 +11,13 @@ describe("buildGameSwitcherModel", () => {
     expect(model!.current.id).toBe("uvs");
     expect(model!.games).toEqual([
       { id: "uvs", displayName: "UniVersus", shortName: "UVS", href: "/gallery", current: true },
+      {
+        id: "cyberpunk",
+        displayName: "Cyberpunk TCG",
+        shortName: "CPK",
+        href: "http://cyberpunk.tcgdecks.localhost:8090/gallery",
+        current: false,
+      },
     ]);
     expect(model!.allGamesHref).toBe("http://tcgdecks.localhost:8090/");
   });

@@ -73,7 +73,36 @@ export interface GameFilterGroupDescriptor<Group extends string = string> {
   label: string;
 }
 
+export interface GameColorFacetOption {
+  /** Stored card value (`cards.color`), lowercase. */
+  value: string;
+  label: string;
+  /** HSL triplet (e.g. `"0 84% 60%"`) for chips/swatches. */
+  swatch: string;
+}
+
+/**
+ * Which facet pickers the gallery shows for a game. Type, rarity and set pickers are always shown.
+ * UI reads this (Phase 3 wave B); `filters` keys for hidden facets are simply never set.
+ */
+export interface GameFacetDefinition {
+  /** UVS symbol + attuned pickers (`filters.symbols` / `attuned`, `cards.symbols`). */
+  symbols: boolean;
+  /** Zone pickers from `GameFilterDefinition.zones`. */
+  zones: boolean;
+  /** Keyword picker (`filters.keywords`, `cards.keywords`). */
+  keywords: boolean;
+  /** UVS-only toggles: has attack/block, is character, ability timing, dual-faced. */
+  uvsCardFlags: boolean;
+  /** Color picker options (`cards.color`); omitted = no color facet. */
+  colors?: readonly GameColorFacetOption[];
+  /** Tag picker (`cards.tags`, pipe-delimited). */
+  tags: boolean;
+}
+
 export interface GameFilterDefinition {
+  /** Facet pickers shown in the gallery filters. */
+  facets: GameFacetDefinition;
   /** Display order of the stat filter groups. */
   groups: readonly GameFilterGroupDescriptor[];
   /** Display order (within groups, and for active chips). */

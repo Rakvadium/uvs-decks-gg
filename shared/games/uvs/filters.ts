@@ -59,6 +59,8 @@ export const UVS_ZONE_FILTERS = [
 ] as const satisfies readonly GameZoneFilterDescriptor<UvsZoneFilterKey, UvsFilterGroupId>[];
 
 export const UVS_FILTER_DEFINITION: GameFilterDefinition = {
+  // Today's UVS gallery: symbols, zones, keywords and the UVS card flags; no colors/tags.
+  facets: { symbols: true, zones: true, keywords: true, uvsCardFlags: true, tags: false },
   groups: UVS_FILTER_GROUPS,
   stats: UVS_STAT_FILTERS,
   zones: UVS_ZONE_FILTERS,

@@ -74,6 +74,17 @@ export const cardValidator = v.object({
   text: v.optional(v.string()),
   keywords: v.optional(v.string()),
   symbols: v.optional(v.string()),
+  /** Cyberpunk TCG columns (docs/games/cyberpunk.md "Card data model"); UVS never sets them. */
+  color: v.optional(v.string()),
+  cost: v.optional(v.number()),
+  power: v.optional(v.number()),
+  ram: v.optional(v.number()),
+  sellable: v.optional(v.boolean()),
+  /** Pipe-delimited, e.g. `Corpo|Netrunner`. */
+  tags: v.optional(v.string()),
+  /** Card subtitle (e.g. a Legend's epithet) and illustrator; used by Cyberpunk TCG. */
+  subname: v.optional(v.string()),
+  artist: v.optional(v.string()),
   searchName: v.optional(v.string()),
   searchText: v.optional(v.string()),
   searchAll: v.optional(v.string()),
@@ -155,8 +166,14 @@ export const uvsDeckSetupValidator = v.object({
   selectedIdentity: v.optional(v.string()),
 });
 
-/** Becomes `v.union(...)` over games in Phase 3. */
-export const deckSetupValidator = uvsDeckSetupValidator;
+/** Cyberpunk TCG deck setup (shape mirrors `shared/games/cyberpunk/setup.ts`): ordered Legends, max 3. */
+export const cyberpunkDeckSetupValidator = v.object({
+  game: v.literal("cyberpunk"),
+  legendIds: v.array(v.id("cards")),
+});
+
+/** Union over games, discriminated by `game` (always equal to the deck's `game`). */
+export const deckSetupValidator = v.union(uvsDeckSetupValidator, cyberpunkDeckSetupValidator);
 
 /** Partial setup update for `decks.update`: omitted keeps, `null` clears, value sets. */
 export const uvsDeckSetupPatchValidator = v.object({
@@ -165,7 +182,13 @@ export const uvsDeckSetupPatchValidator = v.object({
   selectedIdentity: v.optional(v.union(v.string(), v.null())),
 });
 
-export const deckSetupPatchValidator = uvsDeckSetupPatchValidator;
+/** Cyberpunk patch: omitted keeps the Legends, `null` clears them, an array replaces them. */
+export const cyberpunkDeckSetupPatchValidator = v.object({
+  game: v.literal("cyberpunk"),
+  legendIds: v.optional(v.union(v.array(v.id("cards")), v.null())),
+});
+
+export const deckSetupPatchValidator = v.union(uvsDeckSetupPatchValidator, cyberpunkDeckSetupPatchValidator);
 
 export const deckValidator = v.object({
   _id: v.id("decks"),
@@ -565,6 +588,17 @@ export const cardInputValidator = v.object({
   text: v.optional(v.string()),
   keywords: v.optional(v.string()),
   symbols: v.optional(v.string()),
+  /** Cyberpunk TCG columns (docs/games/cyberpunk.md "Card data model"); UVS never sets them. */
+  color: v.optional(v.string()),
+  cost: v.optional(v.number()),
+  power: v.optional(v.number()),
+  ram: v.optional(v.number()),
+  sellable: v.optional(v.boolean()),
+  /** Pipe-delimited, e.g. `Corpo|Netrunner`. */
+  tags: v.optional(v.string()),
+  /** Card subtitle (e.g. a Legend's epithet) and illustrator; used by Cyberpunk TCG. */
+  subname: v.optional(v.string()),
+  artist: v.optional(v.string()),
   searchName: v.optional(v.string()),
   searchText: v.optional(v.string()),
   searchAll: v.optional(v.string()),
@@ -607,6 +641,17 @@ export const cardDraftEditableValidator = v.object({
   text: v.optional(v.string()),
   keywords: v.optional(v.string()),
   symbols: v.optional(v.string()),
+  /** Cyberpunk TCG columns (docs/games/cyberpunk.md "Card data model"); UVS never sets them. */
+  color: v.optional(v.string()),
+  cost: v.optional(v.number()),
+  power: v.optional(v.number()),
+  ram: v.optional(v.number()),
+  sellable: v.optional(v.boolean()),
+  /** Pipe-delimited, e.g. `Corpo|Netrunner`. */
+  tags: v.optional(v.string()),
+  /** Card subtitle (e.g. a Legend's epithet) and illustrator; used by Cyberpunk TCG. */
+  subname: v.optional(v.string()),
+  artist: v.optional(v.string()),
   searchName: v.optional(v.string()),
   searchText: v.optional(v.string()),
   searchAll: v.optional(v.string()),

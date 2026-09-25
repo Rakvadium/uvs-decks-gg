@@ -11,10 +11,11 @@ const validatorMatchesGameId: Equals<typeof gameIdValidator.type, GameId> = true
 
 describe("game ids", () => {
   test("GAME_IDS / DEFAULT_GAME_ID / isGameId", () => {
-    expect(GAME_IDS).toEqual(["uvs"]);
+    expect(GAME_IDS).toEqual(["uvs", "cyberpunk"]);
     expect(DEFAULT_GAME_ID).toBe("uvs");
     expect(isGameId("uvs")).toBe(true);
-    for (const value of ["UVS", "", "cyberpunk", "constructor", "__proto__", null, undefined, 1, {}]) {
+    expect(isGameId("cyberpunk")).toBe(true);
+    for (const value of ["UVS", "", "Cyberpunk", "cpk", "constructor", "__proto__", null, undefined, 1, {}]) {
       expect(isGameId(value)).toBe(false);
     }
   });

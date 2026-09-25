@@ -11,7 +11,7 @@ import type { SharedGameDeckModule } from "./deck";
 
 export type { SharedGameDeckModule } from "./deck";
 
-export const GAME_IDS = ["uvs"] as const;
+export const GAME_IDS = ["uvs", "cyberpunk"] as const;
 
 export type GameId = (typeof GAME_IDS)[number];
 
@@ -45,6 +45,20 @@ export const PLATFORM_BRAND: Brand = {
   description: "Deck building, card galleries, and community tools for trading card games. One account across every game.",
 };
 
+/** A format row `admin.seedFormats` creates for a game (mirrors the `formats` table). */
+export interface GameFormatSeed {
+  key: string;
+  name: string;
+  description?: string;
+  isDefault: boolean;
+  minDeckSize: number;
+  maxDeckSize?: number;
+  sideboardRule: string;
+  defaultCopyLimit: number;
+  requiresStartingCharacter: boolean;
+  requiresIdentity: boolean;
+}
+
 /**
  * Game-specific data/logic shared by server and client. Intentionally minimal for now;
  * later phases add deck setup, validation, filters, import/export, etc.
@@ -62,4 +76,6 @@ export interface SharedGameModule {
   filters: GameFilterDefinition;
   /** Deck setup, validation rules, card eligibility, list display, text import/export (see `shared/games/deck.ts`). */
   deck: SharedGameDeckModule;
+  /** Formats seeded by `admin.seedFormats` (existing rows are kept; `standard` rules are re-synced). */
+  defaultFormats: readonly GameFormatSeed[];
 }

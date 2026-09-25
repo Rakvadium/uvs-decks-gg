@@ -1,9 +1,11 @@
 import { DEFAULT_GAME_ID, isGameId, type GameId } from "@shared/games/types";
 import type { ClientGameModule } from "./types";
+import { CYBERPUNK_CLIENT_GAME_MODULE } from "./cyberpunk";
 import { UVS_CLIENT_GAME_MODULE } from "./uvs";
 
 export const CLIENT_GAME_MODULES: Record<GameId, ClientGameModule> = {
   uvs: UVS_CLIENT_GAME_MODULE,
+  cyberpunk: CYBERPUNK_CLIENT_GAME_MODULE,
 };
 
 export function getClientGameModule(id: GameId): ClientGameModule {

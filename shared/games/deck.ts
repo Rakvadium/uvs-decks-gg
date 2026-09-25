@@ -2,15 +2,29 @@
  * Game-agnostic deck contracts implemented by each game module (`SharedGameModule.deck`).
  * Pure TS: safe to import from convex/ (relative path) and src/ (`@shared/*`).
  */
-import type { UvsDeckSetup, UvsDeckSetupPatch, UvsDeckSetupSource } from "./uvs/setup";
+import type { CyberpunkDeckSetup, CyberpunkDeckSetupPatch } from "./cyberpunk/setup";
+import type { UvsDeckSetup, UvsDeckSetupPatch } from "./uvs/setup";
 
 // ---------------------------------------------------------------------------
-// Deck setup (becomes a union over games in Phase 3)
+// Deck setup: a union over games, discriminated by `game` (must equal the deck's `game`)
 // ---------------------------------------------------------------------------
 
-export type DeckSetup<TCardId extends string = string> = UvsDeckSetup<TCardId>;
-export type DeckSetupPatch<TCardId extends string = string> = UvsDeckSetupPatch<TCardId>;
-export type DeckSetupSource<TCardId extends string = string> = UvsDeckSetupSource<TCardId>;
+export type DeckSetup<TCardId extends string = string> = UvsDeckSetup<TCardId> | CyberpunkDeckSetup<TCardId>;
+export type DeckSetupPatch<TCardId extends string = string> =
+  | UvsDeckSetupPatch<TCardId>
+  | CyberpunkDeckSetupPatch<TCardId>;
+
+/**
+ * Anything shaped like a deck row: `setup` (any game) plus the deprecated UVS top-level fields.
+ * Each game's `normalizeSetup` reads only its own setup (a foreign one normalizes to empty).
+ */
+export interface DeckSetupSource<TCardId extends string = string> {
+  setup?: DeckSetup<TCardId> | null;
+  /** @deprecated UVS legacy field; use `setup` */
+  startingCharacterId?: TCardId | null;
+  /** @deprecated UVS legacy field; use `setup` */
+  selectedIdentity?: string | null;
+}
 
 // ---------------------------------------------------------------------------
 // Validation inputs (plain data; Convex loads them, rules stay pure)
@@ -25,6 +39,15 @@ export interface DeckRuleCard {
   copyLimit?: number | null;
   difficulty?: number | null;
   control?: number | null;
+  /** Cyberpunk: color (`red` | `green` | `blue` | `yellow`); Legends provide RAM of this color. */
+  color?: string;
+  /** Cyberpunk: RAM requirement (cards) / RAM provided (Legends). */
+  ram?: number | null;
+  cost?: number | null;
+  power?: number | null;
+  sellable?: boolean;
+  /** Pipe-delimited tags. */
+  tags?: string;
 }
 
 export interface DeckRuleFormat {
@@ -102,6 +125,7 @@ export interface GameDeckValidationRules {
 export type DeckSection = "main" | "side" | "reference";
 
 export type DeckAddableCard = {
+  type?: string | null;
   difficulty?: number | null;
   control?: number | null;
   copyLimit?: number | null;
@@ -116,35 +140,59 @@ export interface DeckTextLine {
 }
 
 export interface ParsedDeckText {
+  /** UVS: the starting character (`null` for games without one). */
   character: DeckTextLine | null;
+  /** Setup cards in list order (Cyberpunk: Legends). Absent for games whose setup is `character`. */
+  setupCards?: DeckTextLine[];
+  main: DeckTextLine[];
+  side: DeckTextLine[];
+}
+
+export interface DeckTextFormatParams {
+  character: { name: string } | null;
+  /** Setup cards in setup order (Cyberpunk: Legends); ignored by UVS. */
+  setupCards?: readonly { name: string }[];
   main: DeckTextLine[];
   side: DeckTextLine[];
 }
 
 /** Plain-text deck list import/export (UVS: the UVS Ultra `[b]Section[/b]` format). */
 export interface DeckTextFormat {
-  /** Main-deck card types the export groups by (others are dropped). */
+  /**
+   * Main-deck card types the export groups by. UVS drops other types; Cyberpunk lists
+   * everything (known types first, in this order).
+   */
   mainTypeOrder: readonly string[];
   parse(text: string): ParsedDeckText;
-  format(params: { character: { name: string } | null; main: DeckTextLine[]; side: DeckTextLine[] }): string;
+  format(params: DeckTextFormatParams): string;
 }
 
+/**
+ * Per-game deck behavior. Setup functions accept the setup **union** so generic code can call
+ * `getSharedGameModule(deck.game).deck.normalizeSetup(deck)` safely; each module only
+ * understands its own `game`:
+ * - `normalizeSetup` ignores a foreign `setup` (returns the game's empty setup),
+ * - `applySetupPatch` throws on a patch for another game (servers reject it earlier),
+ * - `setupCardIds` / `setupPreviewCardId` return nothing for a foreign setup.
+ */
 export interface SharedGameDeckModule {
   normalizeSetup<TCardId extends string>(deck: DeckSetupSource<TCardId> | null | undefined): DeckSetup<TCardId>;
   applySetupPatch<TCardId extends string>(
     current: DeckSetup<TCardId>,
     patch: DeckSetupPatch<TCardId> | null | undefined,
   ): DeckSetup<TCardId>;
-  /** Card ids referenced by a setup/patch (server rejects back faces). */
+  /** Card ids referenced by a setup/patch (server rejects back faces / other games' cards). */
   setupCardIds<TCardId extends string>(
     setup: DeckSetup<TCardId> | DeckSetupPatch<TCardId> | null | undefined,
   ): TCardId[];
+  /** Card whose art represents the deck (UVS: starting character; Cyberpunk: first Legend). */
+  setupPreviewCardId<TCardId extends string>(setup: DeckSetup<TCardId> | null | undefined): TCardId | undefined;
   validation: GameDeckValidationRules;
   /** Display order of card-type groups in deck lists. */
   cardTypeOrder: readonly string[];
   /** Plural group labels keyed by card type. */
   cardTypeLabels: Readonly<Record<string, string>>;
-  /** Preferred sideboard size (UI warning only). */
+  /** Preferred sideboard size (UI warning only; 0 = the game has no sideboard). */
   sideboardLimit: number;
   /** Whether a card may be put in a deck at all. */
   isMainDeckEligible(card: DeckAddableCard | null | undefined): boolean;
@@ -155,7 +203,7 @@ export interface SharedGameDeckModule {
     setup: DeckSetup<TCardId>,
     getCard: (id: TCardId) => { handSize?: number | null } | null | undefined,
   ): number;
-  /** Parses a zone string (e.g. "High/Mid") into display labels. */
+  /** Parses a zone string (e.g. "High/Mid") into display labels (`[]` for games without zones). */
   extractZones(rawZone?: string | null): string[];
   zoneTone(zone?: string | null): ZoneTone | null;
   text: DeckTextFormat;

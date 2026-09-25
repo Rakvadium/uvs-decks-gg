@@ -34,6 +34,7 @@ import {
 } from "./lib/cardCreate";
 import { normalizeAbilityText } from "./lib/normalizeAbilityText";
 import { DEFAULT_GAME_ID, type GameId } from "../shared/games/types";
+import { seedGameFormats } from "./lib/formatSeed";
 import {
   byCreationTime,
   collectInGame,
@@ -534,74 +535,7 @@ export const seedFormats = mutation({
   handler: async (ctx, rawArgs) => {
     const args = withResolvedGame(rawArgs);
     await requireAdmin(ctx);
-    const defaultFormats = [
-      {
-        key: "standard",
-        name: "Standard",
-        description: "The primary competitive format featuring the most recent sets.",
-        isDefault: true,
-        minDeckSize: 60,
-        maxDeckSize: undefined,
-        sideboardRule: "exact:10",
-        defaultCopyLimit: 4,
-        requiresStartingCharacter: true,
-        requiresIdentity: true,
-      },
-      {
-        key: "heroic",
-        name: "Heroic",
-        description: "An extended format including older sets.",
-        isDefault: false,
-        minDeckSize: 60,
-        maxDeckSize: undefined,
-        sideboardRule: "optional",
-        defaultCopyLimit: 4,
-        requiresStartingCharacter: true,
-        requiresIdentity: false,
-      },
-      {
-        key: "retro",
-        name: "Retro",
-        description: "A legacy format including all sets from the game's history.",
-        isDefault: false,
-        minDeckSize: 60,
-        maxDeckSize: undefined,
-        sideboardRule: "optional",
-        defaultCopyLimit: 4,
-        requiresStartingCharacter: true,
-        requiresIdentity: false,
-      },
-    ];
-
-    let created = 0;
-    let skipped = 0;
-
-    for (const format of defaultFormats) {
-      const existing = await findFormatByKey(ctx, args.game, format.key);
-
-      if (existing) {
-        const tag = gameTagPatch(existing, args.game);
-        if (tag) {
-          await ctx.db.patch(existing._id, tag);
-        }
-        if (format.key === "standard") {
-          await ctx.db.patch(existing._id, {
-            sideboardRule: format.sideboardRule,
-            requiresIdentity: format.requiresIdentity,
-            minDeckSize: format.minDeckSize,
-            defaultCopyLimit: format.defaultCopyLimit,
-            requiresStartingCharacter: format.requiresStartingCharacter,
-          });
-        }
-        skipped++;
-        continue;
-      }
-
-      await ctx.db.insert("formats", { ...format, game: args.game });
-      created++;
-    }
-
-    return { created, skipped };
+    return await seedGameFormats(ctx, args.game);
   },
 });
 
@@ -648,6 +582,17 @@ export const updateCard = mutation({
       text: v.optional(v.string()),
       keywords: v.optional(v.string()),
       symbols: v.optional(v.string()),
+      /** Cyberpunk TCG columns (docs/games/cyberpunk.md "Card data model"); UVS never sets them. */
+      color: v.optional(v.string()),
+      cost: v.optional(v.number()),
+      power: v.optional(v.number()),
+      ram: v.optional(v.number()),
+      sellable: v.optional(v.boolean()),
+      /** Pipe-delimited, e.g. `Corpo|Netrunner`. */
+      tags: v.optional(v.string()),
+      /** Card subtitle (e.g. a Legend's epithet) and illustrator; used by Cyberpunk TCG. */
+      subname: v.optional(v.string()),
+      artist: v.optional(v.string()),
       searchName: v.optional(v.string()),
       searchText: v.optional(v.string()),
       searchAll: v.optional(v.string()),
@@ -685,6 +630,9 @@ export const updateCard = mutation({
       "type",
       "rarity",
       "searchName",
+      "tags",
+      "color",
+      "subname",
     ] as const;
     const shouldRecomputeSearch = searchTriggers.some((k) => k in filteredUpdates);
     if (shouldRecomputeSearch) {
@@ -698,6 +646,9 @@ export const updateCard = mutation({
           setName: merged.setName ?? undefined,
           type: merged.type ?? undefined,
           rarity: merged.rarity ?? undefined,
+          tags: merged.tags ?? undefined,
+          color: merged.color ?? undefined,
+          subname: merged.subname ?? undefined,
         }).searchText;
       }
       if (filteredUpdates.searchAll === undefined) {
@@ -715,6 +666,9 @@ export const updateCard = mutation({
           setName: forAll.setName ?? undefined,
           type: forAll.type ?? undefined,
           rarity: forAll.rarity ?? undefined,
+          tags: forAll.tags ?? undefined,
+          color: forAll.color ?? undefined,
+          subname: forAll.subname ?? undefined,
         }).searchAll;
       }
     }
@@ -868,6 +822,14 @@ function mergeCardReplaceBodyFromAdminJson(
     text: optString("text"),
     keywords: optString("keywords"),
     symbols: optString("symbols"),
+    color: optString("color"),
+    cost: optNumber("cost"),
+    power: optNumber("power"),
+    ram: optNumber("ram"),
+    sellable: optBool("sellable"),
+    tags: optString("tags"),
+    subname: optString("subname"),
+    artist: optString("artist"),
     searchName: optString("searchName"),
     searchText: optString("searchText"),
     searchAll: optString("searchAll"),
@@ -888,6 +850,9 @@ function mergeCardReplaceBodyFromAdminJson(
     setName: row.setName,
     type: row.type,
     rarity: row.rarity,
+    tags: row.tags,
+    color: row.color,
+    subname: row.subname,
   });
   row.searchName = derived.searchName;
   row.searchText = derived.searchText;
@@ -1038,6 +1003,14 @@ interface CardImportData {
   text?: string;
   keywords?: string;
   symbols?: string;
+  color?: string;
+  cost?: number;
+  power?: number;
+  ram?: number;
+  sellable?: boolean;
+  tags?: string;
+  subname?: string;
+  artist?: string;
   searchName?: string;
   searchText?: string;
   searchAll?: string;
@@ -1071,6 +1044,9 @@ export const insertCardBatch = internalMutation({
           setName: card.setName,
           type: card.type,
           rarity: card.rarity,
+          tags: card.tags,
+          color: card.color,
+          subname: card.subname,
         });
 
         const touch = Date.now();
@@ -1393,6 +1369,9 @@ export const importCardsBatch = internalMutation({
           setName: card.setName,
           type: card.type,
           rarity: card.rarity,
+          tags: card.tags,
+          color: card.color,
+          subname: card.subname,
         });
         await ctx.db.insert("cards", {
           ...card,
@@ -1690,6 +1669,9 @@ export const upsertCardsBatch = internalMutation({
           setName: card.setName,
           type: card.type,
           rarity: card.rarity,
+          tags: card.tags,
+          color: card.color,
+          subname: card.subname,
         });
         const cardData = {
           oracleId: card.oracleId,
@@ -1713,6 +1695,14 @@ export const upsertCardsBatch = internalMutation({
           text,
           keywords: card.keywords,
           symbols: card.symbols,
+          color: card.color,
+          cost: card.cost,
+          power: card.power,
+          ram: card.ram,
+          sellable: card.sellable,
+          tags: card.tags,
+          subname: card.subname,
+          artist: card.artist,
           searchName: derived.searchName,
           searchText: derived.searchText,
           searchAll: derived.searchAll,

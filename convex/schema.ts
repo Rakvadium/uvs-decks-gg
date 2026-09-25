@@ -136,6 +136,17 @@ export default defineSchema({
     text: v.optional(v.string()),
     keywords: v.optional(v.string()),
     symbols: v.optional(v.string()),
+    /** Cyberpunk TCG columns (docs/games/cyberpunk.md "Card data model"); UVS never sets them. */
+    color: v.optional(v.string()),
+    cost: v.optional(v.number()),
+    power: v.optional(v.number()),
+    ram: v.optional(v.number()),
+    sellable: v.optional(v.boolean()),
+    /** Pipe-delimited, e.g. `Corpo|Netrunner`. */
+    tags: v.optional(v.string()),
+    /** Card subtitle (e.g. a Legend's epithet) and illustrator; used by Cyberpunk TCG. */
+    subname: v.optional(v.string()),
+    artist: v.optional(v.string()),
     searchName: v.optional(v.string()),
     searchText: v.optional(v.string()),
     searchAll: v.optional(v.string()),

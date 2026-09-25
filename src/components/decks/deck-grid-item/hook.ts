@@ -4,6 +4,7 @@ import { useProfanityDisplayText } from "@/lib/moderation/use-profanity-display-
 import { useCardData } from "@/lib/universus/card-data-provider";
 import { useGameModule } from "@/games/game-context";
 import type { DeckGridItemProps } from "./types";
+import { uvsSetupFields } from "@shared/games/uvs/setup";
 
 export const MAIN_DECK_TARGET = 60;
 
@@ -37,7 +38,7 @@ export function useDeckGridItemModel({
   }, [deck.imageCardId, cards]);
 
   const startingCharacter = useMemo(() => {
-    const startingCharacterId = gameDeck.normalizeSetup(deck).startingCharacterId;
+    const startingCharacterId = gameDeck.setupPreviewCardId(gameDeck.normalizeSetup(deck));
     if (!startingCharacterId) return null;
     return cards.find((card) => card._id === startingCharacterId) ?? null;
   }, [gameDeck, deck, cards]);
@@ -55,7 +56,7 @@ export function useDeckGridItemModel({
     [startingCharacter?.symbols],
   );
 
-  const selectedSymbol = setup.selectedIdentity?.toLowerCase();
+  const selectedSymbol = uvsSetupFields(setup).selectedIdentity?.toLowerCase();
   const accentSymbol =
     selectedSymbol && characterSymbols.includes(selectedSymbol)
       ? selectedSymbol

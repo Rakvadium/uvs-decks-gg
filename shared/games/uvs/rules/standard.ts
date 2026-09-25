@@ -1,7 +1,6 @@
 import type {
   DeckRuleCard,
   DeckRuleDeck,
-  DeckRuleFormat,
   DeckValidationError,
   DeckValidationInput,
   DeckValidationOutcome,
@@ -12,7 +11,7 @@ import { normalizeDeckSetup } from "../setup";
 import {
   buildLegalityMap,
   checkSideboardRule,
-  effectivePerCardCopyLimit,
+  groupEffectiveCopyLimit,
   isCharacterCardType,
   legalityApplies,
   positiveQuantityIds,
@@ -75,21 +74,6 @@ function standardMainCardMatchesIdentity(
 function oracleGroupKey(card: DeckRuleCard): string {
   const o = card.oracleId?.trim();
   return o && o.length > 0 ? `oracle:${o}` : `id:${card._id}`;
-}
-
-function groupEffectiveCopyLimit(cards: DeckRuleCard[], format: DeckRuleFormat): number | null {
-  let unlimited = false;
-  let minFinite = format.defaultCopyLimit;
-  for (const card of cards) {
-    const lim = effectivePerCardCopyLimit(card, format);
-    if (lim === null) {
-      unlimited = true;
-      break;
-    }
-    minFinite = Math.min(minFinite, lim);
-  }
-  if (unlimited) return null;
-  return minFinite;
 }
 
 interface OracleGroup<TCard extends DeckRuleCard> {

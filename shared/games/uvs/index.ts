@@ -1,6 +1,7 @@
 import type { SharedGameModule } from "../types";
 import { UVS_FILTER_DEFINITION } from "./filters";
 import { UVS_DECK_MODULE } from "./deck";
+import { UVS_DEFAULT_FORMATS } from "./formats";
 
 export const UVS_SHARED_GAME_MODULE = {
   id: "uvs",
@@ -20,4 +21,5 @@ export const UVS_SHARED_GAME_MODULE = {
   },
   filters: UVS_FILTER_DEFINITION,
   deck: UVS_DECK_MODULE,
+  defaultFormats: UVS_DEFAULT_FORMATS,
 } as const satisfies SharedGameModule;

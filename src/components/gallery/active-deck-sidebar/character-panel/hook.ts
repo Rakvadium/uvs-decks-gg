@@ -4,12 +4,14 @@ import { useCardData } from "@/lib/universus/card-data-provider";
 import { useActiveDeck } from "@/providers/ActiveDeckProvider";
 import { useGameModule } from "@/games/game-context";
 import type { Id } from "../../../../../convex/_generated/dataModel";
+import { uvsSetupFields } from "@shared/games/uvs/setup";
 
 export function useActiveDeckCharacterPanelModel() {
   const { activeDeck, updateDeck } = useActiveDeck();
   const { cards: allCards } = useCardData();
   const cardMap = useCardIdMap(allCards);
-  const setup = useGameModule().deck.normalizeSetup(activeDeck);
+  // TODO(phase3-ui): UVS setup UI (starting character + symbol); the Cyberpunk Legend UI replaces it in wave B.
+  const setup = uvsSetupFields(useGameModule().deck.normalizeSetup(activeDeck));
 
   const [characterOpen, setCharacterOpen] = useState(false);
   const [characterDetailsOpen, setCharacterDetailsOpen] = useState(false);
@@ -38,11 +40,11 @@ export function useActiveDeckCharacterPanelModel() {
   }, [startingCharacterSymbols]);
 
   const handleSelectCharacter = async (cardId: Id<"cards">) => {
-    await updateDeck({ setup: { game: setup.game, startingCharacterId: cardId } });
+    await updateDeck({ setup: { game: "uvs", startingCharacterId: cardId } });
   };
 
   const handleSelectSymbol = (symbol: string) => {
-    updateDeck({ setup: { game: setup.game, selectedIdentity: symbol } });
+    updateDeck({ setup: { game: "uvs", selectedIdentity: symbol } });
     setSymbolOpen(false);
   };
 

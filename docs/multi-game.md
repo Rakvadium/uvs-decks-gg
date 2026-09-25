@@ -9,7 +9,8 @@ update this doc in the same change.
 
 ## Vocabulary
 
-- **GameId** — string id of a game. `GAME_IDS = ["uvs"] as const`, `DEFAULT_GAME_ID = "uvs"`.
+- **GameId** — string id of a game. `GAME_IDS = ["uvs", "cyberpunk"] as const`, `DEFAULT_GAME_ID = "uvs"`.
+  Cyberpunk TCG (Phase 3) has its own contract: [games/cyberpunk.md](games/cyberpunk.md).
 - **Game module** — everything game-specific (rules, filters, card rendering, deck setup,
   import/export, stats, simulator config, theme, terminology).
 - **Game-scoped** data/route — belongs to exactly one game (cards, sets, formats, decks, …).
@@ -22,6 +23,7 @@ update this doc in the same change.
 | `shared/games/types.ts` | `GameId`, `GAME_IDS`, `DEFAULT_GAME_ID`, `isGameId`, `SharedGameModule` type | convex + src |
 | `shared/games/registry.ts` | `SHARED_GAME_MODULES: Record<GameId, SharedGameModule>`, `getSharedGameModule(id)`, `getSharedGameModuleOrDefault(untrusted)` | convex + src |
 | `shared/games/uvs/**` | Pure TS UVS logic with no React/Next/Convex-runtime deps: deck setup type + normalizer, deck validation rules, card eligibility, stat filter definitions, card type order, import/export text format | convex + src |
+| `shared/games/cyberpunk/**`, `shared/games/rules-common.ts`, `shared/games/deck-setup.ts` | Cyberpunk TCG module (see [games/cyberpunk.md](games/cyberpunk.md)); generic rule helpers; setup dispatch helpers | convex + src |
 | `shared/hosts.ts` | Host → `{ kind: "game" \| "apex" \| "standalone", game }` resolution and cross-host URL builders | middleware, src, convex |
 | `src/games/types.ts` | `ClientGameModule` (extends shared module with React components/hooks) | src |
 | `src/games/registry.ts` | `CLIENT_GAME_MODULES`, `getClientGameModule(id)` | src |
@@ -77,8 +79,15 @@ export const uvsDeckSetupValidator = v.object({
   startingCharacterId: v.optional(v.id("cards")),
   selectedIdentity: v.optional(v.string()),
 });
-export const deckSetupValidator = uvsDeckSetupValidator; // becomes v.union(...) in Phase 3
+export const deckSetupValidator = v.union(uvsDeckSetupValidator, cyberpunkDeckSetupValidator); // Phase 3
 ```
+
+Phase 3: `DeckSetup` / `DeckSetupPatch` (`shared/games/deck.ts`) are unions discriminated by
+`game`; `DeckSetupSource` is `{ setup?: DeckSetup | null } +` the legacy UVS fields. Each module's
+setup functions accept the union: `normalizeSetup` ignores a foreign setup (returns its own empty
+setup), `applySetupPatch` throws on a foreign patch, `setupCardIds` / `setupPreviewCardId` return
+nothing for one. `decks.create`/`update` use `resolveDeckSetupPatchArgs` (`shared/games/deck-setup.ts`).
+UVS-only UI reads `uvsSetupFields(setup)` until each game has its own setup UI.
 
 - `decks.setup: v.optional(deckSetupValidator)`.
 - Legacy top-level `startingCharacterId` / `selectedIdentity` stay in the schema as
@@ -99,7 +108,7 @@ export const deckSetupValidator = uvsDeckSetupValidator; // becomes v.union(...)
 
 ### Deck module (`SharedGameModule.deck`, `shared/games/deck.ts`)
 
-`normalizeSetup`, `applySetupPatch`, `setupCardIds`, `validation.{plan,validate}`, `cardTypeOrder`,
+`normalizeSetup`, `applySetupPatch`, `setupCardIds`, `setupPreviewCardId`, `validation.{plan,validate}`, `cardTypeOrder`,
 `cardTypeLabels`, `sideboardLimit`, `isMainDeckEligible`, `getCardCopyLimit`, `simulatorHandSize`,
 `extractZones`, `zoneTone`, `text.{mainTypeOrder,parse,format}`. UVS implementations live in
 `shared/games/uvs/{setup,rules/*,card-eligibility,card-types,deck-text,zones,deck}.ts`.

@@ -12,7 +12,8 @@ export function useSimulatorDeckState() {
 
   const deck = context?.deck ?? null;
   const setup = gameDeck.normalizeSetup(deck);
-  const startingCharacter = setup.startingCharacterId ? cardMap.get(setup.startingCharacterId) ?? null : null;
+  const previewCardId = gameDeck.setupPreviewCardId(setup);
+  const startingCharacter = previewCardId ? cardMap.get(previewCardId) ?? null : null;
   const handSize = gameDeck.simulatorHandSize(setup, (id) => cardMap.get(id));
 
   const mainDeckPool = useMemo(() => {

@@ -18,6 +18,7 @@ import {
   sumQuantities,
   type UvsUltraDeckLine,
 } from "../uvs-import-export";
+import { uvsSetupFields } from "@shared/games/uvs/setup";
 
 export function useImportExportSidebarModel() {
   const context = useDeckDetailsOptional();
@@ -36,7 +37,8 @@ export function useImportExportSidebarModel() {
   const { formatCardType } = gameModule.ui;
   const { mainTypeOrder } = gameDeck.text;
   const setup = gameDeck.normalizeSetup(deck);
-  const startingCharacterId = setup.startingCharacterId;
+  // TODO(phase3-ui): export Cyberpunk Legends via `setupCards`.
+  const startingCharacterId = uvsSetupFields(setup).startingCharacterId;
   const cardMap = useCardIdMap(cards);
   const cardNameIndex = useMemo(() => buildCardNameIndex(cards), [cards]);
 

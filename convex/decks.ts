@@ -30,7 +30,7 @@ import { requirePositiveIntegerQuantity } from "./lib/deckQuantity";
 import { deckGameModule } from "./lib/deckGame";
 import type { GameId } from "../shared/games/types";
 import { getSharedGameModule } from "../shared/games/registry";
-import { mergeLegacyDeckSetupArgs } from "../shared/games/uvs/setup";
+import { resolveDeckSetupPatchArgs } from "../shared/games/deck-setup";
 import { docGame, isDocInGame, withResolvedGame } from "./lib/gameScope";
 
 /** Rejects cards from another game (decks only reference cards of their own game). */
@@ -42,7 +42,7 @@ async function requireCardInGame(ctx: Pick<QueryCtx, "db">, cardId: Id<"cards">,
   }
 }
 
-/** Rejects a setup (patch) tagged for a different game than the deck. */
+/** Rejects a setup tagged for a different game than the deck. */
 function requireSetupGame(setup: { game: GameId } | null | undefined, game: GameId) {
   if (setup && setup.game !== game) {
     throw new Error(`Deck setup is for "${setup.game}" but the deck is a "${game}" deck`);
@@ -193,11 +193,11 @@ export const create = mutation({
     await requireUserCanPostContent(ctx, userId);
 
     const deckModule = getSharedGameModule(args.game).deck;
-    const setupPatch = mergeLegacyDeckSetupArgs(args.setup, {
+    // Rejects a setup for another game; legacy UVS args only fold in for UVS decks.
+    const setupPatch = resolveDeckSetupPatchArgs(args.game, args.setup, {
       startingCharacterId: args.startingCharacterId,
       selectedIdentity: args.selectedIdentity,
     });
-    requireSetupGame(setupPatch, args.game);
     // `setup.game` always matches the deck's `game` (normalizeSetup starts from the game's empty setup).
     const setup = deckModule.applySetupPatch(
       deckModule.normalizeSetup<Id<"cards">>(undefined),
@@ -281,11 +281,11 @@ export const update = mutation({
 
     const deckModule = deckGameModule(deck).deck;
     const game = docGame(deck);
-    const setupPatch = mergeLegacyDeckSetupArgs(args.setup, {
+    // Rejects a setup patch for another game than the deck's; legacy UVS args only for UVS decks.
+    const setupPatch = resolveDeckSetupPatchArgs(game, args.setup, {
       startingCharacterId: args.startingCharacterId,
       selectedIdentity: args.selectedIdentity,
     });
-    requireSetupGame(setupPatch, game);
     for (const cardId of deckModule.setupCardIds(setupPatch)) {
       await requireNotBackFace(ctx, cardId);
       await requireCardInGame(ctx, cardId, game);
