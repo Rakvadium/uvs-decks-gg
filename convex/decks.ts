@@ -31,7 +31,7 @@ import { deckGameModule } from "./lib/deckGame";
 import type { GameId } from "../shared/games/types";
 import { getSharedGameModule } from "../shared/games/registry";
 import { resolveDeckSetupPatchArgs } from "../shared/games/deck-setup";
-import { docGame, isDocInGame, withResolvedGame } from "./lib/gameScope";
+import { docGame, findDefaultFormat, isDocInGame, withResolvedGame } from "./lib/gameScope";
 
 /** Rejects cards from another game (decks only reference cards of their own game). */
 async function requireCardInGame(ctx: Pick<QueryCtx, "db">, cardId: Id<"cards">, game: GameId) {
@@ -232,6 +232,9 @@ export const create = mutation({
       }
     }
 
+    // New decks start in the game's default format (Standard) unless one was chosen.
+    const format = args.format ?? (await findDefaultFormat(ctx, args.game))?.key;
+
     return await ctx.db.insert("decks", {
       game: args.game,
       userId,
@@ -242,7 +245,7 @@ export const create = mutation({
       teamCollaboration:
         visibility === "team" ? (args.teamCollaboration ?? "team_viewable") : "none",
       isPublic: syncListingIsPublic(visibility),
-      format: args.format,
+      format,
       setup,
       mainCardIds: [],
       mainQuantities: {},

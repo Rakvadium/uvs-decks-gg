@@ -8,6 +8,7 @@ import {
 } from "./validators";
 import {
   byCreationTime,
+  findDefaultFormat,
   findFormatByKey,
   isDocInGame,
   withResolvedGame,
@@ -43,13 +44,7 @@ export const getDefault = query({
   returns: v.union(formatValidator, v.null()),
   handler: async (ctx, rawArgs) => {
     const args = withResolvedGame(rawArgs);
-    const formats = await ctx.db
-      .query("formats")
-      .withIndex("by_game_and_key", (q) => q.eq("game", args.game))
-      .collect()
-      .then(byCreationTime);
-
-    return formats.find(f => f.isDefault) ?? formats[0] ?? null;
+    return await findDefaultFormat(ctx, args.game);
   },
 });
 

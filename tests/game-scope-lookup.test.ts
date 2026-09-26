@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import {
   collectInGame,
+  findDefaultFormat,
   findInGame,
   firstLoggingDuplicates,
   gameTagPatch,
@@ -92,5 +93,53 @@ describe("resolveGame (rolling-deploy default)", () => {
   test("withResolvedGame fills `game` and keeps other args", () => {
     expect(withResolvedGame({ code: "X" } as { code: string; game?: GameId })).toEqual({ code: "X", game: "uvs" });
     expect(withResolvedGame({ code: "X", game: "uvs" as GameId })).toEqual({ code: "X", game: "uvs" });
+  });
+});
+
+describe("findDefaultFormat", () => {
+  type FormatRow = { key: string; isDefault: boolean; _creationTime: number; game?: GameId };
+
+  /** Minimal ctx: `formats.withIndex("by_game_and_key", q => q.eq("game", v)).collect()`. */
+  function ctxWith(rows: FormatRow[]) {
+    return {
+      db: {
+        query: () => ({
+          withIndex: (_name: string, build: (q: { eq: (field: string, value: GameId | undefined) => unknown }) => unknown) => {
+            let game: GameId | undefined;
+            build({
+              eq: (_field, value) => {
+                game = value;
+                return undefined;
+              },
+            });
+            return { collect: async () => rows.filter((row) => row.game === game) };
+          },
+        }),
+      },
+    } as unknown as Parameters<typeof findDefaultFormat>[0];
+  }
+
+  test("picks the game's isDefault format (Standard)", async () => {
+    const ctx = ctxWith([
+      { key: "legacy", isDefault: false, _creationTime: 1, game: "uvs" },
+      { key: "standard", isDefault: true, _creationTime: 2, game: "uvs" },
+      { key: "standard", isDefault: true, _creationTime: 3, game: "cyberpunk" },
+    ]);
+    expect((await findDefaultFormat(ctx, "uvs"))?.key).toBe("standard");
+    expect((await findDefaultFormat(ctx, "cyberpunk"))?.game).toBe("cyberpunk");
+  });
+
+  test("falls back to the oldest format, then null", async () => {
+    const ctx = ctxWith([
+      { key: "b", isDefault: false, _creationTime: 5, game: "cyberpunk" },
+      { key: "a", isDefault: false, _creationTime: 4, game: "cyberpunk" },
+    ]);
+    expect((await findDefaultFormat(ctx, "cyberpunk"))?.key).toBe("a");
+    expect(await findDefaultFormat(ctxWith([]), "cyberpunk")).toBeNull();
+  });
+
+  test("finds untagged legacy formats for the default game", async () => {
+    const ctx = ctxWith([{ key: "standard", isDefault: true, _creationTime: 1 }]);
+    expect((await findDefaultFormat(ctx, "uvs"))?.key).toBe("standard");
   });
 });

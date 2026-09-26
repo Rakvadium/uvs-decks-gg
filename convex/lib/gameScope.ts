@@ -146,6 +146,16 @@ export async function findFormatByKey(
   );
 }
 
+/** The game's default format (`isDefault`, else the oldest), legacy-aware. */
+export async function findDefaultFormat(ctx: DbCtx, game: GameId): Promise<Doc<"formats"> | null> {
+  const formats = byCreationTime(
+    await collectInGame(game, (value) =>
+      ctx.db.query("formats").withIndex("by_game_and_key", (q) => q.eq("game", value)).collect(),
+    ),
+  );
+  return formats.find((f) => f.isDefault) ?? formats[0] ?? null;
+}
+
 /** Card of `game` by set code + collector number, legacy-aware (see `findInGame`). */
 export async function findCardBySetAndNumber(
   ctx: DbCtx,
