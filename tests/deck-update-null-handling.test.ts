@@ -58,8 +58,12 @@ function docs() {
 }
 
 describe("decks.update null handling", () => {
-  // Setup writes go to `setup`; the deprecated top-level fields are always cleared (patched as undefined).
-  const LEGACY_CLEARED = { startingCharacterId: undefined, selectedIdentity: undefined };
+  // Setup writes go to `setup`; the deprecated top-level fields are mirrored from it (the live
+  // frontend still reads them) and patched as undefined when the setup lacks a value.
+  const legacy = (startingCharacterId: string | undefined, selectedIdentity: string | undefined) => ({
+    startingCharacterId,
+    selectedIdentity,
+  });
 
   test("null startingCharacterId / selectedIdentity clear the fields (patched as undefined)", async () => {
     const { ctx, patches } = makeCtx(docs());
@@ -75,19 +79,19 @@ describe("decks.update null handling", () => {
   test("null fields in a setup patch clear them; setup: null clears the whole setup", async () => {
     const a = makeCtx(docs());
     await handler(a.ctx, { deckId: "deck1", setup: { game: "uvs", startingCharacterId: null } });
-    expect(a.patches[0]!.value).toEqual({ setup: { game: "uvs", selectedIdentity: "fire" }, ...LEGACY_CLEARED });
+    expect(a.patches[0]!.value).toEqual({ setup: { game: "uvs", selectedIdentity: "fire" }, ...legacy(undefined, "fire") });
 
     const b = makeCtx(docs());
     await handler(b.ctx, { deckId: "deck1", setup: null });
-    expect(b.patches[0]!.value).toEqual({ setup: { game: "uvs" }, ...LEGACY_CLEARED });
+    expect(b.patches[0]!.value).toEqual({ setup: { game: "uvs" }, ...legacy(undefined, undefined) });
   });
 
   test("setting one setup field keeps the other (read from setup, else legacy fields)", async () => {
-    const legacy = makeCtx(docs());
-    await handler(legacy.ctx, { deckId: "deck1", setup: { game: "uvs", startingCharacterId: "char2" } });
-    expect(legacy.patches[0]!.value).toEqual({
+    const fromLegacy = makeCtx(docs());
+    await handler(fromLegacy.ctx, { deckId: "deck1", setup: { game: "uvs", startingCharacterId: "char2" } });
+    expect(fromLegacy.patches[0]!.value).toEqual({
       setup: { game: "uvs", startingCharacterId: "char2", selectedIdentity: "fire" },
-      ...LEGACY_CLEARED,
+      ...legacy("char2", "fire"),
     });
 
     const migrated = makeCtx({
@@ -95,7 +99,7 @@ describe("decks.update null handling", () => {
       deck1: { ...deck, startingCharacterId: undefined, selectedIdentity: undefined, setup: { game: "uvs", selectedIdentity: "water" } },
     });
     await handler(migrated.ctx, { deckId: "deck1", selectedIdentity: "air" });
-    expect(migrated.patches[0]!.value).toEqual({ setup: { game: "uvs", selectedIdentity: "air" }, ...LEGACY_CLEARED });
+    expect(migrated.patches[0]!.value).toEqual({ setup: { game: "uvs", selectedIdentity: "air" }, ...legacy(undefined, "air") });
   });
 
   test("explicit setup fields win over legacy args", async () => {
@@ -106,7 +110,7 @@ describe("decks.update null handling", () => {
       selectedIdentity: "air",
       startingCharacterId: null,
     });
-    expect(patches[0]!.value).toEqual({ setup: { game: "uvs", selectedIdentity: "water" }, ...LEGACY_CLEARED });
+    expect(patches[0]!.value).toEqual({ setup: { game: "uvs", selectedIdentity: "water" }, ...legacy(undefined, "water") });
   });
 
   test("null imageCardId / format / subFormat / description also clear", async () => {
@@ -127,7 +131,7 @@ describe("decks.update null handling", () => {
     await handler(ctx, { deckId: "deck1", startingCharacterId: "char2", selectedIdentity: "" });
     expect(patches[0]!.value).toEqual({
       setup: { game: "uvs", startingCharacterId: "char2", selectedIdentity: "" },
-      ...LEGACY_CLEARED,
+      ...legacy("char2", ""),
     });
   });
 

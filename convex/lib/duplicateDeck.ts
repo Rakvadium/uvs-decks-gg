@@ -1,6 +1,8 @@
-import type { Doc } from "../_generated/dataModel";
+import type { Doc, Id } from "../_generated/dataModel";
 import { deckGameModule } from "./deckGame";
 import { docGame } from "./gameScope";
+import { legacyUvsSetupFields } from "../../shared/games/uvs/setup";
+import type { DeckSetup } from "../../shared/games/deck";
 
 export function duplicateDeckName(name: string): string {
   const trimmed = name.trim();
@@ -28,6 +30,10 @@ function cloneCardLayouts(
   return next;
 }
 
+function withLegacySetupFields<TCardId extends string, TSetup extends DeckSetup<TCardId>>(setup: TSetup) {
+  return { setup, ...legacyUvsSetupFields<TCardId>(setup) };
+}
+
 export function buildDuplicatedDeckFields(source: Doc<"decks">) {
   return {
     name: duplicateDeckName(source.name),
@@ -37,8 +43,8 @@ export function buildDuplicatedDeckFields(source: Doc<"decks">) {
     isPublic: false,
     format: source.format,
     subFormat: source.subFormat,
-    // Copies are written in the new shape only (normalized from `setup` or the legacy fields).
-    setup: deckGameModule(source).deck.normalizeSetup(source),
+    // Normalized from `setup` or the legacy fields; legacy fields mirrored for the live frontend.
+    ...withLegacySetupFields<Id<"cards">, DeckSetup<Id<"cards">>>(deckGameModule(source).deck.normalizeSetup(source)),
     imageCardId: source.imageCardId,
     mainCardIds: [...source.mainCardIds],
     mainQuantities: { ...source.mainQuantities },

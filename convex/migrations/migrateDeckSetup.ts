@@ -4,9 +4,11 @@ import { internalMutation, internalQuery } from "../_generated/server";
 import { deckSetupMigrationPatch } from "../../shared/games/uvs/setup";
 
 /**
- * Backfill: move legacy `decks.startingCharacterId` / `decks.selectedIdentity` into `decks.setup`
- * and unset the legacy fields. Paginated and self-rescheduling; idempotent (decks that already
- * have `setup` and no legacy fields are skipped, as are non-UVS decks).
+ * Backfill: write `decks.setup` from the legacy `decks.startingCharacterId` /
+ * `decks.selectedIdentity` and keep the legacy fields mirrored from it (the live frontend still
+ * reads them). Paginated and self-rescheduling; idempotent (UVS decks whose setup and legacy
+ * fields already agree are skipped, as are non-UVS decks). Rerunning it restores legacy fields
+ * that an earlier version of this migration removed.
  *
  * Start with `migrations/migrateDeckSetup:run` (no args). Check with `migrations/migrateDeckSetup:status`.
  */

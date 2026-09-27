@@ -97,20 +97,26 @@ hero "Ready" badge use `mainDeckTarget(module)` (`src/games/main-deck-target.ts`
 
 - `decks.setup: v.optional(deckSetupValidator)`.
 - Legacy top-level `startingCharacterId` / `selectedIdentity` stay in the schema as
-  **deprecated optional** fields until the backfill has run in production. Writers only write
-  `setup` (and clear the legacy fields when they patch). Readers go through one normalizer:
-  `normalizeDeckSetup(deck)` in `shared/games/uvs/setup.ts`, which prefers `setup` and falls
-  back to the legacy fields.
+  **deprecated optional** fields. The live frontend still reads them, so every UVS deck write
+  (`decks.create`, `decks.update`, duplicate) writes `setup` **and mirrors the legacy fields from
+  it** via `legacyUvsSetupFields(setup)` (`shared/games/uvs/setup.ts`; a missing value, or a
+  non-UVS setup, patches the field to undefined). Keep mirroring until no deployed frontend reads
+  the legacy fields. Note: the shared "dev" Convex deployment (`honorable-shrimp-618`) is the one
+  the **live** site uses, so schema/function changes deployed there affect production users.
+  Readers go through one normalizer: `normalizeDeckSetup(deck)` in `shared/games/uvs/setup.ts`,
+  which prefers `setup` and falls back to the legacy fields.
 - Mutation API: `decks.create` accepts `setup: v.optional(deckSetupValidator)`. `decks.update` accepts
   `setup: v.optional(v.union(deckSetupPatchValidator, v.null()))` — the patch validator makes each
   field `id | string | null` so today's null-clears semantics hold per field (`applyDeckSetupPatch`);
   `setup: null` clears the whole setup. Writers always write a `setup` object (possibly `{ game }`)
-  and unset the legacy fields. The legacy `startingCharacterId` / `selectedIdentity` args are still
+  plus the mirrored legacy fields. The legacy `startingCharacterId` / `selectedIdentity` args are still
   accepted for one release and folded in by `mergeLegacyDeckSetupArgs` (explicit `setup` fields win).
 - Backfill: `convex/migrations/migrateDeckSetup.ts` — `run` (internalMutation, `cursor`/`batchSize`
   args, 200 per page, reschedules itself until done; `once: true` for a single page) and `status`
   (internalQuery over one page; loop on `continueCursor` and sum `pending`). The per-doc transform is
-  `deckSetupMigrationPatch` in `shared/games/uvs/setup.ts`.
+  `deckSetupMigrationPatch` in `shared/games/uvs/setup.ts`: it returns `setup` plus the mirrored
+  legacy fields, or `null` when the deck already has `setup` and its legacy fields agree (rerunning
+  it restores legacy fields an earlier version of the migration removed).
 
 ### Deck module (`SharedGameModule.deck`, `shared/games/deck.ts`)
 

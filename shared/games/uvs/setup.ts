@@ -137,19 +137,34 @@ export function uvsSetupFields<TCardId extends string>(
 }
 
 /**
- * Backfill transform for `migrations/migrateDeckSetup`: returns the patch that moves legacy
- * fields into `setup` (and unsets them), or `null` when the deck is already migrated or is not a
- * UVS deck (`game` missing means legacy UVS).
+ * Legacy top-level fields mirrored from a setup. The live `master` frontend still reads
+ * `decks.startingCharacterId` / `decks.selectedIdentity`, so every UVS deck write keeps them in
+ * sync with `setup` (both keys always present so a patch also clears them). Non-UVS setups clear
+ * them. Remove once no deployed frontend reads the legacy fields.
+ */
+export function legacyUvsSetupFields<TCardId extends string>(
+  setup: DeckSetup<TCardId> | null | undefined,
+): { startingCharacterId: TCardId | undefined; selectedIdentity: string | undefined } {
+  if (setup?.game !== "uvs") return { startingCharacterId: undefined, selectedIdentity: undefined };
+  return { startingCharacterId: setup.startingCharacterId, selectedIdentity: setup.selectedIdentity };
+}
+
+/**
+ * Backfill transform for `migrations/migrateDeckSetup`: returns the patch that writes `setup`
+ * and keeps the legacy fields mirrored from it, or `null` when the deck already has both in sync
+ * or is not a UVS deck (`game` missing means legacy UVS).
  */
 export function deckSetupMigrationPatch<TCardId extends string>(
   deck: UvsDeckSetupSource<TCardId> & { game?: string | null },
-): { setup: UvsDeckSetup<TCardId>; startingCharacterId: undefined; selectedIdentity: undefined } | null {
+): { setup: UvsDeckSetup<TCardId>; startingCharacterId: TCardId | undefined; selectedIdentity: string | undefined } | null {
   if ((deck.game ?? DEFAULT_GAME_ID) !== "uvs") return null;
-  const hasLegacy = deck.startingCharacterId !== undefined || deck.selectedIdentity !== undefined;
-  if (deck.setup !== undefined && deck.setup !== null && !hasLegacy) return null;
-  return {
-    setup: normalizeDeckSetup(deck),
-    startingCharacterId: undefined,
-    selectedIdentity: undefined,
-  };
+  const setup = normalizeDeckSetup(deck);
+  const legacy = legacyUvsSetupFields(setup);
+  const inSync =
+    deck.setup !== undefined &&
+    deck.setup !== null &&
+    deck.startingCharacterId === legacy.startingCharacterId &&
+    deck.selectedIdentity === legacy.selectedIdentity;
+  if (inSync) return null;
+  return { setup, ...legacy };
 }

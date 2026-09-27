@@ -3,6 +3,7 @@ import {
   applyDeckSetupPatch,
   deckSetupCardIds,
   deckSetupMigrationPatch,
+  legacyUvsSetupFields,
   mergeLegacyDeckSetupArgs,
   normalizeDeckSetup,
 } from "@shared/games/uvs/setup";
@@ -109,13 +110,39 @@ describe("deckSetupCardIds", () => {
   });
 });
 
+describe("legacyUvsSetupFields", () => {
+  test("mirrors a UVS setup's values", () => {
+    expect(legacyUvsSetupFields({ game: "uvs", startingCharacterId: "c1", selectedIdentity: "fire" })).toEqual({
+      startingCharacterId: "c1",
+      selectedIdentity: "fire",
+    });
+    expect(legacyUvsSetupFields({ game: "uvs", selectedIdentity: "" }).selectedIdentity).toBe("");
+  });
+
+  test("UVS setup without values yields undefined for both (keys always present)", () => {
+    const out = legacyUvsSetupFields({ game: "uvs" });
+    expect(Object.keys(out).sort()).toEqual(["selectedIdentity", "startingCharacterId"]);
+    expect(out.startingCharacterId).toBeUndefined();
+    expect(out.selectedIdentity).toBeUndefined();
+  });
+
+  test("non-UVS setup and missing setup clear both", () => {
+    const cleared = { startingCharacterId: undefined, selectedIdentity: undefined };
+    for (const setup of [{ game: "cyberpunk" as const, legendIds: ["l1"] }, null, undefined]) {
+      const out = legacyUvsSetupFields(setup);
+      expect(Object.keys(out).sort()).toEqual(["selectedIdentity", "startingCharacterId"]);
+      expect(out).toEqual(cleared);
+    }
+  });
+});
+
 describe("deckSetupMigrationPatch", () => {
-  test("moves legacy fields into setup and unsets them", () => {
+  test("moves legacy fields into setup and keeps them mirrored", () => {
     const patch = deckSetupMigrationPatch({ startingCharacterId: "c1", selectedIdentity: "fire" });
     expect(patch).toEqual({
       setup: { game: "uvs", startingCharacterId: "c1", selectedIdentity: "fire" },
-      startingCharacterId: undefined,
-      selectedIdentity: undefined,
+      startingCharacterId: "c1",
+      selectedIdentity: "fire",
     });
     expect(Object.keys(patch!).sort()).toEqual(["selectedIdentity", "setup", "startingCharacterId"]);
   });
@@ -125,9 +152,22 @@ describe("deckSetupMigrationPatch", () => {
   });
 
   test("already-migrated decks are skipped (idempotent)", () => {
-    expect(deckSetupMigrationPatch({ setup: { game: "uvs", selectedIdentity: "fire" } })).toBeNull();
+    expect(
+      deckSetupMigrationPatch({ setup: { game: "uvs", selectedIdentity: "fire" }, selectedIdentity: "fire" }),
+    ).toBeNull();
+    expect(deckSetupMigrationPatch({ setup: { game: "uvs" } })).toBeNull();
     const once = deckSetupMigrationPatch({ selectedIdentity: "fire" })!;
-    expect(deckSetupMigrationPatch({ setup: once.setup })).toBeNull();
+    expect(deckSetupMigrationPatch(once)).toBeNull();
+  });
+
+  test("setup without legacy fields gets them restored", () => {
+    expect(
+      deckSetupMigrationPatch({ setup: { game: "uvs", startingCharacterId: "c1", selectedIdentity: "fire" } }),
+    ).toEqual({
+      setup: { game: "uvs", startingCharacterId: "c1", selectedIdentity: "fire" },
+      startingCharacterId: "c1",
+      selectedIdentity: "fire",
+    });
   });
 
   test("non-UVS decks are skipped; missing game means UVS", () => {
@@ -139,10 +179,10 @@ describe("deckSetupMigrationPatch", () => {
     expect(deckSetupMigrationPatch({ game: null, selectedIdentity: "fire" })).not.toBeNull();
   });
 
-  test("setup plus leftover legacy fields: keeps setup, clears legacy", () => {
+  test("setup plus disagreeing legacy fields: keeps setup, mirrors legacy from it", () => {
     expect(
       deckSetupMigrationPatch({ setup: { game: "uvs", selectedIdentity: "water" }, selectedIdentity: "fire" }),
-    ).toEqual({ setup: { game: "uvs", selectedIdentity: "water" }, startingCharacterId: undefined, selectedIdentity: undefined });
+    ).toEqual({ setup: { game: "uvs", selectedIdentity: "water" }, startingCharacterId: undefined, selectedIdentity: "water" });
   });
 });
 

@@ -31,6 +31,7 @@ import { deckGameModule } from "./lib/deckGame";
 import type { GameId } from "../shared/games/types";
 import { getSharedGameModule } from "../shared/games/registry";
 import { resolveDeckSetupPatchArgs } from "../shared/games/deck-setup";
+import { legacyUvsSetupFields } from "../shared/games/uvs/setup";
 import { docGame, findDefaultFormat, isDocInGame, withResolvedGame } from "./lib/gameScope";
 
 /** Rejects cards from another game (decks only reference cards of their own game). */
@@ -247,6 +248,8 @@ export const create = mutation({
       isPublic: syncListingIsPublic(visibility),
       format,
       setup,
+      // Keep legacy fields for the live frontend (see legacyUvsSetupFields).
+      ...legacyUvsSetupFields(setup),
       mainCardIds: [],
       mainQuantities: {},
       sideCardIds: [],
@@ -365,10 +368,11 @@ export const update = mutation({
       }
     }
     if (setupPatch !== undefined) {
-      // Writers only write `setup` and clear the deprecated top-level fields.
-      filteredUpdates.setup = deckModule.applySetupPatch(deckModule.normalizeSetup(deck), setupPatch);
-      filteredUpdates.startingCharacterId = undefined;
-      filteredUpdates.selectedIdentity = undefined;
+      // Write `setup` and keep the legacy fields mirrored for the live frontend
+      // (see legacyUvsSetupFields).
+      const nextSetup = deckModule.applySetupPatch(deckModule.normalizeSetup(deck), setupPatch);
+      filteredUpdates.setup = nextSetup;
+      Object.assign(filteredUpdates, legacyUvsSetupFields(nextSetup));
     }
     if (args.visibility !== undefined) {
       filteredUpdates.isPublic = syncListingIsPublic(args.visibility);

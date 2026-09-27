@@ -57,14 +57,14 @@ describe("buildDuplicatedDeckFields", () => {
     expect(copy.teamCollaboration).toBe("none");
     expect(copy.format).toBe("standard");
     expect(copy.subFormat).toBe("constructed");
-    // Legacy setup fields are copied into `setup` (the copy is written in the new shape only).
+    // Legacy setup fields are copied into `setup` and mirrored back (the live frontend reads them).
     expect(copy.setup).toEqual({
       game: "uvs",
       startingCharacterId: source.startingCharacterId,
       selectedIdentity: "water",
     });
-    expect(copy).not.toHaveProperty("startingCharacterId");
-    expect(copy).not.toHaveProperty("selectedIdentity");
+    expect(copy.startingCharacterId).toBe(source.startingCharacterId);
+    expect(copy.selectedIdentity).toBe("water");
     expect(copy.imageCardId).toBe(source.imageCardId);
     expect(copy.mainCardIds).toEqual(source.mainCardIds);
     expect(copy.mainCardIds).not.toBe(source.mainCardIds);
