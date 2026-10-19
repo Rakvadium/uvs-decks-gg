@@ -10,7 +10,9 @@ import {
 const toHsv = converter("hsv");
 
 const BLOCK_REGION = { x: 0.84, y: 0.04, w: 0.12, h: 0.08 };
-const ATTACK_REGION = { x: 0.84, y: 0.46, w: 0.12, h: 0.08 };
+// Tight box inside the speed circle; a wider box picks up the coloured text box behind it.
+// Matches 402/402 attacks across FT01, SF6, Tekken 8, Godzilla, TMNT and AoT scans.
+const ATTACK_REGION = { x: 0.82, y: 0.58, w: 0.07, h: 0.05 };
 const SYMBOL_STRIP = { x: 0.0, y: 0.895, w: 0.5, h: 0.1 };
 
 type Zone = "high" | "mid" | "low";

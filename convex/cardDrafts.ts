@@ -20,21 +20,11 @@ import { requireAdmin } from "./utils/validation";
 import { createCardWithDerivedFields } from "./lib/cardCreate";
 import { DEFAULT_GAME_ID, type GameId } from "../shared/games/types";
 import { docGame, findSetByCode, withResolvedGame } from "./lib/gameScope";
+import { draftFieldsFromFileName } from "./lib/draftFileName";
 
 type CardDraftEditable = Infer<typeof cardDraftEditableValidator>;
 
 const DRAFT_UPLOAD_BATCH_MAX = 100;
-
-const RARITY_LABELS: Record<string, string> = {
-  C: "Common",
-  UC: "Uncommon",
-  R: "Rare",
-  SR: "Super Rare",
-  UR: "Ultra Rare",
-  CR: "Character Rare",
-  CH: "Champion",
-  P: "Promo",
-};
 
 const draftUploadInputValidator = v.object({
   storageId: v.id("_storage"),
@@ -78,38 +68,6 @@ function mergeOcrDraft(
     ...cleanDraft(parsed),
     symbols: existingSymbols ?? parsedSymbols ?? "",
   };
-}
-
-function splitCompactName(value: string): string {
-  return value
-    .replace(/([a-z])([A-Z])/g, "$1 $2")
-    .replace(/([A-Z]+)([A-Z][a-z])/g, "$1 $2")
-    .replace(/[-_]+/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-function draftFieldsFromFileName(fileName: string): CardDraftEditable {
-  const base = fileName.replace(/\.[^.]+$/, "");
-  const parts = base.split("-").filter(Boolean);
-  const fields: CardDraftEditable = {};
-  if (parts.length >= 2) {
-    fields.setCode = parts[0];
-    fields.collectorNumber = parts[1];
-  }
-  const rarityIndex = parts.findIndex((part, index) => index >= 2 && RARITY_LABELS[part.toUpperCase()]);
-  if (rarityIndex >= 0) {
-    const rarityCode = parts[rarityIndex].toUpperCase();
-    fields.rarity = RARITY_LABELS[rarityCode] ?? rarityCode;
-    fields.isVariant = parts.some((part) => part.toUpperCase() === "ALT");
-    const nameParts = parts.slice(rarityIndex + 1).filter((part) => part.toUpperCase() !== "ALT");
-    if (nameParts.length > 0) {
-      fields.name = splitCompactName(nameParts.join(" "));
-    }
-  } else if (parts.length > 2) {
-    fields.name = splitCompactName(parts.slice(2).join(" "));
-  }
-  return fields;
 }
 
 function draftToCardInput(
