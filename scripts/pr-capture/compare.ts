@@ -96,7 +96,7 @@ const summary = [
   "| --- | --- | --- | --- | --- | --- |",
   ...rows,
   ...(missing.length ? ["", "Unpaired shots:", ...missing] : []),
-  ...(gifs.length ? ["", "### Recordings", "", ...gifs] : []),
+  ...(gifs.length ? ["", "### Recordings", "", ...gifs.flatMap((gif) => [gif, ""])] : []),
   "",
 ].join("\n");
 
