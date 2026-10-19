@@ -46,7 +46,9 @@ next-env.d.ts
 !/scripts/patch-convex-auth-lan-host.mjs
 !/scripts/seed-card-drafts.ts
 !/scripts/ocr-calibration/
+!/scripts/pr-capture/
 /scripts/ocr-calibration/*
 !/scripts/ocr-calibration/fixtures.json
 /scripts/ocr-calibration/output/
 /screenshots/
+/.pr-captures/
