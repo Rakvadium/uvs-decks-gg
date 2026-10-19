@@ -548,8 +548,8 @@ function matchBlob(
 function paddedBox(icon: IconBox, others: IconBox[], pad: number): IconBox {
   let left = pad;
   let right = pad;
-  let top = pad;
-  let bottom = pad;
+  const top = pad;
+  const bottom = pad;
   for (const other of others) {
     const gapLeft = icon.x - (other.x + other.width);
     if (gapLeft >= 0 && gapLeft < icon.width) left = Math.min(left, Math.max(1, gapLeft - 1));
