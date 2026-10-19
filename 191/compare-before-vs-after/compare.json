@@ -1,0 +1,103 @@
+{
+  "base": "before",
+  "head": "after",
+  "threshold": 0.1,
+  "results": [
+    {
+      "name": "decks__desktop__cyberpunk__dark",
+      "diffPercent": 0.026
+    },
+    {
+      "name": "decks__desktop__cyberpunk__light",
+      "diffPercent": 0.023
+    },
+    {
+      "name": "decks__desktop__default__dark",
+      "diffPercent": 0.023
+    },
+    {
+      "name": "decks__desktop__default__light",
+      "diffPercent": 0.025
+    },
+    {
+      "name": "decks__mobile__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "decks__mobile__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "decks__mobile__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "decks__mobile__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "gallery__desktop__cyberpunk__dark",
+      "diffPercent": 0.026
+    },
+    {
+      "name": "gallery__desktop__cyberpunk__light",
+      "diffPercent": 0.023
+    },
+    {
+      "name": "gallery__desktop__default__dark",
+      "diffPercent": 0.023
+    },
+    {
+      "name": "gallery__desktop__default__light",
+      "diffPercent": 0.025
+    },
+    {
+      "name": "gallery__mobile__cyberpunk__dark",
+      "diffPercent": 0.062
+    },
+    {
+      "name": "gallery__mobile__cyberpunk__light",
+      "diffPercent": 0.065
+    },
+    {
+      "name": "gallery__mobile__default__dark",
+      "diffPercent": 0.061
+    },
+    {
+      "name": "gallery__mobile__default__light",
+      "diffPercent": 0.062
+    },
+    {
+      "name": "guest-gallery__desktop__cyberpunk__dark",
+      "diffPercent": 0.026
+    },
+    {
+      "name": "guest-gallery__desktop__cyberpunk__light",
+      "diffPercent": 0.023
+    },
+    {
+      "name": "guest-gallery__desktop__default__dark",
+      "diffPercent": 0.023
+    },
+    {
+      "name": "guest-gallery__desktop__default__light",
+      "diffPercent": 0.025
+    },
+    {
+      "name": "guest-gallery__mobile__cyberpunk__dark",
+      "diffPercent": 0.062
+    },
+    {
+      "name": "guest-gallery__mobile__cyberpunk__light",
+      "diffPercent": 0.065
+    },
+    {
+      "name": "guest-gallery__mobile__default__dark",
+      "diffPercent": 0.061
+    },
+    {
+      "name": "guest-gallery__mobile__default__light",
+      "diffPercent": 0.062
+    }
+  ]
+}
