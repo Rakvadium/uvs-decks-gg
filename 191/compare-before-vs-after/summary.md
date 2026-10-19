@@ -34,6 +34,8 @@ pixelmatch threshold 0.1. Diff % = changed pixels / total pixels.
 **before: `decks-new-deck-dialog__desktop__default__dark.gif`**
 
 ![decks-new-deck-dialog__desktop__default__dark.gif](https://raw.githubusercontent.com/Rakvadium/uvs-decks-gg/pr-media/191/before/decks-new-deck-dialog__desktop__default__dark.gif)
+
 **after: `decks-new-deck-dialog__desktop__default__dark.gif`**
 
 ![decks-new-deck-dialog__desktop__default__dark.gif](https://raw.githubusercontent.com/Rakvadium/uvs-decks-gg/pr-media/191/after/decks-new-deck-dialog__desktop__default__dark.gif)
+
