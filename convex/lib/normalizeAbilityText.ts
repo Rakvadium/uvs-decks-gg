@@ -15,6 +15,17 @@ const REMINDER_PAREN_START_RE = new RegExp(
 );
 const CHOOSE_ONE_TAIL_RE = /:\s*choose\s+(?:one|1|two|2)\s*:?\s*$/i;
 
+const RATING_KEYWORD_BEFORE_RE = /([A-Za-z]+)$/;
+const RATING_VALUE_AFTER_RE = /^\s?(?:\d+|X)\b/;
+const TIMING_WORD_RE = new RegExp(`^(?:${TIMING_WORDS}|Deadlock)$`, "i");
+
+// "gains Quest: 1" / "Stun: 2" — the colon belongs to a keyword rating, not an ability header.
+function isKeywordRatingColon(text: string, index: number): boolean {
+  const word = text.slice(0, index).match(RATING_KEYWORD_BEFORE_RE)?.[1];
+  if (!word || TIMING_WORD_RE.test(word)) return false;
+  return RATING_VALUE_AFTER_RE.test(text.slice(index + 1));
+}
+
 export function indexOfUnprotectedColons(text: string): number[] {
   const indices: number[] = [];
   let braceDepth = 0;
@@ -37,7 +48,7 @@ export function indexOfUnprotectedColons(text: string): number[] {
       bracketDepth -= 1;
       continue;
     }
-    if (char === ":" && braceDepth === 0 && bracketDepth === 0) {
+    if (char === ":" && braceDepth === 0 && bracketDepth === 0 && !isKeywordRatingColon(text, i)) {
       indices.push(i);
     }
   }

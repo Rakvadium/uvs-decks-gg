@@ -142,3 +142,22 @@ describe("normalizeAbilityText", () => {
     );
   });
 });
+
+describe("normalizeAbilityText keyword rating colons", () => {
+  test("keeps the header colon when the effect grants a rated keyword", () => {
+    for (const text of [
+      "Enhance Flip: This {evil} attack gains Quest: 1.",
+      "Blitz: Your next Slam attack gains Stun: 1.",
+      "Blitz: Your next Fury attack gets +1 speed and gains Powerful: 2.",
+      "Enhance [Once per turn] Remove 1 Spell from your discard pile: Your attack gains Echo or Stun: 2 if it has the same name as the removed card.",
+    ]) {
+      expect(normalizeAbilityText(text)).toBe(text);
+    }
+  });
+
+  test("still collapses a doubled timing colon next to a rating", () => {
+    expect(normalizeAbilityText("Enhance: Flip: This attack gains Quest: 1.")).toBe(
+      "Enhance Flip: This attack gains Quest: 1."
+    );
+  });
+});
