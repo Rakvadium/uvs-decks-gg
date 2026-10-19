@@ -1,0 +1,103 @@
+{
+  "base": "verify",
+  "head": "verify-2",
+  "threshold": 0.1,
+  "results": [
+    {
+      "name": "decks__desktop__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "decks__desktop__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "decks__desktop__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "decks__desktop__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "decks__mobile__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "decks__mobile__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "decks__mobile__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "decks__mobile__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "gallery__desktop__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "gallery__desktop__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "gallery__desktop__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "gallery__desktop__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "gallery__mobile__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "gallery__mobile__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "gallery__mobile__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "gallery__mobile__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-gallery__desktop__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-gallery__desktop__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-gallery__desktop__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-gallery__desktop__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-gallery__mobile__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-gallery__mobile__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-gallery__mobile__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-gallery__mobile__default__light",
+      "diffPercent": 0
+    }
+  ]
+}
