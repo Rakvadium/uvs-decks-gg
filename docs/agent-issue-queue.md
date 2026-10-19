@@ -82,7 +82,7 @@ If blocked: comment why, add `blocked` or `needs-human`, stop that item.
 - Base branch: always **`dev`** (never `master` / `main`)
 - PR body references `Fixes #<issue-number>`
 - Example: `gh pr create --base dev --title "..." --body "Fixes #N\n\n..."`
-- UI PRs: embed Before **and** After from `.github/pr-captures/<issue>/` using raw GitHub URLs. Never paste `cursor.com/artifacts` links (they expire; GitHub usually keeps only Before). See [agent-workflow-playbook.md](./agent-workflow-playbook.md) § PR visual embeds.
+- UI PRs: embed Before **and** After from the `pr-media` branch via `bun run capture:publish` (raw GitHub URLs, `scripts/pr-capture/README.md`). Never paste `cursor.com/artifacts` links (they expire; GitHub usually keeps only Before). See [agent-workflow-playbook.md](./agent-workflow-playbook.md) § PR visual embeds.
 - Do not batch unrelated issues into one PR
 
 ---
