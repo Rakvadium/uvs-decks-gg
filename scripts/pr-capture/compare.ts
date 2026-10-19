@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import pixelmatch from "pixelmatch";
 import { PNG } from "pngjs";
+import sharp from "sharp";
 import { OUTPUT_ROOT, parseArgs, rawUrl, repoSlug, requireIssue, requireLabel } from "./shared.ts";
 
 const args = parseArgs(process.argv.slice(2));
@@ -38,6 +39,13 @@ function sideBySide(a: PNG, b: PNG): PNG {
   return out;
 }
 
+/** Side-by-side and diff images are visual aids, so they're palette-quantized to keep pr-media small. */
+async function writeQuantized(png: PNG, file: string) {
+  await sharp(png.data, { raw: { width: png.width, height: png.height, channels: 4 } })
+    .png({ palette: true, quality: 90, effort: 7 })
+    .toFile(path.join(outDir, file));
+}
+
 const repo = repoSlug();
 const img = (rel: string, alt: string) => `<img src="${rawUrl(repo, rel)}" alt="${alt}" width="220">`;
 
@@ -60,8 +68,8 @@ for (const file of baseShots.filter((f) => headShots.has(f))) {
   const diff = new PNG({ width, height });
   const changed = pixelmatch(a.data, b.data, diff.data, width, height, { threshold });
   const diffPercent = Number(((changed / (width * height)) * 100).toFixed(3));
-  fs.writeFileSync(path.join(outDir, `${name}__side.png`), PNG.sync.write(sideBySide(a, b)));
-  fs.writeFileSync(path.join(outDir, `${name}__diff.png`), PNG.sync.write(diff));
+  await writeQuantized(sideBySide(a, b), `${name}__side.png`);
+  await writeQuantized(diff, `${name}__diff.png`);
   results.push({ name, diffPercent });
   rows.push(
     `| \`${name}\` | ${img(`${issue}/${base}/${file}`, base)} | ${img(`${issue}/${head}/${file}`, head)} | ` +

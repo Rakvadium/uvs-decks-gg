@@ -101,7 +101,7 @@ Animations and transitions are then forced to 0s, the caret and the Next dev ind
 - `compare.json`: diff % per pair
 - `summary.md`: a table with base / head / side by side / diff / diff %, plus any GIFs in either label, all as raw `pr-media` URLs
 
-If the two shots differ in height, both are padded to the larger one. Unpaired shots are listed.
+If the two shots differ in height, both are padded to the larger one. Unpaired shots are listed. Diff % is computed on the lossless captures. The side-by-side and diff PNGs are palette-quantized with `sharp`, which makes them about 7x smaller, because every publish retry has to fetch `pr-media`.
 
 ## Publish
 
