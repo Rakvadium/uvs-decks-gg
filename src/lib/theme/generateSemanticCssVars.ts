@@ -1,6 +1,7 @@
-import { converter, parse, wcagContrast } from "culori";
+import { clampChroma, clampRgb, converter, parse, wcagContrast, type Rgb } from "culori";
 
 const toOklch = converter("oklch");
+const toRgb = converter("rgb");
 
 export type AppearanceMode = "light" | "dark";
 
@@ -51,6 +52,40 @@ function pickSignalColor(preferred: Oklch, surface: Oklch, minRatio = 3): Oklch 
   return contrastAgainst(fallback, surface) >= contrastAgainst(preferred, surface)
     ? fallback
     : preferred;
+}
+
+const DESTRUCTIVE = { light: "oklch(0.577 0.245 27.325)", dark: "oklch(0.62 0.22 25)" };
+const DESTRUCTIVE_LABEL_MIN = 4.5;
+
+/** sRGB as the browser paints it: out-of-gamut channels clipped. */
+function painted(c: Oklch): Rgb {
+  return clampRgb(toRgb({ mode: "oklch", l: c.l, c: c.c ?? 0, h: c.h }));
+}
+
+/** `fill` at `alpha` over the opaque `surface`, composited in sRGB like the browser. */
+function over(fill: Oklch, alpha: number, surface: Oklch): Rgb {
+  const top = painted(fill);
+  const bottom = painted(surface);
+  const mix = (a: number, b: number) => a * alpha + b * (1 - alpha);
+  return { mode: "rgb", r: mix(top.r, bottom.r), g: mix(top.g, bottom.g), b: mix(top.b, bottom.b) };
+}
+
+/**
+ * The solid destructive fill under the `#fff` label (`Button variant="destructive"`), as a CSS
+ * color. Keeps `destructive` when the label already reaches 4.5:1 at rest and on the `/90` hover
+ * over each surface. Otherwise it darkens the same hue, in sRGB gamut, only as far as needed.
+ */
+function pickDestructiveFill(destructiveCss: string, surfaces: Oklch[]): string {
+  const destructive = toOklch(parse(destructiveCss)!) as Oklch;
+  const passes = (fill: Oklch) =>
+    wcagContrast("#fff", painted(fill)) >= DESTRUCTIVE_LABEL_MIN &&
+    surfaces.every((surface) => wcagContrast("#fff", over(fill, 0.9, surface)) >= DESTRUCTIVE_LABEL_MIN);
+  if (passes(destructive)) return "var(--destructive)";
+  let fill = destructive;
+  for (let l = destructive.l - 0.005; l > 0 && !passes(fill); l -= 0.005) {
+    fill = clampChroma({ mode: "oklch", l, c: destructive.c ?? 0, h: destructive.h }, "oklch") as Oklch;
+  }
+  return fmt(fill);
 }
 
 function pickInkOn(signal: Oklch): Oklch {
@@ -136,8 +171,9 @@ export function buildSemanticCssVars(primaryHex: string, secondaryHex: string, m
       "--muted-foreground": fmt(mutedFg),
       "--accent": fmt(accent),
       "--accent-foreground": fmt(pickInkOn(accent)),
-      "--destructive": "oklch(0.577 0.245 27.325)",
+      "--destructive": DESTRUCTIVE.light,
       "--destructive-foreground": "#fff",
+      "--destructive-fill": pickDestructiveFill(DESTRUCTIVE.light, [background, card]),
       "--border": fmt(borderCol),
       "--input": fmt(inputCol),
       "--ring": fmt(p),
@@ -194,8 +230,9 @@ export function buildSemanticCssVars(primaryHex: string, secondaryHex: string, m
     "--muted-foreground": fmt(mutedFg),
     "--accent": fmt(accent),
     "--accent-foreground": fmt(pickInkOn(accent)),
-    "--destructive": "oklch(0.62 0.22 25)",
+    "--destructive": DESTRUCTIVE.dark,
     "--destructive-foreground": "#fff",
+    "--destructive-fill": pickDestructiveFill(DESTRUCTIVE.dark, [background, card]),
     "--border": fmt(borderCol),
     "--input": fmt(inputCol),
     "--ring": fmt(shiftL(p, 0.08)),
