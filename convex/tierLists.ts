@@ -7,7 +7,9 @@ import {
   tierListRankingScopeValidator,
   tierDefinitionValidator,
   tierListCommentStatusValidator,
-  tierListCommentValidator,
+  publicTierListCommentFromDocument,
+  publicTierListCommentValidator,
+  type PublicTierListComment,
   tierListItemValidator,
   tierListValidator,
   publicUserProfileFromDocument,
@@ -43,7 +45,7 @@ const tierListFeedEntryValidator = v.object({
 });
 
 const tierListCommentWithAuthorValidator = v.object({
-  comment: tierListCommentValidator,
+  comment: publicTierListCommentValidator,
   author: v.union(publicUserProfileValidator, v.null()),
 });
 
@@ -321,7 +323,7 @@ export const getDetail = query({
     ]);
 
     const commentsWithAuthors: Array<{
-      comment: Doc<"tierListComments">;
+      comment: PublicTierListComment;
       author: PublicUserProfile | null;
     }> = [];
     for (const comment of comments) {
@@ -330,7 +332,7 @@ export const getDetail = query({
         ? publicUserProfileFromDocument(commentAuthorDoc)
         : null;
       commentsWithAuthors.push({
-        comment,
+        comment: publicTierListCommentFromDocument(comment),
         author: commentAuthor,
       });
     }

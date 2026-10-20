@@ -70,7 +70,7 @@ Parse Goal, Done when, Context, Out of scope (and auth/viewport notes if present
    - `partial` — some items pass; list gaps
    - `does not fix` — Goal unmet or critical Done when failed
 
-7. **Comment on the PR** (required)
+7. **Comment on the PR** (required). Write the comment to a file outside the repo and post it with `bun run gh-post -- pr comment <pr> --body-file <file>`, never bare `gh` (hardened-coding § Security & side effects).
 
 ```markdown
 ## Independent verification (round <k>): PASS | FAIL
@@ -113,7 +113,7 @@ Follow docs/agent-os.md.
 PR: from event context (or #<pr>).
 Resolve linked issue via Fixes/Closes #N.
 Confirm base branch is `dev` (flag master/main as blocker).
-Post the Independent verification comment on the PR.
+Post the Independent verification comment on the PR with `bun run gh-post -- pr comment <pr> --body-file <file>`.
 Do not merge.
 Never edit or push to the PR; report every gap as must-fix or should-fix for the builder.
 For UI: repro with correct auth/viewport and attach screenshot/recording evidence.
