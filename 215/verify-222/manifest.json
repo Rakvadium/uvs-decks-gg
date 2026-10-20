@@ -1,0 +1,146 @@
+{
+  "issue": "215",
+  "label": "verify-222",
+  "port": 8164,
+  "chrome": "calm",
+  "fullPage": false,
+  "strict": true,
+  "shots": [
+    {
+      "name": "guest-gallery__desktop__default__dark",
+      "route": "/gallery",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/gallery",
+      "loaded": true,
+      "stable": true,
+      "pin": null
+    },
+    {
+      "name": "guest-decks__desktop__default__dark",
+      "route": "/decks",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/decks",
+      "loaded": true,
+      "stable": true,
+      "pin": null
+    },
+    {
+      "name": "guest-decks-nh7f0kqdg3hwnpjpmga3tavb5sx4nzwf__desktop__default__dark",
+      "route": "/decks/nh7f0kqdg3hwnpjpmga3tavb5sx4nzwf",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/decks/nh7f0kqdg3hwnpjpmga3tavb5sx4nzwf",
+      "loaded": true,
+      "stable": true,
+      "pin": null
+    },
+    {
+      "name": "guest-community__desktop__default__dark",
+      "route": "/community",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/community",
+      "loaded": true,
+      "stable": true,
+      "pin": null
+    },
+    {
+      "name": "guest-community-rankings__desktop__default__dark",
+      "route": "/community/rankings",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/community/tier-lists",
+      "loaded": true,
+      "stable": true,
+      "pin": null
+    },
+    {
+      "name": "guest-community-tier-lists__desktop__default__dark",
+      "route": "/community/tier-lists",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/community/tier-lists",
+      "loaded": true,
+      "stable": true,
+      "pin": null
+    },
+    {
+      "name": "guest-community-tier-lists-qs79cym6q521fdqc7c9qjf7dcqc27a3k__desktop__default__dark",
+      "route": "/community/tier-lists/qs79cym6q521fdqc7c9qjf7dcqc27a3k",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/community/tier-lists/qs79cym6q521fdqc7c9qjf7dcqc27a3k",
+      "loaded": true,
+      "stable": true,
+      "pin": null
+    },
+    {
+      "name": "guest-teams-q97c5vg70e2an6npjm41xn9q8e2g5m9k__desktop__default__dark",
+      "route": "/teams/q97c5vg70e2an6npjm41xn9q8e2g5m9k",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/teams/q97c5vg70e2an6npjm41xn9q8e2g5m9k/announcements",
+      "loaded": true,
+      "stable": true,
+      "pin": null
+    }
+  ],
+  "gif": null,
+  "blockedConvexWrites": [
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityYoutube:bootstrapYoutubeCurationIds",
+    "Action:communityYoutube:bootstrapYoutubeCurationIds",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus"
+  ],
+  "savedAppearance": [],
+  "pinFlagged": [],
+  "unstable": []
+}
