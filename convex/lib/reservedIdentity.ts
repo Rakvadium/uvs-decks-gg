@@ -4,7 +4,7 @@
  */
 export const RESERVED_AGENT_EMAIL_DOMAIN = "validation.invalid";
 
-/** Legacy password-based agent login account (`agent@localhost.dev`). */
+/** Legacy password-based agent login account (`agent@localhost.dev`, plus `agent+*` variants). */
 const LEGACY_AGENT_LOCAL_PART = "agent";
 const LEGACY_AGENT_DOMAIN = "localhost.dev";
 
@@ -21,7 +21,10 @@ export function isReservedAgentEmail(email: unknown): boolean {
   ) {
     return true;
   }
-  return localPart === LEGACY_AGENT_LOCAL_PART && domain === LEGACY_AGENT_DOMAIN;
+  if (domain !== LEGACY_AGENT_DOMAIN) return false;
+  // Plus-addressed variants (`agent+run@localhost.dev`) are the same mailbox.
+  const mailbox = localPart.split("+", 1)[0];
+  return mailbox === LEGACY_AGENT_LOCAL_PART;
 }
 
 export function isReservedAgentUser(

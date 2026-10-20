@@ -3,7 +3,11 @@ import type { Doc, Id } from "../convex/_generated/dataModel";
 import { ensureAdminForAction } from "../convex/admin";
 import { listDirectory, setAccountStatus, setUserRole } from "../convex/adminUsers";
 import passwordProvider from "../convex/auth";
-import { isAdminRole, isEffectiveAdmin } from "../convex/lib/accountStatus";
+import {
+  buildAdminSearchText,
+  isAdminRole,
+  isEffectiveAdmin,
+} from "../convex/lib/accountStatus";
 import { isReservedAgentEmail, isReservedAgentUser } from "../convex/lib/reservedIdentity";
 import { isAdminForUserId } from "../convex/user";
 import { requireAdmin } from "../convex/utils/validation";
@@ -11,12 +15,13 @@ import { requireAdmin } from "../convex/utils/validation";
 type User = Doc<"users">;
 
 function makeUser(id: string, overrides: Partial<User> = {}): User {
-  return {
+  const user = {
     _id: id as Id<"users">,
     _creationTime: 0,
     accountStatus: "active",
     ...overrides,
   } as User;
+  return { ...user, adminSearchText: buildAdminSearchText(user) };
 }
 
 const admin = () => makeUser("u_admin", { email: "owner@example.com", role: "Admin" });
@@ -66,6 +71,32 @@ function makeCtx(users: User[], authUserId?: string) {
           );
           return { collect: async () => rows };
         },
+        withSearchIndex: (
+          _name: string,
+          build: (q: {
+            search: (field: string, term: string) => unknown;
+            eq: (field: string, value: unknown) => unknown;
+          }) => unknown,
+        ) => {
+          const conds: Array<(u: Record<string, unknown>) => boolean> = [];
+          const q = {
+            search(field: string, term: string) {
+              conds.push((u) => String(u[field] ?? "").includes(term.toLowerCase()));
+              return q;
+            },
+            eq(field: string, value: unknown) {
+              conds.push((u) => u[field] === value);
+              return q;
+            },
+          };
+          build(q);
+          const rows = [...byId.values()].filter((u) =>
+            conds.every((c) => c(u as Record<string, unknown>)),
+          );
+          return {
+            paginate: async () => ({ page: rows, isDone: true, continueCursor: "" }),
+          };
+        },
         order: () => ({
           paginate: async () => ({
             page: [...byId.values()],
@@ -100,6 +131,17 @@ describe("isReservedAgentEmail / isReservedAgentUser", () => {
     expect(isReservedAgentEmail("agent@localhost.dev")).toBe(true);
     expect(isReservedAgentEmail("AGENT@LOCALHOST.DEV")).toBe(true);
     expect(isReservedAgentEmail("someone@localhost.dev")).toBe(false);
+  });
+
+  test("matches plus-addressed legacy agent variants without reserving the domain", () => {
+    expect(isReservedAgentEmail("agent+anything@localhost.dev")).toBe(true);
+    expect(isReservedAgentEmail("Agent+Run-42@LocalHost.dev")).toBe(true);
+    expect(isReservedAgentEmail("agent+@localhost.dev")).toBe(true);
+    expect(isReservedAgentEmail("notagent+x@localhost.dev")).toBe(false);
+    expect(isReservedAgentEmail("agentx@localhost.dev")).toBe(false);
+    expect(isReservedAgentEmail("agent.x@localhost.dev")).toBe(false);
+    expect(isReservedAgentEmail("x+agent@localhost.dev")).toBe(false);
+    expect(isReservedAgentEmail("agent+x@example.com")).toBe(false);
   });
 
   test("does not match normal or malformed emails", () => {
@@ -267,6 +309,24 @@ describe("setAccountStatus", () => {
     expect(byId.get("u_admin")?.accountStatus).toBe("suspended");
   });
 
+  test("last-admin check: a real admin can be restricted with a reserved admin present", async () => {
+    // Actor and target are both real admins, so the guard sees two; the
+    // reserved Admin-role account must not change the outcome or be touched.
+    const { ctx, byId } = makeCtx([admin(), admin2(), reservedAdmin()], "u_admin");
+    await run(ctx, { targetUserId: "u_admin2", nextStatus: "write_restricted" });
+    expect(byId.get("u_admin2")?.accountStatus).toBe("write_restricted");
+    expect(byId.get("u_reserved")?.accountStatus).toBe("active");
+    expect(byId.get("u_reserved")?.role).toBe("Admin");
+  });
+
+  test("last-admin check: restricting a reserved admin never trips the guard", async () => {
+    for (const status of ["suspended", "banned", "write_restricted"] as const) {
+      const { ctx, byId } = makeCtx([admin(), reservedAdmin(), legacyAgentAdmin()], "u_admin");
+      await run(ctx, { targetUserId: "u_legacy", nextStatus: status });
+      expect(byId.get("u_legacy")?.accountStatus).toBe(status);
+    }
+  });
+
   test("a reserved admin cannot restrict anyone", async () => {
     const { ctx } = makeCtx([reservedAdmin(), normal()], "u_reserved");
     await expect(run(ctx, { targetUserId: "u_normal", nextStatus: "banned" })).rejects.toThrow(
@@ -297,10 +357,40 @@ describe("listDirectory role filter", () => {
     const r = await run(ctx, { paginationOpts: { numItems: 50, cursor: null } });
     expect(ids(r)).toEqual(["u_admin", "u_normal", "u_reserved"]);
   });
+
+  describe("search path", () => {
+    const users = () => [admin(), normal(), reservedAdmin(), legacyAgentAdmin()];
+    const search = (searchTerm: string, role?: "Admin" | "user") =>
+      run(makeCtx(users(), "u_admin").ctx, {
+        paginationOpts: { numItems: 50, cursor: null },
+        search: searchTerm,
+        ...(role ? { role } : {}),
+      });
+
+    test("Admin filter drops reserved Admin-role users the index prefilter lets through", async () => {
+      expect(ids(await search("validation.invalid", "Admin"))).toEqual([]);
+      expect(ids(await search("localhost.dev", "Admin"))).toEqual([]);
+      expect(ids(await search("owner", "Admin"))).toEqual(["u_admin"]);
+    });
+
+    test("user filter finds reserved Admin-role users", async () => {
+      expect(ids(await search("validation.invalid", "user"))).toEqual(["u_reserved"]);
+      expect(ids(await search("example.com", "user"))).toEqual(["u_normal"]);
+    });
+
+    test("no role filter is unchanged", async () => {
+      expect(ids(await search("example.com"))).toEqual(["u_admin", "u_normal"]);
+      expect(ids(await search("validation.invalid"))).toEqual(["u_reserved"]);
+    });
+  });
 });
 
 describe("Password provider profile", () => {
-  const reservedEmails = ["bot@validation.invalid", " Agent@LocalHost.dev "];
+  const reservedEmails = [
+    "bot@validation.invalid",
+    " Agent@LocalHost.dev ",
+    "agent+run-7@localhost.dev",
+  ];
 
   for (const flow of ["signUp", "signIn", "reset", "reset-verification"]) {
     test(`rejects reserved emails on ${flow}`, () => {
@@ -322,6 +412,9 @@ describe("Password provider profile", () => {
     });
     expect(profile({ flow: "signIn", email: "someone@localhost.dev" }, {})).toEqual({
       email: "someone@localhost.dev",
+    });
+    expect(profile({ flow: "signIn", email: "notagent+x@localhost.dev" }, {})).toEqual({
+      email: "notagent+x@localhost.dev",
     });
   });
 
