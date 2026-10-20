@@ -27,6 +27,12 @@ bun run vconvex -- --app-port 8150 dev --once           # one-shot push when no 
   `vconvex` or `start`) to rewrite it for this port. The rewrite is logged.
 - `start` fails within `--timeout` seconds (default 60) per step, with the log tail
   (`~/.uvs-validation/backends/<P>/backend.log`).
+- `start` saves `CLI_TOUCHED_FILES` and `convex/_generated/*` (see `convex.ts`) before its first
+  CLI run, in `~/.uvs-validation/backends/<P>/cli-touched-files.json`. It restores
+  `CLI_TOUCHED_FILES` once the watcher's first push is done. `stop` restores everything after
+  killing the watcher. Generated files go back only when the CLI changed nothing but their line
+  endings, so real codegen changes stay. `.gitattributes` checks them out with LF, as the CLI
+  writes them, so a checkout made after that rule should see no change at all.
 
 ## What the guard refuses
 

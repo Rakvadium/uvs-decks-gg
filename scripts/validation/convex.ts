@@ -411,25 +411,65 @@ export function formatTarget(inv: Invocation): string {
  */
 export const CLI_TOUCHED_FILES = [".cursor/rules/convex_rules.mdc", "convex/README.md", "convex/tsconfig.json"];
 
-/** Snapshots CLI_TOUCHED_FILES; the returned function puts them back and lists what it reverted. */
-export function snapshotCliTouchedFiles(repoRoot = REPO_ROOT): () => string[] {
-  const before = CLI_TOUCHED_FILES.map((rel) => {
+/**
+ * Codegen output every push rewrites with LF endings. A checkout made with `core.autocrlf=true`
+ * before `.gitattributes` pinned these to LF has CRLF copies, and git keeps showing a size-changed
+ * file as modified even though only the endings differ.
+ */
+export const CLI_GENERATED_DIR = "convex/_generated";
+
+/**
+ * `exact` entries go back byte for byte. `eol` entries go back only when the CLI's rewrite
+ * differs in line endings alone, so real codegen changes stay.
+ */
+export type CliSnapshotEntry = { rel: string; mode: "exact" | "eol"; content: string | null };
+
+export function takeCliSnapshot(repoRoot = REPO_ROOT): CliSnapshotEntry[] {
+  const read = (rel: string) => {
     const full = path.join(repoRoot, rel);
-    return { rel, full, content: fs.existsSync(full) ? fs.readFileSync(full) : null };
+    return fs.existsSync(full) ? fs.readFileSync(full).toString("base64") : null;
+  };
+  const generatedDir = path.join(repoRoot, CLI_GENERATED_DIR);
+  const generated = fs.existsSync(generatedDir)
+    ? fs
+        .readdirSync(generatedDir, { withFileTypes: true })
+        .filter((d) => d.isFile())
+        .map((d) => `${CLI_GENERATED_DIR}/${d.name}`)
+    : [];
+  return [
+    ...CLI_TOUCHED_FILES.map((rel) => ({ rel, mode: "exact" as const, content: read(rel) })),
+    ...generated.map((rel) => ({ rel, mode: "eol" as const, content: read(rel) })),
+  ];
+}
+
+/** Puts a snapshot back and lists what it reverted. */
+export function restoreCliSnapshot(snapshot: CliSnapshotEntry[], repoRoot = REPO_ROOT): string[] {
+  const lf = (b: Buffer) => b.toString("utf8").replace(/\r\n/g, "\n");
+  return snapshot.flatMap(({ rel, mode, content }) => {
+    const full = path.join(repoRoot, rel);
+    const now = fs.existsSync(full) ? fs.readFileSync(full) : null;
+    const before = content === null ? null : Buffer.from(content, "base64");
+    if (mode === "eol") {
+      if (before === null || now === null || now.equals(before) || lf(now) !== lf(before)) return [];
+      fs.writeFileSync(full, before);
+      return [rel];
+    }
+    if (before === null && now !== null) {
+      fs.rmSync(full);
+      return [rel];
+    }
+    if (before !== null && (now === null || !now.equals(before))) {
+      fs.writeFileSync(full, before);
+      return [rel];
+    }
+    return [];
   });
-  return () =>
-    before.flatMap(({ rel, full, content }) => {
-      const now = fs.existsSync(full) ? fs.readFileSync(full) : null;
-      if (content === null && now !== null) {
-        fs.rmSync(full);
-        return [rel];
-      }
-      if (content !== null && (now === null || !now.equals(content))) {
-        fs.writeFileSync(full, content);
-        return [rel];
-      }
-      return [];
-    });
+}
+
+/** Snapshots the CLI-touched files; the returned function puts them back and lists what it reverted. */
+export function snapshotCliTouchedFiles(repoRoot = REPO_ROOT): () => string[] {
+  const snapshot = takeCliSnapshot(repoRoot);
+  return () => restoreCliSnapshot(snapshot, repoRoot);
 }
 
 async function backendAnswers(url: string): Promise<boolean> {
