@@ -7,6 +7,8 @@
     "build": "next build --webpack",
     "start": "next start -p 8090",
     "lint": "eslint",
+    "lint:design": "bun scripts/design-codemod/lint.ts",
+    "design:codemod": "bun scripts/design-codemod/index.ts",
     "typecheck": "tsc --noEmit",
     "test": "bun test tests",
     "postinstall": "node scripts/patch-convex-auth-lan-host.mjs",
