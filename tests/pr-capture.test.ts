@@ -7,7 +7,7 @@ import path from "node:path";
 import zlib from "node:zlib";
 import { agentLogin, newCaptureContext, stableScreenshot } from "../scripts/pr-capture/browser";
 import { convexHostFromEnv, createSocketGuard, isConvexSocket } from "../scripts/pr-capture/guard";
-import { inflatedPngText } from "../scripts/pr-capture/publish";
+import { inflatedPngText, publish, type Git } from "../scripts/pr-capture/publish";
 import { UNSETTLED_PROBLEM, appearanceKey, createSessionPin, pinFlagged, shotPin, stillPin, type Appearance, type PinReport } from "../scripts/pr-capture/pin";
 import {
   cachedLoad,
@@ -19,6 +19,7 @@ import {
   shotName,
 } from "../scripts/pr-capture/shared";
 import { loadManifest } from "../scripts/secret-scan/shared";
+import { SKIP_DIRS } from "../scripts/secret-scan/sources";
 
 describe("pr-capture args", () => {
   test("parses spaced, inline, and boolean flags", () => {
@@ -1013,6 +1014,23 @@ function mediaRepo() {
       const result = spawnSync(process.execPath, [PUBLISH, "--issue", "1", ...args], { cwd, env, encoding: "utf8" });
       return { status: result.status, out: `${result.stdout}\n${result.stderr}` };
     },
+    /**
+     * Runs publish in-process from `cwd` with a stand-in git: every command runs the real git there,
+     * after `before` has seen its args.
+     */
+    publishWith(cwd: string, before: (args: string[]) => void, ...args: string[]) {
+      const standIn: Git = (gitArgs, options = {}) => {
+        before(gitArgs);
+        return execFileSync("git", gitArgs, {
+          cwd,
+          input: options.input,
+          env: { ...options.env, ...env },
+          encoding: "utf8",
+          stdio: ["pipe", "pipe", "pipe"],
+        }).trim();
+      };
+      return publish(["--issue", "1", ...args], { cwd, git: standIn });
+    },
     tip: () => {
       try {
         return git(origin, "rev-parse", "--verify", "-q", "refs/heads/pr-media");
@@ -1022,6 +1040,9 @@ function mediaRepo() {
     },
     tree: () => git(origin, "ls-tree", "-r", "--name-only", "pr-media").split("\n"),
     blob: (rel: string) => execFileSync("git", ["show", `pr-media:${rel}`], { cwd: origin, env, stdio: "pipe" }),
+    /** Whether any object in origin (reachable or not) holds `value`. */
+    originHas: (value: string) =>
+      execFileSync("git", ["cat-file", "--batch-all-objects", "--batch"], { cwd: origin, env, stdio: "pipe", maxBuffer: 1 << 30 }).includes(value),
     /** Every object in both repos, so a write before the abort (even an unreferenced blob) shows up. */
     objects: () => [work, origin].map((dir) => git(dir, "count-objects", "-v")).join("\n"),
     cleanup: () => fs.rmSync(root, { recursive: true, force: true }),
@@ -1103,7 +1124,7 @@ describe("pr-capture publish: secret-scan gate", () => {
       repo.capture(repo.work, "after", { "shot.png": png(pngChunk("zTXt", Buffer.from("Comment\0\0not zlib"))) });
       const result = repo.publish(repo.work, "--env-file", repo.envFile);
       expect(result.status).toBe(1);
-      expect(result.out).toContain("can't read the text chunks of 1/after/shot.png");
+      expect(result.out).toContain("can't read the PNG text chunks of a file to publish");
       expect(result.out).toContain("exited 2");
       expect(repo.tip()).toBeNull();
     } finally {
@@ -1167,17 +1188,194 @@ describe("pr-capture publish: secret-scan gate", () => {
     }
   }, 60_000);
 
-  test("unknown flags and an empty --env-file are refused before anything is published", () => {
+  test("unknown flags, and an empty or bare --env-file, are refused before anything is published", () => {
     const repo = mediaRepo();
     try {
       repo.capture(repo.work, "after", CLEAN_FILES());
       const unknown = repo.publish(repo.work, "--env-file", repo.envFile, "--skip-scan");
       expect(unknown.status).not.toBe(0);
       expect(unknown.out).toContain("Unknown option: --skip-scan");
-      const empty = repo.publish(repo.work, "--env-file=");
-      expect(empty.status).not.toBe(0);
-      expect(empty.out).toContain("--env-file needs a path");
+      for (const args of [
+        ["--env-file="],
+        ["--env-file"],
+        ["--env-file", "--labels", "after"],
+        ["--env-file", "--labels", "after", "--env-file", repo.envFile],
+      ]) {
+        const bare = repo.publish(repo.work, ...args);
+        expect(bare.status).not.toBe(0);
+        expect(bare.out).toContain("--env-file needs a value");
+      }
       expect(repo.tip()).toBeNull();
+    } finally {
+      repo.cleanup();
+    }
+  }, 60_000);
+
+  test("--env-file adds to the main checkout's env files: a dummy-values file can't mask the real ones", () => {
+    const repo = mediaRepo();
+    try {
+      // The main checkout holds the "real" values; dummy.env has other values for every name, so it
+      // passes --strict on its own.
+      fs.writeFileSync(path.join(repo.work, ".env.local.live-backup"), envText(REQUIRED));
+      fs.mkdirSync(path.join(repo.work, "data"));
+      fs.writeFileSync(path.join(repo.work, "data", "live-env-no-r2.txt"), "");
+      const dummy = path.join(repo.root, "dummy.env");
+      fs.writeFileSync(dummy, REQUIRED.map((name) => `${name}=${fakeValue(name)}`).join("\n"));
+      repo.capture(repo.work, "after", { ...CLEAN_FILES(), "summary.md": `${PLANTED}\n` });
+      const result = repo.publish(repo.work, "--env-file", dummy);
+      expect(result.status).toBe(1);
+      expect(result.out).toContain("AGENT_AUTH_PASSWORD 1/after/summary.md:1");
+      expect(repo.tip()).toBeNull();
+    } finally {
+      repo.cleanup();
+    }
+  }, 60_000);
+
+  test("a label named like a folder `--path` skips is still scanned (or refused): no folder walk", () => {
+    expect([...SKIP_DIRS]).toContain("node_modules");
+    for (const label of SKIP_DIRS) {
+      const repo = mediaRepo();
+      try {
+        repo.capture(repo.work, label, { ...CLEAN_FILES(), "manifest.json": JSON.stringify({ token: PLANTED }) });
+        for (const args of [[], ["--labels", label]]) {
+          const result = repo.publish(repo.work, "--env-file", repo.envFile, ...args);
+          expect(result.status).toBe(1);
+          expect(result.out).not.toContain(PLANTED);
+          // `.git` isn't a valid label name; anything that is gets scanned.
+          if (/^[a-zA-Z0-9][\w.-]*$/.test(label)) expect(result.out).toContain(`AGENT_AUTH_PASSWORD 1/${label}/manifest.json:1`);
+          else expect(result.out).toContain("--labels <label> is required");
+        }
+        expect(repo.tip()).toBeNull();
+        expect(repo.originHas(PLANTED)).toBe(false);
+      } finally {
+        repo.cleanup();
+      }
+    }
+  }, 120_000);
+
+  const pngTricks: [string, Record<string, string | Buffer>, string][] = [
+    ["PNG bytes with a zTXt chunk, named .gif", { "x.gif": png(zTXt(`token=${PLANTED}`)) }, "AGENT_AUTH_PASSWORD _scan-only/1/after/x.gif.text-1.txt:1"],
+    ["PNG bytes with a zTXt chunk, named .json", { "x.json": png(zTXt(`token=${PLANTED}`)) }, "AGENT_AUTH_PASSWORD _scan-only/1/after/x.json.text-1.txt:1"],
+    [
+      "a PNG with a zTXt chunk appended to a GIF",
+      { "x.gif": Buffer.concat([Buffer.from("GIF89a"), png(zTXt(`token=${PLANTED}`))]) },
+      "AGENT_AUTH_PASSWORD _scan-only/1/after/x.gif.text-1.txt:1",
+    ],
+    [
+      "a zTXt chunk with the value in a second, concatenated zlib stream",
+      { "shot.png": png(pngChunk("zTXt", Buffer.concat([Buffer.from("Comment\0\0"), zlib.deflateSync("clean"), zlib.deflateSync(`token=${PLANTED}`)]))) },
+      "AGENT_AUTH_PASSWORD _scan-only/1/after/shot.png.text-2.txt:1",
+    ],
+    [
+      "an iTXt chunk with the value in a second, concatenated zlib stream",
+      {
+        "shot.png": png(
+          pngChunk("iTXt", Buffer.concat([Buffer.from("Comment\0\x01\0en\0Comment\0", "latin1"), zlib.deflateSync("clean"), zlib.deflateSync(`token=${PLANTED}`)])),
+        ),
+      },
+      "AGENT_AUTH_PASSWORD _scan-only/1/after/shot.png.text-2.txt:1",
+    ],
+    [
+      "a PNG iCCP (colour profile) chunk",
+      { "shot.png": png(pngChunk("iCCP", Buffer.concat([Buffer.from("icc\0\0"), zlib.deflateSync(`token=${PLANTED}`)]))) },
+      "AGENT_AUTH_PASSWORD _scan-only/1/after/shot.png.text-1.txt:1",
+    ],
+    ["a .png that isn't a PNG", { "shot.png": Buffer.from("not a png at all") }, "a .png that isn't a PNG"],
+    [
+      "a zTXt chunk with undecodable data after its zlib stream",
+      { "shot.png": png(pngChunk("zTXt", Buffer.concat([Buffer.from("Comment\0\0"), zlib.deflateSync("clean"), Buffer.from(PLANTED)]))) },
+      "exited 2",
+    ],
+  ];
+  for (const [what, files, expected] of pngTricks) {
+    test(`${what} aborts`, () => {
+      const repo = mediaRepo();
+      try {
+        repo.capture(repo.work, "after", { ...CLEAN_FILES(), ...files });
+        const result = repo.publish(repo.work, "--env-file", repo.envFile);
+        expect(result.status).toBe(1);
+        expect(result.out).toContain(expected);
+        expect(result.out).toContain("publish: aborted");
+        expect(result.out).not.toContain(PLANTED);
+        expect(repo.tip()).toBeNull();
+      } finally {
+        repo.cleanup();
+      }
+    }, 60_000);
+  }
+
+  test("a --labels name that doesn't exist is refused without printing it, and so are case-only duplicates", () => {
+    const repo = mediaRepo();
+    try {
+      repo.capture(repo.work, "after", CLEAN_FILES());
+      const result = repo.publish(repo.work, "--env-file", repo.envFile, "--labels", `after,${PLANTED}`);
+      expect(result.status).toBe(1);
+      expect(result.out).toContain("1 of the --labels isn't a folder under .pr-captures/1/. Names not printed.");
+      expect(result.out).not.toContain(PLANTED);
+      const cased = repo.publish(repo.work, "--env-file", repo.envFile, "--labels", "after,AFTER");
+      expect(cased.status).toBe(1);
+      expect(cased.out).toContain("--labels has labels that differ only by case");
+      expect(repo.tip()).toBeNull();
+    } finally {
+      repo.cleanup();
+    }
+  }, 60_000);
+
+  test("a folder or symlink with a media extension is refused, without printing its name", () => {
+    const repo = mediaRepo();
+    try {
+      repo.capture(repo.work, "after", CLEAN_FILES());
+      const dir = path.join(repo.work, ".pr-captures", "1", "after");
+      fs.mkdirSync(path.join(dir, `${PLANTED}.png`));
+      const folder = repo.publish(repo.work, "--env-file", repo.envFile);
+      expect(folder.status).toBe(1);
+      expect(folder.out).toContain("1 entry with a media extension under .pr-captures/1/ isn't a regular file");
+      expect(folder.out).not.toContain(PLANTED);
+      fs.rmSync(path.join(dir, `${PLANTED}.png`), { recursive: true });
+
+      // A symlink to a clean file outside the capture would read and scan fine, so only the check stops it.
+      const outside = path.join(repo.root, "outside.json");
+      fs.writeFileSync(outside, "{}");
+      let linked = true;
+      try {
+        fs.symlinkSync(outside, path.join(dir, "linked.json"), "file");
+      } catch {
+        linked = false; // Windows without symlink rights: the junction below still covers a link.
+      }
+      if (!linked) fs.symlinkSync(repo.root, path.join(dir, "linked.json"), "junction");
+      const link = repo.publish(repo.work, "--env-file", repo.envFile);
+      expect(link.status).toBe(1);
+      expect(link.out).toContain("1 entry with a media extension under .pr-captures/1/ isn't a regular file");
+      expect(repo.tip()).toBeNull();
+    } finally {
+      repo.cleanup();
+    }
+  }, 60_000);
+
+  test("a file changed after the scan: the scanned bytes are published, not the new ones (stand-in git)", async () => {
+    const repo = mediaRepo();
+    try {
+      const clean = CLEAN_FILES();
+      repo.capture(repo.work, "after", clean);
+      const file = path.join(repo.work, ".pr-captures", "1", "after", "summary.md");
+      let swapped = false;
+      const code = await repo.publishWith(
+        repo.work,
+        (args) => {
+          // The first git write runs after the scan: swap the file on disk for planted bytes right then.
+          if (args[0] === "hash-object" && !swapped) {
+            fs.writeFileSync(file, `${PLANTED}\n`);
+            swapped = true;
+          }
+        },
+        "--env-file",
+        repo.envFile,
+      );
+      expect(code).toBe(0);
+      expect(swapped).toBe(true);
+      expect(fs.readFileSync(file, "utf8")).toBe(`${PLANTED}\n`);
+      expect(repo.blob("1/after/summary.md").equals(Buffer.from(clean["summary.md"]))).toBe(true);
+      expect(repo.originHas(PLANTED)).toBe(false);
     } finally {
       repo.cleanup();
     }
@@ -1190,10 +1388,19 @@ describe("pr-capture publish: PNG text chunks", () => {
     expect(texts.map((t) => t.toString())).toEqual(["b", "c"]);
   });
 
-  test("a malformed or truncated PNG throws", () => {
-    expect(() => inflatedPngText(Buffer.from("not a png"))).toThrow("not a PNG");
+  test("every zlib stream in a chunk, and every PNG anywhere in the bytes, is inflated", () => {
+    const twoStreams = pngChunk("zTXt", Buffer.concat([Buffer.from("Comment\0\0"), zlib.deflateSync("one"), zlib.deflateSync("two")]));
+    expect(inflatedPngText(png(twoStreams)).map(String)).toEqual(["one", "two"]);
+    expect(inflatedPngText(Buffer.concat([Buffer.from("GIF89a"), png(zTXt("inner"))])).map(String)).toEqual(["inner"]);
+    expect(inflatedPngText(Buffer.from("not a png"))).toEqual([]);
+  });
+
+  test("a malformed or truncated PNG, or leftover bytes after a zlib stream, throws", () => {
     const whole = png(zTXt("b"));
     expect(() => inflatedPngText(whole.subarray(0, whole.length - 6))).toThrow("truncated");
     expect(() => inflatedPngText(png(pngChunk("zTXt", Buffer.from("no keyword end"))))).toThrow("malformed zTXt");
+    expect(() => inflatedPngText(png(pngChunk("zTXt", Buffer.concat([Buffer.from("C\0\0"), zlib.deflateSync("x"), Buffer.from("junk")]))))).toThrow();
+    const cut = zlib.deflateSync("a longer text that compresses into a stream we can cut short");
+    expect(() => inflatedPngText(png(pngChunk("zTXt", Buffer.concat([Buffer.from("C\0\0"), cut.subarray(0, cut.length - 4)]))))).toThrow();
   });
 });

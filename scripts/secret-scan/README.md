@@ -77,7 +77,11 @@ A value counts as added when it occurs more often in the new blob than in the pa
 
 `--staged` does the same for each staged file: the index blob compared with `HEAD`'s.
 
-`--path` reads every file under the directory, text or binary. It skips `.git` and `node_modules`.
+`--path` reads every file under the directory, text or binary. It skips every folder named `.git` or `node_modules` (`SKIP_DIRS` in `sources.ts`) at any depth, along with everything inside it. So don't use `--path` to gate files that will be published: a folder with one of those names is never read.
+
+### `scanBuffers` (in-process)
+
+`scanBuffers(files, { envFiles, strict }, options)` from `index.ts` scans a list of in-memory `{ path, bytes }` files. It uses the same decoders and matchers as `--path`, and the same env loading, output and exit codes as the CLI. There is no directory walk, so no file is skipped, whatever its path. `capture:publish` uses it to scan the exact bytes it is about to push.
 
 ## What is not detected
 

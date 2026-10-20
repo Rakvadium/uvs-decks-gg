@@ -2,123 +2,150 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import zlib from "node:zlib";
-import { run as secretScan } from "../secret-scan/index.ts";
+import { scanBuffers, type BufferedFile } from "../secret-scan/index.ts";
 import { flagValues } from "../secret-scan/shared.ts";
-import { MEDIA_BRANCH, OUTPUT_ROOT, git, list, parseArgs, rawUrl, repoSlug, requireIssue, requireLabel } from "./shared.ts";
+import { MEDIA_BRANCH, git as realGit, list, parseArgs, rawUrl, repoSlug, requireIssue, requireLabel } from "./shared.ts";
 
 const MEDIA_EXT = /\.(png|gif|webm|md|json)$/;
 const MAX_ATTEMPTS = 6;
 const FLAGS = ["issue", "labels", "env-file"];
-/** The main checkout's env files, used when no `--env-file` is passed. */
+/** The main checkout's env files. Always scanned with when present; required when no `--env-file` is passed. */
 export const DEFAULT_ENV_FILES = [".env.local.live-backup", "data/live-env-no-r2.txt"];
 // pr-media has no app, so every push would otherwise trigger a failing Vercel preview deployment.
 const VERCEL_JSON = '{ "git": { "deploymentEnabled": false } }\n';
-/** Scan-only files (paths, commit message, inflated PNG text) live here in the scan dir, never in the tree. */
-const SCAN_ONLY_DIR = "_scan-only";
+/** Scan-only entries (paths, commit message, inflated PNG text) are reported under this prefix; never published. */
+const SCAN_ONLY = "_scan-only";
+const PNG_SIGNATURE = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
 
+export type Git = (args: string[], options?: { input?: string | Buffer; env?: NodeJS.ProcessEnv }) => string;
 export type Entry = { rel: string; bytes: Buffer };
 
-/** The env files to scan with: every `--env-file`, else the main checkout's two (via `--git-common-dir`). */
-export function envFiles(argv: string[]): string[] {
-  const given = flagValues(argv, "env-file");
-  if (given.some((file) => !file)) throw new Error("--env-file needs a path");
-  if (given.length) return given.map((file) => path.resolve(file));
+/**
+ * The env files to scan with: every `--env-file`, plus each of the main checkout's two files that
+ * exists (found via `--git-common-dir`). With no `--env-file`, both of those are required, so a
+ * missing one fails the scan (exit 2).
+ */
+export function envFiles(argv: string[], git: Git = realGit): string[] {
+  const given = flagValues(argv, "env-file").map((file) => path.resolve(file));
   const common = git(["rev-parse", "--path-format=absolute", "--git-common-dir"]);
-  if (path.basename(common) !== ".git") {
-    throw new Error(`Can't find the main checkout from ${common}; pass --env-file for each env file`);
-  }
-  const main = path.dirname(common);
-  return DEFAULT_ENV_FILES.map((file) => path.join(main, file));
+  if (path.basename(common) !== ".git") throw new Error("Can't find the main checkout from --git-common-dir");
+  const defaults = DEFAULT_ENV_FILES.map((file) => path.join(path.dirname(common), file));
+  if (!given.length) return defaults;
+  return [...new Set([...defaults.filter((file) => fs.existsSync(file)), ...given])];
 }
 
-/**
- * The text of every compressed PNG text chunk (`zTXt`, and `iTXt` with its compression flag set),
- * inflated. The scanner reads raw bytes, so a value in one of these would otherwise be invisible.
- * Throws on a malformed chunk or one that won't inflate, so publish fails closed.
- */
-export function inflatedPngText(bytes: Buffer): Buffer[] {
-  const SIGNATURE = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
-  if (!bytes.subarray(0, 8).equals(SIGNATURE)) throw new Error("not a PNG");
+/** Every zlib stream in `data`, back to back, inflated. Throws on anything left that isn't one. */
+function inflateAll(data: Buffer): Buffer[] {
   const out: Buffer[] = [];
-  for (let at = 8; at < bytes.length; ) {
+  for (let rest = data; rest.length > 0; ) {
+    const { buffer, engine } = zlib.inflateSync(rest, { info: true }) as unknown as {
+      buffer: Buffer;
+      engine: { bytesWritten: number };
+    };
+    if (!(engine.bytesWritten > 0 && engine.bytesWritten <= rest.length)) throw new Error("zlib stream didn't advance");
+    out.push(buffer);
+    rest = rest.subarray(engine.bytesWritten);
+  }
+  return out;
+}
+
+/** The inflated compressed chunks of a PNG starting at `start`, parsed to the end of `bytes`. */
+function pngText(bytes: Buffer, start: number): Buffer[] {
+  const out: Buffer[] = [];
+  for (let at = start + PNG_SIGNATURE.length; at < bytes.length; ) {
     if (at + 12 > bytes.length) throw new Error("truncated PNG chunk");
     const length = bytes.readUInt32BE(at);
     const type = bytes.toString("latin1", at + 4, at + 8);
+    if (at + 12 + length > bytes.length) throw new Error(`truncated PNG ${type} chunk`);
     const data = bytes.subarray(at + 8, at + 8 + length);
-    if (data.length !== length || at + 12 + length > bytes.length) throw new Error(`truncated PNG ${type} chunk`);
     at += 12 + length;
     const keywordEnd = data.indexOf(0);
-    if (type === "zTXt") {
-      if (keywordEnd === -1) throw new Error("malformed zTXt chunk");
-      out.push(zlib.inflateSync(data.subarray(keywordEnd + 2)));
+    if (type === "zTXt" || type === "iCCP") {
+      // keyword (or profile name), NUL, compression method, then zlib data.
+      if (keywordEnd === -1) throw new Error(`malformed ${type} chunk`);
+      out.push(...inflateAll(data.subarray(keywordEnd + 2)));
     } else if (type === "iTXt") {
       if (keywordEnd === -1) throw new Error("malformed iTXt chunk");
       if (data[keywordEnd + 1] !== 1) continue; // Uncompressed: the raw scan already reads it.
       const language = data.indexOf(0, keywordEnd + 3);
       const translated = language === -1 ? -1 : data.indexOf(0, language + 1);
       if (translated === -1) throw new Error("malformed iTXt chunk");
-      out.push(zlib.inflateSync(data.subarray(translated + 1)));
+      out.push(...inflateAll(data.subarray(translated + 1)));
     }
   }
   return out;
 }
 
 /**
- * Writes exactly `entries` (plus the tree paths and commit message, and any inflated PNG text, as
- * scan-only files) to a fresh temp dir and runs `secret-scan --strict --path` on it in-process.
- * Returns the scanner's exit code: 0 clean, 1 hits, 2 the scan couldn't run completely.
+ * The inflated contents of every compressed PNG text or profile chunk (`zTXt`, `iCCP`, and `iTXt`
+ * with compression on) in any PNG inside `bytes`, whatever the file is named: each PNG signature
+ * found is parsed from there to the end. Every zlib stream in a chunk is inflated. The scanner reads
+ * raw bytes, so a value in one of these would otherwise be invisible. Throws on anything malformed,
+ * so publish fails closed.
  */
-export function scanEntries(entries: Entry[], message: string, envFileList: string[]): number {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "pr-capture-publish-scan-"));
-  try {
-    const write = (rel: string, bytes: Buffer | string) => {
-      const file = path.join(dir, ...rel.split("/"));
-      fs.mkdirSync(path.dirname(file), { recursive: true });
-      fs.writeFileSync(file, bytes, { flag: "wx" });
-    };
-    for (const { rel, bytes } of entries) {
-      write(rel, bytes);
-      if (!rel.endsWith(".png")) continue;
-      let texts: Buffer[];
-      try {
-        texts = inflatedPngText(bytes);
-      } catch (error) {
-        console.error(`publish: can't read the text chunks of ${rel}: ${(error as Error).message}`);
-        return 2;
-      }
-      texts.forEach((text, i) => write(`${SCAN_ONLY_DIR}/${rel}.text-${i + 1}.txt`, text));
-    }
-    write(`${SCAN_ONLY_DIR}/paths-and-commit-message.txt`, [...entries.map((e) => e.rel), message].join("\n") + "\n");
-    return secretScan(["--strict", "--path", ".", ...envFileList.flatMap((file) => ["--env-file", file])], { cwd: dir });
-  } finally {
-    fs.rmSync(dir, { recursive: true, force: true });
+export function inflatedPngText(bytes: Buffer): Buffer[] {
+  const out: Buffer[] = [];
+  for (let at = bytes.indexOf(PNG_SIGNATURE); at !== -1; at = bytes.indexOf(PNG_SIGNATURE, at + 1)) {
+    out.push(...pngText(bytes, at));
   }
+  return out;
 }
 
+/**
+ * The scanner's input: every entry to publish at its tree path, plus scan-only entries for the tree
+ * paths and commit message and for any inflated PNG text. Throws if a PNG can't be parsed.
+ */
+export function scanSet(entries: Entry[], message: string): BufferedFile[] {
+  const files: BufferedFile[] = [];
+  for (const { rel, bytes } of entries) {
+    files.push({ path: rel, bytes });
+    let texts: Buffer[];
+    try {
+      if (rel.endsWith(".png") && !bytes.subarray(0, PNG_SIGNATURE.length).equals(PNG_SIGNATURE)) throw new Error("a .png that isn't a PNG");
+      texts = inflatedPngText(bytes);
+    } catch (error) {
+      throw new Error(`can't read the PNG text chunks of a file to publish (${(error as Error).message})`);
+    }
+    texts.forEach((text, i) => files.push({ path: `${SCAN_ONLY}/${rel}.text-${i + 1}.txt`, bytes: text }));
+  }
+  files.push({
+    path: `${SCAN_ONLY}/paths-and-commit-message.txt`,
+    bytes: Buffer.from([...entries.map((e) => e.rel), message].join("\n") + "\n"),
+  });
+  return files;
+}
+
+// Errors before the scan never print a label or file name: either could hold the value it would catch.
 function collectEntries(issue: string, issueDir: string, labels: string[]): Entry[] {
   const entries: Entry[] = [{ rel: "vercel.json", bytes: Buffer.from(VERCEL_JSON) }];
-  for (const label of labels) {
-    for (const dirent of fs.readdirSync(path.join(issueDir, label), { withFileTypes: true })) {
-      if (!MEDIA_EXT.test(dirent.name)) continue;
-      const rel = `${issue}/${label}/${dirent.name}`;
-      // A symlink or folder could point the publish at bytes that weren't produced by this tool.
-      if (!dirent.isFile()) throw new Error(`Not a regular file: ${rel}`);
-      entries.push({ rel, bytes: fs.readFileSync(path.join(issueDir, label, dirent.name)) });
+  let irregular = 0;
+  try {
+    for (const label of labels) {
+      for (const dirent of fs.readdirSync(path.join(issueDir, label), { withFileTypes: true })) {
+        if (!MEDIA_EXT.test(dirent.name)) continue;
+        // A symlink or folder could point the publish at bytes this tool didn't produce.
+        if (!dirent.isFile()) irregular++;
+        else entries.push({ rel: `${issue}/${label}/${dirent.name}`, bytes: fs.readFileSync(path.join(issueDir, label, dirent.name)) });
+      }
     }
+  } catch (error) {
+    throw new Error(`Can't read the capture files under .pr-captures/${issue}/ (${(error as NodeJS.ErrnoException).code ?? "error"})`);
+  }
+  if (irregular) {
+    throw new Error(`${irregular} entr${irregular === 1 ? "y" : "ies"} with a media extension under .pr-captures/${issue}/ ${irregular === 1 ? "isn't a regular file" : "aren't regular files"} (a folder or symlink); remove it. Names not printed.`);
   }
   return entries;
 }
 
-function remoteTip(): string | null {
-  const line = git(["ls-remote", "origin", `refs/heads/${MEDIA_BRANCH}`]);
-  if (!line) return null;
-  const sha = line.split(/\s+/)[0];
-  git(["fetch", "--no-write-fetch-head", "--quiet", "origin", sha]);
-  return sha;
+function refuseBareFlags(argv: string[]) {
+  for (const flag of ["--issue", "--labels", "--env-file"]) {
+    const bare = argv.some((arg, i) => arg === flag && (argv[i + 1] === undefined || argv[i + 1].startsWith("--")));
+    if (bare || argv.includes(`${flag}=`)) throw new Error(`${flag} needs a value`);
+  }
 }
 
 /** Builds a commit with a throwaway index file, so no checkout or working tree is touched. */
-function buildCommit(parent: string | null, issue: string, labels: string[], indexInfo: string, message: string): string | null {
+function buildCommit(git: Git, parent: string | null, issue: string, labels: string[], indexInfo: string, message: string): string | null {
   const indexFile = path.join(os.tmpdir(), `pr-capture-index-${process.pid}-${Date.now()}`);
   const env = { ...process.env, GIT_INDEX_FILE: indexFile };
   const run = (cmd: string[], input?: string) => git(cmd, { input, env });
@@ -134,26 +161,44 @@ function buildCommit(parent: string | null, issue: string, labels: string[], ind
   }
 }
 
-async function main(argv: string[]): Promise<number> {
+/**
+ * `capture:publish`. Returns the exit code. `cwd` holds `.pr-captures/`; `git` runs every git
+ * command (tests pass a stand-in).
+ */
+export async function publish(argv: string[], options: { cwd?: string; git?: Git } = {}): Promise<number> {
+  const git = options.git ?? realGit;
+  const outputRoot = path.join(options.cwd ?? process.cwd(), ".pr-captures");
+  refuseBareFlags(argv);
   const args = parseArgs(argv);
   const unknown = Object.keys(args).find((key) => !FLAGS.includes(key));
   if (unknown) throw new Error(`Unknown option: --${unknown}`);
   const issue = requireIssue(args);
-  const issueDir = path.join(OUTPUT_ROOT, issue);
+  const issueDir = path.join(outputRoot, issue);
   if (!fs.existsSync(issueDir)) throw new Error(`Nothing to publish: ${issueDir} does not exist`);
-  const envFileList = envFiles(argv);
+  const envFileList = envFiles(argv, git);
 
   const labels = [...new Set(list(
     args.labels,
     fs.readdirSync(issueDir, { withFileTypes: true }).filter((d) => d.isDirectory()).map((d) => d.name),
   ))].map((label) => requireLabel(label, "--labels"));
+  // On a case-insensitive disk `Foo` and `foo` are one folder; publishing it twice helps no one.
+  if (new Set(labels.map((label) => label.toLowerCase())).size !== labels.length) throw new Error("--labels has labels that differ only by case");
+  const missing = labels.filter((label) => !fs.statSync(path.join(issueDir, label), { throwIfNoEntry: false })?.isDirectory()).length;
+  if (missing) throw new Error(`${missing} of the --labels ${missing === 1 ? "isn't a folder" : "aren't folders"} under .pr-captures/${issue}/. Names not printed.`);
   const entries = collectEntries(issue, issueDir, labels);
   const files = entries.slice(1);
-  if (!files.length) throw new Error(`No media under ${issueDir} for labels: ${labels.join(", ")}`);
+  if (!files.length) throw new Error(`No media under .pr-captures/${issue}/ for the ${labels.length} label(s)`);
   const message = `media: #${issue} ${labels.join(", ")}`;
 
-  // The scan sees the exact bytes that become blobs below, and runs before any git write.
-  const scan = scanEntries(entries, message, envFileList);
+  // The scan reads the exact bytes that become blobs below, in memory (no folder walk can skip a
+  // label), and runs before any git write.
+  let scan: number;
+  try {
+    scan = scanBuffers(scanSet(entries, message), { envFiles: envFileList, strict: true });
+  } catch (error) {
+    console.error(`publish: ${(error as Error).message}`);
+    scan = 2;
+  }
   if (scan !== 0) {
     console.error(
       `publish: aborted, secret-scan --strict exited ${scan}${scan === 2 ? " (the scan couldn't run completely)" : ""}. ` +
@@ -164,8 +209,10 @@ async function main(argv: string[]): Promise<number> {
 
   const indexInfo = entries.map(({ rel, bytes }) => `100644 ${git(["hash-object", "-w", "--stdin"], { input: bytes })}\t${rel}`).join("\n") + "\n";
   for (let attempt = 1; ; attempt++) {
-    const parent = remoteTip();
-    const commit = buildCommit(parent, issue, labels, indexInfo, message);
+    const line = git(["ls-remote", "origin", `refs/heads/${MEDIA_BRANCH}`]);
+    const parent = line ? line.split(/\s+/)[0] : null;
+    if (parent) git(["fetch", "--no-write-fetch-head", "--quiet", "origin", parent]);
+    const commit = buildCommit(git, parent, issue, labels, indexInfo, message);
     if (!commit) {
       console.log(`${MEDIA_BRANCH} already has this media; nothing to push.`);
       break;
@@ -184,7 +231,7 @@ async function main(argv: string[]): Promise<number> {
     }
   }
 
-  console.log(`Base URL: ${rawUrl(repoSlug(), `${issue}/`)}`);
+  console.log(`Base URL: ${rawUrl(repoSlug(git(["remote", "get-url", "origin"])), `${issue}/`)}`);
   for (const label of labels) {
     const summary = path.join(issueDir, label, "summary.md");
     if (fs.existsSync(summary)) console.log(`Paste into the PR body: ${summary}`);
@@ -192,4 +239,13 @@ async function main(argv: string[]): Promise<number> {
   return 0;
 }
 
-if (import.meta.main) process.exit(await main(process.argv.slice(2)));
+if (import.meta.main) {
+  let code: number;
+  try {
+    code = await publish(process.argv.slice(2));
+  } catch (error) {
+    console.error(`publish: ${(error as Error).message}`);
+    code = 1;
+  }
+  process.exit(code);
+}

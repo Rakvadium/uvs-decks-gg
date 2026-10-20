@@ -27,16 +27,9 @@ export type RunOptions = {
 
 /** Returns the exit code: 0 clean, 1 hits, 2 incomplete scan. */
 export function run(argv: string[], options: RunOptions = {}): number {
-  const env = options.env ?? process.env;
   const cwd = options.cwd ?? process.cwd();
   const out = options.out ?? ((line: string) => console.log(line));
   const err = options.err ?? ((line: string) => console.error(line));
-  const actions = env.GITHUB_ACTIONS === "true";
-  const warn = (message: string) => err(actions ? `::warning title=secret-scan::${message}` : `secret-scan: warning: ${message}`);
-  const fail = (message: string) => {
-    err(`secret-scan: ${message}`);
-    if (actions) err(`::error title=secret-scan::${message}`);
-  };
 
   let args: Record<string, string | true>;
   try {
@@ -55,8 +48,50 @@ export function run(argv: string[], options: RunOptions = {}): number {
     return 2;
   }
 
+  // --ci implies --strict: CI must never pass on missing values.
+  const config = { envFiles: flagValues(argv, "env-file"), strict: Boolean(args.strict || args.ci), ci: Boolean(args.ci) };
+  return scanWith(config, options, (scan) => {
+    for (const range of flagValues(argv, "diff")) scan(rangeTargets(range, cwd));
+    if (args.staged) scan(stagedTargets(cwd));
+    if (typeof args.path === "string") scan(pathTargets(args.path, cwd));
+  });
+}
+
+/** A file held in memory: `path` is where hits are reported. */
+export type BufferedFile = { path: string; bytes: Buffer };
+
+/**
+ * Scans in-memory files the way `--path` scans files on disk (same decoders and matchers), but with
+ * no directory walk, so nothing is skipped (`--path` skips `.git` and `node_modules` folders).
+ * `envFiles` and `strict` work like `--env-file` and `--strict`; output and exit codes are `run`'s.
+ */
+export function scanBuffers(
+  files: Iterable<BufferedFile>,
+  config: { envFiles?: string[]; strict?: boolean } = {},
+  options: RunOptions = {},
+): number {
+  const settings = { envFiles: config.envFiles ?? [], strict: Boolean(config.strict), ci: false };
+  return scanWith(settings, options, (scan) => scan([...files].map((file) => ({ location: file.path, bytes: file.bytes }))));
+}
+
+function scanWith(
+  config: { envFiles: string[]; strict: boolean; ci: boolean },
+  options: RunOptions,
+  collect: (scan: (targets: Iterable<Target>) => void) => void,
+): number {
+  const env = options.env ?? process.env;
+  const cwd = options.cwd ?? process.cwd();
+  const out = options.out ?? ((line: string) => console.log(line));
+  const err = options.err ?? ((line: string) => console.error(line));
+  const actions = env.GITHUB_ACTIONS === "true";
+  const warn = (message: string) => err(actions ? `::warning title=secret-scan::${message}` : `secret-scan: warning: ${message}`);
+  const fail = (message: string) => {
+    err(`secret-scan: ${message}`);
+    if (actions) err(`::error title=secret-scan::${message}`);
+  };
+
   const envs: Record<string, string | undefined>[] = [env];
-  for (const file of flagValues(argv, "env-file")) {
+  for (const file of config.envFiles) {
     try {
       envs.push(parseEnvFile(fs.readFileSync(path.resolve(cwd, file), "utf8")));
     } catch {
@@ -65,11 +100,10 @@ export function run(argv: string[], options: RunOptions = {}): number {
     }
   }
 
-  // --ci implies --strict: CI must never pass on missing values.
-  const strict = Boolean(args.strict || args.ci);
+  const strict = config.strict;
   const manifest = loadManifest(options.manifest);
   const loaded = loadSecrets(manifest.names, envs);
-  const ignored = new Set(args.ci ? [] : manifest.ciOnly);
+  const ignored = new Set(config.ci ? [] : manifest.ciOnly);
   const secrets = loaded.secrets.filter((s) => !ignored.has(s.name));
   const short = loaded.short.filter((name) => !ignored.has(name));
   const unavailable = [...loaded.missing, ...short].filter((name) => !ignored.has(name));
@@ -93,9 +127,7 @@ export function run(argv: string[], options: RunOptions = {}): number {
     }
   };
   try {
-    for (const range of flagValues(argv, "diff")) scan(rangeTargets(range, cwd));
-    if (args.staged) scan(stagedTargets(cwd));
-    if (typeof args.path === "string") scan(pathTargets(args.path, cwd));
+    collect(scan);
   } catch (error) {
     fail((error as Error).message.split("\n")[0]);
     return 2;

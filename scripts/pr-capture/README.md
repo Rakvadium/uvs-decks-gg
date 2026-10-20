@@ -135,20 +135,26 @@ If the two shots differ in height, both are padded to the larger one. Unpaired s
 
 ### Secret scan before publishing
 
-`pr-media` is public the moment it's pushed, and CI never scans it. So publish runs [`secret-scan --strict --path`](../secret-scan/README.md) on exactly what it is about to publish, **before any git write** (no `hash-object`, no commit, no push):
+`pr-media` is public the moment it's pushed, and CI never scans it. So publish runs the secret scan with `--strict` on exactly what it is about to publish, **before any git write** (no `hash-object`, no commit, no push):
 
 1. It reads each file once into memory. Folders, symlinks and other non-regular files with a media extension abort the publish.
-2. It writes those bytes, plus the root `vercel.json`, to a fresh temp dir with the same paths they'll have on `pr-media`. It also adds scan-only files under `_scan-only/`:
+2. It hands those bytes, plus the root `vercel.json`, to the scanner's in-process [`scanBuffers`](../secret-scan/README.md#scanbuffers-in-process), under the paths they'll have on `pr-media`. `scanBuffers` matches and decodes the same way `--path` does, but nothing walks a folder, so no label is skipped. `--path` would skip a label named `node_modules`. It also gets scan-only entries, reported under `_scan-only/`:
    - every tree path and the commit message, since labels end up in both
-   - the inflated text of every compressed PNG text chunk (`zTXt`, and `iTXt` with compression on). The scanner reads raw bytes, so it can't see inside these. A PNG whose chunks can't be parsed or inflated aborts the publish.
-3. It runs the scanner in-process on that dir, with `--strict` and the env files below. The process env is checked too.
-4. **Any non-zero exit aborts**, before anything is written to git: `1` (a hit, printed as `VAR_NAME <path>:<line>`, never the value) and `2` (the scan couldn't run completely: an unreadable env file, zero values loaded, or a missing required value). The blobs are then written from the same in-memory bytes, so what was scanned is what gets published. `--stdin` hashing applies no CRLF or attribute filters.
+   - the inflated contents of every compressed PNG text or profile chunk (`zTXt`, `iCCP`, and `iTXt` with compression on), in any file to be published, whatever its name. Every PNG signature in the bytes is parsed from there to the end, and a `.png` file that doesn't start with one aborts. Every zlib stream in a chunk is inflated in turn, until the chunk's data is used up. The scanner reads raw bytes, so it can't see inside these. A PNG whose chunks can't be parsed, a stream that won't inflate, or leftover bytes after the last stream abort the publish.
+3. The process env is checked too.
+4. **Any non-zero exit aborts**, before anything is written to git:
+   - `1`: a hit, printed as `VAR_NAME <path>:<line>`, never the value
+   - `2`: the scan couldn't run completely: an unreadable env file, zero values loaded, or a missing required value
 
-**Env files.** Every `--env-file` (repeatable) is used. With none, publish uses the main checkout's two files, `.env.local.live-backup` and `data/live-env-no-r2.txt`. It finds the main checkout with `git rev-parse --git-common-dir`, so this also works from a worktree. If either file is missing, the scan exits 2 and nothing is published. There is **no flag to skip the scan**. Without the env files (for example, a cloud agent), you can't publish.
+   The blobs are then written from the same in-memory bytes, so what was scanned is what gets published. `--stdin` hashing applies no CRLF or attribute filters.
+
+Errors before the scan never print a label or file name, since either could hold a value. For example, a `--labels` name that isn't a folder is reported by count only.
+
+**Env files.** The main checkout's two files, `.env.local.live-backup` and `data/live-env-no-r2.txt`, are always used when they exist. Publish finds the main checkout with `git rev-parse --git-common-dir`, so this also works from a worktree. Each `--env-file` (repeatable; a bare `--env-file` is refused) **adds** to them and never replaces them, so an env file of dummy values can't hide the real ones. With no `--env-file`, both default files are required: if either is missing, the scan exits 2 and nothing is published. There is **no flag to skip the scan**. Without a main checkout's env files (for example, a cloud agent), you can only publish with an `--env-file` that holds every required value.
 
 **Not covered.** The scanner's own limits apply ([What is not detected](../secret-scan/README.md#what-is-not-detected)). For media, the ones that matter are:
 - values drawn into pixels (a screenshot of a token), including GIF and WebM frames
-- other compressed data: PNG `iCCP` and image data, and anything inside a WebM stream
+- other compressed data: PNG image data (`IDAT`, APNG `fdAT`), compressed data outside a PNG chunk (for example, a raw zlib stream inside a `.json`), and anything inside a WebM stream
 
 Don't capture pages that show secret values.
 
