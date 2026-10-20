@@ -198,6 +198,8 @@ export async function allocatePort(opts: AllocateOptions): Promise<PortAllocatio
       `This worktree's port ${existing} backend is still running. Stop it first (bun run validation:backend -- stop --app-port ${existing}) or use --port auto.`,
     );
   }
+  const holder = Object.entries(readRegistry(root)).find(([, p]) => p === appPort)?.[0];
+  if (holder) throw new Error(`App port ${appPort} is already claimed by ${holder}. Pick another port or use --port auto.`);
   const inUse = await busy(appPort);
   if (inUse.length > 0) throw new Error(`Port(s) ${inUse.join(", ")} for app port ${appPort} are in use. Pick another port or use --port auto.`);
   claimPort(opts.worktree, appPort, root);

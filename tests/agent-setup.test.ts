@@ -186,6 +186,11 @@ describe("port allocation", () => {
     await expect(allocatePort({ worktree: "/wt/b", requested: 8170, range: RANGE, root, ...probes([]) })).rejects.toThrow(
       /already claimed by/,
     );
+    // The holder's backend is up too: the message still names the registry claim.
+    const held = portsFor(8170);
+    await expect(
+      allocatePort({ worktree: "/wt/b", requested: 8170, range: RANGE, root, ...probes([held.cloud, held.site]) }),
+    ).rejects.toThrow(/already claimed by/);
     await expect(
       allocatePort({ worktree: "/wt/b", requested: 8171, range: RANGE, root, ...probes([portsFor(8171).site]) }),
     ).rejects.toThrow(/in use/);
