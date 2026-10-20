@@ -1,0 +1,275 @@
+{
+  "issue": "197",
+  "label": "verify-pin",
+  "port": 8221,
+  "chrome": "expressive",
+  "fullPage": false,
+  "strict": true,
+  "shots": [
+    {
+      "name": "usermenu__desktop__cyberpunk__dark",
+      "route": "/decks",
+      "auth": "agent",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "dark",
+        "chrome": "expressive"
+      },
+      "finalPath": "/decks",
+      "loaded": true,
+      "stable": true,
+      "pin": {
+        "saved": "cyberpunk/dark/expressive",
+        "patched": true,
+        "problems": [],
+        "pinned": "cyberpunk/dark/expressive",
+        "overridden": false,
+        "flagged": false
+      }
+    },
+    {
+      "name": "usermenu__desktop__cyberpunk__light",
+      "route": "/decks",
+      "auth": "agent",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "light",
+        "chrome": "expressive"
+      },
+      "finalPath": "/decks",
+      "loaded": true,
+      "stable": true,
+      "pin": {
+        "saved": "cyberpunk/dark/expressive",
+        "patched": true,
+        "problems": [],
+        "pinned": "cyberpunk/light/expressive",
+        "overridden": true,
+        "flagged": false
+      }
+    },
+    {
+      "name": "usermenu__desktop__aurora__dark",
+      "route": "/decks",
+      "auth": "agent",
+      "appearance": {
+        "theme": "aurora",
+        "mode": "dark",
+        "chrome": "expressive"
+      },
+      "finalPath": "/decks",
+      "loaded": true,
+      "stable": true,
+      "pin": {
+        "saved": "cyberpunk/dark/expressive",
+        "patched": true,
+        "problems": [],
+        "pinned": "aurora/dark/expressive",
+        "overridden": true,
+        "flagged": false
+      }
+    },
+    {
+      "name": "usermenu__desktop__aurora__light",
+      "route": "/decks",
+      "auth": "agent",
+      "appearance": {
+        "theme": "aurora",
+        "mode": "light",
+        "chrome": "expressive"
+      },
+      "finalPath": "/decks",
+      "loaded": true,
+      "stable": true,
+      "pin": {
+        "saved": "cyberpunk/dark/expressive",
+        "patched": true,
+        "problems": [],
+        "pinned": "aurora/light/expressive",
+        "overridden": true,
+        "flagged": false
+      }
+    },
+    {
+      "name": "copy-link-toast__desktop__cyberpunk__dark",
+      "route": "/decks/kh7bt06q3w0x7j29fc6d07hvss8ba18p",
+      "auth": "agent",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "dark",
+        "chrome": "expressive"
+      },
+      "finalPath": "/decks/kh7bt06q3w0x7j29fc6d07hvss8ba18p",
+      "loaded": true,
+      "stable": true,
+      "pin": {
+        "saved": "cyberpunk/dark/expressive",
+        "patched": true,
+        "problems": [],
+        "pinned": "cyberpunk/dark/expressive",
+        "overridden": false,
+        "flagged": false
+      }
+    },
+    {
+      "name": "copy-link-toast__desktop__cyberpunk__light",
+      "route": "/decks/kh7bt06q3w0x7j29fc6d07hvss8ba18p",
+      "auth": "agent",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "light",
+        "chrome": "expressive"
+      },
+      "finalPath": "/decks/kh7bt06q3w0x7j29fc6d07hvss8ba18p",
+      "loaded": true,
+      "stable": true,
+      "pin": {
+        "saved": "cyberpunk/dark/expressive",
+        "patched": true,
+        "problems": [],
+        "pinned": "cyberpunk/light/expressive",
+        "overridden": true,
+        "flagged": false
+      }
+    },
+    {
+      "name": "copy-link-toast__desktop__aurora__dark",
+      "route": "/decks/kh7bt06q3w0x7j29fc6d07hvss8ba18p",
+      "auth": "agent",
+      "appearance": {
+        "theme": "aurora",
+        "mode": "dark",
+        "chrome": "expressive"
+      },
+      "finalPath": "/decks/kh7bt06q3w0x7j29fc6d07hvss8ba18p",
+      "loaded": true,
+      "stable": true,
+      "pin": {
+        "saved": "cyberpunk/dark/expressive",
+        "patched": true,
+        "problems": [],
+        "pinned": "aurora/dark/expressive",
+        "overridden": true,
+        "flagged": false
+      }
+    },
+    {
+      "name": "copy-link-toast__desktop__aurora__light",
+      "route": "/decks/kh7bt06q3w0x7j29fc6d07hvss8ba18p",
+      "auth": "agent",
+      "appearance": {
+        "theme": "aurora",
+        "mode": "light",
+        "chrome": "expressive"
+      },
+      "finalPath": "/decks/kh7bt06q3w0x7j29fc6d07hvss8ba18p",
+      "loaded": true,
+      "stable": true,
+      "pin": {
+        "saved": "cyberpunk/dark/expressive",
+        "patched": true,
+        "problems": [],
+        "pinned": "aurora/light/expressive",
+        "overridden": true,
+        "flagged": false
+      }
+    },
+    {
+      "name": "guest-gallery__desktop__cyberpunk__dark",
+      "route": "/gallery",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "dark",
+        "chrome": "expressive"
+      },
+      "finalPath": "/gallery",
+      "loaded": true,
+      "stable": true,
+      "pin": null
+    },
+    {
+      "name": "guest-gallery__desktop__cyberpunk__light",
+      "route": "/gallery",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "light",
+        "chrome": "expressive"
+      },
+      "finalPath": "/gallery",
+      "loaded": true,
+      "stable": true,
+      "pin": null
+    },
+    {
+      "name": "guest-gallery__desktop__aurora__dark",
+      "route": "/gallery",
+      "auth": "guest",
+      "appearance": {
+        "theme": "aurora",
+        "mode": "dark",
+        "chrome": "expressive"
+      },
+      "finalPath": "/gallery",
+      "loaded": true,
+      "stable": true,
+      "pin": null
+    },
+    {
+      "name": "guest-gallery__desktop__aurora__light",
+      "route": "/gallery",
+      "auth": "guest",
+      "appearance": {
+        "theme": "aurora",
+        "mode": "light",
+        "chrome": "expressive"
+      },
+      "finalPath": "/gallery",
+      "loaded": true,
+      "stable": true,
+      "pin": null
+    }
+  ],
+  "gif": null,
+  "blockedConvexWrites": [
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus"
+  ],
+  "savedAppearance": [
+    "cyberpunk/dark/expressive"
+  ],
+  "pinFlagged": []
+}
