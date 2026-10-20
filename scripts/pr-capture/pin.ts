@@ -11,7 +11,7 @@ const MODIFICATION_TYPES = new Set(["QueryUpdated", "QueryFailed", "QueryRemoved
 /** Test-only: makes the rewrite miss `sessions:getSession`, as if the query had been renamed. */
 export const BREAK_PIN_ENV = "PR_CAPTURE_TEST_BREAK_PIN";
 
-/** What one capture context's `sessions:getSession` rewrite had done at one moment. Recorded per shot in manifest.json. */
+/** What the shot page's `sessions:getSession` rewrite had done at one moment. Recorded per shot in manifest.json. */
 export type PinReport = {
   /** The agent's stored `preset/mode/chrome`, read before the rewrite. null if no valid result was read. */
   saved: string | null;
@@ -22,7 +22,7 @@ export type PinReport = {
   /** Monotonic count of session-state changes (subscribe, remove, result, socket close, ...). */
   events?: number;
   /**
-   * Monotonic count of changes that left the context not fully rewritten. If it differs between two
+   * Monotonic count of changes that left the page not fully rewritten. If it differs between two
    * snapshots, the page was unpinned at some point in between, even if both snapshots look clean.
    */
   unpinned?: number;
@@ -67,9 +67,10 @@ export function readSavedAppearance(value: object): { saved: string } | { invali
 
 /**
  * Rewrites the `sessions:getSession` result the browser receives so ColorSchemeProvider's JS state
- * (isDark, chrome, preset) follows the pin, and tracks every session subscription in the context
- * so `report()` can say whether, at that moment, the page's JS state follows the pin.
- * One per capture context; call `socket()` once per Convex sync WebSocket.
+ * (isDark, chrome, preset) follows the pin, and tracks every session subscription on its page so
+ * `report()` can say whether, at that moment, that page's JS state follows the pin.
+ * One per page: the shot page gets its own, so another page in the same context (a popup) can't
+ * stand in for it. Call `socket()` once per Convex sync WebSocket of that page.
  */
 export function createSessionPin(appearance: Appearance, options: { broken?: boolean } = {}) {
   const pinned = { theme: appearance.mode, chrome: appearance.chrome, colorSource: { kind: "preset", preset: appearance.theme } };

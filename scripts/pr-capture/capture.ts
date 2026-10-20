@@ -6,7 +6,7 @@ import readline from "node:readline";
 import { chromium, type Browser } from "playwright";
 import {
   HIDE_DEV_OVERLAY_CSS,
-  agentStorageState,
+  agentLogin,
   newCaptureContext,
   runSteps,
   settle,
@@ -125,6 +125,17 @@ function warnPin(pin: ShotPin | null) {
   if (pin?.problems.length) console.warn(`    WARNING: JS theme pin may not apply: ${pin.problems.join("; ")}`);
 }
 
+function warnUnproxied(unproxied: string[]) {
+  if (unproxied.length) console.warn(`    WARNING: Convex socket outside the capture proxy: ${unproxied.join("; ")}`);
+}
+
+/** Signed-in shots sign in on their own (see `agentLogin`); guests don't. */
+async function loginFor(browser: Browser, auth: RouteSpec["auth"], blocked: string[]) {
+  if (auth !== "agent") return { storageState: undefined, unproxied: [] };
+  const login = await agentLogin(browser, baseUrl, blocked);
+  return { storageState: login.storageState, unproxied: login.unproxied.map((problem) => `during sign-in: ${problem}`) };
+}
+
 function stopServer(child: ChildProcess | null) {
   if (!child?.pid || child.exitCode !== null) return;
   if (process.platform === "win32") spawnSync("taskkill", ["/pid", String(child.pid), "/T", "/F"]);
@@ -136,19 +147,18 @@ async function captureStill(
   route: RouteSpec,
   viewport: string,
   appearance: Appearance,
-  storageState: Awaited<ReturnType<typeof agentStorageState>> | undefined,
   blocked: string[],
 ) {
   const name = shotName(route, viewport, appearance.theme, appearance.mode);
-  const { context, pin } = await newCaptureContext(browser, {
+  const login = await loginFor(browser, route.auth, blocked);
+  const { context, page, pin, guard } = await newCaptureContext(browser, {
     viewport,
     appearance,
-    storageState: route.auth === "agent" ? storageState : undefined,
+    storageState: login.storageState,
     blocked,
     still: true,
   });
   try {
-    const page = await context.newPage();
     await page.goto(baseUrl + route.path, { timeout: 180_000 });
     await settle(page);
     await runSteps(page, route.steps);
@@ -164,33 +174,32 @@ async function captureStill(
     console.log(`  ${name}.png${notes.length ? `  (${notes.join("; ")})` : ""}`);
     const report = route.auth === "agent" ? stillPin(at, stable, appearance) : null;
     warnPin(report);
-    return { name, route: route.path, auth: route.auth, appearance, finalPath, loaded, stable, pin: report };
+    const unproxied = [...login.unproxied, ...guard.problems()];
+    warnUnproxied(unproxied);
+    return { name, route: route.path, auth: route.auth, appearance, finalPath, loaded, stable, pin: report, unproxied };
   } finally {
     await context.close();
   }
 }
 
-async function captureGif(
-  browser: Browser,
-  storageState: Awaited<ReturnType<typeof agentStorageState>> | undefined,
-  blocked: string[],
-) {
+async function captureGif(browser: Browser, blocked: string[]) {
   const gif = spec.gif!;
   const viewport = gif.viewport ?? "desktop";
   const appearance = { theme: gif.theme ?? themes[0], mode: gif.mode ?? modes[0], chrome };
   const name = shotName(gif, viewport, appearance.theme, appearance.mode);
   const videoDir = path.join(outDir, ".video-tmp");
-  const { context, pin } = await newCaptureContext(browser, {
+  const login = await loginFor(browser, gif.auth, blocked);
+  const { context, page, pin, guard } = await newCaptureContext(browser, {
     viewport,
     appearance,
-    storageState: gif.auth === "agent" ? storageState : undefined,
+    storageState: login.storageState,
     blocked,
     still: false,
     videoDir,
   });
-  const page = await context.newPage();
   let frames: Awaited<ReturnType<typeof recordFrames<PinReport>>> = [];
   let afterRecording: PinReport | undefined;
+  const unproxied = [...login.unproxied];
   try {
     await page.goto(baseUrl + gif.path, { timeout: 180_000 });
     await settle(page);
@@ -200,6 +209,7 @@ async function captureGif(
     await page.waitForTimeout(GIF_TAIL_MS);
     afterRecording = pin.report();
   } finally {
+    unproxied.push(...guard.problems());
     await context.close();
   }
   const gifPin = shotPinFor([...(frames.length ? frames.map((frame) => frame.snapshot) : [undefined]), afterRecording], gif.auth, appearance);
@@ -208,7 +218,8 @@ async function captureGif(
   await writeGif(frames, path.join(outDir, `${name}.gif`), gifWidth);
   console.log(`  ${name}.gif (${frames.length} frames) + ${name}.webm`);
   warnPin(gifPin);
-  return { name, auth: gif.auth, appearance, frames: frames.length, pin: gifPin };
+  warnUnproxied(unproxied);
+  return { name, auth: gif.auth, appearance, frames: frames.length, pin: gifPin, unproxied };
 }
 
 async function main() {
@@ -229,7 +240,9 @@ async function main() {
     const needsAgent = [...(stills ? spec.routes : []), ...(spec.gif && args.gif ? [spec.gif] : [])].some(
       (route) => route.auth === "agent",
     );
-    const storageState = needsAgent ? await agentStorageState(browser, baseUrl, blocked) : undefined;
+    if (needsAgent && !process.env.AGENT_AUTH_SECRET) {
+      throw new Error("AGENT_AUTH_SECRET is missing (copy .env.local into this checkout)");
+    }
 
     if (stills) {
       console.log(`Capturing #${issue} "${label}" → ${outDir}`);
@@ -237,9 +250,9 @@ async function main() {
         for (const viewport of route.viewports ?? viewports)
           for (const theme of themes)
             for (const mode of modes)
-              shots.push(await captureStill(browser, route, viewport, { theme, mode, chrome }, storageState, blocked));
+              shots.push(await captureStill(browser, route, viewport, { theme, mode, chrome }, blocked));
     }
-    if (args.gif === true) gifShot = await captureGif(browser, storageState, blocked);
+    if (args.gif === true) gifShot = await captureGif(browser, blocked);
   } finally {
     await browser?.close();
     stopServer(server);
@@ -250,6 +263,8 @@ async function main() {
   const flagged = signedIn.filter((shot) => shot.pin.flagged).map((shot) => shot.name);
   // Signed-in unstable shots are already pin-flagged; this list covers every shot, guests included.
   const unstable = shots.filter((shot) => !shot.stable).map((shot) => shot.name);
+  // Every shot, guests included: an unproxied socket skips the write blocking as well as the pin.
+  const unproxied = [...shots, ...(gifShot ? [gifShot] : [])].filter((shot) => shot.unproxied.length).map((shot) => shot.name);
 
   fs.writeFileSync(
     path.join(outDir, "manifest.json"),
@@ -267,6 +282,7 @@ async function main() {
         savedAppearance,
         pinFlagged: flagged,
         unstable,
+        unproxiedSockets: unproxied,
       },
       null,
       2,
@@ -293,10 +309,20 @@ async function main() {
   if (unstable.length) {
     console.warn(`WARNING: ${unstable.length} shot(s) never settled within the stability window: ${unstable.join(", ")}.`);
   }
-  if (strict && (flagged.length || unstable.length)) {
+  if (unproxied.length) {
+    console.warn(
+      `WARNING: ${unproxied.length} shot(s) had a Convex WebSocket (or a worker that could open one) outside the capture proxy, ` +
+        `so its writes were not blocked: ${unproxied.join(", ")}. See \`unproxied\` in manifest.json.`,
+    );
+  }
+  if (strict && (flagged.length || unstable.length || unproxied.length)) {
     throw new Error(
       "--strict: failing because " +
-        [flagged.length && "the JS theme pin did not apply to every signed-in shot", unstable.length && "some shots never settled"]
+        [
+          flagged.length && "the JS theme pin did not apply to every signed-in shot",
+          unstable.length && "some shots never settled",
+          unproxied.length && "a Convex socket bypassed the capture proxy",
+        ]
           .filter(Boolean)
           .join(" and ") +
         ".",
