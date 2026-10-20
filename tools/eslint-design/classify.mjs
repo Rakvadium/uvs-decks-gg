@@ -78,10 +78,13 @@ const SURFACE_RE = new RegExp(`^bg-(${BASES.join("|")})/(.+)$`);
 const NAMED_SURFACE_RE = new RegExp(`^bg-(${BASES.join("|")})-(tint|soft|elevated|overlay)$`);
 
 const RADIUS_SIDES = "t|r|b|l|s|e|tl|tr|br|bl|ss|se|es|ee";
-const RADIUS_OFF_RE = new RegExp(`^rounded(-(?:${RADIUS_SIDES}))?(-sm)?$`);
+const RADIUS_OFF_RE = new RegExp(`^rounded(-(?:${RADIUS_SIDES}))?(-sm|-xs)?$`);
 const RADIUS_ARB_RE = new RegExp(`^rounded(-(?:${RADIUS_SIDES}))?-\\[(\\d*\\.?\\d+)(px|rem)\\]$`);
-/** Micro geometry (tooltip arrows and the like): arbitrary radii up to this many px are allowed. */
-export const MICRO_RADIUS_PX = 2;
+/**
+ * Micro geometry (tooltip arrows, the checkbox corner kept by #201): arbitrary radii up to
+ * this many px are allowed.
+ */
+export const MICRO_RADIUS_PX = 4;
 
 const Z_RE = /^z-(?:(\d+)|\[(\d+)\])$/;
 const TINY_TEXT_RE = /^text-\[(\d*\.?\d+)(px|rem)\]$/;
@@ -252,7 +255,7 @@ export function classifyUtility(utility) {
     const name = `rounded${side}-md`;
     return {
       rule: RULES.radius,
-      message: `\`${utility}\` is off the radius ladder (bare/sm ignore the chrome --radius). Use \`${name}\`.`,
+      message: `\`${utility}\` is off the radius ladder (bare/sm/xs ignore the chrome --radius). Use \`${name}\`.`,
       replacement: name,
     };
   }
@@ -356,11 +359,13 @@ export function namedFamily(utility) {
 
 /**
  * Classifies every token of one class group (all strings feeding one className / cn() / cva()).
- * `tokens` is `[{ text, ...extra }]`. Returns `[{ token, finding, replacementToken? }]` for drift.
+ * `tokens` is `[{ text, source?, ...extra }]`; `source` identifies the string the token came from.
+ * Returns `[{ token, finding, replacementToken? }]` for drift.
  *
- * Collision guard: when a snap makes two different states of one ladder family (say `bg-primary/15`
- * and `hover:bg-primary/25`) land on the same name, the hover would vanish, so that family's
- * snaps are left for judgment. Exact aliases (`bg-primary/20` -> `bg-primary-selected`) still
+ * Collision guard: when a snap makes two different states of one ladder family land on the same
+ * name, the state change would vanish, so that family's snaps are left for judgment. States differ
+ * by variant (`bg-primary/15` vs `hover:bg-primary/25`) or by string (`canDrop && "bg-primary/5"`
+ * vs `isOver && "bg-primary/10"`, ternary arms, cva options). Exact aliases (`bg-primary/20` -> `bg-primary-selected`) still
  * rewrite: they emit identical CSS.
  */
 export function classifyGroup(tokens) {
@@ -372,13 +377,13 @@ export function classifyGroup(tokens) {
     const finding = classifyUtility(parsed.utility);
     if (finding?.family && finding.family !== "z") {
       const list = families.get(finding.family) ?? [];
-      list.push({ variants: parsed.variants, original: parsed.utility, step: finding.step });
+      list.push({ variants: parsed.variants, source: token.source ?? 0, original: parsed.utility, step: finding.step });
       families.set(finding.family, list);
     } else if (!finding) {
       const named = namedFamily(parsed.utility);
       if (named) {
         const list = families.get(named.family) ?? [];
-        list.push({ variants: parsed.variants, original: parsed.utility, step: named.step });
+        list.push({ variants: parsed.variants, source: token.source ?? 0, original: parsed.utility, step: named.step });
         families.set(named.family, list);
       }
     }
@@ -391,7 +396,11 @@ export function classifyGroup(tokens) {
       for (let j = i + 1; j < list.length; j++) {
         const a = list[i];
         const b = list[j];
-        if (a.step === b.step && a.original !== b.original && a.variants !== b.variants) collided.add(family);
+        // Different variants, or different strings (cn() args, ?: / && arms, cva options), are
+        // different states. Two different originals in one string with one variant chain are
+        // already a conflict, not a state change.
+        const distinct = a.variants !== b.variants || a.source !== b.source;
+        if (a.step === b.step && a.original !== b.original && distinct) collided.add(family);
       }
     }
   }

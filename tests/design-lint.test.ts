@@ -37,7 +37,7 @@ describe("design rules: valid (no warnings)", () => {
     ["no-named-form exceptions", `<div className="from-primary/10 border-y-border/50 text-muted-foreground/70 ring-ring/50 bg-border text-primary/80 border-t-primary/40" />`],
     ["allowed typography", `<span className="tracking-tight normal-case tracking-normal text-[10px] text-xs" />`],
     ["allowed motion", `<div className="transition-colors transition-opacity transition-none transition-[color,box-shadow] duration-150" />`],
-    ["allowed radius", `<div className="rounded-md rounded-lg rounded-full rounded-none rounded-[2px] rounded-[inherit] rounded-t-xl" />`],
+    ["allowed radius", `<div className="rounded-md rounded-lg rounded-full rounded-none rounded-[2px] rounded-[4px] rounded-[inherit] rounded-t-xl" />`],
     ["z without a named layer", `<div className="z-10 z-20 z-0 z-[1] z-[140] -z-10" />`],
     ["solid tokens", `<div className="bg-card bg-background bg-muted bg-popover bg-primary border-border" />`],
     ["non-class strings", `const label = "rounded uppercase transition-all bg-red-500"; toast("z-50 rounded-sm");`],
@@ -47,6 +47,12 @@ describe("design rules: valid (no warnings)", () => {
     ["cva defaultVariants and variant keys", `cva("rounded-md", { variants: { shape: { rounded: "rounded-lg" } }, defaultVariants: { shape: "rounded" } });`],
     ["template token glued to an expression", "<div className={`bg-primary/${opacity} rounded-${size}`} />"],
     ["comments", `// className="rounded uppercase"\n<div className="rounded-md" />`],
+    ["const used outside a sink", `const msg = "rounded z-50"; toast(msg);`],
+    ["let/var is not a resolvable constant", `let shell = "rounded"; shell = x; const a = cn(shell);`],
+    [
+      "SCREAMING constants that are not class lists",
+      `export const ERROR_TEXT = "transition failed"; export const STORAGE_KEY = "z-50"; export const ROUTE = "/decks/rounded";`,
+    ],
   ];
   for (const [name, code] of valid) {
     test(name, () => expect(lint(code)).toEqual([]));
@@ -210,10 +216,11 @@ describe("design rules: invalid", () => {
     ]);
   });
 
-  test("radius: side forms and one-off px values", () => {
-    expect(lint(`<div className="rounded-t rounded-bl-sm rounded-[6px] rounded-t-[8px] rounded-[0.5rem]" />`)).toEqual([
+  test("radius: side forms, xs and one-off px values", () => {
+    expect(lint(`<div className="rounded-t rounded-bl-sm rounded-xs rounded-[6px] rounded-t-[8px] rounded-[0.5rem]" />`)).toEqual([
       { rule: "design/radius-ladder", text: "rounded-t", fix: "rounded-t-md" },
       { rule: "design/radius-ladder", text: "rounded-bl-sm", fix: "rounded-bl-md" },
+      { rule: "design/radius-ladder", text: "rounded-xs", fix: "rounded-md" },
       { rule: "design/radius-ladder", text: "rounded-[6px]" },
       { rule: "design/radius-ladder", text: "rounded-t-[8px]" },
       { rule: "design/radius-ladder", text: "rounded-[0.5rem]" },
@@ -234,6 +241,112 @@ describe("design rules: invalid", () => {
   test("a string reached from two sinks is reported once", () => {
     expect(lint(`const buttonClasses = { className: "rounded" };`)).toEqual([
       { rule: "design/radius-ladder", text: "rounded", fix: "rounded-md" },
+    ]);
+  });
+});
+
+describe("collision guard across strings", () => {
+  test("separate && arms (active-deck-sidebar/section/content.tsx:15-16)", () => {
+    const code = `cn(
+      "space-y-2 rounded-lg border border-border/50 bg-card/50 p-3 transition-colors",
+      canDrop && "border-primary/40 bg-primary/5",
+      isOver && "bg-primary/10"
+    )`;
+    expect(lint(code)).toEqual([
+      { rule: "design/ladder-opacity", text: "border-border/50", fix: "border-surface" },
+      { rule: "design/ladder-opacity", text: "bg-card/50", fix: "bg-card-soft" },
+      { rule: "design/ladder-opacity", text: "border-primary/40", fix: "border-primary-soft" },
+      // /5 would snap onto /10 and erase the drag-over state: left for judgment
+      { rule: "design/ladder-opacity", text: "bg-primary/5" },
+      // exact alias: identical CSS, still fixable
+      { rule: "design/ladder-opacity", text: "bg-primary/10", fix: "bg-primary-wash" },
+    ]);
+  });
+
+  test("ternary arms", () => {
+    expect(lint(`<div className={on ? "bg-primary/25" : "bg-primary/15"} />`)).toEqual([
+      { rule: "design/ladder-opacity", text: "bg-primary/25" },
+      { rule: "design/ladder-opacity", text: "bg-primary/15" },
+    ]);
+    expect(lint(`<div className={on ? "bg-primary/25" : "bg-primary/20"} />`)).toEqual([
+      { rule: "design/ladder-opacity", text: "bg-primary/25" },
+      { rule: "design/ladder-opacity", text: "bg-primary/20", fix: "bg-primary-selected" },
+    ]);
+  });
+
+  test("separate cn() arguments and clsx object keys", () => {
+    expect(lint(`cn("border-border/35", { "border-border/40": active })`)).toEqual([
+      { rule: "design/ladder-opacity", text: "border-border/35" },
+      { rule: "design/ladder-opacity", text: "border-border/40", fix: "border-divider" },
+    ]);
+  });
+
+  test("cva variant options in one group", () => {
+    expect(lint(`cva("", { variants: { tone: { on: "bg-primary/30", off: "bg-primary/15" } } })`)).toEqual([
+      { rule: "design/ladder-opacity", text: "bg-primary/30" },
+      { rule: "design/ladder-opacity", text: "bg-primary/15" },
+    ]);
+  });
+
+  test("cva compound variant against the base", () => {
+    const code = `cva("bg-primary/15", {
+      variants: { size: { sm: "h-8" } },
+      compoundVariants: [{ size: "sm", class: "bg-primary/25" }],
+    })`;
+    expect(lint(code)).toEqual([
+      { rule: "design/ladder-opacity", text: "bg-primary/15" },
+      { rule: "design/ladder-opacity", text: "bg-primary/25" },
+    ]);
+  });
+
+  test("snaps to different steps across strings still rewrite", () => {
+    expect(lint(`cn(a && "bg-primary/5", b && "bg-primary/15")`)).toEqual([
+      { rule: "design/ladder-opacity", text: "bg-primary/5", fix: "bg-primary-wash" },
+      { rule: "design/ladder-opacity", text: "bg-primary/15", fix: "bg-primary-selected" },
+    ]);
+  });
+});
+
+describe("clsx identifier keys", () => {
+  test("a rewrite becomes a quoted key", () => {
+    expect(lint(`clsx({ rounded: on, "z-50": top })`)).toEqual([
+      { rule: "design/radius-ladder", text: "rounded", fix: `"rounded-md"` },
+      { rule: "design/named-z-index", text: "z-50", fix: "z-modal" },
+    ]);
+  });
+
+  test("a shorthand key keeps its value", () => {
+    expect(lint(`clsx({ rounded })`)).toEqual([{ rule: "design/radius-ladder", text: "rounded", fix: `"rounded-md": rounded` }]);
+  });
+});
+
+describe("class-string constants", () => {
+  test("same-file const used in a sink", () => {
+    const code = [
+      `const shell = "flex rounded border-border/50";`,
+      "const TILE_SURFACE = `border ${x} bg-card/80`;",
+      `export function A() {`,
+      `  return <div className={cn(shell, "p-2")}><span className={TILE_SURFACE} /></div>;`,
+      `}`,
+    ].join("\n");
+    expect(lint(code)).toEqual([
+      { rule: "design/radius-ladder", text: "rounded", fix: "rounded-md" },
+      { rule: "design/ladder-opacity", text: "border-border/50", fix: "border-surface" },
+      { rule: "design/ladder-opacity", text: "bg-card/80", fix: "bg-card-elevated" },
+    ]);
+  });
+
+  test("top-level SCREAMING_CASE class lists (exported chrome strings)", () => {
+    const code = [
+      `export const MOBILE_GLASS_BAR = "bg-background/80 backdrop-blur-xl";`,
+      `export const MOBILE_INSET_DIVIDER = "[&>*+*]:border-t [&>*+*]:border-border/30";`,
+      `const SHELL_NAV_ITEM_ACTIVE = "border-accent/55 bg-accent/18 text-accent";`,
+    ].join("\n");
+    expect(lint(code)).toEqual([
+      { rule: "design/ladder-opacity", text: "bg-background/80", fix: "bg-background-elevated" },
+      { rule: "design/ladder-opacity", text: "[&>*+*]:border-border/30", fix: "[&>*+*]:border-hairline" },
+      { rule: "design/ladder-opacity", text: "border-accent/55" },
+      { rule: "design/ladder-opacity", text: "bg-accent/18" },
     ]);
   });
 });

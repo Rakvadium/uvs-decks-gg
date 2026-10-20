@@ -106,6 +106,23 @@ describe("transformSource", () => {
 `);
   });
 
+  test("clsx identifier keys are rewritten to valid quoted keys", () => {
+    const once = transformSource(`const a = clsx({ rounded: on }, { rounded });\n`, "keys.ts");
+    expect(once.fatal).toBeUndefined();
+    expect(once.output).toBe(`const a = clsx({ "rounded-md": on }, { "rounded-md": rounded });\n`);
+    const twice = transformSource(once.output, "keys.ts");
+    expect(twice.fatal).toBeUndefined();
+    expect(twice.rewrites).toEqual([]);
+    expect(twice.output).toBe(once.output);
+  });
+
+  test("the drag-over state survives (active-deck-sidebar/section/content.tsx)", () => {
+    const code = `cn("bg-card/50", canDrop && "border-primary/40 bg-primary/5", isOver && "bg-primary/10");\n`;
+    expect(transformSource(code, "section.tsx").output).toBe(
+      `cn("bg-card-soft", canDrop && "border-primary-soft bg-primary/5", isOver && "bg-primary-wash");\n`,
+    );
+  });
+
   test("a file that does not parse is reported, not rewritten", () => {
     const broken = transformSource(`<div className="rounded" `, "broken.tsx");
     expect(broken.fatal).toBeDefined();

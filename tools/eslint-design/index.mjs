@@ -21,14 +21,19 @@ export function analyze(sourceCode) {
   const findings = [];
 
   for (const group of groups) {
-    const tokens = group.flatMap((node) => tokensOf(node, text));
+    // `source` tells the collision guard which string each token came from.
+    const tokens = group.flatMap((node, source) => tokensOf(node, text).map((t) => ({ ...t, source })));
     for (const { token, finding, replacementToken } of classifyGroup(tokens)) {
+      let fixText = replacementToken;
+      if (fixText && token.identifierKey) {
+        fixText = token.identifierKey.shorthand ? `"${fixText}": ${token.identifierKey.name}` : `"${fixText}"`;
+      }
       findings.push({
         rule: finding.rule,
         message: finding.message,
         start: token.start,
         end: token.end,
-        fix: replacementToken && token.fixable ? { range: [token.start, token.end], text: replacementToken } : undefined,
+        fix: fixText && token.fixable ? { range: [token.start, token.end], text: fixText } : undefined,
       });
     }
   }
