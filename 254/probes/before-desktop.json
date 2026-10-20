@@ -1,0 +1,485 @@
+{
+  "port": "8122",
+  "viewport": "desktop",
+  "pages": {
+    "gallery": {
+      "finalUrl": "/gallery",
+      "dom": {
+        "mains": 2,
+        "mainContent": 1,
+        "dupIds": []
+      },
+      "slash": {
+        "keydownListeners": 2,
+        "slashHandlers": 2
+      },
+      "wire": {
+        "adds": 12,
+        "removes": 9,
+        "activeAfterLoad": 3
+      },
+      "client": {
+        "queries": 3,
+        "hookSubscribers": 3,
+        "multi": []
+      },
+      "mutationsOnLoad": [
+        "communityLive:refreshLiveStatus"
+      ],
+      "overlays": {
+        "card details (click first card)": {
+          "trigger": "ui:main [data-card-id], main button:has(img), main [role=\"button\"]:has(img)",
+          "open": 1,
+          "findableByRole": 1,
+          "ariaHiddenAll": false,
+          "dialogs": [
+            {
+              "role": "dialog",
+              "title": "Cana Alberona, Cardslinger - Card Details",
+              "ariaHidden": false
+            }
+          ]
+        }
+      },
+      "mutationsTotal": [
+        "communityLive:refreshLiveStatus"
+      ],
+      "httpWritesTotal": [],
+      "consoleErrors": []
+    },
+    "decks": {
+      "finalUrl": "/decks",
+      "dom": {
+        "mains": 2,
+        "mainContent": 1,
+        "dupIds": []
+      },
+      "slash": {
+        "keydownListeners": 2,
+        "slashHandlers": 2
+      },
+      "wire": {
+        "adds": 15,
+        "removes": 9,
+        "activeAfterLoad": 6
+      },
+      "client": {
+        "queries": 6,
+        "hookSubscribers": 13,
+        "multi": [
+          {
+            "udfPath": "decks:listPublic",
+            "subscribers": 2
+          },
+          {
+            "udfPath": "decks:listTournament",
+            "subscribers": 2
+          },
+          {
+            "udfPath": "user:currentUser",
+            "subscribers": 6
+          }
+        ]
+      },
+      "mutationsOnLoad": [
+        "communityLive:refreshLiveStatus"
+      ],
+      "overlays": {
+        "New deck (openCreateDialog)": {
+          "trigger": "{\"found\":1,\"distinctValues\":1}",
+          "open": 2,
+          "findableByRole": 0,
+          "ariaHiddenAll": true,
+          "dialogs": [
+            {
+              "role": "dialog",
+              "title": "Create New Deck",
+              "ariaHidden": true
+            },
+            {
+              "role": "dialog",
+              "title": "Create New Deck",
+              "ariaHidden": true
+            }
+          ]
+        }
+      },
+      "mutationsTotal": [
+        "communityLive:refreshLiveStatus"
+      ],
+      "httpWritesTotal": [],
+      "consoleErrors": []
+    },
+    "deckDetails": {
+      "finalUrl": "/decks/nh7f0kqdg3hwnpjpmga3tavb5sx4nzwf",
+      "dom": {
+        "mains": 2,
+        "mainContent": 1,
+        "dupIds": []
+      },
+      "slash": {
+        "keydownListeners": 0,
+        "slashHandlers": 0
+      },
+      "wire": {
+        "adds": 17,
+        "removes": 9,
+        "activeAfterLoad": 8
+      },
+      "client": {
+        "queries": 8,
+        "hookSubscribers": 15,
+        "multi": [
+          {
+            "udfPath": "formats:list",
+            "subscribers": 2
+          },
+          {
+            "udfPath": "formats:getByKey",
+            "subscribers": 4
+          },
+          {
+            "udfPath": "deckValidation:validateDeck",
+            "subscribers": 4
+          }
+        ]
+      },
+      "mutationsOnLoad": [
+        "communityLive:refreshLiveStatus"
+      ],
+      "overlays": {
+        "Duplicate deck (setDuplicateConfirmOpen)": {
+          "trigger": "{\"found\":3,\"distinctValues\":1}",
+          "open": 2,
+          "findableByRole": 0,
+          "ariaHiddenAll": true,
+          "dialogs": [
+            {
+              "role": "alertdialog",
+              "title": "Duplicate Deck",
+              "ariaHidden": true
+            },
+            {
+              "role": "alertdialog",
+              "title": "Duplicate Deck",
+              "ariaHidden": true
+            }
+          ]
+        },
+        "Edit deck (startEditing)": {
+          "trigger": "{\"found\":3,\"distinctValues\":1}",
+          "open": 1,
+          "findableByRole": 1,
+          "ariaHiddenAll": false,
+          "dialogs": [
+            {
+              "role": "dialog",
+              "title": "Edit deck details",
+              "ariaHidden": false
+            }
+          ]
+        },
+        "card details (click first card)": {
+          "trigger": "ui:main [data-card-id], main button:has(img), main [role=\"button\"]:has(img)",
+          "open": 1,
+          "findableByRole": 1,
+          "ariaHiddenAll": false,
+          "dialogs": [
+            {
+              "role": "dialog",
+              "title": "Wendy Marvell, Sky Dragon Slayer - Card Details",
+              "ariaHidden": false
+            }
+          ]
+        }
+      },
+      "mutationsTotal": [
+        "communityLive:refreshLiveStatus"
+      ],
+      "httpWritesTotal": [],
+      "consoleErrors": []
+    },
+    "community": {
+      "finalUrl": "/community",
+      "dom": {
+        "mains": 2,
+        "mainContent": 1,
+        "dupIds": [
+          "universus-contentx2",
+          "tier-listsx2"
+        ]
+      },
+      "slash": {
+        "keydownListeners": 0,
+        "slashHandlers": 0
+      },
+      "wire": {
+        "adds": 14,
+        "removes": 9,
+        "activeAfterLoad": 5
+      },
+      "client": {
+        "queries": 5,
+        "hookSubscribers": 15,
+        "multi": [
+          {
+            "udfPath": "communityYoutube:getFeed",
+            "subscribers": 3
+          },
+          {
+            "udfPath": "tierLists:listPublicFeed",
+            "subscribers": 2
+          },
+          {
+            "udfPath": "user:currentUser",
+            "subscribers": 8
+          }
+        ]
+      },
+      "mutationsOnLoad": [
+        "communityYoutube:bootstrapYoutubeCurationIds",
+        "communityYoutube:bootstrapYoutubeCurationIds",
+        "communityLive:refreshLiveStatus"
+      ],
+      "overlays": {},
+      "mutationsTotal": [
+        "communityYoutube:bootstrapYoutubeCurationIds",
+        "communityYoutube:bootstrapYoutubeCurationIds",
+        "communityLive:refreshLiveStatus"
+      ],
+      "httpWritesTotal": [],
+      "consoleErrors": []
+    },
+    "tierLists": {
+      "finalUrl": "/community/tier-lists",
+      "dom": {
+        "mains": 2,
+        "mainContent": 1,
+        "dupIds": []
+      },
+      "slash": {
+        "keydownListeners": 2,
+        "slashHandlers": 2
+      },
+      "wire": {
+        "adds": 14,
+        "removes": 9,
+        "activeAfterLoad": 5
+      },
+      "client": {
+        "queries": 5,
+        "hookSubscribers": 16,
+        "multi": [
+          {
+            "udfPath": "user:currentUser",
+            "subscribers": 12
+          }
+        ]
+      },
+      "mutationsOnLoad": [
+        "communityLive:refreshLiveStatus"
+      ],
+      "overlays": {
+        "Create tier list (setIsCreateOpen)": {
+          "trigger": "{\"found\":1,\"distinctValues\":1}",
+          "open": 2,
+          "findableByRole": 0,
+          "ariaHiddenAll": true,
+          "dialogs": [
+            {
+              "role": "dialog",
+              "title": "Create New Tier List",
+              "ariaHidden": true
+            },
+            {
+              "role": "dialog",
+              "title": "Create New Tier List",
+              "ariaHidden": true
+            }
+          ]
+        }
+      },
+      "mutationsTotal": [
+        "communityLive:refreshLiveStatus"
+      ],
+      "httpWritesTotal": [],
+      "consoleErrors": []
+    },
+    "tierListDetail": {
+      "finalUrl": "/community/tier-lists/qs7ffw2bacs9td21pdrj40f1tr00zrjr",
+      "dom": {
+        "mains": 2,
+        "mainContent": 1,
+        "dupIds": []
+      },
+      "slash": {
+        "keydownListeners": 0,
+        "slashHandlers": 0
+      },
+      "wire": {
+        "adds": 14,
+        "removes": 9,
+        "activeAfterLoad": 5
+      },
+      "client": {
+        "queries": 5,
+        "hookSubscribers": 15,
+        "multi": [
+          {
+            "udfPath": "user:currentUser",
+            "subscribers": 11
+          }
+        ]
+      },
+      "mutationsOnLoad": [
+        "communityLive:refreshLiveStatus"
+      ],
+      "overlays": {
+        "Choose cards pool (setIsPoolDialogOpen)": {
+          "trigger": "{\"found\":1,\"distinctValues\":1}",
+          "open": 2,
+          "findableByRole": 0,
+          "ariaHiddenAll": true,
+          "dialogs": [
+            {
+              "role": "dialog",
+              "title": "Choose the Cards to Evaluate",
+              "ariaHidden": true
+            },
+            {
+              "role": "dialog",
+              "title": "Choose the Cards to Evaluate",
+              "ariaHidden": true
+            }
+          ]
+        },
+        "Ranked-lanes reset confirm (addTier + requestRankingScopeChange)": {
+          "trigger": "scope=unranked addTier={\"found\":1,\"distinctValues\":1} request={\"found\":1,\"distinctValues\":1} shouldConfirm=true",
+          "open": 3,
+          "findableByRole": 0,
+          "ariaHiddenAll": true,
+          "dialogs": [
+            {
+              "role": "alertdialog",
+              "title": "Reset this tier list to ranked lanes?",
+              "ariaHidden": true
+            },
+            {
+              "role": "alertdialog",
+              "title": "Reset this tier list to ranked lanes?",
+              "ariaHidden": true
+            },
+            {
+              "role": "alertdialog",
+              "title": "Reset this tier list to ranked lanes?",
+              "ariaHidden": true
+            }
+          ]
+        }
+      },
+      "mutationsTotal": [
+        "communityLive:refreshLiveStatus"
+      ],
+      "httpWritesTotal": [],
+      "consoleErrors": []
+    },
+    "teams": {
+      "finalUrl": "/teams",
+      "dom": {
+        "mains": 2,
+        "mainContent": 1,
+        "dupIds": []
+      },
+      "slash": {
+        "keydownListeners": 0,
+        "slashHandlers": 0
+      },
+      "wire": {
+        "adds": 12,
+        "removes": 9,
+        "activeAfterLoad": 3
+      },
+      "client": {
+        "queries": 3,
+        "hookSubscribers": 3,
+        "multi": []
+      },
+      "mutationsOnLoad": [
+        "communityLive:refreshLiveStatus"
+      ],
+      "overlays": {},
+      "mutationsTotal": [
+        "communityLive:refreshLiveStatus"
+      ],
+      "httpWritesTotal": [],
+      "consoleErrors": []
+    },
+    "collection": {
+      "finalUrl": "/collection",
+      "dom": {
+        "mains": 2,
+        "mainContent": 1,
+        "dupIds": []
+      },
+      "slash": {
+        "keydownListeners": 0,
+        "slashHandlers": 0
+      },
+      "wire": {
+        "adds": 12,
+        "removes": 9,
+        "activeAfterLoad": 3
+      },
+      "client": {
+        "queries": 3,
+        "hookSubscribers": 3,
+        "multi": []
+      },
+      "mutationsOnLoad": [
+        "communityLive:refreshLiveStatus"
+      ],
+      "overlays": {},
+      "mutationsTotal": [
+        "communityLive:refreshLiveStatus"
+      ],
+      "httpWritesTotal": [],
+      "consoleErrors": []
+    },
+    "settings": {
+      "finalUrl": "/settings",
+      "dom": {
+        "mains": 2,
+        "mainContent": 1,
+        "dupIds": []
+      },
+      "slash": {
+        "keydownListeners": 0,
+        "slashHandlers": 0
+      },
+      "wire": {
+        "adds": 13,
+        "removes": 9,
+        "activeAfterLoad": 4
+      },
+      "client": {
+        "queries": 4,
+        "hookSubscribers": 5,
+        "multi": [
+          {
+            "udfPath": "user:currentUser",
+            "subscribers": 2
+          }
+        ]
+      },
+      "mutationsOnLoad": [
+        "communityLive:refreshLiveStatus"
+      ],
+      "overlays": {},
+      "mutationsTotal": [
+        "communityLive:refreshLiveStatus"
+      ],
+      "httpWritesTotal": [],
+      "consoleErrors": []
+    }
+  }
+}

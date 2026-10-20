@@ -1,0 +1,26 @@
+{
+ "mobile /decks/nh7f0": {
+  "inserted": "mobile",
+  "visibleSequence": "none -> mobile"
+ },
+ "mobile /gallery": {
+  "inserted": "mobile",
+  "visibleSequence": "none -> mobile"
+ },
+ "mobile /community": {
+  "inserted": "mobile",
+  "visibleSequence": "none -> mobile"
+ },
+ "desktop /decks/nh7f0": {
+  "inserted": "desktop",
+  "visibleSequence": "none -> desktop"
+ },
+ "desktop /gallery": {
+  "inserted": "desktop",
+  "visibleSequence": "none -> desktop"
+ },
+ "desktop /community": {
+  "inserted": "desktop",
+  "visibleSequence": "none -> desktop"
+ }
+}

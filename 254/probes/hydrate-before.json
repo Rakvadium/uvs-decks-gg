@@ -1,0 +1,66 @@
+{
+ "mobile_decks_nh7f0": {
+  "ssr": {
+   "mains": 0,
+   "visibleMain": 0,
+   "visibleTextLen": 0
+  },
+  "live": {
+   "mains": 2,
+   "ids": 1
+  },
+  "hydrationMessages": [],
+  "otherErrors": [],
+  "mutations": [
+   "communityLive:refreshLiveStatus"
+  ]
+ },
+ "mobile_gallery": {
+  "ssr": {
+   "mains": 0,
+   "visibleMain": 0,
+   "visibleTextLen": 0
+  },
+  "live": {
+   "mains": 2,
+   "ids": 1
+  },
+  "hydrationMessages": [],
+  "otherErrors": [],
+  "mutations": [
+   "communityLive:refreshLiveStatus"
+  ]
+ },
+ "desktop_decks_nh7f0": {
+  "ssr": {
+   "mains": 0,
+   "visibleMain": 0,
+   "visibleTextLen": 0
+  },
+  "live": {
+   "mains": 2,
+   "ids": 1
+  },
+  "hydrationMessages": [],
+  "otherErrors": [],
+  "mutations": [
+   "communityLive:refreshLiveStatus"
+  ]
+ },
+ "desktop_gallery": {
+  "ssr": {
+   "mains": 0,
+   "visibleMain": 0,
+   "visibleTextLen": 0
+  },
+  "live": {
+   "mains": 2,
+   "ids": 1
+  },
+  "hydrationMessages": [],
+  "otherErrors": [],
+  "mutations": [
+   "communityLive:refreshLiveStatus"
+  ]
+ }
+}

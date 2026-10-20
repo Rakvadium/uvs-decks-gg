@@ -1,0 +1,340 @@
+{
+  "Edit deck dialog + typed name (provider state) (desktop->mobile)": {
+    "pre": [
+      {
+        "title": "Edit deck details",
+        "hidden": false,
+        "visible": true,
+        "focusInside": true,
+        "inputs": [
+          "draft-254-resize",
+          "Seeded public deck for validation captures."
+        ]
+      }
+    ],
+    "afterCrossing": [
+      {
+        "title": "Edit deck details",
+        "hidden": false,
+        "visible": true,
+        "focusInside": true,
+        "inputs": [
+          "draft-254-resize",
+          "Seeded public deck for validation captures."
+        ]
+      }
+    ],
+    "afterCrossingBack": [
+      {
+        "title": "Edit deck details",
+        "hidden": false,
+        "visible": true,
+        "focusInside": true,
+        "inputs": [
+          "draft-254-resize",
+          "Seeded public deck for validation captures."
+        ]
+      }
+    ],
+    "blocked": [
+      "Action:communityLive:refreshLiveStatus"
+    ]
+  },
+  "Edit deck dialog + typed name (provider state) (mobile->desktop)": {
+    "pre": [
+      {
+        "title": "Edit deck details",
+        "hidden": false,
+        "visible": true,
+        "focusInside": true,
+        "inputs": [
+          "draft-254-resize",
+          "Seeded public deck for validation captures."
+        ]
+      }
+    ],
+    "afterCrossing": [
+      {
+        "title": "Edit deck details",
+        "hidden": false,
+        "visible": true,
+        "focusInside": true,
+        "inputs": [
+          "draft-254-resize",
+          "Seeded public deck for validation captures."
+        ]
+      }
+    ],
+    "afterCrossingBack": [
+      {
+        "title": "Edit deck details",
+        "hidden": false,
+        "visible": true,
+        "focusInside": true,
+        "inputs": [
+          "draft-254-resize",
+          "Seeded public deck for validation captures."
+        ]
+      }
+    ],
+    "blocked": [
+      "Action:communityLive:refreshLiveStatus"
+    ]
+  },
+  "New deck dialog + typed name (desktop->mobile)": {
+    "error": "locator.fill: Timeout 30000ms exceeded.",
+    "blocked": [
+      "Action:communityLive:refreshLiveStatus"
+    ]
+  },
+  "New deck dialog + typed name (mobile->desktop)": {
+    "error": "locator.fill: Timeout 30000ms exceeded.",
+    "blocked": [
+      "Action:communityLive:refreshLiveStatus"
+    ]
+  },
+  "Duplicate deck confirm (provider state) (desktop->mobile)": {
+    "pre": [
+      {
+        "title": "Duplicate Deck",
+        "hidden": true,
+        "visible": true,
+        "focusInside": false,
+        "inputs": []
+      },
+      {
+        "title": "Duplicate Deck",
+        "hidden": true,
+        "visible": true,
+        "focusInside": true,
+        "inputs": []
+      }
+    ],
+    "afterCrossing": [
+      {
+        "title": "Duplicate Deck",
+        "hidden": true,
+        "visible": true,
+        "focusInside": false,
+        "inputs": []
+      },
+      {
+        "title": "Duplicate Deck",
+        "hidden": true,
+        "visible": true,
+        "focusInside": true,
+        "inputs": []
+      }
+    ],
+    "afterCrossingBack": [
+      {
+        "title": "Duplicate Deck",
+        "hidden": true,
+        "visible": true,
+        "focusInside": false,
+        "inputs": []
+      },
+      {
+        "title": "Duplicate Deck",
+        "hidden": true,
+        "visible": true,
+        "focusInside": true,
+        "inputs": []
+      }
+    ],
+    "blocked": [
+      "Action:communityLive:refreshLiveStatus"
+    ]
+  },
+  "Duplicate deck confirm (provider state) (mobile->desktop)": {
+    "pre": [
+      {
+        "title": "Duplicate Deck",
+        "hidden": true,
+        "visible": true,
+        "focusInside": false,
+        "inputs": []
+      },
+      {
+        "title": "Duplicate Deck",
+        "hidden": true,
+        "visible": true,
+        "focusInside": true,
+        "inputs": []
+      }
+    ],
+    "afterCrossing": [
+      {
+        "title": "Duplicate Deck",
+        "hidden": true,
+        "visible": true,
+        "focusInside": false,
+        "inputs": []
+      },
+      {
+        "title": "Duplicate Deck",
+        "hidden": true,
+        "visible": true,
+        "focusInside": true,
+        "inputs": []
+      }
+    ],
+    "afterCrossingBack": [
+      {
+        "title": "Duplicate Deck",
+        "hidden": true,
+        "visible": true,
+        "focusInside": false,
+        "inputs": []
+      },
+      {
+        "title": "Duplicate Deck",
+        "hidden": true,
+        "visible": true,
+        "focusInside": true,
+        "inputs": []
+      }
+    ],
+    "blocked": [
+      "Action:communityLive:refreshLiveStatus"
+    ]
+  },
+  "Card details dialog (local state) (desktop->mobile)": {
+    "pre": [
+      {
+        "title": "Cana Alberona, Cardslinger - Card Detail",
+        "hidden": false,
+        "visible": true,
+        "focusInside": true,
+        "inputs": []
+      }
+    ],
+    "afterCrossing": [
+      {
+        "title": "Cana Alberona, Cardslinger - Card Detail",
+        "hidden": false,
+        "visible": true,
+        "focusInside": true,
+        "inputs": []
+      }
+    ],
+    "afterCrossingBack": [
+      {
+        "title": "Cana Alberona, Cardslinger - Card Detail",
+        "hidden": false,
+        "visible": true,
+        "focusInside": true,
+        "inputs": []
+      }
+    ],
+    "blocked": [
+      "Action:communityLive:refreshLiveStatus"
+    ]
+  },
+  "Card details dialog (local state) (mobile->desktop)": {
+    "pre": [
+      {
+        "title": "Cana Alberona, Cardslinger - Card Detail",
+        "hidden": false,
+        "visible": true,
+        "focusInside": true,
+        "inputs": []
+      }
+    ],
+    "afterCrossing": [
+      {
+        "title": "Cana Alberona, Cardslinger - Card Detail",
+        "hidden": false,
+        "visible": true,
+        "focusInside": true,
+        "inputs": []
+      }
+    ],
+    "afterCrossingBack": [
+      {
+        "title": "Cana Alberona, Cardslinger - Card Detail",
+        "hidden": false,
+        "visible": true,
+        "focusInside": true,
+        "inputs": []
+      }
+    ],
+    "blocked": [
+      "Action:communityLive:refreshLiveStatus"
+    ]
+  },
+  "Gallery scroll position (desktop->mobile)": {
+    "pre": {
+      "scrollTop": 1500
+    },
+    "afterCrossing": {
+      "scrollTop": 0
+    },
+    "afterCrossingBack": {
+      "scrollTop": 1500
+    },
+    "blocked": [
+      "Action:communityLive:refreshLiveStatus"
+    ]
+  },
+  "Gallery scroll position (mobile->desktop)": {
+    "pre": {
+      "scrollTop": 1500
+    },
+    "afterCrossing": {
+      "scrollTop": 0
+    },
+    "afterCrossingBack": {
+      "scrollTop": 1500
+    },
+    "blocked": [
+      "Action:communityLive:refreshLiveStatus"
+    ]
+  },
+  "Gallery search query (URL / filters provider) (desktop->mobile)": {
+    "pre": {
+      "url": "/gallery?q=dragon",
+      "inputs": [
+        "dragon"
+      ]
+    },
+    "afterCrossing": {
+      "url": "/gallery?q=dragon",
+      "inputs": [
+        "dragon"
+      ]
+    },
+    "afterCrossingBack": {
+      "url": "/gallery?q=dragon",
+      "inputs": [
+        "dragon"
+      ]
+    },
+    "blocked": [
+      "Action:communityLive:refreshLiveStatus"
+    ]
+  },
+  "Gallery search query (URL / filters provider) (mobile->desktop)": {
+    "pre": {
+      "url": "/gallery?q=dragon",
+      "inputs": [
+        "dragon"
+      ]
+    },
+    "afterCrossing": {
+      "url": "/gallery?q=dragon",
+      "inputs": [
+        "dragon"
+      ]
+    },
+    "afterCrossingBack": {
+      "url": "/gallery?q=dragon",
+      "inputs": [
+        "dragon"
+      ]
+    },
+    "blocked": [
+      "Action:communityLive:refreshLiveStatus"
+    ]
+  }
+}
