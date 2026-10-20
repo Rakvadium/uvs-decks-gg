@@ -1,0 +1,391 @@
+{
+  "base": "after",
+  "head": "verify-260",
+  "threshold": 0.1,
+  "results": [
+    {
+      "name": "design-actions__desktop__caffeine__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-actions__desktop__caffeine__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-actions__desktop__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-actions__desktop__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-actions__desktop__singularity__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-actions__desktop__singularity__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-actions__desktop__sorbet__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-actions__desktop__sorbet__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-actions__mobile__caffeine__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-actions__mobile__caffeine__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-actions__mobile__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-actions__mobile__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-actions__mobile__singularity__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-actions__mobile__singularity__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-actions__mobile__sorbet__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-actions__mobile__sorbet__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-colors__desktop__caffeine__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-colors__desktop__caffeine__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-colors__desktop__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-colors__desktop__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-colors__desktop__singularity__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-colors__desktop__singularity__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-colors__desktop__sorbet__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-colors__desktop__sorbet__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-colors__mobile__caffeine__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-colors__mobile__caffeine__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-colors__mobile__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-colors__mobile__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-colors__mobile__singularity__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-colors__mobile__singularity__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-colors__mobile__sorbet__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-colors__mobile__sorbet__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-forms__desktop__caffeine__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-forms__desktop__caffeine__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-forms__desktop__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-forms__desktop__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-forms__desktop__singularity__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-forms__desktop__singularity__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-forms__desktop__sorbet__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-forms__desktop__sorbet__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-forms__mobile__caffeine__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-forms__mobile__caffeine__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-forms__mobile__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-forms__mobile__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-forms__mobile__singularity__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-forms__mobile__singularity__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-forms__mobile__sorbet__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-forms__mobile__sorbet__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-ladders__desktop__caffeine__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-ladders__desktop__caffeine__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-ladders__desktop__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-ladders__desktop__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-ladders__desktop__singularity__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-ladders__desktop__singularity__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-ladders__desktop__sorbet__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-ladders__desktop__sorbet__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-ladders__mobile__caffeine__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-ladders__mobile__caffeine__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-ladders__mobile__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-ladders__mobile__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-ladders__mobile__singularity__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-ladders__mobile__singularity__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-ladders__mobile__sorbet__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-ladders__mobile__sorbet__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-overview__desktop__caffeine__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-overview__desktop__caffeine__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-overview__desktop__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-overview__desktop__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-overview__desktop__singularity__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-overview__desktop__singularity__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-overview__desktop__sorbet__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-overview__desktop__sorbet__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-overview__mobile__caffeine__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-overview__mobile__caffeine__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-overview__mobile__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-overview__mobile__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-overview__mobile__singularity__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-overview__mobile__singularity__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-overview__mobile__sorbet__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-overview__mobile__sorbet__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-patterns__desktop__caffeine__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-patterns__desktop__caffeine__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-patterns__desktop__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-patterns__desktop__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-patterns__desktop__singularity__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-patterns__desktop__singularity__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-patterns__desktop__sorbet__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-patterns__desktop__sorbet__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-patterns__mobile__caffeine__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-patterns__mobile__caffeine__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-patterns__mobile__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-patterns__mobile__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-patterns__mobile__singularity__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-patterns__mobile__singularity__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-patterns__mobile__sorbet__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "design-patterns__mobile__sorbet__light",
+      "diffPercent": 0
+    }
+  ]
+}
