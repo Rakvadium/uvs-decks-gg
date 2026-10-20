@@ -1,85 +1,49 @@
-import type { Browser, BrowserContext, BrowserContextOptions, Page } from "playwright";
-import { VIEWPORTS, type Mode, type Step } from "./shared.ts";
+import type { Browser, BrowserContext, BrowserContextOptions, Page, WebSocketRoute } from "playwright";
+import { BREAK_PIN_ENV, createSessionPin, parseFrame, type Appearance, type ClientFrame, type SessionPin } from "./pin.ts";
+import { VIEWPORTS, cachedLoad, type Step } from "./shared.ts";
 
 type StorageState = Exclude<BrowserContextOptions["storageState"], string | undefined>;
 
-export type Appearance = { theme: string; mode: Mode; chrome: string };
-
 const CONVEX_SYNC_SOCKET = /\/api\/[^/]+\/sync$/;
-
-const SESSION_QUERY = /^sessions(\.js)?:getSession$/;
-
-/** `preset/mode/chrome` values the agent's stored session actually had (before the in-browser rewrite). */
-export const savedAppearances = new Set<string>();
-
-type ClientFrame = {
-  type?: string;
-  udfPath?: string;
-  modifications?: { type: string; queryId: number; udfPath?: string }[];
-};
-type Transition = { type: "Transition"; modifications: { type: string; queryId: number; value?: unknown }[] };
-
-function parse<T>(message: string): T | null {
-  try {
-    return JSON.parse(message) as T;
-  } catch {
-    return null;
-  }
-}
 
 /**
  * Proxies the Convex sync WebSocket:
  * - drops every Mutation/Action frame, so nothing a capture does (including app-initiated writes
  *   like appearance migration) reaches the shared deployment. Queries still flow.
- * - when `appearance` is set, rewrites the `sessions:getSession` result the browser receives so
+ * - with a `pin`, rewrites the `sessions:getSession` result the browser receives so
  *   ColorSchemeProvider's JS state (isDark, chrome, preset: menus, toasts, frosted controls) matches
  *   the pin, not the agent's saved prefs. The stored session is never touched.
  */
-async function proxyConvexSocket(context: BrowserContext, blocked: string[], appearance?: Appearance) {
+async function proxyConvexSocket(context: BrowserContext, blocked: string[], pin?: SessionPin) {
   await context.routeWebSocket(CONVEX_SYNC_SOCKET, (ws) => {
     const server = ws.connectToServer();
-    const sessionQueryIds = new Set<number>();
-    let raw: string[] = [];
+    const socket = pin?.socket();
 
     ws.onMessage((message) => {
-      const frame = typeof message === "string" ? parse<ClientFrame>(message) : null;
+      const frame = typeof message === "string" ? parseFrame<ClientFrame & { udfPath?: string }>(message) : null;
       if (frame?.type === "Mutation" || frame?.type === "Action") {
         blocked.push(`${frame.type}:${frame.udfPath}`);
         return;
       }
-      for (const mod of frame?.type === "ModifyQuerySet" ? (frame.modifications ?? []) : []) {
-        if (mod.type === "Add" && SESSION_QUERY.test(mod.udfPath ?? "")) sessionQueryIds.add(mod.queryId);
-      }
+      socket?.fromClient(frame);
       server.send(message);
     });
 
-    if (!appearance) return;
-    const pinned = { theme: appearance.mode, chrome: appearance.chrome, colorSource: { kind: "preset", preset: appearance.theme } };
-    const patch = (transition: Transition) => {
-      for (const mod of transition.modifications) {
-        if (mod.type === "QueryUpdated" && sessionQueryIds.has(mod.queryId) && mod.value && typeof mod.value === "object") {
-          const saved = mod.value as { theme?: string; chrome?: string; colorSource?: { kind?: string; preset?: string } };
-          savedAppearances.add(`${saved.colorSource?.preset ?? saved.colorSource?.kind ?? "default"}/${saved.theme ?? "system"}/${saved.chrome ?? "calm"}`);
-          mod.value = { ...mod.value, ...pinned };
-        }
-      }
-      return JSON.stringify(transition);
-    };
+    if (!socket) return;
     server.onMessage((message) => {
-      const frame = typeof message === "string" ? parse<{ type?: string; totalParts?: number }>(message) : null;
-      if (frame?.type === "Transition") return ws.send(patch(frame as Transition));
-      if (frame?.type === "TransitionChunk") {
-        // Large transitions arrive in parts; reassemble so the session result can be patched.
-        raw.push(message as string);
-        if (raw.length < (frame.totalParts ?? 1)) return;
-        const parts = raw;
-        raw = [];
-        const whole = parse<Transition>(parts.map((part) => parse<{ chunk: string }>(part)?.chunk ?? "").join(""));
-        if (whole) ws.send(patch(whole));
-        else parts.forEach((part) => ws.send(part));
-        return;
-      }
-      ws.send(message);
+      for (const out of socket.fromServer(message)) ws.send(out);
+    });
+    // Setting onClose turns off Playwright's automatic close forwarding, so forward it ourselves.
+    // Codes a peer may not send (1005/1006, ...) are rejected, so fall back to a plain close.
+    const forward = (target: WebSocketRoute, code: number | undefined, reason: string | undefined) =>
+      target.close({ code, reason }).catch(() => target.close().catch(() => {}));
+    ws.onClose((code, reason) => {
+      socket.close();
+      void forward(server, code, reason);
+    });
+    server.onClose((code, reason) => {
+      socket.close();
+      void forward(ws, code, reason);
     });
   });
 }
@@ -95,9 +59,9 @@ const catalogCache = new Map<string, Promise<{ status: number; contentType: stri
 async function allowStaticCatalog(context: BrowserContext) {
   await context.route(/\/catalog\/.+\.json\.gz$/, async (route) => {
     const url = route.request().url();
-    if (!catalogCache.has(url)) {
-      catalogCache.set(
-        url,
+    let download;
+    try {
+      download = await cachedLoad(catalogCache, url, () =>
         fetch(url, { signal: AbortSignal.timeout(30_000) }).then(async (res) => {
           if (!res.ok) throw new Error(`HTTP ${res.status}`);
           return {
@@ -107,13 +71,8 @@ async function allowStaticCatalog(context: BrowserContext) {
           };
         }),
       );
-    }
-    let download;
-    try {
-      download = await catalogCache.get(url)!;
     } catch (error) {
-      // Don't cache the failure, and fail the browser request now instead of letting it hang.
-      catalogCache.delete(url);
+      // Fail the browser request now instead of letting it hang. cachedLoad already forgot the failure.
       console.warn(`  card catalog download failed (${url}): ${error instanceof Error ? error.message : error}`);
       await route.abort("failed").catch(() => {});
       return;
@@ -163,7 +122,7 @@ export async function newCaptureContext(
     still: boolean;
     videoDir?: string;
   },
-): Promise<BrowserContext> {
+): Promise<{ context: BrowserContext; pin: SessionPin }> {
   const vp = VIEWPORTS[options.viewport];
   const context = await browser.newContext({
     viewport: { width: vp.width, height: vp.height },
@@ -172,15 +131,18 @@ export async function newCaptureContext(
     hasTouch: vp.mobile,
     colorScheme: options.appearance.mode,
     reducedMotion: options.still ? "reduce" : "no-preference",
+    // So copy buttons show their success toast instead of the clipboard-denied error.
+    permissions: ["clipboard-read", "clipboard-write"],
     storageState: options.storageState,
     recordVideo: options.videoDir
       ? { dir: options.videoDir, size: { width: vp.width, height: vp.height } }
       : undefined,
   });
-  await proxyConvexSocket(context, options.blocked, options.appearance);
+  const pin = createSessionPin(options.appearance, { broken: process.env[BREAK_PIN_ENV] === "1" });
+  await proxyConvexSocket(context, options.blocked, pin);
   await allowStaticCatalog(context);
   await context.addInitScript(pinAppearance, options.appearance);
-  return context;
+  return { context, pin };
 }
 
 /** Signs in once through /agent-login and returns the cookies/localStorage for reuse. */
@@ -268,17 +230,27 @@ ${HIDE_DEV_OVERLAY_CSS}
 const QUIET_MS = 2_000;
 const SHOT_INTERVAL_MS = 400;
 
-export async function stableScreenshot(page: Page, fullPage: boolean) {
+/**
+ * `snapshot` runs just before each screenshot. The returned `at` belongs to the returned `png`, so
+ * callers can tell what state (e.g. the theme pin) the page was in when that image was taken. A
+ * change in the snapshot restarts the quiet window like a pixel change does, so the shot is only
+ * returned once the image and the snapshot have both been unchanged for QUIET_MS (a newly forwarded
+ * result gets time to render).
+ */
+export async function stableScreenshot<T = undefined>(page: Page, fullPage: boolean, snapshot?: () => T) {
   await page.addStyleTag({ content: FREEZE_CSS });
-  const shoot = () => page.screenshot({ animations: "disabled", caret: "hide", fullPage });
+  const shoot = async () => {
+    const at = snapshot?.();
+    return { png: await page.screenshot({ animations: "disabled", caret: "hide", fullPage }), at };
+  };
   let previous = await shoot();
   let quietSince = Date.now();
   for (const deadline = Date.now() + 30_000; Date.now() < deadline; ) {
     await page.waitForTimeout(SHOT_INTERVAL_MS);
     const next = await shoot();
-    if (!next.equals(previous)) quietSince = Date.now();
-    else if (Date.now() - quietSince >= QUIET_MS) return { png: next, stable: true };
+    if (!next.png.equals(previous.png) || JSON.stringify(next.at) !== JSON.stringify(previous.at)) quietSince = Date.now();
+    else if (Date.now() - quietSince >= QUIET_MS) return { ...next, stable: true };
     previous = next;
   }
-  return { png: previous, stable: false };
+  return { ...previous, stable: false };
 }

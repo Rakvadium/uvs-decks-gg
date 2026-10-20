@@ -7,14 +7,13 @@ import { chromium, type Browser } from "playwright";
 import {
   HIDE_DEV_OVERLAY_CSS,
   agentStorageState,
-  savedAppearances,
   newCaptureContext,
   runSteps,
   settle,
   stableScreenshot,
-  type Appearance,
 } from "./browser.ts";
 import { recordFrames, writeGif } from "./gif.ts";
+import { BREAK_PIN_ENV, shotPin, stillPin, type Appearance, type PinReport, type ShotPin } from "./pin.ts";
 import {
   OUTPUT_ROOT,
   VIEWPORTS,
@@ -48,6 +47,8 @@ const chrome = typeof args.chrome === "string" ? args.chrome : "calm";
 const fullPage = args["full-page"] === true;
 const stills = args["skip-stills"] !== true;
 const gifWidth = Number(args["gif-width"] ?? 960);
+const strict = args.strict === true;
+if (process.env[BREAK_PIN_ENV] === "1") console.warn(`${BREAK_PIN_ENV}=1: the session rewrite is deliberately broken (test only).`);
 
 if ((chrome !== "calm" || themes.some((t) => t !== "default")) && spec.routes.some((r) => r.auth === "guest")) {
   console.warn(
@@ -112,6 +113,18 @@ async function ensureServer(): Promise<ChildProcess | null> {
   throw new Error(`next dev was not ready on port ${port} within 180s`);
 }
 
+/** Signed-in shots only (guests have no session to pin). */
+function shotPinFor(snapshots: (PinReport | undefined)[], auth: RouteSpec["auth"], appearance: Appearance): ShotPin | null {
+  return auth === "agent" ? shotPin(snapshots, appearance) : null;
+}
+
+/** After the last GIF frame, give an in-flight session change time to reach Node before the final snapshot. */
+const GIF_TAIL_MS = 500;
+
+function warnPin(pin: ShotPin | null) {
+  if (pin?.problems.length) console.warn(`    WARNING: JS theme pin may not apply: ${pin.problems.join("; ")}`);
+}
+
 function stopServer(child: ChildProcess | null) {
   if (!child?.pid || child.exitCode !== null) return;
   if (process.platform === "win32") spawnSync("taskkill", ["/pid", String(child.pid), "/T", "/F"]);
@@ -127,7 +140,7 @@ async function captureStill(
   blocked: string[],
 ) {
   const name = shotName(route, viewport, appearance.theme, appearance.mode);
-  const context = await newCaptureContext(browser, {
+  const { context, pin } = await newCaptureContext(browser, {
     viewport,
     appearance,
     storageState: route.auth === "agent" ? storageState : undefined,
@@ -140,7 +153,7 @@ async function captureStill(
     await settle(page);
     await runSteps(page, route.steps);
     const loaded = await settle(page);
-    const { png, stable } = await stableScreenshot(page, fullPage);
+    const { png, stable, at } = await stableScreenshot(page, fullPage, route.auth === "agent" ? pin.report : undefined);
     fs.writeFileSync(path.join(outDir, `${name}.png`), png);
     const finalPath = new URL(page.url()).pathname;
     const notes = [
@@ -149,7 +162,9 @@ async function captureStill(
       finalPath !== route.path && `landed on ${finalPath}`,
     ].filter(Boolean);
     console.log(`  ${name}.png${notes.length ? `  (${notes.join("; ")})` : ""}`);
-    return { name, route: route.path, auth: route.auth, finalPath, loaded, stable };
+    const report = route.auth === "agent" ? stillPin(at, stable, appearance) : null;
+    warnPin(report);
+    return { name, route: route.path, auth: route.auth, appearance, finalPath, loaded, stable, pin: report };
   } finally {
     await context.close();
   }
@@ -165,7 +180,7 @@ async function captureGif(
   const appearance = { theme: gif.theme ?? themes[0], mode: gif.mode ?? modes[0], chrome };
   const name = shotName(gif, viewport, appearance.theme, appearance.mode);
   const videoDir = path.join(outDir, ".video-tmp");
-  const context = await newCaptureContext(browser, {
+  const { context, pin } = await newCaptureContext(browser, {
     viewport,
     appearance,
     storageState: gif.auth === "agent" ? storageState : undefined,
@@ -174,19 +189,26 @@ async function captureGif(
     videoDir,
   });
   const page = await context.newPage();
-  let frames: Awaited<ReturnType<typeof recordFrames>> = [];
+  let frames: Awaited<ReturnType<typeof recordFrames<PinReport>>> = [];
+  let afterRecording: PinReport | undefined;
   try {
     await page.goto(baseUrl + gif.path, { timeout: 180_000 });
     await settle(page);
     await page.addStyleTag({ content: HIDE_DEV_OVERLAY_CSS });
-    frames = await recordFrames(page, gif.steps ?? []);
+    frames = await recordFrames(page, gif.steps ?? [], gif.auth === "agent" ? pin.report : undefined);
+    // Something rendered during the last frame may only reach Node afterwards; snapshot once more.
+    await page.waitForTimeout(GIF_TAIL_MS);
+    afterRecording = pin.report();
   } finally {
     await context.close();
   }
+  const gifPin = shotPinFor([...(frames.length ? frames.map((frame) => frame.snapshot) : [undefined]), afterRecording], gif.auth, appearance);
   await page.video()?.saveAs(path.join(outDir, `${name}.webm`));
   fs.rmSync(videoDir, { recursive: true, force: true });
   await writeGif(frames, path.join(outDir, `${name}.gif`), gifWidth);
   console.log(`  ${name}.gif (${frames.length} frames) + ${name}.webm`);
+  warnPin(gifPin);
+  return { name, auth: gif.auth, appearance, frames: frames.length, pin: gifPin };
 }
 
 async function main() {
@@ -200,6 +222,7 @@ async function main() {
 
   const blocked: string[] = [];
   const shots: Awaited<ReturnType<typeof captureStill>>[] = [];
+  let gifShot: Awaited<ReturnType<typeof captureGif>> | undefined;
   let browser: Browser | undefined;
   try {
     browser = await chromium.launch();
@@ -216,16 +239,35 @@ async function main() {
             for (const mode of modes)
               shots.push(await captureStill(browser, route, viewport, { theme, mode, chrome }, storageState, blocked));
     }
-    if (args.gif === true) await captureGif(browser, storageState, blocked);
+    if (args.gif === true) gifShot = await captureGif(browser, storageState, blocked);
   } finally {
     await browser?.close();
     stopServer(server);
   }
 
+  const signedIn = [...shots, ...(gifShot ? [gifShot] : [])].flatMap((shot) => (shot.pin ? [{ ...shot, pin: shot.pin }] : []));
+  const savedAppearance = [...new Set(signedIn.flatMap((shot) => (shot.pin.saved ? [shot.pin.saved] : [])))];
+  const flagged = signedIn.filter((shot) => shot.pin.flagged).map((shot) => shot.name);
+  // Signed-in unstable shots are already pin-flagged; this list covers every shot, guests included.
+  const unstable = shots.filter((shot) => !shot.stable).map((shot) => shot.name);
+
   fs.writeFileSync(
     path.join(outDir, "manifest.json"),
     JSON.stringify(
-      { issue, label, port, chrome, fullPage, shots, blockedConvexWrites: blocked, savedAppearance: [...savedAppearances] },
+      {
+        issue,
+        label,
+        port,
+        chrome,
+        fullPage,
+        strict,
+        shots,
+        gif: gifShot ?? null,
+        blockedConvexWrites: blocked,
+        savedAppearance,
+        pinFlagged: flagged,
+        unstable,
+      },
       null,
       2,
     ),
@@ -234,9 +276,31 @@ async function main() {
   for (const write of blocked) counts.set(write, (counts.get(write) ?? 0) + 1);
   const summary = [...counts].map(([write, n]) => `${write} ×${n}`).join(", ");
   console.log(`Done: ${shots.length} stills. Blocked Convex writes: ${summary || "none"}`);
-  if (savedAppearances.size) {
-    const saved = [...savedAppearances].join(", ");
-    console.log(`Agent's saved appearance (preset/mode/chrome): ${saved}. Overridden in the browser for every shot.`);
+  if (signedIn.length) {
+    const patched = signedIn.filter((shot) => shot.pin.patched).length;
+    const overridden = signedIn.filter((shot) => shot.pin.overridden).length;
+    console.log(
+      `Agent's saved appearance (preset/mode/chrome): ${savedAppearance.join(", ") || "unknown"}. ` +
+        `Session result rewritten in ${patched}/${signedIn.length} signed-in shots (${overridden} differ from saved).`,
+    );
+  }
+  if (flagged.length) {
+    console.warn(
+      `WARNING: ${flagged.length} signed-in shot(s) may show the agent's saved theme or the app defaults in JS-driven UI ` +
+        `(menus, toasts, neon forks) instead of the pin: ${flagged.join(", ")}. See \`pin.problems\` in manifest.json.`,
+    );
+  }
+  if (unstable.length) {
+    console.warn(`WARNING: ${unstable.length} shot(s) never settled within the stability window: ${unstable.join(", ")}.`);
+  }
+  if (strict && (flagged.length || unstable.length)) {
+    throw new Error(
+      "--strict: failing because " +
+        [flagged.length && "the JS theme pin did not apply to every signed-in shot", unstable.length && "some shots never settled"]
+          .filter(Boolean)
+          .join(" and ") +
+        ".",
+    );
   }
 }
 
