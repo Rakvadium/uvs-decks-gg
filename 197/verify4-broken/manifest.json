@@ -1,0 +1,44 @@
+{
+  "issue": "197",
+  "label": "verify4-broken",
+  "port": 8252,
+  "chrome": "expressive",
+  "fullPage": false,
+  "strict": true,
+  "shots": [
+    {
+      "name": "decks__desktop__cyberpunk__dark",
+      "route": "/decks",
+      "auth": "agent",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "dark",
+        "chrome": "expressive"
+      },
+      "finalPath": "/decks",
+      "loaded": true,
+      "stable": true,
+      "pin": {
+        "saved": null,
+        "patched": false,
+        "problems": [
+          "no sessions:getSession subscription was seen (renamed, or the page isn't signed in)"
+        ],
+        "pinned": "cyberpunk/dark/expressive",
+        "overridden": false,
+        "flagged": true
+      }
+    }
+  ],
+  "gif": null,
+  "blockedConvexWrites": [
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus"
+  ],
+  "savedAppearance": [],
+  "pinFlagged": [
+    "decks__desktop__cyberpunk__dark"
+  ]
+}
