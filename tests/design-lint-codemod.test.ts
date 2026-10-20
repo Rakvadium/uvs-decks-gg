@@ -90,6 +90,22 @@ describe("transformSource", () => {
     expect(second.left.map((l) => l.text)).toEqual(result.left.map((l) => l.text));
   });
 
+  test("keeps a byte-order mark and rewrites the right offsets", () => {
+    const withBom = transformSource(`﻿<div className="rounded z-50" />`, "bom.tsx");
+    expect(withBom.output).toBe(`﻿<div className="rounded-md z-modal" />`);
+  });
+
+  test("CRLF line endings are preserved", () => {
+    const crlf = transformSource(`<div
+  className="rounded"
+/>
+`, "crlf.tsx");
+    expect(crlf.output).toBe(`<div
+  className="rounded-md"
+/>
+`);
+  });
+
   test("a file that does not parse is reported, not rewritten", () => {
     const broken = transformSource(`<div className="rounded" `, "broken.tsx");
     expect(broken.fatal).toBeDefined();

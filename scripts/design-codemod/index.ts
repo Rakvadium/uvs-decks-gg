@@ -38,11 +38,14 @@ function lineStarts(code: string): number[] {
 }
 
 /** Rewrites one file's source. Pure: same input, same output; output is a fixed point. */
-export function transformSource(code: string, filename: string): TransformResult {
+export function transformSource(source: string, filename: string): TransformResult {
+  // ESLint drops a BOM and reports offsets without it; put it back after rewriting.
+  const bom = source.startsWith("﻿") ? "﻿" : "";
+  const code = bom ? source.slice(1) : source;
   const linter = new Linter({ configType: "flat" });
   const messages = linter.verify(code, config, path.basename(filename));
   const fatal = messages.find((m) => m.fatal || (m.ruleId === null && m.line === 0));
-  if (fatal) return { output: code, rewrites: [], left: [], fatal: `${fatal.line}:${fatal.column} ${fatal.message}` };
+  if (fatal) return { output: source, rewrites: [], left: [], fatal: `${fatal.line}:${fatal.column} ${fatal.message}` };
 
   const starts = lineStarts(code);
   const offset = (line: number, column: number) => starts[line - 1] + column - 1;
@@ -72,7 +75,7 @@ export function transformSource(code: string, filename: string): TransformResult
     floor = fix.range[0];
   }
   rewrites.reverse();
-  return { output, rewrites, left };
+  return { output: bom + output, rewrites, left };
 }
 
 /** Source files under `target` (a file or a directory). */
