@@ -6,21 +6,27 @@ on:
   pull_request:
     # edited: re-run when the PR's base branch changes.
     types: [opened, synchronize, reopened, edited]
-  # Nightly backstop for the secret scan: rescans the last 3 days of dev and master.
-  # Scheduled runs ignore [skip ci], and the overlapping windows cover cancelled or missed runs.
+  # Nightly backstop for the secret scan: rescans every push to dev and master from the last
+  # 3 days, by push time (repository activity API). Scheduled runs ignore [skip ci], and the
+  # overlapping windows cover cancelled or missed runs. workflow_dispatch runs the same scan now.
   schedule:
     - cron: "23 4 * * *"
+  workflow_dispatch:
 
-# A newer PR run replaces an older one for the same PR (it scans a superset). Push and
-# scheduled runs each get their own group (run_id), so a later push can never cancel, or drop
-# as pending, an earlier push's scan.
+# Read-only token: checkout, and the repository activity API for the nightly scan.
+permissions:
+  contents: read
+
+# A newer PR run replaces an older one for the same PR (it scans a superset). Push, scheduled
+# and dispatched runs each get their own group (run_id), so a later push can never cancel, or
+# drop as pending, an earlier push's scan.
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.ref || github.run_id }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   check:
-    if: github.event_name != 'schedule'
+    if: github.event_name != 'schedule' && github.event_name != 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -47,7 +53,8 @@ jobs:
   # Value-based scan for the real values of the secrets named in scripts/secret-scan/secrets.json.
   # Fails closed: --strict --ci fails if any required Actions secret (including the canary) is
   # missing. Runs on PRs (the PR's commits), on pushes to dev/master (the pushed commits), and
-  # nightly (the last 3 days of dev and master). The range logic is scripts/secret-scan/ci-range.sh.
+  # nightly (every push to dev and master in the last 3 days, by push time). The range logic is
+  # scripts/secret-scan/ci-range.sh.
   secret-scan:
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -70,11 +77,13 @@ jobs:
         with:
           bun-version: latest
 
-      # Fails the job when the range can't be determined (e.g. a force-pushed-over tip that
-      # can't be fetched) instead of guessing.
+      # Fails the job when a range can't be determined (a force-pushed-over tip that can't be
+      # fetched, or a failed activity API call) instead of guessing.
       - name: Pick the commit ranges
         id: range
         env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
           EVENT: ${{ github.event_name }}
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
@@ -93,6 +102,7 @@ jobs:
       # Keep this env list in sync with scripts/secret-scan/secrets.json (a test checks it).
       - name: Scan commits for secret values
         env:
+          EVENT: ${{ github.event_name }}
           RANGES: ${{ steps.range.outputs.ranges }}
           AGENT_AUTH_SECRET: ${{ secrets.AGENT_AUTH_SECRET }}
           AGENT_AUTH_EMAIL: ${{ secrets.AGENT_AUTH_EMAIL }}
@@ -113,7 +123,16 @@ jobs:
           while IFS= read -r range; do
             if [ -n "$range" ]; then args+=(--diff "$range"); fi
           done <<< "$RANGES"
-          if [ ${#args[@]} -eq 0 ]; then echo "::error title=secret-scan::no commit range to scan"; exit 1; fi
+          if [ ${#args[@]} -eq 0 ]; then
+            if [ "$EVENT" != schedule ] && [ "$EVENT" != workflow_dispatch ]; then
+              echo "::error title=secret-scan::no commit range to scan"
+              exit 1
+            fi
+            # No pushes in the window is clean. Still check that every secret is wired.
+            echo "No pushes to dev or master in the window."
+            bun run secret-scan --strict --ci --path "$(mktemp -d)"
+            exit 0
+          fi
           bun run secret-scan --strict --ci "${args[@]}"
 
   # Pattern-based scan for well-known token formats. On pull_request events the

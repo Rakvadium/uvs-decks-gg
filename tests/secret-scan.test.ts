@@ -111,8 +111,8 @@ describe("secret-scan matching", () => {
     expect(found(`$k = "${FAKE.slice(0, half)}" . "${FAKE.slice(half)}";`)).toEqual(["FAKE_TOKEN:1"]);
   });
 
-  test("zero-width characters inside a value (U+200B-U+200D, U+2060, U+FEFF)", () => {
-    for (const zw of ["​", "‌", "‍", "⁠", "﻿"]) {
+  test("invisible characters inside a value (U+00AD, U+200B-U+200D, U+2060-U+2064, U+FEFF)", () => {
+    for (const zw of [0xad, 0x200b, 0x200c, 0x200d, 0x2060, 0x2061, 0x2062, 0x2063, 0x2064, 0xfeff].map((c) => String.fromCodePoint(c))) {
       const hidden = FAKE.match(/.{1,5}/g)!.join(zw);
       expect(hidden).not.toContain(FAKE);
       expect(found(`token: ${hidden}\n`)).toEqual(["FAKE_TOKEN:1"]);
@@ -247,6 +247,12 @@ describe("secret-scan env file and manifest", () => {
 
   test("CI has a nightly schedule, and the secret-scan job has no job-level skip", () => {
     expect(ci()).toMatch(/schedule:\s*\n\s*- cron: "[^"]+"/);
+    expect(ci()).toContain("  workflow_dispatch:\n");
+    expect(ci()).toContain("\npermissions:\n  contents: read\n");
+    expect(ci()).toContain("GH_TOKEN: ${{ github.token }}");
+    // An empty nightly window still verifies the secrets, and only schedule/dispatch may be empty.
+    expect(ci()).toContain('bun run secret-scan --strict --ci --path "$(mktemp -d)"');
+    expect(ci()).toContain('if [ "$EVENT" != schedule ] && [ "$EVENT" != workflow_dispatch ]; then');
     const job = ci().split("\n  secret-scan:\n")[1].split("\n  gitleaks:\n")[0];
     expect(job).not.toMatch(/^ {4}if:/m);
     expect(job).not.toContain("continue-on-error");
@@ -537,18 +543,173 @@ function forcePushScenario() {
 
   test("pull_request scans base..head; an unknown event fails", () => {
     expect(ciRange(s.ci, { EVENT: "pull_request", BASE_SHA: s.old, HEAD_SHA: s.c2 }).out).toBe(`${s.old}..${s.c2}`);
-    expect(ciRange(s.ci, { EVENT: "workflow_dispatch" }).code).toBe(1);
+    expect(ciRange(s.ci, { EVENT: "release" }).code).toBe(1);
+  });
+});
+
+const iso = (msAgo: number) => new Date(Date.now() - msAgo).toISOString().replace(/\.\d{3}Z$/, "Z");
+const HOUR = 3_600_000;
+const DAY = 24 * HOUR;
+const ZERO_SHA = "0".repeat(40);
+
+/**
+ * Push history on a bare origin's dev, as GitHub's activity API would list it:
+ *   P0 (6 days ago): branch created at B; O below it holds a known historical leak (10 days old).
+ *   P1 (yesterday):  S, which adds a fake secret.
+ *   P2 (today):      fast-forward to F, local work committed 5 days ago with [skip ci] in the message.
+ *   P3 (today):      force-push from F to R (rewritten on S, adds a fake secret), so F is unreferenced.
+ * The "CI" clone fetches refs/heads/* only, like actions/checkout.
+ */
+function pushHistoryScenario() {
+  const root = tempDir();
+  const origin = path.join(root, "origin.git");
+  execFileSync("git", ["init", "-q", "--bare", "-b", "dev", origin]);
+  execFileSync("git", ["-C", origin, "config", "uploadpack.allowAnySHA1InWant", "true"]);
+  const url = pathToFileURL(origin).href;
+  const daysAgo = (days: number) => new Date(Date.now() - days * DAY).toISOString();
+
+  const r = repo();
+  r.git("remote", "add", "origin", url);
+  const push = (force = false) => r.git("push", "-q", ...(force ? ["-f"] : []), "origin", "HEAD:refs/heads/dev");
+  r.write("old-leak.txt", `old=${FAKE}\n`);
+  r.commit("old leak", { date: daysAgo(10) });
+  r.write("b.txt", "clean\n");
+  const B = r.commit("b", { date: daysAgo(6) });
+  push();
+  r.write("y.txt", `yesterday=${FAKE}\n`);
+  const S = r.commit("pushed yesterday", { date: daysAgo(1) });
+  push();
+  r.write("f.txt", `old-work=${FAKE}\n`);
+  const F = r.commit("[skip ci] old local work", { date: daysAgo(5) });
+  push();
+  r.git("reset", "-q", "--hard", S);
+  r.write("r.txt", `rewritten=${FAKE}\n`);
+  const R = r.commit("rewritten");
+  push(true);
+
+  const ci = tempDir();
+  const git = (...args: string[]) => execFileSync("git", args, { cwd: ci, stdio: "pipe" }).toString().trim();
+  git("init", "-q");
+  git("remote", "add", "origin", url);
+  git("fetch", "-q", "--no-tags", "origin", "+refs/heads/*:refs/remotes/origin/*");
+  git("checkout", "-q", R);
+  return { ci, git, B, S, F, R, work: r };
+}
+
+/**
+ * A fake `gh` first on PATH. For the activity endpoint it prints `entries` the way the real
+ * `gh api --jq '... | @tsv'` would; for `repos/<repo>` it prints the default branch. Every call
+ * is logged.
+ */
+function fakeGh(entries: [string, string, string, string][], options: { fail?: boolean; raw?: string } = {}) {
+  const dir = tempDir();
+  const tsv = path.join(dir, "activity.tsv");
+  fs.writeFileSync(tsv, options.raw ?? entries.map((e) => `${e.join("\t")}\n`).join(""));
+  const log = path.join(dir, "calls.log");
+  const script = [
+    "#!/usr/bin/env bash",
+    `echo "$*" >> '${log.split(path.sep).join("/")}'`,
+    options.fail ? 'echo "HTTP 403: Resource not accessible by integration" >&2; exit 1' : "",
+    'case "$*" in',
+    `  *"/activity"*) cat '${tsv.split(path.sep).join("/")}' ;;`,
+    "  *) echo dev ;;",
+    "esac",
+  ].join("\n");
+  fs.writeFileSync(path.join(dir, "gh"), `${script}\n`, { mode: 0o755 });
+  const pathKey = Object.keys(process.env).find((k) => k.toUpperCase() === "PATH") ?? "PATH";
+  const env: NodeJS.ProcessEnv = { ...process.env };
+  for (const key of Object.keys(env)) if (key.toUpperCase() === "PATH") delete env[key];
+  env.PATH = `${dir}${path.delimiter}${process.env[pathKey]}`;
+  return { env, calls: () => (fs.existsSync(log) ? fs.readFileSync(log, "utf8") : "") };
+}
+
+function nightly(cwd: string, gh: ReturnType<typeof fakeGh>, extra: Record<string, string> = {}) {
+  const result = spawnSync(BASH!, [CI_RANGE], {
+    cwd,
+    env: {
+      ...gh.env,
+      EVENT: "schedule",
+      REPO: "owner/repo",
+      DEFAULT_BRANCH: "dev",
+      WINDOW: "3 days ago",
+      SCHEDULE_BRANCHES: "dev",
+      ...extra,
+    },
+  });
+  return { code: result.status, out: result.stdout.toString().trim(), err: result.stderr.toString() };
+}
+
+(BASH ? describe : describe.skip)("secret-scan ci-range.sh nightly window (push time, activity API)", () => {
+  const s = pushHistoryScenario();
+  const env = { FAKE_TOKEN: FAKE };
+  const scanRanges = (out: string) => capture(out.split("\n").flatMap((range) => ["--diff", range]), env, s.ci);
+
+  test("a backdated tip pushed today is scanned (its commit date is 5 days old)", () => {
+    expect(s.work.git("log", "-1", "--format=%cI", s.F).slice(0, 10)).toBe(new Date(Date.now() - 5 * DAY).toISOString().slice(0, 10));
+    const r = nightly(s.ci, fakeGh([[iso(2 * HOUR), "push", s.S, s.F]]));
+    expect(r.code).toBe(0);
+    expect(r.out).toBe(`${s.S}..${s.F}`);
+    const { code, output } = scanRanges(r.out);
+    expect(code).toBe(1);
+    expect(output).toContain("FAKE_TOKEN f.txt:1");
   });
 
-  test("schedule: the window's commits are scanned, older history (the old leak) is not", () => {
-    const range = ciRange(s.ci, { EVENT: "schedule", WINDOW: "3 days ago", SCHEDULE_BRANCHES: "dev" });
-    expect(range.code).toBe(0);
-    expect(range.out).toBe(`${s.old}..origin/dev`);
-    const { code, output } = capture(["--diff", range.out], env, s.ci);
-    expect(code).toBe(1);
-    expect(output).toContain("FAKE_TOKEN b.txt:1");
-    expect(output).not.toContain("old-leak.txt");
-    expect(ciRange(s.ci, { EVENT: "schedule", WINDOW: "30 days ago", SCHEDULE_BRANCHES: "dev" }).code).toBe(1);
+  test("a fast-forward of old local commits on top of yesterday's push: both pushes are scanned", () => {
+    const r = nightly(s.ci, fakeGh([[iso(2 * HOUR), "push", s.S, s.F], [iso(DAY), "push", s.B, s.S]]));
+    expect(r.out.split("\n").sort()).toEqual([`${s.B}..${s.S}`, `${s.S}..${s.F}`].sort());
+    const { output } = scanRanges(r.out);
+    expect(output).toContain("FAKE_TOKEN y.txt:1");
+    expect(output).toContain("FAKE_TOKEN f.txt:1");
+  });
+
+  test("a [skip ci] push is scanned", () => {
+    expect(s.work.git("log", "-1", "--format=%s", s.F)).toContain("[skip ci]");
+    const r = nightly(s.ci, fakeGh([[iso(HOUR), "push", s.S, s.F]]));
+    expect(scanRanges(r.out).output).toMatch(/FAKE_TOKEN f\.txt:1 @/);
+  });
+
+  test("a force-push fetches the overwritten tip by SHA and scans from the merge-base", () => {
+    const fresh = pushHistoryScenario();
+    expect(() => fresh.git("cat-file", "-e", `${fresh.F}^{commit}`)).toThrow();
+    const r = nightly(fresh.ci, fakeGh([[iso(HOUR), "force_push", fresh.F, fresh.R]]));
+    expect(r.code).toBe(0);
+    expect(r.out).toBe(`${fresh.S}..${fresh.R}`);
+    const { output } = capture(["--diff", r.out], env, fresh.ci);
+    expect(output).toContain("FAKE_TOKEN r.txt:1");
+    expect(output).not.toContain("y.txt");
+  });
+
+  test("pushes before the window, branch creation and deletion", () => {
+    const old = nightly(s.ci, fakeGh([[iso(6 * DAY), "branch_creation", ZERO_SHA, s.B]]));
+    expect(old).toMatchObject({ code: 0, out: "" });
+    const created = nightly(s.ci, fakeGh([[iso(HOUR), "branch_creation", ZERO_SHA, s.B]]), { DEFAULT_BRANCH: "" });
+    expect(created.code).toBe(0);
+    expect(created.out).toBe(`${s.B}^!`);
+    expect(nightly(s.ci, fakeGh([[iso(HOUR), "branch_deletion", s.R, ZERO_SHA]]))).toMatchObject({ code: 0, out: "" });
+  });
+
+  test("an empty week is clean, not a failure", () => {
+    expect(nightly(s.ci, fakeGh([]))).toMatchObject({ code: 0, out: "" });
+    expect(nightly(s.ci, fakeGh([]), { EVENT: "workflow_dispatch" })).toMatchObject({ code: 0, out: "" });
+  });
+
+  test("an API failure, a malformed entry, or an unfetchable SHA fails the job", () => {
+    const failed = nightly(s.ci, fakeGh([], { fail: true }));
+    expect(failed.code).toBe(1);
+    expect(failed.err).toContain("the repository activity API call for dev failed");
+    const malformed = nightly(s.ci, fakeGh([], { raw: '{"message":"Not Found"}\n' }));
+    expect(malformed.code).toBe(1);
+    expect(malformed.err).toContain("unexpected activity entry");
+    const missing = nightly(s.ci, fakeGh([[iso(HOUR), "push", s.R, "1".repeat(40)]]));
+    expect(missing.code).toBe(1);
+    expect(missing.err).toContain("can't be fetched");
+  });
+
+  test("calls the activity endpoint for each branch, by ref", () => {
+    const gh = fakeGh([]);
+    nightly(s.ci, gh, { SCHEDULE_BRANCHES: "dev master" });
+    expect(gh.calls()).toContain("api --paginate repos/owner/repo/activity?ref=refs/heads/dev&time_period=month&per_page=100");
+    expect(gh.calls()).toContain("repos/owner/repo/activity?ref=refs/heads/master&");
   });
 });
 

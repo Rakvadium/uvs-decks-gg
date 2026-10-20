@@ -75,7 +75,7 @@ function matchBytes(bytes: Buffer, matcher: Matcher): Matches {
 
 /**
  * The raw bytes, the UTF-16 decoding when the file looks like UTF-16, and for text: a copy with
- * all whitespace and zero-width chars removed (wrapped base64, line-split values) and one that also removes string
+ * all whitespace and invisible chars removed (wrapped base64, line-split values) and one that also removes string
  * joins like `"abc" +\n "def"`. Offsets in derived views map back to lines of their source.
  */
 export function viewsOf(bytes: Buffer): View[] {
@@ -154,10 +154,14 @@ function derive(base: View, joinStrings: boolean): View {
   return { bytes: out.subarray(0, n), lineAt: (offset) => base.lineAt(origin[offset]) };
 }
 
-/** UTF-8 length of a zero-width char at `i` (U+200B-U+200D, U+2060, U+FEFF), else 0. */
+/**
+ * UTF-8 length of an invisible char at `i`, else 0: soft hyphen U+00AD, zero-width U+200B-U+200D,
+ * word joiner U+2060, invisible operators U+2061-U+2064, and U+FEFF.
+ */
 function zeroWidthLength(bytes: Buffer, i: number): number {
+  if (bytes[i] === 0xc2 && bytes[i + 1] === 0xad) return 2;
   if (bytes[i] === 0xe2 && bytes[i + 1] === 0x80 && bytes[i + 2] >= 0x8b && bytes[i + 2] <= 0x8d) return 3;
-  if (bytes[i] === 0xe2 && bytes[i + 1] === 0x81 && bytes[i + 2] === 0xa0) return 3;
+  if (bytes[i] === 0xe2 && bytes[i + 1] === 0x81 && bytes[i + 2] >= 0xa0 && bytes[i + 2] <= 0xa4) return 3;
   if (bytes[i] === 0xef && bytes[i + 1] === 0xbb && bytes[i + 2] === 0xbf) return 3;
   return 0;
 }

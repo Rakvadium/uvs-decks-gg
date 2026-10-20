@@ -65,7 +65,7 @@ Each file is scanned in several decoded forms:
 
 - the raw bytes
 - a UTF-16 decoding, when the file has a UTF-16 BOM or the NUL pattern of UTF-16 text. Windows PowerShell 5.1 `>` writes UTF-16LE.
-- for text files (no NUL in the first 8000 bytes): a copy with all whitespace and zero-width chars (U+200B–U+200D, U+2060, U+FEFF) removed (hard-wrapped base64, values broken across lines or salted with invisible chars), and a copy that also joins split strings: `"abc" +\n "def"`, `'abc' 'def'`, `"abc" . "def"`, `"abc","def"`, and `\` line continuations
+- for text files (no NUL in the first 8000 bytes): a copy with all whitespace and invisible chars removed (hard-wrapped base64, values broken across lines or salted with invisible chars). The invisible chars are soft hyphen U+00AD, zero-width U+200B–U+200D, word joiner U+2060, invisible operators U+2061–U+2064, and U+FEFF. Other invisible or look-alike chars are not removed, and a copy that also joins split strings: `"abc" +\n "def"`, `'abc' 'def'`, `"abc" . "def"`, `"abc","def"`, and `\` line continuations
 
 On the current tree, all of this gives zero false positives. Across the repo's whole history, it flags only the real old leaks.
 
@@ -100,7 +100,14 @@ The ranges come from [`ci-range.sh`](ci-range.sh), which the tests run against t
   - After a force-push, `actions/checkout` doesn't have the old tip, because it's no longer on any branch. The script fetches it by SHA; GitHub serves it until garbage collection. If it still can't be read, the job fails.
   - For a new branch (`before` all zeros), the range is everything not already on the default branch.
   - Push scans alert after the push; they can't block it.
-- **Nightly (`schedule`):** every commit that landed on `dev` and `master` in the last 3 days, meaning commits reachable from the tip but not from the newest first-parent commit older than the window. Older history, including known historical leaks, is reachable from that base, so it never turns this run red. The overlapping windows cover runs that were skipped, cancelled or missed.
+- **Nightly (`schedule`, or `workflow_dispatch` to run it now):** every push to `dev` and `master` in the last 3 days, **by push time**.
+  - Pushes come from GitHub's repository activity API (`GET /repos/{owner}/{repo}/activity?ref=refs/heads/<branch>`). It lists each push, force-push, PR merge and branch creation, with its time and `before`/`after` SHAs.
+  - Each push is scanned like the push path: `merge-base(before, after)..after`. An overwritten `before`, or a since-overwritten `after`, is fetched by SHA.
+  - Commit dates play no part, so the window covers backdated commits, fast-forwards of old local work, and `[skip ci]` pushes. Scheduled runs ignore `[skip ci]`.
+  - Older history, including known historical leaks, is outside every listed push, so it never turns this run red.
+  - A window with no pushes is clean. The run still checks that every secret is wired, by running `--strict --ci` on an empty directory.
+  - The job **fails** if the API call fails, returns something unexpected, or a listed SHA can't be fetched.
+  - The overlapping windows cover push runs that were skipped, cancelled or missed. A push older than 3 days is not covered, for example if the nightly run itself didn't run for 3 days in a row.
 - **Fork PRs fail** with an error saying a maintainer must run the scan locally. Forks get no Actions secrets, so CI can't scan them.
 
 **Concurrency:** a newer PR run cancels an older one for the same PR, because it scans a superset. Push and scheduled runs each get their own concurrency group (`run_id`), so a later push can never cancel an earlier push's scan, or drop it while it's pending.
@@ -111,7 +118,7 @@ The `gitleaks` job adds pattern-based detection for well-known token formats. On
 
 These skip or weaken the scan. They are known and accepted; the gate can't prevent them on its own.
 
-- **Skip markers:** `[skip ci]`, `[ci skip]`, `[no ci]`, `[skip actions]`, `[actions skip]`, or a `skip-checks: true` trailer in the head commit. These skip the push run, with no record, and the PR run too. For PRs, required checks then block the merge. For direct pushes, the nightly run is the backstop.
+- **Skip markers:** `[skip ci]`, `[ci skip]`, `[no ci]`, `[skip actions]`, `[actions skip]`, or a `skip-checks: true` trailer in the head commit. These skip the push run, with no record, and the PR run too. For PRs, required checks then block the merge. For direct pushes, the nightly run is the backstop: it scans every push by push time, so it catches these within a day.
 - **Editing the gate itself:** a PR runs its own version of `ci.yml`, `secrets.json` and `scripts/secret-scan/`, so it can weaken or remove the scan for itself. Review changes to these files with care. Once merged, the weakened version also runs nightly.
 - **Disabled or missing workflows:** a disabled workflow, a deleted secret (which fails `--strict --ci`), and GitHub pausing scheduled workflows after 60 days without repo activity.
 - **Not required:** these jobs only block merges if they are **required status checks** on `dev` and `master`. That is a repo setting, separate from this code.
