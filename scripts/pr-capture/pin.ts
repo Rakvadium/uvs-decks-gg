@@ -35,8 +35,24 @@ export function appearanceKey({ theme, mode, chrome }: Appearance) {
   return `${theme}/${mode}/${chrome}`;
 }
 
-function savedKey(prefs: SessionPrefs) {
-  return `${prefs.colorSource?.preset ?? prefs.colorSource?.kind ?? "default"}/${prefs.theme ?? "system"}/${prefs.chrome ?? "calm"}`;
+/**
+ * The stored `preset/mode/chrome` when the result has all three fields ColorSchemeProvider reads,
+ * each with a valid value. Otherwise the fields that are missing or invalid, so nothing is guessed.
+ */
+export function readSavedAppearance(value: object): { saved: string } | { invalid: string[] } {
+  const { theme, chrome, colorSource } = value as SessionPrefs;
+  const source =
+    colorSource?.kind === "preset" && typeof colorSource.preset === "string" && colorSource.preset
+      ? colorSource.preset
+      : colorSource?.kind === "custom"
+        ? "custom"
+        : null;
+  const invalid = [
+    !(theme === "light" || theme === "dark" || theme === "system") && "theme",
+    !(typeof chrome === "string" && chrome) && "chrome",
+    !source && "colorSource",
+  ].filter((key): key is string => Boolean(key));
+  return invalid.length ? { invalid } : { saved: `${source}/${theme}/${chrome}` };
 }
 
 /**
@@ -53,9 +69,16 @@ export function createSessionPin(appearance: Appearance, options: { broken?: boo
   };
 
   return {
-    /** The final report. Adds a problem if the page never subscribed to the session query. */
+    /**
+     * The final report. A context that rewrote nothing always has a problem: either it never
+     * subscribed, or it subscribed but no recognisable result was rewritten (no result before the
+     * shot, or the sync protocol changed shape).
+     */
     report(): PinReport {
       if (!subscribed) problem("no sessions:getSession subscription was seen (renamed, or the page isn't signed in)");
+      else if (!report.patched && !report.problems.length) {
+        problem("subscribed to sessions:getSession but no result was rewritten (none arrived, or the sync protocol changed)");
+      }
       return report;
     },
 
@@ -73,12 +96,15 @@ export function createSessionPin(appearance: Appearance, options: { broken?: boo
             const value = mod.value;
             if (value === null || value === undefined) {
               problem("sessions:getSession returned null, so there was nothing to rewrite");
-            } else if (typeof value !== "object" || !PREF_KEYS.some((key) => key in value)) {
-              problem("sessions:getSession result has no theme/chrome/colorSource fields (shape changed?)");
             } else {
-              report.saved = savedKey(value as SessionPrefs);
-              report.patched = true;
-              mod.value = { ...value, ...pinned };
+              const read = typeof value === "object" ? readSavedAppearance(value) : { invalid: [...PREF_KEYS] };
+              if ("invalid" in read) {
+                problem(`sessions:getSession result is missing or has invalid ${read.invalid.join("/")} (shape changed?)`);
+              } else {
+                report.saved = read.saved;
+                report.patched = true;
+                mod.value = { ...(value as object), ...pinned };
+              }
             }
           }
         }

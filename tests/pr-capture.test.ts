@@ -157,6 +157,44 @@ describe("pr-capture session pin", () => {
     expect(pin.report()).toMatchObject({ patched: false, problems: [expect.stringContaining(problem)] });
   });
 
+  test.each([
+    ["a partial shape change (one field moved)", "chrome", { ...SAVED, chrome: undefined, prefs: { chrome: "expressive" } }],
+    ["an invalid theme", "theme", { ...SAVED, theme: "midnight" }],
+    ["a colorSource without a preset", "colorSource", { ...SAVED, colorSource: { kind: "preset" } }],
+  ])("doesn't count %s as rewritten, and leaves saved unknown", (_, field, value) => {
+    const { pin, socket } = subscribedPin();
+    expect(JSON.parse(socket.fromServer(update(value))[0]).modifications[0].value).toEqual(JSON.parse(JSON.stringify(value)));
+    const report = pin.report();
+    expect(pinFlagged(report, PIN, null)).toBe(true);
+    expect([report.saved, report.patched, report.problems.length]).toEqual([null, false, 1]);
+    expect(report.problems[0]).toContain("shape changed");
+    expect(report.problems[0]).toContain(field);
+  });
+
+  test("records a custom colorSource as saved preset `custom`", () => {
+    const { pin, socket } = subscribedPin();
+    socket.fromServer(update({ ...SAVED, colorSource: { kind: "custom", custom: {} } }));
+    expect(pin.report()).toEqual({ saved: "custom/dark/expressive", patched: true, problems: [] });
+  });
+
+  test.each([
+    ["no result before the shot", []],
+    [
+      "a renamed update type",
+      [JSON.stringify({ type: "Transition", modifications: [{ type: "QueryResult", queryId: 3, value: SAVED }] })],
+    ],
+    ["an unknown frame type", [JSON.stringify({ type: "TransitionV2", modifications: [{ type: "QueryUpdated", queryId: 3, value: SAVED }] })]],
+    ["a renamed modifications key", [JSON.stringify({ type: "Transition", changes: [{ type: "QueryUpdated", queryId: 3, value: SAVED }] })]],
+  ])("subscribed but nothing rewritten (%s) is a problem and flags the shot", (_, messages) => {
+    const { pin, socket } = subscribedPin();
+    for (const message of messages) socket.fromServer(message);
+    const report = pin.report();
+    expect(pinFlagged(report, PIN, null)).toBe(true);
+    expect(pinFlagged(report, PIN, "cyberpunk/dark/expressive")).toBe(true);
+    expect([report.saved, report.patched, report.problems.length]).toEqual([null, false, 1]);
+    expect(report.problems[0]).toContain("no result was rewritten");
+  });
+
   test("reports a chunked transition that can't be reassembled, and forwards it as-is", () => {
     const { pin, socket } = subscribedPin();
     const parts = [chunk("{not json", 0), chunk("either", 1)];
