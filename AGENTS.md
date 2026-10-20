@@ -22,21 +22,17 @@ The cloud Convex deployment (the one Convex calls "dev") serves the live site. A
 - Keep secrets out of URLs and logs. The one exception is `/agent-login?token=` on `http://localhost:<port>` under `next dev` (the route only works when `NODE_ENV=development` and `VERCEL!=1`). Open it only in your own browser. `next dev` output logs that URL with the token, so redact `token=` before you share dev-server output.
 - Leave live data as you found it: read only. Signing in as the agent user (its own auth session) is the only write allowed.
 - Convex commands:
-  - **Read-only, allowed:** `convex logs`, `convex function-spec`, and env var names via the filter below. Never run `env get` or an unfiltered `env list`, and never redirect their output to a file.
+  - **Read only, allowed:** only `convex logs`, `convex function-spec`, and env var names through this filter. In bash (Git Bash on Windows), from the checkout root, it prints names the repo already uses, plus a count of other entries:
 
     ```bash
-    bunx convex env list | sed -nE 's/^([A-Z][A-Z0-9_]*)=.*/\1/p'
+    known="$(grep -rhoE 'process\.env\.[A-Z][A-Z0-9_]*' convex | cut -d. -f3 | sort -u | paste -sd'|')|JWKS|JWT_PRIVATE_KEY|SITE_URL|R2_ACCESS_KEY_ID|R2_SECRET_ACCESS_KEY|R2_ENDPOINT|R2_BUCKET"
+    bunx convex env list | awk -F= -v k="^($known)\$" '/^[A-Z][A-Z0-9_]*=/ { if ($1 ~ k) print $1; else n++ } END { print (n+0) " other NAME= lines (not printed)" }'
     ```
 
-  - **Always need explicit human approval:** `convex deploy` (it always targets a cloud deployment, prod by default), and any command with `--prod`, `--url`, `--deployment-name`, `--env-file`, `--admin-key` or `--preview-*`.
-  - **Every other write** (`dev`, `run`, `import`, `env set`, `env remove`, migrations) runs only through `bun run vconvex -- …` once #210 merges. Until then, it also needs explicit human approval for this task.
-- Sanity check before an approved local run. It is not a permission. In bash (Git Bash on Windows), from the checkout root, it prints only three booleans. Any `false` means the CLI may target the cloud, so stop and tell the human.
-
-  ```bash
-  node -e 'const fs=require("fs");const rd=f=>fs.existsSync(f)?fs.readFileSync(f,"utf8"):"";const t=rd(".env.local")+"\n"+rd(".env");const g=k=>(process.env[k]||(t.match(new RegExp("^\\s*(?:export\\s+)?"+k+"\\s*[=:]\\s*(.*)$","m"))||[])[1]||"").trim().replace(/^["\x27]|["\x27]$/g,"");const key=/^\s*(?:export\s+)?(convex_deploy_key|dotenv_key)\s*[=:]/im;const urls=["CONVEX_URL","NEXT_PUBLIC_CONVEX_URL"].map(g).filter(Boolean);console.log({noDeployKey:!Object.keys(process.env).some(k=>/^(convex_deploy_key|dotenv_key)$/i.test(k))&&!key.test(t)&&!fs.existsSync(".env.vault"),localDeployment:/^(local|anonymous):/.test(g("CONVEX_DEPLOYMENT")),localUrl:urls.length>0&&urls.every(u=>/^https?:\/\/(127\.0\.0\.1|localhost)(:|\/|$)/.test(u))})'
-  ```
-
-  `noDeployKey` checks for a deploy key or `DOTENV_KEY` in the shell, in `.env.local` and in `.env` (any case, `=` or `:`), and for a `.env.vault` file.
+    Against the cloud deployment, never run `env get` or an unfiltered `env list`, and never redirect their output to a file. `bun run vconvex -- env get` on a local validation backend is fine.
+  - **Every other `convex` command is a write.** That includes `export` (downloads every table), `data` (prints live rows), `mcp start`, `integration`, and any Convex MCP server pointed at the cloud deployment.
+  - **Always need explicit human approval of the exact command:** `convex deploy` (it always targets a cloud deployment, prod by default), and any command with `--prod`, `--url`, `--deployment-name`, `--env-file`, `--admin-key` or `--preview-*`.
+  - **All other writes** (`dev`, `run`, `import`, `env set`, `env remove`, migrations, and the commands above): once #210 merges, run them only through `bun run vconvex -- …` against a local backend. First run `bun run vconvex -- --check`. It prints only the resolved target class (`local`/`cloud`/`unknown`) and which guard rules passed. Until #210 merges there is no self-check, so every Convex write or deploy needs explicit human approval of the exact command.
 
 Per-PR checklist: `hardened-coding` § Security & side effects. Verifiers rerun it through `pr-issue-verify`.
 
@@ -75,7 +71,7 @@ Use ShadCN and MagicUI for styling/components when possible.
 Stack: Next.js 16 (App Router, React 19) + Convex backend, **Bun** as package manager/runner. The update script runs `bun install`; the notes below are for starting/running services (not covered by the update script).
 
 Two dev services (no combined script — run each in its own tmux session):
-- Convex backend: `bunx convex dev` (keeps functions/codegen synced with the cloud dev deployment). Standard command per Convex; started manually, not in `package.json` scripts. Needs human approval first (see Secrets and live data).
+- Convex backend: never raw `bunx convex dev`, which syncs functions to the cloud deployment. Follow the Convex command rules in Secrets and live data: `bun run vconvex -- dev` against a local backend once #210 merges, and explicit human approval of the exact command until then.
 - Next.js frontend: `bun run dev` → serves on **http://localhost:8090** (port is hardcoded).
 
 Convex deployment + secrets (already provisioned; do not re-provision):

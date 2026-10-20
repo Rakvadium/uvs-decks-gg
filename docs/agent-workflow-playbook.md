@@ -106,7 +106,7 @@ A coordinator hands one issue to a builder agent, then the PR to a different ver
 Both briefs rely on these setup rules:
 
 - **One agent, one worktree, one port range.** Concurrent dev servers never share a checkout: Next allows one `next dev` per checkout (`.next/dev/lock`). Builder and verifier get different ranges, and both stay off the default port 8090 (`bunx next dev -p <port>`).
-- **Choose the worktree's env on purpose.** A new worktree has no `.env.local`, and the main checkout's copy may point at a local Convex instead of the cloud deployment. The brief names the target (`cloud` or `local`). Copy the main `.env.local` only after checking that its `NEXT_PUBLIC_CONVEX_URL` host matches that target, without printing the value. The sanity check in `AGENTS.md` § Secrets and live data prints all `true` only for a local target.
+- **Choose the worktree's env on purpose.** A new worktree has no `.env.local`, and the main checkout's copy may point at a local Convex instead of the cloud deployment. The brief names the target (`cloud` or `local`). Copy the main `.env.local` in when the app needs it, but don't hand-parse env files to decide the target. Once #210 merges, `bun run vconvex -- --check` prints the resolved target class without values. Until then, treat the target as cloud, and every Convex write needs human approval.
 
 ### Builder brief
 
@@ -204,7 +204,7 @@ Use project-context-gate, then hardened-convex-ops.
 Symptom: <…>
 Environment: <local (127.0.0.1/localhost) | cloud (serves the live site) | unknown>
 The cloud deployment serves the live site: read only there.
-Follow the Convex command rules in AGENTS.md § Secrets and live data: deploy and target flags always need my approval; other writes go through `bun run vconvex -- …` once #210 merges, and need my approval until then.
+Follow the Convex command rules in AGENTS.md § Secrets and live data: deploy and target flags always need my approval of the exact command; other writes go through `bun run vconvex -- …` against a local backend once #210 merges, and need my approval of the exact command until then.
 ```
 
 ### D) PR babysit

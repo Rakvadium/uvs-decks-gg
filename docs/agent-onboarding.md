@@ -68,7 +68,7 @@ Before you report completion:
 - `bun run build`
 - If UI changed: BEFORE/AFTER snapshots (desktop + mobile), `ui-ux-adversary` with image compare, placement still matches [floating-header-islands.md](./floating-header-islands.md) and [mobile-shell.md](./mobile-shell.md). On the PR, embed both shots via `bun run capture` → `capture:compare` → `capture:publish` ([scripts/pr-capture/README.md](../scripts/pr-capture/README.md)) with raw GitHub URLs — not `cursor.com/artifacts` ([playbook](./agent-workflow-playbook.md) § PR visual embeds).
 
-If you change Convex schema or function signatures, regenerate Convex types only against a local backend, following the Convex command rules in [AGENTS.md](../AGENTS.md) § Secrets and live data: `bun run vconvex -- …` once #210 merges, and human approval until then. Running `convex dev` against the cloud deployment deploys to the live site.
+If you change Convex schema or function signatures, regenerate Convex types only against a local backend, following the Convex command rules in [AGENTS.md](../AGENTS.md) § Secrets and live data: `bun run vconvex -- …` once #210 merges, and explicit human approval of the exact command until then. Running `convex dev` against the cloud deployment deploys to the live site.
 
 ## 5. Documentation updates
 
