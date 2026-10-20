@@ -313,12 +313,60 @@ function resolvedRoot(root: string): string {
   return realpathOrNull(root) ?? path.resolve(root);
 }
 
+/** Like realpathOrNull, but keeps the error code so a failure can fail closed. */
+function realpathResult(p: string): { real: string } | { code: string } {
+  try {
+    return { real: fs.realpathSync.native(p) };
+  } catch (err) {
+    return { code: (err as NodeJS.ErrnoException).code ?? "unknown error" };
+  }
+}
+
+/** `/proc/self/mountinfo` on a Linux host (per mount namespace, so it sees `unshare -m` mounts), else null. */
+function readMountinfo(): string | null {
+  if (process.platform !== "linux") return null;
+  try {
+    return fs.readFileSync("/proc/self/mountinfo", "utf8");
+  } catch {
+    return null;
+  }
+}
+
+/** The mount points listed in a mountinfo text (field 5, with `\ooo` octal escapes undone). */
+export function parseMountPoints(mountinfo: string): string[] {
+  return mountinfo
+    .split("\n")
+    .map((line) => line.split(" ")[4])
+    .filter((field): field is string => !!field)
+    .map((field) => field.replace(/\\([0-7]{3})/g, (_, oct: string) => String.fromCharCode(parseInt(oct, 8))));
+}
+
 /**
- * Walks `<base>/<rel>` and everything under it, and lists each symlink, junction or other reparse
- * point (anything `readdir`/`lstat` reports as a link), each entry that is neither a regular file
- * nor a dir, and each dir whose real path isn't its parent's real path plus its name. Empty when
- * it is all plain. `onLink` decides about a link: null allows it (it isn't descended into), a
- * string is the problem to report. Entries that vanish mid-walk are skipped.
+ * Mount points at or below any of `under`, or equal to any of `exact`. A bind mount or volume is a
+ * plain dir to lstat and realpath, so only the mount table shows it. `mountinfo` defaults to this
+ * process's own table on Linux, and there is nothing to check elsewhere.
+ */
+export function mountPointProblems(
+  dirs: { under: string[]; exact?: string[] },
+  platform: NodeJS.Platform,
+  mountinfo: string | null = readMountinfo(),
+): string[] {
+  if (mountinfo === null) return [];
+  return parseMountPoints(mountinfo)
+    .filter((mp) => dirs.under.some((d) => isInside(mp, d, platform)) || (dirs.exact ?? []).some((d) => samePath(mp, d, platform)))
+    .map((mp) => `${mp} is a mount point`);
+}
+
+/**
+ * Walks `<base>/<rel>` and everything under it, and lists:
+ * - each symlink, junction or other reparse point (anything `readdir`/`lstat` reports as a link);
+ * - each entry that is neither a regular file nor a dir (sockets are allowed with `allowSockets`);
+ * - each dir on another device than its parent (a mount point, as far as `st_dev` can tell);
+ * - each dir whose real path isn't its parent's real path plus its name, or can't be resolved.
+ *
+ * Empty when it is all plain. `onLink` decides about a link: null allows it (it isn't descended
+ * into), a string is the problem to report. Only entries that vanish mid-walk (`ENOENT`) are
+ * skipped; any other failure is reported, so the walk fails closed.
  */
 export function plainTreeProblems(
   base: string,
@@ -326,8 +374,8 @@ export function plainTreeProblems(
   opts: {
     platform?: NodeJS.Platform;
     onLink?: (full: string) => string | null;
-    /** Allow sockets, FIFOs and devices (the backend's node executor makes a Unix socket in its temp dir). */
-    allowSpecialFiles?: boolean;
+    /** Allow Unix sockets (the backend's node executor makes one in its temp dir). FIFOs and devices stay refused. */
+    allowSockets?: boolean;
   } = {},
 ): string[] {
   const platform = opts.platform ?? process.platform;
@@ -346,7 +394,7 @@ export function plainTreeProblems(
       return out;
     }
   }
-  const walk = (dir: string, realDir: string) => {
+  const walk = (dir: string, realDir: string, dev: number) => {
     let entries: fs.Dirent[];
     try {
       entries = fs.readdirSync(dir, { withFileTypes: true });
@@ -356,37 +404,60 @@ export function plainTreeProblems(
     }
     for (const entry of entries) {
       const full = path.join(dir, entry.name);
-      let kind = entry.isSymbolicLink() ? "link" : entry.isDirectory() ? "dir" : entry.isFile() ? "file" : null;
-      if (kind === null) {
-        const stat = lstatOrNull(full);
-        if (stat === null) continue;
-        kind = stat.isSymbolicLink() ? "link" : stat.isDirectory() ? "dir" : stat.isFile() ? "file" : "other";
+      const typed = entry.isSymbolicLink() ? "link" : entry.isDirectory() ? "dir" : entry.isFile() ? "file" : null;
+      if (typed === "file") continue;
+      // Dirs get an lstat too, for their device.
+      let stat: fs.Stats;
+      try {
+        stat = fs.lstatSync(full);
+      } catch (err) {
+        // ENOENT: gone between readdir and lstat. Anything else fails closed.
+        if ((err as NodeJS.ErrnoException).code !== "ENOENT") out.push(`${full} could not be read`);
+        continue;
       }
-      if (kind === "link") onLink(full);
-      else if (kind === "other" && !opts.allowSpecialFiles) out.push(`${full} is not a regular file or dir`);
-      else if (kind === "dir") {
-        const real = realpathOrNull(full);
-        if (real === null) continue;
+      if (typed === "link" || stat.isSymbolicLink()) onLink(full);
+      else if (stat.isDirectory()) {
+        if (stat.dev !== dev) {
+          out.push(`${full} is on another device than ${dir} (a mount point)`);
+          continue;
+        }
+        const resolved = realpathResult(full);
+        if ("code" in resolved) {
+          if (resolved.code !== "ENOENT" || lstatOrNull(full) !== null) out.push(`${full} could not be resolved (${resolved.code})`);
+          continue;
+        }
         const expected = path.join(realDir, entry.name);
-        if (samePath(real, expected, platform)) walk(full, real);
-        else out.push(`${full} resolves to ${real}, not ${expected}`);
-      }
+        if (samePath(resolved.real, expected, platform)) walk(full, resolved.real, dev);
+        else out.push(`${full} resolves to ${resolved.real}, not ${expected}`);
+      } else if (stat.isFile()) continue;
+      else if (!(opts.allowSockets && stat.isSocket())) out.push(`${full} is not a regular file or dir`);
     }
   };
-  const realAt = realpathOrNull(at);
-  if (realAt !== null) walk(at, realAt);
+  const top = lstatOrNull(at);
+  if (top === null) return out;
+  const resolved = realpathResult(at);
+  if ("code" in resolved) {
+    if (resolved.code !== "ENOENT") out.push(`${at} could not be resolved (${resolved.code})`);
+    return out;
+  }
+  walk(at, resolved.real, top.dev);
   return out;
 }
 
-/** Checks `<root>/<parts…>` one level at a time with lstat: each must be a plain dir resolving to the built path. */
+/**
+ * Checks `<root>/<parts…>` one level at a time with lstat: each must be a plain dir on the resolved
+ * root's device, resolving to the path built from the resolved root.
+ */
 function plainDirChain(root: string, parts: string[], platform: NodeJS.Platform, what: string): string[] {
   const base = resolvedRoot(root);
+  const rootDev = lstatOrNull(base)?.dev;
   for (let i = 1; i <= parts.length; i++) {
     const p = path.join(root, ...parts.slice(0, i));
     const stat = lstatOrNull(p);
     if (stat === null) return [];
     if (stat.isSymbolicLink()) return [`${p} is a symlink or junction; ${what} must be a plain dir.`];
     if (!stat.isDirectory()) return [`${p} is not a dir.`];
+    if (rootDev !== undefined && stat.dev !== rootDev) return [`${p} is on another device than ${base} (a mount point); ${what} must be a plain dir.`];
     const expected = path.join(base, ...parts.slice(0, i));
     const real = realpathOrNull(p);
     if (!samePath(real ?? undefined, expected, platform)) return [`${p} resolves to ${real}, not ${expected}.`];
@@ -395,17 +466,18 @@ function plainDirChain(root: string, parts: string[], platform: NodeJS.Platform,
 }
 
 /**
- * Nothing under `<root>/cache` may be a link, at any depth, on any platform: the wrapper seeds
- * there and the CLI runs the binary and writes the dashboard config there, so a link anywhere in
- * it would reach wherever it points (the owner's Convex cache or login dir, say).
+ * Nothing under `<root>/cache` may be a link or a mount point, at any depth, on any platform: the
+ * wrapper seeds there and the CLI runs the binary and writes the dashboard config there, so a link
+ * or mount anywhere in it would reach wherever it points (the owner's Convex cache or login dir, say).
  */
-export function sharedCacheProblems(root: string, platform: NodeJS.Platform = process.platform): string[] {
+export function sharedCacheProblems(root: string, platform: NodeJS.Platform = process.platform, mountinfo?: string | null): string[] {
+  const why = "nothing in the shared cache may be a link or a mount, so the owner's Convex cache stays untouched.";
+  const cache = path.join(resolvedRoot(root), "cache");
+  const mounts = mountPointProblems({ under: [cache] }, platform, mountinfo).map((p) => `${p}; ${why}`);
   // `cache/convex` must be a dir too: the walk alone would accept a plain file there.
   const chain = plainDirChain(root, ["cache", "convex"], platform, "the shared cache");
-  if (chain.length > 0 || lstatOrNull(path.join(root, "cache")) === null) return chain;
-  return plainTreeProblems(path.join(root, "cache"), "", { platform }).map(
-    (p) => `${p}; nothing in the shared cache may be a link, so the owner's Convex cache stays untouched.`,
-  );
+  if (chain.length > 0 || lstatOrNull(path.join(root, "cache")) === null) return [...mounts, ...chain];
+  return [...mounts, ...plainTreeProblems(path.join(root, "cache"), "", { platform }).map((p) => `${p}; ${why}`)];
 }
 
 export type BackendHomeInput = {
@@ -415,22 +487,30 @@ export type BackendHomeInput = {
   /** The caller's LOCALAPPDATA, whose `convex` dir is the owner's cache on Windows. */
   ownerLocalAppData?: string;
   platform?: NodeJS.Platform;
+  /** For tests: a mountinfo text instead of this process's own. */
+  mountinfo?: string | null;
 };
 
 /**
  * `<root>/backends/<P>` is the wrapped CLI's HOME, where it looks for a login. It and
- * `<root>/backends` must be plain dirs (lstat), it must resolve to the path built from the
- * resolved root, and it must not be, contain, or sit inside the owner's home or Convex dirs.
- * Nothing under it may be a link, except the `.cache/convex` link the wrapper makes on macOS and
- * Linux, which must resolve to the shared cache exactly.
+ * `<root>/backends` must be plain dirs (lstat) on the root's device, it must resolve to the path
+ * built from the resolved root, and it must not be, contain, or sit inside the owner's home or
+ * Convex dirs. Nothing under it may be a link, a mount point or a FIFO or device, except the
+ * `.cache/convex` link the wrapper makes on macOS and Linux, which must resolve to the shared
+ * cache exactly, and the backend's own sockets.
  */
 export function backendHomeProblems(input: BackendHomeInput): string[] {
   const platform = input.platform ?? process.platform;
   const home = backendDir(input.appPort, input.root);
   const base = resolvedRoot(input.root);
+  const builtHome = backendDir(input.appPort, base);
+  const why = "nothing in the backend home may be a link or a mount, so the owner's login stays hidden.";
+  const mounts = mountPointProblems({ under: [builtHome], exact: [path.join(base, "backends")] }, platform, input.mountinfo).map(
+    (p) => `${p}; ${why}`,
+  );
   const chain = plainDirChain(input.root, ["backends", String(input.appPort)], platform, "the backend home");
-  if (chain.length > 0) return chain;
-  const realHome = realpathOrNull(home) ?? backendDir(input.appPort, base);
+  if (chain.length > 0) return [...mounts, ...chain];
+  const realHome = realpathOrNull(home) ?? builtHome;
   const ownerHome = realpathOrNull(input.realHome) ?? path.resolve(input.realHome);
   const ownerDirs = [
     path.join(input.realHome, ".convex"),
@@ -439,26 +519,25 @@ export function backendHomeProblems(input: BackendHomeInput): string[] {
     ...(input.ownerLocalAppData ? [path.join(input.ownerLocalAppData, "convex")] : []),
   ].map((d) => realpathOrNull(d) ?? path.resolve(d));
   if (isInside(ownerHome, realHome, platform)) {
-    return [`${home} resolves to ${realHome}, which is or contains the owner's home ${ownerHome}.`];
+    return [...mounts, `${home} resolves to ${realHome}, which is or contains the owner's home ${ownerHome}.`];
   }
   const owner = ownerDirs.find((d) => isInside(realHome, d, platform) || isInside(d, realHome, platform));
-  if (owner) return [`${home} resolves to ${realHome}, which overlaps the owner's Convex dir ${owner}.`];
-  if (lstatOrNull(home) === null) return [];
+  if (owner) return [...mounts, `${home} resolves to ${realHome}, which overlaps the owner's Convex dir ${owner}.`];
+  if (lstatOrNull(home) === null) return mounts;
   const sharedLink = path.join(home, ".cache", "convex");
   const shared = path.join(sharedCacheDir(base), "convex");
-  return plainTreeProblems(home, "", {
+  const walked = plainTreeProblems(home, "", {
     platform,
-    // A socket or FIFO can't redirect a path; only links can point the CLI at the owner's files.
-    allowSpecialFiles: true,
+    // A socket can't redirect a path. FIFOs stay refused: one at a saved config would hang `start`.
+    allowSockets: true,
     onLink: (full) => {
-      if (platform === "win32" || !samePath(full, sharedLink, platform)) {
-        return `${full} is a symlink or junction; nothing in the backend home may be a link, so the owner's login stays hidden.`;
-      }
+      if (platform === "win32" || !samePath(full, sharedLink, platform)) return `${full} is a symlink or junction`;
       const real = realpathOrNull(full);
       if (real === null) return `${full} is a link that resolves nowhere; remove it so the wrapper can link it to ${shared}.`;
       return samePath(real, shared, platform) ? null : `${full} must resolve to ${shared} so the owner's Convex cache is untouched.`;
     },
   });
+  return [...mounts, ...walked.map((p) => (/so the owner's Convex cache is untouched|resolves nowhere/.test(p) ? p : `${p}; ${why}`))];
 }
 
 function callerEnv(input: GuardInput): Env {

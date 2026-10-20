@@ -43,8 +43,12 @@ import {
   PINNED_CHILD_ENV,
   PINNED_LOCAL_BACKEND_VERSION,
   TESTED_CONVEX_VERSIONS,
+  backendHomeProblems,
   dotenvEntries,
   guardViolations,
+  mountPointProblems,
+  parseMountPoints,
+  sharedCacheProblems,
   loadCliDotenv,
   parseDotenv,
   resolveCliTarget,
@@ -631,6 +635,106 @@ describe("pinned local backend version (#221)", () => {
       fs.mkdirSync(dir, { recursive: true });
       fs.symlinkSync(path.join(owner.ownerLocal, "convex", "binaries", pin, backendExeName("linux")), path.join(dir, backendExeName("linux")));
       refusedEverywhere("linux", root, owner, /symlink or junction/);
+    });
+
+    // Round 3 of #236: a bind mount or volume is a plain dir to lstat and realpath.
+    describe("mounts are refused (#236 round 3)", () => {
+      const fixture = (points: string[]) =>
+        points.map((mp, i) => `${100 + i} 1 0:${50 + i} / ${mp.replace(/ /g, "\\040")} rw,relatime shared:1 - ext4 /dev/sda1 rw`).join("\n");
+      test("mountinfo parsing undoes octal escapes", () => {
+        expect(parseMountPoints(`36 35 98:0 /mnt1 /mnt/with\\040space rw,noatime master:1 - ext3 /dev/root rw\n37 35 0:1 / / rw - ext4 /dev/sda rw\n`)).toEqual([
+          "/mnt/with space",
+          "/",
+        ]);
+      });
+      test("only mounts at or below the checked dirs count, not siblings that share a prefix", () => {
+        const mi = fixture(["/r/cache", "/r/cache/convex/dashboard", "/r/cache2", "/r", "/r/backends", "/r/backends/8182/.convex", "/r/backends/81820"]);
+        expect(mountPointProblems({ under: ["/r/cache"] }, "linux", mi)).toEqual(["/r/cache is a mount point", "/r/cache/convex/dashboard is a mount point"]);
+        expect(mountPointProblems({ under: ["/r/backends/8182"], exact: ["/r/backends"] }, "linux", mi)).toEqual([
+          "/r/backends is a mount point",
+          "/r/backends/8182/.convex is a mount point",
+        ]);
+        expect(mountPointProblems({ under: ["/r/cache"] }, "linux", null)).toEqual([]);
+      });
+      test("a mount in the shared cache or the backend home is refused (mountinfo fixture)", () => {
+        const owner = ownerSetup("linux");
+        const root = tmpDir("uvs-root-");
+        const real = fs.realpathSync.native(root);
+        fs.mkdirSync(path.join(root, "cache", "convex", "dashboard"), { recursive: true });
+        fs.mkdirSync(path.join(backendDir(8182, root), ".convex"), { recursive: true });
+        const clean = fixture(["/", path.join(real, "..")]);
+        expect(sharedCacheProblems(root, "linux", clean)).toEqual([]);
+        expect(backendHomeProblems({ root, appPort: 8182, realHome: owner.realHome, platform: "linux", mountinfo: clean })).toEqual([]);
+        const dashboard = fixture([path.join(real, "cache", "convex", "dashboard")]);
+        expect(sharedCacheProblems(root, "linux", dashboard)[0]).toMatch(/dashboard is a mount point; nothing in the shared cache may be a link or a mount/);
+        const login = fixture([path.join(real, "backends", "8182", ".convex")]);
+        expect(backendHomeProblems({ root, appPort: 8182, realHome: owner.realHome, platform: "linux", mountinfo: login })[0]).toMatch(
+          /\.convex is a mount point; nothing in the backend home may be a link or a mount/,
+        );
+        // Another port's mounts are not this port's problem.
+        const other = fixture([path.join(real, "backends", "8183", ".convex")]);
+        expect(backendHomeProblems({ root, appPort: 8182, realHome: owner.realHome, platform: "linux", mountinfo: other })).toEqual([]);
+      });
+
+      const sh = (script: string) => spawnSync("sh", ["-c", script], { encoding: "utf8" });
+      const isLinuxRoot = process.platform === "linux" && process.getuid?.() === 0;
+      const canMount = isLinuxRoot && sh("d=$(mktemp -d) && mount -t tmpfs tmpfs $d && umount $d && rmdir $d").status === 0;
+      test.skipIf(!canMount)("linux, privileged: a bind mount of the owner's ~/.convex and a tmpfs in the cache are refused", () => {
+        const owner = ownerSetup("linux");
+        const root = tmpDir("uvs-root-");
+        const login = path.join(backendDir(8182, root), ".convex");
+        const out = path.join(root, "cache", "convex", "dashboard", "out");
+        fs.mkdirSync(login, { recursive: true });
+        fs.mkdirSync(out, { recursive: true });
+        expect(sh(`mount --bind '${path.join(owner.realHome, ".convex")}' '${login}' && mount -t tmpfs tmpfs '${out}'`).status).toBe(0);
+        try {
+          const childEnv = buildChildEnv({ parentEnv: {}, appPort: 8182, root, platform: "linux" });
+          const v = guardViolations(input({ parentEnv: {}, childEnv, platform: "linux", root, realHome: owner.realHome, appPort: 8182 }));
+          // The bind mount is on the same device, so only mountinfo sees it; the tmpfs is caught both ways.
+          expect(v.some((m) => /backends[\\/]8182[\\/]\.convex is a mount point/.test(m))).toBe(true);
+          expect(v.some((m) => /dashboard[\\/]out is a mount point/.test(m))).toBe(true);
+          expect(v.some((m) => /dashboard[\\/]out is on another device/.test(m))).toBe(true);
+          const inv = { appPort: 8182, home: backendDir(8182, root), childEnv, fetchPinnedBackend: true };
+          expect(() => preparePinnedBackend(inv, () => {}, { parentEnv: {}, realHome: owner.realHome, platform: "linux" })).toThrow(/mount point/);
+        } finally {
+          sh(`umount '${out}'; umount '${login}'`);
+        }
+      });
+      const canUnshare = process.platform === "linux" && sh("unshare -Urm true").status === 0;
+      test.skipIf(!canUnshare)("linux: a bind mount made inside `unshare -Urm` (no real root) is refused from inside it", () => {
+        const owner = ownerSetup("linux");
+        const root = tmpDir("uvs-root-");
+        const login = path.join(backendDir(8182, root), ".convex");
+        fs.mkdirSync(login, { recursive: true });
+        const probe = path.join(tmpDir("uvs-probe-"), "probe.ts");
+        fs.writeFileSync(
+          probe,
+          `import { backendHomeProblems } from ${JSON.stringify(path.resolve("scripts/validation/guard.ts"))};\n` +
+            `console.log(JSON.stringify(backendHomeProblems({ root: ${JSON.stringify(root)}, appPort: 8182, realHome: ${JSON.stringify(owner.realHome)}, platform: "linux" })));\n`,
+        );
+        const r = sh(`unshare -Urm sh -c "mount --bind '${path.join(owner.realHome, ".convex")}' '${login}' && '${process.execPath}' '${probe}'"`);
+        expect(r.status).toBe(0);
+        const problems = JSON.parse(r.stdout.trim().split("\n").at(-1)!) as string[];
+        expect(problems.some((m) => /\.convex is a mount point/.test(m))).toBe(true);
+        // Outside the namespace there is no mount, and nothing to refuse.
+        expect(backendHomeProblems({ root, appPort: 8182, realHome: owner.realHome, platform: "linux" })).toEqual([]);
+      });
+      test.skipIf(process.platform !== "linux")("linux host: a FIFO in the backend home is refused, and so is an unreadable deep path", () => {
+        const owner = ownerSetup("linux");
+        const root = tmpDir("uvs-root-");
+        const state = path.join(backendDir(8182, root), ".convex", "anonymous-convex-backend-state", "anonymous-agent");
+        fs.mkdirSync(state, { recursive: true });
+        expect(sh(`mkfifo '${path.join(state, "config.json")}'`).status).toBe(0);
+        const homeProblems = () => backendHomeProblems({ root, appPort: 8182, realHome: owner.realHome, platform: "linux", mountinfo: null });
+        expect(homeProblems().some((m) => /config\.json is not a regular file or dir/.test(m))).toBe(true);
+        expect(() => checkSavedBackendVersion(backendDir(8182, root), 8182)).toThrow(/is not a regular file/);
+        fs.rmSync(path.join(state, "config.json"));
+        // A tree deeper than PATH_MAX: the walk can't resolve or read it, so it refuses.
+        const name = "d".repeat(200);
+        expect(sh(`cd '${backendDir(8182, root)}' && for i in $(seq 1 25); do mkdir ${name} && cd ${name} || exit 1; done && ln -s '${owner.realHome}' x`).status).toBe(0);
+        expect(homeProblems().some((m) => /could not be (read|resolved)/.test(m))).toBe(true);
+        sh(`cd '${backendDir(8182, root)}' && rm -rf ${name}`);
+      });
     });
 
     test("plain shared dirs pass, also when ~/.uvs-validation itself is a link", () => {

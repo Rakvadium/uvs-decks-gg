@@ -368,6 +368,18 @@ export function prepareInvocation(opts: InvocationOptions): Invocation {
   };
 }
 
+/** Whether the CLI's saved config exists. Throws for anything but a regular file: reading a FIFO would hang. */
+function savedConfigExists(config: string): boolean {
+  let stat: fs.Stats;
+  try {
+    stat = fs.lstatSync(config);
+  } catch {
+    return false;
+  }
+  if (!stat.isFile()) throw new GuardError([`${config} is not a regular file.`]);
+  return true;
+}
+
 function savedDeploymentConfig(home: string): string {
   const name = ANONYMOUS_DEPLOYMENT.slice("anonymous:".length);
   return path.join(home, ".convex", "anonymous-convex-backend-state", name, "config.json");
@@ -376,7 +388,7 @@ function savedDeploymentConfig(home: string): string {
 /** The CLI saves the ports a deployment was created with; refuse if they drifted from ports.ts. */
 export function checkSavedDeploymentPorts(home: string, ports: BackendPorts): void {
   const config = savedDeploymentConfig(home);
-  if (!fs.existsSync(config)) return;
+  if (!savedConfigExists(config)) return;
   const saved = JSON.parse(fs.readFileSync(config, "utf8")) as { ports?: { cloud?: number; site?: number } };
   if (saved.ports && (saved.ports.cloud !== ports.cloud || saved.ports.site !== ports.site)) {
     throw new GuardError([
@@ -391,7 +403,7 @@ export function checkSavedDeploymentPorts(home: string, ports: BackendPorts): vo
  */
 export function checkSavedBackendVersion(home: string, appPort: number): void {
   const config = savedDeploymentConfig(home);
-  if (!fs.existsSync(config)) return;
+  if (!savedConfigExists(config)) return;
   const saved = JSON.parse(fs.readFileSync(config, "utf8")) as { backendVersion?: string };
   if (saved.backendVersion === undefined || saved.backendVersion === PINNED_LOCAL_BACKEND_VERSION) return;
   throw new Error(
