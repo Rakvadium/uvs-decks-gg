@@ -1,0 +1,1105 @@
+{
+  "issue": "194",
+  "label": "states",
+  "port": 8125,
+  "chrome": "calm",
+  "fullPage": false,
+  "strict": true,
+  "shots": [
+    {
+      "name": "design-top__desktop__default__light",
+      "route": "/design",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-top__desktop__default__dark",
+      "route": "/design",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-top__desktop__cyberpunk__light",
+      "route": "/design",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-top__desktop__cyberpunk__dark",
+      "route": "/design",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-top__mobile__default__light",
+      "route": "/design",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-top__mobile__default__dark",
+      "route": "/design",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-top__mobile__cyberpunk__light",
+      "route": "/design",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-top__mobile__cyberpunk__dark",
+      "route": "/design",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-open-dialog__desktop__default__light",
+      "route": "/design?focus=overlays",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-open-dialog__desktop__default__dark",
+      "route": "/design?focus=overlays",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-open-dialog__desktop__cyberpunk__light",
+      "route": "/design?focus=overlays",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-open-dialog__desktop__cyberpunk__dark",
+      "route": "/design?focus=overlays",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-open-dialog__mobile__default__light",
+      "route": "/design?focus=overlays",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-open-dialog__mobile__default__dark",
+      "route": "/design?focus=overlays",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-open-dialog__mobile__cyberpunk__light",
+      "route": "/design?focus=overlays",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-open-dialog__mobile__cyberpunk__dark",
+      "route": "/design?focus=overlays",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-open-dropdown__desktop__default__light",
+      "route": "/design?focus=overlays",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-open-dropdown__desktop__default__dark",
+      "route": "/design?focus=overlays",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-open-dropdown__desktop__cyberpunk__light",
+      "route": "/design?focus=overlays",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-open-dropdown__desktop__cyberpunk__dark",
+      "route": "/design?focus=overlays",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-open-dropdown__mobile__default__light",
+      "route": "/design?focus=overlays",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-open-dropdown__mobile__default__dark",
+      "route": "/design?focus=overlays",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-open-dropdown__mobile__cyberpunk__light",
+      "route": "/design?focus=overlays",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-open-dropdown__mobile__cyberpunk__dark",
+      "route": "/design?focus=overlays",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-open-sheet__desktop__default__light",
+      "route": "/design?focus=overlays",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-open-sheet__desktop__default__dark",
+      "route": "/design?focus=overlays",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-open-sheet__desktop__cyberpunk__light",
+      "route": "/design?focus=overlays",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-open-sheet__desktop__cyberpunk__dark",
+      "route": "/design?focus=overlays",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-open-sheet__mobile__default__light",
+      "route": "/design?focus=overlays",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-open-sheet__mobile__default__dark",
+      "route": "/design?focus=overlays",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-open-sheet__mobile__cyberpunk__light",
+      "route": "/design?focus=overlays",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-open-sheet__mobile__cyberpunk__dark",
+      "route": "/design?focus=overlays",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-open-alert-dialog__desktop__default__light",
+      "route": "/design?focus=overlays",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-open-alert-dialog__desktop__default__dark",
+      "route": "/design?focus=overlays",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-open-alert-dialog__desktop__cyberpunk__light",
+      "route": "/design?focus=overlays",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-open-alert-dialog__desktop__cyberpunk__dark",
+      "route": "/design?focus=overlays",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-open-alert-dialog__mobile__default__light",
+      "route": "/design?focus=overlays",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-open-alert-dialog__mobile__default__dark",
+      "route": "/design?focus=overlays",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-open-alert-dialog__mobile__cyberpunk__light",
+      "route": "/design?focus=overlays",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-open-alert-dialog__mobile__cyberpunk__dark",
+      "route": "/design?focus=overlays",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-open-popover__desktop__default__light",
+      "route": "/design?focus=overlays",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-open-popover__desktop__default__dark",
+      "route": "/design?focus=overlays",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-open-popover__desktop__cyberpunk__light",
+      "route": "/design?focus=overlays",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-open-popover__desktop__cyberpunk__dark",
+      "route": "/design?focus=overlays",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-open-popover__mobile__default__light",
+      "route": "/design?focus=overlays",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-open-popover__mobile__default__dark",
+      "route": "/design?focus=overlays",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-open-popover__mobile__cyberpunk__light",
+      "route": "/design?focus=overlays",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-open-popover__mobile__cyberpunk__dark",
+      "route": "/design?focus=overlays",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-open-select__desktop__default__light",
+      "route": "/design?focus=forms",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-open-select__desktop__default__dark",
+      "route": "/design?focus=forms",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-open-select__desktop__cyberpunk__light",
+      "route": "/design?focus=forms",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-open-select__desktop__cyberpunk__dark",
+      "route": "/design?focus=forms",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-open-select__mobile__default__light",
+      "route": "/design?focus=forms",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-open-select__mobile__default__dark",
+      "route": "/design?focus=forms",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-open-select__mobile__cyberpunk__light",
+      "route": "/design?focus=forms",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-open-select__mobile__cyberpunk__dark",
+      "route": "/design?focus=forms",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-button-hover__desktop__default__light",
+      "route": "/design?focus=actions",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-button-hover__desktop__default__dark",
+      "route": "/design?focus=actions",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-button-hover__desktop__cyberpunk__light",
+      "route": "/design?focus=actions",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-button-hover__desktop__cyberpunk__dark",
+      "route": "/design?focus=actions",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-button-focus__desktop__default__light",
+      "route": "/design?focus=actions",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-button-focus__desktop__default__dark",
+      "route": "/design?focus=actions",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-button-focus__desktop__cyberpunk__light",
+      "route": "/design?focus=actions",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-button-focus__desktop__cyberpunk__dark",
+      "route": "/design?focus=actions",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-mobile-sections__mobile__default__light",
+      "route": "/design?focus=overview",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-mobile-sections__mobile__default__dark",
+      "route": "/design?focus=overview",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-mobile-sections__mobile__cyberpunk__light",
+      "route": "/design?focus=overview",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "design-mobile-sections__mobile__cyberpunk__dark",
+      "route": "/design?focus=overview",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/design",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    }
+  ],
+  "gif": null,
+  "blockedConvexWrites": [
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget",
+    "Mutation:rateLimit:claimCatalogSyncBudget"
+  ],
+  "savedAppearance": [],
+  "pinFlagged": [],
+  "unstable": [],
+  "unproxiedSockets": []
+}
