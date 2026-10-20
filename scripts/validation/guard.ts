@@ -289,23 +289,9 @@ export function childPinViolations(childEnv: Env): string[] {
   return out;
 }
 
-export function homeViolations(input: GuardInput): string[] {
-  const platform = input.platform ?? process.platform;
-  const home = backendDir(input.appPort, input.root);
-  const out: string[] = [];
-  if (samePath(home, input.realHome, platform)) out.push("The backend home must not be the real home directory.");
-  for (const homeVar of ["USERPROFILE", "HOME"]) {
-    const values = valuesFor(input.childEnv, homeVar);
-    if (values.length !== 1 || !samePath(values[0], home, platform)) {
-      out.push(`${homeVar} must be ${home} so the owner's Convex login is hidden.`);
-    }
-  }
-  return out;
-}
-
 function realpathOrNull(p: string): string | null {
   try {
-    return fs.realpathSync(p);
+    return fs.realpathSync.native(p);
   } catch {
     return null;
   }
@@ -320,56 +306,187 @@ function lstatOrNull(p: string): fs.Stats | null {
 }
 
 /**
- * `~/.uvs-validation` with links resolved. Every expected cache path is built from this, never
- * from where a link under it points, so a swapped-in link can't make both sides of a check agree.
+ * `~/.uvs-validation` with links resolved. Every expected path is built from this, never from
+ * where a link under it points, so a swapped-in link can't make both sides of a check agree.
  */
 function resolvedRoot(root: string): string {
   return realpathOrNull(root) ?? path.resolve(root);
 }
 
 /**
- * `<root>/cache` and `<root>/cache/convex` must be plain dirs (or not exist yet), on every
- * platform. Each one that is a symlink or junction, or that resolves anywhere but the path built
- * from the resolved root, is a problem: the wrapper would seed, and the CLI would run and write,
- * wherever it points (the owner's Convex cache or login dir, say).
+ * Walks `<base>/<rel>` and everything under it, and lists each symlink, junction or other reparse
+ * point (anything `readdir`/`lstat` reports as a link), each entry that is neither a regular file
+ * nor a dir, and each dir whose real path isn't its parent's real path plus its name. Empty when
+ * it is all plain. `onLink` decides about a link: null allows it (it isn't descended into), a
+ * string is the problem to report. Entries that vanish mid-walk are skipped.
  */
-export function sharedCacheProblems(root: string, platform: NodeJS.Platform = process.platform): string[] {
-  const base = resolvedRoot(root);
+export function plainTreeProblems(
+  base: string,
+  rel = "",
+  opts: { platform?: NodeJS.Platform; onLink?: (full: string) => string | null } = {},
+): string[] {
+  const platform = opts.platform ?? process.platform;
   const out: string[] = [];
-  for (const parts of [["cache"], ["cache", "convex"]]) {
-    const p = path.join(root, ...parts);
-    const stat = lstatOrNull(p);
-    if (stat === null) break;
-    const expected = path.join(base, ...parts);
-    if (stat.isSymbolicLink()) out.push(`${p} is a symlink or junction; it must be a plain dir.`);
-    else if (!stat.isDirectory()) out.push(`${p} is not a dir.`);
-    else if (!samePath(realpathOrNull(p) ?? undefined, expected, platform)) out.push(`${p} resolves outside ${expected}.`);
+  const onLink = (full: string) => {
+    const problem = opts.onLink ? opts.onLink(full) : `${full} is a symlink or junction`;
+    if (problem) out.push(problem);
+  };
+  let at = base;
+  for (const part of rel.split(/[\\/]/).filter(Boolean)) {
+    at = path.join(at, part);
+    const stat = lstatOrNull(at);
+    if (stat === null) return out;
+    if (stat.isSymbolicLink()) {
+      onLink(at);
+      return out;
+    }
   }
+  const walk = (dir: string, realDir: string) => {
+    let entries: fs.Dirent[];
+    try {
+      entries = fs.readdirSync(dir, { withFileTypes: true });
+    } catch (err) {
+      if ((err as NodeJS.ErrnoException).code !== "ENOENT") out.push(`${dir} could not be read`);
+      return;
+    }
+    for (const entry of entries) {
+      const full = path.join(dir, entry.name);
+      let kind = entry.isSymbolicLink() ? "link" : entry.isDirectory() ? "dir" : entry.isFile() ? "file" : null;
+      if (kind === null) {
+        const stat = lstatOrNull(full);
+        if (stat === null) continue;
+        kind = stat.isSymbolicLink() ? "link" : stat.isDirectory() ? "dir" : stat.isFile() ? "file" : "other";
+      }
+      if (kind === "link") onLink(full);
+      else if (kind === "other") out.push(`${full} is not a regular file or dir`);
+      else if (kind === "dir") {
+        const real = realpathOrNull(full);
+        if (real === null) continue;
+        const expected = path.join(realDir, entry.name);
+        if (samePath(real, expected, platform)) walk(full, real);
+        else out.push(`${full} resolves to ${real}, not ${expected}`);
+      }
+    }
+  };
+  const realAt = realpathOrNull(at);
+  if (realAt !== null) walk(at, realAt);
   return out;
 }
 
-/**
- * macOS and Linux: the CLI caches under `$HOME/.cache/convex`, which the wrapper links to the
- * shared cache. If that path exists, it must resolve to the shared cache or inside the backend
- * home, both built from the resolved root.
- */
-function posixCacheViolations(input: GuardInput, platform: NodeJS.Platform): string[] {
-  const cache = path.join(backendDir(input.appPort, input.root), ".cache", "convex");
-  const base = resolvedRoot(input.root);
-  const shared = path.join(sharedCacheDir(base), "convex");
-  const home = backendDir(input.appPort, base);
-  const resolved = realpathOrNull(cache);
-  if (resolved === null) {
-    return lstatOrNull(cache) ? [`${cache} is a link that resolves nowhere; remove it so the wrapper can link it to ${shared}.`] : [];
+/** Checks `<root>/<parts…>` one level at a time with lstat: each must be a plain dir resolving to the built path. */
+function plainDirChain(root: string, parts: string[], platform: NodeJS.Platform, what: string): string[] {
+  const base = resolvedRoot(root);
+  for (let i = 1; i <= parts.length; i++) {
+    const p = path.join(root, ...parts.slice(0, i));
+    const stat = lstatOrNull(p);
+    if (stat === null) return [];
+    if (stat.isSymbolicLink()) return [`${p} is a symlink or junction; ${what} must be a plain dir.`];
+    if (!stat.isDirectory()) return [`${p} is not a dir.`];
+    const expected = path.join(base, ...parts.slice(0, i));
+    const real = realpathOrNull(p);
+    if (!samePath(real ?? undefined, expected, platform)) return [`${p} resolves to ${real}, not ${expected}.`];
   }
-  const ok = samePath(resolved, shared, platform) || isInside(resolved, home, platform);
-  return ok ? [] : [`${cache} must resolve to ${shared} or inside ${home} so the owner's Convex cache is untouched.`];
+  return [];
+}
+
+/**
+ * Nothing under `<root>/cache` may be a link, at any depth, on any platform: the wrapper seeds
+ * there and the CLI runs the binary and writes the dashboard config there, so a link anywhere in
+ * it would reach wherever it points (the owner's Convex cache or login dir, say).
+ */
+export function sharedCacheProblems(root: string, platform: NodeJS.Platform = process.platform): string[] {
+  const chain = plainDirChain(root, ["cache"], platform, "the shared cache");
+  if (chain.length > 0 || lstatOrNull(path.join(root, "cache")) === null) return chain;
+  return plainTreeProblems(path.join(root, "cache"), "", { platform }).map(
+    (p) => `${p}; nothing in the shared cache may be a link, so the owner's Convex cache stays untouched.`,
+  );
+}
+
+export type BackendHomeInput = {
+  root: string;
+  appPort: number;
+  realHome: string;
+  /** The caller's LOCALAPPDATA, whose `convex` dir is the owner's cache on Windows. */
+  ownerLocalAppData?: string;
+  platform?: NodeJS.Platform;
+};
+
+/**
+ * `<root>/backends/<P>` is the wrapped CLI's HOME, where it looks for a login. It and
+ * `<root>/backends` must be plain dirs (lstat), it must resolve to the path built from the
+ * resolved root, and it must not be, contain, or sit inside the owner's home or Convex dirs.
+ * Nothing under it may be a link, except the `.cache/convex` link the wrapper makes on macOS and
+ * Linux, which must resolve to the shared cache exactly.
+ */
+export function backendHomeProblems(input: BackendHomeInput): string[] {
+  const platform = input.platform ?? process.platform;
+  const home = backendDir(input.appPort, input.root);
+  const base = resolvedRoot(input.root);
+  const chain = plainDirChain(input.root, ["backends", String(input.appPort)], platform, "the backend home");
+  if (chain.length > 0) return chain;
+  const realHome = realpathOrNull(home) ?? backendDir(input.appPort, base);
+  const ownerHome = realpathOrNull(input.realHome) ?? path.resolve(input.realHome);
+  const ownerDirs = [
+    path.join(input.realHome, ".convex"),
+    path.join(input.realHome, ".cache", "convex"),
+    path.join(input.realHome, "AppData", "Local", "convex"),
+    ...(input.ownerLocalAppData ? [path.join(input.ownerLocalAppData, "convex")] : []),
+  ].map((d) => realpathOrNull(d) ?? path.resolve(d));
+  if (isInside(ownerHome, realHome, platform)) {
+    return [`${home} resolves to ${realHome}, which is or contains the owner's home ${ownerHome}.`];
+  }
+  const owner = ownerDirs.find((d) => isInside(realHome, d, platform) || isInside(d, realHome, platform));
+  if (owner) return [`${home} resolves to ${realHome}, which overlaps the owner's Convex dir ${owner}.`];
+  if (lstatOrNull(home) === null) return [];
+  const sharedLink = path.join(home, ".cache", "convex");
+  const shared = path.join(sharedCacheDir(base), "convex");
+  return plainTreeProblems(home, "", {
+    platform,
+    onLink: (full) => {
+      if (platform === "win32" || !samePath(full, sharedLink, platform)) {
+        return `${full} is a symlink or junction; nothing in the backend home may be a link, so the owner's login stays hidden.`;
+      }
+      const real = realpathOrNull(full);
+      if (real === null) return `${full} is a link that resolves nowhere; remove it so the wrapper can link it to ${shared}.`;
+      return samePath(real, shared, platform) ? null : `${full} must resolve to ${shared} so the owner's Convex cache is untouched.`;
+    },
+  });
+}
+
+function callerEnv(input: GuardInput): Env {
+  return input.sources.find((s) => s.name === "the caller's environment")?.env ?? {};
+}
+
+export function homeViolations(input: GuardInput): string[] {
+  const platform = input.platform ?? process.platform;
+  const home = backendDir(input.appPort, input.root);
+  const realHomeOf = (p: string) => realpathOrNull(p) ?? path.resolve(p);
+  const out: string[] = [];
+  if (samePath(home, input.realHome, platform) || samePath(realHomeOf(home), realHomeOf(input.realHome), platform)) {
+    out.push("The backend home must not be the real home directory.");
+  }
+  for (const homeVar of ["USERPROFILE", "HOME"]) {
+    const values = valuesFor(input.childEnv, homeVar);
+    if (values.length !== 1 || !samePath(values[0], home, platform) || !samePath(realHomeOf(values[0]), realHomeOf(home), platform)) {
+      out.push(`${homeVar} must be ${home} so the owner's Convex login is hidden.`);
+    }
+  }
+  out.push(
+    ...backendHomeProblems({
+      root: input.root,
+      appPort: input.appPort,
+      realHome: input.realHome,
+      ownerLocalAppData: valuesFor(callerEnv(input), "LOCALAPPDATA")[0],
+      platform,
+    }),
+  );
+  return out;
 }
 
 export function cacheViolations(input: GuardInput): string[] {
   const platform = input.platform ?? process.platform;
-  const shared = sharedCacheProblems(input.root, platform).map((p) => `${p} The owner's Convex cache must stay untouched.`);
-  if (platform !== "win32") return [...shared, ...posixCacheViolations(input, platform)];
+  const shared = sharedCacheProblems(input.root, platform);
+  if (platform !== "win32") return shared;
   const values = valuesFor(input.childEnv, "LOCALAPPDATA");
   const cache = sharedCacheDir(input.root);
   const resolved = values.length === 1 ? realpathOrNull(values[0]) : null;

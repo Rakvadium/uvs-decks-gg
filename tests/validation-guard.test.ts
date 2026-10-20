@@ -413,7 +413,7 @@ describe("pinned local backend version (#221)", () => {
       fs.mkdirSync(b.home, { recursive: true });
       fs.symlinkSync(path.join(realHome, ".cache"), path.join(b.home, ".cache"), linkType);
       expect(() => linkSharedConvexCache(b.home, root, "linux")).toThrow(/must be a plain dir inside the backend home/);
-      expect(guarded(8183).some((v) => /must resolve to /.test(v))).toBe(true);
+      expect(guarded(8183).some((v) => /\.cache is a symlink or junction; nothing in the backend home may be a link/.test(v))).toBe(true);
       expect(fs.readdirSync(ownerCache).sort()).toEqual(["binaries", "dashboard"]);
       expect(fs.existsSync(path.join(ownerCache, "binaries", PINNED_LOCAL_BACKEND_VERSION, linuxExe))).toBe(true);
     });
@@ -484,7 +484,7 @@ describe("pinned local backend version (#221)", () => {
             const parentEnv = platform === "win32" ? { LOCALAPPDATA: ownerLocal } : {};
             const childEnv = buildChildEnv({ parentEnv, appPort: 8182, root, platform });
             const violations = guardViolations(input({ parentEnv, childEnv, platform, root, realHome, appPort: 8182 }));
-            expect(violations.some((v) => /is a symlink or junction; it must be a plain dir/.test(v))).toBe(true);
+            expect(violations.some((v) => /is a symlink or junction; (the shared cache must be a plain dir|nothing in the shared cache may be a link)/.test(v))).toBe(true);
             const inv = { appPort: 8182, home: backendDir(8182, root), childEnv, fetchPinnedBackend: true };
             expect(() => preparePinnedBackend(inv, () => {}, { parentEnv, realHome, platform })).toThrow(/symlink or junction/);
             expect(listFiles(realHome)).toEqual(before);
@@ -492,6 +492,114 @@ describe("pinned local backend version (#221)", () => {
         }
       }
     }
+
+    // Round 2 of #236: the rule is "no link anywhere under the shared cache or the backend home",
+    // so plant one at every depth, on both platforms.
+    const pin = PINNED_LOCAL_BACKEND_VERSION;
+    const sharedDepths: [string, string][] = [
+      ["depth 1: cache/convex", "convex"],
+      ["depth 2: cache/convex/binaries", "convex/binaries"],
+      ["depth 3: cache/convex/binaries/<pin>", `convex/binaries/${pin}`],
+      ["depth 4: inside binaries/<pin>", `convex/binaries/${pin}/lib`],
+      ["depth 2: cache/convex/dashboard", "convex/dashboard"],
+      ["depth 3: inside dashboard", "convex/dashboard/out"],
+      ["depth 6: deep inside dashboard", "convex/dashboard/out/_next/static/chunks"],
+    ];
+    const homeDepths: [string, string][] = [
+      ["depth 1: <home>/.convex (the CLI's login dir)", ".convex"],
+      ["depth 1: <home>/.cache", ".cache"],
+      ["depth 2: <home>/.convex/anonymous-convex-backend-state", ".convex/anonymous-convex-backend-state"],
+      ["depth 3: the deployment dir", ".convex/anonymous-convex-backend-state/anonymous-agent"],
+      ["depth 5: inside the deployment's storage", ".convex/anonymous-convex-backend-state/anonymous-agent/convex_local_storage/modules"],
+      ["depth 1: <home>/tmp", "tmp"],
+    ];
+    const plantAt = (top: string, rel: string, dest: string) => {
+      const at = path.join(top, ...rel.split("/"));
+      fs.mkdirSync(path.dirname(at), { recursive: true });
+      fs.symlinkSync(dest, at, linkType);
+      // Plain siblings, so the walk has real dirs to go through before it reaches the link.
+      fs.mkdirSync(path.join(path.dirname(at), "plain-sibling"), { recursive: true });
+      fs.writeFileSync(path.join(path.dirname(at), "plain-sibling", "f"), "x");
+    };
+    const ownerSetup = (platform: NodeJS.Platform) => {
+      const realHome = tmpDir("uvs-home-");
+      fs.mkdirSync(path.join(realHome, ".convex"), { recursive: true });
+      fs.writeFileSync(path.join(realHome, ".convex", "config.json"), '{"accessToken":"<placeholder>"}');
+      const ownerLocal = platform === "win32" ? path.join(realHome, "AppData", "Local") : path.join(realHome, ".cache");
+      fs.mkdirSync(path.join(ownerLocal, "convex", "binaries", pin), { recursive: true });
+      fs.writeFileSync(path.join(ownerLocal, "convex", "binaries", pin, backendExeName(platform)), "owner");
+      return { realHome, ownerLocal, parentEnv: platform === "win32" ? { LOCALAPPDATA: ownerLocal } : {} };
+    };
+    const refusedEverywhere = (platform: NodeJS.Platform, root: string, owner: ReturnType<typeof ownerSetup>, pattern: RegExp) => {
+      const childEnv = buildChildEnv({ parentEnv: owner.parentEnv, appPort: 8182, root, platform });
+      const violations = guardViolations(input({ parentEnv: owner.parentEnv, childEnv, platform, root, realHome: owner.realHome, appPort: 8182 }));
+      expect(violations.some((v) => pattern.test(v))).toBe(true);
+      const before = listFiles(owner.realHome);
+      const inv = { appPort: 8182, home: backendDir(8182, root), childEnv, fetchPinnedBackend: true };
+      expect(() => preparePinnedBackend(inv, () => {}, { ...owner, platform })).toThrow(pattern);
+      expect(listFiles(owner.realHome)).toEqual(before);
+      expect(fs.existsSync(path.join(owner.realHome, ".cache", "convex", "binaries", pin, "x"))).toBe(false);
+    };
+    for (const platform of ["linux", "win32"] as const) {
+      for (const [label, rel] of sharedDepths) {
+        test(`${platform}: a link at shared ${label} is refused`, () => {
+          const owner = ownerSetup(platform);
+          const root = tmpDir("uvs-root-");
+          fs.mkdirSync(path.join(root, "cache"), { recursive: true });
+          plantAt(path.join(root, "cache"), rel, path.join(owner.ownerLocal, "convex"));
+          refusedEverywhere(platform, root, owner, /symlink or junction/);
+        });
+      }
+      for (const [label, rel] of homeDepths) {
+        test(`${platform}: a link in the backend home at ${label} is refused`, () => {
+          const owner = ownerSetup(platform);
+          const root = tmpDir("uvs-root-");
+          fs.mkdirSync(backendDir(8182, root), { recursive: true });
+          plantAt(backendDir(8182, root), rel, path.join(owner.realHome, ".convex"));
+          refusedEverywhere(platform, root, owner, /symlink or junction; nothing in the backend home may be a link/);
+        });
+      }
+      test(`${platform}: the backend home, or backends/, as a link to the owner's home is refused`, () => {
+        for (const level of ["backends/8182", "backends"]) {
+          const owner = ownerSetup(platform);
+          const root = tmpDir("uvs-root-");
+          plantAt(root, level, owner.realHome);
+          refusedEverywhere(platform, root, owner, /symlink or junction; the backend home must be a plain dir/);
+          // Case G: nothing was created in the owner's home, such as a `.cache/convex` link.
+          expect(fs.lstatSync(path.join(owner.ownerLocal, "convex")).isSymbolicLink()).toBe(false);
+          if (platform === "win32") expect(fs.existsSync(path.join(owner.realHome, ".cache"))).toBe(false);
+        }
+      });
+      test(`${platform}: a root that puts the backend home inside the owner's Convex dir is refused`, () => {
+        const owner = ownerSetup(platform);
+        const root = path.join(tmpDir("uvs-link-parent-"), ".uvs-validation");
+        fs.symlinkSync(path.join(owner.realHome, ".convex"), root, linkType);
+        fs.mkdirSync(backendDir(8182, root), { recursive: true });
+        refusedEverywhere(platform, root, owner, /overlaps the owner's Convex dir/);
+        fs.rmSync(path.join(owner.realHome, ".convex", "backends"), { recursive: true, force: true });
+      });
+    }
+    test("linux: the wrapper's own .cache/convex link passes only when it resolves to the shared cache", () => {
+      const owner = ownerSetup("linux");
+      const root = tmpDir("uvs-root-");
+      fs.mkdirSync(path.join(root, "cache", "convex"), { recursive: true });
+      const home = backendDir(8182, root);
+      const guarded = () =>
+        guardViolations(input({ parentEnv: {}, childEnv: buildChildEnv({ parentEnv: {}, appPort: 8182, root, platform: "linux" }), platform: "linux", root, realHome: owner.realHome, appPort: 8182 }));
+      expect(linkSharedConvexCache(home, root, "linux")).toContain("linked");
+      expect(guarded()).toEqual([]);
+      // The same link is refused on Windows, where the wrapper never makes it.
+      const win = buildChildEnv({ parentEnv: {}, appPort: 8182, root, platform: "win32" });
+      expect(guardViolations(input({ parentEnv: {}, childEnv: win, platform: "win32", root, realHome: owner.realHome, appPort: 8182 })).some((v) => /nothing in the backend home may be a link/.test(v))).toBe(true);
+    });
+    test.skipIf(process.platform === "win32")("linux host: a file symlink inside the shared binary dir is refused", () => {
+      const owner = ownerSetup("linux");
+      const root = tmpDir("uvs-root-");
+      const dir = path.join(root, "cache", "convex", "binaries", pin);
+      fs.mkdirSync(dir, { recursive: true });
+      fs.symlinkSync(path.join(owner.ownerLocal, "convex", "binaries", pin, backendExeName("linux")), path.join(dir, backendExeName("linux")));
+      refusedEverywhere("linux", root, owner, /symlink or junction/);
+    });
 
     test("plain shared dirs pass, also when ~/.uvs-validation itself is a link", () => {
       const real = tmpDir("uvs-real-root-");
