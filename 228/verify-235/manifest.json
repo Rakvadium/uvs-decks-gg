@@ -1,0 +1,51 @@
+{
+  "issue": "228",
+  "label": "verify-235",
+  "port": 8184,
+  "chrome": "calm",
+  "fullPage": false,
+  "strict": true,
+  "shots": [
+    {
+      "name": "guest-gallery-dual-faced-front__desktop__default__dark",
+      "route": "/gallery",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/gallery",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "guest-gallery-dual-faced-back__desktop__default__dark",
+      "route": "/gallery",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/gallery",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    }
+  ],
+  "gif": null,
+  "blockedConvexWrites": [
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus"
+  ],
+  "savedAppearance": [],
+  "pinFlagged": [],
+  "unstable": [],
+  "unproxiedSockets": []
+}
