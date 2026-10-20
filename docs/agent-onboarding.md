@@ -86,10 +86,10 @@ Use this when a browser agent (Cursor preview, Playwright, Computer Use, etc.) n
 1. In `.env.local` (never commit):
 
 ```bash
-AGENT_AUTH_SECRET=replace-with-a-long-random-string
-AGENT_AUTH_EMAIL=agent@localhost.dev
-AGENT_AUTH_PASSWORD=AgentDev1
-AGENT_AUTH_USERNAME=agent
+AGENT_AUTH_SECRET=<set-in-env>
+AGENT_AUTH_EMAIL=<set-in-env>
+AGENT_AUTH_PASSWORD=<set-in-env>
+AGENT_AUTH_USERNAME=<set-in-env>
 ```
 
 Password must be at least 8 characters and include a number (same rules as normal signup).
