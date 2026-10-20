@@ -46,7 +46,7 @@ export function TeamsDecksBody() {
     return (
       <div className="space-y-3">
         <div className="h-8 w-48 animate-pulse rounded-md bg-muted" />
-        <div className="mt-4 h-32 w-full animate-pulse rounded-md bg-muted/80" />
+        <div className="mt-4 h-32 w-full animate-pulse rounded-md bg-muted-overlay" />
       </div>
     );
   }
@@ -71,8 +71,8 @@ export function TeamsDecksBody() {
     return (
       <div className="space-y-3">
         <div className="h-8 w-56 animate-pulse rounded-md bg-muted" />
-        <div className="h-10 w-full max-w-sm animate-pulse rounded-md bg-muted/60" />
-        <div className="h-32 w-full animate-pulse rounded-md bg-muted/80" />
+        <div className="h-10 w-full max-w-sm animate-pulse rounded-md bg-muted-elevated" />
+        <div className="h-32 w-full animate-pulse rounded-md bg-muted-overlay" />
       </div>
     );
   }
@@ -93,7 +93,7 @@ export function TeamsDecksBody() {
       </div>
       {isEmpty ? (
         <div
-          className="mt-6 rounded-lg border border-dashed border-border/80 bg-muted/20 px-4 py-10 text-center"
+          className="mt-6 rounded-lg border border-dashed border-placeholder bg-muted-tint px-4 py-10 text-center"
           role="status"
         >
           <p className="text-sm text-muted-foreground">No team-visible decks yet for this filter.</p>
@@ -110,7 +110,7 @@ export function TeamsDecksBody() {
           </p>
         </div>
       ) : (
-        <div className="mt-6 overflow-x-auto rounded-lg border border-border/50">
+        <div className="mt-6 overflow-x-auto rounded-lg border border-surface">
           <Table>
             <TableHeader>
               <TableRow className="hover:bg-transparent">

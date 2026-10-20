@@ -77,7 +77,7 @@ export function TeamsLandingView() {
   }
 
   const featureClass =
-    "flex gap-3 rounded-xl border border-border/50 bg-card/50 p-4 backdrop-blur-sm md:p-5";
+    "flex gap-3 rounded-xl border border-surface bg-card-soft p-4 backdrop-blur-sm md:p-5";
 
   return (
     <FloatingPageLayout bar={<TeamsLandingFloatingBar isAuthenticated={isAuthenticated} />}>
@@ -98,7 +98,7 @@ export function TeamsLandingView() {
             )}
           </div>
 
-          <Surface className="rounded-3xl border-border/50 bg-card/80 p-5 backdrop-blur-sm md:p-7">
+          <Surface className="rounded-3xl border-surface bg-card-elevated p-5 backdrop-blur-sm md:p-7">
             <SectionHeading size="md">What you get</SectionHeading>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
               {isAuthenticated

@@ -100,7 +100,7 @@ export function TeamHubAnnouncementsContent({ teamId }: TeamHubAnnouncementsCont
     return (
       <div className="space-y-3">
         <div className="h-6 w-40 animate-pulse rounded-md bg-muted" />
-        <div className="h-40 w-full animate-pulse rounded-md bg-muted/80" />
+        <div className="h-40 w-full animate-pulse rounded-md bg-muted-overlay" />
       </div>
     );
   }
@@ -301,7 +301,7 @@ function AnnouncementCard({
   const canDelete = isAuthor || caps.canModerateChat;
 
   return (
-    <li className="rounded-lg border border-border/50 bg-background/50 p-4">
+    <li className="rounded-lg border border-surface bg-background-soft p-4">
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div className="min-w-0 flex-1">
           {editing ? (
@@ -339,7 +339,7 @@ function AnnouncementCard({
         </div>
       </div>
       {!editing && (
-        <div className="mt-3 flex flex-wrap items-center gap-3 border-t border-border/40 pt-3">
+        <div className="mt-3 flex flex-wrap items-center gap-3 border-t border-divider pt-3">
           {caps.canPinAnnouncements && (
             <div className="flex items-center gap-2">
               <Switch

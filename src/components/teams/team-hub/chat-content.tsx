@@ -73,7 +73,7 @@ export function TeamHubChatContent({ teamId }: TeamHubChatContentProps) {
     return (
       <div className="space-y-3">
         <div className="h-6 w-32 animate-pulse rounded-md bg-muted" />
-        <div className="h-64 w-full animate-pulse rounded-md bg-muted/80" />
+        <div className="h-64 w-full animate-pulse rounded-md bg-muted-overlay" />
       </div>
     );
   }
@@ -102,7 +102,7 @@ export function TeamHubChatContent({ teamId }: TeamHubChatContentProps) {
         </div>
       )}
       <div
-        className="flex min-h-0 flex-1 flex-col-reverse gap-2 overflow-y-auto rounded-lg border border-border/50 bg-muted/20 p-3"
+        className="flex min-h-0 flex-1 flex-col-reverse gap-2 overflow-y-auto rounded-lg border border-surface bg-muted-tint p-3"
         role="log"
         aria-live="polite"
       >
@@ -114,7 +114,7 @@ export function TeamHubChatContent({ teamId }: TeamHubChatContentProps) {
             return (
               <div
                 key={m._id}
-                className="rounded-md border border-border/40 bg-background/80 px-3 py-2 text-sm"
+                className="rounded-md border border-divider bg-background-elevated px-3 py-2 text-sm"
               >
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
                   <span className="text-xs font-medium text-foreground">
