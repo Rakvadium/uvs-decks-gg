@@ -290,19 +290,35 @@ export const tierListCommentStatusValidator = v.union(
   v.literal("rejected")
 );
 
-export const tierListCommentValidator = v.object({
+/**
+ * Comment fields any viewer may see. Moderation details (reason, provider, raw result) stay on the
+ * server. Convex rejects return values with extra fields, so they can't be sent by accident.
+ */
+export const publicTierListCommentValidator = v.object({
   _id: v.id("tierListComments"),
   _creationTime: v.number(),
   tierListId: v.id("tierLists"),
   userId: v.id("users"),
   content: v.string(),
   status: tierListCommentStatusValidator,
-  moderationReason: v.optional(v.string()),
-  textModerationProvider: v.optional(v.string()),
-  textModerationResult: v.optional(v.any()),
   createdAt: v.number(),
   updatedAt: v.number(),
 });
+
+export type PublicTierListComment = Infer<typeof publicTierListCommentValidator>;
+
+export function publicTierListCommentFromDocument(doc: Doc<"tierListComments">): PublicTierListComment {
+  return {
+    _id: doc._id,
+    _creationTime: doc._creationTime,
+    tierListId: doc.tierListId,
+    userId: doc.userId,
+    content: doc.content,
+    status: doc.status,
+    createdAt: doc.createdAt,
+    updatedAt: doc.updatedAt,
+  };
+}
 
 export const collectionEntryValidator = v.object({
   _id: v.id("collections"),
@@ -475,7 +491,7 @@ export const formatErrataValidator = v.object({
   sortOrder: v.number(),
 });
 
-export const setDocValidator = v.object({
+const publicSetFields = {
   _id: v.id("sets"),
   _creationTime: v.number(),
   code: v.string(),
@@ -489,6 +505,22 @@ export const setDocValidator = v.object({
   isFuture: v.optional(v.boolean()),
   spotlightIP: v.optional(v.string()),
   updatedAt: v.optional(v.number()),
+};
+
+/** Set fields any caller may see. Leaves out `updatedBy`, the id of whoever last edited the set. */
+export const publicSetValidator = v.object(publicSetFields);
+
+export type PublicSet = Infer<typeof publicSetValidator>;
+
+export function publicSetFromDocument(doc: Doc<"sets">): PublicSet {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- dropped on purpose
+  const { updatedBy: _updatedBy, ...publicFields } = doc;
+  return publicFields;
+}
+
+/** Full set document, for admin-gated functions only. */
+export const setDocValidator = v.object({
+  ...publicSetFields,
   updatedBy: v.optional(v.id("users")),
 });
 
@@ -705,16 +737,28 @@ export const teamAnnouncementValidator = v.object({
   createdAt: v.number(),
 });
 
-export const teamChatMessageValidator = v.object({
+/** Chat message fields team members may see. Moderation details stay on the server. */
+export const memberTeamChatMessageValidator = v.object({
   _id: v.id("teamChatMessages"),
   _creationTime: v.number(),
   teamId: v.id("teams"),
   authorUserId: v.id("users"),
   body: v.string(),
   createdAt: v.number(),
-  textModerationProvider: v.optional(v.string()),
-  textModerationResult: v.optional(v.any()),
 });
+
+export type MemberTeamChatMessage = Infer<typeof memberTeamChatMessageValidator>;
+
+export function memberTeamChatMessageFromDocument(doc: Doc<"teamChatMessages">): MemberTeamChatMessage {
+  return {
+    _id: doc._id,
+    _creationTime: doc._creationTime,
+    teamId: doc.teamId,
+    authorUserId: doc.authorUserId,
+    body: doc.body,
+    createdAt: doc.createdAt,
+  };
+}
 
 export const teamEventValidator = v.object({
   _id: v.id("teamEvents"),

@@ -1,16 +1,17 @@
 import { query, internalMutation } from "./_generated/server";
 import { v } from "convex/values";
-import { setDocValidator } from "./validators";
+import { publicSetFromDocument, publicSetValidator, setDocValidator } from "./validators";
 import { requireAdmin } from "./utils/validation";
 import { countListCardsForSetCode, syncSetCardCountByCode } from "./setCardCountSync";
 
 export const list = query({
   args: {},
-  returns: v.array(setDocValidator),
+  returns: v.array(publicSetValidator),
   handler: async (ctx) => {
-    return await ctx.db
+    const sets = await ctx.db
       .query("sets")
       .collect();
+    return sets.map(publicSetFromDocument);
   },
 });
 
@@ -18,12 +19,13 @@ export const getByCode = query({
   args: {
     code: v.string(),
   },
-  returns: v.union(setDocValidator, v.null()),
+  returns: v.union(publicSetValidator, v.null()),
   handler: async (ctx, args) => {
-    return await ctx.db
+    const set = await ctx.db
       .query("sets")
       .withIndex("by_code", (q) => q.eq("code", args.code))
       .unique();
+    return set ? publicSetFromDocument(set) : null;
   },
 });
 
@@ -31,22 +33,23 @@ export const getById = query({
   args: {
     setId: v.id("sets"),
   },
-  returns: v.union(setDocValidator, v.null()),
+  returns: v.union(publicSetValidator, v.null()),
   handler: async (ctx, args) => {
-    return await ctx.db.get(args.setId);
+    const set = await ctx.db.get(args.setId);
+    return set ? publicSetFromDocument(set) : null;
   },
 });
 
 export const getMostRecent = query({
   args: {},
-  returns: v.union(setDocValidator, v.null()),
+  returns: v.union(publicSetValidator, v.null()),
   handler: async (ctx) => {
     const sets = await ctx.db
       .query("sets")
       .withIndex("by_setNumber")
       .order("desc")
       .take(1);
-    return sets[0] ?? null;
+    return sets[0] ? publicSetFromDocument(sets[0]) : null;
   },
 });
 
