@@ -143,6 +143,15 @@ bun run secret-scan:sync-ci [--env-file <file>]... [--repo Rakvadium/uvs-decks-g
 2. Add `NAME: ${{ secrets.NAME }}` to the `secret-scan` job's env.
 3. Run `bun run secret-scan:sync-ci`.
 
+## Public values stay out
+
+List only values that must stay private. A public value that the code is meant to contain would fail every scan that touches it, and hide nothing. These names are left out on purpose:
+
+- `AGENT_AUTH_EMAIL`: a public identifier, not a secret. Its value is the legacy agent account's address, which reserved-identity matching hardcodes by design (#206). The agent password and login token stay listed. Removed in #223.
+- `AGENT_AUTH_USERNAME` and `R2_BUCKET`: names, not credentials.
+
+To drop a name, remove it from `secrets.json` and its line from the `secret-scan` job's env. `sync-ci` then stops setting it. Delete the old Actions secret with `gh secret delete NAME`.
+
 ## The canary and proving the gate
 
 `SECRET_SCAN_CANARY` is a fake, test-only secret that's set by hand. It's `ciOnly`, so CI fails when it's missing. That proves Actions secrets are actually wired into the job. To prove the gate fails on a leak:
