@@ -5,7 +5,7 @@
   "results": [
     {
       "name": "community__desktop__aurora__dark",
-      "diffPercent": 0
+      "diffPercent": 0.001
     },
     {
       "name": "community__desktop__aurora__light",
@@ -13,7 +13,7 @@
     },
     {
       "name": "community__desktop__cyberpunk__dark",
-      "diffPercent": 0.001
+      "diffPercent": 0
     },
     {
       "name": "community__desktop__cyberpunk__light",
@@ -25,11 +25,11 @@
     },
     {
       "name": "community__desktop__default__light",
-      "diffPercent": 0.001
+      "diffPercent": 15.84
     },
     {
       "name": "community__mobile__aurora__dark",
-      "diffPercent": 0
+      "diffPercent": 16.041
     },
     {
       "name": "community__mobile__aurora__light",
@@ -41,7 +41,7 @@
     },
     {
       "name": "community__mobile__cyberpunk__light",
-      "diffPercent": 15.505
+      "diffPercent": 0
     },
     {
       "name": "community__mobile__default__dark",
@@ -57,7 +57,7 @@
     },
     {
       "name": "deck-card-dialog-open__desktop__aurora__light",
-      "diffPercent": 0.18
+      "diffPercent": 0.181
     },
     {
       "name": "deck-card-dialog-open__desktop__cyberpunk__dark",
@@ -172,6 +172,54 @@
       "diffPercent": 1.168
     },
     {
+      "name": "filter-panel-open__desktop__aurora__dark",
+      "diffPercent": 0.013
+    },
+    {
+      "name": "filter-panel-open__desktop__aurora__light",
+      "diffPercent": 0.014
+    },
+    {
+      "name": "filter-panel-open__desktop__cyberpunk__dark",
+      "diffPercent": 0.013
+    },
+    {
+      "name": "filter-panel-open__desktop__cyberpunk__light",
+      "diffPercent": 0.014
+    },
+    {
+      "name": "filter-panel-open__desktop__default__dark",
+      "diffPercent": 0.014
+    },
+    {
+      "name": "filter-panel-open__desktop__default__light",
+      "diffPercent": 0.013
+    },
+    {
+      "name": "filter-panel-sets__desktop__aurora__dark",
+      "diffPercent": 0.037
+    },
+    {
+      "name": "filter-panel-sets__desktop__aurora__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "filter-panel-sets__desktop__cyberpunk__dark",
+      "diffPercent": 0.037
+    },
+    {
+      "name": "filter-panel-sets__desktop__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "filter-panel-sets__desktop__default__dark",
+      "diffPercent": 0.037
+    },
+    {
+      "name": "filter-panel-sets__desktop__default__light",
+      "diffPercent": 0
+    },
+    {
       "name": "gallery__desktop__aurora__dark",
       "diffPercent": 0
     },
@@ -221,7 +269,7 @@
     },
     {
       "name": "guest-gallery__desktop__aurora__dark",
-      "diffPercent": 0.253
+      "diffPercent": 0.25
     },
     {
       "name": "guest-gallery__desktop__aurora__light",
@@ -229,19 +277,19 @@
     },
     {
       "name": "guest-gallery__desktop__cyberpunk__dark",
-      "diffPercent": 0.225
+      "diffPercent": 0.243
     },
     {
       "name": "guest-gallery__desktop__cyberpunk__light",
-      "diffPercent": 0.003
+      "diffPercent": 0.004
     },
     {
       "name": "guest-gallery__desktop__default__dark",
-      "diffPercent": 0.251
+      "diffPercent": 0.231
     },
     {
       "name": "guest-gallery__desktop__default__light",
-      "diffPercent": 0.233
+      "diffPercent": 0.25
     },
     {
       "name": "guest-gallery__mobile__aurora__dark",
@@ -266,6 +314,54 @@
     {
       "name": "guest-gallery__mobile__default__light",
       "diffPercent": 0
+    },
+    {
+      "name": "guest-ghost-hover__desktop__aurora__dark",
+      "diffPercent": 0.496
+    },
+    {
+      "name": "guest-ghost-hover__desktop__aurora__light",
+      "diffPercent": 0.499
+    },
+    {
+      "name": "guest-ghost-hover__desktop__cyberpunk__dark",
+      "diffPercent": 0.489
+    },
+    {
+      "name": "guest-ghost-hover__desktop__cyberpunk__light",
+      "diffPercent": 0.249
+    },
+    {
+      "name": "guest-ghost-hover__desktop__default__dark",
+      "diffPercent": 0.477
+    },
+    {
+      "name": "guest-ghost-hover__desktop__default__light",
+      "diffPercent": 0.496
+    },
+    {
+      "name": "guest-secondary-hover__desktop__aurora__dark",
+      "diffPercent": 0.25
+    },
+    {
+      "name": "guest-secondary-hover__desktop__aurora__light",
+      "diffPercent": 0.254
+    },
+    {
+      "name": "guest-secondary-hover__desktop__cyberpunk__dark",
+      "diffPercent": 0.226
+    },
+    {
+      "name": "guest-secondary-hover__desktop__cyberpunk__light",
+      "diffPercent": 0.003
+    },
+    {
+      "name": "guest-secondary-hover__desktop__default__dark",
+      "diffPercent": 0.248
+    },
+    {
+      "name": "guest-secondary-hover__desktop__default__light",
+      "diffPercent": 0.228
     },
     {
       "name": "mobile-profile-sheet-open__mobile__aurora__dark",
@@ -293,27 +389,27 @@
     },
     {
       "name": "new-deck-dialog-open__desktop__aurora__dark",
-      "diffPercent": 18.8
+      "diffPercent": 17.763
     },
     {
       "name": "new-deck-dialog-open__desktop__aurora__light",
-      "diffPercent": 19.084
+      "diffPercent": 18.032
     },
     {
       "name": "new-deck-dialog-open__desktop__cyberpunk__dark",
-      "diffPercent": 13.096
+      "diffPercent": 11.708
     },
     {
       "name": "new-deck-dialog-open__desktop__cyberpunk__light",
-      "diffPercent": 13.938
+      "diffPercent": 12.639
     },
     {
       "name": "new-deck-dialog-open__desktop__default__dark",
-      "diffPercent": 14.527
+      "diffPercent": 13.434
     },
     {
       "name": "new-deck-dialog-open__desktop__default__light",
-      "diffPercent": 15.701
+      "diffPercent": 14.55
     },
     {
       "name": "new-deck-dialog-open__mobile__aurora__dark",
@@ -393,7 +489,7 @@
     },
     {
       "name": "settings__desktop__aurora__light",
-      "diffPercent": 0.058
+      "diffPercent": 0.015
     },
     {
       "name": "settings__desktop__cyberpunk__dark",
@@ -409,7 +505,7 @@
     },
     {
       "name": "settings__desktop__default__light",
-      "diffPercent": 0.014
+      "diffPercent": 0.016
     },
     {
       "name": "settings__mobile__aurora__dark",
