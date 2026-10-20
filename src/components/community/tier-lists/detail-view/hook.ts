@@ -34,7 +34,7 @@ import {
   serializeLaneMap,
   tierListCardMatchesPool,
 } from "../utils";
-import { getTierListCatalogState, syncTierListLaneMap } from "./lane-map-sync";
+import { getTierListCatalogState, getTierListUnknownCardDisplay, syncTierListLaneMap } from "./lane-map-sync";
 
 type TierListDraftSnapshot = {
   title: string;
@@ -59,6 +59,7 @@ export function useCommunityTierListDetailModel(tierListId: string) {
     cachedVersion,
     serverVersion,
   });
+  const unknownCardDisplay = getTierListUnknownCardDisplay(catalogState, isCatalogDataLoading);
   const { sets } = useCardReferenceData();
 
   const [title, setTitle] = useState("Untitled Tier List");
@@ -362,6 +363,27 @@ export function useCommunityTierListDetailModel(tierListId: string) {
     );
   };
 
+  /** Takes a card out of every lane, e.g. an unavailable card the catalog no longer has. */
+  const removeCardFromLanes = (cardId: Id<"cards">) => {
+    if (!canEdit) {
+      return;
+    }
+
+    const nextLaneMap: BuilderLaneMap = Object.fromEntries(
+      Object.entries(getDraftSnapshot().laneMap).map(([laneKey, laneCards]) => [
+        laneKey,
+        laneCards.filter((value) => value !== cardId),
+      ])
+    );
+
+    setLaneMap(nextLaneMap);
+    queueAutoSave(
+      getDraftSnapshot({
+        laneMap: nextLaneMap,
+      })
+    );
+  };
+
   const setTierLabel = (tierId: string, value: string) => {
     if (isRankedScope) {
       return;
@@ -547,6 +569,7 @@ export function useCommunityTierListDetailModel(tierListId: string) {
     isPresentationMode,
     setIsPresentationMode,
     cardMap,
+    unknownCardDisplay,
     selectedCards,
     filteredPoolCardIds,
     poolCardIds,
@@ -554,6 +577,7 @@ export function useCommunityTierListDetailModel(tierListId: string) {
     visibleSets,
     sourceCards,
     moveCardToLane,
+    removeCardFromLanes,
     setTierLabel,
     setTierColor,
     addPoolScope,

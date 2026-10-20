@@ -35,6 +35,26 @@ export function getTierListCatalogState(catalog: {
 }
 
 /**
+ * How to show a placed card the catalog has no entry for: `loading` while the catalog is loading
+ * or outdated (a sync may still bring the card), `unavailable` once it is current, or once loading
+ * ended with no cards at all.
+ */
+export type TierListUnknownCardDisplay = "loading" | "unavailable";
+
+export function getTierListUnknownCardDisplay(
+  catalogState: TierListCatalogState,
+  isCatalogDataLoading: boolean
+): TierListUnknownCardDisplay {
+  if (catalogState === "current") {
+    return "unavailable";
+  }
+  if (catalogState === "unavailable" && !isCatalogDataLoading) {
+    return "unavailable";
+  }
+  return "loading";
+}
+
+/**
  * Fits the lane map to the pool: unplaced pool cards join the pool lane, and with `prune` a card
  * is dropped only when the catalog knows it and it is outside the pool. Ids the catalog doesn't
  * know stay in their lanes, so a catalog that lacks a card can never move or drop its placement.

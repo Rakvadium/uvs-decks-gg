@@ -3,7 +3,7 @@
 // store the tests drive.
 import { afterAll, beforeEach, describe, expect, mock, test } from "bun:test";
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
-import { useSyncExternalStore } from "react";
+import { createElement, useEffect, useSyncExternalStore, type ComponentType, type ReactNode } from "react";
 import type { Id } from "../convex/_generated/dataModel";
 import type { CachedCard } from "../src/lib/universus/card-store";
 import { TIER_LIST_POOL_ALL_TYPES } from "../shared/tier-list-pool";
@@ -108,9 +108,9 @@ const router = { push: () => {}, replace: () => {}, back: () => {}, refresh: () 
 const noSets = { sets: [] };
 
 mock.module("convex/react", () => ({
-  useQuery: (_ref: unknown, args: { tierListId: string }) => {
+  useQuery: (_ref: unknown, args?: { tierListId?: string }) => {
     useStore();
-    return store.details.get(args.tierListId);
+    return args?.tierListId ? store.details.get(args.tierListId) : undefined;
   },
   useMutation: (ref: unknown) => {
     const name = String((ref as Record<symbol, unknown>)[Symbol.for("functionName")] ?? "");
@@ -125,6 +125,12 @@ mock.module("../src/lib/universus/card-data-provider", () => ({
   },
   useCardReferenceData: () => noSets,
 }));
+// Known cards render as a labelled stub, so the DOM tests can count tiles without the gallery's
+// image pipeline.
+mock.module("../src/components/universus/card-grid-item", () => ({
+  CardGridItem: ({ card }: { card: CachedCard }) =>
+    createElement("div", { role: "img", "aria-label": `Card ${String(card._id)}` }),
+}));
 
 // The DOM globals must exist before React Testing Library and react-dom load. RTL registers its
 // own act-environment hooks on import, so it is imported at the top level, not in a hook.
@@ -134,6 +140,14 @@ const { useCommunityTierListDetailModel: useModel } = await import(
   "../src/components/community/tier-lists/detail-view/hook"
 );
 type Model = ReturnType<typeof useModel>;
+const { TcgDndProvider } = await import("../src/lib/dnd");
+const { CommunityTierListDetailProvider, useCommunityTierListDetailContext } = await import(
+  "../src/components/community/tier-lists/detail-view/context"
+);
+const { CommunityTierListDetailBoard } = await import("../src/components/community/tier-lists/detail-view/board");
+const { CommunityTierListDetailPoolPanel } = await import(
+  "../src/components/community/tier-lists/detail-view/pool-panel"
+);
 
 afterAll(async () => {
   rtl.cleanup();
@@ -329,5 +343,141 @@ describe("useCommunityTierListDetailModel lane hydration", () => {
 
     rerender({ tierListId: LIST_A });
     expect(lanes(result.current)).toBe(SAVED_LANES);
+  });
+});
+
+/** The provider's latest value, published after each commit. */
+const view: { model: Model | null } = { model: null };
+function ViewProbe() {
+  const model = useCommunityTierListDetailContext();
+  useEffect(() => {
+    view.model = model;
+  });
+  return null;
+}
+
+/** The real board and pool panel under the real provider, as the detail page renders them. */
+function mountView(listId = LIST_A) {
+  view.model = null;
+  // The providers type `children` as a required prop; createElement passes it as an argument.
+  const Dnd = TcgDndProvider as ComponentType<{ children?: ReactNode }>;
+  const Detail = CommunityTierListDetailProvider as ComponentType<{ tierListId: string; children?: ReactNode }>;
+  return rtl.render(
+    createElement(
+      Dnd,
+      null,
+      createElement(
+        Detail,
+        { tierListId: listId },
+        createElement(ViewProbe),
+        createElement(CommunityTierListDetailBoard),
+        createElement(CommunityTierListDetailPoolPanel)
+      )
+    )
+  );
+}
+
+const TILE_SELECTOR = '[aria-label^="Card "], [aria-label="Loading card"], [aria-label="Unavailable card"]';
+
+/** Per lane: the badge count and what is actually rendered under it. */
+function laneView(laneKey: string) {
+  const lane = document.querySelector(`[data-tcg-drop-zone="tier-list-${laneKey}"]`);
+  if (!lane) throw new Error(`lane ${laneKey} not rendered`);
+  const badgeText = lane.querySelector("[data-slot=badge]")?.textContent?.trim() ?? "";
+  const badge = Number(/^(\d+) cards$/.exec(badgeText)?.[1]);
+  const tiles = [...lane.querySelectorAll(TILE_SELECTOR)].map((tile) => {
+    const label = tile.getAttribute("aria-label") ?? "";
+    return label.startsWith("Card ") ? "card" : label === "Loading card" ? "loading" : "unavailable";
+  });
+  return { badge, tiles, emptyMessage: /No cards in this lane|Drag cards here/.test(lane.textContent ?? "") };
+}
+
+function expectBadgesMatchTiles() {
+  for (const tier of TIERS) {
+    const view = laneView(tier.id);
+    expect({ lane: tier.label, rendered: view.tiles.length }).toEqual({ lane: tier.label, rendered: view.badge });
+  }
+}
+
+const withoutMissingCard = () => FULL_CATALOG.filter((entry) => entry._id !== MISSING_FROM_OLD_CACHE);
+
+describe("tier list lanes render every counted card", () => {
+  test("while the catalog loads, every placement is a same-size skeleton under a matching badge", () => {
+    store.details.set(LIST_A, makeList(LIST_A, "a"));
+    mountView();
+    expectBadgesMatchTiles();
+    expect(laneView("tier-a")).toEqual({ badge: 4, tiles: ["loading", "loading", "loading", "loading"], emptyMessage: false });
+  });
+
+  test("an outdated catalog missing a card shows a skeleton for it until the sync brings it", async () => {
+    store.details.set(LIST_A, makeList(LIST_A, "a"));
+    store.catalog = outdated(withoutMissingCard());
+    mountView();
+    expect(laneView("tier-a").tiles).toEqual(["card", "loading", "card", "card"]);
+    expectBadgesMatchTiles();
+
+    await update(() => (store.catalog = current()));
+    expect(laneView("tier-a").tiles).toEqual(["card", "card", "card", "card"]);
+    expectBadgesMatchTiles();
+  });
+
+  test("a current catalog that lacks a card shows an Unavailable tile the owner can remove", async () => {
+    const detail = makeList(LIST_A, "a");
+    store.details.set(LIST_A, detail);
+    store.catalog = current(withoutMissingCard());
+    mountView();
+    expect(laneView("tier-a").tiles).toEqual(["card", "unavailable", "card", "card"]);
+    expectBadgesMatchTiles();
+
+    const remove = rtl.screen.getByRole("button", { name: "Remove unavailable card" });
+    await rtl.act(async () => remove.click());
+    expect(laneView("tier-a")).toEqual({ badge: 3, tiles: ["card", "card", "card"], emptyMessage: false });
+    expect(store.saves).toHaveLength(1);
+    expect(store.saves[0].items.some((item) => item.cardId === MISSING_FROM_OLD_CACHE)).toBe(false);
+    expect(keptPlacements(store.saves[0], detail)).toBe(11);
+  });
+
+  test("an Unavailable tile moves with the owner's drop and stays visible in its new lane", async () => {
+    store.details.set(LIST_A, makeList(LIST_A, "a"));
+    store.catalog = current(withoutMissingCard());
+    mountView();
+
+    await rtl.act(async () => view.model!.moveCardToLane(MISSING_FROM_OLD_CACHE, "tier-f"));
+    expect(laneView("tier-a").tiles).toEqual(["card", "card", "card"]);
+    expect(laneView("tier-f").tiles).toEqual(["card", "card", "unavailable"]);
+    expectBadgesMatchTiles();
+    expect(store.saves[0].items).toContainEqual({ cardId: MISSING_FROM_OLD_CACHE, laneKey: "tier-f", order: 2 });
+  });
+
+  test("a lane whose only card is unknown shows its tile, not an empty lane", () => {
+    store.details.set(LIST_A, makeList(LIST_A, "a"));
+    store.catalog = current(FULL_CATALOG.filter((entry) => entry._id !== id("a1")));
+    mountView();
+    expect(laneView("tier-s")).toEqual({ badge: 1, tiles: ["unavailable"], emptyMessage: false });
+  });
+
+  test("guests see the Unavailable tile without a remove control", () => {
+    store.details.set(LIST_A, { ...makeList(LIST_A, "a"), canEdit: false });
+    store.catalog = current(withoutMissingCard());
+    mountView();
+    expect(laneView("tier-a").tiles).toEqual(["card", "unavailable", "card", "card"]);
+    expect(rtl.screen.queryByRole("button", { name: "Remove unavailable card" })).toBeNull();
+  });
+
+  test("a failed catalog load shows Unavailable tiles under matching badges", () => {
+    store.details.set(LIST_A, makeList(LIST_A, "a"));
+    store.catalog = { cards: [], isCatalogDataLoading: false, isCheckingVersion: false, cachedVersion: null, serverVersion: 29 };
+    mountView();
+    expectBadgesMatchTiles();
+    expect(laneView("tier-a").tiles).toEqual(["unavailable", "unavailable", "unavailable", "unavailable"]);
+  });
+
+  test("an unknown card in the pool is shown in the pool too", () => {
+    store.details.set(LIST_A, makeList(LIST_A, "a", "SET1", [{ cardId: id("gone1"), laneKey: "pool", order: 0 }]));
+    store.catalog = current();
+    mountView();
+    expect(view.model!.poolCardIds.map(String)).toContain("gone1");
+    expect(rtl.screen.getAllByRole("group", { name: "Unavailable card" })).toHaveLength(1);
+    expect(rtl.screen.getByText("5 cards waiting to be ranked")).toBeTruthy();
   });
 });
