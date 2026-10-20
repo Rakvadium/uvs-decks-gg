@@ -7,27 +7,79 @@ export type Appearance = { theme: string; mode: Mode; chrome: string };
 
 const CONVEX_SYNC_SOCKET = /\/api\/[^/]+\/sync$/;
 
-function convexWrite(message: string): string | null {
+const SESSION_QUERY = /^sessions(\.js)?:getSession$/;
+
+/** `preset/mode/chrome` values the agent's stored session actually had (before the in-browser rewrite). */
+export const savedAppearances = new Set<string>();
+
+type ClientFrame = {
+  type?: string;
+  udfPath?: string;
+  modifications?: { type: string; queryId: number; udfPath?: string }[];
+};
+type Transition = { type: "Transition"; modifications: { type: string; queryId: number; value?: unknown }[] };
+
+function parse<T>(message: string): T | null {
   try {
-    const frame = JSON.parse(message) as { type?: string; udfPath?: string };
-    return frame.type === "Mutation" || frame.type === "Action" ? `${frame.type}:${frame.udfPath}` : null;
+    return JSON.parse(message) as T;
   } catch {
     return null;
   }
 }
 
 /**
- * Proxies the Convex sync WebSocket and drops every Mutation/Action frame, so nothing a capture
- * does (including app-initiated writes like appearance migration) reaches the shared deployment.
- * Queries still flow. Sign-in uses Next's /api/auth over HTTP and is unaffected.
+ * Proxies the Convex sync WebSocket:
+ * - drops every Mutation/Action frame, so nothing a capture does (including app-initiated writes
+ *   like appearance migration) reaches the shared deployment. Queries still flow.
+ * - when `appearance` is set, rewrites the `sessions:getSession` result the browser receives so
+ *   ColorSchemeProvider's JS state (isDark, chrome, preset: menus, toasts, frosted controls) matches
+ *   the pin, not the agent's saved prefs. The stored session is never touched.
  */
-async function blockConvexWrites(context: BrowserContext, blocked: string[]) {
+async function proxyConvexSocket(context: BrowserContext, blocked: string[], appearance?: Appearance) {
   await context.routeWebSocket(CONVEX_SYNC_SOCKET, (ws) => {
     const server = ws.connectToServer();
+    const sessionQueryIds = new Set<number>();
+    let raw: string[] = [];
+
     ws.onMessage((message) => {
-      const write = typeof message === "string" ? convexWrite(message) : null;
-      if (write) blocked.push(write);
-      else server.send(message);
+      const frame = typeof message === "string" ? parse<ClientFrame>(message) : null;
+      if (frame?.type === "Mutation" || frame?.type === "Action") {
+        blocked.push(`${frame.type}:${frame.udfPath}`);
+        return;
+      }
+      for (const mod of frame?.type === "ModifyQuerySet" ? (frame.modifications ?? []) : []) {
+        if (mod.type === "Add" && SESSION_QUERY.test(mod.udfPath ?? "")) sessionQueryIds.add(mod.queryId);
+      }
+      server.send(message);
+    });
+
+    if (!appearance) return;
+    const pinned = { theme: appearance.mode, chrome: appearance.chrome, colorSource: { kind: "preset", preset: appearance.theme } };
+    const patch = (transition: Transition) => {
+      for (const mod of transition.modifications) {
+        if (mod.type === "QueryUpdated" && sessionQueryIds.has(mod.queryId) && mod.value && typeof mod.value === "object") {
+          const saved = mod.value as { theme?: string; chrome?: string; colorSource?: { kind?: string; preset?: string } };
+          savedAppearances.add(`${saved.colorSource?.preset ?? saved.colorSource?.kind ?? "default"}/${saved.theme ?? "system"}/${saved.chrome ?? "calm"}`);
+          mod.value = { ...mod.value, ...pinned };
+        }
+      }
+      return JSON.stringify(transition);
+    };
+    server.onMessage((message) => {
+      const frame = typeof message === "string" ? parse<{ type?: string; totalParts?: number }>(message) : null;
+      if (frame?.type === "Transition") return ws.send(patch(frame as Transition));
+      if (frame?.type === "TransitionChunk") {
+        // Large transitions arrive in parts; reassemble so the session result can be patched.
+        raw.push(message as string);
+        if (raw.length < (frame.totalParts ?? 1)) return;
+        const parts = raw;
+        raw = [];
+        const whole = parse<Transition>(parts.map((part) => parse<{ chunk: string }>(part)?.chunk ?? "").join(""));
+        if (whole) ws.send(patch(whole));
+        else parts.forEach((part) => ws.send(part));
+        return;
+      }
+      ws.send(message);
     });
   });
 }
@@ -46,19 +98,30 @@ async function allowStaticCatalog(context: BrowserContext) {
     if (!catalogCache.has(url)) {
       catalogCache.set(
         url,
-        fetch(url).then(async (res) => ({
-          status: res.status,
-          contentType: res.headers.get("content-type") ?? "application/gzip",
-          body: Buffer.from(await res.arrayBuffer()),
-        })),
+        fetch(url, { signal: AbortSignal.timeout(30_000) }).then(async (res) => {
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          return {
+            status: res.status,
+            contentType: res.headers.get("content-type") ?? "application/gzip",
+            body: Buffer.from(await res.arrayBuffer()),
+          };
+        }),
       );
     }
+    let download;
     try {
-      const { status, contentType, body } = await catalogCache.get(url)!;
-      await route.fulfill({ status, body, contentType, headers: { "access-control-allow-origin": "*" } });
-    } catch {
-      // The context closed first (e.g. a page that never needed the catalog).
+      download = await catalogCache.get(url)!;
+    } catch (error) {
+      // Don't cache the failure, and fail the browser request now instead of letting it hang.
+      catalogCache.delete(url);
+      console.warn(`  card catalog download failed (${url}): ${error instanceof Error ? error.message : error}`);
+      await route.abort("failed").catch(() => {});
+      return;
     }
+    const { status, contentType, body } = download;
+    await route
+      .fulfill({ status, body, contentType, headers: { "access-control-allow-origin": "*" } })
+      .catch(() => {}); // The context closed first (e.g. a page that never needed the catalog).
   });
 }
 
@@ -114,7 +177,7 @@ export async function newCaptureContext(
       ? { dir: options.videoDir, size: { width: vp.width, height: vp.height } }
       : undefined,
   });
-  await blockConvexWrites(context, options.blocked);
+  await proxyConvexSocket(context, options.blocked, options.appearance);
   await allowStaticCatalog(context);
   await context.addInitScript(pinAppearance, options.appearance);
   return context;
@@ -125,7 +188,7 @@ export async function agentStorageState(browser: Browser, baseUrl: string, block
   const token = process.env.AGENT_AUTH_SECRET;
   if (!token) throw new Error("AGENT_AUTH_SECRET is missing (copy .env.local into this checkout)");
   const context = await browser.newContext();
-  await blockConvexWrites(context, blocked);
+  await proxyConvexSocket(context, blocked);
   await allowStaticCatalog(context);
   const page = await context.newPage();
   try {

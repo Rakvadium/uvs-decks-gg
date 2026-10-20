@@ -2,10 +2,12 @@ import { spawn, spawnSync, type ChildProcess } from "node:child_process";
 import fs from "node:fs";
 import net from "node:net";
 import path from "node:path";
+import readline from "node:readline";
 import { chromium, type Browser } from "playwright";
 import {
   HIDE_DEV_OVERLAY_CSS,
   agentStorageState,
+  savedAppearances,
   newCaptureContext,
   runSteps,
   settle,
@@ -47,6 +49,12 @@ const fullPage = args["full-page"] === true;
 const stills = args["skip-stills"] !== true;
 const gifWidth = Number(args["gif-width"] ?? 960);
 
+if ((chrome !== "calm" || themes.some((t) => t !== "default")) && spec.routes.some((r) => r.auth === "guest")) {
+  console.warn(
+    "Note: signed-out pages have no session to rewrite, so their JS-driven UI uses chrome `calm` and preset " +
+      "`default` (CSS still follows the pin; mode follows colorScheme emulation).",
+  );
+}
 for (const v of viewports) if (!VIEWPORTS[v]) throw new Error(`Unknown viewport: ${v}`);
 for (const m of modes) if (m !== "light" && m !== "dark") throw new Error(`Unknown mode: ${m}`);
 if (args.gif === true && !spec.gif) throw new Error("--gif needs a `gif` entry in the --spec JSON");
@@ -71,19 +79,37 @@ async function ensureServer(): Promise<ChildProcess | null> {
     console.log(`Reusing server on ${baseUrl}`);
     return null;
   }
-  console.log(`Starting next dev on ${baseUrl} (log: ${path.join(outDir, "next-dev.log")})`);
-  const log = fs.openSync(path.join(outDir, "next-dev.log"), "w");
+  const logFile = path.join(outDir, "next-dev.log");
+  console.log(`Starting next dev on ${baseUrl} (log: ${logFile})`);
+  const log = fs.createWriteStream(logFile);
   const next = path.join(process.cwd(), "node_modules", "next", "dist", "bin", "next");
   const child = spawn(process.execPath, [next, "dev", "-p", String(port)], {
-    stdio: ["ignore", log, log],
+    stdio: ["ignore", "pipe", "pipe"],
     detached: process.platform !== "win32",
   });
-  for (let waited = 0; waited < 180_000; waited += 1000) {
-    if (await portOpen()) return child;
-    if (child.exitCode !== null) throw new Error("next dev exited early; see next-dev.log");
-    await new Promise((r) => setTimeout(r, 1000));
+  let ready = false;
+  let lockBusy = false;
+  for (const stream of [child.stdout, child.stderr]) {
+    readline.createInterface({ input: stream }).on("line", (line) => {
+      // Next logs request URLs, and /agent-login carries AGENT_AUTH_SECRET.
+      log.write(`${line.replace(/token=[^&\s]+/g, "token=<redacted>")}\n`);
+      if (/Ready in/.test(line)) ready = true;
+      if (/Unable to acquire lock/.test(line)) lockBusy = true;
+    });
   }
-  throw new Error(`next dev did not open port ${port} within 180s`);
+  for (let waited = 0; waited < 180_000; waited += 500) {
+    if (ready && (await portOpen())) return child;
+    if (child.exitCode !== null) {
+      throw new Error(
+        lockBusy
+          ? "next dev refused to start: another `next dev` already holds .next/dev/lock in this checkout. " +
+              "Use one checkout/worktree per concurrent run, or pass that run's --port to reuse its server."
+          : `next dev exited early (code ${child.exitCode}); see ${logFile}`,
+      );
+    }
+    await new Promise((r) => setTimeout(r, 500));
+  }
+  throw new Error(`next dev was not ready on port ${port} within 180s`);
 }
 
 function stopServer(child: ChildProcess | null) {
@@ -185,7 +211,7 @@ async function main() {
     if (stills) {
       console.log(`Capturing #${issue} "${label}" → ${outDir}`);
       for (const route of spec.routes)
-        for (const viewport of viewports)
+        for (const viewport of route.viewports ?? viewports)
           for (const theme of themes)
             for (const mode of modes)
               shots.push(await captureStill(browser, route, viewport, { theme, mode, chrome }, storageState, blocked));
@@ -198,12 +224,20 @@ async function main() {
 
   fs.writeFileSync(
     path.join(outDir, "manifest.json"),
-    JSON.stringify({ issue, label, port, chrome, fullPage, shots, blockedConvexWrites: blocked }, null, 2),
+    JSON.stringify(
+      { issue, label, port, chrome, fullPage, shots, blockedConvexWrites: blocked, savedAppearance: [...savedAppearances] },
+      null,
+      2,
+    ),
   );
   const counts = new Map<string, number>();
   for (const write of blocked) counts.set(write, (counts.get(write) ?? 0) + 1);
   const summary = [...counts].map(([write, n]) => `${write} ×${n}`).join(", ");
   console.log(`Done: ${shots.length} stills. Blocked Convex writes: ${summary || "none"}`);
+  if (savedAppearances.size) {
+    const saved = [...savedAppearances].join(", ");
+    console.log(`Agent's saved appearance (preset/mode/chrome): ${saved}. Overridden in the browser for every shot.`);
+  }
 }
 
 main().catch((error) => {

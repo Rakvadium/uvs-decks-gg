@@ -25,7 +25,10 @@ if (!files.length) throw new Error(`No media under ${issueDir} for labels: ${lab
 
 // Blobs are written once; each attempt only rebuilds the tree on top of the latest remote tip.
 const blobs = git(["hash-object", "-w", "--stdin-paths"], { input: files.map((f) => f.abs).join("\n") }).split(/\r?\n/);
-const indexInfo = files.map((f, i) => `100644 ${blobs[i]}\t${f.rel}`).join("\n") + "\n";
+// pr-media has no app, so every push would otherwise trigger a failing Vercel preview deployment.
+const vercelJson = git(["hash-object", "-w", "--stdin"], { input: '{ "git": { "deploymentEnabled": false } }\n' });
+const indexInfo =
+  [`100644 ${vercelJson}\tvercel.json`, ...files.map((f, i) => `100644 ${blobs[i]}\t${f.rel}`)].join("\n") + "\n";
 
 function remoteTip(): string | null {
   const line = git(["ls-remote", "origin", `refs/heads/${MEDIA_BRANCH}`]);

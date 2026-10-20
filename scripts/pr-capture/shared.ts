@@ -20,6 +20,8 @@ export type RouteSpec = {
   auth: Auth;
   name?: string;
   steps?: Step[];
+  /** Overrides --viewports for this route (e.g. a desktop-only menu). */
+  viewports?: string[];
 };
 
 export type GifSpec = RouteSpec & { viewport?: string; theme?: string; mode?: Mode };

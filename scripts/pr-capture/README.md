@@ -37,7 +37,7 @@ Paste `.pr-captures/<issue>/compare-before-vs-after/summary.md` into the PR body
 | --- | --- | --- |
 | `--issue` | required | Output goes to `.pr-captures/<issue>/<label>/` (gitignored). |
 | `--label` | required | `before`, `after`, or any `[\w.-]` name. Each run replaces that label's folder. |
-| `--port` | required | Uses the server already listening on this port, or starts `next dev -p <port>` and stops it at the end. It never runs `convex dev`. Pick a port no other agent uses. A reused server must be running from your own checkout, or you'll capture someone else's code. |
+| `--port` | required | Uses the server already listening on this port, or starts `next dev -p <port>` and stops it at the end. It never runs `convex dev`. Pick a port no other agent uses. A reused server must be running from your own checkout, or you'll capture someone else's code. The `next-dev.log` it writes has `token=` redacted. |
 | `--routes` | `gallery,decks,guest:gallery` | Comma list. Routes sign in as `agent` unless prefixed `guest:`. The leading `/` is optional, which stops Git Bash rewriting `/gallery` into a path. |
 | `--spec` | | JSON file used instead of `--routes` (see below). |
 | `--viewports` | `desktop,mobile` | `desktop` = 1280×800 @1x. `mobile` = 390×844 @2x, touch. |
@@ -69,15 +69,20 @@ Every route runs for each viewport × theme × mode. Files are named `<route>__<
 }
 ```
 
-Steps: `click`, `hover`, `fill` (+ `value`), `waitFor` (all take Playwright selectors), `press` (a key), `wait` (ms). Stills run their steps before the shot. The GIF records while its steps run.
+Steps: `click`, `hover`, `fill` (+ `value`), `waitFor` (all take Playwright selectors), `press` (a key), `wait` (ms). Stills run their steps before the shot. The GIF records while its steps run. A route can set `"viewports": ["desktop"]` to override `--viewports`, for example for a menu that only exists on desktop.
 
 ## Guarantees
 
-**Parallel-safe.** Each run has its own `--port`, its own `.pr-captures/<issue>/<label>/` folder, its own browser, and a single agent sign-in. Publishing never touches your checkout, and it retries when another agent pushed first (see below).
+**Parallel-safe.** Each run has its own `--port`, its own `.pr-captures/<issue>/<label>/` folder, its own browser, and a single agent sign-in. Publishing never touches your checkout, and it retries when another agent pushed first (see below). Use **one checkout or worktree per concurrent run**: Next allows only one `next dev` per checkout (`.next/dev/lock`). A second run that has to start a server in the same checkout stops with that explanation, unless you point it at the first run's `--port`.
 
-**No Convex writes.** Every capture context proxies the Convex sync WebSocket and drops all `Mutation` and `Action` frames before they leave the browser. Queries still flow. The app's own background writes, such as `sessions:ensureAppearanceMigrated` and `communityLive:refreshLiveStatus`, never reach the shared deployment, and neither does an accidental click. Each run lists what it dropped under `blockedConvexWrites` in `manifest.json`. The only server-side write is the agent sign-in, which goes through Next's `/api/auth` over HTTP.
+**No Convex writes.** Every capture context proxies the Convex sync WebSocket and drops all `Mutation` and `Action` frames before they leave the browser. Queries still flow. The app's own background writes, such as `sessions:ensureAppearanceMigrated` and `communityLive:refreshLiveStatus`, never reach the shared deployment, and neither does an accidental click. Each run lists what it dropped under `blockedConvexWrites` in `manifest.json`. Convex Auth is the exception, because it goes through Next's `/api/auth` over HTTP. The run signs in once (`/agent-login`, which creates an auth session for `agent`). After that, every capture context does one refresh-token exchange (`auth:signIn` with a refresh token), roughly one per shot. Those write only to Convex Auth's session and refresh-token tables, and only for that run's own `agent` session. App data and the `agent` user's preferences are never written.
 
-**Client-side theme.** `--themes`, `--modes`, and `--chrome` never call `updateSession`. An init script sets `data-color-theme`, `data-chrome`, `.dark`, and `color-scheme` on `<html>` before the app's scripts run. A `MutationObserver` re-applies them whenever `ColorSchemeProvider` writes the `agent` user's session values back. Playwright's `colorScheme` emulation also matches the mode, so `system` mode and guests agree. Parallel runs can use different themes on the same `agent` user without affecting each other. Limitation: a component that branches in JS on `useColorScheme().isDark` or on chrome still sees the session value. The CSS tokens, which cover nearly everything, follow the pin.
+**Client-side theme.** `--themes`, `--modes`, and `--chrome` never call `updateSession`. There are two layers:
+
+1. **JS state.** The WebSocket proxy rewrites the `sessions:getSession` result the browser receives (`theme`, `chrome`, `colorSource`), so `ColorSchemeProvider`'s `isDark`, `chrome`, and `colorPreset` match the pin. That covers what reads them in JS: the user-menu Light/Dark label and preset checkmark, the mobile profile sheet switch and preset label, Sonner toasts, neon-chrome forks (frosted card controls, `.scanlines`). It also reassembles chunked transitions. The stored session row is untouched. `manifest.json` records the real saved value under `savedAppearance`.
+2. **DOM.** An init script sets `data-color-theme`, `data-chrome`, `.dark`, and `color-scheme` on `<html>` before the app's scripts run, and a `MutationObserver` re-applies them. This covers first paint, before the session query answers. Playwright's `colorScheme` emulation matches the mode, so `system` mode agrees.
+
+Parallel runs can pin different themes on the same `agent` user without affecting each other. Limitation: signed-out pages have no session, so their JS sees chrome `calm` and preset `default`. Mode is still right via emulation, and CSS still follows the pin. The tool prints a note when a guest route is captured with a non-default theme or chrome.
 
 **Deterministic stills.** Before each shot the tool waits for:
 - network idle
@@ -87,7 +92,7 @@ Steps: `click`, `hover`, `fill` (+ `value`), `waitFor` (all take Playwright sele
 
 Animations and transitions are then forced to 0s, the caret and the Next dev indicator are hidden, `prefers-reduced-motion` is set, and shots repeat until two in a row are byte-identical. Shots that never settle are flagged in the log and in `manifest.json` (`loaded` / `stable`). Two runs of the same state should differ by ~0%. Anything left over is live data changing on the shared deployment.
 
-**Card catalog.** The R2 static catalog only sends CORS headers for the usual origins. On other ports the gallery would fall back to a rate-limited Convex sync, which these captures block. So the capture downloads `catalog/*.json.gz` once from Node and serves the same bytes to every capture context with `Access-Control-Allow-Origin` added. This is read-only and happens only inside the capture browser. It also removes R2 latency, which used to make card-derived content (such as deck art on `/decks`) show up after the page already looked settled.
+**Card catalog.** The R2 static catalog only sends CORS headers for the usual origins. On other ports the gallery would fall back to a rate-limited Convex sync, which these captures block. So the capture downloads `catalog/*.json.gz` once from Node and serves the same bytes to every capture context with `Access-Control-Allow-Origin` added. This is read-only and happens only inside the capture browser. A failed download (HTTP error, or 30s timeout) is not cached. The browser request fails immediately and a warning is printed. It also removes R2 latency, which used to make card-derived content (such as deck art on `/decks`) show up after the page already looked settled.
 
 ## GIFs
 
@@ -107,7 +112,7 @@ If the two shots differ in height, both are padded to the larger one. Unpaired s
 
 `capture:publish --issue N [--labels before,after,...]` pushes every `png/gif/webm/md/json` under `.pr-captures/<issue>/` to `pr-media:<issue>/<label>/`. Re-publishing a label replaces its folder. Other issues and labels are untouched.
 
-It uses git plumbing only (`hash-object`, a throwaway `GIT_INDEX_FILE`, `commit-tree`, `push <sha>:refs/heads/pr-media`). Your branch, index, and working tree are never touched. If `pr-media` doesn't exist yet, the first commit creates it as an orphan. On a rejected push (another agent published first) it re-reads the remote tip, rebuilds on top, and retries with backoff (up to 6 attempts).
+It uses git plumbing only (`hash-object`, a throwaway `GIT_INDEX_FILE`, `commit-tree`, `push <sha>:refs/heads/pr-media`). Your branch, index, and working tree are never touched. If `pr-media` doesn't exist yet, the first commit creates it as an orphan. On a rejected push (another agent published first) it re-reads the remote tip, rebuilds on top, and retries with backoff (up to 6 attempts). Every commit also carries a root `vercel.json` with `{"git":{"deploymentEnabled":false}}`. Without it, each push to `pr-media` (which contains no app) triggers a failing Vercel preview deployment.
 
 URL shape: `https://raw.githubusercontent.com/<owner>/<repo>/pr-media/<issue>/<label>/<file>`.
 
