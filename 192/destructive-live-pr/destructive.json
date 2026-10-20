@@ -1,0 +1,792 @@
+{
+  "blocked": [
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus"
+  ],
+  "canEditRewrites": 18,
+  "results": [
+    {
+      "shot": "tierlist-delete-dialog__desktop__default__light",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(100 0 0)",
+      "background": "lab(48.4493 77.4328 61.5452)",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        231,
+        0,
+        11
+      ],
+      "contrast": 4.77,
+      "rect": {
+        "x": 788.1875,
+        "y": 426,
+        "width": 83.8125,
+        "height": 40
+      }
+    },
+    {
+      "shot": "button-destructive__desktop__default__light",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-destructive-foreground hover:bg-destructive-dim shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+      "color": "lab(100 0 0)",
+      "background": "lab(48.4493 77.4328 61.5452)",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        231,
+        0,
+        11
+      ],
+      "contrast": 4.77,
+      "rect": {
+        "x": 40,
+        "y": 40,
+        "width": 83.8125,
+        "height": 40
+      }
+    },
+    {
+      "shot": "tierlist-delete-dialog__desktop__default__dark",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(7.17888 2.76081 3.77234)",
+      "background": "lab(53.6853 69.6775 43.7724)",
+      "fg": [
+        27,
+        20,
+        16
+      ],
+      "bg": [
+        238,
+        52,
+        59
+      ],
+      "contrast": 4.5,
+      "rect": {
+        "x": 788.1875,
+        "y": 426,
+        "width": 83.8125,
+        "height": 40
+      }
+    },
+    {
+      "shot": "button-destructive__desktop__default__dark",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-destructive-foreground hover:bg-destructive-dim shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+      "color": "lab(7.17888 2.76081 3.77234)",
+      "background": "lab(53.6853 69.6775 43.7724)",
+      "fg": [
+        27,
+        20,
+        16
+      ],
+      "bg": [
+        238,
+        52,
+        59
+      ],
+      "contrast": 4.5,
+      "rect": {
+        "x": 40,
+        "y": 40,
+        "width": 83.8125,
+        "height": 40
+      }
+    },
+    {
+      "shot": "tierlist-delete-dialog__desktop__calm-storm__light",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(2.51107 0.242703 -0.886115)",
+      "background": "lab(55.4814 75.0732 48.8528)",
+      "fg": [
+        9,
+        9,
+        11
+      ],
+      "bg": [
+        251,
+        44,
+        54
+      ],
+      "contrast": 5.23,
+      "rect": {
+        "x": 788.1875,
+        "y": 426,
+        "width": 83.8125,
+        "height": 40
+      }
+    },
+    {
+      "shot": "button-destructive__desktop__calm-storm__light",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-destructive-foreground hover:bg-destructive-dim shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+      "color": "lab(2.51107 0.242703 -0.886115)",
+      "background": "lab(55.4814 75.0732 48.8528)",
+      "fg": [
+        9,
+        9,
+        11
+      ],
+      "bg": [
+        251,
+        44,
+        54
+      ],
+      "contrast": 5.23,
+      "rect": {
+        "x": 40,
+        "y": 40,
+        "width": 83.8125,
+        "height": 40
+      }
+    },
+    {
+      "shot": "tierlist-delete-dialog__desktop__calm-storm__dark",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(2.51107 0.242703 -0.886115)",
+      "background": "lab(55.4814 75.0732 48.8528)",
+      "fg": [
+        9,
+        9,
+        11
+      ],
+      "bg": [
+        251,
+        44,
+        54
+      ],
+      "contrast": 5.23,
+      "rect": {
+        "x": 788.1875,
+        "y": 426,
+        "width": 83.8125,
+        "height": 40
+      }
+    },
+    {
+      "shot": "button-destructive__desktop__calm-storm__dark",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-destructive-foreground hover:bg-destructive-dim shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+      "color": "lab(2.51107 0.242703 -0.886115)",
+      "background": "lab(55.4814 75.0732 48.8528)",
+      "fg": [
+        9,
+        9,
+        11
+      ],
+      "bg": [
+        251,
+        44,
+        54
+      ],
+      "contrast": 5.23,
+      "rect": {
+        "x": 40,
+        "y": 40,
+        "width": 83.8125,
+        "height": 40
+      }
+    },
+    {
+      "shot": "tierlist-delete-dialog__desktop__cyberpunk__light",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(3.79387 2.93769 -10.5157)",
+      "background": "lab(57.6471 71.5278 70.6416)",
+      "fg": [
+        12,
+        12,
+        29
+      ],
+      "bg": [
+        255,
+        61,
+        0
+      ],
+      "contrast": 5.45,
+      "rect": {
+        "x": 788.1875,
+        "y": 426,
+        "width": 83.8125,
+        "height": 40
+      }
+    },
+    {
+      "shot": "button-destructive__desktop__cyberpunk__light",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-destructive-foreground hover:bg-destructive-dim shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+      "color": "lab(3.79387 2.93769 -10.5157)",
+      "background": "lab(57.6471 71.5278 70.6416)",
+      "fg": [
+        12,
+        12,
+        29
+      ],
+      "bg": [
+        255,
+        61,
+        0
+      ],
+      "contrast": 5.45,
+      "rect": {
+        "x": 40,
+        "y": 40,
+        "width": 83.8125,
+        "height": 40
+      }
+    },
+    {
+      "shot": "tierlist-delete-dialog__desktop__cyberpunk__dark",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(3.79387 2.93769 -10.5157)",
+      "background": "lab(57.6471 71.5278 70.6416)",
+      "fg": [
+        12,
+        12,
+        29
+      ],
+      "bg": [
+        255,
+        61,
+        0
+      ],
+      "contrast": 5.45,
+      "rect": {
+        "x": 788.1875,
+        "y": 426,
+        "width": 83.8125,
+        "height": 40
+      }
+    },
+    {
+      "shot": "button-destructive__desktop__cyberpunk__dark",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-destructive-foreground hover:bg-destructive-dim shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+      "color": "lab(3.79387 2.93769 -10.5157)",
+      "background": "lab(57.6471 71.5278 70.6416)",
+      "fg": [
+        12,
+        12,
+        29
+      ],
+      "bg": [
+        255,
+        61,
+        0
+      ],
+      "contrast": 5.45,
+      "rect": {
+        "x": 40,
+        "y": 40,
+        "width": 83.8125,
+        "height": 40
+      }
+    },
+    {
+      "shot": "tierlist-delete-dialog__desktop__cotton-candy__light",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(100 0 0)",
+      "background": "lab(51.3806 69.5087 46.4972)",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        230,
+        43,
+        48
+      ],
+      "contrast": 4.42,
+      "rect": {
+        "x": 788.1875,
+        "y": 426,
+        "width": 83.8125,
+        "height": 40
+      }
+    },
+    {
+      "shot": "button-destructive__desktop__cotton-candy__light",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-destructive-foreground hover:bg-destructive-dim shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+      "color": "lab(100 0 0)",
+      "background": "lab(51.3806 69.5087 46.4972)",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        230,
+        43,
+        48
+      ],
+      "contrast": 4.42,
+      "rect": {
+        "x": 40,
+        "y": 40,
+        "width": 83.8125,
+        "height": 40
+      }
+    },
+    {
+      "shot": "tierlist-delete-dialog__desktop__cotton-candy__dark",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(4.23876 0.152506 -14.0985)",
+      "background": "lab(56.1657 63.7783 33.3305)",
+      "fg": [
+        2,
+        15,
+        34
+      ],
+      "bg": [
+        237,
+        73,
+        82
+      ],
+      "contrast": 5.19,
+      "rect": {
+        "x": 788.1875,
+        "y": 426,
+        "width": 83.8125,
+        "height": 40
+      }
+    },
+    {
+      "shot": "button-destructive__desktop__cotton-candy__dark",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-destructive-foreground hover:bg-destructive-dim shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+      "color": "lab(4.23876 0.152506 -14.0985)",
+      "background": "lab(56.1657 63.7783 33.3305)",
+      "fg": [
+        2,
+        15,
+        34
+      ],
+      "bg": [
+        237,
+        73,
+        82
+      ],
+      "contrast": 5.19,
+      "rect": {
+        "x": 40,
+        "y": 40,
+        "width": 83.8125,
+        "height": 40
+      }
+    },
+    {
+      "shot": "tierlist-delete-dialog__desktop__caffeine__light",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(12.246 0 0)",
+      "background": "lab(54.9915 58.7064 50.9473)",
+      "fg": [
+        32,
+        32,
+        32
+      ],
+      "bg": [
+        229,
+        77,
+        46
+      ],
+      "contrast": 4.21,
+      "rect": {
+        "x": 788.1875,
+        "y": 426,
+        "width": 83.8125,
+        "height": 40
+      }
+    },
+    {
+      "shot": "button-destructive__desktop__caffeine__light",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-destructive-foreground hover:bg-destructive-dim shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+      "color": "lab(12.246 0 0)",
+      "background": "lab(54.9915 58.7064 50.9473)",
+      "fg": [
+        32,
+        32,
+        32
+      ],
+      "bg": [
+        229,
+        77,
+        46
+      ],
+      "contrast": 4.21,
+      "rect": {
+        "x": 40,
+        "y": 40,
+        "width": 83.8125,
+        "height": 40
+      }
+    },
+    {
+      "shot": "tierlist-delete-dialog__desktop__caffeine__dark",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(5.0601 0 0)",
+      "background": "lab(54.9915 58.7064 50.9473)",
+      "fg": [
+        17,
+        17,
+        17
+      ],
+      "bg": [
+        229,
+        77,
+        46
+      ],
+      "contrast": 4.88,
+      "rect": {
+        "x": 788.1875,
+        "y": 426,
+        "width": 83.8125,
+        "height": 40
+      }
+    },
+    {
+      "shot": "button-destructive__desktop__caffeine__dark",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-destructive-foreground hover:bg-destructive-dim shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+      "color": "lab(5.0601 0 0)",
+      "background": "lab(54.9915 58.7064 50.9473)",
+      "fg": [
+        17,
+        17,
+        17
+      ],
+      "bg": [
+        229,
+        77,
+        46
+      ],
+      "contrast": 4.88,
+      "rect": {
+        "x": 40,
+        "y": 40,
+        "width": 83.8125,
+        "height": 40
+      }
+    },
+    {
+      "shot": "tierlist-delete-dialog__desktop__aurora__light",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(100 0 0)",
+      "background": "lab(48.8037 76.3079 51.5884)",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        230,
+        0,
+        35
+      ],
+      "contrast": 4.78,
+      "rect": {
+        "x": 788.1875,
+        "y": 426,
+        "width": 83.8125,
+        "height": 40
+      }
+    },
+    {
+      "shot": "button-destructive__desktop__aurora__light",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-destructive-foreground hover:bg-destructive-dim shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+      "color": "lab(100 0 0)",
+      "background": "lab(48.8037 76.3079 51.5884)",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        230,
+        0,
+        35
+      ],
+      "contrast": 4.78,
+      "rect": {
+        "x": 40,
+        "y": 40,
+        "width": 83.8125,
+        "height": 40
+      }
+    },
+    {
+      "shot": "tierlist-delete-dialog__desktop__aurora__dark",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(2.71343 0.0284314 -2.96205)",
+      "background": "lab(53.3476 79.4347 52.8628)",
+      "fg": [
+        7,
+        10,
+        16
+      ],
+      "bg": [
+        249,
+        5,
+        43
+      ],
+      "contrast": 4.8,
+      "rect": {
+        "x": 788.1875,
+        "y": 426,
+        "width": 83.8125,
+        "height": 40
+      }
+    },
+    {
+      "shot": "button-destructive__desktop__aurora__dark",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-destructive-foreground hover:bg-destructive-dim shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+      "color": "lab(2.71343 0.0284314 -2.96205)",
+      "background": "lab(53.3476 79.4347 52.8628)",
+      "fg": [
+        7,
+        10,
+        16
+      ],
+      "bg": [
+        249,
+        5,
+        43
+      ],
+      "contrast": 4.8,
+      "rect": {
+        "x": 40,
+        "y": 40,
+        "width": 83.8125,
+        "height": 40
+      }
+    },
+    {
+      "shot": "tierlist-delete-dialog__desktop__sorbet__light",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(100 0 0)",
+      "background": "lab(64.5223 53.9312 26.9975)",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        249,
+        111,
+        112
+      ],
+      "contrast": 2.79,
+      "rect": {
+        "x": 788.1875,
+        "y": 426,
+        "width": 83.8125,
+        "height": 40
+      }
+    },
+    {
+      "shot": "button-destructive__desktop__sorbet__light",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-destructive-foreground hover:bg-destructive-dim shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+      "color": "lab(100 0 0)",
+      "background": "lab(64.5223 53.9312 26.9975)",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        249,
+        111,
+        112
+      ],
+      "contrast": 2.79,
+      "rect": {
+        "x": 40,
+        "y": 40,
+        "width": 83.8125,
+        "height": 40
+      }
+    },
+    {
+      "shot": "tierlist-delete-dialog__desktop__sorbet__dark",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(13.0154 -5.03349 -9.09395)",
+      "background": "lab(59.3147 57.7323 -10.7534)",
+      "fg": [
+        18,
+        36,
+        46
+      ],
+      "bg": [
+        227,
+        94,
+        164
+      ],
+      "contrast": 4.86,
+      "rect": {
+        "x": 788.1875,
+        "y": 426,
+        "width": 83.8125,
+        "height": 40
+      }
+    },
+    {
+      "shot": "button-destructive__desktop__sorbet__dark",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-destructive-foreground hover:bg-destructive-dim shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+      "color": "lab(13.0154 -5.03349 -9.09395)",
+      "background": "lab(59.3147 57.7323 -10.7534)",
+      "fg": [
+        18,
+        36,
+        46
+      ],
+      "bg": [
+        227,
+        94,
+        164
+      ],
+      "contrast": 4.86,
+      "rect": {
+        "x": 40,
+        "y": 40,
+        "width": 83.8125,
+        "height": 40
+      }
+    },
+    {
+      "shot": "tierlist-delete-dialog__desktop__singularity__light",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(8.15285 0.645563 -11.4852)",
+      "background": "lab(55.7819 65.6007 40.7857)",
+      "fg": [
+        17,
+        24,
+        39
+      ],
+      "bg": [
+        239,
+        68,
+        68
+      ],
+      "contrast": 4.71,
+      "rect": {
+        "x": 788.1875,
+        "y": 426,
+        "width": 83.8125,
+        "height": 40
+      }
+    },
+    {
+      "shot": "button-destructive__desktop__singularity__light",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-destructive-foreground hover:bg-destructive-dim shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+      "color": "lab(8.15285 0.645563 -11.4852)",
+      "background": "lab(55.7819 65.6007 40.7857)",
+      "fg": [
+        17,
+        24,
+        39
+      ],
+      "bg": [
+        239,
+        68,
+        68
+      ],
+      "contrast": 4.71,
+      "rect": {
+        "x": 40,
+        "y": 40,
+        "width": 83.8125,
+        "height": 40
+      }
+    },
+    {
+      "shot": "tierlist-delete-dialog__desktop__singularity__dark",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(5.20229 0.700206 -0.985724)",
+      "background": "lab(53.3698 -14.3715 -4.71399)",
+      "fg": [
+        18,
+        17,
+        19
+      ],
+      "bg": [
+        95,
+        135,
+        135
+      ],
+      "contrast": 4.75,
+      "rect": {
+        "x": 788.1875,
+        "y": 426,
+        "width": 83.8125,
+        "height": 40
+      }
+    },
+    {
+      "shot": "button-destructive__desktop__singularity__dark",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-destructive-foreground hover:bg-destructive-dim shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+      "color": "lab(5.20229 0.700206 -0.985724)",
+      "background": "lab(53.3698 -14.3715 -4.71399)",
+      "fg": [
+        18,
+        17,
+        19
+      ],
+      "bg": [
+        95,
+        135,
+        135
+      ],
+      "contrast": 4.75,
+      "rect": {
+        "x": 40,
+        "y": 40,
+        "width": 83.8125,
+        "height": 40
+      }
+    }
+  ]
+}
