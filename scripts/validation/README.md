@@ -67,10 +67,15 @@ dashboard and never contact GitHub.
 - On macOS and Linux the CLI caches under `$HOME/.cache/convex`, and `HOME` is the backend dir.
   Every wrapped `dev` links `~/.uvs-validation/backends/<P>/.cache/convex` to the shared dir.
   - A real dir an older wrapper left there hands its pinned binary and dashboard to the shared
-    cache, and is then replaced by the link.
+    cache, and is then replaced by the link. Only regular files and dirs are moved. A
+    `binaries/<pin>` or `dashboard` that is a link, or holds one, is refused.
   - A link aimed anywhere else, or a `.cache` that is itself a link, is refused. The
-    `owner-cache-untouched` rule checks that the path resolves inside the shared cache or the
+    `owner-cache-untouched` rule checks that the path resolves to the shared cache or inside the
     backend home.
+- On every platform, `~/.uvs-validation/cache` and `~/.uvs-validation/cache/convex` must be plain
+  dirs. `owner-cache-untouched` refuses a symlink or junction at either path, and so does every
+  wrapped `dev` before it seeds. Expected paths are built from the resolved `~/.uvs-validation`,
+  never from a link's own target.
 - `dev` copies the pinned binary from the owner's own Convex cache when the owner has it, and
   only reads from that cache.
 - If the pinned version isn't cached, `start` and `vconvex dev` fail and print the one-time fetch
@@ -109,8 +114,9 @@ See `guard.ts`. In short:
   names inside other values.
 - **Other fallbacks.** Any `.env*.vault` file, and a `convex.json` that links a team or project.
 - **Isolation.** The wrapped env must hide the owner's login: `USERPROFILE`/`HOME` set to the
-  backend dir, and `LOCALAPPDATA` set to `~/.uvs-validation/cache` on Windows. On macOS and Linux,
-  `<backend dir>/.cache/convex` must resolve inside that cache or the backend dir. Its credential vars are pinned:
+  backend dir, and `LOCALAPPDATA` set to `~/.uvs-validation/cache` on Windows. `~/.uvs-validation/cache`
+  and its `convex` dir must not be links. On macOS and Linux, `<backend dir>/.cache/convex` must
+  resolve to the shared `cache/convex` or inside the backend dir. Its credential vars are pinned:
   `CONVEX_DEPLOY_KEY=<ignore_deploy_key>`, `DISABLE_BEACON=1` and the others in
   `PINNED_CHILD_ENV`. The target the CLI would resolve from all of this must be the wrapper's own
   `anonymous:anonymous-agent`.
