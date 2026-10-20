@@ -1,0 +1,289 @@
+{
+  "issue": "238",
+  "label": "verify241-head",
+  "port": 8178,
+  "chrome": "calm",
+  "fullPage": false,
+  "strict": true,
+  "shots": [
+    {
+      "name": "guest-gallery__desktop__default__light",
+      "route": "/gallery",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/gallery",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "guest-gallery__desktop__default__dark",
+      "route": "/gallery",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/gallery",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "guest-gallery__mobile__default__light",
+      "route": "/gallery",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/gallery",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "guest-gallery__mobile__default__dark",
+      "route": "/gallery",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/gallery",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "guest-community-tier-lists__desktop__default__light",
+      "route": "/community/tier-lists",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/community/tier-lists",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "guest-community-tier-lists__desktop__default__dark",
+      "route": "/community/tier-lists",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/community/tier-lists",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "guest-community-tier-lists__mobile__default__light",
+      "route": "/community/tier-lists",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/community/tier-lists",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "guest-community-tier-lists__mobile__default__dark",
+      "route": "/community/tier-lists",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/community/tier-lists",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "guest-tierlist-detail__desktop__default__light",
+      "route": "/community/tier-lists/qs79cym6q521fdqc7c9qjf7dcqc27a3k",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/community/tier-lists/qs79cym6q521fdqc7c9qjf7dcqc27a3k",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "guest-tierlist-detail__desktop__default__dark",
+      "route": "/community/tier-lists/qs79cym6q521fdqc7c9qjf7dcqc27a3k",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/community/tier-lists/qs79cym6q521fdqc7c9qjf7dcqc27a3k",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "guest-tierlist-detail__mobile__default__light",
+      "route": "/community/tier-lists/qs79cym6q521fdqc7c9qjf7dcqc27a3k",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/community/tier-lists/qs79cym6q521fdqc7c9qjf7dcqc27a3k",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "guest-tierlist-detail__mobile__default__dark",
+      "route": "/community/tier-lists/qs79cym6q521fdqc7c9qjf7dcqc27a3k",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/community/tier-lists/qs79cym6q521fdqc7c9qjf7dcqc27a3k",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "guest-tierlist-detail-comments__desktop__default__light",
+      "route": "/community/tier-lists/qs79cym6q521fdqc7c9qjf7dcqc27a3k",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/community/tier-lists/qs79cym6q521fdqc7c9qjf7dcqc27a3k",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "guest-tierlist-detail-comments__desktop__default__dark",
+      "route": "/community/tier-lists/qs79cym6q521fdqc7c9qjf7dcqc27a3k",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/community/tier-lists/qs79cym6q521fdqc7c9qjf7dcqc27a3k",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "guest-tierlist-detail-b-comments__desktop__default__light",
+      "route": "/community/tier-lists/qs7ffw2bacs9td21pdrj40f1tr00zrjr",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/community/tier-lists/qs7ffw2bacs9td21pdrj40f1tr00zrjr",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "guest-tierlist-detail-b-comments__desktop__default__dark",
+      "route": "/community/tier-lists/qs7ffw2bacs9td21pdrj40f1tr00zrjr",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/community/tier-lists/qs7ffw2bacs9td21pdrj40f1tr00zrjr",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    }
+  ],
+  "gif": null,
+  "blockedConvexWrites": [
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus"
+  ],
+  "savedAppearance": [],
+  "pinFlagged": [],
+  "unstable": [],
+  "unproxiedSockets": []
+}

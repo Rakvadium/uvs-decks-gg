@@ -1,0 +1,71 @@
+{
+  "base": "verify241-dev",
+  "head": "verify241-head",
+  "threshold": 0.1,
+  "results": [
+    {
+      "name": "guest-community-tier-lists__desktop__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-community-tier-lists__desktop__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-community-tier-lists__mobile__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-community-tier-lists__mobile__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-gallery__desktop__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-gallery__desktop__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-gallery__mobile__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-gallery__mobile__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-tierlist-detail-b-comments__desktop__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-tierlist-detail-b-comments__desktop__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-tierlist-detail-comments__desktop__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-tierlist-detail-comments__desktop__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-tierlist-detail__desktop__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-tierlist-detail__desktop__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-tierlist-detail__mobile__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-tierlist-detail__mobile__default__light",
+      "diffPercent": 0
+    }
+  ]
+}
