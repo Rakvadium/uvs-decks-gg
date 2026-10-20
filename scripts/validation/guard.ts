@@ -303,44 +303,81 @@ export function homeViolations(input: GuardInput): string[] {
   return out;
 }
 
+function realpathOrNull(p: string): string | null {
+  try {
+    return fs.realpathSync(p);
+  } catch {
+    return null;
+  }
+}
+
+function lstatOrNull(p: string): fs.Stats | null {
+  try {
+    return fs.lstatSync(p);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * `~/.uvs-validation` with links resolved. Every expected cache path is built from this, never
+ * from where a link under it points, so a swapped-in link can't make both sides of a check agree.
+ */
+function resolvedRoot(root: string): string {
+  return realpathOrNull(root) ?? path.resolve(root);
+}
+
+/**
+ * `<root>/cache` and `<root>/cache/convex` must be plain dirs (or not exist yet), on every
+ * platform. Each one that is a symlink or junction, or that resolves anywhere but the path built
+ * from the resolved root, is a problem: the wrapper would seed, and the CLI would run and write,
+ * wherever it points (the owner's Convex cache or login dir, say).
+ */
+export function sharedCacheProblems(root: string, platform: NodeJS.Platform = process.platform): string[] {
+  const base = resolvedRoot(root);
+  const out: string[] = [];
+  for (const parts of [["cache"], ["cache", "convex"]]) {
+    const p = path.join(root, ...parts);
+    const stat = lstatOrNull(p);
+    if (stat === null) break;
+    const expected = path.join(base, ...parts);
+    if (stat.isSymbolicLink()) out.push(`${p} is a symlink or junction; it must be a plain dir.`);
+    else if (!stat.isDirectory()) out.push(`${p} is not a dir.`);
+    else if (!samePath(realpathOrNull(p) ?? undefined, expected, platform)) out.push(`${p} resolves outside ${expected}.`);
+  }
+  return out;
+}
+
 /**
  * macOS and Linux: the CLI caches under `$HOME/.cache/convex`, which the wrapper links to the
- * shared cache. If that path exists, it must resolve inside the shared cache or the backend home.
+ * shared cache. If that path exists, it must resolve to the shared cache or inside the backend
+ * home, both built from the resolved root.
  */
 function posixCacheViolations(input: GuardInput, platform: NodeJS.Platform): string[] {
-  const home = backendDir(input.appPort, input.root);
-  const cache = path.join(home, ".cache", "convex");
-  const shared = path.join(sharedCacheDir(input.root), "convex");
-  const real = (p: string) => {
-    try {
-      return fs.realpathSync(p);
-    } catch {
-      return null;
-    }
-  };
-  const resolved = real(cache);
+  const cache = path.join(backendDir(input.appPort, input.root), ".cache", "convex");
+  const base = resolvedRoot(input.root);
+  const shared = path.join(sharedCacheDir(base), "convex");
+  const home = backendDir(input.appPort, base);
+  const resolved = realpathOrNull(cache);
   if (resolved === null) {
-    const exists = (() => {
-      try {
-        fs.lstatSync(cache);
-        return true;
-      } catch {
-        return false;
-      }
-    })();
-    return exists ? [`${cache} is a link that resolves nowhere; remove it so the wrapper can link it to ${shared}.`] : [];
+    return lstatOrNull(cache) ? [`${cache} is a link that resolves nowhere; remove it so the wrapper can link it to ${shared}.`] : [];
   }
-  const inside = [shared, home].some((dir) => isInside(resolved, real(dir) ?? dir, platform));
-  return inside ? [] : [`${cache} must resolve inside ${shared} or ${home} so the owner's Convex cache is untouched.`];
+  const ok = samePath(resolved, shared, platform) || isInside(resolved, home, platform);
+  return ok ? [] : [`${cache} must resolve to ${shared} or inside ${home} so the owner's Convex cache is untouched.`];
 }
 
 export function cacheViolations(input: GuardInput): string[] {
   const platform = input.platform ?? process.platform;
-  if (platform !== "win32") return posixCacheViolations(input, platform);
+  const shared = sharedCacheProblems(input.root, platform).map((p) => `${p} The owner's Convex cache must stay untouched.`);
+  if (platform !== "win32") return [...shared, ...posixCacheViolations(input, platform)];
   const values = valuesFor(input.childEnv, "LOCALAPPDATA");
-  return values.length !== 1 || !isInside(values[0], sharedCacheDir(input.root), platform)
-    ? [`LOCALAPPDATA must be inside ${sharedCacheDir(input.root)} so the owner's Convex cache is untouched.`]
-    : [];
+  const cache = sharedCacheDir(input.root);
+  const resolved = values.length === 1 ? realpathOrNull(values[0]) : null;
+  const inside =
+    values.length === 1 &&
+    isInside(values[0], cache, platform) &&
+    (resolved === null || isInside(resolved, sharedCacheDir(resolvedRoot(input.root)), platform));
+  return inside ? shared : [...shared, `LOCALAPPDATA must be inside ${cache} so the owner's Convex cache is untouched.`];
 }
 
 /** Kept for callers that want every child-env check in one list. */

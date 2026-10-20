@@ -28,6 +28,7 @@ import {
   parseDotenv,
   readCliEnvFiles,
   resolveCliTarget,
+  sharedCacheProblems,
   type Env,
   type GuardInput,
   type TargetClass,
@@ -507,13 +508,18 @@ export function linkSharedConvexCache(home: string, root: string, platform: Node
   const parent = path.join(home, ".cache");
   const link = path.join(parent, "convex");
   const target = path.join(sharedCacheDir(root), "convex");
+  assertSharedCache(root, platform);
   fs.mkdirSync(parent, { recursive: true });
   fs.mkdirSync(target, { recursive: true });
+  assertSharedCache(root, platform);
   // A `.cache` that is itself a link (say, to the owner's ~/.cache) would make `link` the owner's cache.
   if (realpathOrNull(parent) !== path.join(realpathOrNull(home) ?? home, ".cache")) {
     throw new Error(`${parent} must be a plain dir inside the backend home; remove it and run again.`);
   }
-  const resolvesToTarget = () => realpathOrNull(link) !== null && realpathOrNull(link) === realpathOrNull(target);
+  // Built from the resolved root, not from where `target` resolves, so a swapped-in link under the
+  // root can't match itself.
+  const expected = path.join(sharedCacheDir(realpathOrNull(root) ?? path.resolve(root)), "convex");
+  const resolvesToTarget = () => realpathOrNull(link) === expected;
   let stat: fs.Stats | null = null;
   try {
     stat = fs.lstatSync(link);
@@ -555,16 +561,53 @@ export function linkSharedConvexCache(home: string, root: string, platform: Node
   return `[vconvex] linked ${link} to the shared cache ${target}${migrated.length ? ` (moved the ${migrated.join(" and ")} it held there)` : ""}`;
 }
 
+/** Throws when `<root>/cache` or `<root>/cache/convex` is a link (see sharedCacheProblems). */
+function assertSharedCache(root: string, platform: NodeJS.Platform): void {
+  const problems = sharedCacheProblems(root, platform);
+  if (problems.length > 0) throw new GuardError(problems);
+}
+
+/**
+ * Why `<base>/<rel>` can't be copied as plain files: a link on the way to it or inside it, or an
+ * entry that is neither a regular file nor a dir. Empty when it is all plain.
+ */
+export function plainTreeProblems(base: string, rel: string): string[] {
+  const out: string[] = [];
+  let at = base;
+  for (const part of rel.split(/[\\/]/)) {
+    at = path.join(at, part);
+    if (fs.lstatSync(at).isSymbolicLink()) out.push(`${at} is a symlink or junction`);
+  }
+  const walk = (dir: string) => {
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const full = path.join(dir, entry.name);
+      if (entry.isSymbolicLink()) out.push(`${full} is a symlink or junction`);
+      else if (entry.isDirectory()) walk(full);
+      else if (!entry.isFile()) out.push(`${full} is not a regular file`);
+    }
+  };
+  if (out.length === 0) walk(at);
+  return out;
+}
+
 /**
  * Copies the pinned binary and dashboard from a per-port cache into the shared one when the shared
- * cache lacks them. Throws, leaving the per-port cache in place, if one of them couldn't be copied.
+ * cache lacks them. Throws, leaving the per-port cache in place, if one of them couldn't be copied
+ * or holds anything but regular files and dirs, so a planted link isn't promoted machine-wide.
  */
 function migrateLegacyCache(legacy: string, shared: string, platform: NodeJS.Platform): string[] {
   const exe = backendExe(platform);
   const binary = path.join("binaries", PINNED_LOCAL_BACKEND_VERSION);
   const out: string[] = [];
+  const assertPlain = (rel: string) => {
+    const problems = plainTreeProblems(legacy, rel);
+    if (problems.length > 0) {
+      throw new Error(`Refusing to move ${path.join(legacy, rel)} into the shared cache: ${problems.join("; ")}. Remove ${legacy} and run again.`);
+    }
+  };
   const hasBinary = (dir: string) => fs.existsSync(path.join(dir, binary, exe));
   if (hasBinary(legacy) && !hasBinary(shared)) {
+    assertPlain(binary);
     if (!copyDirAtomically(path.join(legacy, binary), path.join(shared, binary))) {
       throw new Error(`Could not copy ${path.join(legacy, binary)} into the shared cache ${shared}; run again.`);
     }
@@ -572,6 +615,7 @@ function migrateLegacyCache(legacy: string, shared: string, platform: NodeJS.Pla
   }
   const atPin = (dir: string) => dashboardVersion(dir) === PINNED_LOCAL_BACKEND_VERSION;
   if (atPin(legacy) && !atPin(shared)) {
+    assertPlain("dashboard");
     if (!copyDirAtomically(path.join(legacy, "dashboard"), path.join(shared, "dashboard"))) {
       throw new Error(`Could not copy ${path.join(legacy, "dashboard")} into the shared cache ${shared}; run again.`);
     }
@@ -603,10 +647,16 @@ export function preparePinnedBackend(
 ): void {
   const platform = owner.platform ?? process.platform;
   checkSavedBackendVersion(inv.home, inv.appPort);
-  if (inv.childEnv.LOCALAPPDATA && platform === "win32") fs.mkdirSync(inv.childEnv.LOCALAPPDATA, { recursive: true });
+  // backendDir() is `<root>/backends/<P>`, and the guard holds HOME to it.
+  const root = path.dirname(path.dirname(inv.home));
+  // The guard checked this too; check again right before seeding writes into the shared cache.
+  assertSharedCache(root, platform);
+  if (inv.childEnv.LOCALAPPDATA && platform === "win32") {
+    fs.mkdirSync(inv.childEnv.LOCALAPPDATA, { recursive: true });
+    assertSharedCache(root, platform);
+  }
   if (platform !== "win32") {
-    // backendDir() is `<root>/backends/<P>`, and the guard holds HOME to it.
-    const linked = linkSharedConvexCache(inv.home, path.dirname(path.dirname(inv.home)), platform);
+    const linked = linkSharedConvexCache(inv.home, root, platform);
     if (linked) say(linked);
   }
   const seeded = seedBinaryCache({ ...owner, childEnv: inv.childEnv, platform });
