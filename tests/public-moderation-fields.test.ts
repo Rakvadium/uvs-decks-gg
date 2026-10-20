@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import type { Id } from "../convex/_generated/dataModel";
+import schema from "../convex/schema";
 import { getDetail } from "../convex/tierLists";
 import { listPage } from "../convex/teams/chat";
 import {
@@ -181,6 +182,13 @@ describe("public shapes", () => {
       expect(Object.keys(memberTeamChatMessageValidator.fields)).not.toContain(field);
     }
     expect(Object.keys(publicSetValidator.fields)).not.toContain("updatedBy");
+  });
+
+  test("public set shape covers every other sets field", () => {
+    // publicSetFromDocument drops only updatedBy, so a sets field missing here would fail at runtime.
+    const tableFields = Object.keys(schema.tables.sets.validator.fields).filter((f) => f !== "updatedBy");
+    const publicFields = Object.keys(publicSetValidator.fields).filter((f) => !f.startsWith("_"));
+    expect(publicFields.sort()).toEqual(tableFields.sort());
   });
 });
 
