@@ -1,0 +1,39 @@
+{
+  "base": "verify-before-reload",
+  "head": "verify-after-reload",
+  "threshold": 0.1,
+  "results": [
+    {
+      "name": "guest-tier-list-reload__desktop__cyberpunk__dark",
+      "diffPercent": 13.485
+    },
+    {
+      "name": "guest-tier-list-reload__desktop__cyberpunk__light",
+      "diffPercent": 13.24
+    },
+    {
+      "name": "guest-tier-list-reload__desktop__default__dark",
+      "diffPercent": 12.828
+    },
+    {
+      "name": "guest-tier-list-reload__desktop__default__light",
+      "diffPercent": 13.006
+    },
+    {
+      "name": "guest-tier-list-reload__mobile__cyberpunk__dark",
+      "diffPercent": 24.301
+    },
+    {
+      "name": "guest-tier-list-reload__mobile__cyberpunk__light",
+      "diffPercent": 23.065
+    },
+    {
+      "name": "guest-tier-list-reload__mobile__default__dark",
+      "diffPercent": 23.227
+    },
+    {
+      "name": "guest-tier-list-reload__mobile__default__light",
+      "diffPercent": 22.682
+    }
+  ]
+}

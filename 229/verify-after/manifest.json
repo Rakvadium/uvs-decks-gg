@@ -1,0 +1,153 @@
+{
+  "issue": "229",
+  "label": "verify-after",
+  "port": 8176,
+  "chrome": "calm",
+  "fullPage": false,
+  "strict": true,
+  "shots": [
+    {
+      "name": "guest-tier-list-direct-load__desktop__default__light",
+      "route": "/community/tier-lists/qs79cym6q521fdqc7c9qjf7dcqc27a3k",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/community/tier-lists/qs79cym6q521fdqc7c9qjf7dcqc27a3k",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "guest-tier-list-direct-load__desktop__default__dark",
+      "route": "/community/tier-lists/qs79cym6q521fdqc7c9qjf7dcqc27a3k",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/community/tier-lists/qs79cym6q521fdqc7c9qjf7dcqc27a3k",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "guest-tier-list-direct-load__desktop__cyberpunk__light",
+      "route": "/community/tier-lists/qs79cym6q521fdqc7c9qjf7dcqc27a3k",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/community/tier-lists/qs79cym6q521fdqc7c9qjf7dcqc27a3k",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "guest-tier-list-direct-load__desktop__cyberpunk__dark",
+      "route": "/community/tier-lists/qs79cym6q521fdqc7c9qjf7dcqc27a3k",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/community/tier-lists/qs79cym6q521fdqc7c9qjf7dcqc27a3k",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "guest-tier-list-direct-load__mobile__default__light",
+      "route": "/community/tier-lists/qs79cym6q521fdqc7c9qjf7dcqc27a3k",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/community/tier-lists/qs79cym6q521fdqc7c9qjf7dcqc27a3k",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "guest-tier-list-direct-load__mobile__default__dark",
+      "route": "/community/tier-lists/qs79cym6q521fdqc7c9qjf7dcqc27a3k",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/community/tier-lists/qs79cym6q521fdqc7c9qjf7dcqc27a3k",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "guest-tier-list-direct-load__mobile__cyberpunk__light",
+      "route": "/community/tier-lists/qs79cym6q521fdqc7c9qjf7dcqc27a3k",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/community/tier-lists/qs79cym6q521fdqc7c9qjf7dcqc27a3k",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "guest-tier-list-direct-load__mobile__cyberpunk__dark",
+      "route": "/community/tier-lists/qs79cym6q521fdqc7c9qjf7dcqc27a3k",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/community/tier-lists/qs79cym6q521fdqc7c9qjf7dcqc27a3k",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    }
+  ],
+  "gif": null,
+  "blockedConvexWrites": [
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus"
+  ],
+  "savedAppearance": [],
+  "pinFlagged": [],
+  "unstable": [],
+  "unproxiedSockets": []
+}
