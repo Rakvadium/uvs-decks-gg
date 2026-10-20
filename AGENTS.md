@@ -16,16 +16,22 @@ For any non-trivial change to `src/` or `convex/`, start with **`project-context
 
 ## Secrets and live data
 
-The cloud Convex deployment (the one Convex calls "dev") serves the live site. A write or deploy there is a production change. A local backend on `127.0.0.1` is yours to write to.
+The cloud Convex deployment (the one Convex calls "dev") serves the live site. A write or deploy there is a production change. A local backend (`127.0.0.1`/`localhost`) is yours to write to.
 
 - Write env var **names**, never values, in tracked files, commit messages, PR text, comments and published media. Docs and tests use `<placeholder>` values.
 - Keep secrets out of URLs and logs. The one exception is `/agent-login?token=` on `http://localhost:<port>` under `next dev` (the route only works when `NODE_ENV=development` and `VERCEL!=1`). Open it only in your own browser. `next dev` output logs that URL with the token, so redact `token=` before you share dev-server output.
 - Leave live data as you found it: read only. Signing in as the agent user (its own auth session) is the only write allowed.
-- Get explicit human approval for this task before any `convex` command that changes the cloud deployment: `dev`, `deploy`, `run`, `import`, `env set`, `env remove`, or a migration. The same commands against a local backend (`127.0.0.1`, e.g. `convex dev --local`) are allowed.
-- Before any `convex` command, prove the target is local, checking by name only and printing no values:
-  1. `CONVEX_DEPLOY_KEY` is unset in your shell (`env | cut -d= -f1 | grep '^CONVEX'`). An injected deploy key targets the cloud whatever `.env.local` says.
+- Get explicit human approval for this task before any `convex` command that changes the cloud deployment: `dev`, `deploy`, `run`, `import`, `env set`, `env remove`, or a migration. The same commands against a local backend (`127.0.0.1`/`localhost`, e.g. `convex dev --local`) are allowed.
+- Before any of those write or deploy commands, prove the target is local, printing no values. Read-only commands that `hardened-convex-ops` allows (`logs`, `function-spec`, `env list` names only) are exempt.
+  1. `CONVEX_DEPLOY_KEY` is unset in your shell. An injected deploy key targets the cloud whatever `.env.local` says.
   2. `CONVEX_DEPLOYMENT`, in the shell or `.env.local`, starts with `local:` or `anonymous:`.
-  3. The Convex URL host is `127.0.0.1` or `localhost`.
+  3. `CONVEX_URL` and `NEXT_PUBLIC_CONVEX_URL`, in the shell or `.env.local`, have host `127.0.0.1` or `localhost`.
+
+  Run this from the checkout root; it prints only three booleans, and all three must be `true`:
+
+  ```bash
+  node -e 'const fs=require("fs");const t=fs.existsSync(".env.local")?fs.readFileSync(".env.local","utf8"):"";const g=k=>(process.env[k]||(t.match(new RegExp("^"+k+"=(.*)$","m"))||[])[1]||"").trim().replace(/^"|"$/g,"");const urls=["CONVEX_URL","NEXT_PUBLIC_CONVEX_URL"].map(g).filter(Boolean);console.log({noDeployKey:!process.env.CONVEX_DEPLOY_KEY,localDeployment:/^(local|anonymous):/.test(g("CONVEX_DEPLOYMENT")),localUrl:urls.length>0&&urls.every(u=>/^https?:\/\/(127\.0\.0\.1|localhost)(:|\/|$)/.test(u))})'
+  ```
 
   If any check fails or is unclear, the target is the live cloud deployment: get approval first. Once merged, the guarded `bun run vconvex` wrapper (#207) enforces these checks.
 

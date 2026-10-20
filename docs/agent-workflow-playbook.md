@@ -202,9 +202,9 @@ Do not implement until I say apply UI fixes.
 Follow docs/agent-workflow-playbook.md.
 Use project-context-gate, then hardened-convex-ops.
 Symptom: <…>
-Environment: <local (127.0.0.1) | cloud (serves the live site) | unknown>
+Environment: <local (127.0.0.1/localhost) | cloud (serves the live site) | unknown>
 The cloud deployment serves the live site: read only there.
-Write, deploy or migrate only on a local backend (127.0.0.1) unless I approve the exact command.
+Write, deploy or migrate only on a local backend (127.0.0.1/localhost) unless I approve the exact command.
 ```
 
 ### D) PR babysit
