@@ -2,24 +2,27 @@
 
 Before/after screenshots, GIFs, and pixel diffs for PRs. Media goes to the orphan `pr-media` branch so it renders inline from `raw.githubusercontent.com`. Several agents can run this at once.
 
+Captures run only against **this worktree's own seeded local validation backend** ([`scripts/validation/`](../validation/README.md)). The cloud deployment that serves the live site is never a capture target, and there is no mode that reads from it.
+
 ## One-time setup
 
+In an agent worktree (never the main checkout):
+
 ```bash
-bun install
-bunx playwright install chromium
+bun run agent:setup --port 8128     # installs deps + chromium, writes a loopback .env.local, starts and seeds the backend
 ```
 
-You need `.env.local` with `AGENT_AUTH_SECRET` (see [agent-onboarding.md](../../docs/agent-onboarding.md) §6) and Node 22.18+. `capture` runs on Node, not Bun, because Playwright can't launch Chromium under Bun on Windows. The one-line `package.json` here (`"type": "module"`) stops Node's `MODULE_TYPELESS_PACKAGE_JSON` warning on every run.
+`--port` here and in `capture` is the same app port `P` (8100–8199). It picks the backend's Convex ports. You also need Node 22.18+. `capture` runs on Node, not Bun, because Playwright can't launch Chromium under Bun on Windows. The validation checks it reuses are Bun-only, so it runs them in Bun subprocesses ([`validation.ts`](./validation.ts), `bun run agent:login-url`). The one-line `package.json` here (`"type": "module"`) stops Node's `MODULE_TYPELESS_PACKAGE_JSON` warning on every run. No secret is needed: there is no `AGENT_AUTH_SECRET` and no password.
 
 ## Flow
 
 ```bash
 # 1. Before you edit anything
-bun run capture --issue 191 --label before --port 8101 \
+bun run capture --issue 191 --label before --port 8128 --reseed \
   --routes gallery,decks,guest:gallery --themes default,cyberpunk
 
 # 2. Make the change, then the same command with --label after
-bun run capture --issue 191 --label after --port 8101 \
+bun run capture --issue 191 --label after --port 8128 --reseed \
   --routes gallery,decks,guest:gallery --themes default,cyberpunk
 
 # 3. Side-by-side + diff PNGs + summary.md
@@ -37,8 +40,12 @@ Paste `.pr-captures/<issue>/compare-before-vs-after/summary.md` into the PR body
 | --- | --- | --- |
 | `--issue` | required | Output goes to `.pr-captures/<issue>/<label>/` (gitignored). |
 | `--label` | required | `before`, `after`, or any `[\w.-]` name. Each run replaces that label's folder. |
-| `--port` | required | Uses the server already listening on this port, or starts `next dev -p <port>` and stops it at the end. It never runs `convex dev`. Pick a port no other agent uses. A reused server must be running from your own checkout, or you'll capture someone else's code. The `next-dev.log` it writes has `token=` redacted. |
-| `--routes` | `gallery,decks,guest:gallery` | Comma list. Routes sign in as `agent` unless prefixed `guest:`. The leading `/` is optional, which stops Git Bash rewriting `/gallery` into a path. |
+| `--port` | required | This worktree's validation app port `P` (8100–8199, the one `agent:setup` claimed). Capture first runs the checks in Target below. Then it uses the server already listening on `P`, or starts `next dev -p <P>` with `NEXT_PUBLIC_CONVEX_URL` set to the backend and stops it at the end. It never runs `convex dev`. A reused server must be running from your own checkout, or you'll capture someone else's code, and its Convex target is checked before the first sign-in. The `next-dev.log` it writes has `code=` and `token=` redacted. |
+| `--routes` | `gallery,decks,guest:gallery` | Comma list. Routes sign in as `--persona` unless prefixed `guest:`. The leading `/` is optional, which stops Git Bash rewriting `/gallery` into a path. |
+| `--persona` | `alice` | Signed-in routes sign in as `<persona>@validation.invalid`. The seed has `alice`, `bruno`, `chen`, `dana` and `eli` (`alice` owns a public and a private deck). Any other name gets a new, empty account from `mintCode`. A spec route can set `"persona"` too. |
+| `--reseed` | off | Resets the backend to the golden seed (`validation:seed:reset`) before this label. Use it for every label you compare, so both start from the same data. |
+| `--clock` | off | Epoch ms or an ISO date. Fixes `Date.now()` and `new Date()` in every capture context with Playwright's `clock.setFixedTime` (timers keep running), so relative dates render the same in every run. Sign-in contexts keep the real time. A time later than now is refused, since the auth client would treat its fresh token as expired. |
+| `--allow-writes` | off | Forwards Convex writes from the capture browser to the validation backend instead of dropping them (see No Convex writes). It only exists because capture refuses any target but the local backend. Each forwarded write is listed under `forwardedConvexWrites` in `manifest.json`, and the run prints a `WARNING`. Reseed afterwards (or use `--reseed` on the next label). |
 | `--spec` | | JSON file used instead of `--routes` (see below). |
 | `--viewports` | `desktop,mobile` | `desktop` = 1280×800 @1x. `mobile` = 390×844 @2x, touch. |
 | `--themes` | `default` | `data-color-theme` presets (`default`, `cyberpunk`, `calm-storm`, ...). |
@@ -48,7 +55,7 @@ Paste `.pr-captures/<issue>/compare-before-vs-after/summary.md` into the PR body
 | `--gif` | off | Also records the spec's `gif` entry (needs `--spec`). |
 | `--gif-width` | `960` | The GIF is downscaled to this width. The `.webm` stays at full size. |
 | `--skip-stills` | off | Only record the GIF. |
-| `--strict` | off | Exit 1 if any signed-in shot is flagged because the JS theme pin didn't apply (see Client-side theme), or any shot (guest included) never settled within the stability window (`unstable` in `manifest.json`) or had a Convex socket outside the proxy (`unproxiedSockets`, see No Convex writes). The manifest and images are still written. Verifiers should always pass it. |
+| `--strict` | off | Exit 1 if any signed-in shot is flagged because the JS theme pin didn't apply (see Client-side theme), or any shot (guest included) never settled within the stability window (`unstable` in `manifest.json`), had a Convex socket outside the proxy (`unproxiedSockets`, see No Convex writes), or the app asked for a catalog other than the pinned one (`catalog.misses`). The manifest and images are still written. Verifiers should always pass it. |
 
 Every route runs for each viewport × theme × mode. Files are named `<route>__<viewport>__<theme>__<mode>.png`. Signed-out routes get a `guest-` prefix.
 
@@ -56,10 +63,13 @@ Every route runs for each viewport × theme × mode. Files are named `<route>__<
 
 [`example.spec.json`](./example.spec.json) is the spec used for this tool's own PR (#191). It has three routes and a GIF of the New Deck dialog opening. The shape, abridged:
 
+`"auth": "agent"` means signed in (as `--persona`, or the route's own `"persona"`).
+
 ```json
 {
   "routes": [
     { "path": "/decks", "auth": "agent" },
+    { "path": "/decks", "auth": "agent", "persona": "bruno", "name": "bruno-decks" },
     { "path": "/gallery", "auth": "guest", "name": "guest-gallery-dialog",
       "steps": [{ "click": "<selector>" }, { "waitFor": "[role=\"dialog\"]" }] }
   ],
@@ -72,18 +82,36 @@ Every route runs for each viewport × theme × mode. Files are named `<route>__<
 
 Steps: `click`, `hover`, `fill` (+ `value`), `waitFor` (all take Playwright selectors), `press` (a key), `wait` (ms). Stills run their steps before the shot. Capture contexts grant clipboard read/write, so copy buttons show their success toast. The GIF records while its steps run. A route can set `"viewports": ["desktop"]` to override `--viewports`, for example for a menu that only exists on desktop.
 
+## Target
+
+Before it starts a server, opens a browser or clears the label's folder, capture runs these checks in order. Any failure prints the reason and exits 1. Nothing falls back to another target.
+
+1. **Env files and shell.** The same check `agent:setup` runs (`assertEnvFilesLocal` in [`scripts/agent-setup/setup.ts`](../agent-setup/setup.ts), reused, not copied). Every env file Next.js can load under any `NODE_ENV` (`.env.development.local`, `.env.production`, `.env.test.local`, …, plus `.env.local` and `.env`) must point only at a local backend, both one by one and as Next.js itself resolves each mode. The same goes for the shell (for example, no `CONVEX_DEPLOY_KEY`), and `NODE_ENV` must be unset or `development`.
+2. **`vconvex --check`.** The check behind `bun run vconvex -- --app-port <P> --check` must report `target=local` and pass every rule.
+3. **Backend.** The port's backend must be running and `lib/validationBackend:status` must say it is a validation backend.
+4. **Seed.** With `--reseed`, the golden seed is imported first. Then the backend's `validationSeedMeta` must equal `scripts/validation/seed/manifest.json`. A different or missing seed is refused, and the message suggests `--reseed`.
+5. **Catalog.** The pinned catalog file must be present with the pinned sha256 (see Card catalog).
+
+Inside the browser, every capture, sign-in and probe context refuses any Convex WebSocket that isn't to the backend's own host (`127.0.0.1:<cloud port>` or `localhost:<cloud port>`) before it connects, and aborts every HTTP request to a `*.convex.cloud` or `*.convex.site` host. A refusal ends the run with exit 1, `--strict` or not. Before the first sign-in, a signed-out probe loads `/agent-login` without a code and waits for the app's Convex socket. A reused server that points anywhere else is caught there, before any code is sent.
+
+`manifest.json` records `backend`, `seedVersion`, `catalogVersion`, `seed` (with `reseeded`), `catalog` (`version`, `url`, `sha256`, `served`, `misses`), `clock`, `personas` and `allowWrites`.
+
 ## Guarantees
 
-**Parallel-safe.** Each run has its own `--port`, its own `.pr-captures/<issue>/<label>/` folder, its own browser, and its own agent sign-ins. Publishing never touches your checkout, and it retries when another agent pushed first (see below). Use **one checkout or worktree per concurrent run**: Next allows only one `next dev` per checkout (`.next/dev/lock`). A second run that has to start a server in the same checkout stops with that explanation, unless you point it at the first run's `--port`.
+**Parallel-safe.** Each run has its own `--port` (its own backend), its own `.pr-captures/<issue>/<label>/` folder, its own browser, and its own sign-ins. Publishing never touches your checkout, and it retries when another agent pushed first (see below). Use **one checkout or worktree per concurrent run**: Next allows only one `next dev` per checkout (`.next/dev/lock`). A second run that has to start a server in the same checkout stops with that explanation, unless you point it at the first run's `--port`.
 
-**No Convex writes.** Every capture context proxies the Convex sync WebSocket and drops all `Mutation` and `Action` frames before they leave the browser. Queries still flow. The app's own background writes, such as `sessions:ensureAppearanceMigrated` and `communityLive:refreshLiveStatus`, never reach the shared deployment, and neither does an accidental click. Each run lists what it dropped under `blockedConvexWrites` in `manifest.json`. Convex Auth is the exception, because it goes through Next's `/api/auth` over HTTP. Every signed-in shot (and the GIF) signs in on its own: `/agent-login` runs in a throwaway context, which creates one auth session for `agent`, and the capture context starts from a copy of that sign-in's cookies and storage. The capture context then does one refresh-token exchange (`auth:signIn` with a refresh token). So a signed-in run creates one auth session per signed-in shot (Convex Auth expires them after 30 days), and a step that signs out, or reloads and rotates the refresh token, only ends its own shot's session: the next shot still starts signed in. These write only to Convex Auth's session and refresh-token tables, and only for that run's own `agent` sessions. App data and the `agent` user's preferences are never written.
+**Sign-in.** Every signed-in shot (and the GIF) signs in on its own, with its own one-time code. Capture runs `bun run agent:login-url -- --app-port <P> --persona <name>`, which mints the code with `agentLogin:mintCode` through the guarded wrapper. That command must name `<persona>@validation.invalid` as the account, or capture refuses. `/agent-login#code=…` then runs in a throwaway context. The code is only in the URL fragment, which the browser never sends to a server. It is single use and expires after 60 seconds. It stays in capture's memory: it never goes into a log, `manifest.json`, an env var or any published file, and a failed sign-in reports only the page's path. The capture context starts from a copy of that sign-in's cookies and storage. So a step that signs out, or reloads and rotates the refresh token, only ends its own shot's session: the next shot still starts signed in. Only reserved `@validation.invalid` personas can sign in this way (`agentLogin:consume` checks that too).
 
-**Sockets outside the proxy.** Playwright only routes WebSockets that pages open. A Convex client in a worker would skip the write blocking and the theme pin. The app has none, so a per-context tripwire flags the shot instead (`unproxied` on the shot, `unproxiedSockets` at the top of `manifest.json`, a `WARNING`, and `--strict` exits 1). It covers guest shots and each shot's sign-in context too. Note that the writes of such a socket are **not** blocked: the tripwire reports them after the fact. It flags:
+A persona's first sign-in in a run also checks that it has a `sessions` row. Seeded and new personas have none, so `sessions:getSession` would return `null` and the theme pin would have nothing to rewrite. When the row is missing, capture stores the app defaults (`default/system/calm`) through the app's own `sessions:updateSession`, run as that user with `vconvex run --identity` on the local backend, and lists it under `personas[].sessionCreated`. `--reseed` removes the row again.
+
+**No Convex writes.** Every capture context proxies the Convex sync WebSocket and drops all `Mutation` and `Action` frames before they leave the browser. Queries still flow. The app's own background writes, such as `sessions:ensureAppearanceMigrated` and `communityLive:refreshLiveStatus`, never reach the backend, and neither does an accidental click. Each run lists what it dropped under `blockedConvexWrites` in `manifest.json`. `--allow-writes` turns this off for one run (see the flag). Setup writes still happen, all on the local backend: `mintCode` (a code row, and the persona's user on first use), the session row above, and Convex Auth's own session and refresh-token rows. Convex Auth goes through Next's `/api/auth` over HTTP, and each capture context does one refresh-token exchange.
+
+**Sockets outside the proxy.** Playwright only routes WebSockets that pages open. A Convex client in a worker would skip the write blocking, the target check and the theme pin. The app has none, so a per-context tripwire flags the shot instead (`unproxied` on the shot, `unproxiedSockets` at the top of `manifest.json`, a `WARNING`, and `--strict` exits 1). It covers guest shots and each shot's sign-in context too. Note that the writes of such a socket are **not** blocked: the tripwire reports them after the fact. It flags:
 - a frame sent on a Convex socket that the proxy never forwarded. Playwright reports every real socket a page or its dedicated workers (nested ones too) open, including the real connection behind each proxied socket. The proxy records each client frame before handing it to that connection, so only an unproxied socket can send an unrecorded frame. Every Convex client starts with a `Connect` frame carrying its own random session id, so an unproxied client that sends anything at all is caught.
 - more Convex sockets opened than proxied (a socket that never sends a frame). This is a count, so a proxied socket whose real connection was never made (its page navigated away in between) can offset one silent socket. A silent socket can't read or write anything.
 - any SharedWorker (seen by an init script that wraps the `SharedWorker` constructor) or service worker (Playwright's `serviceworker` event) started in the context. Playwright reports no WebSockets for those at all, so starting one is a problem by itself.
 
-"Convex socket" means a URL matching `/api/<version>/sync`, or any socket to the `NEXT_PUBLIC_CONVEX_URL` host.
+"Convex socket" means a URL matching `/api/<version>/sync`, any socket to the backend's host, or any socket to a Convex cloud host.
 
 **Client-side theme.** `--themes`, `--modes`, and `--chrome` never call `updateSession`. There are two layers:
 
@@ -103,7 +131,7 @@ Steps: `click`, `hover`, `fill` (+ `value`), `waitFor` (all take Playwright sele
    Any problem flags the shot, even when the pin equals the saved appearance: a page that never got a session value shows the app defaults (`system`/`calm`/`default`), not the saved prefs. The shot's `pin.problems` lists why, a `WARNING` prints under it, the shot is listed under `pinFlagged`, and a summary `WARNING` prints at the end. With `--strict` the run then exits 1. To see this path, run with `PR_CAPTURE_TEST_BREAK_PIN=1`, a test-only switch that makes the proxy ignore the session subscription, as if it had been renamed.
 2. **DOM.** An init script sets `data-color-theme`, `data-chrome`, `.dark`, and `color-scheme` on `<html>` before the app's scripts run, and a `MutationObserver` re-applies them. This covers first paint, before the session query answers. Playwright's `colorScheme` emulation matches the mode, so `system` mode agrees.
 
-Parallel runs can pin different themes on the same `agent` user without affecting each other. Limitation: signed-out pages have no session, so their JS sees chrome `calm` and preset `default`. Mode is still right via emulation, and CSS still follows the pin. The tool prints a note when a guest route is captured with a non-default theme or chrome.
+Parallel runs can pin different themes on the same persona without affecting each other. Limitation: signed-out pages have no session, so their JS sees chrome `calm` and preset `default`. Mode is still right via emulation, and CSS still follows the pin. The tool prints a note when a guest route is captured with a non-default theme or chrome.
 
 **Deterministic stills.** Before each shot the tool waits for:
 - network idle
@@ -111,9 +139,9 @@ Parallel runs can pin different themes on the same `agent` user without affectin
 - `document.fonts.ready`
 - every on-screen image decoded
 
-Animations and transitions are then forced to 0s, the caret and the Next dev indicator are hidden, `prefers-reduced-motion` is set, and shots repeat until the image (and, for signed-in shots, the pin snapshot) has been unchanged for 2s. Shots that never settle are flagged in the log and in `manifest.json` (`loaded` / `stable`). Unsettled shots are also listed under `unstable`, print a `WARNING`, and fail `--strict`. Two runs of the same state should differ by ~0%. Anything left over is live data changing on the shared deployment.
+Animations and transitions are then forced to 0s, the caret and the Next dev indicator are hidden, `prefers-reduced-motion` is set, and shots repeat until the image (and, for signed-in shots, the pin snapshot) has been unchanged for 2s. Shots that never settle are flagged in the log and in `manifest.json` (`loaded` / `stable`). Unsettled shots are also listed under `unstable`, print a `WARNING`, and fail `--strict`. The data is pinned too: the golden seed (`--reseed`), the pinned catalog and, with `--clock`, the time. So two runs of the same code should differ by ~0%.
 
-**Card catalog.** The R2 static catalog only sends CORS headers for the usual origins. On other ports the gallery would fall back to a rate-limited Convex sync, which these captures block. So the capture downloads `catalog/*.json.gz` once from Node and serves the same bytes to every capture context with `Access-Control-Allow-Origin` added. This is read-only and happens only inside the capture browser. A failed download (HTTP error, or 30s timeout) is not cached. The browser request fails immediately and a warning is printed. Only the failed download itself is evicted, so a context still waiting on it can't evict a newer retry. It also removes R2 latency, which used to make card-derived content (such as deck art on `/decks`) show up after the page already looked settled.
+**Card catalog.** The catalog comes from the seed's pinned bytes, never from a download. The preflight runs `readPinnedCatalog` from [`scripts/validation/seed/catalog.ts`](../validation/seed/catalog.ts). That is the file `pinnedCatalogForUrl` returns: `~/.uvs-validation/seed/catalog-<sha12>.json.gz`, which `validation:seed:reset` caches from the seed branch. Node re-reads it and checks its sha256 again. Every context answers the request for the pinned URL (`manifest.json` `catalog.url`, the seeded `cardDataVersion.catalogUrl`) from those bytes, with `Access-Control-Allow-Origin: *` added, because R2 only sends CORS headers for the usual origins. Any other `catalog/*.json.gz` URL is aborted, listed under `catalog.misses`, and fails `--strict`. The page then falls back to Convex sync. So captures still work after R2 drops the pinned version, and nothing in capture contacts R2 for the catalog. **Card images still load from public R2** (`pub-…r2.dev`), straight from the browser. They are public, read-only and versioned by card.
 
 ## GIFs
 
@@ -164,13 +192,18 @@ URL shape: `https://raw.githubusercontent.com/<owner>/<repo>/pr-media/<issue>/<l
 
 ## Verifying someone else's PR
 
-Check out the PR head in your own worktree. Then run `capture --label verify` with the same routes and themes on your own port, and compare it against theirs:
+Check out the PR head in your own worktree and run `bun run agent:setup --port <your P>`. Then run `capture --label verify --reseed` with the same routes, themes, persona and clock on your own port, and compare it against theirs:
 
 ```bash
 git fetch origin pr-media
 mkdir -p .pr-captures && git archive origin/pr-media 191/after | tar -x -C .pr-captures   # their after shots
-bun run capture --issue 191 --label verify --port 8102 --strict --routes gallery,decks,guest:gallery --themes default,cyberpunk
+bun run capture --issue 191 --label verify --port 8129 --reseed --strict --routes gallery,decks,guest:gallery --themes default,cyberpunk
 bun run capture:compare --issue 191 --base after --head verify
 ```
 
-A diff near 0% means you reproduced their After. Remember that live data on the shared deployment can move between runs.
+A diff near 0% means you reproduced their After. Both runs used the same golden seed and catalog, so a real difference is a code difference. Captures made before the switch to validation backends showed live data, so they can't be compared with these.
+
+### Test-only switches
+
+- `PR_CAPTURE_TEST_BREAK_PIN=1`: see Client-side theme.
+- `PR_CAPTURE_TEST_CODE_SINK=<file outside the checkout>`: appends every login code capture mints to that file, so a verifier can grep the output for codes that were really used. The codes are already burned by then (single use, 60 seconds, local backend only). A path inside the checkout is refused.

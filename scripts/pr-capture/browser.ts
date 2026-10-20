@@ -1,24 +1,57 @@
 import type { Browser, BrowserContext, BrowserContextOptions, Page, WebSocketRoute } from "playwright";
-import { CONVEX_SYNC_SOCKET, convexHostFromEnv, createSocketGuard, type SocketGuard } from "./guard.ts";
+import { CONVEX_SYNC_SOCKET, createSocketGuard, isBackendUrl, isCloudConvexUrl, type SocketGuard } from "./guard.ts";
 import { BREAK_PIN_ENV, createSessionPin, parseFrame, type Appearance, type ClientFrame, type SessionPin } from "./pin.ts";
-import { VIEWPORTS, cachedLoad, type Step } from "./shared.ts";
+import { VIEWPORTS, type Step } from "./shared.ts";
+import type { PinnedCatalog } from "./target.ts";
 
 type StorageState = Exclude<BrowserContextOptions["storageState"], string | undefined>;
 
 /**
+ * What every context of one run talks to and how. Built once from the preflight (capture.ts).
+ * `catalog.served`, `catalog.misses` and `writes` fill in as the run goes.
+ */
+export type CaptureTarget = {
+  /** The validation backend's hosts (`127.0.0.1:<port>`, `localhost:<port>`). Every other Convex target is refused. */
+  backendHosts: string[];
+  catalog: PinnedCatalog & { served: number; misses: string[] };
+  /** `--allow-writes`: forward Mutation/Action frames (each recorded in `writes`) instead of dropping them. */
+  allowWrites: boolean;
+  writes: string[];
+  /** `--clock`: the fixed Date.now() of every capture context (not the sign-in contexts), or null. */
+  clock: number | null;
+};
+
+/** Sockets to a Convex sync path, or to any Convex cloud host, go through the proxy (which refuses the latter). */
+const proxiedSocket = (url: URL) => CONVEX_SYNC_SOCKET.test(url.href) || isCloudConvexUrl(url.href);
+
+/**
  * Proxies the Convex sync WebSocket:
+ * - refuses (never connects) any socket that isn't to the validation backend, and records it on
+ *   `guard`. Capture treats that as fatal.
  * - drops every Mutation/Action frame, so nothing a capture does (including app-initiated writes
- *   like appearance migration) reaches the shared deployment. Queries still flow.
+ *   like appearance migration) reaches the backend. Queries still flow. `--allow-writes` forwards
+ *   them instead and records each one in `target.writes`.
  * - with a `pin`, rewrites the `sessions:getSession` result the browser receives so
  *   ColorSchemeProvider's JS state (isDark, chrome, preset: menus, toasts, frosted controls) matches
- *   the pin, not the agent's saved prefs. The stored session is never touched.
+ *   the pin, not the persona's saved prefs. The stored session is never touched.
  * - tells `guard` about every socket and forwarded client frame, so it can spot sockets it never saw.
  *
  * On a page it handles that page's sockets. On a context it handles every page without its own
  * route (Playwright checks page routes first).
  */
-async function proxyConvexSocket(target: BrowserContext | Page, blocked: string[], guard: SocketGuard, pin?: SessionPin) {
-  await target.routeWebSocket(CONVEX_SYNC_SOCKET, (ws) => {
+async function proxyConvexSocket(
+  on: BrowserContext | Page,
+  target: CaptureTarget,
+  blocked: string[],
+  guard: SocketGuard,
+  pin?: SessionPin,
+) {
+  await on.routeWebSocket(proxiedSocket, (ws) => {
+    if (!isBackendUrl(ws.url(), target.backendHosts)) {
+      guard.refuse("WebSocket", ws.url());
+      void ws.close({ code: 1008, reason: "pr-capture: not the validation backend" }).catch(() => {});
+      return;
+    }
     guard.proxied();
     const server = ws.connectToServer();
     const socket = pin?.socket();
@@ -26,8 +59,12 @@ async function proxyConvexSocket(target: BrowserContext | Page, blocked: string[
     ws.onMessage((message) => {
       const frame = typeof message === "string" ? parseFrame<ClientFrame & { udfPath?: string }>(message) : null;
       if (frame?.type === "Mutation" || frame?.type === "Action") {
-        blocked.push(`${frame.type}:${frame.udfPath}`);
-        return;
+        const write = `${frame.type}:${frame.udfPath}`;
+        if (!target.allowWrites) {
+          blocked.push(write);
+          return;
+        }
+        target.writes.push(write);
       }
       socket?.fromClient(frame);
       guard.forwarded(message);
@@ -53,40 +90,45 @@ async function proxyConvexSocket(target: BrowserContext | Page, blocked: string[
   });
 }
 
-const catalogCache = new Map<string, Promise<{ status: number; contentType: string; body: Buffer }>>();
+/** Aborts every HTTP request to a Convex cloud host before it is sent, and records it on `guard`. */
+async function refuseCloudRequests(context: BrowserContext, guard: SocketGuard) {
+  await context.route(
+    (url) => isCloudConvexUrl(url.href),
+    async (route) => {
+      guard.refuse("request", route.request().url());
+      await route.abort("blockedbyclient").catch(() => {});
+    },
+  );
+}
+
+const CATALOG_REQUEST = /\/catalog\/.+\.json\.gz$/;
 
 /**
- * The R2 static card catalog only sends CORS headers for the usual dev/prod origins, so on any
- * other --port the app falls back to a rate-limited Convex sync. Fetch it once from Node and
- * serve it to every context. That also removes R2 latency, which otherwise makes card-derived
- * content (deck art, gallery) pop in after the page looks settled.
+ * Serves the card catalog from the seed's pinned bytes (the file `pinnedCatalogForUrl` reads,
+ * sha256-checked by the preflight and again in target.ts). Nothing is downloaded. The request for
+ * the pinned URL is answered from memory with `access-control-allow-origin: *` (R2 only sends CORS
+ * headers for the usual origins). Any other catalog URL is aborted and listed in `catalog.misses`,
+ * which fails --strict. Card images still load from public R2.
  */
-async function allowStaticCatalog(context: BrowserContext) {
-  await context.route(/\/catalog\/.+\.json\.gz$/, async (route) => {
-    const url = route.request().url();
-    let download;
-    try {
-      download = await cachedLoad(catalogCache, url, () =>
-        fetch(url, { signal: AbortSignal.timeout(30_000) }).then(async (res) => {
-          if (!res.ok) throw new Error(`HTTP ${res.status}`);
-          return {
-            status: res.status,
-            contentType: res.headers.get("content-type") ?? "application/gzip",
-            body: Buffer.from(await res.arrayBuffer()),
-          };
-        }),
-      );
-    } catch (error) {
-      // Fail the browser request now instead of letting it hang. cachedLoad already forgot the failure.
-      console.warn(`  card catalog download failed (${url}): ${error instanceof Error ? error.message : error}`);
-      await route.abort("failed").catch(() => {});
-      return;
-    }
-    const { status, contentType, body } = download;
-    await route
-      .fulfill({ status, body, contentType, headers: { "access-control-allow-origin": "*" } })
-      .catch(() => {}); // The context closed first (e.g. a page that never needed the catalog).
-  });
+async function servePinnedCatalog(context: BrowserContext, catalog: CaptureTarget["catalog"]) {
+  await context.route(
+    (url) => url.href === catalog.url || CATALOG_REQUEST.test(url.pathname),
+    async (route) => {
+      const url = route.request().url();
+      if (url !== catalog.url) {
+        if (!catalog.misses.includes(url)) {
+          catalog.misses.push(url);
+          console.warn(`  WARNING: the app asked for catalog ${url}, not the pinned v${catalog.version}; the request was aborted`);
+        }
+        await route.abort("blockedbyclient").catch(() => {});
+        return;
+      }
+      catalog.served++;
+      await route
+        .fulfill({ status: 200, body: catalog.body, contentType: "application/gzip", headers: { "access-control-allow-origin": "*" } })
+        .catch(() => {}); // The context closed first (e.g. a page that never needed the catalog).
+    },
+  );
 }
 
 /**
@@ -122,6 +164,7 @@ export async function newCaptureContext(
   options: {
     viewport: string;
     appearance: Appearance;
+    target: CaptureTarget;
     storageState?: StorageState;
     blocked: string[];
     still: boolean;
@@ -144,16 +187,18 @@ export async function newCaptureContext(
       : undefined,
   });
   const broken = process.env[BREAK_PIN_ENV] === "1";
-  const guard = await guardContext(context);
+  const { target } = options;
+  const guard = await guardContext(context, target);
   // Any page without its own route (a popup a step opened) gets this pin: rewritten the same way so
   // its UI follows the pin too, but never reported, so its subscriptions can't stand in for the shot page's.
-  await proxyConvexSocket(context, options.blocked, guard, createSessionPin(options.appearance, { broken }));
-  await allowStaticCatalog(context);
+  await proxyConvexSocket(context, target, options.blocked, guard, createSessionPin(options.appearance, { broken }));
+  await servePinnedCatalog(context, target.catalog);
   await context.addInitScript(pinAppearance, options.appearance);
+  if (target.clock !== null) await context.clock.setFixedTime(target.clock);
   // The page that gets shot has its own route and pin, installed before it navigates anywhere.
   const page = await context.newPage();
   const pin = createSessionPin(options.appearance, { broken });
-  await proxyConvexSocket(page, options.blocked, guard, pin);
+  await proxyConvexSocket(page, target, options.blocked, guard, pin);
   return { context, page, pin, guard };
 }
 
@@ -174,9 +219,11 @@ function reportSharedWorkers(binding: string) {
 /**
  * Feeds the context's socket guard: every WebSocket (and its sent frames) Playwright reports on any
  * page, which covers the page's dedicated workers, plus every SharedWorker and service worker started.
+ * Also refuses every HTTP request to a Convex cloud host.
  */
-async function guardContext(context: BrowserContext): Promise<SocketGuard> {
-  const guard = createSocketGuard(convexHostFromEnv());
+async function guardContext(context: BrowserContext, target: CaptureTarget): Promise<SocketGuard> {
+  const guard = createSocketGuard(target.backendHosts);
+  await refuseCloudRequests(context, guard);
   context.on("page", (page) =>
     page.on("websocket", (ws) => {
       if (!guard.isConvexSocket(ws.url())) return;
@@ -191,31 +238,55 @@ async function guardContext(context: BrowserContext): Promise<SocketGuard> {
 }
 
 /**
- * Signs in through /agent-login in a throwaway context and returns that sign-in's cookies/localStorage.
- * Call it once per capture context: each sign-in is its own Convex Auth session, so a step that signs
- * out or reloads (rotating the refresh token) in one context can't sign out the next one.
- * `unproxied` is the sign-in context's own socket guard result.
+ * Signs in with a one-time agent code in a throwaway context and returns that sign-in's
+ * cookies/localStorage. `loginUrl` is a freshly minted `/agent-login#code=…` URL (target.ts
+ * `mintLoginUrl`). The code is only in the fragment, which the browser never sends to a server.
+ * Call it once per capture context, each time with a new code: each sign-in is its own Convex
+ * Auth session, so a step that signs out or reloads (rotating the refresh token) in one context
+ * can't sign out the next one. `unproxied` and `refused` are the sign-in context's own guard results.
  */
-export async function agentLogin(browser: Browser, baseUrl: string, blocked: string[]) {
-  const token = process.env.AGENT_AUTH_SECRET;
-  if (!token) throw new Error("AGENT_AUTH_SECRET is missing (copy .env.local into this checkout)");
+export async function agentLogin(browser: Browser, loginUrl: string, target: CaptureTarget, blocked: string[]) {
   const context = await browser.newContext();
   try {
-    const guard = await guardContext(context);
-    await proxyConvexSocket(context, blocked, guard);
-    await allowStaticCatalog(context);
+    const guard = await guardContext(context, target);
+    await proxyConvexSocket(context, target, blocked, guard);
+    await servePinnedCatalog(context, target.catalog);
     const page = await context.newPage();
     try {
-      await page.goto(`${baseUrl}/agent-login?token=${encodeURIComponent(token)}&next=/decks`, {
-        timeout: 180_000,
-      });
+      await page.goto(loginUrl, { timeout: 180_000 });
       await page.waitForURL((url) => !url.pathname.startsWith("/agent-login"), { timeout: 120_000 });
     } catch {
-      // Playwright errors echo the URL, which contains the token.
+      // Playwright errors echo the URL, and its fragment holds the code.
       throw new Error(`Agent login did not complete (stuck on ${new URL(page.url()).pathname})`);
     }
     const storageState = await context.storageState();
-    return { storageState, unproxied: guard.problems() };
+    return { storageState, unproxied: guard.problems(), refused: guard.refusals() };
+  } finally {
+    await context.close();
+  }
+}
+
+/**
+ * Runs before the first sign-in. Loads `/agent-login` signed out (no code, so nothing is redeemed)
+ * and waits for the app's Convex socket. Throws unless that socket goes to the validation backend,
+ * so a reused `next dev` started with another deployment's URL is caught before any code is sent.
+ */
+export async function probeServerTarget(browser: Browser, baseUrl: string, target: CaptureTarget, blocked: string[]) {
+  const context = await browser.newContext();
+  try {
+    const guard = await guardContext(context, target);
+    await proxyConvexSocket(context, target, blocked, guard);
+    await servePinnedCatalog(context, target.catalog);
+    const page = await context.newPage();
+    await page.goto(`${baseUrl}/agent-login`, { timeout: 180_000 });
+    for (const deadline = Date.now() + 60_000; Date.now() < deadline; ) {
+      if (guard.refusals().length) {
+        throw new Error(`capture refused: the app on ${baseUrl} tried to reach another Convex deployment: ${guard.refusals().join("; ")}`);
+      }
+      if (guard.proxiedCount() > 0) return;
+      await page.waitForTimeout(250);
+    }
+    throw new Error(`capture refused: the app on ${baseUrl} opened no Convex socket within 60s, so its backend can't be confirmed.`);
   } finally {
     await context.close();
   }

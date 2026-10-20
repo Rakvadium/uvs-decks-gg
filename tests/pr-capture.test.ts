@@ -5,12 +5,11 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import zlib from "node:zlib";
-import { agentLogin, newCaptureContext, stableScreenshot } from "../scripts/pr-capture/browser";
-import { convexHostFromEnv, createSocketGuard, isConvexSocket } from "../scripts/pr-capture/guard";
+import { agentLogin, newCaptureContext, probeServerTarget, stableScreenshot, type CaptureTarget } from "../scripts/pr-capture/browser";
+import { createSocketGuard, isBackendUrl, isCloudConvexUrl, isConvexSocket } from "../scripts/pr-capture/guard";
 import { MAX_INFLATED_PER_CHUNK, inflatedPngText, publish, type Git } from "../scripts/pr-capture/publish";
 import { UNSETTLED_PROBLEM, appearanceKey, createSessionPin, pinFlagged, shotPin, stillPin, type Appearance, type PinReport } from "../scripts/pr-capture/pin";
 import {
-  cachedLoad,
   parseArgs,
   parseRouteList,
   rawUrl,
@@ -18,8 +17,35 @@ import {
   requireLabel,
   shotName,
 } from "../scripts/pr-capture/shared";
+import {
+  CODE_SINK_ENV,
+  backendHosts,
+  checkLoginUrl,
+  codeSinkFile,
+  loadPinnedCatalog,
+  mintedEmail,
+  parseClock,
+  parseHelperResult,
+} from "../scripts/pr-capture/target";
+import { DEFAULT_SESSION, RESULT_PREFIX, findUserId, hasPinnableSession, personaEmail } from "../scripts/pr-capture/validation";
 import { loadManifest } from "../scripts/secret-scan/shared";
 import { SKIP_DIRS } from "../scripts/secret-scan/sources";
+
+/** The validation backend of app port 8131 (Convex port 3362). */
+const BACKEND_SOCKET = "ws://127.0.0.1:3362/api/1.31.0/sync";
+const CLOUD_SOCKET = "wss://happy-otter-123.convex.cloud/api/1.31.0/sync";
+const PINNED_CATALOG_URL = "https://pub-x.r2.dev/catalog/uvs/v29.json.gz";
+
+function testTarget(overrides: Partial<CaptureTarget> = {}): CaptureTarget {
+  return {
+    backendHosts: backendHosts(3362),
+    catalog: { version: 29, url: PINNED_CATALOG_URL, sha256: "x", body: Buffer.from("pinned bytes"), served: 0, misses: [] },
+    allowWrites: false,
+    writes: [],
+    clock: null,
+    ...overrides,
+  };
+}
 
 describe("pr-capture args", () => {
   test("parses spaced, inline, and boolean flags", () => {
@@ -74,27 +100,88 @@ describe("pr-capture urls", () => {
   });
 });
 
-describe("pr-capture catalog cache", () => {
-  test("concurrent callers share one load", async () => {
-    const cache = new Map<string, Promise<number>>();
-    let loads = 0;
-    const load = () => Promise.resolve(++loads);
-    expect(await Promise.all([cachedLoad(cache, "k", load), cachedLoad(cache, "k", load)])).toEqual([1, 1]);
-    expect(loads).toBe(1);
+describe("pr-capture validation target", () => {
+  test("the helper's result is its one marked stdout line; CLI chatter around it is ignored", () => {
+    const out = `✔ Added 10879 documents.\n${RESULT_PREFIX}{"appPort":8131}\nmore\n`;
+    expect(parseHelperResult<{ appPort: number }>(out)).toEqual({ appPort: 8131 });
+    expect(() => parseHelperResult("no result here")).toThrow("printed no result");
   });
 
-  test("a late waiter on a failed load can't evict a newer retry", async () => {
-    const cache = new Map<string, Promise<string>>();
-    let loads = 0;
-    const load = () => (++loads === 1 ? Promise.reject(new Error("HTTP 500")) : new Promise<string>(() => {}));
-    // Two waiters on the same failing download. Each retries on failure, like a new browser request.
-    const waiter = () => cachedLoad(cache, "k", load).catch(() => void cachedLoad(cache, "k", load));
-    void waiter();
-    void waiter();
-    await new Promise((resolve) => setTimeout(resolve, 0));
-    // The second waiter reuses the first waiter's retry instead of evicting it and downloading again.
-    expect(loads).toBe(2);
-    expect(cache.has("k")).toBe(true);
+  test("a login URL must be this server's /agent-login with the code in the fragment only", () => {
+    const base = "http://localhost:8131";
+    const code = "A".repeat(43);
+    expect(checkLoginUrl(`${base}/agent-login#code=${code}&next=%2Fdecks`, base)).toBe(`${base}/agent-login#code=${code}&next=%2Fdecks`);
+    for (const bad of [
+      `http://localhost:8132/agent-login#code=${code}`, // another server
+      `${base}/agent-login?code=${code}`, // a query string reaches the server
+      `${base}/agent-login?x=1#code=${code}`,
+      `${base}/other#code=${code}`,
+      `${base}/agent-login#next=%2Fdecks`, // no code
+      "not a url",
+    ]) {
+      const error = (() => {
+        try {
+          checkLoginUrl(bad, base);
+        } catch (e) {
+          return e as Error;
+        }
+      })();
+      expect(error).toBeInstanceOf(Error);
+      expect(error!.message).not.toContain(code);
+    }
+  });
+
+  test("the minted persona is read from agent:login-url's stderr", () => {
+    const stderr = "$ bun scripts/validation/mint-login.ts\n[vconvex] app port 8131 -> ...\n[agent:login-url] alice@validation.invalid, single use, expires 2026-10-20T00:00:00.000Z\n";
+    expect(mintedEmail(stderr)).toBe("alice@validation.invalid");
+    expect(mintedEmail("nothing")).toBeNull();
+    expect(personaEmail("alice")).toBe("alice@validation.invalid");
+  });
+
+  test("--clock takes epoch ms or an ISO date, never a time after now", () => {
+    const now = Date.UTC(2026, 9, 20);
+    expect(parseClock(undefined, now)).toBeNull();
+    expect(parseClock("1790812800000", now)).toBe(1790812800000);
+    expect(parseClock("2026-10-01T00:00:00Z", now)).toBe(Date.UTC(2026, 9, 1));
+    expect(() => parseClock(true, now)).toThrow("needs a value");
+    expect(() => parseClock("soon", now)).toThrow("epoch milliseconds or an ISO date");
+    expect(() => parseClock(String(now + 1), now)).toThrow("later than now");
+  });
+
+  test("the pinned catalog file is re-checked against its sha256 before it is served", () => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "pr-capture-catalog-"));
+    try {
+      const file = path.join(dir, "catalog.json.gz");
+      fs.writeFileSync(file, "pinned bytes");
+      const sha256 = crypto.createHash("sha256").update("pinned bytes").digest("hex");
+      const pin = { version: 29, url: PINNED_CATALOG_URL, sha256, path: file };
+      expect(loadPinnedCatalog(pin).body.toString()).toBe("pinned bytes");
+      fs.writeFileSync(file, "swapped bytes");
+      expect(() => loadPinnedCatalog(pin)).toThrow("the pin is");
+    } finally {
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  test("ensure-session finds the persona's user and only accepts a session the pin can rewrite", () => {
+    const lines = [
+      JSON.stringify({ _id: "u-bruno", email: "bruno@validation.invalid" }),
+      JSON.stringify({ _id: "u-alice", email: "alice@validation.invalid" }),
+    ].join("\n");
+    expect(findUserId(lines, "alice@validation.invalid")).toBe("u-alice");
+    expect(findUserId(lines, "eli@validation.invalid")).toBeNull();
+    expect(hasPinnableSession(null)).toBe(false);
+    expect(hasPinnableSession({ theme: "dark", chrome: "calm" })).toBe(false);
+    expect(hasPinnableSession({ _id: "s", ...DEFAULT_SESSION })).toBe(true);
+  });
+
+  test("the code sink (test only) is off by default and refused inside the checkout", () => {
+    const cwd = path.join(os.tmpdir(), "checkout");
+    expect(codeSinkFile({}, cwd)).toBeNull();
+    expect(codeSinkFile({ [CODE_SINK_ENV]: path.join(os.tmpdir(), "codes.txt") }, cwd)).toBe(path.join(os.tmpdir(), "codes.txt"));
+    for (const inside of ["codes.txt", ".pr-captures/239/codes.txt", path.join(cwd, "x.txt"), "."]) {
+      expect(() => codeSinkFile({ [CODE_SINK_ENV]: inside }, cwd)).toThrow("outside the checkout");
+    }
   });
 });
 
@@ -581,15 +668,42 @@ describe("pr-capture socket guard", () => {
     ]);
   });
 
-  test("Convex sockets: the sync path, or anything on the deployment host", () => {
-    const host = convexHostFromEnv({ NEXT_PUBLIC_CONVEX_URL: "https://happy-otter-123.convex.cloud" });
-    expect(host).toBe("happy-otter-123.convex.cloud");
-    expect(isConvexSocket("wss://happy-otter-123.convex.cloud/api/1.31.0/sync", host)).toBe(true);
-    expect(isConvexSocket("wss://happy-otter-123.convex.cloud/api/v2/stream", host)).toBe(true);
-    expect(isConvexSocket("ws://127.0.0.1:8132/api/probe/sync", host)).toBe(true);
-    expect(isConvexSocket("ws://localhost:8131/_next/webpack-hmr", host)).toBe(false);
-    expect(isConvexSocket("wss://other.convex.cloud/api/v2/stream")).toBe(false);
-    expect(convexHostFromEnv({})).toBeUndefined();
+  test("Convex sockets: the sync path, anything on the backend's hosts, or any Convex cloud host", () => {
+    const hosts = backendHosts(3362);
+    expect(hosts).toEqual(["127.0.0.1:3362", "localhost:3362"]);
+    expect(isConvexSocket(BACKEND_SOCKET, hosts)).toBe(true);
+    expect(isConvexSocket("ws://localhost:3362/api/v2/stream", hosts)).toBe(true);
+    expect(isConvexSocket("ws://127.0.0.1:8132/api/probe/sync", hosts)).toBe(true);
+    expect(isConvexSocket("ws://localhost:8131/_next/webpack-hmr", hosts)).toBe(false);
+    expect(isConvexSocket("wss://other.convex.cloud/api/v2/stream", hosts)).toBe(true);
+    expect(isConvexSocket("wss://other.convex.site/x", hosts)).toBe(true);
+  });
+
+  test("only the backend's own hosts are the target; every Convex cloud host is recognised", () => {
+    const hosts = backendHosts(3362);
+    expect(isBackendUrl(BACKEND_SOCKET, hosts)).toBe(true);
+    expect(isBackendUrl("ws://LOCALHOST:3362/api/1/sync", hosts)).toBe(true);
+    expect(isBackendUrl("ws://127.0.0.1:3364/api/1/sync", hosts)).toBe(false); // another worktree's backend
+    expect(isBackendUrl(CLOUD_SOCKET, hosts)).toBe(false);
+    expect(isBackendUrl("not a url", hosts)).toBe(false);
+    for (const url of [CLOUD_SOCKET, "https://x.convex.site/api/auth", "https://X.CONVEX.CLOUD:443/api/query", "https://convex.cloud/"]) {
+      expect(isCloudConvexUrl(url)).toBe(true);
+    }
+    for (const url of [BACKEND_SOCKET, "https://convex.cloud.example.com/", "https://notconvex.cloud/", "https://pub-x.r2.dev/a.png"]) {
+      expect(isCloudConvexUrl(url)).toBe(false);
+    }
+  });
+
+  test("a refusal keeps the host only, once, and is separate from the tripwire problems", () => {
+    const guard = createSocketGuard(backendHosts(3362));
+    guard.refuse("WebSocket", `${CLOUD_SOCKET}?token=abc`);
+    guard.refuse("WebSocket", CLOUD_SOCKET);
+    guard.refuse("request", "https://x.convex.site/api/auth?code=abc");
+    expect(guard.refusals()).toEqual([
+      "a WebSocket to happy-otter-123.convex.cloud was refused: it is not this worktree's validation backend",
+      "a request to x.convex.site was refused: it is not this worktree's validation backend",
+    ]);
+    expect(guard.problems()).toEqual([]);
   });
 });
 
@@ -638,6 +752,19 @@ function startSharedWorker(context: HookedContext, url: string) {
   return started;
 }
 
+type FakeRoute = ReturnType<typeof fakeRequestRoute>;
+
+/** A routed HTTP request: records whether it was fulfilled (and with what) or aborted. */
+function fakeRequestRoute(url: string) {
+  const result: { network?: boolean; aborted?: string; fulfilled?: { status: number; body: Buffer; headers: Record<string, string> } } = {};
+  return {
+    result,
+    request: () => ({ url: () => url }),
+    abort: async (reason: string) => void (result.aborted = reason),
+    fulfill: async (response: { status: number; body: Buffer; headers: Record<string, string> }) => void (result.fulfilled = response),
+  };
+}
+
 /** Just enough of Playwright's Browser/BrowserContext/Page to drive newCaptureContext's wiring. */
 function fakeBrowser() {
   const fakePage = () => {
@@ -654,16 +781,34 @@ function fakeBrowser() {
     const bindingNames: string[] = [];
     const initScripts: InitScript[] = [];
     const pages: ReturnType<typeof fakePage>[] = [];
+    const routes: { match: (url: URL) => boolean; handler: (route: FakeRoute) => Promise<void> }[] = [];
+    const fixedTimes: number[] = [];
     let wsRoute: ((ws: unknown) => void) | undefined;
+    let wsMatch: ((url: URL) => boolean) | undefined;
     return {
       ...events,
       pages,
       bindings,
       bindingNames,
       initScripts,
-      routeWebSocket: async (_pattern: RegExp, handler: (ws: unknown) => void) => void (wsRoute = handler),
+      fixedTimes,
+      clock: { setFixedTime: async (time: number) => void fixedTimes.push(time) },
+      routeWebSocket: async (match: (url: URL) => boolean, handler: (ws: unknown) => void) => {
+        wsMatch = match;
+        wsRoute = handler;
+      },
+      /** Whether the context's WebSocket route would take `url` (Playwright evaluates the matcher). */
+      routesSocket: (url: string) => wsMatch!(new URL(url)),
       routeSocket: (ws: unknown) => wsRoute!(ws),
-      route: async () => {},
+      route: async (match: (url: URL) => boolean, handler: (route: FakeRoute) => Promise<void>) => void routes.push({ match, handler }),
+      /** A request the way Playwright dispatches it: the first matching route handles it, else it goes to the network. */
+      request: async (url: string) => {
+        const route = fakeRequestRoute(url);
+        const hit = routes.find((r) => r.match(new URL(url)));
+        if (!hit) return { ...route.result, network: true };
+        await hit.handler(route);
+        return route.result;
+      },
       addInitScript: async (script: InitScript["script"], arg?: unknown) => void initScripts.push({ script, arg }),
       exposeBinding: async (name: string, fn: (source: unknown, url: string) => void) => {
         bindingNames.push(name);
@@ -689,10 +834,11 @@ function fakeBrowser() {
 }
 
 /** A routed socket: frames from the page and the server, and what the proxy passed on. */
-function fakeSocketRoute(url = "wss://x.convex.cloud/api/1.0/sync") {
+function fakeSocketRoute(url = BACKEND_SOCKET) {
   const toServer: unknown[] = [];
   const toPage: unknown[] = [];
   const handlers: Record<string, (...args: unknown[]) => void> = {};
+  const state = { connected: false, closed: null as { code?: number; reason?: string } | null };
   const server = {
     send: (m: unknown) => toServer.push(m),
     onMessage: (h: (m: unknown) => void) => void (handlers.server = h as never),
@@ -701,14 +847,18 @@ function fakeSocketRoute(url = "wss://x.convex.cloud/api/1.0/sync") {
   };
   const ws = {
     url: () => url,
-    connectToServer: () => server,
+    connectToServer: () => {
+      state.connected = true;
+      return server;
+    },
     onMessage: (h: (m: unknown) => void) => void (handlers.page = h as never),
     onClose: (h: (code?: number, reason?: string) => void) => void (handlers.pageClose = h as never),
     send: (m: unknown) => toPage.push(m),
-    close: async () => {},
+    close: async (options?: { code?: number; reason?: string }) => void (state.closed = options ?? {}),
   };
   return {
     ws,
+    state,
     toServer,
     toPage,
     fromPage: (m: unknown) => handlers.page(m),
@@ -729,18 +879,86 @@ function nativeSocket(url: string) {
 
 describe("pr-capture capture context wiring", () => {
   const subscribeFrame = JSON.stringify(subscribe);
-  const open = async () => {
+  const open = async (target = testTarget()) => {
     const browser = fakeBrowser();
     const blocked: string[] = [];
     const made = await newCaptureContext(browser as unknown as Parameters<typeof newCaptureContext>[0], {
       viewport: "desktop",
       appearance: PIN,
+      target,
       blocked,
       still: true,
     });
     const context = browser.contexts[0];
-    return { ...made, blocked, context, main: context.pages[0] };
+    return { ...made, blocked, target, context, main: context.pages[0] };
   };
+
+  test("a socket to anything but the validation backend is refused before it connects", async () => {
+    const { guard, context, main } = await open();
+    expect(context.routesSocket(CLOUD_SOCKET)).toBe(true); // routed even without a sync path match
+    expect(context.routesSocket("wss://happy-otter-123.convex.cloud/api/v2/stream")).toBe(true);
+    expect(context.routesSocket("ws://localhost:8131/_next/webpack-hmr")).toBe(false);
+    for (const [route, url] of [
+      [main.route, CLOUD_SOCKET],
+      [context.routeSocket, "ws://127.0.0.1:3364/api/1.31.0/sync"], // another worktree's backend
+    ] as const) {
+      const s = fakeSocketRoute(url);
+      route(s.ws);
+      expect(s.state).toEqual({ connected: false, closed: { code: 1008, reason: "pr-capture: not the validation backend" } });
+    }
+    expect(guard.refusals()).toEqual([
+      expect.stringContaining("a WebSocket to happy-otter-123.convex.cloud was refused"),
+      expect.stringContaining("a WebSocket to 127.0.0.1:3364 was refused"),
+    ]);
+    const local = fakeSocketRoute();
+    main.route(local.ws);
+    expect(local.state.connected).toBe(true);
+  });
+
+  test("HTTP requests to a Convex cloud host are aborted and recorded", async () => {
+    const { guard, context } = await open();
+    expect(await context.request("https://happy-otter-123.convex.site/api/auth")).toEqual({ aborted: "blockedbyclient" });
+    expect(await context.request("http://localhost:8131/api/auth")).toEqual({ network: true });
+    expect(guard.refusals()).toEqual([expect.stringContaining("a request to happy-otter-123.convex.site was refused")]);
+  });
+
+  test("the catalog is served from the pinned bytes, never fetched; any other catalog URL is aborted", async () => {
+    const realFetch = globalThis.fetch;
+    globalThis.fetch = (() => {
+      throw new Error("capture must not download the catalog");
+    }) as unknown as typeof fetch;
+    try {
+      const { context, target } = await open();
+      const pinned = await context.request(PINNED_CATALOG_URL);
+      expect(pinned.fulfilled?.status).toBe(200);
+      expect(pinned.fulfilled?.body.toString()).toBe("pinned bytes");
+      expect(pinned.fulfilled?.headers).toEqual({ "access-control-allow-origin": "*" });
+      const other = "https://pub-x.r2.dev/catalog/uvs/v30.json.gz";
+      expect(await context.request(other)).toEqual({ aborted: "blockedbyclient" });
+      expect(await context.request(other)).toEqual({ aborted: "blockedbyclient" });
+      expect(target.catalog).toMatchObject({ served: 1, misses: [other] });
+      // Card images are not the catalog: they go to the network (public R2).
+      expect(await context.request("https://pub-x.r2.dev/cards/abc.webp")).toEqual({ network: true });
+    } finally {
+      globalThis.fetch = realFetch;
+    }
+  });
+
+  test("--allow-writes forwards writes and records them; by default they are dropped", async () => {
+    const { blocked, target, main } = await open(testTarget({ allowWrites: true }));
+    const s = fakeSocketRoute();
+    main.route(s.ws);
+    const write = JSON.stringify({ type: "Mutation", udfPath: "decks:create" });
+    s.fromPage(write);
+    expect(s.toServer).toEqual([write]);
+    expect(target.writes).toEqual(["Mutation:decks:create"]);
+    expect(blocked).toEqual([]);
+  });
+
+  test("--clock fixes Date.now() in the capture context; without it the clock is left alone", async () => {
+    expect((await open(testTarget({ clock: 1790812800000 }))).context.fixedTimes).toEqual([1790812800000]);
+    expect((await open()).context.fixedTimes).toEqual([]);
+  });
   const cleanSocket = (route: (ws: unknown) => void) => {
     const s = fakeSocketRoute();
     route(s.ws);
@@ -826,23 +1044,28 @@ describe("pr-capture capture context wiring", () => {
 
 describe("pr-capture agent login", () => {
   type Emitter = ReturnType<typeof emitter>;
+  type LoginContext = Emitter & HookedContext & { routeSocket: (ws: unknown) => void };
   /** Runs while the sign-in page loads, like something the page or a worker it starts would do. */
-  type During = (context: Emitter & HookedContext, page: Emitter) => void;
+  type During = (context: LoginContext, page: Emitter) => void;
+  const CODE = "c".repeat(43);
+  const LOGIN_URL = `http://localhost:8131/agent-login#code=${CODE}&next=%2Fdecks`;
   const loginBrowser = (options: { fail?: boolean; during?: During } = {}) => {
-    const contexts: { closed: boolean; state: object }[] = [];
+    const contexts: { closed: boolean; state: object; visited: string[] }[] = [];
     return {
       contexts,
       newContext: async () => {
-        const record = { closed: false, state: { cookies: [{ name: "__convexAuthRefreshToken", value: `t${contexts.length}` }] } };
+        const record = { closed: false, state: { cookies: [{ name: "__convexAuthRefreshToken", value: `t${contexts.length}` }] }, visited: [] as string[] };
         contexts.push(record);
         let at = "about:blank";
-        const context = {
+        let wsRoute: ((ws: unknown) => void) | undefined;
+        const context: LoginContext & Record<string, unknown> = {
           ...emitter(),
           initScripts: [] as InitScript[],
           bindingNames: [] as string[],
           bindings: [] as ((source: unknown, url: string) => void)[],
           route: async () => {},
-          routeWebSocket: async () => {},
+          routeWebSocket: async (_match: unknown, handler: (ws: unknown) => void) => void (wsRoute = handler),
+          routeSocket: (ws: unknown) => wsRoute!(ws),
           addInitScript: async (script: InitScript["script"], arg?: unknown) => void context.initScripts.push({ script, arg }),
           exposeBinding: async (name: string, fn: (source: unknown, url: string) => void) => {
             context.bindingNames.push(name);
@@ -856,11 +1079,13 @@ describe("pr-capture agent login", () => {
               url: () => at,
               goto: async (url: string) => {
                 at = url;
+                record.visited.push(url);
                 options.during?.(context, page);
                 if (options.fail) throw new Error(`timeout navigating to ${url}`);
                 at = "http://localhost:8131/decks";
               },
               waitForURL: async () => {},
+              waitForTimeout: async () => {},
             };
             context.emit("page", page);
             return page;
@@ -870,60 +1095,78 @@ describe("pr-capture agent login", () => {
       },
     };
   };
-  const withSecret = async (run: () => Promise<void>) => {
-    const previous = process.env.AGENT_AUTH_SECRET;
-    process.env.AGENT_AUTH_SECRET = "s3cret";
-    try {
-      await run();
-    } finally {
-      if (previous === undefined) delete process.env.AGENT_AUTH_SECRET;
-      else process.env.AGENT_AUTH_SECRET = previous;
-    }
-  };
+  const asBrowser = (browser: ReturnType<typeof loginBrowser>) => browser as unknown as Parameters<typeof agentLogin>[0];
 
-  test("every call is its own sign-in in its own throwaway context", () =>
-    withSecret(async () => {
-      const browser = loginBrowser();
-      const asBrowser = browser as unknown as Parameters<typeof agentLogin>[0];
-      const first = await agentLogin(asBrowser, "http://localhost:8131", []);
-      const second = await agentLogin(asBrowser, "http://localhost:8131", []);
-      expect(browser.contexts).toHaveLength(2);
-      expect(browser.contexts.every((context) => context.closed)).toBe(true);
-      expect(first.storageState as object).toBe(browser.contexts[0].state);
-      expect(second.storageState as object).toBe(browser.contexts[1].state);
-      expect([first.unproxied, second.unproxied]).toEqual([[], []]);
-    }));
+  test("every call is its own sign-in, with its own code, in its own throwaway context", async () => {
+    const browser = loginBrowser();
+    const second = LOGIN_URL.replace(CODE, "d".repeat(43));
+    const first = await agentLogin(asBrowser(browser), LOGIN_URL, testTarget(), []);
+    const next = await agentLogin(asBrowser(browser), second, testTarget(), []);
+    expect(browser.contexts).toHaveLength(2);
+    expect(browser.contexts.map((context) => context.visited)).toEqual([[LOGIN_URL], [second]]);
+    expect(browser.contexts.every((context) => context.closed)).toBe(true);
+    expect(first.storageState as object).toBe(browser.contexts[0].state);
+    expect(next.storageState as object).toBe(browser.contexts[1].state);
+    expect([first.unproxied, next.unproxied, first.refused]).toEqual([[], [], []]);
+  });
 
-  test("unproxied is the sign-in context's own guard result: worker sockets, SharedWorkers, service workers", () =>
-    withSecret(async () => {
-      const login = (during: During) =>
-        agentLogin(loginBrowser({ during }) as unknown as Parameters<typeof agentLogin>[0], "http://localhost:8131", []);
-      const worker = await login((_context, page) => {
-        const socket = nativeSocket("wss://x.convex.cloud/api/1.0/sync"); // a dedicated worker's socket: never proxied
-        page.emit("websocket", socket);
-        socket.send(JSON.stringify({ type: "Connect", sessionId: "w" }));
-      });
-      expect(worker.unproxied).toEqual([
-        expect.stringContaining("1 frame(s) (Connect ×1) were sent on a Convex WebSocket the capture proxy never saw"),
-        expect.stringContaining("1 more Convex WebSocket(s) were opened than the capture proxy saw"),
-      ]);
-      const shared = await login((context) => void startSharedWorker(context, "/shared.js"));
-      expect(shared.unproxied).toEqual([expect.stringContaining("a SharedWorker started (/shared.js)")]);
-      const service = await login((context) => context.emit("serviceworker", { url: () => "http://localhost:8131/sw.js" }));
-      expect(service.unproxied).toEqual([expect.stringContaining("a service worker started (http://localhost:8131/sw.js)")]);
-    }));
+  test("unproxied is the sign-in context's own guard result: worker sockets, SharedWorkers, service workers", async () => {
+    const login = (during: During) => agentLogin(asBrowser(loginBrowser({ during })), LOGIN_URL, testTarget(), []);
+    const worker = await login((_context, page) => {
+      const socket = nativeSocket(BACKEND_SOCKET); // a dedicated worker's socket: never proxied
+      page.emit("websocket", socket);
+      socket.send(JSON.stringify({ type: "Connect", sessionId: "w" }));
+    });
+    expect(worker.unproxied).toEqual([
+      expect.stringContaining("1 frame(s) (Connect ×1) were sent on a Convex WebSocket the capture proxy never saw"),
+      expect.stringContaining("1 more Convex WebSocket(s) were opened than the capture proxy saw"),
+    ]);
+    const shared = await login((context) => void startSharedWorker(context, "/shared.js"));
+    expect(shared.unproxied).toEqual([expect.stringContaining("a SharedWorker started (/shared.js)")]);
+    const service = await login((context) => context.emit("serviceworker", { url: () => "http://localhost:8131/sw.js" }));
+    expect(service.unproxied).toEqual([expect.stringContaining("a service worker started (http://localhost:8131/sw.js)")]);
+  });
 
-  test("a failed sign-in closes its context and never echoes the token", () =>
-    withSecret(async () => {
-      const browser = loginBrowser({ fail: true });
-      const error = await agentLogin(browser as unknown as Parameters<typeof agentLogin>[0], "http://localhost:8131", []).catch(
-        (e: unknown) => e,
-      );
-      expect(error).toBeInstanceOf(Error);
-      expect((error as Error).message).toContain("stuck on /agent-login");
-      expect((error as Error).message).not.toContain("s3cret");
-      expect(browser.contexts[0].closed).toBe(true);
-    }));
+  test("a sign-in page that dials a cloud deployment is refused and reported", async () => {
+    let socket: ReturnType<typeof fakeSocketRoute> | undefined;
+    const login = await agentLogin(
+      asBrowser(
+        loginBrowser({
+          during: (context) => {
+            socket = fakeSocketRoute(CLOUD_SOCKET);
+            context.routeSocket(socket.ws);
+          },
+        }),
+      ),
+      LOGIN_URL,
+      testTarget(),
+      [],
+    );
+    expect(socket!.state.connected).toBe(false);
+    expect(login.refused).toEqual([expect.stringContaining("a WebSocket to happy-otter-123.convex.cloud was refused")]);
+  });
+
+  test("a failed sign-in closes its context and never echoes the code", async () => {
+    const browser = loginBrowser({ fail: true });
+    const error = await agentLogin(asBrowser(browser), LOGIN_URL, testTarget(), []).catch((e: unknown) => e);
+    expect(error).toBeInstanceOf(Error);
+    expect((error as Error).message).toContain("stuck on /agent-login");
+    expect((error as Error).message).not.toContain(CODE);
+    expect(browser.contexts[0].closed).toBe(true);
+  });
+
+  test("the server probe passes on a backend socket and refuses a cloud one, without any code", async () => {
+    const probe = (url: string | null) => {
+      const browser = loginBrowser({ during: (context) => void (url && context.routeSocket(fakeSocketRoute(url).ws)) });
+      return { browser, run: probeServerTarget(asBrowser(browser), "http://localhost:8131", testTarget(), []) };
+    };
+    const ok = probe(BACKEND_SOCKET);
+    await ok.run;
+    expect(ok.browser.contexts[0]).toMatchObject({ visited: ["http://localhost:8131/agent-login"], closed: true });
+    const cloud = probe(CLOUD_SOCKET);
+    expect(await cloud.run.catch((e: Error) => e.message)).toContain("tried to reach another Convex deployment");
+    expect(cloud.browser.contexts[0].closed).toBe(true);
+  });
 });
 
 const PUBLISH = path.join(import.meta.dir, "../scripts/pr-capture/publish.ts");

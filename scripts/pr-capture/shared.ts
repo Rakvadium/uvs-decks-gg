@@ -20,6 +20,8 @@ export type RouteSpec = {
   auth: Auth;
   name?: string;
   steps?: Step[];
+  /** Signed-in routes: overrides --persona (`<persona>@validation.invalid`). */
+  persona?: string;
   /** Overrides --viewports for this route (e.g. a desktop-only menu). */
   viewports?: string[];
 };
@@ -111,19 +113,4 @@ export function repoSlug(remoteUrl = git(["remote", "get-url", "origin"])): stri
 export function rawUrl(repo: string, relativePath: string): string {
   const encoded = relativePath.split("/").map(encodeURIComponent).join("/");
   return `https://raw.githubusercontent.com/${repo}/${MEDIA_BRANCH}/${encoded}`;
-}
-
-/**
- * Shares one load per key across concurrent callers. A failed load is forgotten (once, by the load
- * itself) so the next caller retries; a late waiter on the failure can't evict a newer retry.
- */
-export function cachedLoad<T>(cache: Map<string, Promise<T>>, key: string, load: () => Promise<T>): Promise<T> {
-  const existing = cache.get(key);
-  if (existing) return existing;
-  const promise = load();
-  cache.set(key, promise);
-  promise.catch(() => {
-    if (cache.get(key) === promise) cache.delete(key);
-  });
-  return promise;
 }
