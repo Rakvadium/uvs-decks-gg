@@ -55,10 +55,10 @@ Cap: 8 new issues.
 Deduplicate against open issues first.
 
 LABELS ARE MANDATORY (GitHub labels, not markdown):
-- Every issue: gh issue create ... --label size/S|M|L --label area/ui|shell|... --label agent-ready|needs-human
+- Every issue: bun run gh-post -- issue create ... --label size/S|M|L --label area/ui|shell|... --label agent-ready|needs-human
 - Readiness: size/S or size/M → agent-ready; size/L → needs-human
 - Do NOT write ## Size / ## Area in the issue body as a substitute
-- After create: gh issue view N --json labels — fix with gh issue edit --add-label if missing
+- After create: gh issue view N --json labels — fix with bun run gh-post -- issue edit N --add-label if missing
 ```
 
 ## Forbidden
