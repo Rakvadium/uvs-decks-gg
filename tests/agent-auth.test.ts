@@ -28,8 +28,8 @@ function setDevAgentEnv(overrides?: Partial<Record<(typeof KEYS)[number], string
   setEnv("NODE_ENV", "development");
   setEnv("VERCEL", undefined);
   setEnv("AGENT_AUTH_SECRET", "test-agent-secret");
-  setEnv("AGENT_AUTH_EMAIL", "agent@localhost.dev");
-  setEnv("AGENT_AUTH_PASSWORD", "AgentDev1");
+  setEnv("AGENT_AUTH_EMAIL", "agent@example.test");
+  setEnv("AGENT_AUTH_PASSWORD", "test-password-1");
   setEnv("AGENT_AUTH_USERNAME", "agent");
   if (overrides) {
     for (const [key, value] of Object.entries(overrides) as Array<
@@ -68,8 +68,8 @@ describe("agent-auth", () => {
   test("getAgentAuthCredentials requires configured password rules", () => {
     setDevAgentEnv();
     expect(getAgentAuthCredentials()).toEqual({
-      email: "agent@localhost.dev",
-      password: "AgentDev1",
+      email: "agent@example.test",
+      password: "test-password-1",
       username: "agent",
     });
 
@@ -79,7 +79,7 @@ describe("agent-auth", () => {
 
   test("assertAgentAuthSecret rejects bad secrets", () => {
     setDevAgentEnv();
-    expect(assertAgentAuthSecret("test-agent-secret").email).toBe("agent@localhost.dev");
+    expect(assertAgentAuthSecret("test-agent-secret").email).toBe("agent@example.test");
     expect(() => assertAgentAuthSecret("wrong")).toThrow("Invalid agent auth secret");
   });
 
