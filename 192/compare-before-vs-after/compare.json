@@ -5,31 +5,31 @@
   "results": [
     {
       "name": "community__desktop__aurora__dark",
-      "diffPercent": 0.001
+      "diffPercent": 0.016
     },
     {
       "name": "community__desktop__aurora__light",
-      "diffPercent": 0
+      "diffPercent": 0.016
     },
     {
       "name": "community__desktop__cyberpunk__dark",
-      "diffPercent": 0
+      "diffPercent": 15.83
     },
     {
       "name": "community__desktop__cyberpunk__light",
-      "diffPercent": 0
+      "diffPercent": 0.017
     },
     {
       "name": "community__desktop__default__dark",
-      "diffPercent": 15.821
+      "diffPercent": 15.837
     },
     {
       "name": "community__desktop__default__light",
-      "diffPercent": 15.84
+      "diffPercent": 0.017
     },
     {
       "name": "community__mobile__aurora__dark",
-      "diffPercent": 16.041
+      "diffPercent": 15.491
     },
     {
       "name": "community__mobile__aurora__light",
@@ -41,7 +41,7 @@
     },
     {
       "name": "community__mobile__cyberpunk__light",
-      "diffPercent": 0
+      "diffPercent": 15.505
     },
     {
       "name": "community__mobile__default__dark",
@@ -57,7 +57,7 @@
     },
     {
       "name": "deck-card-dialog-open__desktop__aurora__light",
-      "diffPercent": 0.181
+      "diffPercent": 0.18
     },
     {
       "name": "deck-card-dialog-open__desktop__cyberpunk__dark",
@@ -181,19 +181,19 @@
     },
     {
       "name": "filter-panel-open__desktop__cyberpunk__dark",
-      "diffPercent": 0.013
+      "diffPercent": 0.014
     },
     {
       "name": "filter-panel-open__desktop__cyberpunk__light",
-      "diffPercent": 0.014
+      "diffPercent": 0.013
     },
     {
       "name": "filter-panel-open__desktop__default__dark",
-      "diffPercent": 0.014
+      "diffPercent": 0.013
     },
     {
       "name": "filter-panel-open__desktop__default__light",
-      "diffPercent": 0.013
+      "diffPercent": 0.014
     },
     {
       "name": "filter-panel-sets__desktop__aurora__dark",
@@ -209,11 +209,11 @@
     },
     {
       "name": "filter-panel-sets__desktop__cyberpunk__light",
-      "diffPercent": 0
+      "diffPercent": 0.001
     },
     {
       "name": "filter-panel-sets__desktop__default__dark",
-      "diffPercent": 0.037
+      "diffPercent": 0.038
     },
     {
       "name": "filter-panel-sets__desktop__default__light",
@@ -277,7 +277,7 @@
     },
     {
       "name": "guest-gallery__desktop__cyberpunk__dark",
-      "diffPercent": 0.243
+      "diffPercent": 0.242
     },
     {
       "name": "guest-gallery__desktop__cyberpunk__light",
@@ -337,11 +337,11 @@
     },
     {
       "name": "guest-ghost-hover__desktop__default__light",
-      "diffPercent": 0.496
+      "diffPercent": 0.495
     },
     {
       "name": "guest-secondary-hover__desktop__aurora__dark",
-      "diffPercent": 0.25
+      "diffPercent": 0.248
     },
     {
       "name": "guest-secondary-hover__desktop__aurora__light",
@@ -349,7 +349,7 @@
     },
     {
       "name": "guest-secondary-hover__desktop__cyberpunk__dark",
-      "diffPercent": 0.226
+      "diffPercent": 0.225
     },
     {
       "name": "guest-secondary-hover__desktop__cyberpunk__light",
@@ -361,7 +361,7 @@
     },
     {
       "name": "guest-secondary-hover__desktop__default__light",
-      "diffPercent": 0.228
+      "diffPercent": 0.227
     },
     {
       "name": "mobile-profile-sheet-open__mobile__aurora__dark",
@@ -437,7 +437,7 @@
     },
     {
       "name": "select-open__desktop__aurora__dark",
-      "diffPercent": 0.004
+      "diffPercent": 0.037
     },
     {
       "name": "select-open__desktop__aurora__light",
@@ -489,7 +489,7 @@
     },
     {
       "name": "settings__desktop__aurora__light",
-      "diffPercent": 0.015
+      "diffPercent": 0.016
     },
     {
       "name": "settings__desktop__cyberpunk__dark",
@@ -505,7 +505,7 @@
     },
     {
       "name": "settings__desktop__default__light",
-      "diffPercent": 0.016
+      "diffPercent": 0.058
     },
     {
       "name": "settings__mobile__aurora__dark",
