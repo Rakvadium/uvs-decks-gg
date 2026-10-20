@@ -656,6 +656,14 @@ export function headBlobs(repoRoot: string, rels: string[]): Map<string, string 
   return out;
 }
 
+/** Which of `rels` `git status` lists as changed, or null when git can't tell. */
+function gitChanged(repoRoot: string, rels: string[]): Set<string> | null {
+  if (rels.length === 0) return new Set();
+  const out = runGit(repoRoot, ["status", "--porcelain=v1", "-z", "--untracked-files=no", "--", ...rels]);
+  if (out === null) return null;
+  return new Set(out.split("\0").filter((r) => r.length > 3).map((r) => r.slice(3)));
+}
+
 export function takeCliSnapshot(repoRoot = REPO_ROOT): CliSnapshotEntry[] {
   const read = (rel: string) => {
     const full = path.join(repoRoot, rel);
@@ -772,6 +780,10 @@ export function restoreCliSnapshot(
   };
   const readFile = (full: string) => (fs.existsSync(full) ? fs.readFileSync(full) : null);
   const heads = snapshot.some((e) => e.head !== undefined) ? headBlobs(repoRoot, snapshot.map((e) => e.rel)) : null;
+  // A codegen file git already calls unchanged needs no line-ending fix. A `git checkout` since the
+  // snapshot may have rewritten it with LF, and putting the snapshot's CRLF bytes back would then
+  // make git list it as modified.
+  const eolChanged = heads ? gitChanged(repoRoot, snapshot.filter((e) => e.mode === "eol").map((e) => e.rel)) : null;
   const reverted = snapshot.flatMap(({ rel, mode, content, head }): RevertedFile[] => {
     const full = path.join(repoRoot, rel);
     const now = readFile(full);
@@ -797,6 +809,7 @@ export function restoreCliSnapshot(
       return [{ rel, backup, stale: { snapshotBackup } }];
     }
     if (mode === "eol") {
+      if (eolChanged !== null && !eolChanged.has(rel)) return [];
       if (before === null || now === null || now.equals(before) || lf(now) !== lf(before)) return [];
       fs.writeFileSync(full, before);
       return [{ rel }];

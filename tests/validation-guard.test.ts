@@ -1082,6 +1082,33 @@ describe("CLI side-effect restore", () => {
     expect(read(root, RULES)).toBe("rules on other\n");
   });
 
+  test("codegen goes back to CRLF only while git lists the CLI's LF rewrite as modified", () => {
+    const root = tmpDir("uvs-repo-");
+    const GEN = "convex/_generated/api.js";
+    git(root, "init", "-q", "-b", "main");
+    write(root, ".gitattributes", "convex/_generated/** text eol=lf\n");
+    write(root, GEN, "a\nb\n");
+    git(root, "add", "-A");
+    git(root, "commit", "-q", "-m", "init");
+    // A checkout from before .gitattributes: CRLF on disk, and an index that matches it.
+    write(root, GEN, "a\r\nb\r\n");
+    git(root, "add", GEN);
+    expect(git(root, "status", "--porcelain")).toBe("");
+    const snapshot = saved(root);
+    write(root, GEN, "a\nb\n");
+    expect(git(root, "status", "--porcelain")).toContain(GEN);
+    expect(restoreCliSnapshot(snapshot, root).map((r) => r.rel)).toEqual([GEN]);
+    expect(read(root, GEN)).toBe("a\r\nb\r\n");
+    expect(git(root, "status", "--porcelain")).toBe("");
+    // After a killed start, `git checkout -f` writes it with LF and git calls it clean: leave it.
+    write(root, GEN, "a\nb\n");
+    git(root, "checkout", "-q", "-f", "HEAD");
+    expect(git(root, "status", "--porcelain")).toBe("");
+    expect(restoreCliSnapshot(snapshot, root)).toEqual([]);
+    expect(read(root, GEN)).toBe("a\nb\n");
+    expect(git(root, "status", "--porcelain")).toBe("");
+  });
+
   test("identical backups are kept once, and only the newest dirs are kept per port", () => {
     const root = tmpDir("uvs-repo-");
     const home = tmpDir("uvs-home-");
