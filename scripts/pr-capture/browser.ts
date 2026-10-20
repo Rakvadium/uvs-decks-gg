@@ -1,4 +1,4 @@
-import type { Browser, BrowserContext, BrowserContextOptions, Page } from "playwright";
+import type { Browser, BrowserContext, BrowserContextOptions, Page, WebSocketRoute } from "playwright";
 import { BREAK_PIN_ENV, createSessionPin, parseFrame, type Appearance, type ClientFrame, type SessionPin } from "./pin.ts";
 import { VIEWPORTS, cachedLoad, type Step } from "./shared.ts";
 
@@ -32,6 +32,18 @@ async function proxyConvexSocket(context: BrowserContext, blocked: string[], pin
     if (!socket) return;
     server.onMessage((message) => {
       for (const out of socket.fromServer(message)) ws.send(out);
+    });
+    // Setting onClose turns off Playwright's automatic close forwarding, so forward it ourselves.
+    // Codes a peer may not send (1005/1006, ...) are rejected, so fall back to a plain close.
+    const forward = (target: WebSocketRoute, code: number | undefined, reason: string | undefined) =>
+      target.close({ code, reason }).catch(() => target.close().catch(() => {}));
+    ws.onClose((code, reason) => {
+      socket.close();
+      void forward(server, code, reason);
+    });
+    server.onClose((code, reason) => {
+      socket.close();
+      void forward(ws, code, reason);
     });
   });
 }

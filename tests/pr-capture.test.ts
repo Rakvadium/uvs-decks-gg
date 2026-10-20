@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { stableScreenshot } from "../scripts/pr-capture/browser";
-import { appearanceKey, createSessionPin, pinFlagged, shotPin, type Appearance, type PinReport } from "../scripts/pr-capture/pin";
+import { UNSETTLED_PROBLEM, appearanceKey, createSessionPin, pinFlagged, shotPin, stillPin, type Appearance, type PinReport } from "../scripts/pr-capture/pin";
 import {
   cachedLoad,
   parseArgs,
@@ -121,7 +121,7 @@ describe("pr-capture session pin", () => {
       chrome: "calm",
       colorSource: { kind: "preset", preset: "aurora" },
     });
-    expect(pin.report()).toEqual({ saved: "cyberpunk/dark/expressive", patched: true, problems: [] });
+    expect(pin.report()).toMatchObject({ saved: "cyberpunk/dark/expressive", patched: true, problems: [] });
   });
 
   test("reassembles chunked transitions before patching", () => {
@@ -181,7 +181,7 @@ describe("pr-capture session pin", () => {
   test("records a custom colorSource as saved preset `custom`", () => {
     const { pin, socket } = subscribedPin();
     socket.fromServer(update({ ...SAVED, colorSource: { kind: "custom", custom: {} } }));
-    expect(pin.report()).toEqual({ saved: "custom/dark/expressive", patched: true, problems: [] });
+    expect(pin.report()).toMatchObject({ saved: "custom/dark/expressive", patched: true, problems: [] });
   });
 
   test.each([
@@ -223,7 +223,7 @@ describe("pr-capture session pin", () => {
     socket.fromServer(JSON.stringify({ type: "Ping" }));
     socket.fromServer(update(SAVED));
     pin.socket().fromServer(JSON.stringify({ type: "TransitionV2" }));
-    expect(pin.report()).toEqual({ saved: "cyberpunk/dark/expressive", patched: true, problems: [] });
+    expect(pin.report()).toMatchObject({ saved: "cyberpunk/dark/expressive", patched: true, problems: [] });
   });
 });
 
@@ -260,7 +260,7 @@ describe("pr-capture session pin: every subscription, every result", () => {
     s.fromServer(updateFor(3, SAVED));
     const report = pin.report();
     expect([report.patched, pinFlagged(report)]).toEqual([false, true]);
-    expect(has(report, "1 of 2 sessions:getSession subscription(s) had no rewritten result")).toBe(true);
+    expect(has(report, "1 of 2 live sessions:getSession subscription(s) had no rewritten result")).toBe(true);
   });
 
   test("a second subscription whose result uses an unknown type is a problem", () => {
@@ -304,7 +304,7 @@ describe("pr-capture session pin: every subscription, every result", () => {
     expect(
       pinFlagged(reconnect((s) => s.fromServer(JSON.stringify({ type: "TransitionV2", modifications: [{ type: "QueryUpdated", queryId: 0, value: SAVED }] })))),
     ).toBe(true);
-    expect(reconnect((s) => s.fromServer(updateFor(0, SAVED)))).toEqual({ saved: "cyberpunk/dark/expressive", patched: true, problems: [] });
+    expect(reconnect((s) => s.fromServer(updateFor(0, SAVED)))).toMatchObject({ saved: "cyberpunk/dark/expressive", patched: true, problems: [] });
   });
 
   test("a removed subscription no longer needs a result", () => {
@@ -314,7 +314,7 @@ describe("pr-capture session pin: every subscription, every result", () => {
     s.fromClient({ type: "ModifyQuerySet", modifications: [{ type: "Remove", queryId: 3 }] });
     s.fromClient(add(4));
     s.fromServer(updateFor(4, SAVED));
-    expect(pin.report()).toEqual({ saved: "cyberpunk/dark/expressive", patched: true, problems: [] });
+    expect(pin.report()).toMatchObject({ saved: "cyberpunk/dark/expressive", patched: true, problems: [] });
   });
 
   test("a report is a snapshot: a result that arrives after it doesn't count", () => {
@@ -324,7 +324,7 @@ describe("pr-capture session pin: every subscription, every result", () => {
     const atScreenshot = pin.report();
     s.fromServer(updateFor(3, SAVED));
     expect([atScreenshot.patched, pinFlagged(atScreenshot)]).toEqual([false, true]);
-    expect(pin.report()).toEqual({ saved: "cyberpunk/dark/expressive", patched: true, problems: [] });
+    expect(pin.report()).toMatchObject({ saved: "cyberpunk/dark/expressive", patched: true, problems: [] });
   });
 
   test("a clean report has no problems, so it isn't flagged", () => {
@@ -352,7 +352,7 @@ describe("pr-capture session pin: removal, every GIF frame, stable window", () =
     drive(s);
     const report = pin.report();
     expect([report.patched, pinFlagged(report)]).toEqual([false, true]);
-    expect(has(report, "every sessions:getSession subscription was removed")).toBe(true);
+    expect(has(report, "no live sessions:getSession subscription")).toBe(true);
     expect(shotPin([report], PIN).flagged).toBe(true);
   });
 
@@ -368,10 +368,13 @@ describe("pr-capture session pin: removal, every GIF frame, stable window", () =
     s.fromServer(updateFor(4, SAVED));
     const last = pin.report();
     expect([pinFlagged(first), pinFlagged(last)]).toEqual([false, false]);
-    expect(shotPin([first, last], PIN).flagged).toBe(false);
+    // Even without the middle snapshot, the unpinned counter moved between first and last, so the gap is caught.
+    const ends = shotPin([first, last], PIN);
+    expect(ends.flagged).toBe(true);
+    expect(has(ends, "not fully applied at some point between snapshots")).toBe(true);
     const gif = shotPin([first, middle, last], PIN);
     expect([gif.patched, gif.flagged]).toEqual([false, true]);
-    expect(has(gif, "every sessions:getSession subscription was removed")).toBe(true);
+    expect(has(gif, "no live sessions:getSession subscription")).toBe(true);
   });
 
   test("shotPin: a missing snapshot or an unexplained patched:false is a problem", () => {
@@ -406,4 +409,104 @@ describe("pr-capture session pin: removal, every GIF frame, stable window", () =
     // Pixels alone were quiet from the first shot; the change pushed the return to >= 2s after it.
     expect(Date.now() - changedAt).toBeGreaterThanOrEqual(1_900);
   }, 15_000);
+});
+
+describe("pr-capture session pin: socket close, unsettled shots, GIF churn", () => {
+  const add = (queryId: number) => ({ type: "ModifyQuerySet", modifications: [{ type: "Add", queryId, udfPath: "sessions:getSession" }] });
+  const remove = (queryId: number) => ({ type: "ModifyQuerySet", modifications: [{ type: "Remove", queryId }] });
+  const updateFor = (queryId: number, value: unknown) =>
+    JSON.stringify({ type: "Transition", modifications: [{ type: "QueryUpdated", queryId, value }] });
+  const cleanSocket = (pin: ReturnType<typeof createSessionPin>, queryId = 3) => {
+    const s = pin.socket();
+    s.fromClient(add(queryId));
+    s.fromServer(updateFor(queryId, SAVED));
+    return s;
+  };
+
+  test("a reload whose new socket never re-subscribes is flagged once the old socket closes", () => {
+    const pin = createSessionPin(PIN);
+    const old = cleanSocket(pin);
+    old.close();
+    pin.socket(); // signed out: useQuery skips getSession
+    const report = pin.report();
+    expect([report.patched, pinFlagged(report)]).toEqual([false, true]);
+    expect(has(report, "no live sessions:getSession subscription")).toBe(true);
+  });
+
+  test("a reconnect whose new socket removes its subscription is flagged", () => {
+    const pin = createSessionPin(PIN);
+    cleanSocket(pin).close();
+    const next = pin.socket();
+    next.fromClient(add(0));
+    next.fromClient(remove(0)); // AuthError restart, refresh fails, the provider skips the query
+    expect(pinFlagged(pin.report())).toBe(true);
+  });
+
+  test("an old socket that closed while pending doesn't flag a correct page", () => {
+    const pin = createSessionPin(PIN);
+    const old = pin.socket();
+    old.fromClient(add(3));
+    old.close(); // closed before its result arrived
+    cleanSocket(pin, 0);
+    expect(pin.report()).toMatchObject({ saved: "cyberpunk/dark/expressive", patched: true, problems: [] });
+  });
+
+  test("a closed socket drops its half-received chunks and ignores late frames", () => {
+    const pin = createSessionPin(PIN);
+    const old = pin.socket();
+    old.fromClient(add(3));
+    const whole = updateFor(3, SAVED);
+    old.fromServer(chunk(whole.slice(0, 10), 0));
+    old.close();
+    old.fromClient(add(4));
+    expect(old.fromServer(chunk(whole.slice(10), 1))).toEqual([chunk(whole.slice(10), 1)]);
+    cleanSocket(pin, 0);
+    expect(pin.report()).toMatchObject({ patched: true, problems: [] });
+  });
+
+  test("an unsettled stability window flags a signed-in shot", () => {
+    const pin = createSessionPin(PIN);
+    cleanSocket(pin);
+    const report = pin.report();
+    expect(shotPin([report], PIN).flagged).toBe(false);
+    const unsettled = shotPin([report], PIN, ["the stability window ran out"]);
+    expect([unsettled.patched, unsettled.flagged]).toEqual([true, true]);
+    expect(stillPin(report, true, PIN).flagged).toBe(false);
+    const timedOut = stillPin(report, false, PIN);
+    expect([timedOut.flagged, timedOut.problems]).toEqual([true, [UNSETTLED_PROBLEM]]);
+  });
+
+  test("GIF: a Remove + Add + rewrite entirely between two frames is still caught", () => {
+    const pin = createSessionPin(PIN);
+    const s = cleanSocket(pin);
+    const before = pin.report();
+    s.fromClient(remove(3));
+    s.fromClient(add(5));
+    s.fromServer(updateFor(5, SAVED));
+    const after = pin.report();
+    expect([pinFlagged(before), pinFlagged(after)]).toEqual([false, false]);
+    expect(after.unpinned).toBeGreaterThan(before.unpinned!);
+    expect(shotPin([before, after], PIN).flagged).toBe(true);
+  });
+
+  test("GIF: a skip that lands after the last frame is caught by the snapshot taken after recording", () => {
+    const pin = createSessionPin(PIN);
+    const s = cleanSocket(pin);
+    const lastFrame = pin.report();
+    s.fromClient(remove(3));
+    const afterRecording = pin.report();
+    expect(shotPin([lastFrame], PIN).flagged).toBe(false);
+    expect(shotPin([lastFrame, afterRecording], PIN).flagged).toBe(true);
+  });
+
+  test("a steady clean context keeps the same counters, so repeated snapshots stay clean", () => {
+    const pin = createSessionPin(PIN);
+    const s = cleanSocket(pin);
+    const a = pin.report();
+    s.fromServer(JSON.stringify({ type: "Ping" }));
+    s.fromServer(updateFor(3, SAVED)); // a later rewritten update is a change, but not an unpinned one
+    const b = pin.report();
+    expect(b.unpinned).toBe(a.unpinned);
+    expect(shotPin([a, b, pin.report()], PIN).flagged).toBe(false);
+  });
 });

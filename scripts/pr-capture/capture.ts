@@ -13,7 +13,7 @@ import {
   stableScreenshot,
 } from "./browser.ts";
 import { recordFrames, writeGif } from "./gif.ts";
-import { BREAK_PIN_ENV, shotPin, type Appearance, type PinReport, type ShotPin } from "./pin.ts";
+import { BREAK_PIN_ENV, shotPin, stillPin, type Appearance, type PinReport, type ShotPin } from "./pin.ts";
 import {
   OUTPUT_ROOT,
   VIEWPORTS,
@@ -118,6 +118,9 @@ function shotPinFor(snapshots: (PinReport | undefined)[], auth: RouteSpec["auth"
   return auth === "agent" ? shotPin(snapshots, appearance) : null;
 }
 
+/** After the last GIF frame, give an in-flight session change time to reach Node before the final snapshot. */
+const GIF_TAIL_MS = 500;
+
 function warnPin(pin: ShotPin | null) {
   if (pin?.problems.length) console.warn(`    WARNING: JS theme pin may not apply: ${pin.problems.join("; ")}`);
 }
@@ -159,7 +162,7 @@ async function captureStill(
       finalPath !== route.path && `landed on ${finalPath}`,
     ].filter(Boolean);
     console.log(`  ${name}.png${notes.length ? `  (${notes.join("; ")})` : ""}`);
-    const report = shotPinFor([at], route.auth, appearance);
+    const report = route.auth === "agent" ? stillPin(at, stable, appearance) : null;
     warnPin(report);
     return { name, route: route.path, auth: route.auth, appearance, finalPath, loaded, stable, pin: report };
   } finally {
@@ -187,15 +190,19 @@ async function captureGif(
   });
   const page = await context.newPage();
   let frames: Awaited<ReturnType<typeof recordFrames<PinReport>>> = [];
+  let afterRecording: PinReport | undefined;
   try {
     await page.goto(baseUrl + gif.path, { timeout: 180_000 });
     await settle(page);
     await page.addStyleTag({ content: HIDE_DEV_OVERLAY_CSS });
     frames = await recordFrames(page, gif.steps ?? [], gif.auth === "agent" ? pin.report : undefined);
+    // Something rendered during the last frame may only reach Node afterwards; snapshot once more.
+    await page.waitForTimeout(GIF_TAIL_MS);
+    afterRecording = pin.report();
   } finally {
     await context.close();
   }
-  const gifPin = shotPinFor(frames.length ? frames.map((frame) => frame.snapshot) : [undefined], gif.auth, appearance);
+  const gifPin = shotPinFor([...(frames.length ? frames.map((frame) => frame.snapshot) : [undefined]), afterRecording], gif.auth, appearance);
   await page.video()?.saveAs(path.join(outDir, `${name}.webm`));
   fs.rmSync(videoDir, { recursive: true, force: true });
   await writeGif(frames, path.join(outDir, `${name}.gif`), gifWidth);
@@ -241,6 +248,8 @@ async function main() {
   const signedIn = [...shots, ...(gifShot ? [gifShot] : [])].flatMap((shot) => (shot.pin ? [{ ...shot, pin: shot.pin }] : []));
   const savedAppearance = [...new Set(signedIn.flatMap((shot) => (shot.pin.saved ? [shot.pin.saved] : [])))];
   const flagged = signedIn.filter((shot) => shot.pin.flagged).map((shot) => shot.name);
+  // Signed-in unstable shots are already pin-flagged; this list covers every shot, guests included.
+  const unstable = shots.filter((shot) => !shot.stable).map((shot) => shot.name);
 
   fs.writeFileSync(
     path.join(outDir, "manifest.json"),
@@ -257,6 +266,7 @@ async function main() {
         blockedConvexWrites: blocked,
         savedAppearance,
         pinFlagged: flagged,
+        unstable,
       },
       null,
       2,
@@ -279,7 +289,18 @@ async function main() {
       `WARNING: ${flagged.length} signed-in shot(s) may show the agent's saved theme or the app defaults in JS-driven UI ` +
         `(menus, toasts, neon forks) instead of the pin: ${flagged.join(", ")}. See \`pin.problems\` in manifest.json.`,
     );
-    if (strict) throw new Error("--strict: failing because the JS theme pin did not apply to every signed-in shot.");
+  }
+  if (unstable.length) {
+    console.warn(`WARNING: ${unstable.length} shot(s) never settled within the stability window: ${unstable.join(", ")}.`);
+  }
+  if (strict && (flagged.length || unstable.length)) {
+    throw new Error(
+      "--strict: failing because " +
+        [flagged.length && "the JS theme pin did not apply to every signed-in shot", unstable.length && "some shots never settled"]
+          .filter(Boolean)
+          .join(" and ") +
+        ".",
+    );
   }
 }
 
