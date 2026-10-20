@@ -1,0 +1,779 @@
+{
+  "issue": "192",
+  "label": "verify-harness",
+  "port": 8231,
+  "chrome": "calm",
+  "fullPage": false,
+  "shots": [
+    {
+      "name": "harness__desktop__default__light",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness__desktop__default__dark",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness__desktop__cyberpunk__light",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness__desktop__cyberpunk__dark",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness__desktop__aurora__light",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness__desktop__aurora__dark",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness__mobile__default__light",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness__mobile__default__dark",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness__mobile__cyberpunk__light",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness__mobile__cyberpunk__dark",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness__mobile__aurora__light",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness__mobile__aurora__dark",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-hover-default__desktop__default__light",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-hover-default__desktop__default__dark",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-hover-default__desktop__cyberpunk__light",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-hover-default__desktop__cyberpunk__dark",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-hover-default__desktop__aurora__light",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-hover-default__desktop__aurora__dark",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-hover-secondary__desktop__default__light",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-hover-secondary__desktop__default__dark",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-hover-secondary__desktop__cyberpunk__light",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-hover-secondary__desktop__cyberpunk__dark",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-hover-secondary__desktop__aurora__light",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-hover-secondary__desktop__aurora__dark",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-hover-ghost__desktop__default__light",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-hover-ghost__desktop__default__dark",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-hover-ghost__desktop__cyberpunk__light",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-hover-ghost__desktop__cyberpunk__dark",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-hover-ghost__desktop__aurora__light",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-hover-ghost__desktop__aurora__dark",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-hover-destructive__desktop__default__light",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-hover-destructive__desktop__default__dark",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-hover-destructive__desktop__cyberpunk__light",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-hover-destructive__desktop__cyberpunk__dark",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-hover-destructive__desktop__aurora__light",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-hover-destructive__desktop__aurora__dark",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-hover-outline__desktop__default__light",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-hover-outline__desktop__default__dark",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-hover-outline__desktop__cyberpunk__light",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-hover-outline__desktop__cyberpunk__dark",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-hover-outline__desktop__aurora__light",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-hover-outline__desktop__aurora__dark",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-hover-destructiveOutline__desktop__default__light",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-hover-destructiveOutline__desktop__default__dark",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-hover-destructiveOutline__desktop__cyberpunk__light",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-hover-destructiveOutline__desktop__cyberpunk__dark",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-hover-destructiveOutline__desktop__aurora__light",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-hover-destructiveOutline__desktop__aurora__dark",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-hover-cyber__desktop__default__light",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-hover-cyber__desktop__default__dark",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-hover-cyber__desktop__cyberpunk__light",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-hover-cyber__desktop__cyberpunk__dark",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-hover-cyber__desktop__aurora__light",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-hover-cyber__desktop__aurora__dark",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-focus-btn-default__desktop__default__light",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-focus-btn-default__desktop__default__dark",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-focus-btn-default__desktop__cyberpunk__light",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-focus-btn-default__desktop__cyberpunk__dark",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-focus-btn-default__desktop__aurora__light",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-focus-btn-default__desktop__aurora__dark",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-focus-btn-destructiveOutline__desktop__default__light",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-focus-btn-destructiveOutline__desktop__default__dark",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-focus-btn-destructiveOutline__desktop__cyberpunk__light",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-focus-btn-destructiveOutline__desktop__cyberpunk__dark",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-focus-btn-destructiveOutline__desktop__aurora__light",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-focus-btn-destructiveOutline__desktop__aurora__dark",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-focus-input__desktop__default__light",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-focus-input__desktop__default__dark",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-focus-input__desktop__cyberpunk__light",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-focus-input__desktop__cyberpunk__dark",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-focus-input__desktop__aurora__light",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-focus-input__desktop__aurora__dark",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-focus-switch__desktop__default__light",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-focus-switch__desktop__default__dark",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-focus-switch__desktop__cyberpunk__light",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-focus-switch__desktop__cyberpunk__dark",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-focus-switch__desktop__aurora__light",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-focus-switch__desktop__aurora__dark",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-focus-tab__desktop__default__light",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-focus-tab__desktop__default__dark",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-focus-tab__desktop__cyberpunk__light",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-focus-tab__desktop__cyberpunk__dark",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-focus-tab__desktop__aurora__light",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-focus-tab__desktop__aurora__dark",
+      "route": "/v201-harness",
+      "auth": "guest",
+      "finalPath": "/v201-harness",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-dialog-hovercard__desktop__default__light",
+      "route": "/v201-harness/dialog",
+      "auth": "guest",
+      "finalPath": "/v201-harness/dialog",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-dialog-hovercard__desktop__default__dark",
+      "route": "/v201-harness/dialog",
+      "auth": "guest",
+      "finalPath": "/v201-harness/dialog",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-dialog-hovercard__desktop__cyberpunk__light",
+      "route": "/v201-harness/dialog",
+      "auth": "guest",
+      "finalPath": "/v201-harness/dialog",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-dialog-hovercard__desktop__cyberpunk__dark",
+      "route": "/v201-harness/dialog",
+      "auth": "guest",
+      "finalPath": "/v201-harness/dialog",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-dialog-hovercard__desktop__aurora__light",
+      "route": "/v201-harness/dialog",
+      "auth": "guest",
+      "finalPath": "/v201-harness/dialog",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-dialog-hovercard__desktop__aurora__dark",
+      "route": "/v201-harness/dialog",
+      "auth": "guest",
+      "finalPath": "/v201-harness/dialog",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-dialog-hovercard__mobile__default__light",
+      "route": "/v201-harness/dialog",
+      "auth": "guest",
+      "finalPath": "/v201-harness/dialog",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-dialog-hovercard__mobile__default__dark",
+      "route": "/v201-harness/dialog",
+      "auth": "guest",
+      "finalPath": "/v201-harness/dialog",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-dialog-hovercard__mobile__cyberpunk__light",
+      "route": "/v201-harness/dialog",
+      "auth": "guest",
+      "finalPath": "/v201-harness/dialog",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-dialog-hovercard__mobile__cyberpunk__dark",
+      "route": "/v201-harness/dialog",
+      "auth": "guest",
+      "finalPath": "/v201-harness/dialog",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-dialog-hovercard__mobile__aurora__light",
+      "route": "/v201-harness/dialog",
+      "auth": "guest",
+      "finalPath": "/v201-harness/dialog",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "harness-dialog-hovercard__mobile__aurora__dark",
+      "route": "/v201-harness/dialog",
+      "auth": "guest",
+      "finalPath": "/v201-harness/dialog",
+      "loaded": true,
+      "stable": true
+    }
+  ],
+  "blockedConvexWrites": [],
+  "savedAppearance": []
+}

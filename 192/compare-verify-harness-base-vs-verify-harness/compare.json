@@ -1,0 +1,391 @@
+{
+  "base": "verify-harness-base",
+  "head": "verify-harness",
+  "threshold": 0,
+  "results": [
+    {
+      "name": "harness-dialog-hovercard__desktop__aurora__dark",
+      "diffPercent": 17.171
+    },
+    {
+      "name": "harness-dialog-hovercard__desktop__aurora__light",
+      "diffPercent": 17.132
+    },
+    {
+      "name": "harness-dialog-hovercard__desktop__cyberpunk__dark",
+      "diffPercent": 9.868
+    },
+    {
+      "name": "harness-dialog-hovercard__desktop__cyberpunk__light",
+      "diffPercent": 12.33
+    },
+    {
+      "name": "harness-dialog-hovercard__desktop__default__dark",
+      "diffPercent": 13.274
+    },
+    {
+      "name": "harness-dialog-hovercard__desktop__default__light",
+      "diffPercent": 13.788
+    },
+    {
+      "name": "harness-dialog-hovercard__mobile__aurora__dark",
+      "diffPercent": 77.399
+    },
+    {
+      "name": "harness-dialog-hovercard__mobile__aurora__light",
+      "diffPercent": 78.906
+    },
+    {
+      "name": "harness-dialog-hovercard__mobile__cyberpunk__dark",
+      "diffPercent": 40.761
+    },
+    {
+      "name": "harness-dialog-hovercard__mobile__cyberpunk__light",
+      "diffPercent": 52.081
+    },
+    {
+      "name": "harness-dialog-hovercard__mobile__default__dark",
+      "diffPercent": 59.234
+    },
+    {
+      "name": "harness-dialog-hovercard__mobile__default__light",
+      "diffPercent": 60.926
+    },
+    {
+      "name": "harness-focus-btn-default__desktop__aurora__dark",
+      "diffPercent": 8.55
+    },
+    {
+      "name": "harness-focus-btn-default__desktop__aurora__light",
+      "diffPercent": 8.666
+    },
+    {
+      "name": "harness-focus-btn-default__desktop__cyberpunk__dark",
+      "diffPercent": 8.516
+    },
+    {
+      "name": "harness-focus-btn-default__desktop__cyberpunk__light",
+      "diffPercent": 8.644
+    },
+    {
+      "name": "harness-focus-btn-default__desktop__default__dark",
+      "diffPercent": 8.529
+    },
+    {
+      "name": "harness-focus-btn-default__desktop__default__light",
+      "diffPercent": 8.64
+    },
+    {
+      "name": "harness-focus-btn-destructiveOutline__desktop__aurora__dark",
+      "diffPercent": 8.628
+    },
+    {
+      "name": "harness-focus-btn-destructiveOutline__desktop__aurora__light",
+      "diffPercent": 8.744
+    },
+    {
+      "name": "harness-focus-btn-destructiveOutline__desktop__cyberpunk__dark",
+      "diffPercent": 8.595
+    },
+    {
+      "name": "harness-focus-btn-destructiveOutline__desktop__cyberpunk__light",
+      "diffPercent": 8.722
+    },
+    {
+      "name": "harness-focus-btn-destructiveOutline__desktop__default__dark",
+      "diffPercent": 8.607
+    },
+    {
+      "name": "harness-focus-btn-destructiveOutline__desktop__default__light",
+      "diffPercent": 8.718
+    },
+    {
+      "name": "harness-focus-input__desktop__aurora__dark",
+      "diffPercent": 8.55
+    },
+    {
+      "name": "harness-focus-input__desktop__aurora__light",
+      "diffPercent": 8.667
+    },
+    {
+      "name": "harness-focus-input__desktop__cyberpunk__dark",
+      "diffPercent": 8.515
+    },
+    {
+      "name": "harness-focus-input__desktop__cyberpunk__light",
+      "diffPercent": 8.648
+    },
+    {
+      "name": "harness-focus-input__desktop__default__dark",
+      "diffPercent": 8.53
+    },
+    {
+      "name": "harness-focus-input__desktop__default__light",
+      "diffPercent": 8.643
+    },
+    {
+      "name": "harness-focus-switch__desktop__aurora__dark",
+      "diffPercent": 8.578
+    },
+    {
+      "name": "harness-focus-switch__desktop__aurora__light",
+      "diffPercent": 8.694
+    },
+    {
+      "name": "harness-focus-switch__desktop__cyberpunk__dark",
+      "diffPercent": 8.545
+    },
+    {
+      "name": "harness-focus-switch__desktop__cyberpunk__light",
+      "diffPercent": 8.672
+    },
+    {
+      "name": "harness-focus-switch__desktop__default__dark",
+      "diffPercent": 8.558
+    },
+    {
+      "name": "harness-focus-switch__desktop__default__light",
+      "diffPercent": 8.672
+    },
+    {
+      "name": "harness-focus-tab__desktop__aurora__dark",
+      "diffPercent": 8.557
+    },
+    {
+      "name": "harness-focus-tab__desktop__aurora__light",
+      "diffPercent": 8.674
+    },
+    {
+      "name": "harness-focus-tab__desktop__cyberpunk__dark",
+      "diffPercent": 8.523
+    },
+    {
+      "name": "harness-focus-tab__desktop__cyberpunk__light",
+      "diffPercent": 8.652
+    },
+    {
+      "name": "harness-focus-tab__desktop__default__dark",
+      "diffPercent": 8.541
+    },
+    {
+      "name": "harness-focus-tab__desktop__default__light",
+      "diffPercent": 8.648
+    },
+    {
+      "name": "harness-hover-cyber__desktop__aurora__dark",
+      "diffPercent": 8.83
+    },
+    {
+      "name": "harness-hover-cyber__desktop__aurora__light",
+      "diffPercent": 8.939
+    },
+    {
+      "name": "harness-hover-cyber__desktop__cyberpunk__dark",
+      "diffPercent": 8.797
+    },
+    {
+      "name": "harness-hover-cyber__desktop__cyberpunk__light",
+      "diffPercent": 8.906
+    },
+    {
+      "name": "harness-hover-cyber__desktop__default__dark",
+      "diffPercent": 8.785
+    },
+    {
+      "name": "harness-hover-cyber__desktop__default__light",
+      "diffPercent": 8.909
+    },
+    {
+      "name": "harness-hover-default__desktop__aurora__dark",
+      "diffPercent": 8.57
+    },
+    {
+      "name": "harness-hover-default__desktop__aurora__light",
+      "diffPercent": 8.69
+    },
+    {
+      "name": "harness-hover-default__desktop__cyberpunk__dark",
+      "diffPercent": 8.541
+    },
+    {
+      "name": "harness-hover-default__desktop__cyberpunk__light",
+      "diffPercent": 8.669
+    },
+    {
+      "name": "harness-hover-default__desktop__default__dark",
+      "diffPercent": 8.554
+    },
+    {
+      "name": "harness-hover-default__desktop__default__light",
+      "diffPercent": 8.665
+    },
+    {
+      "name": "harness-hover-destructiveOutline__desktop__aurora__dark",
+      "diffPercent": 8.549
+    },
+    {
+      "name": "harness-hover-destructiveOutline__desktop__aurora__light",
+      "diffPercent": 8.666
+    },
+    {
+      "name": "harness-hover-destructiveOutline__desktop__cyberpunk__dark",
+      "diffPercent": 8.516
+    },
+    {
+      "name": "harness-hover-destructiveOutline__desktop__cyberpunk__light",
+      "diffPercent": 8.644
+    },
+    {
+      "name": "harness-hover-destructiveOutline__desktop__default__dark",
+      "diffPercent": 8.529
+    },
+    {
+      "name": "harness-hover-destructiveOutline__desktop__default__light",
+      "diffPercent": 8.64
+    },
+    {
+      "name": "harness-hover-destructive__desktop__aurora__dark",
+      "diffPercent": 8.576
+    },
+    {
+      "name": "harness-hover-destructive__desktop__aurora__light",
+      "diffPercent": 8.671
+    },
+    {
+      "name": "harness-hover-destructive__desktop__cyberpunk__dark",
+      "diffPercent": 8.549
+    },
+    {
+      "name": "harness-hover-destructive__desktop__cyberpunk__light",
+      "diffPercent": 8.65
+    },
+    {
+      "name": "harness-hover-destructive__desktop__default__dark",
+      "diffPercent": 8.558
+    },
+    {
+      "name": "harness-hover-destructive__desktop__default__light",
+      "diffPercent": 8.671
+    },
+    {
+      "name": "harness-hover-ghost__desktop__aurora__dark",
+      "diffPercent": 8.827
+    },
+    {
+      "name": "harness-hover-ghost__desktop__aurora__light",
+      "diffPercent": 8.944
+    },
+    {
+      "name": "harness-hover-ghost__desktop__cyberpunk__dark",
+      "diffPercent": 8.794
+    },
+    {
+      "name": "harness-hover-ghost__desktop__cyberpunk__light",
+      "diffPercent": 8.922
+    },
+    {
+      "name": "harness-hover-ghost__desktop__default__dark",
+      "diffPercent": 8.807
+    },
+    {
+      "name": "harness-hover-ghost__desktop__default__light",
+      "diffPercent": 8.918
+    },
+    {
+      "name": "harness-hover-outline__desktop__aurora__dark",
+      "diffPercent": 8.549
+    },
+    {
+      "name": "harness-hover-outline__desktop__aurora__light",
+      "diffPercent": 8.666
+    },
+    {
+      "name": "harness-hover-outline__desktop__cyberpunk__dark",
+      "diffPercent": 8.516
+    },
+    {
+      "name": "harness-hover-outline__desktop__cyberpunk__light",
+      "diffPercent": 8.644
+    },
+    {
+      "name": "harness-hover-outline__desktop__default__dark",
+      "diffPercent": 8.529
+    },
+    {
+      "name": "harness-hover-outline__desktop__default__light",
+      "diffPercent": 8.64
+    },
+    {
+      "name": "harness-hover-secondary__desktop__aurora__dark",
+      "diffPercent": 8.163
+    },
+    {
+      "name": "harness-hover-secondary__desktop__aurora__light",
+      "diffPercent": 8.281
+    },
+    {
+      "name": "harness-hover-secondary__desktop__cyberpunk__dark",
+      "diffPercent": 8.132
+    },
+    {
+      "name": "harness-hover-secondary__desktop__cyberpunk__light",
+      "diffPercent": 8.263
+    },
+    {
+      "name": "harness-hover-secondary__desktop__default__dark",
+      "diffPercent": 8.15
+    },
+    {
+      "name": "harness-hover-secondary__desktop__default__light",
+      "diffPercent": 8.258
+    },
+    {
+      "name": "harness__desktop__aurora__dark",
+      "diffPercent": 8.549
+    },
+    {
+      "name": "harness__desktop__aurora__light",
+      "diffPercent": 8.666
+    },
+    {
+      "name": "harness__desktop__cyberpunk__dark",
+      "diffPercent": 8.516
+    },
+    {
+      "name": "harness__desktop__cyberpunk__light",
+      "diffPercent": 8.644
+    },
+    {
+      "name": "harness__desktop__default__dark",
+      "diffPercent": 8.529
+    },
+    {
+      "name": "harness__desktop__default__light",
+      "diffPercent": 8.64
+    },
+    {
+      "name": "harness__mobile__aurora__dark",
+      "diffPercent": 16.102
+    },
+    {
+      "name": "harness__mobile__aurora__light",
+      "diffPercent": 16.35
+    },
+    {
+      "name": "harness__mobile__cyberpunk__dark",
+      "diffPercent": 16.064
+    },
+    {
+      "name": "harness__mobile__cyberpunk__light",
+      "diffPercent": 16.245
+    },
+    {
+      "name": "harness__mobile__default__dark",
+      "diffPercent": 16.114
+    },
+    {
+      "name": "harness__mobile__default__light",
+      "diffPercent": 16.205
+    }
+  ]
+}
