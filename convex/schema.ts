@@ -701,4 +701,12 @@ export default defineSchema({
   })
     .index("by_codeHash", ["codeHash"])
     .index("by_expiresAt", ["expiresAt"]),
+
+  // Validation backends only (scripts/validation/seed): identifies the loaded golden seed.
+  // Always empty on cloud deployments.
+  validationSeedMeta: defineTable({
+    seedVersion: v.number(),
+    catalogVersion: v.number(),
+    sha256: v.string(),
+  }),
 });

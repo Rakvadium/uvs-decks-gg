@@ -91,6 +91,7 @@ import type * as user from "../user.js";
 import type * as userStatusInternal from "../userStatusInternal.js";
 import type * as utils_filtering from "../utils/filtering.js";
 import type * as utils_validation from "../utils/validation.js";
+import type * as validationSeed from "../validationSeed.js";
 import type * as validators from "../validators.js";
 
 import type {
@@ -183,6 +184,7 @@ declare const fullApi: ApiFromModules<{
   userStatusInternal: typeof userStatusInternal;
   "utils/filtering": typeof utils_filtering;
   "utils/validation": typeof utils_validation;
+  validationSeed: typeof validationSeed;
   validators: typeof validators;
 }>;
 

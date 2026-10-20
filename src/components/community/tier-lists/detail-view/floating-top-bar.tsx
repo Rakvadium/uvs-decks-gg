@@ -192,7 +192,7 @@ export function CommunityTierListDetailFloatingTopBar() {
                     <AlertDialogFooter>
                       <AlertDialogCancel>Cancel</AlertDialogCancel>
                       <AlertDialogAction
-                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        className="bg-destructive text-foreground hover:bg-destructive/90"
                         onClick={() => void handleDelete()}
                       >
                         {isDeleting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}

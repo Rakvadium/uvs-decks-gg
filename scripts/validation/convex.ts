@@ -9,8 +9,9 @@
  * Wrapper flags: `--app-port P` (else UVS_APP_PORT, else the port registry), `--print-target`
  * (run the guard, print the target, exit without calling the CLI), `--repoint-env-local`
  * (rewrite `.env.local`'s loopback Convex URLs for P instead of refusing when they point at
- * another backend), and `--log-file <path>` (append all output there; backend.ts uses it for the
- * detached dev watcher).
+ * another backend), `--log-file <path>` (append all output there; backend.ts uses it for the
+ * detached dev watcher), and `--fetch-pinned-backend` (let `dev` download the pinned backend
+ * release assets from github.com once, when they aren't cached).
  */
 import { spawn, spawnSync, type ChildProcess, type StdioOptions } from "node:child_process";
 import fs from "node:fs";
@@ -21,6 +22,7 @@ import {
   ANONYMOUS_DEPLOYMENT,
   GuardError,
   PINNED_CHILD_ENV,
+  PINNED_LOCAL_BACKEND_VERSION,
   assertGuard,
   guardReport,
   parseDotenv,
@@ -184,6 +186,7 @@ export function splitArgs(argv: string[]): {
   logFile?: string;
   repointEnvLocal: boolean;
   check: boolean;
+  fetchPinnedBackend: boolean;
   convexArgs: string[];
 } {
   const rest = argv[0] === "--" ? argv.slice(1) : [...argv];
@@ -192,6 +195,7 @@ export function splitArgs(argv: string[]): {
   let printTarget = false;
   let repointEnvLocal = false;
   let check = false;
+  let fetchPinnedBackend = false;
   const convexArgs: string[] = [];
   for (let i = 0; i < rest.length; i++) {
     const arg = rest[i];
@@ -200,13 +204,15 @@ export function splitArgs(argv: string[]): {
     else if (arg === "--print-target") printTarget = true;
     else if (arg === "--repoint-env-local") repointEnvLocal = true;
     else if (arg === "--check") check = true;
+    else if (arg === "--fetch-pinned-backend") fetchPinnedBackend = true;
     else if (arg === "--log-file") logFile = rest[++i];
     else convexArgs.push(arg);
   }
-  return { appPortFlag, printTarget, logFile, repointEnvLocal, check, convexArgs };
+  return { appPortFlag, printTarget, logFile, repointEnvLocal, check, fetchPinnedBackend, convexArgs };
 }
 
-export function withLocalPorts(args: string[], ports: BackendPorts): string[] {
+/** `dev` gets the local backend on the fixed ports, at the pinned version. Other commands are untouched. */
+export function withLocalBackendFlags(args: string[], ports: BackendPorts): string[] {
   const devIndex = args.findIndex((a) => !a.startsWith("-"));
   if (devIndex === -1 || args[devIndex] !== "dev") return args;
   return [
@@ -216,6 +222,8 @@ export function withLocalPorts(args: string[], ports: BackendPorts): string[] {
     String(ports.cloud),
     "--local-site-port",
     String(ports.site),
+    "--local-backend-version",
+    PINNED_LOCAL_BACKEND_VERSION,
     ...args.slice(devIndex + 1),
   ];
 }
@@ -227,6 +235,7 @@ export type Invocation = {
   childEnv: Env;
   cliArgs: string[];
   printTarget: boolean;
+  fetchPinnedBackend: boolean;
   logFile?: string;
   target: { deployment: string; url: string; siteUrl: string; home: string };
 };
@@ -252,10 +261,13 @@ function guardContext(opts: InvocationOptions) {
   const appPort = resolveAppPort({ flag: split.appPortFlag, env: parentEnv, worktree: cwd, root });
   const ports = portsFor(appPort);
   const childEnv = buildChildEnv({ parentEnv, appPort, root, platform });
+  const noArgs = split.check && split.convexArgs.length === 0;
+  const cliArgs = withLocalBackendFlags(split.convexArgs, ports);
   const guardInput = (skipEnvLocalPort: boolean): GuardInput => {
     const files = readCliEnvFiles(cwd);
     return {
-      args: split.check && split.convexArgs.length === 0 ? null : split.convexArgs,
+      args: noArgs ? null : split.convexArgs,
+      cliArgs: noArgs ? undefined : cliArgs,
       sources: [{ name: "the caller's environment", env: parentEnv }, ...files.sources],
       envFiles: files.envFiles,
       vaultFiles: files.vaultFiles,
@@ -270,7 +282,7 @@ function guardContext(opts: InvocationOptions) {
       skipEnvLocalPort,
     };
   };
-  return { ...split, cwd, root, appPort, ports, parentEnv, childEnv, guardInput };
+  return { ...split, cwd, root, appPort, ports, parentEnv, childEnv, cliArgs, guardInput };
 }
 
 export type CheckResult = {
@@ -323,7 +335,7 @@ export function formatCheck(result: CheckResult): string {
 
 /** Resolves the port, builds the wrapped env, and runs the guard. Throws GuardError on refusal. */
 export function prepareInvocation(opts: InvocationOptions): Invocation {
-  const { cwd, root, appPort, ports, childEnv, guardInput, printTarget, logFile, repointEnvLocal: repoint, convexArgs } =
+  const { cwd, root, appPort, ports, childEnv, cliArgs, guardInput, printTarget, fetchPinnedBackend, logFile, repointEnvLocal: repoint } =
     guardContext(opts);
   if (repoint) {
     // Everything else must pass before the wrapper writes to .env.local.
@@ -340,8 +352,9 @@ export function prepareInvocation(opts: InvocationOptions): Invocation {
     ports,
     home,
     childEnv,
-    cliArgs: withLocalPorts(convexArgs, ports),
+    cliArgs,
     printTarget,
+    fetchPinnedBackend,
     logFile,
     target: {
       deployment: ANONYMOUS_DEPLOYMENT,
@@ -352,10 +365,14 @@ export function prepareInvocation(opts: InvocationOptions): Invocation {
   };
 }
 
+function savedDeploymentConfig(home: string): string {
+  const name = ANONYMOUS_DEPLOYMENT.slice("anonymous:".length);
+  return path.join(home, ".convex", "anonymous-convex-backend-state", name, "config.json");
+}
+
 /** The CLI saves the ports a deployment was created with; refuse if they drifted from ports.ts. */
 export function checkSavedDeploymentPorts(home: string, ports: BackendPorts): void {
-  const name = ANONYMOUS_DEPLOYMENT.slice("anonymous:".length);
-  const config = path.join(home, ".convex", "anonymous-convex-backend-state", name, "config.json");
+  const config = savedDeploymentConfig(home);
   if (!fs.existsSync(config)) return;
   const saved = JSON.parse(fs.readFileSync(config, "utf8")) as { ports?: { cloud?: number; site?: number } };
   if (saved.ports && (saved.ports.cloud !== ports.cloud || saved.ports.site !== ports.site)) {
@@ -365,40 +382,144 @@ export function checkSavedDeploymentPorts(home: string, ports: BackendPorts): vo
   }
 }
 
-/** Seeds the wrapped CLI's binary cache from the owner's cache (read only) to skip a 130MB download. */
+/**
+ * A backend created at another version would make `dev` prompt to upgrade it (and download the
+ * old binary if it declined), so refuse with the way out instead.
+ */
+export function checkSavedBackendVersion(home: string, appPort: number): void {
+  const config = savedDeploymentConfig(home);
+  if (!fs.existsSync(config)) return;
+  const saved = JSON.parse(fs.readFileSync(config, "utf8")) as { backendVersion?: string };
+  if (saved.backendVersion === undefined || saved.backendVersion === PINNED_LOCAL_BACKEND_VERSION) return;
+  throw new Error(
+    `The port ${appPort} backend was created with local backend ${saved.backendVersion}, but the wrapper pins ` +
+      `${PINNED_LOCAL_BACKEND_VERSION} (PINNED_LOCAL_BACKEND_VERSION in scripts/validation/guard.ts). Its data is throwaway: run ` +
+      `\`bun run validation:backend -- stop --app-port ${appPort}\`, delete ${path.dirname(path.dirname(config))}, then start it again.`,
+  );
+}
+
+/** Where the CLI caches backend binaries and the dashboard (cacheDir() in cli/lib/utils/utils.js). */
+function convexCacheDir(env: Env, platform: NodeJS.Platform): string {
+  return platform === "win32" ? path.join(env.LOCALAPPDATA!, "convex") : path.join(env.HOME!, ".cache", "convex");
+}
+
+function ownerConvexCacheDir(opts: { parentEnv: Env; realHome: string; platform: NodeJS.Platform }): string {
+  return opts.platform === "win32"
+    ? path.join(opts.parentEnv.LOCALAPPDATA ?? path.join(opts.realHome, "AppData", "Local"), "convex")
+    : path.join(opts.realHome, ".cache", "convex");
+}
+
+const backendExe = (platform: NodeJS.Platform) => (platform === "win32" ? "convex-local-backend.exe" : "convex-local-backend");
+
+function dashboardVersion(cache: string): string | null {
+  try {
+    return (JSON.parse(fs.readFileSync(path.join(cache, "dashboard", "config.json"), "utf8")) as { version?: string }).version ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * What the CLI would download from github.com for the pinned version: the backend binary when
+ * `binaries/<version>/` lacks it, and the dashboard when its config names another version
+ * (ensureBackendBinaryDownloaded and ensureDashboardDownloaded in cli/lib/localDeployment/download.js).
+ */
+export function pinnedBackendCacheProblems(opts: { childEnv: Env; platform?: NodeJS.Platform }): string[] {
+  const platform = opts.platform ?? process.platform;
+  const cache = convexCacheDir(opts.childEnv, platform);
+  const out: string[] = [];
+  const exe = path.join(cache, "binaries", PINNED_LOCAL_BACKEND_VERSION, backendExe(platform));
+  if (!fs.existsSync(exe)) out.push(`${exe} is missing`);
+  const dashboard = dashboardVersion(cache);
+  if (dashboard !== PINNED_LOCAL_BACKEND_VERSION) {
+    out.push(`${path.join(cache, "dashboard")} is ${dashboard ? `at ${dashboard}` : "missing"}, not ${PINNED_LOCAL_BACKEND_VERSION}`);
+  }
+  return out;
+}
+
+/** Copies `source` to `dest` through a temp dir next to it, so a half-copied dir is never seen. */
+function copyDirAtomically(source: string, dest: string): boolean {
+  const partial = path.join(path.dirname(dest), `.${path.basename(dest)}-partial-${process.pid}`);
+  fs.mkdirSync(path.dirname(dest), { recursive: true });
+  try {
+    fs.cpSync(source, partial, { recursive: true });
+    fs.rmSync(dest, { recursive: true, force: true });
+    fs.renameSync(partial, dest);
+    return true;
+  } catch {
+    // Another run seeded it first, or the copy failed; the cache check reports what is missing.
+    return false;
+  } finally {
+    fs.rmSync(partial, { recursive: true, force: true });
+  }
+}
+
+/**
+ * Copies the pinned backend binary (130MB) and the dashboard, when the owner's cache has them at
+ * the pinned version, into the wrapped CLI's cache. The owner's cache is only read. Returns what
+ * it copied.
+ */
 export function seedBinaryCache(opts: {
   parentEnv: Env;
   childEnv: Env;
   realHome: string;
   platform?: NodeJS.Platform;
-}): boolean {
+}): string[] {
   const platform = opts.platform ?? process.platform;
-  const ownerCache =
-    platform === "win32"
-      ? path.join(opts.parentEnv.LOCALAPPDATA ?? path.join(opts.realHome, "AppData", "Local"), "convex", "binaries")
-      : path.join(opts.realHome, ".cache", "convex", "binaries");
-  const childCache =
-    platform === "win32"
-      ? path.join(opts.childEnv.LOCALAPPDATA!, "convex", "binaries")
-      : path.join(opts.childEnv.HOME!, ".cache", "convex", "binaries");
-  const exe = platform === "win32" ? "convex-local-backend.exe" : "convex-local-backend";
-  const versions = (dir: string) =>
-    fs.existsSync(dir) ? fs.readdirSync(dir).filter((d) => fs.existsSync(path.join(dir, d, exe))) : [];
-  if (versions(childCache).length > 0) return false;
-  const newest = versions(ownerCache).sort().at(-1);
-  if (!newest) return false;
-  const partial = path.join(path.dirname(childCache), `.binaries-partial-${process.pid}`);
-  fs.mkdirSync(childCache, { recursive: true });
-  try {
-    fs.cpSync(path.join(ownerCache, newest), partial, { recursive: true });
-    fs.renameSync(partial, path.join(childCache, newest));
-    return true;
-  } catch {
-    // Another run seeded it first, or the copy failed; the CLI downloads the binary itself then.
-    return false;
-  } finally {
-    fs.rmSync(partial, { recursive: true, force: true });
+  const exe = backendExe(platform);
+  const owner = ownerConvexCacheDir({ ...opts, platform });
+  const child = convexCacheDir(opts.childEnv, platform);
+  const seeded: string[] = [];
+  const binary = path.join("binaries", PINNED_LOCAL_BACKEND_VERSION);
+  if (
+    !fs.existsSync(path.join(child, binary, exe)) &&
+    fs.existsSync(path.join(owner, binary, exe)) &&
+    copyDirAtomically(path.join(owner, binary), path.join(child, binary))
+  ) {
+    seeded.push("backend binary");
   }
+  if (
+    dashboardVersion(child) !== PINNED_LOCAL_BACKEND_VERSION &&
+    dashboardVersion(owner) === PINNED_LOCAL_BACKEND_VERSION &&
+    copyDirAtomically(path.join(owner, "dashboard"), path.join(child, "dashboard"))
+  ) {
+    seeded.push("dashboard");
+  }
+  return seeded;
+}
+
+/** The one-time fetch instruction, shared by `vconvex` and `start`. */
+export function pinnedBackendFetchHint(appPort: number, problems: string[]): string {
+  return [
+    `The pinned Convex local backend ${PINNED_LOCAL_BACKEND_VERSION} is not fully cached, and the wrapper never asks GitHub which version to use:`,
+    ...problems.map((p) => `  - ${p}`),
+    "Fetch it once. This downloads the pinned release assets from github.com (no api.github.com lookup) into the shared cache:",
+    `  bun run validation:backend -- start --app-port ${appPort} --fetch-pinned-backend`,
+    `  (or, with no backend running: bun run vconvex -- --app-port ${appPort} --fetch-pinned-backend dev --once)`,
+  ].join("\n");
+}
+
+/**
+ * Before any `dev`: refuse a backend saved at another version, seed the pinned binary from the
+ * owner's cache, and fail with the one-time fetch instruction when anything is still missing,
+ * unless `--fetch-pinned-backend` allows the CLI to download the pinned assets.
+ */
+export function preparePinnedBackend(
+  inv: Pick<Invocation, "appPort" | "home" | "childEnv" | "fetchPinnedBackend">,
+  say: (message: string) => void,
+  owner: { parentEnv: Env; realHome: string; platform?: NodeJS.Platform } = { parentEnv: process.env, realHome: os.homedir() },
+): void {
+  const platform = owner.platform ?? process.platform;
+  checkSavedBackendVersion(inv.home, inv.appPort);
+  if (inv.childEnv.LOCALAPPDATA && platform === "win32") fs.mkdirSync(inv.childEnv.LOCALAPPDATA, { recursive: true });
+  const seeded = seedBinaryCache({ ...owner, childEnv: inv.childEnv, platform });
+  if (seeded.length > 0) {
+    say(`[vconvex] seeded the ${seeded.join(" and ")} for ${PINNED_LOCAL_BACKEND_VERSION} from the owner's cache (read only)`);
+  }
+  const problems = pinnedBackendCacheProblems({ childEnv: inv.childEnv, platform });
+  if (problems.length === 0) return;
+  if (!inv.fetchPinnedBackend) throw new Error(pinnedBackendFetchHint(inv.appPort, problems));
+  say(`[vconvex] --fetch-pinned-backend: the CLI downloads ${PINNED_LOCAL_BACKEND_VERSION} from github.com release assets (${problems.join("; ")})`);
 }
 
 export function formatTarget(inv: Invocation): string {
@@ -411,25 +532,98 @@ export function formatTarget(inv: Invocation): string {
  */
 export const CLI_TOUCHED_FILES = [".cursor/rules/convex_rules.mdc", "convex/README.md", "convex/tsconfig.json"];
 
-/** Snapshots CLI_TOUCHED_FILES; the returned function puts them back and lists what it reverted. */
-export function snapshotCliTouchedFiles(repoRoot = REPO_ROOT): () => string[] {
-  const before = CLI_TOUCHED_FILES.map((rel) => {
+/**
+ * Codegen output every push rewrites with LF endings. A checkout made with `core.autocrlf=true`
+ * before `.gitattributes` pinned these to LF has CRLF copies, and git keeps showing a size-changed
+ * file as modified even though only the endings differ.
+ */
+export const CLI_GENERATED_DIR = "convex/_generated";
+
+/**
+ * `exact` entries go back byte for byte. `eol` entries go back only when the CLI's rewrite
+ * differs in line endings alone, so real codegen changes stay.
+ */
+export type CliSnapshotEntry = { rel: string; mode: "exact" | "eol"; content: string | null };
+
+export function takeCliSnapshot(repoRoot = REPO_ROOT): CliSnapshotEntry[] {
+  const read = (rel: string) => {
     const full = path.join(repoRoot, rel);
-    return { rel, full, content: fs.existsSync(full) ? fs.readFileSync(full) : null };
+    return fs.existsSync(full) ? fs.readFileSync(full).toString("base64") : null;
+  };
+  const generatedDir = path.join(repoRoot, CLI_GENERATED_DIR);
+  const generated = fs.existsSync(generatedDir)
+    ? fs
+        .readdirSync(generatedDir, { withFileTypes: true })
+        .filter((d) => d.isFile())
+        .map((d) => `${CLI_GENERATED_DIR}/${d.name}`)
+    : [];
+  return [
+    ...CLI_TOUCHED_FILES.map((rel) => ({ rel, mode: "exact" as const, content: read(rel) })),
+    ...generated.map((rel) => ({ rel, mode: "eol" as const, content: read(rel) })),
+  ];
+}
+
+/** A file a restore put back. `backup` holds the bytes it replaced, when there were any to lose. */
+export type RevertedFile = { rel: string; backup?: string };
+
+/** A fresh dir per restore, under the backend dir, for the bytes that restore overwrites. */
+export function revertBackupDir(home: string, now = new Date()): string {
+  return path.join(home, "reverted", now.toISOString().replace(/[:.]/g, "-"));
+}
+
+/**
+ * Puts a snapshot back and lists what it reverted. Before an `exact` file is overwritten or
+ * deleted, its current bytes go to `backupDir/<rel>`, so an edit made during a session isn't lost.
+ * `eol` files only change line endings, so they need no copy.
+ */
+export function restoreCliSnapshot(
+  snapshot: CliSnapshotEntry[],
+  repoRoot = REPO_ROOT,
+  opts: { backupDir?: string } = {},
+): RevertedFile[] {
+  const lf = (b: Buffer) => b.toString("utf8").replace(/\r\n/g, "\n");
+  const backUp = (rel: string, bytes: Buffer | null): string | undefined => {
+    if (!opts.backupDir || bytes === null) return undefined;
+    const dest = path.join(opts.backupDir, rel);
+    fs.mkdirSync(path.dirname(dest), { recursive: true });
+    fs.writeFileSync(dest, bytes);
+    return dest;
+  };
+  return snapshot.flatMap(({ rel, mode, content }): RevertedFile[] => {
+    const full = path.join(repoRoot, rel);
+    const now = fs.existsSync(full) ? fs.readFileSync(full) : null;
+    const before = content === null ? null : Buffer.from(content, "base64");
+    if (mode === "eol") {
+      if (before === null || now === null || now.equals(before) || lf(now) !== lf(before)) return [];
+      fs.writeFileSync(full, before);
+      return [{ rel }];
+    }
+    if (before === null && now !== null) {
+      const backup = backUp(rel, now);
+      fs.rmSync(full);
+      return [{ rel, backup }];
+    }
+    if (before !== null && (now === null || !now.equals(before))) {
+      const backup = backUp(rel, now);
+      fs.writeFileSync(full, before);
+      return [{ rel, backup }];
+    }
+    return [];
   });
-  return () =>
-    before.flatMap(({ rel, full, content }) => {
-      const now = fs.existsSync(full) ? fs.readFileSync(full) : null;
-      if (content === null && now !== null) {
-        fs.rmSync(full);
-        return [rel];
-      }
-      if (content !== null && (now === null || !now.equals(content))) {
-        fs.writeFileSync(full, content);
-        return [rel];
-      }
-      return [];
-    });
+}
+
+/** For the revert log line: each file, plus where the bytes it replaced were saved. */
+export function formatReverted(reverted: RevertedFile[]): string {
+  return reverted.map((r) => (r.backup ? `${r.rel} (replaced bytes saved to ${r.backup})` : r.rel)).join(", ");
+}
+
+/**
+ * Snapshots the CLI-touched files. The returned function puts them back and lists what it
+ * reverted, saving replaced bytes under `revertBackupDir(home)` when `home` is given.
+ */
+export function snapshotCliTouchedFiles(repoRoot = REPO_ROOT, home?: string): () => RevertedFile[] {
+  const snapshot = takeCliSnapshot(repoRoot);
+  return () => restoreCliSnapshot(snapshot, repoRoot, { backupDir: home ? revertBackupDir(home) : undefined });
 }
 
 async function backendAnswers(url: string): Promise<boolean> {
@@ -476,12 +670,9 @@ export async function runConvexCapture(argv: string[], opts: RunOptions = {}): P
           `run \`bun run validation:backend -- stop --app-port ${inv.appPort}\` first to use \`vconvex dev\` directly.`,
       );
     }
-    const restore = snapshotCliTouchedFiles();
+    if (inv.cliArgs.find((a) => !a.startsWith("-")) === "dev") preparePinnedBackend(inv, say);
+    const restore = snapshotCliTouchedFiles(REPO_ROOT, inv.home);
     fs.mkdirSync(backendTempDir(inv.home), { recursive: true });
-    if (inv.childEnv.LOCALAPPDATA && process.platform === "win32") fs.mkdirSync(inv.childEnv.LOCALAPPDATA, { recursive: true });
-    if (seedBinaryCache({ parentEnv: process.env, childEnv: inv.childEnv, realHome: os.homedir() })) {
-      say("[vconvex] seeded the backend binary cache from the owner's cache (read only)");
-    }
     const out = logFd ?? "inherit";
     const stdin = opts.input !== undefined ? "pipe" : logFd !== null ? "ignore" : "inherit";
     const child: ChildProcess = spawn("node", [CONVEX_BIN, ...inv.cliArgs], {
@@ -511,7 +702,7 @@ export async function runConvexCapture(argv: string[], opts: RunOptions = {}): P
     const code = timedOut ? 124 : exitCode;
     if (timedOut) say(`[vconvex] killed \`convex ${inv.cliArgs.join(" ")}\` after ${opts.timeoutMs}ms`);
     const reverted = restore();
-    if (reverted.length > 0) say(`[vconvex] reverted CLI side-effect edits: ${reverted.join(", ")}`);
+    if (reverted.length > 0) say(`[vconvex] reverted CLI side-effect edits: ${formatReverted(reverted)}`);
     if (inv.cliArgs.find((a) => !a.startsWith("-")) === "dev") {
       const killed = killBackendExecutors(inv.home);
       if (killed.length > 0) say(`[vconvex] stopped orphaned backend node executor(s): ${killed.join(", ")}`);

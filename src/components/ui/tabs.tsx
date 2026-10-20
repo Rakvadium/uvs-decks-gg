@@ -28,8 +28,8 @@ function TabsList({ className, orientation = "horizontal", ...props }: TabsListP
       data-slot="tabs-list"
       data-orientation={orientation}
       className={cn(
-        "group tab-container inline-flex h-11 w-fit items-stretch justify-center overflow-hidden rounded-sm p-0",
-        "bg-muted/50 border border-border/50",
+        "group tab-container inline-flex h-11 w-fit items-stretch justify-center overflow-hidden rounded-md p-0",
+        "bg-muted-soft border border-surface",
         "backdrop-blur-sm",
         orientation === "vertical" && "tab-container-vertical h-auto w-full flex-col",
         className
@@ -48,10 +48,10 @@ function TabsTrigger({
       data-slot="tabs-trigger"
       className={cn(
         "inline-flex h-full flex-1 items-center justify-center gap-2 border-y border-transparent px-4 py-2 text-sm whitespace-nowrap transition-colors duration-150",
-        "border-r border-border/50 last:border-r-0",
+        "border-r border-surface last:border-r-0",
         "chrome-label-case text-muted-foreground text-xs",
-        "hover:bg-muted/80 hover:text-foreground",
-        "focus-visible:z-10 focus-visible:ring-2 focus-visible:ring-primary/25 focus-visible:ring-offset-0 focus-visible:outline-none",
+        "hover:bg-muted-overlay hover:text-foreground",
+        "focus-visible:z-10 focus-visible:ring-2 focus-visible:ring-primary-soft focus-visible:ring-offset-0 focus-visible:outline-none",
         "disabled:pointer-events-none disabled:opacity-50",
         "data-[state=active]:bg-background data-[state=active]:text-primary",
         "group-data-[orientation=vertical]:border-r-0 group-data-[orientation=vertical]:border-b group-data-[orientation=vertical]:last:border-b-0",

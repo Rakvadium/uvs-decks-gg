@@ -21,6 +21,17 @@ const ANONYMOUS_PATTERN = /^anonymous:anonymous-[A-Za-z0-9_-]+$/;
  */
 export const TESTED_CONVEX_VERSIONS = ["1.31.0"];
 
+/**
+ * The local backend release every wrapped `dev` runs, passed as `--local-backend-version`. Without
+ * it, CLI 1.31 asks api.github.com for the latest release on every anonymous `dev`
+ * (findLatestVersionWithBinary in cli/lib/localDeployment/download.js), and the unauthenticated
+ * limit of 60 calls an hour stalls parallel agents. With it, the CLI uses
+ * `<cache>/convex/binaries/<version>/` and `<cache>/convex/dashboard/` as they are. Tested with CLI
+ * 1.31.0 on the validation backends. Changing it means every existing backend has to be recreated
+ * (see checkSavedBackendVersion in convex.ts).
+ */
+export const PINNED_LOCAL_BACKEND_VERSION = "precompiled-2026-10-10-72ce13c";
+
 /** The CLI's own "no deploy key" sentinel (processDeployKeyValue in cli/lib/utils/utils.js). */
 export const DEPLOY_KEY_SENTINEL = "<ignore_deploy_key>";
 
@@ -39,7 +50,10 @@ export const ALLOWED_SUBCOMMANDS = new Set([
   "help",
 ]);
 
-/** Flags that pick a different deployment, add credentials, or override the wrapper's fixed ports. */
+/**
+ * Flags that pick a different deployment, add credentials, or override the wrapper's fixed ports or
+ * pinned backend. Any other `--local-*` flag is refused too (see LOCAL_BACKEND_FLAG).
+ */
 export const FORBIDDEN_FLAGS = [
   "--prod",
   "--env-file",
@@ -58,9 +72,15 @@ export const FORBIDDEN_FLAGS = [
   "--override-auth-client",
   "--override-auth-username",
   "--override-auth-password",
+  "--local",
   "--local-cloud-port",
   "--local-site-port",
+  "--local-backend-version",
+  "--local-force-upgrade",
 ];
+
+/** `--local` and every `--local-*` flag: the wrapper alone picks the local backend, its ports and binary. */
+const LOCAL_BACKEND_FLAG = /^--local(-|$)/;
 
 /**
  * Refused when present at all, under any letter case and even when empty, in the caller's env or
@@ -112,6 +132,8 @@ export type TargetClass = "local" | "cloud" | "unknown";
 export type GuardInput = {
   /** Args passed to the Convex CLI (wrapper flags already removed). `null` = not checked (`--check`). */
   args: string[] | null;
+  /** The args the CLI will really get (wrapper flags added). Omitted = not checked (`--check` with no args). */
+  cliArgs?: string[];
   /** Everything the CLI could read a deployment from: the caller's env, `.env.local`, `.env`. */
   sources: EnvSource[];
   /** Raw `.env.local`/`.env` text, for the ambiguity checks. */
@@ -185,9 +207,38 @@ export function argViolations(args: string[]): string[] {
     out.push(`Subcommand \`${subcommand}\` is not allowed. Allowed: ${[...ALLOWED_SUBCOMMANDS].join(", ")}.`);
   }
   for (const arg of args) {
-    if (arg.startsWith("--") && FORBIDDEN_FLAGS.includes(flagName(arg))) {
-      out.push(`Flag \`${flagName(arg)}\` is forbidden.`);
+    if (!arg.startsWith("--")) continue;
+    const name = flagName(arg);
+    if (FORBIDDEN_FLAGS.includes(name)) {
+      out.push(`Flag \`${name}\` is forbidden.`);
+    } else if (LOCAL_BACKEND_FLAG.test(name)) {
+      out.push(`Flag \`${name}\` is forbidden: the wrapper alone sets the local backend flags.`);
     }
+  }
+  return out;
+}
+
+/**
+ * Checks the args the wrapper actually hands the CLI: `dev` must carry `--local` and the pinned
+ * `--local-backend-version` exactly once each, so it never asks GitHub for the latest release;
+ * other commands start no backend and carry neither.
+ */
+export function pinnedBackendViolations(cliArgs: string[]): string[] {
+  const subcommand = cliArgs.find((a) => !a.startsWith("-"));
+  const versionFlags = cliArgs.flatMap((a, i) => (flagName(a) === "--local-backend-version" ? [i] : []));
+  const local = cliArgs.filter((a) => a === "--local").length;
+  const forceUpgrade = cliArgs.some((a) => flagName(a) === "--local-force-upgrade");
+  if (subcommand !== "dev") {
+    return versionFlags.length > 0 || local > 0 || forceUpgrade
+      ? [`Only \`dev\` may carry the local backend flags, but \`${subcommand}\` has them.`]
+      : [];
+  }
+  const out: string[] = [];
+  if (local !== 1) out.push("`dev` must carry `--local` exactly once.");
+  if (forceUpgrade) out.push("`dev` must not carry `--local-force-upgrade`.");
+  const value = versionFlags.length === 1 && cliArgs[versionFlags[0]] === "--local-backend-version" ? cliArgs[versionFlags[0] + 1] : null;
+  if (value !== PINNED_LOCAL_BACKEND_VERSION) {
+    out.push(`\`dev\` must carry \`--local-backend-version ${PINNED_LOCAL_BACKEND_VERSION}\` exactly once, so the CLI never asks GitHub for the latest release.`);
   }
   return out;
 }
@@ -445,7 +496,8 @@ export function resolveCliTarget(input: {
     for (const [k, v] of Object.entries(source?.env ?? {})) if (!has(k)) env[k] = v;
   }
   const deployKey = get("CONVEX_DEPLOY_KEY");
-  if (deployKey !== undefined && deployKey !== DEPLOY_KEY_SENTINEL) return { target: "cloud", reason: "a deploy key is set" };
+  // The CLI treats an empty deploy key as unset; caller-env-clean still refuses one.
+  if (deployKey && deployKey !== DEPLOY_KEY_SENTINEL) return { target: "cloud", reason: "a deploy key is set" };
   if (get("CONVEX_OVERRIDE_ACCESS_TOKEN")) return { target: "cloud", reason: "an access token override is set" };
   if (get("CONVEX_PROVISION_HOST")) return { target: "unknown", reason: "CONVEX_PROVISION_HOST redirects the CLI" };
   const selfHosted = get("CONVEX_SELF_HOSTED_URL");
@@ -497,6 +549,9 @@ export function guardReport(input: GuardInput): RuleResult[] {
     input.args === null
       ? { rule: "subcommand-and-flags", violations: [], skipped: true }
       : { rule: "subcommand-and-flags", violations: argViolations(input.args) },
+    input.cliArgs === undefined
+      ? { rule: "backend-version-pinned", violations: [], skipped: true }
+      : { rule: "backend-version-pinned", violations: pinnedBackendViolations(input.cliArgs) },
     { rule: "caller-env-clean", violations: otherSources.flatMap(envViolations) },
     { rule: "env-files-clean", violations: fileSources.flatMap(envViolations) },
     {

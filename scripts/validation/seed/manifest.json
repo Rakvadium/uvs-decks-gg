@@ -1,0 +1,35 @@
+{
+  "seedVersion": 1,
+  "seed": "uvs-validation-seed-v1",
+  "epoch": 1790812800000,
+  "publicConvexUrl": "https://honorable-shrimp-618.convex.cloud",
+  "catalog": {
+    "version": 29,
+    "url": "https://pub-53d81abf7a7f442a90c9383c1e7bdc60.r2.dev/catalog/uvs/v29.json.gz",
+    "sha256": "fc0dbddee10379b4833dfc0a1c7cfa469fc154e03b4de05a87de42112b4dfe36",
+    "updatedAt": 1792435558559,
+    "cardCount": 10457
+  },
+  "publicReadsSha256": "4622faf292736197b5b83ef6f9500e6d6075dc5a375ce0a1e7497cedc2d5ade8",
+  "publicReads": {
+    "backFaces": "ac64ab1d9e46d811028aa2ec515af8f6ffc09cd1351c71d6c091555c17d290e0",
+    "cardLegality": "09265a7e94968ba6a2b9bca399f93388e5439b2d79d0cb262dd939adcff2a0a5",
+    "facets": "0b3efc0d45a7cd99f5eb0f56221083e5944e0460d5b4eabc9d095921da98254b",
+    "formats": "f62a12f41846a73a156ab16df0b6476adae99289010f7624aaf15acc7f46a7dc",
+    "setLegality": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "sets": "54af724705746698015e221e54d7b9f4f826af5c559c605627ad58bb243f879e"
+  },
+  "meta": {
+    "catalogVersion": 29,
+    "seedVersion": 1,
+    "sha256": "98df8df24f23fc50f64bb0bbc76a2ef596fd7735f9d4281a6d8a7174bf62bc23"
+  },
+  "golden": {
+    "branch": "validation-seed",
+    "path": "golden.zip",
+    "catalogPath": "catalog.json.gz",
+    "sha256": "f1e892edc8adae356d78410cf5b7aa053f9f6736a4d27bd72548bce8afcbbd3b",
+    "bytes": 12287322,
+    "commit": "4df3bbe706696810e1554c89ea577e6821f8435d"
+  }
+}

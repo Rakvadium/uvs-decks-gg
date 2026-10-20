@@ -111,7 +111,7 @@ Every implementation path starts with **`project-context-gate`** (Context Brief 
 | `scheduled-reviewer` | Find problems; file issues only | Cap findings; prefer `needs-human`; no code changes |
 | `project-context-gate` | Investigate before coding | Docs + neighbors + placement/visual plan |
 | `hardened-coding` | Ship a change | Brief → slices → adversary → lint/build → UI visual verify |
-| `hardened-convex-ops` | Fix Convex/ops with evidence | Dev first; logs/insights/repro; no auth weakening |
+| `hardened-convex-ops` | Fix Convex/ops with evidence | Cloud deployment is live: read only; Convex writes per AGENTS.md § Secrets and live data; logs/insights/repro; no auth weakening |
 | `ui-ux-adversary` | Scrutinize UI | Placement, tokens, neighbors, BEFORE/AFTER images |
 | `hardened-pr-babysit` | Merge-ready PR | Conflicts → CI → comments → UI check if needed |
 | `pr-issue-verify` | Issue completion on a PR | Each Done when item evidenced; PR comment verdict |
@@ -169,9 +169,9 @@ PR: from event context.
 Resolve linked issue via Fixes/Closes #N in the PR body.
 Confirm base branch is `dev` (wrong base = blocker).
 For each Done when item: pass/fail with evidence (UI: repro + screenshot/recording with correct auth/viewport).
-Post an "Issue completion review" comment on the PR with verdict: fixes issue | partial | does not fix.
+Post an "Independent verification" comment on the PR with verdict: fixes issue | partial | does not fix.
 Do not merge.
-Do not implement unless only a trivial in-scope gap remains and you state what you changed.
+Never edit or push to the PR; report every gap as must-fix or should-fix for the builder, then a new verification round follows.
 Model policy: single-agent when possible; sub-agents only if needed and must use composer-2.5; never Sonnet/Opus.
 ```
 

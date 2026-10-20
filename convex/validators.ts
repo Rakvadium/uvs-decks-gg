@@ -1,4 +1,4 @@
-import { v } from "convex/values";
+import { v, type Infer } from "convex/values";
 import type { Doc } from "./_generated/dataModel";
 
 export const deckVisibilityValidator = v.union(
@@ -80,18 +80,27 @@ export const cardValidator = v.object({
   isRevealHidden: v.optional(v.boolean()),
 });
 
-export const userValidator = v.object({
+/**
+ * The only user fields any caller may see about another user. Convex rejects return values with
+ * extra fields, so a function that returns this can't send private fields by accident.
+ */
+export const publicUserProfileValidator = v.object({
   _id: v.id("users"),
   _creationTime: v.number(),
   username: v.optional(v.string()),
-  email: v.optional(v.string()),
-  emailVerificationTime: v.optional(v.number()),
   image: v.optional(v.string()),
-  isAnonymous: v.optional(v.boolean()),
-  role: v.optional(v.string()),
-  profanityFilterEnabled: v.boolean(),
-  hasVerifiedEmail: v.optional(v.boolean()),
 });
+
+export type PublicUserProfile = Infer<typeof publicUserProfileValidator>;
+
+export function publicUserProfileFromDocument(doc: Doc<"users">): PublicUserProfile {
+  return {
+    _id: doc._id,
+    _creationTime: doc._creationTime,
+    username: doc.username,
+    image: doc.image,
+  };
+}
 
 export const currentUserSelfValidator = v.object({
   _id: v.id("users"),
@@ -116,7 +125,8 @@ export const currentUserSelfValidator = v.object({
   userFacingMessage: v.optional(v.string()),
 });
 
-export function publicUserFromDocument(doc: Doc<"users">) {
+/** Self view only (`currentUser`): includes the signed-in user's own private fields. */
+export function selfUserFromDocument(doc: Doc<"users">) {
   return {
     _id: doc._id,
     _creationTime: doc._creationTime,
@@ -280,19 +290,35 @@ export const tierListCommentStatusValidator = v.union(
   v.literal("rejected")
 );
 
-export const tierListCommentValidator = v.object({
+/**
+ * Comment fields any viewer may see. Moderation details (reason, provider, raw result) stay on the
+ * server. Convex rejects return values with extra fields, so they can't be sent by accident.
+ */
+export const publicTierListCommentValidator = v.object({
   _id: v.id("tierListComments"),
   _creationTime: v.number(),
   tierListId: v.id("tierLists"),
   userId: v.id("users"),
   content: v.string(),
   status: tierListCommentStatusValidator,
-  moderationReason: v.optional(v.string()),
-  textModerationProvider: v.optional(v.string()),
-  textModerationResult: v.optional(v.any()),
   createdAt: v.number(),
   updatedAt: v.number(),
 });
+
+export type PublicTierListComment = Infer<typeof publicTierListCommentValidator>;
+
+export function publicTierListCommentFromDocument(doc: Doc<"tierListComments">): PublicTierListComment {
+  return {
+    _id: doc._id,
+    _creationTime: doc._creationTime,
+    tierListId: doc.tierListId,
+    userId: doc.userId,
+    content: doc.content,
+    status: doc.status,
+    createdAt: doc.createdAt,
+    updatedAt: doc.updatedAt,
+  };
+}
 
 export const collectionEntryValidator = v.object({
   _id: v.id("collections"),
@@ -695,16 +721,28 @@ export const teamAnnouncementValidator = v.object({
   createdAt: v.number(),
 });
 
-export const teamChatMessageValidator = v.object({
+/** Chat message fields team members may see. Moderation details stay on the server. */
+export const memberTeamChatMessageValidator = v.object({
   _id: v.id("teamChatMessages"),
   _creationTime: v.number(),
   teamId: v.id("teams"),
   authorUserId: v.id("users"),
   body: v.string(),
   createdAt: v.number(),
-  textModerationProvider: v.optional(v.string()),
-  textModerationResult: v.optional(v.any()),
 });
+
+export type MemberTeamChatMessage = Infer<typeof memberTeamChatMessageValidator>;
+
+export function memberTeamChatMessageFromDocument(doc: Doc<"teamChatMessages">): MemberTeamChatMessage {
+  return {
+    _id: doc._id,
+    _creationTime: doc._creationTime,
+    teamId: doc.teamId,
+    authorUserId: doc.authorUserId,
+    body: doc.body,
+    createdAt: doc.createdAt,
+  };
+}
 
 export const teamEventValidator = v.object({
   _id: v.id("teamEvents"),

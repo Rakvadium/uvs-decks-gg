@@ -7,11 +7,14 @@ import {
   tierListRankingScopeValidator,
   tierDefinitionValidator,
   tierListCommentStatusValidator,
-  tierListCommentValidator,
+  publicTierListCommentFromDocument,
+  publicTierListCommentValidator,
+  type PublicTierListComment,
   tierListItemValidator,
   tierListValidator,
-  publicUserFromDocument,
-  userValidator,
+  publicUserProfileFromDocument,
+  publicUserProfileValidator,
+  type PublicUserProfile,
 } from "./validators";
 import { requireAuth, requireUserCanPostContent } from "./utils/validation";
 import {
@@ -37,13 +40,13 @@ const tierListSaveItemValidator = v.object({
 
 const tierListFeedEntryValidator = v.object({
   tierList: tierListValidator,
-  author: v.union(userValidator, v.null()),
+  author: v.union(publicUserProfileValidator, v.null()),
   likedByViewer: v.boolean(),
 });
 
 const tierListCommentWithAuthorValidator = v.object({
-  comment: tierListCommentValidator,
-  author: v.union(userValidator, v.null()),
+  comment: publicTierListCommentValidator,
+  author: v.union(publicUserProfileValidator, v.null()),
 });
 
 const tierListEditableValidator = v.object({
@@ -53,7 +56,7 @@ const tierListEditableValidator = v.object({
 
 const tierListDetailValidator = v.object({
   tierList: tierListValidator,
-  author: v.union(userValidator, v.null()),
+  author: v.union(publicUserProfileValidator, v.null()),
   items: v.array(tierListItemValidator),
   comments: v.array(tierListCommentWithAuthorValidator),
   likedByViewer: v.boolean(),
@@ -219,12 +222,12 @@ export const listPublicFeed = query({
 
     const feed: Array<{
       tierList: Doc<"tierLists">;
-      author: ReturnType<typeof publicUserFromDocument> | null;
+      author: PublicUserProfile | null;
       likedByViewer: boolean;
     }> = [];
     for (const tierList of tierLists) {
       const authorDoc = await ctx.db.get(tierList.userId);
-      const author = authorDoc ? publicUserFromDocument(authorDoc) : null;
+      const author = authorDoc ? publicUserProfileFromDocument(authorDoc) : null;
       const likedByViewer = await getLikedState(ctx, viewerId, tierList._id);
       feed.push({
         tierList,
@@ -320,22 +323,22 @@ export const getDetail = query({
     ]);
 
     const commentsWithAuthors: Array<{
-      comment: Doc<"tierListComments">;
-      author: ReturnType<typeof publicUserFromDocument> | null;
+      comment: PublicTierListComment;
+      author: PublicUserProfile | null;
     }> = [];
     for (const comment of comments) {
       const commentAuthorDoc = await ctx.db.get(comment.userId);
       const commentAuthor = commentAuthorDoc
-        ? publicUserFromDocument(commentAuthorDoc)
+        ? publicUserProfileFromDocument(commentAuthorDoc)
         : null;
       commentsWithAuthors.push({
-        comment,
+        comment: publicTierListCommentFromDocument(comment),
         author: commentAuthor,
       });
     }
 
     const authorPublic = author
-      ? publicUserFromDocument(author)
+      ? publicUserProfileFromDocument(author)
       : null;
 
     return {

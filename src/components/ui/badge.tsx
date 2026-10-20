@@ -10,21 +10,21 @@ const badgeVariants = cva(
     variants: {
       tone: {
         default:
-          "rounded-md bg-primary/20 text-primary border-primary/40 shadow-[var(--chrome-badge-default-shadow)] hover:shadow-[var(--chrome-badge-default-shadow-hover)] hover:bg-primary/30",
+          "rounded-md bg-primary-selected text-primary border-primary-soft shadow-[var(--chrome-badge-default-shadow)] hover:shadow-[var(--chrome-badge-default-shadow-hover)] hover:border-primary-strong",
         secondary:
-          "rounded-md bg-secondary/20 text-secondary border-secondary/40 shadow-[var(--chrome-badge-secondary-shadow)] hover:shadow-[var(--chrome-badge-secondary-shadow-hover)] hover:bg-secondary/30",
+          "rounded-md bg-secondary-selected text-secondary border-secondary-soft shadow-[var(--chrome-badge-secondary-shadow)] hover:shadow-[var(--chrome-badge-secondary-shadow-hover)] hover:border-secondary-strong",
         destructive:
-          "rounded-md bg-destructive/20 text-destructive border-destructive/40 shadow-[var(--chrome-badge-destructive-shadow)] hover:shadow-[var(--chrome-badge-destructive-shadow-hover)]",
+          "rounded-md bg-destructive-selected text-destructive border-destructive-soft shadow-[var(--chrome-badge-destructive-shadow)] hover:shadow-[var(--chrome-badge-destructive-shadow-hover)]",
         outline:
-          "rounded-md bg-transparent text-foreground border-border/50 hover:border-primary/50 hover:text-primary hover:shadow-[var(--chrome-badge-outline-shadow-hover)]",
+          "rounded-md bg-transparent text-foreground border-surface hover:border-primary-strong hover:text-primary hover:shadow-[var(--chrome-badge-outline-shadow-hover)]",
         success:
-          "rounded-md bg-success/15 text-success border-success/40",
+          "rounded-md bg-success-selected text-success border-success-soft",
         warning:
-          "rounded-md bg-warning/15 text-warning border-warning/40",
+          "rounded-md bg-warning-selected text-warning border-warning-soft",
         info:
-          "rounded-md bg-info/15 text-info border-info/40",
+          "rounded-md bg-info-selected text-info border-info-soft",
         muted:
-          "rounded-full bg-muted/50 text-muted-foreground border-muted-foreground/30",
+          "rounded-full bg-muted-soft text-muted-foreground border-muted-foreground/30",
         entity:
           "rounded-none bg-gradient-to-r from-primary/10 to-secondary/10 text-foreground border-l-2 border-l-primary border-y border-y-border/50 border-r-0 backdrop-blur-sm",
         signal:
