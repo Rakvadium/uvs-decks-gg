@@ -67,7 +67,7 @@ Use browser preview snapshots (and short recordings only for interaction-heavy w
 
 **Before edits**
 
-1. App running (`bun run dev`, port **8090**).
+1. App running. `bun run dev` is fixed to port **8090**. To use your own port, run `bunx next dev -p <port>` (`capture --port` starts one for you).
 2. Sign in via agent-login if the route needs auth ([agent-onboarding.md](./agent-onboarding.md) §6).
 3. Snapshot BEFORE on each affected route: desktop + mobile.
 4. Same theme/chrome/auth state you will use for AFTER.
@@ -101,11 +101,11 @@ Captures never write to Convex, and they set theme and mode in the browser only.
 
 ## Coordinator brief templates
 
-A coordinator hands one issue to a builder agent, then the PR to a different verifier agent, and repeats verify rounds until one passes. Fill every `<placeholder>` and delete lines that don't apply. Reference runs: #196 and #198 (capture tooling, two verification rounds each), #201 (design foundation).
+A coordinator hands one issue to a builder agent, then the PR to a different verifier agent, and repeats verify rounds until one passes. Fill every `<placeholder>` and delete lines that don't apply. Reference runs: #196 and #198 (capture tooling, multiple verification rounds), #201 (design foundation, builder and compare reference).
 
 Both briefs rely on these setup rules:
 
-- **One agent, one worktree, one port range.** Concurrent dev servers never share a checkout: Next allows one `next dev` per checkout (`.next/dev/lock`). Builder and verifier get different ranges, and both stay off the default port 8090.
+- **One agent, one worktree, one port range.** Concurrent dev servers never share a checkout: Next allows one `next dev` per checkout (`.next/dev/lock`). Builder and verifier get different ranges, and both stay off the default port 8090 (`bunx next dev -p <port>`).
 - **Choose the worktree's env on purpose.** A new worktree has no `.env.local`, and the main checkout's copy may point at a local Convex instead of the cloud deployment. The brief names the target (`cloud` or `local`). Copy the main `.env.local` only after checking that its `NEXT_PUBLIC_CONVEX_URL` host matches that target, without printing the value (for example, `grep -c` for the local host).
 
 ### Builder brief
@@ -144,18 +144,20 @@ You are the VERIFIER for PR #<pr> (issue #<n>), round <k>. You did not build it.
 Setup
 1. Your own worktree at the PR head (`gh pr checkout <pr>`). Record the head SHA.
 2. Ports <first>–<last>, different from the builder's. Convex target: <same as builder>; same env rule.
+3. Allowed files: <globs>. Any other changed path fails the scope check.
 
 Bans
 - AGENTS.md § Secrets and live data. Approved exceptions: <none | command + reason>.
-- No pushes to the PR branch. Publish your media only under `<n>/verify*` labels. Don't merge.
+- Never edit or push to the PR; report fixes as must-fix or should-fix. Publish your media only under `<n>/verify*` labels. Don't merge.
 
 Process
 - Use pr-issue-verify. Reproduce every PR-body claim with your own runs and captures.
+- Builder's open questions to rule on: <list from the builder's final report, or "none">. Answer each in the comment.
 - <Round 2+: re-check each prior must-fix and should-fix by number, then rerun the full check table.>
 - <Issue-specific probes, e.g. break the tool and confirm it fails loudly.>
 
 Checks
-- Each Done when item, typecheck/test/lint/build, and every item in pr-issue-verify § Security & side effects.
+- Each Done when item, typecheck/test/lint/build, and every item in hardened-coding § Security & side effects (pr-issue-verify step 4).
 
 Output
 - One PR comment in the pr-issue-verify format (check table, evidence, must-fix, should-fix, nits). Verdict rules: pr-issue-verify § Verdict.
@@ -200,8 +202,9 @@ Do not implement until I say apply UI fixes.
 Follow docs/agent-workflow-playbook.md.
 Use project-context-gate, then hardened-convex-ops.
 Symptom: <…>
-Environment: <dev | prod | unknown>
-Dev first. No prod mutations without approval.
+Environment: <local (127.0.0.1) | cloud (serves the live site) | unknown>
+The cloud deployment serves the live site: read only there.
+Write, deploy or migrate only on a local backend (127.0.0.1) unless I approve the exact command.
 ```
 
 ### D) PR babysit

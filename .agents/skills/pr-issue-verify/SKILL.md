@@ -57,13 +57,7 @@ Parse Goal, Done when, Context, Out of scope (and auth/viewport notes if present
    - Non-UI: tests, typecheck/lint output, or precise code citation
    - Tooling: break it on purpose and confirm the failure is reported
 
-4. **Security & side effects** (rules: `AGENTS.md` § Secrets and live data). Run each yourself:
-   - [ ] **Secret scan:** `bun run secret-scan --diff origin/<base>..HEAD`, and `bun run secret-scan --path <dir>` over your own media before you publish it. Until `secret-scan` is available (#202), search the diff, the PR's published media and your media for each `.env.local` value (raw and URL-encoded), printing match counts only.
-   - [ ] **Live data:** the PR's code and your own runs write nothing live. You ran no `convex dev`/deploy/run/migrations without human approval.
-   - [ ] **Scope:** every path in `git diff --name-only origin/<base>...HEAD` is in the issue's allowed paths.
-   - [ ] **New targets:** for each new branch, push target, upload or workflow, check what CI/CD it triggered (deployments and checks on that ref) and who can see it.
-   - [ ] **Preview:** the PR's own Vercel check passes (`gh pr checks <pr>`).
-   - [ ] **Validation tooling:** env var name patterns accept digits (`[A-Z0-9_]`), and every failure path you probed is loud.
+4. **Security & side effects:** rerun every item of the checklist in `.agents/skills/hardened-coding/SKILL.md` § Security & side effects yourself, at the PR head. Scan the PR's published media, and scan your own media before you publish it. For new targets, look at the deployments and checks that actually ran on each new ref. Report each item in the check table.
 
 5. **CI signal** (secondary)
    - Note failing required checks; they block “fixes issue” if they prevent confidence
@@ -79,7 +73,7 @@ Parse Goal, Done when, Context, Out of scope (and auth/viewport notes if present
 7. **Comment on the PR** (required)
 
 ```markdown
-## Issue completion review (round <k>): PASS | FAIL
+## Independent verification (round <k>): PASS | FAIL
 **Issue:** #<n> — <title>
 **Verdict:** fixes issue | partial | does not fix. <m> must-fix, <s> should-fix.
 **Verified at:** `<head sha>`, own worktree, ports <ports>. Live data: no writes | <approved exception>. Base: `dev` | wrong (`master`/`main`).
@@ -108,9 +102,8 @@ Parse Goal, Done when, Context, Out of scope (and auth/viewport notes if present
 - Screenshots/recordings with raw URLs (or N/A), and where your media was published.
 ```
 
-8. **Fixing**
-   - Default: **do not implement** unless the user/automation says “fix gaps in this PR”
-   - If allowed: only fix clear gaps for this issue; re-run verification; do not merge unless asked
+8. **Hand back**
+   - Never edit or push to the PR. Report every gap as a must-fix or should-fix. The builder fixes it, and the coordinator then starts a new verification round.
 
 ## Automation prompt
 
@@ -120,9 +113,9 @@ Follow docs/agent-os.md.
 PR: from event context (or #<pr>).
 Resolve linked issue via Fixes/Closes #N.
 Confirm base branch is `dev` (flag master/main as blocker).
-Post the Issue completion review comment on the PR.
+Post the Independent verification comment on the PR.
 Do not merge.
-Do not implement unless the PR only needs a trivial gap fix and you state what you changed.
+Never edit or push to the PR; report every gap as must-fix or should-fix for the builder.
 For UI: repro with correct auth/viewport and attach screenshot/recording evidence.
 Model policy: prefer single-agent work; if sub-agents are required use composer-2.5 only; never Sonnet/Opus.
 ```
@@ -130,7 +123,7 @@ Model policy: prefer single-agent work; if sub-agents are required use composer-
 ## Forbidden
 
 - Merging without explicit ask
-- Verifying a PR you built
+- Verifying a PR you built, or editing the PR you are verifying
 - Approving “fixes issue” without your own evidence per Done when item
 - Ignoring wrong base branch (`master`/`main` instead of `dev`)
 - Ignoring Out of scope drive-by changes

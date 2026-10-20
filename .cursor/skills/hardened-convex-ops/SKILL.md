@@ -25,16 +25,16 @@ No mutations or code edits before the Context Brief exists.
 ## Done-When defaults
 
 - Root cause named with evidence (logs, insights, readonly repro)
-- Fix on dev first
+- Fix proven on a local backend (`127.0.0.1`) or by readonly repro
 - Exact repro passes
 - Failure logs for that path clean or explained
-- No prod mutation unless user explicitly approves
+- Nothing written or deployed to the cloud deployment without explicit human approval
 
 ## Prep
 
-1. Identify deployment (prefer dev).
+1. Identify the target deployment without printing env values. The cloud deployment (the one Convex calls "dev") serves the live site: read only there (`AGENTS.md` § Secrets and live data). Writes, pushes and migrations go to a local backend on `127.0.0.1`, or wait for explicit human approval of the exact command.
 2. Build `failures` queue from failure logs, insights (OCC / read limits), readonly repro.
-3. Note forbidden: prod writes, auth weakening, broad deletes, secret dumping.
+3. Note forbidden: unapproved writes or deploys to the cloud deployment, auth weakening, broad deletes, secret dumping.
 
 ## Loop
 
@@ -49,4 +49,4 @@ No mutations or code edits before the Context Brief exists.
 
 Stop when the symptom’s failure queue is cleared on the target deployment.
 
-Escalate for prod mutations, destructive cleanup, unclear deployment, or two failed fix attempts on the same root cause.
+Escalate for any write or deploy to the cloud deployment, destructive cleanup, unclear deployment, or two failed fix attempts on the same root cause.

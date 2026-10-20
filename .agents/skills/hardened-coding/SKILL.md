@@ -54,14 +54,21 @@ If any UI file changed:
 
 ## Security & side effects
 
-Rules: `AGENTS.md` § Secrets and live data. Before opening or updating a PR, run every item and put the results in the PR body:
+Rules: `AGENTS.md` § Secrets and live data. This is the one checklist for both roles. Builders run every item before opening or updating a PR and put the results in the PR body. Verifiers rerun every item themselves through `pr-issue-verify`.
 
-- [ ] **Secret scan:** `bun run secret-scan --diff origin/<base>..HEAD` is clean, and `bun run secret-scan --path <dir>` is clean for every capture or media folder before you publish it. Until `secret-scan` is available (#202), search the diff and the media for each `.env.local` value instead (raw and URL-encoded), printing match counts only.
-- [ ] **Live data:** no writes, and no `convex dev`/deploy/run/migrations without human approval. Say so in the PR body.
+- [ ] **Secret scan:** `bun run secret-scan --diff origin/<base>..HEAD` is clean. It scans the PR's own commits (merge-base to HEAD), not a two-way diff against the base. `bun run secret-scan --path <dir>` is clean for every capture or media folder before it is published. Until `secret-scan` is available (#202), run the fallback scan below.
+- [ ] **Live data:** no writes, and no `convex` command that changes the cloud deployment without human approval. Say so in the PR body.
 - [ ] **Scope:** every path in `git diff --name-only origin/<base>...HEAD` is in the issue's allowed paths.
 - [ ] **New targets:** for each new branch, push target, upload or workflow, name the CI/CD it triggers (Vercel, GitHub Actions) and who can see it (this repo is public). Example: the orphan `pr-media` branch triggered failed Vercel builds until it got a `vercel.json` with deployments disabled.
 - [ ] **Preview:** the PR's own Vercel check passes (`gh pr checks <pr>`).
 - [ ] **Validation tooling** (capture, scan, verify scripts): env var name patterns accept digits (`[A-Z0-9_]`, so `R2_*` matches), and every failure path is loud (non-zero exit or a flagged result).
+
+**Fallback scan** (until `secret-scan` is available):
+
+- **Inputs:** the added lines of `git diff origin/<base>...HEAD` (three dots, so only the PR's changes), the commit messages from `git log origin/<base>..HEAD --format=%B`, the PR title and body, and each media folder.
+- **Values:** read them from this worktree's env file. Skip values shorter than 8 characters.
+- **Forms:** match each value raw, URL-encoded and base64-encoded.
+- **Output:** print each variable name with its hit count, never the value.
 
 ## Forbidden
 

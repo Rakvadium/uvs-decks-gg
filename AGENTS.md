@@ -16,14 +16,14 @@ For any non-trivial change to `src/` or `convex/`, start with **`project-context
 
 ## Secrets and live data
 
-The live site runs on the same Convex deployment agents can reach. Treat it as production.
+The cloud Convex deployment (the one Convex calls "dev") serves the live site. A write or deploy there is a production change. A local backend on `127.0.0.1` is yours to write to.
 
 - Write env var **names**, never values, in tracked files, commit messages, PR text, comments and published media. Docs and tests use `<placeholder>` values.
-- Keep secrets out of URLs and logs. The one exception is the local `/agent-login?token=` link: open it only in your own browser, and redact `token=` in anything you paste or save.
+- Keep secrets out of URLs and logs. The one exception is `/agent-login?token=` on `http://localhost:<port>` under `next dev` (the route only works when `NODE_ENV=development` and `VERCEL!=1`). Open it only in your own browser. `next dev` output logs that URL with the token, so redact `token=` before you share dev-server output.
 - Leave live data as you found it: read only. Signing in as the agent user (its own auth session) is the only write allowed.
-- Run `convex dev`, `convex deploy`, `convex run` and migrations only after a human explicitly approves that command for this task.
+- Get explicit human approval for this task before any `convex` command that changes the cloud deployment: `dev`, `deploy`, `run`, `import`, `env set`, `env remove`, or a migration. The same commands against a local backend (`127.0.0.1`, e.g. `convex dev --local`) are allowed. Confirm which one `.env.local` targets first, without printing values.
 
-Per-PR checks: `hardened-coding` and `pr-issue-verify` § Security & side effects.
+Per-PR checklist: `hardened-coding` § Security & side effects. Verifiers rerun it through `pr-issue-verify`.
 
 ## Workflow skills
 
