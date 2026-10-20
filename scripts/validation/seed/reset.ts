@@ -7,12 +7,17 @@
  * checks its sha256 against the manifest, imports it with `vconvex import --replace-all`, then
  * checks that the backend's validationSeedMeta row matches the manifest. The backend must already
  * be running (`validation:backend -- start`).
+ *
+ * Before importing, it also caches the pinned catalog from the same seed commit (catalog.ts) and
+ * fails if that copy is missing or its sha256 is wrong. Afterwards it warns when R2 no longer
+ * serves the seeded `catalogUrl`.
  */
 import fs from "node:fs";
 import path from "node:path";
 import { status } from "../backend";
 import { REPO_ROOT, runConvex, runConvexCapture } from "../convex";
 import { defaultValidationRoot, resolveAppPort } from "../ports";
+import { checkCatalogUrl, readPinnedCatalog, rePinHint } from "./catalog";
 import { GOLDEN_FILE, assertLocalTarget, git, gitBlob, gitOk, parseRunOutput, readManifest, seedWorkDir, sha256, type SeedMeta } from "./manifest";
 
 const log = (message: string) => console.error(`[seed] ${message}`);
@@ -45,6 +50,8 @@ export async function reset(appPort: number, opts: { zip?: string; repointEnvLoc
   }
   const file = path.join(seedWorkDir(), `golden-${actual.slice(0, 12)}.zip`);
   if (!fs.existsSync(file)) fs.writeFileSync(file, zip);
+  const catalog = readPinnedCatalog(manifest);
+  log(`pinned catalog v${manifest.catalog.version} (sha256 verified) from ${catalog.source}, cached at ${catalog.cachePath}`);
   log(`importing ${source} (sha256 ${actual}) into the port ${appPort} backend`);
 
   const code = await runConvex(["--app-port", String(appPort), "import", "--replace-all", "-y", file], { quiet: true });
@@ -63,6 +70,15 @@ export async function reset(appPort: number, opts: { zip?: string; repointEnvLoc
     throw new Error(`validationSeedMeta ${JSON.stringify(meta)} does not match manifest.json ${JSON.stringify(expected)}`);
   }
   log(`port ${appPort} backend reset to seed v${meta.seedVersion} (catalog v${meta.catalogVersion}, sha256 ${meta.sha256})`);
+
+  const r2 = await checkCatalogUrl(manifest.catalog);
+  if (!r2.ok) {
+    log(
+      `WARNING: R2 no longer serves the seeded catalogUrl (${r2.status === null ? "request failed" : `HTTP ${r2.status}`}): ${manifest.catalog.url}. ` +
+        `The app's static catalog fetch fails and falls back to Convex sync unless something serves ${catalog.cachePath} for that URL ` +
+        `(pinnedCatalogForUrl in scripts/validation/seed/catalog.ts). ${rePinHint(manifest.catalog)}`,
+    );
+  }
   return meta;
 }
 

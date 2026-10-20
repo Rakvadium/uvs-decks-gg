@@ -22,9 +22,13 @@ export type Manifest = {
   /** Public production Convex URL; only public queries are called on it. */
   publicConvexUrl: string;
   catalog: CatalogPin;
+  /** sha256 over `publicReads`; `build` reports when a rebuild's value differs. */
   publicReadsSha256: string | null;
+  /** sha256 per public read (sets, formats, legality, back faces, facets). */
+  publicReads?: Record<string, string> | null;
   meta: SeedMeta | null;
-  golden: { branch: string; path: string; sha256: string; bytes: number; commit: string | null } | null;
+  /** `catalogPath` is the pinned catalog's file in the same seed branch commit (see catalog.ts). */
+  golden: { branch: string; path: string; catalogPath?: string; sha256: string; bytes: number; commit: string | null } | null;
 };
 
 export function readManifest(file = MANIFEST_PATH): Manifest {

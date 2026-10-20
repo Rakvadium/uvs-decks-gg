@@ -2,7 +2,7 @@
  * Synthetic fixtures for local validation backends (scripts/validation/seed/build.ts).
  *
  * `seedFixtures` runs once on a fresh backend that already holds the public catalog tables
- * (cards, sets, formats, legality, facets, cardDataVersion). It derives every fixture from a
+ * (cards incl. back faces, sets, formats, legality, facets, cardDataVersion). It derives every fixture from a
  * seeded RNG and a fixed epoch, so the same catalog and seed always give the same documents.
  * `buildFixturePlan` is pure (no ctx) so tests can check determinism and that no real-looking
  * identity is produced. Every entry point starts with `assertValidationBackend()`.
@@ -466,7 +466,8 @@ export const seedFixtures = internalMutation({
         .query("cards")
         .withIndex("by_setCode_and_collectorNumber", (q) => q.eq("setCode", setCode))
         .collect();
-      cards.push(...rows);
+      // Back faces are never deck or tier list entries; the plan draws from the gallery cards only.
+      cards.push(...rows.filter((card) => card.isFrontFace !== false));
     }
     const banned = new Set(
       (await ctx.db.query("cardLegality").collect())
