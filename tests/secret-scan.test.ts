@@ -223,10 +223,29 @@ describe("secret-scan env file and manifest", () => {
     for (const name of ["AGENT_AUTH_SECRET", "AGENT_AUTH_PASSWORD", "R2_ACCESS_KEY_ID", "R2_SECRET_ACCESS_KEY", "JWKS"]) {
       expect(manifest.names).toContain(name);
     }
-    expect(manifest.names).not.toContain("AGENT_AUTH_USERNAME");
-    expect(manifest.names).not.toContain("R2_BUCKET");
+    // Public identifiers, not secrets: the code hardcodes the legacy agent email on purpose (#223).
+    for (const name of ["AGENT_AUTH_USERNAME", "AGENT_AUTH_EMAIL", "R2_BUCKET"]) {
+      expect(manifest.names).not.toContain(name);
+    }
     expect(manifest.optional).toEqual(["CONVEX_DEPLOY_KEY"]);
     expect(manifest.ciOnly).toEqual(["SECRET_SCAN_CANARY"]);
+  });
+
+  test("sync-ci sets only manifest names, so a public name in the env files is skipped", () => {
+    const dir = tempDir();
+    const envFile = path.join(dir, "env");
+    fs.writeFileSync(envFile, `AGENT_AUTH_EMAIL=${FAKE}\nAGENT_AUTH_SECRET=${FAKE}\nSECRET_SCAN_CANARY=${FAKE}\n`);
+    const result = spawnSync(
+      process.execPath,
+      [path.join(import.meta.dir, "../scripts/secret-scan/sync-ci.ts"), "--dry-run", "--env-file", envFile],
+      { cwd: dir },
+    );
+    const output = `${result.stdout}${result.stderr}`;
+    expect(result.status).toBe(0);
+    expect(output).toContain("would set AGENT_AUTH_SECRET");
+    expect(output).not.toContain("AGENT_AUTH_EMAIL");
+    expect(output).not.toContain("SECRET_SCAN_CANARY");
+    expect(output).not.toContain(FAKE);
   });
 
   const ci = () => fs.readFileSync(path.join(import.meta.dir, "../.github/workflows/ci.yml"), "utf8").replace(/\r\n/g, "\n");
