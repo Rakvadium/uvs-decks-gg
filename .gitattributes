@@ -1,0 +1,3 @@
+# The Convex CLI writes codegen with LF endings. Check it out the same way, so a push does not
+# leave line-ending-only changes behind under core.autocrlf=true.
+convex/_generated/** text eol=lf

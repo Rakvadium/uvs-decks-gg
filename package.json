@@ -24,8 +24,8 @@
     "secret-scan:sync-ci": "bun scripts/secret-scan/sync-ci.ts",
     "vconvex": "bun scripts/validation/convex.ts",
     "validation:backend": "bun scripts/validation/backend.ts",
-    "validation:seed:build": "bun scripts/validation/not-implemented.ts validation:seed:build",
-    "validation:seed:reset": "bun scripts/validation/not-implemented.ts validation:seed:reset",
+    "validation:seed:build": "bun scripts/validation/seed/build.ts",
+    "validation:seed:reset": "bun scripts/validation/seed/reset.ts",
     "agent:setup": "bun scripts/validation/not-implemented.ts agent:setup",
     "agent:login-url": "bun scripts/validation/not-implemented.ts agent:login-url"
   },
