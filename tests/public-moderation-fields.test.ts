@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import type { Id } from "../convex/_generated/dataModel";
+import { v } from "convex/values";
+import type { Doc, Id } from "../convex/_generated/dataModel";
 import schema from "../convex/schema";
 import { getDetail } from "../convex/tierLists";
 import { listPage } from "../convex/teams/chat";
@@ -10,10 +11,14 @@ import {
   getSetCardCountAudit,
   list,
   listWithCardCountAudit,
+  PRIVATE_SET_FIELDS,
+  publicSetFromDocument,
+  publicSetShape,
+  publicSetValidator,
+  type PublicSet,
 } from "../convex/sets";
 import {
   memberTeamChatMessageValidator,
-  publicSetValidator,
   publicTierListCommentValidator,
 } from "../convex/validators";
 
@@ -183,12 +188,56 @@ describe("public shapes", () => {
     }
     expect(Object.keys(publicSetValidator.fields)).not.toContain("updatedBy");
   });
+});
 
-  test("public set shape covers every other sets field", () => {
-    // publicSetFromDocument drops only updatedBy, so a sets field missing here would fail at runtime.
+/**
+ * Same rule Convex applies to a `returns` object validator: no extra fields, and every required
+ * field present. Returns the problems, so a test can show both a pass and a fail.
+ */
+function strictObjectProblems(value: object, validator: { fields: Record<string, { isOptional: string }> }) {
+  const problems: string[] = [];
+  for (const key of Object.keys(value)) {
+    if (!(key in validator.fields)) problems.push(`extra field ${key}`);
+  }
+  for (const [key, field] of Object.entries(validator.fields)) {
+    if (field.isOptional === "required" && !(key in value)) problems.push(`missing field ${key}`);
+  }
+  return problems;
+}
+
+describe("public set shape", () => {
+  const SYSTEM_FIELDS = ["_creationTime", "_id"];
+
+  test("is every sets column except the private ones, plus system fields", () => {
+    expect([...PRIVATE_SET_FIELDS]).toEqual(["updatedBy"]);
     const tableFields = Object.keys(schema.tables.sets.validator.fields).filter((f) => f !== "updatedBy");
-    const publicFields = Object.keys(publicSetValidator.fields).filter((f) => !f.startsWith("_"));
-    expect(publicFields.sort()).toEqual(tableFields.sort());
+    expect(Object.keys(publicSetValidator.fields).sort()).toEqual([...tableFields, ...SYSTEM_FIELDS].sort());
+  });
+
+  test("a private field can't leak", () => {
+    const publicSet = publicSetFromDocument(set as Doc<"sets">);
+    expect(Object.keys(publicSet)).not.toContain("updatedBy");
+    expect(strictObjectProblems(publicSet, publicSetValidator)).toEqual([]);
+    // A mapper that kept the field would be rejected by the strict `returns` validator.
+    expect(strictObjectProblems({ ...publicSet, updatedBy: adminId }, publicSetValidator)).toEqual([
+      "extra field updatedBy",
+    ]);
+    // @ts-expect-error updatedBy is not part of the public set type
+    const typeCheck: PublicSet["updatedBy"] = undefined;
+    expect(typeCheck).toBeUndefined();
+  });
+
+  test("a new non-private column flows through without code changes", () => {
+    const tableWithNewColumn = schema.tables.sets.validator.extend({ releaseNotes: v.optional(v.string()) });
+    const shape = publicSetShape(tableWithNewColumn);
+    expect(Object.keys(shape.fields)).toContain("releaseNotes");
+    expect(Object.keys(shape.fields)).not.toContain("updatedBy");
+
+    const docWithNewColumn = { ...set, releaseNotes: "<placeholder>" } as Doc<"sets">;
+    const mapped = publicSetFromDocument(docWithNewColumn);
+    expect((mapped as Record<string, unknown>).releaseNotes).toBe("<placeholder>");
+    expect(Object.keys(mapped)).not.toContain("updatedBy");
+    expect(strictObjectProblems(mapped, shape)).toEqual([]);
   });
 });
 

@@ -1,8 +1,41 @@
 import { query, internalMutation } from "./_generated/server";
-import { v } from "convex/values";
-import { publicSetFromDocument, publicSetValidator, setDocValidator } from "./validators";
+import { v, type GenericValidator, type Infer, type ObjectType, type VObject } from "convex/values";
+import type { Doc } from "./_generated/dataModel";
+import schema from "./schema";
+import { setDocValidator } from "./validators";
 import { requireAdmin } from "./utils/validation";
 import { countListCardsForSetCode, syncSetCardCountByCode } from "./setCardCountSync";
+
+/** `sets` columns only admins may see. `updatedBy` is the id of whoever last edited the set. */
+export const PRIVATE_SET_FIELDS = ["updatedBy"] as const;
+
+type PrivateSetField = (typeof PRIVATE_SET_FIELDS)[number];
+
+/**
+ * Public set shape for a `sets` table validator: every column except the private ones, plus system
+ * fields. A new column is public without touching this file; only the fields above are removed.
+ */
+export function publicSetShape<Fields extends Record<PrivateSetField, GenericValidator>>(
+  table: VObject<ObjectType<Fields>, Fields>
+) {
+  return table.omit(...PRIVATE_SET_FIELDS).extend({
+    _id: v.id("sets"),
+    _creationTime: v.number(),
+  });
+}
+
+/** Strict `returns` validator for public set reads. */
+export const publicSetValidator = publicSetShape(schema.tables.sets.validator);
+
+export type PublicSet = Infer<typeof publicSetValidator>;
+
+export function publicSetFromDocument(doc: Doc<"sets">): PublicSet {
+  const publicDoc: Partial<Doc<"sets">> = { ...doc };
+  for (const field of PRIVATE_SET_FIELDS) {
+    delete publicDoc[field];
+  }
+  return publicDoc as PublicSet;
+}
 
 export const list = query({
   args: {},

@@ -491,7 +491,7 @@ export const formatErrataValidator = v.object({
   sortOrder: v.number(),
 });
 
-const publicSetFields = {
+export const setDocValidator = v.object({
   _id: v.id("sets"),
   _creationTime: v.number(),
   code: v.string(),
@@ -505,22 +505,6 @@ const publicSetFields = {
   isFuture: v.optional(v.boolean()),
   spotlightIP: v.optional(v.string()),
   updatedAt: v.optional(v.number()),
-};
-
-/** Set fields any caller may see. Leaves out `updatedBy`, the id of whoever last edited the set. */
-export const publicSetValidator = v.object(publicSetFields);
-
-export type PublicSet = Infer<typeof publicSetValidator>;
-
-export function publicSetFromDocument(doc: Doc<"sets">): PublicSet {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- dropped on purpose
-  const { updatedBy: _updatedBy, ...publicFields } = doc;
-  return publicFields;
-}
-
-/** Full set document, for admin-gated functions only. */
-export const setDocValidator = v.object({
-  ...publicSetFields,
   updatedBy: v.optional(v.id("users")),
 });
 
