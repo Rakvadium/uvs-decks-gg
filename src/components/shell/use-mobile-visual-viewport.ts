@@ -1,8 +1,8 @@
 "use client";
 
 import { useLayoutEffect, type RefObject } from "react";
+import { MOBILE_MEDIA_QUERY } from "@/hooks/useIsMobile";
 
-const MOBILE_QUERY = "(max-width: 767px)";
 const RESYNC_DELAYS_MS = [60, 180, 400, 800];
 const ZOOM_TOLERANCE = 0.01;
 const NON_TEXT_INPUT_TYPES = new Set([
@@ -81,7 +81,7 @@ export function useMobileVisualViewportFrame(ref: RefObject<HTMLElement | null>)
     const node = ref.current;
     if (!node) return;
 
-    const media = window.matchMedia(MOBILE_QUERY);
+    const media = window.matchMedia(MOBILE_MEDIA_QUERY);
     const html = document.documentElement;
     const body = document.body;
     let active = false;

@@ -2,8 +2,9 @@
 
 import { useSyncExternalStore } from "react";
 
-const MOBILE_BREAKPOINT = 768;
-const MOBILE_MEDIA_QUERY = `(max-width: ${MOBILE_BREAKPOINT - 1}px)`;
+// The exact complement of Tailwind's `md:` query (`width >= 48rem`, 768px at the default root font
+// size), so JS and CSS agree at fractional widths and with a non-default browser font size too.
+export const MOBILE_MEDIA_QUERY = "(width < 48rem)";
 const BELOW_LG_MEDIA_QUERY = "(max-width: 1023px)";
 
 function getServerSnapshot(): boolean {
@@ -28,11 +29,11 @@ function createMediaStore(query: string) {
   return { getSnapshot, subscribe };
 }
 
-const mobileStore = createMediaStore(MOBILE_MEDIA_QUERY);
+export const mobileViewportStore = createMediaStore(MOBILE_MEDIA_QUERY);
 const belowLgStore = createMediaStore(BELOW_LG_MEDIA_QUERY);
 
 export function useIsMobile(): boolean {
-  return useSyncExternalStore(mobileStore.subscribe, mobileStore.getSnapshot, getServerSnapshot);
+  return useSyncExternalStore(mobileViewportStore.subscribe, mobileViewportStore.getSnapshot, getServerSnapshot);
 }
 
 export function useIsBelowLg(): boolean {
