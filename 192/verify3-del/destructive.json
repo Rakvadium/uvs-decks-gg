@@ -1,0 +1,1370 @@
+{
+  "blocked": [
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus"
+  ],
+  "canEditRewrites": 33,
+  "results": [
+    {
+      "shot": "deck-delete-dialog__desktop__default__light",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-primary text-primary-foreground hover:bg-primary-dim shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+      "color": "lab(96.5245 0.915796 2.88128)",
+      "background": "lab(20.9871 5.30131 5.07494)",
+      "fg": [
+        249,
+        244,
+        239
+      ],
+      "bg": [
+        60,
+        48,
+        43
+      ],
+      "contrast": 11.65,
+      "rect": {
+        "x": 788.1875,
+        "y": 426,
+        "width": 83.8125,
+        "height": 40
+      }
+    },
+    {
+      "shot": "tierlist-delete-dialog__desktop__default__light",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(100 0 0)",
+      "background": "lab(48.4493 77.4328 61.5452)",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        231,
+        0,
+        11
+      ],
+      "contrast": 4.77,
+      "rect": {
+        "x": 788.1875,
+        "y": 426,
+        "width": 83.8125,
+        "height": 40
+      }
+    },
+    {
+      "shot": "deck-delete-dialog__desktop__default__dark",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-primary text-primary-foreground hover:bg-primary-dim shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+      "color": "lab(3.62684 3.21627 2.83818)",
+      "background": "lab(74.2573 12.4404 19.6076)",
+      "fg": [
+        21,
+        10,
+        6
+      ],
+      "bg": [
+        214,
+        174,
+        147
+      ],
+      "contrast": 9.59,
+      "rect": {
+        "x": 788.1875,
+        "y": 426,
+        "width": 83.8125,
+        "height": 40
+      }
+    },
+    {
+      "shot": "tierlist-delete-dialog__desktop__default__dark",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(100 0 0)",
+      "background": "lab(53.6853 69.6775 43.7724)",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        238,
+        52,
+        59
+      ],
+      "contrast": 4.05,
+      "rect": {
+        "x": 788.1875,
+        "y": 426,
+        "width": 83.8125,
+        "height": 40
+      }
+    },
+    {
+      "shot": "deck-delete-dialog__desktop__calm-storm__light",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-primary text-primary-foreground hover:bg-primary-dim shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+      "color": "lab(97.3623 -2.33799 -4.13098)",
+      "background": "lab(70.687 -23.6078 -45.9483)",
+      "fg": [
+        240,
+        249,
+        255
+      ],
+      "bg": [
+        0,
+        188,
+        255
+      ],
+      "contrast": 2.04,
+      "rect": {
+        "x": 788.1875,
+        "y": 426,
+        "width": 83.8125,
+        "height": 40
+      }
+    },
+    {
+      "shot": "tierlist-delete-dialog__desktop__calm-storm__light",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(100 0 0)",
+      "background": "lab(55.4814 75.0732 48.8528)",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        251,
+        44,
+        54
+      ],
+      "contrast": 3.81,
+      "rect": {
+        "x": 788.1875,
+        "y": 426,
+        "width": 83.8125,
+        "height": 40
+      }
+    },
+    {
+      "shot": "deck-delete-dialog__desktop__calm-storm__dark",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-primary text-primary-foreground hover:bg-primary-dim shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+      "color": "lab(97.3623 -2.33799 -4.13098)",
+      "background": "lab(63.3038 -18.433 -51.0407)",
+      "fg": [
+        240,
+        249,
+        255
+      ],
+      "bg": [
+        0,
+        166,
+        244
+      ],
+      "contrast": 2.54,
+      "rect": {
+        "x": 788.1875,
+        "y": 426,
+        "width": 83.8125,
+        "height": 40
+      }
+    },
+    {
+      "shot": "tierlist-delete-dialog__desktop__calm-storm__dark",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(100 0 0)",
+      "background": "lab(55.4814 75.0732 48.8528)",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        251,
+        44,
+        54
+      ],
+      "contrast": 3.81,
+      "rect": {
+        "x": 788.1875,
+        "y": 426,
+        "width": 83.8125,
+        "height": 40
+      }
+    },
+    {
+      "shot": "deck-delete-dialog__desktop__cyberpunk__light",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-primary text-primary-foreground hover:bg-primary-dim shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+      "color": "lab(100 0 0)",
+      "background": "lab(57.7998 88.5379 -33.2537)",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        255,
+        0,
+        200
+      ],
+      "contrast": 3.45,
+      "rect": {
+        "x": 788.1875,
+        "y": 426,
+        "width": 83.8125,
+        "height": 40
+      }
+    },
+    {
+      "shot": "tierlist-delete-dialog__desktop__cyberpunk__light",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(100 0 0)",
+      "background": "lab(57.6471 71.5278 70.6416)",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        255,
+        61,
+        0
+      ],
+      "contrast": 3.55,
+      "rect": {
+        "x": 788.1875,
+        "y": 426,
+        "width": 83.8125,
+        "height": 40
+      }
+    },
+    {
+      "shot": "deck-delete-dialog__desktop__cyberpunk__dark",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-primary text-primary-foreground hover:bg-primary-dim shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+      "color": "lab(100 0 0)",
+      "background": "lab(57.7998 88.5379 -33.2537)",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        255,
+        0,
+        200
+      ],
+      "contrast": 3.45,
+      "rect": {
+        "x": 788.1875,
+        "y": 426,
+        "width": 83.8125,
+        "height": 40
+      }
+    },
+    {
+      "shot": "tierlist-delete-dialog__desktop__cyberpunk__dark",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(100 0 0)",
+      "background": "lab(57.6471 71.5278 70.6416)",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        255,
+        61,
+        0
+      ],
+      "contrast": 3.55,
+      "rect": {
+        "x": 788.1875,
+        "y": 426,
+        "width": 83.8125,
+        "height": 40
+      }
+    },
+    {
+      "shot": "deck-delete-dialog__desktop__cotton-candy__light",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-primary text-primary-foreground hover:bg-primary-dim shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+      "color": "lab(98.7177 2.21431 -2.8852)",
+      "background": "lab(60.5 53.1449 -18.0183)",
+      "fg": [
+        254,
+        250,
+        255
+      ],
+      "bg": [
+        221,
+        104,
+        180
+      ],
+      "contrast": 3.03,
+      "rect": {
+        "x": 788.1875,
+        "y": 426,
+        "width": 83.8125,
+        "height": 40
+      }
+    },
+    {
+      "shot": "tierlist-delete-dialog__desktop__cotton-candy__light",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(100 0 0)",
+      "background": "lab(51.3806 69.5087 46.4972)",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        230,
+        43,
+        48
+      ],
+      "contrast": 4.42,
+      "rect": {
+        "x": 788.1875,
+        "y": 426,
+        "width": 83.8125,
+        "height": 40
+      }
+    },
+    {
+      "shot": "deck-delete-dialog__desktop__cotton-candy__dark",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-primary text-primary-foreground hover:bg-primary-dim shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+      "color": "lab(4.23876 0.152506 -14.0985)",
+      "background": "lab(77.4569 37.8695 -13.5553)",
+      "fg": [
+        2,
+        15,
+        34
+      ],
+      "bg": [
+        250,
+        165,
+        218
+      ],
+      "contrast": 10.47,
+      "rect": {
+        "x": 788.1875,
+        "y": 426,
+        "width": 83.8125,
+        "height": 40
+      }
+    },
+    {
+      "shot": "tierlist-delete-dialog__desktop__cotton-candy__dark",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(4.23876 0.152506 -14.0985)",
+      "background": "lab(56.1657 63.7783 33.3305)",
+      "fg": [
+        2,
+        15,
+        34
+      ],
+      "bg": [
+        237,
+        73,
+        82
+      ],
+      "contrast": 5.19,
+      "rect": {
+        "x": 788.1875,
+        "y": 426,
+        "width": 83.8125,
+        "height": 40
+      }
+    },
+    {
+      "shot": "deck-delete-dialog__desktop__caffeine__light",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-primary text-primary-foreground hover:bg-primary-dim shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+      "color": "lab(100 0 0)",
+      "background": "lab(34.1026 10.2567 10.5093)",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        100,
+        74,
+        64
+      ],
+      "contrast": 8.09,
+      "rect": {
+        "x": 788.1875,
+        "y": 426,
+        "width": 83.8125,
+        "height": 40
+      }
+    },
+    {
+      "shot": "tierlist-delete-dialog__desktop__caffeine__light",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(100 0 0)",
+      "background": "lab(54.9915 58.7064 50.9473)",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        229,
+        77,
+        46
+      ],
+      "contrast": 3.87,
+      "rect": {
+        "x": 788.1875,
+        "y": 426,
+        "width": 83.8125,
+        "height": 40
+      }
+    },
+    {
+      "shot": "deck-delete-dialog__desktop__caffeine__dark",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-primary text-primary-foreground hover:bg-primary-dim shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+      "color": "lab(7.77197 -6.85518 -3.13658)",
+      "background": "lab(91.2121 7.75713 18.8901)",
+      "fg": [
+        8,
+        26,
+        27
+      ],
+      "bg": [
+        255,
+        224,
+        194
+      ],
+      "contrast": 14.22,
+      "rect": {
+        "x": 788.1875,
+        "y": 426,
+        "width": 83.8125,
+        "height": 40
+      }
+    },
+    {
+      "shot": "tierlist-delete-dialog__desktop__caffeine__dark",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(100 0 0)",
+      "background": "lab(54.9915 58.7064 50.9473)",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        229,
+        77,
+        46
+      ],
+      "contrast": 3.87,
+      "rect": {
+        "x": 788.1875,
+        "y": 426,
+        "width": 83.8125,
+        "height": 40
+      }
+    },
+    {
+      "shot": "deck-delete-dialog__desktop__aurora__light",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-primary text-primary-foreground hover:bg-primary-dim shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+      "color": "lab(97.68 -0.0000298023 0.0000119209)",
+      "background": "lab(49.8708 -65.6837 -19.0864)",
+      "fg": [
+        248,
+        248,
+        248
+      ],
+      "bg": [
+        0,
+        144,
+        149
+      ],
+      "contrast": 3.65,
+      "rect": {
+        "x": 788.1875,
+        "y": 426,
+        "width": 83.8125,
+        "height": 40
+      }
+    },
+    {
+      "shot": "tierlist-delete-dialog__desktop__aurora__light",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(100 0 0)",
+      "background": "lab(48.8037 76.3079 51.5884)",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        230,
+        0,
+        35
+      ],
+      "contrast": 4.78,
+      "rect": {
+        "x": 788.1875,
+        "y": 426,
+        "width": 83.8125,
+        "height": 40
+      }
+    },
+    {
+      "shot": "deck-delete-dialog__desktop__aurora__dark",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-primary text-primary-foreground hover:bg-primary-dim shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+      "color": "lab(1.51253 0.181951 -3.16651)",
+      "background": "lab(76.3705 -58.9675 -17.5061)",
+      "fg": [
+        3,
+        6,
+        13
+      ],
+      "bg": [
+        0,
+        217,
+        219
+      ],
+      "contrast": 11.54,
+      "rect": {
+        "x": 788.1875,
+        "y": 426,
+        "width": 83.8125,
+        "height": 40
+      }
+    },
+    {
+      "shot": "tierlist-delete-dialog__desktop__aurora__dark",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(100 0 0)",
+      "background": "lab(53.3476 79.4347 52.8628)",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        249,
+        5,
+        43
+      ],
+      "contrast": 4.13,
+      "rect": {
+        "x": 788.1875,
+        "y": 426,
+        "width": 83.8125,
+        "height": 40
+      }
+    },
+    {
+      "shot": "deck-delete-dialog__desktop__sorbet__light",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-primary text-primary-foreground hover:bg-primary-dim shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+      "color": "lab(100 0 0)",
+      "background": "lab(53.5656 57.0426 -13.2722)",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        208,
+        79,
+        153
+      ],
+      "contrast": 3.99,
+      "rect": {
+        "x": 788.1875,
+        "y": 426,
+        "width": 83.8125,
+        "height": 40
+      }
+    },
+    {
+      "shot": "tierlist-delete-dialog__desktop__sorbet__light",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(100 0 0)",
+      "background": "lab(64.5223 53.9312 26.9975)",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        249,
+        111,
+        112
+      ],
+      "contrast": 2.79,
+      "rect": {
+        "x": 788.1875,
+        "y": 426,
+        "width": 83.8125,
+        "height": 40
+      }
+    },
+    {
+      "shot": "deck-delete-dialog__desktop__sorbet__dark",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-primary text-primary-foreground hover:bg-primary-dim shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+      "color": "lab(13.0154 -5.03349 -9.09395)",
+      "background": "lab(90.9311 2.74095 32.2)",
+      "fg": [
+        18,
+        36,
+        46
+      ],
+      "bg": [
+        251,
+        226,
+        167
+      ],
+      "contrast": 12.55,
+      "rect": {
+        "x": 788.1875,
+        "y": 426,
+        "width": 83.8125,
+        "height": 40
+      }
+    },
+    {
+      "shot": "tierlist-delete-dialog__desktop__sorbet__dark",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(13.0154 -5.03349 -9.09395)",
+      "background": "lab(59.3147 57.7323 -10.7534)",
+      "fg": [
+        18,
+        36,
+        46
+      ],
+      "bg": [
+        227,
+        94,
+        164
+      ],
+      "contrast": 4.86,
+      "rect": {
+        "x": 788.1875,
+        "y": 426,
+        "width": 83.8125,
+        "height": 40
+      }
+    },
+    {
+      "shot": "deck-delete-dialog__desktop__singularity__light",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-primary text-primary-foreground hover:bg-primary-dim shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+      "color": "lab(100 0 0)",
+      "background": "lab(61.0635 34.7377 45.747)",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        216,
+        121,
+        67
+      ],
+      "contrast": 3.12,
+      "rect": {
+        "x": 788.1875,
+        "y": 426,
+        "width": 83.8125,
+        "height": 40
+      }
+    },
+    {
+      "shot": "tierlist-delete-dialog__desktop__singularity__light",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(100 0 0)",
+      "background": "lab(55.7819 65.6007 40.7857)",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        239,
+        68,
+        68
+      ],
+      "contrast": 3.76,
+      "rect": {
+        "x": 788.1875,
+        "y": 426,
+        "width": 83.8125,
+        "height": 40
+      }
+    },
+    {
+      "shot": "deck-delete-dialog__desktop__singularity__dark",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-primary text-primary-foreground hover:bg-primary-dim shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+      "color": "lab(5.20229 0.700206 -0.985724)",
+      "background": "lab(66.9146 32.9179 44.8058)",
+      "fg": [
+        18,
+        17,
+        19
+      ],
+      "bg": [
+        231,
+        138,
+        83
+      ],
+      "contrast": 7.31,
+      "rect": {
+        "x": 788.1875,
+        "y": 426,
+        "width": 83.8125,
+        "height": 40
+      }
+    },
+    {
+      "shot": "tierlist-delete-dialog__desktop__singularity__dark",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(5.20229 0.700206 -0.985724)",
+      "background": "lab(53.3698 -14.3715 -4.71399)",
+      "fg": [
+        18,
+        17,
+        19
+      ],
+      "bg": [
+        95,
+        135,
+        135
+      ],
+      "contrast": 4.75,
+      "rect": {
+        "x": 788.1875,
+        "y": 426,
+        "width": 83.8125,
+        "height": 40
+      }
+    },
+    {
+      "shot": "deck-delete-dialog__mobile__default__light",
+      "error": "TimeoutError: locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('role=button[name=/^Edit$/]').visible().first()\u001b[22m\n"
+    },
+    {
+      "shot": "tierlist-delete-dialog__mobile__default__light",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(100 0 0)",
+      "background": "lab(48.4493 77.4328 61.5452)",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        231,
+        0,
+        11
+      ],
+      "contrast": 4.77,
+      "rect": {
+        "x": 16,
+        "y": 732,
+        "width": 358,
+        "height": 40
+      }
+    },
+    {
+      "shot": "deck-delete-dialog__mobile__default__dark",
+      "error": "TimeoutError: locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('role=button[name=/^Edit$/]').visible().first()\u001b[22m\n"
+    },
+    {
+      "shot": "tierlist-delete-dialog__mobile__default__dark",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(100 0 0)",
+      "background": "lab(53.6853 69.6775 43.7724)",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        238,
+        52,
+        59
+      ],
+      "contrast": 4.05,
+      "rect": {
+        "x": 16,
+        "y": 732,
+        "width": 358,
+        "height": 40
+      }
+    },
+    {
+      "shot": "deck-delete-dialog__mobile__calm-storm__light",
+      "error": "TimeoutError: locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('role=button[name=/^Edit$/]').visible().first()\u001b[22m\n"
+    },
+    {
+      "shot": "tierlist-delete-dialog__mobile__calm-storm__light",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(100 0 0)",
+      "background": "lab(55.4814 75.0732 48.8528)",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        251,
+        44,
+        54
+      ],
+      "contrast": 3.81,
+      "rect": {
+        "x": 16,
+        "y": 732,
+        "width": 358,
+        "height": 40
+      }
+    },
+    {
+      "shot": "deck-delete-dialog__mobile__calm-storm__dark",
+      "error": "TimeoutError: locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('role=button[name=/^Edit$/]').visible().first()\u001b[22m\n"
+    },
+    {
+      "shot": "tierlist-delete-dialog__mobile__calm-storm__dark",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(100 0 0)",
+      "background": "lab(55.4814 75.0732 48.8528)",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        251,
+        44,
+        54
+      ],
+      "contrast": 3.81,
+      "rect": {
+        "x": 16,
+        "y": 732,
+        "width": 358,
+        "height": 40
+      }
+    },
+    {
+      "shot": "deck-delete-dialog__mobile__cyberpunk__light",
+      "error": "TimeoutError: locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('role=button[name=/^Edit$/]').visible().first()\u001b[22m\n"
+    },
+    {
+      "shot": "tierlist-delete-dialog__mobile__cyberpunk__light",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(100 0 0)",
+      "background": "lab(57.6471 71.5278 70.6416)",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        255,
+        61,
+        0
+      ],
+      "contrast": 3.55,
+      "rect": {
+        "x": 16,
+        "y": 732,
+        "width": 358,
+        "height": 40
+      }
+    },
+    {
+      "shot": "deck-delete-dialog__mobile__cyberpunk__dark",
+      "error": "TimeoutError: locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('role=button[name=/^Edit$/]').visible().first()\u001b[22m\n"
+    },
+    {
+      "shot": "tierlist-delete-dialog__mobile__cyberpunk__dark",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(100 0 0)",
+      "background": "lab(57.6471 71.5278 70.6416)",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        255,
+        61,
+        0
+      ],
+      "contrast": 3.55,
+      "rect": {
+        "x": 16,
+        "y": 732,
+        "width": 358,
+        "height": 40
+      }
+    },
+    {
+      "shot": "deck-delete-dialog__mobile__cotton-candy__light",
+      "error": "TimeoutError: locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('role=button[name=/^Edit$/]').visible().first()\u001b[22m\n"
+    },
+    {
+      "shot": "tierlist-delete-dialog__mobile__cotton-candy__light",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(100 0 0)",
+      "background": "lab(51.3806 69.5087 46.4972)",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        230,
+        43,
+        48
+      ],
+      "contrast": 4.42,
+      "rect": {
+        "x": 16,
+        "y": 732,
+        "width": 358,
+        "height": 40
+      }
+    },
+    {
+      "shot": "deck-delete-dialog__mobile__cotton-candy__dark",
+      "error": "TimeoutError: locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('role=button[name=/^Edit$/]').visible().first()\u001b[22m\n"
+    },
+    {
+      "shot": "tierlist-delete-dialog__mobile__cotton-candy__dark",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(4.23876 0.152506 -14.0985)",
+      "background": "lab(56.1657 63.7783 33.3305)",
+      "fg": [
+        2,
+        15,
+        34
+      ],
+      "bg": [
+        237,
+        73,
+        82
+      ],
+      "contrast": 5.19,
+      "rect": {
+        "x": 16,
+        "y": 732,
+        "width": 358,
+        "height": 40
+      }
+    },
+    {
+      "shot": "deck-delete-dialog__mobile__caffeine__light",
+      "error": "TimeoutError: locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('role=button[name=/^Edit$/]').visible().first()\u001b[22m\n"
+    },
+    {
+      "shot": "tierlist-delete-dialog__mobile__caffeine__light",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(100 0 0)",
+      "background": "lab(54.9915 58.7064 50.9473)",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        229,
+        77,
+        46
+      ],
+      "contrast": 3.87,
+      "rect": {
+        "x": 16,
+        "y": 732,
+        "width": 358,
+        "height": 40
+      }
+    },
+    {
+      "shot": "deck-delete-dialog__mobile__caffeine__dark",
+      "error": "TimeoutError: locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('role=button[name=/^Edit$/]').visible().first()\u001b[22m\n"
+    },
+    {
+      "shot": "tierlist-delete-dialog__mobile__caffeine__dark",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(100 0 0)",
+      "background": "lab(54.9915 58.7064 50.9473)",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        229,
+        77,
+        46
+      ],
+      "contrast": 3.87,
+      "rect": {
+        "x": 16,
+        "y": 732,
+        "width": 358,
+        "height": 40
+      }
+    },
+    {
+      "shot": "deck-delete-dialog__mobile__aurora__light",
+      "error": "TimeoutError: locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('role=button[name=/^Edit$/]').visible().first()\u001b[22m\n"
+    },
+    {
+      "shot": "tierlist-delete-dialog__mobile__aurora__light",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(100 0 0)",
+      "background": "lab(48.8037 76.3079 51.5884)",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        230,
+        0,
+        35
+      ],
+      "contrast": 4.78,
+      "rect": {
+        "x": 16,
+        "y": 732,
+        "width": 358,
+        "height": 40
+      }
+    },
+    {
+      "shot": "deck-delete-dialog__mobile__aurora__dark",
+      "error": "TimeoutError: locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('role=button[name=/^Edit$/]').visible().first()\u001b[22m\n"
+    },
+    {
+      "shot": "tierlist-delete-dialog__mobile__aurora__dark",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(100 0 0)",
+      "background": "lab(53.3476 79.4347 52.8628)",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        249,
+        5,
+        43
+      ],
+      "contrast": 4.13,
+      "rect": {
+        "x": 16,
+        "y": 732,
+        "width": 358,
+        "height": 40
+      }
+    },
+    {
+      "shot": "deck-delete-dialog__mobile__sorbet__light",
+      "error": "TimeoutError: locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('role=button[name=/^Edit$/]').visible().first()\u001b[22m\n"
+    },
+    {
+      "shot": "tierlist-delete-dialog__mobile__sorbet__light",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(100 0 0)",
+      "background": "lab(64.5223 53.9312 26.9975)",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        249,
+        111,
+        112
+      ],
+      "contrast": 2.79,
+      "rect": {
+        "x": 16,
+        "y": 732,
+        "width": 358,
+        "height": 40
+      }
+    },
+    {
+      "shot": "deck-delete-dialog__mobile__sorbet__dark",
+      "error": "TimeoutError: locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('role=button[name=/^Edit$/]').visible().first()\u001b[22m\n"
+    },
+    {
+      "shot": "tierlist-delete-dialog__mobile__sorbet__dark",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(13.0154 -5.03349 -9.09395)",
+      "background": "lab(59.3147 57.7323 -10.7534)",
+      "fg": [
+        18,
+        36,
+        46
+      ],
+      "bg": [
+        227,
+        94,
+        164
+      ],
+      "contrast": 4.86,
+      "rect": {
+        "x": 16,
+        "y": 732,
+        "width": 358,
+        "height": 40
+      }
+    },
+    {
+      "shot": "deck-delete-dialog__mobile__singularity__light",
+      "error": "TimeoutError: locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('role=button[name=/^Edit$/]').visible().first()\u001b[22m\n"
+    },
+    {
+      "shot": "tierlist-delete-dialog__mobile__singularity__light",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(100 0 0)",
+      "background": "lab(55.7819 65.6007 40.7857)",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        239,
+        68,
+        68
+      ],
+      "contrast": 3.76,
+      "rect": {
+        "x": 16,
+        "y": 732,
+        "width": 358,
+        "height": 40
+      }
+    },
+    {
+      "shot": "deck-delete-dialog__mobile__singularity__dark",
+      "error": "TimeoutError: locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('role=button[name=/^Edit$/]').visible().first()\u001b[22m\n"
+    },
+    {
+      "shot": "tierlist-delete-dialog__mobile__singularity__dark",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(5.20229 0.700206 -0.985724)",
+      "background": "lab(53.3698 -14.3715 -4.71399)",
+      "fg": [
+        18,
+        17,
+        19
+      ],
+      "bg": [
+        95,
+        135,
+        135
+      ],
+      "contrast": 4.75,
+      "rect": {
+        "x": 16,
+        "y": 732,
+        "width": 358,
+        "height": 40
+      }
+    }
+  ]
+}

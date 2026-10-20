@@ -1,0 +1,583 @@
+{
+  "base": "verify3-base",
+  "head": "verify3",
+  "threshold": 0,
+  "results": [
+    {
+      "name": "community__desktop__aurora__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "community__desktop__aurora__light",
+      "diffPercent": 15.84
+    },
+    {
+      "name": "community__desktop__cyberpunk__dark",
+      "diffPercent": 15.814
+    },
+    {
+      "name": "community__desktop__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "community__desktop__default__dark",
+      "diffPercent": 15.626
+    },
+    {
+      "name": "community__desktop__default__light",
+      "diffPercent": 15.841
+    },
+    {
+      "name": "community__mobile__aurora__dark",
+      "diffPercent": 15.491
+    },
+    {
+      "name": "community__mobile__aurora__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "community__mobile__cyberpunk__dark",
+      "diffPercent": 16.057
+    },
+    {
+      "name": "community__mobile__cyberpunk__light",
+      "diffPercent": 16.056
+    },
+    {
+      "name": "community__mobile__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "community__mobile__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "deck-card-dialog-open__desktop__aurora__dark",
+      "diffPercent": 0.198
+    },
+    {
+      "name": "deck-card-dialog-open__desktop__aurora__light",
+      "diffPercent": 0.182
+    },
+    {
+      "name": "deck-card-dialog-open__desktop__cyberpunk__dark",
+      "diffPercent": 0.181
+    },
+    {
+      "name": "deck-card-dialog-open__desktop__cyberpunk__light",
+      "diffPercent": 0.167
+    },
+    {
+      "name": "deck-card-dialog-open__desktop__default__dark",
+      "diffPercent": 0.185
+    },
+    {
+      "name": "deck-card-dialog-open__desktop__default__light",
+      "diffPercent": 0.167
+    },
+    {
+      "name": "deck-detail__desktop__aurora__dark",
+      "diffPercent": 0.139
+    },
+    {
+      "name": "deck-detail__desktop__aurora__light",
+      "diffPercent": 0.135
+    },
+    {
+      "name": "deck-detail__desktop__cyberpunk__dark",
+      "diffPercent": 0.13
+    },
+    {
+      "name": "deck-detail__desktop__cyberpunk__light",
+      "diffPercent": 0.134
+    },
+    {
+      "name": "deck-detail__desktop__default__dark",
+      "diffPercent": 0.13
+    },
+    {
+      "name": "deck-detail__desktop__default__light",
+      "diffPercent": 0.135
+    },
+    {
+      "name": "deck-detail__mobile__aurora__dark",
+      "diffPercent": 0.396
+    },
+    {
+      "name": "deck-detail__mobile__aurora__light",
+      "diffPercent": 0.396
+    },
+    {
+      "name": "deck-detail__mobile__cyberpunk__dark",
+      "diffPercent": 0.396
+    },
+    {
+      "name": "deck-detail__mobile__cyberpunk__light",
+      "diffPercent": 0.396
+    },
+    {
+      "name": "deck-detail__mobile__default__dark",
+      "diffPercent": 0.396
+    },
+    {
+      "name": "deck-detail__mobile__default__light",
+      "diffPercent": 0.396
+    },
+    {
+      "name": "decks__desktop__aurora__dark",
+      "diffPercent": 0.525
+    },
+    {
+      "name": "decks__desktop__aurora__light",
+      "diffPercent": 0.512
+    },
+    {
+      "name": "decks__desktop__cyberpunk__dark",
+      "diffPercent": 0.516
+    },
+    {
+      "name": "decks__desktop__cyberpunk__light",
+      "diffPercent": 0.512
+    },
+    {
+      "name": "decks__desktop__default__dark",
+      "diffPercent": 0.51
+    },
+    {
+      "name": "decks__desktop__default__light",
+      "diffPercent": 0.511
+    },
+    {
+      "name": "decks__mobile__aurora__dark",
+      "diffPercent": 1.166
+    },
+    {
+      "name": "decks__mobile__aurora__light",
+      "diffPercent": 1.183
+    },
+    {
+      "name": "decks__mobile__cyberpunk__dark",
+      "diffPercent": 1.163
+    },
+    {
+      "name": "decks__mobile__cyberpunk__light",
+      "diffPercent": 1.182
+    },
+    {
+      "name": "decks__mobile__default__dark",
+      "diffPercent": 1.17
+    },
+    {
+      "name": "decks__mobile__default__light",
+      "diffPercent": 1.168
+    },
+    {
+      "name": "filter-panel-open__desktop__aurora__dark",
+      "diffPercent": 0.013
+    },
+    {
+      "name": "filter-panel-open__desktop__aurora__light",
+      "diffPercent": 0.014
+    },
+    {
+      "name": "filter-panel-open__desktop__cyberpunk__dark",
+      "diffPercent": 0.013
+    },
+    {
+      "name": "filter-panel-open__desktop__cyberpunk__light",
+      "diffPercent": 0.013
+    },
+    {
+      "name": "filter-panel-open__desktop__default__dark",
+      "diffPercent": 0.013
+    },
+    {
+      "name": "filter-panel-open__desktop__default__light",
+      "diffPercent": 0.013
+    },
+    {
+      "name": "filter-panel-sets__desktop__aurora__dark",
+      "diffPercent": 0.037
+    },
+    {
+      "name": "filter-panel-sets__desktop__aurora__light",
+      "diffPercent": 0.001
+    },
+    {
+      "name": "filter-panel-sets__desktop__cyberpunk__dark",
+      "diffPercent": 0.038
+    },
+    {
+      "name": "filter-panel-sets__desktop__cyberpunk__light",
+      "diffPercent": 0.001
+    },
+    {
+      "name": "filter-panel-sets__desktop__default__dark",
+      "diffPercent": 0.037
+    },
+    {
+      "name": "filter-panel-sets__desktop__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "gallery__desktop__aurora__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "gallery__desktop__aurora__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "gallery__desktop__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "gallery__desktop__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "gallery__desktop__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "gallery__desktop__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "gallery__mobile__aurora__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "gallery__mobile__aurora__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "gallery__mobile__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "gallery__mobile__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "gallery__mobile__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "gallery__mobile__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-gallery__desktop__aurora__dark",
+      "diffPercent": 0.25
+    },
+    {
+      "name": "guest-gallery__desktop__aurora__light",
+      "diffPercent": 0.254
+    },
+    {
+      "name": "guest-gallery__desktop__cyberpunk__dark",
+      "diffPercent": 0.243
+    },
+    {
+      "name": "guest-gallery__desktop__cyberpunk__light",
+      "diffPercent": 0.004
+    },
+    {
+      "name": "guest-gallery__desktop__default__dark",
+      "diffPercent": 0.231
+    },
+    {
+      "name": "guest-gallery__desktop__default__light",
+      "diffPercent": 0.25
+    },
+    {
+      "name": "guest-gallery__mobile__aurora__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-gallery__mobile__aurora__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-gallery__mobile__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-gallery__mobile__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-gallery__mobile__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-gallery__mobile__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-ghost-hover__desktop__aurora__dark",
+      "diffPercent": 0.495
+    },
+    {
+      "name": "guest-ghost-hover__desktop__aurora__light",
+      "diffPercent": 0.499
+    },
+    {
+      "name": "guest-ghost-hover__desktop__cyberpunk__dark",
+      "diffPercent": 0.489
+    },
+    {
+      "name": "guest-ghost-hover__desktop__cyberpunk__light",
+      "diffPercent": 0.249
+    },
+    {
+      "name": "guest-ghost-hover__desktop__default__dark",
+      "diffPercent": 0.477
+    },
+    {
+      "name": "guest-ghost-hover__desktop__default__light",
+      "diffPercent": 0.496
+    },
+    {
+      "name": "guest-secondary-hover__desktop__aurora__dark",
+      "diffPercent": 0.25
+    },
+    {
+      "name": "guest-secondary-hover__desktop__aurora__light",
+      "diffPercent": 0.254
+    },
+    {
+      "name": "guest-secondary-hover__desktop__cyberpunk__dark",
+      "diffPercent": 0.225
+    },
+    {
+      "name": "guest-secondary-hover__desktop__cyberpunk__light",
+      "diffPercent": 0.003
+    },
+    {
+      "name": "guest-secondary-hover__desktop__default__dark",
+      "diffPercent": 0.247
+    },
+    {
+      "name": "guest-secondary-hover__desktop__default__light",
+      "diffPercent": 0.228
+    },
+    {
+      "name": "mobile-profile-sheet-open__mobile__aurora__dark",
+      "diffPercent": 0.29
+    },
+    {
+      "name": "mobile-profile-sheet-open__mobile__aurora__light",
+      "diffPercent": 0.115
+    },
+    {
+      "name": "mobile-profile-sheet-open__mobile__cyberpunk__dark",
+      "diffPercent": 0.086
+    },
+    {
+      "name": "mobile-profile-sheet-open__mobile__cyberpunk__light",
+      "diffPercent": 0.105
+    },
+    {
+      "name": "mobile-profile-sheet-open__mobile__default__dark",
+      "diffPercent": 0.132
+    },
+    {
+      "name": "mobile-profile-sheet-open__mobile__default__light",
+      "diffPercent": 0.246
+    },
+    {
+      "name": "new-deck-dialog-open__desktop__aurora__dark",
+      "diffPercent": 17.763
+    },
+    {
+      "name": "new-deck-dialog-open__desktop__aurora__light",
+      "diffPercent": 18.032
+    },
+    {
+      "name": "new-deck-dialog-open__desktop__cyberpunk__dark",
+      "diffPercent": 11.708
+    },
+    {
+      "name": "new-deck-dialog-open__desktop__cyberpunk__light",
+      "diffPercent": 12.639
+    },
+    {
+      "name": "new-deck-dialog-open__desktop__default__dark",
+      "diffPercent": 13.434
+    },
+    {
+      "name": "new-deck-dialog-open__desktop__default__light",
+      "diffPercent": 14.55
+    },
+    {
+      "name": "new-deck-dialog-open__mobile__aurora__dark",
+      "diffPercent": 75.234
+    },
+    {
+      "name": "new-deck-dialog-open__mobile__aurora__light",
+      "diffPercent": 74.884
+    },
+    {
+      "name": "new-deck-dialog-open__mobile__cyberpunk__dark",
+      "diffPercent": 43.96
+    },
+    {
+      "name": "new-deck-dialog-open__mobile__cyberpunk__light",
+      "diffPercent": 50.022
+    },
+    {
+      "name": "new-deck-dialog-open__mobile__default__dark",
+      "diffPercent": 54.015
+    },
+    {
+      "name": "new-deck-dialog-open__mobile__default__light",
+      "diffPercent": 55.872
+    },
+    {
+      "name": "select-open__desktop__aurora__dark",
+      "diffPercent": 0.004
+    },
+    {
+      "name": "select-open__desktop__aurora__light",
+      "diffPercent": 0.045
+    },
+    {
+      "name": "select-open__desktop__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "select-open__desktop__cyberpunk__light",
+      "diffPercent": 0.002
+    },
+    {
+      "name": "select-open__desktop__default__dark",
+      "diffPercent": 0.034
+    },
+    {
+      "name": "select-open__desktop__default__light",
+      "diffPercent": 0.001
+    },
+    {
+      "name": "select-open__mobile__aurora__dark",
+      "diffPercent": 0.038
+    },
+    {
+      "name": "select-open__mobile__aurora__light",
+      "diffPercent": 0.041
+    },
+    {
+      "name": "select-open__mobile__cyberpunk__dark",
+      "diffPercent": 0.003
+    },
+    {
+      "name": "select-open__mobile__cyberpunk__light",
+      "diffPercent": 0.002
+    },
+    {
+      "name": "select-open__mobile__default__dark",
+      "diffPercent": 0.004
+    },
+    {
+      "name": "select-open__mobile__default__light",
+      "diffPercent": 0.002
+    },
+    {
+      "name": "settings__desktop__aurora__dark",
+      "diffPercent": 0.016
+    },
+    {
+      "name": "settings__desktop__aurora__light",
+      "diffPercent": 0.015
+    },
+    {
+      "name": "settings__desktop__cyberpunk__dark",
+      "diffPercent": 0.014
+    },
+    {
+      "name": "settings__desktop__cyberpunk__light",
+      "diffPercent": 0.013
+    },
+    {
+      "name": "settings__desktop__default__dark",
+      "diffPercent": 0.013
+    },
+    {
+      "name": "settings__desktop__default__light",
+      "diffPercent": 0.014
+    },
+    {
+      "name": "settings__mobile__aurora__dark",
+      "diffPercent": 0.101
+    },
+    {
+      "name": "settings__mobile__aurora__light",
+      "diffPercent": 0.104
+    },
+    {
+      "name": "settings__mobile__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "settings__mobile__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "settings__mobile__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "settings__mobile__default__light",
+      "diffPercent": 0.002
+    },
+    {
+      "name": "tooltip-open__desktop__aurora__dark",
+      "diffPercent": 0.536
+    },
+    {
+      "name": "tooltip-open__desktop__aurora__light",
+      "diffPercent": 0.522
+    },
+    {
+      "name": "tooltip-open__desktop__cyberpunk__dark",
+      "diffPercent": 0.526
+    },
+    {
+      "name": "tooltip-open__desktop__cyberpunk__light",
+      "diffPercent": 0.523
+    },
+    {
+      "name": "tooltip-open__desktop__default__dark",
+      "diffPercent": 0.521
+    },
+    {
+      "name": "tooltip-open__desktop__default__light",
+      "diffPercent": 0.521
+    },
+    {
+      "name": "user-menu-open__desktop__aurora__dark",
+      "diffPercent": 0.507
+    },
+    {
+      "name": "user-menu-open__desktop__aurora__light",
+      "diffPercent": 0.478
+    },
+    {
+      "name": "user-menu-open__desktop__cyberpunk__dark",
+      "diffPercent": 0.5
+    },
+    {
+      "name": "user-menu-open__desktop__cyberpunk__light",
+      "diffPercent": 0.5
+    },
+    {
+      "name": "user-menu-open__desktop__default__dark",
+      "diffPercent": 0.495
+    },
+    {
+      "name": "user-menu-open__desktop__default__light",
+      "diffPercent": 0.486
+    }
+  ]
+}
