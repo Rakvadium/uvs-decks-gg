@@ -5,6 +5,11 @@ import type { MutationCtx } from "./_generated/server";
 import { mutation, query } from "./_generated/server";
 import { buildAdminSearchText, isAdminRole } from "./lib/accountStatus";
 import { requireAdmin } from "./utils/validation";
+import {
+  getEligibleRankingScopeRefs,
+  recomputeAffectedRankingScopes,
+  type RankingScopeRef,
+} from "./tierLists";
 
 const accountStatusFilterValidator = v.union(
   v.literal("active"),
@@ -480,12 +485,19 @@ export const bulkSetTierListListModeration = mutation({
   returns: v.null(),
   handler: async (ctx, args) => {
     const actorId = await requireAdmin(ctx);
+    const affectedScopes: RankingScopeRef[] = [];
     for (const id of args.tierListIds) {
       const tl = await ctx.db.get(id);
       if (tl) {
         await ctx.db.patch(id, { listModerationStatus: args.listModerationStatus });
+        // Pending and rejected lists don't count toward rankings, so refresh the scope it leaves or joins.
+        affectedScopes.push(
+          ...getEligibleRankingScopeRefs(tl),
+          ...getEligibleRankingScopeRefs({ ...tl, listModerationStatus: args.listModerationStatus })
+        );
       }
     }
+    await recomputeAffectedRankingScopes(ctx, affectedScopes);
     await appendModerationLog(ctx, {
       actorId,
       action: "bulkSetTierListListModeration",

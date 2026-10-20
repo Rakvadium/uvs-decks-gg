@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { useProfanityDisplayText } from "@/lib/moderation/use-profanity-display-text";
+import { isHiddenByModeration, TierListModerationBadge } from "../moderation-badge";
 import { TierListPreviewGrid } from "../preview-grid";
 import { getTierListScopeLabel } from "../utils";
 
@@ -24,6 +25,8 @@ interface TierListBrowserCardProps {
   authorLabel: string;
   cardMap: Map<string, CachedCard>;
   href: string;
+  /** Only the owner and admins receive it. */
+  moderationStatus?: Doc<"tierLists">["listModerationStatus"];
 }
 
 export function TierListBrowserCard({
@@ -31,6 +34,7 @@ export function TierListBrowserCard({
   authorLabel,
   cardMap,
   href,
+  moderationStatus,
 }: TierListBrowserCardProps) {
   const { display, viewerUserId } = useProfanityDisplayText();
   const isOwnList =
@@ -62,9 +66,13 @@ export function TierListBrowserCard({
         <CardHeader className="space-y-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex flex-wrap items-center gap-2">
-              <Badge variant={tierList.isPublic ? "default" : "outline"}>
-                {tierList.isPublic ? "Public" : "Private"}
-              </Badge>
+              {isHiddenByModeration(moderationStatus) ? (
+                <TierListModerationBadge status={moderationStatus} />
+              ) : (
+                <Badge variant={tierList.isPublic ? "default" : "outline"}>
+                  {tierList.isPublic ? "Public" : "Private"}
+                </Badge>
+              )}
               <Badge variant="outline">{getTierListScopeLabel(tierList.rankingScope)}</Badge>
             </div>
             <span className="chrome-label-case text-[10px] text-muted-foreground">

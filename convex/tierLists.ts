@@ -1,5 +1,5 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
-import { v } from "convex/values";
+import { v, type Infer } from "convex/values";
 import type { Doc, Id } from "./_generated/dataModel";
 import { mutation, query, type MutationCtx, type QueryCtx } from "./_generated/server";
 import { internal } from "./_generated/api";
@@ -12,11 +12,17 @@ import {
   type PublicTierListComment,
   tierListItemValidator,
   tierListValidator,
+  tierListModerationStatusValidator,
+  isTierListHiddenByModeration,
+  publicTierListFromDocument,
+  publicTierListValidator,
+  type TierListModerationStatus,
   publicUserProfileFromDocument,
   publicUserProfileValidator,
   type PublicUserProfile,
 } from "./validators";
 import { requireAuth, requireUserCanPostContent } from "./utils/validation";
+import { isAdminRole, isDocAccountActiveForQuery } from "./lib/accountStatus";
 import {
   COMMUNITY_TIER_RANKING,
   buildCanonicalRankedTiers,
@@ -39,9 +45,11 @@ const tierListSaveItemValidator = v.object({
 });
 
 const tierListFeedEntryValidator = v.object({
-  tierList: tierListValidator,
+  tierList: publicTierListValidator,
   author: v.union(publicUserProfileValidator, v.null()),
   likedByViewer: v.boolean(),
+  /** Sent only to the list's owner and admins (see `moderationStatusForViewer`). */
+  listModerationStatus: v.optional(tierListModerationStatusValidator),
 });
 
 const tierListCommentWithAuthorValidator = v.object({
@@ -55,13 +63,65 @@ const tierListEditableValidator = v.object({
 });
 
 const tierListDetailValidator = v.object({
-  tierList: tierListValidator,
+  tierList: publicTierListValidator,
   author: v.union(publicUserProfileValidator, v.null()),
   items: v.array(tierListItemValidator),
   comments: v.array(tierListCommentWithAuthorValidator),
   likedByViewer: v.boolean(),
   canEdit: v.boolean(),
+  /** Sent only to the list's owner and admins (see `moderationStatusForViewer`). */
+  listModerationStatus: v.optional(tierListModerationStatusValidator),
 });
+
+/** Most tier lists `listPublicFeed` reads to fill one page, so hidden lists can't make it scan the table. */
+const PUBLIC_FEED_SCAN_LIMIT = 200;
+
+export type TierListViewer = {
+  userId: Id<"users"> | null;
+  isAdmin: boolean;
+};
+
+/** The caller, and whether they are an admin by the same rule as `requireAdmin` (without throwing). */
+export async function getTierListViewer(ctx: QueryCtx | MutationCtx): Promise<TierListViewer> {
+  const userId = await getAuthUserId(ctx);
+  if (!userId) {
+    return { userId: null, isAdmin: false };
+  }
+  const user = await ctx.db.get(userId);
+  return {
+    userId,
+    isAdmin: user !== null && isAdminRole(user.role) && isDocAccountActiveForQuery(user),
+  };
+}
+
+/**
+ * Private lists: the owner only. Public lists that moderation marked `pending` or `rejected`: the
+ * owner and admins only. Every other public list: anyone.
+ */
+export function canViewTierList(
+  viewer: TierListViewer,
+  tierList: Pick<Doc<"tierLists">, "userId" | "isPublic" | "listModerationStatus">
+): boolean {
+  if (viewer.userId !== null && viewer.userId === tierList.userId) {
+    return true;
+  }
+  if (!tierList.isPublic) {
+    return false;
+  }
+  return viewer.isAdmin || !isTierListHiddenByModeration(tierList.listModerationStatus);
+}
+
+/** The list's moderation status, for its owner and admins only. Everyone else gets nothing. */
+function moderationStatusForViewer(
+  viewer: TierListViewer,
+  tierList: Doc<"tierLists">
+): { listModerationStatus?: TierListModerationStatus } {
+  const isOwner = viewer.userId !== null && viewer.userId === tierList.userId;
+  if ((!isOwner && !viewer.isAdmin) || tierList.listModerationStatus === undefined) {
+    return {};
+  }
+  return { listModerationStatus: tierList.listModerationStatus };
+}
 
 function sanitizeText(value: string | undefined, maxLength: number) {
   if (!value) return undefined;
@@ -105,27 +165,35 @@ function normalizeTiers(
     .slice(0, 12);
 }
 
-type RankingScopeRef = {
+export type RankingScopeRef = {
   scopeType: "global" | "set_scope";
   scopeKey: string;
 };
 
-function getEligibleRankingScopeRefs({
+/** The ranking scope a list counts toward, if any. Mirrors `getEligibleScopeFromTierList` in communityRankings. */
+export function getEligibleRankingScopeRefs({
   isPublic,
   rankingScope,
   rankingScopeKey,
   selectedSetCodes,
   tiers,
+  listModerationStatus,
 }: {
   isPublic: boolean;
   rankingScope?: CommunityTierRankingScope;
   rankingScopeKey?: string;
   selectedSetCodes: string[];
   tiers: Array<{ id: string; label: string; color: string; order: number }>;
+  listModerationStatus?: TierListModerationStatus;
 }) {
   const resolvedRankingScope = rankingScope ?? COMMUNITY_TIER_RANKING.scopes.unranked;
 
-  if (!isPublic || !isRankedTierScope(resolvedRankingScope) || !isCanonicalRankedTierDefinitions(tiers)) {
+  if (
+    !isPublic ||
+    isTierListHiddenByModeration(listModerationStatus) ||
+    !isRankedTierScope(resolvedRankingScope) ||
+    !isCanonicalRankedTierDefinitions(tiers)
+  ) {
     return [] as RankingScopeRef[];
   }
 
@@ -150,7 +218,7 @@ function getEligibleRankingScopeRefs({
   ];
 }
 
-async function recomputeAffectedRankingScopes(
+export async function recomputeAffectedRankingScopes(
   ctx: MutationCtx,
   scopes: RankingScopeRef[]
 ) {
@@ -212,27 +280,33 @@ export const listPublicFeed = query({
   },
   returns: v.array(tierListFeedEntryValidator),
   handler: async (ctx, args) => {
-    const viewerId = await getAuthUserId(ctx);
+    const viewer = await getTierListViewer(ctx);
     const limit = Math.min(Math.max(args.limit ?? 12, 1), 24);
-    const tierLists = await ctx.db
+    const tierLists: Doc<"tierLists">[] = [];
+    let scanned = 0;
+    for await (const tierList of ctx.db
       .query("tierLists")
       .withIndex("by_isPublic_and_updatedAt", (q) => q.eq("isPublic", true))
-      .order("desc")
-      .take(limit);
+      .order("desc")) {
+      scanned += 1;
+      if (canViewTierList(viewer, tierList)) {
+        tierLists.push(tierList);
+      }
+      if (tierLists.length >= limit || scanned >= PUBLIC_FEED_SCAN_LIMIT) {
+        break;
+      }
+    }
 
-    const feed: Array<{
-      tierList: Doc<"tierLists">;
-      author: PublicUserProfile | null;
-      likedByViewer: boolean;
-    }> = [];
+    const feed: Array<Infer<typeof tierListFeedEntryValidator>> = [];
     for (const tierList of tierLists) {
       const authorDoc = await ctx.db.get(tierList.userId);
       const author = authorDoc ? publicUserProfileFromDocument(authorDoc) : null;
-      const likedByViewer = await getLikedState(ctx, viewerId, tierList._id);
+      const likedByViewer = await getLikedState(ctx, viewer.userId, tierList._id);
       feed.push({
-        tierList,
+        tierList: publicTierListFromDocument(tierList),
         author,
         likedByViewer,
+        ...moderationStatusForViewer(viewer, tierList),
       });
     }
 
@@ -294,17 +368,14 @@ export const getDetail = query({
   },
   returns: v.union(tierListDetailValidator, v.null()),
   handler: async (ctx, args) => {
-    const viewerId = await getAuthUserId(ctx);
+    const viewer = await getTierListViewer(ctx);
     const tierList = await ctx.db.get(args.tierListId);
 
-    if (!tierList) {
+    if (!tierList || !canViewTierList(viewer, tierList)) {
       return null;
     }
 
-    const canEdit = viewerId === tierList.userId;
-    if (!tierList.isPublic && !canEdit) {
-      return null;
-    }
+    const canEdit = viewer.userId === tierList.userId;
 
     const [author, items, comments, likedByViewer] = await Promise.all([
       ctx.db.get(tierList.userId),
@@ -319,7 +390,7 @@ export const getDetail = query({
         )
         .order("desc")
         .take(50),
-      getLikedState(ctx, viewerId, args.tierListId),
+      getLikedState(ctx, viewer.userId, args.tierListId),
     ]);
 
     const commentsWithAuthors: Array<{
@@ -342,12 +413,13 @@ export const getDetail = query({
       : null;
 
     return {
-      tierList,
+      tierList: publicTierListFromDocument(tierList),
       author: authorPublic,
       items,
       comments: commentsWithAuthors,
       likedByViewer,
       canEdit,
+      ...moderationStatusForViewer(viewer, tierList),
     };
   },
 });
@@ -503,6 +575,7 @@ export const save = mutation({
       rankingScopeKey: normalizedRankingScopeKey,
       selectedSetCodes: normalizedSetCodes,
       tiers: normalizedTiers,
+      listModerationStatus: previousExisting?.listModerationStatus ?? "approved",
     });
 
     await recomputeAffectedRankingScopes(ctx, [...previousScopeRefs, ...nextScopeRefs]);
@@ -528,7 +601,7 @@ export const toggleLike = mutation({
       throw new Error("Tier list not found");
     }
 
-    if (!tierList.isPublic && tierList.userId !== userId) {
+    if (!canViewTierList(await getTierListViewer(ctx), tierList)) {
       throw new Error("Not authorized");
     }
 
@@ -581,7 +654,7 @@ async function handleAddTierListComment(
     throw new Error("Tier list not found");
   }
 
-  if (!tierList.isPublic && tierList.userId !== userId) {
+  if (!canViewTierList(await getTierListViewer(ctx), tierList)) {
     throw new Error("Not authorized");
   }
 
