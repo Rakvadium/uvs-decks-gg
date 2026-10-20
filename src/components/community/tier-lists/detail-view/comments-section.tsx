@@ -24,7 +24,6 @@ export function CommunityTierListDetailCommentsSection() {
           const body = display(row.comment.content, isOwn);
           const who =
             row.author?.username?.trim() ||
-            row.author?.email?.trim() ||
             String(row.comment.userId).slice(-6);
 
           return (

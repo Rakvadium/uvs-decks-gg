@@ -1,4 +1,4 @@
-import { v } from "convex/values";
+import { v, type Infer } from "convex/values";
 import type { Doc } from "./_generated/dataModel";
 
 export const deckVisibilityValidator = v.union(
@@ -80,18 +80,27 @@ export const cardValidator = v.object({
   isRevealHidden: v.optional(v.boolean()),
 });
 
-export const userValidator = v.object({
+/**
+ * The only user fields any caller may see about another user. Convex rejects return values with
+ * extra fields, so a function that returns this can't send private fields by accident.
+ */
+export const publicUserProfileValidator = v.object({
   _id: v.id("users"),
   _creationTime: v.number(),
   username: v.optional(v.string()),
-  email: v.optional(v.string()),
-  emailVerificationTime: v.optional(v.number()),
   image: v.optional(v.string()),
-  isAnonymous: v.optional(v.boolean()),
-  role: v.optional(v.string()),
-  profanityFilterEnabled: v.boolean(),
-  hasVerifiedEmail: v.optional(v.boolean()),
 });
+
+export type PublicUserProfile = Infer<typeof publicUserProfileValidator>;
+
+export function publicUserProfileFromDocument(doc: Doc<"users">): PublicUserProfile {
+  return {
+    _id: doc._id,
+    _creationTime: doc._creationTime,
+    username: doc.username,
+    image: doc.image,
+  };
+}
 
 export const currentUserSelfValidator = v.object({
   _id: v.id("users"),
@@ -116,7 +125,8 @@ export const currentUserSelfValidator = v.object({
   userFacingMessage: v.optional(v.string()),
 });
 
-export function publicUserFromDocument(doc: Doc<"users">) {
+/** Self view only (`currentUser`): includes the signed-in user's own private fields. */
+export function selfUserFromDocument(doc: Doc<"users">) {
   return {
     _id: doc._id,
     _creationTime: doc._creationTime,

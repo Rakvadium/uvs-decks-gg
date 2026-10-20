@@ -58,7 +58,7 @@ export function CommunityTierListsSidebarPanel() {
                       <div className="line-clamp-2 text-sm font-medium leading-snug">{tierList.title}</div>
                       <div className="mt-1 flex flex-wrap items-center gap-1.5">
                         <span className="text-[10px] text-muted-foreground">
-                          {author?.username ?? author?.email ?? "Community"}
+                          {author?.username ?? "Community"}
                         </span>
                         <Badge variant="outline" className="h-5 px-1.5 text-[10px] font-normal">
                           {getTierListScopeLabel(tierList.rankingScope)}

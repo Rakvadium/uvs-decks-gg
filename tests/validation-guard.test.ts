@@ -13,15 +13,22 @@ import {
   CONVEX_BIN,
   buildChildEnv,
   checkInvocation,
+  checkSavedBackendVersion,
   checkSavedDeploymentPorts,
   formatCheck,
+  formatReverted,
   installedConvexVersion,
+  pinnedBackendCacheProblems,
+  pinnedBackendFetchHint,
   prepareInvocation,
+  preparePinnedBackend,
   repointEnvLocal,
   restoreCliSnapshot,
+  revertBackupDir,
+  seedBinaryCache,
   splitArgs,
   takeCliSnapshot,
-  withLocalPorts,
+  withLocalBackendFlags,
 } from "../scripts/validation/convex";
 import { buildBackendEnv } from "../scripts/validation/env";
 import {
@@ -30,6 +37,7 @@ import {
   FORBIDDEN_FLAGS,
   GuardError,
   PINNED_CHILD_ENV,
+  PINNED_LOCAL_BACKEND_VERSION,
   TESTED_CONVEX_VERSIONS,
   dotenvEntries,
   guardViolations,
@@ -69,6 +77,7 @@ function input(overrides: Partial<GuardInput> & { parentEnv?: Env; files?: Recor
   const parentEnv = overrides.parentEnv ?? { PATH: "/bin", LOCALAPPDATA: OWNER_LOCALAPPDATA };
   return {
     args: overrides.args ?? ["dev", "--once"],
+    cliArgs: overrides.cliArgs,
     sources: [
       { name: "the caller's environment", env: parentEnv },
       ...Object.entries(overrides.files ?? {}).map(([name, env]) => ({ name, env })),
@@ -189,6 +198,142 @@ describe("guard rejections: args", () => {
   });
   test("the issue's named flags are all covered", () => {
     for (const flag of ["--prod", "--env-file", "--url"]) expect(FORBIDDEN_FLAGS).toContain(flag);
+  });
+  test("callers can't pick the local backend, its version, or its binary (#221)", () => {
+    for (const flag of ["--local", "--local-backend-version", "--local-force-upgrade", "--local-cloud-port", "--local-site-port"]) {
+      expect(FORBIDDEN_FLAGS).toContain(flag);
+    }
+    for (const args of [
+      ["dev", "--local-backend-version", PINNED_LOCAL_BACKEND_VERSION],
+      ["dev", "--once", "--local-backend-version=precompiled-2020-01-01-0000000"],
+      ["dev", "--local-force-upgrade"],
+      ["dev", "--local"],
+      ["dev", "--local-binary", "C:/evil/convex-local-backend.exe"],
+      ["dev", "--local-anything=x"],
+      ["run", "f", "--local-backend-version", "x"],
+    ]) {
+      expectRefused(input({ args }), /Flag `--local[\w-]*` is forbidden/);
+    }
+  });
+});
+
+describe("pinned local backend version (#221)", () => {
+  const ports = portsFor(8150);
+  const pinned = (args: string[]) => withLocalBackendFlags(args, ports);
+  test("the wrapper's dev args carry the pin and pass", () => {
+    expect(pinned(["dev", "--once"])).toContain(PINNED_LOCAL_BACKEND_VERSION);
+    expect(guardViolations(input({ cliArgs: pinned(["dev", "--once"]) }))).toEqual([]);
+    expect(guardViolations(input({ args: ["env", "list"], cliArgs: pinned(["env", "list"]) }))).toEqual([]);
+  });
+  test("dev args without the pin, with another version, or with it twice are refused", () => {
+    const pin = /must carry `--local-backend-version precompiled-/;
+    const devPorts = ["dev", "--local", "--local-cloud-port", "3400", "--local-site-port", "3401"];
+    expectRefused(input({ cliArgs: devPorts }), pin);
+    expectRefused(input({ cliArgs: [...devPorts, "--local-backend-version", "precompiled-2020-01-01-0000000"] }), pin);
+    expectRefused(input({ cliArgs: [...devPorts, `--local-backend-version=${PINNED_LOCAL_BACKEND_VERSION}`] }), pin);
+    expectRefused(input({ cliArgs: [...pinned(["dev"]), "--local-backend-version", PINNED_LOCAL_BACKEND_VERSION] }), pin);
+    expectRefused(input({ cliArgs: [...pinned(["dev"]), "--local-force-upgrade"] }), /must not carry `--local-force-upgrade`/);
+    expectRefused(input({ cliArgs: pinned(["dev"]).filter((a) => a !== "--local") }), /must carry `--local` exactly once/);
+  });
+  test("non-dev commands must not carry backend flags", () => {
+    expectRefused(
+      input({ args: ["env", "list"], cliArgs: ["env", "list", "--local-backend-version", PINNED_LOCAL_BACKEND_VERSION] }),
+      /Only `dev` may carry the local backend flags/,
+    );
+  });
+  test("prepareInvocation passes the pin exactly once and refuses a caller's own", () => {
+    const cwd = tmpDir("uvs-wt-");
+    const root = tmpDir("uvs-root-");
+    const inv = prepareInvocation({ argv: ["--app-port", "8150", "dev", "--once"], parentEnv: {}, cwd, root });
+    expect(inv.cliArgs.filter((a) => a === "--local-backend-version")).toHaveLength(1);
+    expect(inv.cliArgs[inv.cliArgs.indexOf("--local-backend-version") + 1]).toBe(PINNED_LOCAL_BACKEND_VERSION);
+    expect(inv.fetchPinnedBackend).toBe(false);
+    for (const extra of [["--local-backend-version", "x"], ["--local-backend-version=x"], ["--local-force-upgrade"]]) {
+      expect(() => prepareInvocation({ argv: ["--app-port", "8150", "dev", ...extra], parentEnv: {}, cwd, root })).toThrow(GuardError);
+    }
+    const fetching = prepareInvocation({ argv: ["--app-port", "8150", "--fetch-pinned-backend", "dev"], parentEnv: {}, cwd, root });
+    expect(fetching.fetchPinnedBackend).toBe(true);
+    expect(fetching.cliArgs).not.toContain("--fetch-pinned-backend");
+  });
+  test("--check reports the pin rule for dev and skips it without args", () => {
+    const cwd = tmpDir("uvs-wt-");
+    const run = (extra: string[]) =>
+      checkInvocation({ argv: ["--app-port", "8150", "--check", ...extra], parentEnv: {}, cwd, root: tmpDir("uvs-root-") });
+    expect(run(["dev", "--once"]).rules.find((r) => r.rule === "backend-version-pinned")?.status).toBe("pass");
+    expect(run([]).rules.find((r) => r.rule === "backend-version-pinned")?.status).toBe("skipped");
+    expect(run(["dev", "--local-backend-version", "x"]).ok).toBe(false);
+  });
+
+  const exe = "convex-local-backend.exe";
+  const fakeCache = (dir: string, opts: { binary?: string; dashboard?: string }) => {
+    if (opts.binary) {
+      fs.mkdirSync(path.join(dir, "convex", "binaries", opts.binary), { recursive: true });
+      fs.writeFileSync(path.join(dir, "convex", "binaries", opts.binary, exe), opts.binary);
+    }
+    if (opts.dashboard) {
+      fs.mkdirSync(path.join(dir, "convex", "dashboard", "out"), { recursive: true });
+      fs.writeFileSync(
+        path.join(dir, "convex", "dashboard", "config.json"),
+        JSON.stringify({ port: 6790, apiPort: 6791, version: opts.dashboard }),
+      );
+    }
+  };
+  const childEnvFor = (root: string) => buildChildEnv({ parentEnv: {}, appPort: 8150, root, platform: "win32" });
+
+  test("the cache check wants the pinned binary and dashboard, nothing newer", () => {
+    const childEnv = childEnvFor(tmpDir("uvs-root-"));
+    expect(pinnedBackendCacheProblems({ childEnv, platform: "win32" })).toHaveLength(2);
+    fakeCache(childEnv.LOCALAPPDATA!, { binary: "precompiled-2099-01-01-fffffff", dashboard: "precompiled-2099-01-01-fffffff" });
+    const problems = pinnedBackendCacheProblems({ childEnv, platform: "win32" });
+    expect(problems).toHaveLength(2);
+    expect(problems[1]).toContain("at precompiled-2099-01-01-fffffff");
+    fakeCache(childEnv.LOCALAPPDATA!, { binary: PINNED_LOCAL_BACKEND_VERSION, dashboard: PINNED_LOCAL_BACKEND_VERSION });
+    expect(pinnedBackendCacheProblems({ childEnv, platform: "win32" })).toEqual([]);
+  });
+
+  test("a missing pinned binary fails with the one-time fetch instruction, unless --fetch-pinned-backend", () => {
+    const root = tmpDir("uvs-root-");
+    const owner = { parentEnv: { LOCALAPPDATA: tmpDir("uvs-owner-") }, realHome: tmpDir("uvs-home-"), platform: "win32" as const };
+    const inv = { appPort: 8150, home: backendDir(8150, root), childEnv: childEnvFor(root), fetchPinnedBackend: false };
+    const said: string[] = [];
+    expect(() => preparePinnedBackend(inv, (m) => said.push(m), owner)).toThrow(
+      /pinned Convex local backend precompiled-[\s\S]*no api\.github\.com lookup[\s\S]*bun run validation:backend -- start --app-port 8150 --fetch-pinned-backend/,
+    );
+    expect(pinnedBackendFetchHint(8150, ["x is missing"])).toContain("  - x is missing");
+    expect(() => preparePinnedBackend({ ...inv, fetchPinnedBackend: true }, (m) => said.push(m), owner)).not.toThrow();
+    expect(said.some((m) => m.includes("--fetch-pinned-backend"))).toBe(true);
+  });
+
+  test("seeding copies only the pinned version from the owner's cache, which stays untouched", () => {
+    const ownerLocal = tmpDir("uvs-owner-");
+    fakeCache(ownerLocal, { binary: "precompiled-2099-01-01-fffffff" });
+    const opts = {
+      parentEnv: { LOCALAPPDATA: ownerLocal },
+      childEnv: childEnvFor(tmpDir("uvs-root-")),
+      realHome: tmpDir("uvs-home-"),
+      platform: "win32" as const,
+    };
+    expect(seedBinaryCache(opts)).toEqual([]);
+    fakeCache(ownerLocal, { binary: PINNED_LOCAL_BACKEND_VERSION, dashboard: PINNED_LOCAL_BACKEND_VERSION });
+    expect(seedBinaryCache(opts)).toEqual(["backend binary", "dashboard"]);
+    expect(fs.readdirSync(path.join(opts.childEnv.LOCALAPPDATA!, "convex", "binaries"))).toEqual([PINNED_LOCAL_BACKEND_VERSION]);
+    expect(pinnedBackendCacheProblems({ childEnv: opts.childEnv, platform: "win32" })).toEqual([]);
+    expect(seedBinaryCache(opts)).toEqual([]);
+    expect(fs.readdirSync(path.join(ownerLocal, "convex", "binaries")).sort()).toEqual([
+      PINNED_LOCAL_BACKEND_VERSION,
+      "precompiled-2099-01-01-fffffff",
+    ]);
+  });
+
+  test("a backend saved at another version is refused with the way out", () => {
+    const home = tmpDir("uvs-home-");
+    const dir = path.join(home, ".convex", "anonymous-convex-backend-state", "anonymous-agent");
+    fs.mkdirSync(dir, { recursive: true });
+    const save = (backendVersion: string) => fs.writeFileSync(path.join(dir, "config.json"), JSON.stringify({ backendVersion }));
+    save(PINNED_LOCAL_BACKEND_VERSION);
+    expect(() => checkSavedBackendVersion(home, 8150)).not.toThrow();
+    save("precompiled-2026-06-09-b6aaa1a");
+    expect(() => checkSavedBackendVersion(home, 8150)).toThrow(/created with local backend precompiled-2026-06-09-b6aaa1a[\s\S]*stop --app-port 8150/);
   });
 });
 
@@ -639,6 +784,7 @@ describe("wrapper", () => {
       printTarget: false,
       repointEnvLocal: false,
       check: false,
+      fetchPinnedBackend: false,
       convexArgs: ["dev", "--once"],
     });
     expect(splitArgs(["env", "list", "--app-port=8151", "--print-target", "--repoint-env-local", "--log-file", "x.log"])).toEqual({
@@ -646,22 +792,26 @@ describe("wrapper", () => {
       printTarget: true,
       repointEnvLocal: true,
       check: false,
+      fetchPinnedBackend: false,
       logFile: "x.log",
       convexArgs: ["env", "list"],
     });
+    expect(splitArgs(["--fetch-pinned-backend", "dev"]).fetchPinnedBackend).toBe(true);
   });
 
-  test("dev gets the fixed local ports; other commands are untouched", () => {
-    expect(withLocalPorts(["dev", "--once"], portsFor(8150))).toEqual([
+  test("dev gets the fixed local ports and the pinned backend; other commands are untouched", () => {
+    expect(withLocalBackendFlags(["dev", "--once"], portsFor(8150))).toEqual([
       "dev",
       "--local",
       "--local-cloud-port",
       "3400",
       "--local-site-port",
       "3401",
+      "--local-backend-version",
+      PINNED_LOCAL_BACKEND_VERSION,
       "--once",
     ]);
-    expect(withLocalPorts(["env", "list"], portsFor(8150))).toEqual(["env", "list"]);
+    expect(withLocalBackendFlags(["env", "list"], portsFor(8150))).toEqual(["env", "list"]);
   });
 
   test("prepareInvocation refuses a worktree whose .env.local targets a cloud deployment", () => {
@@ -713,7 +863,7 @@ describe("CLI side-effect restore", () => {
     write(root, "convex/_generated/api.d.ts", "type A = 2;\n");
     write(root, "convex/_generated/dataModel.d.ts", "new file\n");
 
-    expect(restoreCliSnapshot(snapshot, root).sort()).toEqual([
+    expect(restoreCliSnapshot(snapshot, root).map((r) => r.rel).sort()).toEqual([
       ".cursor/rules/convex_rules.mdc",
       "convex/README.md",
       "convex/_generated/api.js",
@@ -726,6 +876,37 @@ describe("CLI side-effect restore", () => {
     expect(read(root, "convex/_generated/dataModel.d.ts")).toBe("new file\n");
     expect(read(root, "convex/_generated/server.js")).toBe("same\n");
     expect(restoreCliSnapshot(snapshot, root)).toEqual([]);
+  });
+
+  test("bytes a restore overwrites or deletes are saved to the backend dir first (#221)", () => {
+    const root = tmpDir("uvs-repo-");
+    const home = tmpDir("uvs-home-");
+    write(root, ".cursor/rules/convex_rules.mdc", "committed rules\n");
+    write(root, "convex/_generated/api.js", "a\r\n");
+    const snapshot = takeCliSnapshot(root);
+    write(root, ".cursor/rules/convex_rules.mdc", "rules edited mid-session\n");
+    write(root, "convex/README.md", "readme written mid-session\n");
+    write(root, "convex/_generated/api.js", "a\n");
+
+    const backupDir = revertBackupDir(home, new Date("2026-10-19T01:02:03.456Z"));
+    expect(backupDir).toBe(path.join(home, "reverted", "2026-10-19T01-02-03-456Z"));
+    const reverted = restoreCliSnapshot(snapshot, root, { backupDir });
+    const byRel = Object.fromEntries(reverted.map((r) => [r.rel, r.backup]));
+    expect(byRel[".cursor/rules/convex_rules.mdc"]).toBe(path.join(backupDir, ".cursor/rules/convex_rules.mdc"));
+    expect(byRel["convex/README.md"]).toBe(path.join(backupDir, "convex/README.md"));
+    // Line-ending-only reverts lose nothing, so they get no copy.
+    expect(byRel["convex/_generated/api.js"]).toBeUndefined();
+    expect(fs.readFileSync(byRel[".cursor/rules/convex_rules.mdc"]!, "utf8")).toBe("rules edited mid-session\n");
+    expect(fs.readFileSync(byRel["convex/README.md"]!, "utf8")).toBe("readme written mid-session\n");
+    expect(read(root, ".cursor/rules/convex_rules.mdc")).toBe("committed rules\n");
+    expect(fs.existsSync(path.join(root, "convex/README.md"))).toBe(false);
+    const line = formatReverted(reverted);
+    expect(line).toContain(`.cursor/rules/convex_rules.mdc (replaced bytes saved to ${byRel[".cursor/rules/convex_rules.mdc"]})`);
+    expect(line).toContain("convex/_generated/api.js");
+    // A restore with nothing to put back writes no backup dir.
+    const again = revertBackupDir(home, new Date("2026-10-19T01:02:04.000Z"));
+    expect(restoreCliSnapshot(snapshot, root, { backupDir: again })).toEqual([]);
+    expect(fs.existsSync(again)).toBe(false);
   });
 });
 
