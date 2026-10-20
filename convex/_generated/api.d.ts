@@ -13,7 +13,6 @@ import type * as accountStatusExpiry from "../accountStatusExpiry.js";
 import type * as admin from "../admin.js";
 import type * as adminHttp from "../adminHttp.js";
 import type * as adminUsers from "../adminUsers.js";
-import type * as agentLogin from "../agentLogin.js";
 import type * as auth from "../auth.js";
 import type * as cardDraftActions from "../cardDraftActions.js";
 import type * as cardDrafts from "../cardDrafts.js";
@@ -55,7 +54,6 @@ import type * as lib_moderation_textPublish from "../lib/moderation/textPublish.
 import type * as lib_r2Keys from "../lib/r2Keys.js";
 import type * as lib_reservedIdentity from "../lib/reservedIdentity.js";
 import type * as lib_username from "../lib/username.js";
-import type * as lib_validationBackend from "../lib/validationBackend.js";
 import type * as mediaAssetActions from "../mediaAssetActions.js";
 import type * as mediaAssets from "../mediaAssets.js";
 import type * as migrations_migrateDeckSchema from "../migrations/migrateDeckSchema.js";
@@ -91,7 +89,6 @@ import type * as user from "../user.js";
 import type * as userStatusInternal from "../userStatusInternal.js";
 import type * as utils_filtering from "../utils/filtering.js";
 import type * as utils_validation from "../utils/validation.js";
-import type * as validationSeed from "../validationSeed.js";
 import type * as validators from "../validators.js";
 
 import type {
@@ -106,7 +103,6 @@ declare const fullApi: ApiFromModules<{
   admin: typeof admin;
   adminHttp: typeof adminHttp;
   adminUsers: typeof adminUsers;
-  agentLogin: typeof agentLogin;
   auth: typeof auth;
   cardDraftActions: typeof cardDraftActions;
   cardDrafts: typeof cardDrafts;
@@ -148,7 +144,6 @@ declare const fullApi: ApiFromModules<{
   "lib/r2Keys": typeof lib_r2Keys;
   "lib/reservedIdentity": typeof lib_reservedIdentity;
   "lib/username": typeof lib_username;
-  "lib/validationBackend": typeof lib_validationBackend;
   mediaAssetActions: typeof mediaAssetActions;
   mediaAssets: typeof mediaAssets;
   "migrations/migrateDeckSchema": typeof migrations_migrateDeckSchema;
@@ -184,7 +179,6 @@ declare const fullApi: ApiFromModules<{
   userStatusInternal: typeof userStatusInternal;
   "utils/filtering": typeof utils_filtering;
   "utils/validation": typeof utils_validation;
-  validationSeed: typeof validationSeed;
   validators: typeof validators;
 }>;
 
