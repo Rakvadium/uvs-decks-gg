@@ -12,8 +12,21 @@ import {
   type SeedSet,
 } from "../convex/validationSeed";
 import { decodeConvexId, deterministicConvexId, encodeConvexId, isConvexId } from "../scripts/validation/seed/convexId";
-import { readManifest } from "../scripts/validation/seed/manifest";
-import { projectRow } from "../scripts/validation/seed/public-data";
+import { createHash } from "node:crypto";
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
+import { gzipSync } from "node:zlib";
+import { catalogCachePath, parseCatalog, pinnedCatalogForUrl, readPinnedCatalog } from "../scripts/validation/seed/catalog";
+import { readManifest, type Manifest } from "../scripts/validation/seed/manifest";
+import {
+  backFaceIds,
+  buildBaseSnapshot,
+  describePublicReadsDrift,
+  hashPublicReads,
+  projectRow,
+  type PublicReads,
+} from "../scripts/validation/seed/public-data";
 import {
   assignTableNumbers,
   buildSnapshotZip,
@@ -219,6 +232,101 @@ describe("snapshot normalization", () => {
       ["b", 10003],
       ["c", 10001],
     ]);
+  });
+});
+
+describe("back faces", () => {
+  const id = (n: number) => deterministicConvexId(10008, "test", `card:${n}`);
+  const front: SnapshotDoc = { _id: id(1), _creationTime: 1, name: "Front", setCode: "s", backCardId: id(2) };
+  const back: SnapshotDoc = { _id: id(2), _creationTime: 2, name: "Back", setCode: "s", isFrontFace: false, frontCardId: id(1), game: "uvs" };
+  const pin = { version: 1, url: "https://example.invalid/catalog/v1.json.gz", sha256: "0".repeat(64), updatedAt: 5, cardCount: 1 };
+  const reads = (backFaces: SnapshotDoc[]): PublicReads => ({
+    sets: [],
+    formats: [],
+    cardLegality: [{ _id: deterministicConvexId(10020, "test", "legality:0"), _creationTime: 3, formatKey: "standard", cardId: id(2), status: "banned" }],
+    setLegality: [],
+    backFaces,
+    missingBackFaceIds: [],
+    facets: { rarities: [], types: [], setCodes: [] },
+  });
+
+  test("backFaceIds lists only backs outside the catalog", () => {
+    expect(backFaceIds([front, { _id: id(3), _creationTime: 3, backCardId: id(1) }])).toEqual([id(2)]);
+  });
+
+  test("the base snapshot holds the back faces and their legality rows", () => {
+    const base = buildBaseSnapshot({ pin, cards: [front], reads: reads([back]), idNamespace: "test" });
+    expect(base.rows.get("cards")!.map((c) => c._id)).toEqual([id(1), id(2)]);
+    expect(base.rows.get("cards")![1].game).toBeUndefined();
+    expect(base.rows.get("cardLegality")).toHaveLength(1);
+    const without = buildBaseSnapshot({ pin, cards: [front], reads: reads([]), idNamespace: "test" });
+    expect(without.droppedLegalityRows).toBe(1);
+    const drift = describePublicReadsDrift(
+      { sha256: without.publicReadsSha256, parts: without.publicReads },
+      { sha256: base.publicReadsSha256, parts: base.publicReads },
+    );
+    expect(drift).toEqual([
+      expect.stringMatching(/^backFaces /),
+      expect.stringMatching(/^cardLegality /),
+    ]);
+  });
+
+  test("refuses a back face that is also a catalog card", () => {
+    expect(() => buildBaseSnapshot({ pin, cards: [front], reads: reads([front]), idNamespace: "test" })).toThrow(/also a catalog card/);
+  });
+});
+
+describe("public reads drift", () => {
+  const current = hashPublicReads({ sets: [1], formats: [2] });
+
+  test("is empty when nothing changed or nothing was recorded", () => {
+    expect(describePublicReadsDrift({ sha256: current.sha256, parts: current.parts }, current)).toEqual([]);
+    expect(describePublicReadsDrift({ sha256: null }, current)).toEqual([]);
+  });
+
+  test("names each changed read", () => {
+    const before = hashPublicReads({ sets: [1], formats: [3] });
+    const [line, ...rest] = describePublicReadsDrift({ sha256: before.sha256, parts: before.parts }, current);
+    expect(rest).toEqual([]);
+    expect(line).toBe(`formats ${before.parts.formats.slice(0, 12)} -> ${current.parts.formats.slice(0, 12)}`);
+  });
+
+  test("checks the per-read hashes even when the combined hash matches", () => {
+    const edited = { sha256: current.sha256, parts: { ...current.parts, sets: "0".repeat(64) } };
+    expect(describePublicReadsDrift(edited, current)).toEqual([`sets 000000000000 -> ${current.parts.sets.slice(0, 12)}`]);
+  });
+
+  test("reports a combined change when the manifest has no per-read hashes", () => {
+    expect(describePublicReadsDrift({ sha256: "f".repeat(64) }, current)[0]).toMatch(/no per-read hashes/);
+  });
+});
+
+describe("pinned catalog", () => {
+  const cards = [{ _id: PROD_CARD_ID, _creationTime: 1, name: "Bleeding Internally" }];
+  const gz = gzipSync(Buffer.from(JSON.stringify({ schemaVersion: 1, version: 7, cardCount: 1, cards })));
+  const manifest = (): Manifest => ({
+    ...readManifest(),
+    catalog: { version: 7, url: "https://example.invalid/catalog/v7.json.gz", sha256: createHash("sha256").update(gz).digest("hex"), updatedAt: 1, cardCount: 1 },
+    golden: null,
+  });
+
+  test("serves the verified cached bytes for the pinned URL only", () => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), "seed-catalog-"));
+    const m = manifest();
+    fs.writeFileSync(catalogCachePath(m.catalog, root), gz);
+    expect(pinnedCatalogForUrl(m.catalog.url, m, { root })!.equals(gz)).toBe(true);
+    expect(pinnedCatalogForUrl("https://example.invalid/catalog/v6.json.gz", m, { root })).toBeNull();
+    expect(parseCatalog(gz, m.catalog)).toEqual(cards);
+    expect(() => parseCatalog(gz, { ...m.catalog, version: 8 })).toThrow(/file says v7/);
+  });
+
+  test("fails loudly with the re-pin procedure when no verified copy exists", () => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), "seed-catalog-"));
+    const m = manifest();
+    const cache = catalogCachePath(m.catalog, root);
+    fs.writeFileSync(cache, Buffer.from("tampered"));
+    expect(() => readPinnedCatalog(m, { root })).toThrow(/--pin-catalog/);
+    expect(fs.existsSync(cache)).toBe(false);
   });
 });
 

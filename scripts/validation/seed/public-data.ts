@@ -1,13 +1,12 @@
 /**
- * Public, unauthenticated production reads for the validation seed: the pinned static catalog on
- * the public R2 bucket, and public Convex queries over HTTP (the same calls any site visitor's
- * browser makes). No credentials, no writes.
+ * Public, unauthenticated production reads for the validation seed: public Convex queries over
+ * HTTP (the same calls any site visitor's browser makes). No credentials, no writes. The pinned
+ * static catalog is loaded by catalog.ts.
  *
  * Rows are projected onto this branch's schema (production may carry extra fields, e.g. `game`)
  * and stripped of references to production users.
  */
 import { createHash } from "node:crypto";
-import { gunzipSync } from "node:zlib";
 import schema from "../../../convex/schema";
 import { canonicalJson } from "../../../convex/validationSeed";
 import { deterministicConvexId } from "./convexId";
@@ -58,24 +57,43 @@ export async function publicQuery<T>(convexUrl: string, path: string, args: Reco
   return body.value as T;
 }
 
-export async function fetchCatalog(pin: CatalogPin): Promise<{ gz: Buffer; cards: SnapshotDoc[] }> {
-  const gz = Buffer.from(await (await fetchOk(pin.url)).arrayBuffer());
-  const sha = createHash("sha256").update(gz).digest("hex");
-  if (sha !== pin.sha256) throw new Error(`catalog v${pin.version}: sha256 ${sha} does not match the pinned ${pin.sha256}`);
-  const json = JSON.parse(gunzipSync(gz).toString("utf8")) as { version: number; cardCount: number; cards: SnapshotDoc[] };
-  if (json.version !== pin.version || json.cards.length !== pin.cardCount) {
-    throw new Error(`catalog v${pin.version}: file says v${json.version} with ${json.cards.length} cards`);
-  }
-  return { gz, cards: json.cards };
-}
-
 export type PublicReads = {
   sets: SnapshotDoc[];
   formats: SnapshotDoc[];
   cardLegality: SnapshotDoc[];
   setLegality: SnapshotDoc[];
+  /** Back faces of the catalog's dual-faced cards (the catalog holds front faces only). */
+  backFaces: SnapshotDoc[];
+  /** `backCardId`s production did not return (e.g. unreleased); the seed has no row for them. */
+  missingBackFaceIds: string[];
   facets: { rarities: string[]; types: string[]; setCodes: string[] };
 };
+
+/** `backCardId`s of `cards` that point outside `cards`, sorted. */
+export function backFaceIds(cards: SnapshotDoc[]): string[] {
+  const have = new Set(cards.map((c) => c._id));
+  const ids = new Set<string>();
+  for (const card of cards) {
+    if (typeof card.backCardId === "string" && !have.has(card.backCardId)) ids.add(card.backCardId);
+  }
+  return [...ids].sort();
+}
+
+const BATCH_IDS = 200;
+
+/**
+ * Back faces through `cards:batchGetCardsByIds`, the public query the gallery uses for them. It
+ * rewrites `imageUrl` the same way the catalog does, so back and front rows have the same shape.
+ */
+export async function fetchBackFaces(convexUrl: string, catalogCards: SnapshotDoc[]): Promise<{ rows: SnapshotDoc[]; missing: string[] }> {
+  const ids = backFaceIds(catalogCards);
+  const rows: SnapshotDoc[] = [];
+  for (let i = 0; i < ids.length; i += BATCH_IDS) {
+    rows.push(...(await publicQuery<SnapshotDoc[]>(convexUrl, "cards:batchGetCardsByIds", { ids: ids.slice(i, i + BATCH_IDS) })));
+  }
+  const got = new Set(rows.map((r) => r._id));
+  return { rows, missing: ids.filter((id) => !got.has(id)) };
+}
 
 /**
  * Tables the seed can't read publicly, and why. They are left empty.
@@ -86,7 +104,7 @@ export const UNREADABLE_TABLES: Record<string, string> = {
   formatErrata: "no public query exposes it; nothing on this branch reads it",
 };
 
-export async function fetchPublicReads(convexUrl: string): Promise<PublicReads> {
+export async function fetchPublicReads(convexUrl: string, catalogCards: SnapshotDoc[]): Promise<PublicReads> {
   const sets = await publicQuery<SnapshotDoc[]>(convexUrl, "sets:list");
   const formats = await publicQuery<SnapshotDoc[]>(convexUrl, "formats:list");
   const cardLegality: SnapshotDoc[] = [];
@@ -101,7 +119,8 @@ export async function fetchPublicReads(convexUrl: string): Promise<PublicReads> 
     types: await publicQuery<string[]>(convexUrl, "cards:getTypes"),
     setCodes: await publicQuery<string[]>(convexUrl, "cards:getSets"),
   };
-  return { sets, formats, cardLegality, setLegality, facets };
+  const backFaces = await fetchBackFaces(convexUrl, catalogCards);
+  return { sets, formats, cardLegality, setLegality, backFaces: backFaces.rows, missingBackFaceIds: backFaces.missing, facets };
 }
 
 export type BaseSnapshot = {
@@ -110,15 +129,49 @@ export type BaseSnapshot = {
   droppedFields: string[];
   droppedLegalityRows: number;
   publicReadsSha256: string;
+  /** sha256 per public read, so a rebuild can say which one changed. */
+  publicReads: Record<string, string>;
 };
+
+/** sha256 per public read, and one over all of them. Rows are hashed as projected into the seed. */
+export function hashPublicReads(parts: Record<string, unknown>): { sha256: string; parts: Record<string, string> } {
+  const hashes = Object.fromEntries(
+    Object.keys(parts)
+      .sort()
+      .map((name) => [name, createHash("sha256").update(canonicalJson(parts[name])).digest("hex")]),
+  );
+  return { sha256: createHash("sha256").update(canonicalJson(hashes)).digest("hex"), parts: hashes };
+}
+
+/**
+ * How a rebuild's public reads differ from the ones the manifest recorded, one line per change.
+ * Empty when they match or the manifest has no previous hash.
+ */
+export function describePublicReadsDrift(
+  previous: { sha256: string | null; parts?: Record<string, string> | null },
+  current: { sha256: string; parts: Record<string, string> },
+): string[] {
+  const before = previous.parts;
+  if (!before) {
+    if (previous.sha256 === null || previous.sha256 === current.sha256) return [];
+    return [`publicReadsSha256 ${previous.sha256.slice(0, 12)} -> ${current.sha256.slice(0, 12)} (the manifest has no per-read hashes)`];
+  }
+  const short = (hash: string | undefined) => hash?.slice(0, 12) ?? "(none)";
+  return [...new Set([...Object.keys(before), ...Object.keys(current.parts)])]
+    .sort()
+    .filter((name) => before[name] !== current.parts[name])
+    .map((name) => `${name} ${short(before[name])} -> ${short(current.parts[name])}`);
+}
 
 /** Tables whose rows keep their production `_id`s (and so their production table numbers). */
 const PRODUCTION_ID_TABLES = ["cards", "sets", "formats", "cardLegality", "setLegality"] as const;
 
 export function buildBaseSnapshot(opts: { pin: CatalogPin; cards: SnapshotDoc[]; reads: PublicReads; idNamespace: string }): BaseSnapshot {
   const dropped = new Set<string>();
-  const cards = opts.cards.map((row) => projectRow("cards", row, dropped));
+  const backFaces = opts.reads.backFaces.map((row) => projectRow("cards", row, dropped));
+  const cards = [...opts.cards.map((row) => projectRow("cards", row, dropped)), ...backFaces];
   const cardIds = new Set(cards.map((c) => c._id));
+  if (cardIds.size !== cards.length) throw new Error("buildBaseSnapshot: a back face is also a catalog card");
   const legalityAll = opts.reads.cardLegality.map((row) => projectRow("cardLegality", row, dropped));
   const cardLegality = legalityAll.filter((row) => cardIds.has(row.cardId as string));
   const rows: TableRows = new Map([
@@ -128,10 +181,11 @@ export function buildBaseSnapshot(opts: { pin: CatalogPin; cards: SnapshotDoc[];
     ["cardLegality", cardLegality],
     ["setLegality", opts.reads.setLegality.map((row) => projectRow("setLegality", row, dropped))],
   ]);
-  const publicReadsSha256 = createHash("sha256")
-    .update(canonicalJson(Object.fromEntries([...rows].filter(([t]) => t !== "cards")) as unknown))
-    .update(canonicalJson(opts.reads.facets))
-    .digest("hex");
+  const publicReads = hashPublicReads({
+    ...Object.fromEntries([...rows].filter(([t]) => t !== "cards")),
+    backFaces,
+    facets: opts.reads.facets,
+  });
 
   const fixed = new Map<string, number>();
   for (const table of PRODUCTION_ID_TABLES) {
@@ -170,6 +224,7 @@ export function buildBaseSnapshot(opts: { pin: CatalogPin; cards: SnapshotDoc[];
     rows,
     droppedFields: [...dropped].sort(),
     droppedLegalityRows: legalityAll.length - cardLegality.length,
-    publicReadsSha256,
+    publicReadsSha256: publicReads.sha256,
+    publicReads: publicReads.parts,
   };
 }

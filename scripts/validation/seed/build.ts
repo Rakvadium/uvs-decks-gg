@@ -1,22 +1,25 @@
 /**
  * Builds the golden validation seed (maintainer-run, occasionally):
  *
- *   bun run validation:seed:build -- --app-port P [--no-publish] [--pin-catalog] [--keep-backend]
- *                                    [--repoint-env-local]
+ *   bun run validation:seed:build -- --app-port P [--no-publish] [--pin-catalog] [--strict]
+ *                                    [--keep-backend] [--repoint-env-local]
  *
- * 1. Downloads the catalog version pinned in manifest.json from the public R2 bucket (sha256
- *    checked) and keeps the cards' production `_id`s. `--pin-catalog` first re-pins the manifest
- *    to the version production currently serves.
- * 2. Reads sets, formats, legality and facets through public production queries (no credentials).
- *    See UNREADABLE_TABLES in public-data.ts for what can't be read that way.
+ * 1. Loads the catalog version pinned in manifest.json (sha256 checked) and keeps the cards'
+ *    production `_id`s. It comes from the seed branch when stored there, else from the public R2
+ *    bucket (see catalog.ts). `--pin-catalog` first re-pins the manifest to the version production
+ *    currently serves.
+ * 2. Reads sets, formats, legality, facets and the catalog's back faces through public production
+ *    queries (no credentials). See UNREADABLE_TABLES in public-data.ts for what can't be read that
+ *    way. When those reads differ from the hashes manifest.json recorded, it logs which ones
+ *    changed. `--strict` fails instead, before any backend work.
  * 3. Starts the port P validation backend through the guarded wrapper (it must not already be
  *    running), imports those tables with --replace-all, and runs internal.validationSeed.seedFixtures.
  * 4. Exports it, normalizes the export into a byte-deterministic golden zip, checks it for
- *    non-reserved emails, publishes it to the orphan `validation-seed` branch (root vercel.json
- *    disables Vercel deployments), and updates manifest.json.
+ *    non-reserved emails, publishes it with the pinned catalog to the orphan `validation-seed`
+ *    branch (root vercel.json disables Vercel deployments), and updates manifest.json.
  *
- * Work files go to ~/.uvs-validation/seed/. Prints the golden sha256; two builds of the same pins
- * print the same value.
+ * Work files go to ~/.uvs-validation/seed/ (per-port build files under build-P/). Prints the golden
+ * sha256; two builds of the same pins print the same value.
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -24,6 +27,7 @@ import { RESERVED_EMAIL_DOMAIN } from "../../../convex/validationSeed";
 import { start, status, stop } from "../backend";
 import { REPO_ROOT, runConvex, runConvexCapture } from "../convex";
 import { defaultValidationRoot, resolveAppPort } from "../ports";
+import { CATALOG_FILE, catalogCachePath, loadCatalogForBuild } from "./catalog";
 import {
   GOLDEN_FILE,
   SEED_BRANCH,
@@ -38,7 +42,14 @@ import {
   type Manifest,
   type SeedMeta,
 } from "./manifest";
-import { UNREADABLE_TABLES, buildBaseSnapshot, fetchCatalog, fetchPublicReads, publicQuery, type CatalogPin } from "./public-data";
+import {
+  UNREADABLE_TABLES,
+  buildBaseSnapshot,
+  describePublicReadsDrift,
+  fetchPublicReads,
+  publicQuery,
+  type CatalogPin,
+} from "./public-data";
 import { buildSnapshotZip, findNonReservedEmails, normalizeExport, readExport } from "./snapshot";
 
 const log = (message: string) => console.error(`[seed] ${message}`);
@@ -63,15 +74,15 @@ async function cli(appPort: number, args: string[]): Promise<void> {
   if (code !== 0) throw new Error(`vconvex ${args[0]} exited ${code}`);
 }
 
-/** Commits golden.zip, seed.json and vercel.json as the next commit of the orphan seed branch. */
-function publish(golden: Buffer, goldenPath: string, seedJson: string): string {
+/** Commits golden.zip, the pinned catalog, seed.json and vercel.json as the next commit of the orphan seed branch. */
+function publish(golden: Buffer, goldenPath: string, catalogPath: string, seedJson: string): string {
   const remote = git(["ls-remote", "origin", `refs/heads/${SEED_BRANCH}`], { allowFail: true }).split(/\s+/)[0] || null;
   if (remote) git(["fetch", "origin", `refs/heads/${SEED_BRANCH}`]);
   const blob = (args: string[], input?: string) => git(["hash-object", "-w", "--no-filters", ...args], { input });
-  const goldenBlob = blob([goldenPath]);
   const tree = git(["mktree"], {
     input: [
-      `100644 blob ${goldenBlob}\t${GOLDEN_FILE}`,
+      `100644 blob ${blob([catalogPath])}\t${CATALOG_FILE}`,
+      `100644 blob ${blob([goldenPath])}\t${GOLDEN_FILE}`,
       `100644 blob ${blob(["--stdin"], seedJson)}\tseed.json`,
       `100644 blob ${blob(["--stdin"], VERCEL_JSON)}\tvercel.json`,
       "",
@@ -84,7 +95,7 @@ function publish(golden: Buffer, goldenPath: string, seedJson: string): string {
   const message = `Validation seed ${sha256(golden).slice(0, 12)}`;
   const commit = git(["commit-tree", tree, ...(remote ? ["-p", remote] : []), "-m", message]);
   git(["push", "origin", `${commit}:refs/heads/${SEED_BRANCH}`]);
-  log(`published ${GOLDEN_FILE} to ${SEED_BRANCH} at ${commit}`);
+  log(`published ${GOLDEN_FILE} and ${CATALOG_FILE} to ${SEED_BRANCH} at ${commit}`);
   return commit;
 }
 
@@ -96,28 +107,44 @@ async function main(argv: string[]) {
   };
   const appPort = resolveAppPort({ flag: flag("--app-port"), env: process.env, worktree: REPO_ROOT, root: defaultValidationRoot() });
   const manifest = readManifest();
-  const work = seedWorkDir();
+  const seedDir = seedWorkDir();
+  const work = path.join(seedDir, `build-${appPort}`);
+  fs.mkdirSync(work, { recursive: true });
 
   const repoint = args.includes("--repoint-env-local");
   assertLocalTarget(appPort, repoint, log);
 
-  if (args.includes("--pin-catalog")) {
-    manifest.catalog = await pinCatalog(manifest);
-    log(`pinned catalog v${manifest.catalog.version}`);
-  }
+  const pin = args.includes("--pin-catalog") ? await pinCatalog(manifest) : manifest.catalog;
+  if (pin !== manifest.catalog) log(`pinned catalog v${pin.version}`);
 
   // 1-2. Public reads -> base snapshot.
-  const { cards } = await fetchCatalog(manifest.catalog);
-  log(`catalog v${manifest.catalog.version}: ${cards.length} cards (sha256 verified)`);
-  const reads = await fetchPublicReads(manifest.publicConvexUrl);
+  const { cards, source: catalogSource } = await loadCatalogForBuild(manifest, pin);
+  log(`catalog v${pin.version}: ${cards.length} cards from ${catalogSource} (sha256 verified)`);
+  const reads = await fetchPublicReads(manifest.publicConvexUrl, cards);
   const idNamespace = `uvs-validation-seed-v${manifest.seedVersion}`;
-  const base = buildBaseSnapshot({ pin: manifest.catalog, cards, reads, idNamespace });
+  const base = buildBaseSnapshot({ pin, cards, reads, idNamespace });
   log(
     `public reads: ${reads.sets.length} sets, ${reads.formats.length} formats, ${base.rows.get("cardLegality")!.length} card legality rows ` +
-      `(${base.droppedLegalityRows} for cards outside the catalog dropped), ${reads.setLegality.length} set legality rows`,
+      `(${base.droppedLegalityRows} for cards outside the seed dropped), ${reads.setLegality.length} set legality rows, ` +
+      `${reads.backFaces.length} back faces`,
   );
+  if (reads.missingBackFaceIds.length > 0) {
+    log(`WARNING: production returned no row for ${reads.missingBackFaceIds.length} backCardId(s): ${reads.missingBackFaceIds.join(", ")}`);
+  }
   if (base.droppedFields.length > 0) log(`dropped fields not in this schema or pointing at production users: ${base.droppedFields.join(", ")}`);
   for (const [table, why] of Object.entries(UNREADABLE_TABLES)) log(`left empty: ${table} (${why})`);
+
+  const drift = describePublicReadsDrift(
+    { sha256: manifest.publicReadsSha256, parts: manifest.publicReads },
+    { sha256: base.publicReadsSha256, parts: base.publicReads },
+  );
+  if (drift.length > 0) {
+    for (const line of drift) log(`WARNING: public reads changed since the manifest: ${line}`);
+    if (args.includes("--strict")) throw new Error(`--strict: production's public reads differ from manifest.json (${drift.length} change(s))`);
+  } else if (manifest.publicReadsSha256 !== null) {
+    log(`public reads match the manifest (${base.publicReadsSha256.slice(0, 12)})`);
+  }
+
   const baseZip = buildSnapshotZip(base.tableNumbers, base.rows);
   const basePath = path.join(work, "base.zip");
   fs.writeFileSync(basePath, baseZip);
@@ -153,7 +180,7 @@ async function main(argv: string[]) {
     idNamespace,
   });
   const goldenSha = sha256(golden);
-  const goldenPath = path.join(work, `golden-${goldenSha.slice(0, 12)}.zip`);
+  const goldenPath = path.join(seedDir, `golden-${goldenSha.slice(0, 12)}.zip`);
   fs.writeFileSync(goldenPath, golden);
   log(`fixture rows: ${Object.entries(fixtureCounts).map(([t, n]) => `${t}=${n}`).join(", ")}`);
   const leaked = findNonReservedEmails(golden, RESERVED_EMAIL_DOMAIN);
@@ -164,16 +191,25 @@ async function main(argv: string[]) {
   if (args.includes("--no-publish")) {
     log("--no-publish: left the seed branch and manifest.json unchanged");
   } else {
-    const seedJson = `${JSON.stringify({ meta, golden: { sha256: goldenSha, bytes: golden.length }, catalog: manifest.catalog }, null, 2)}\n`;
-    commit = publish(golden, goldenPath, seedJson);
+    const catalog = { ...pin, file: CATALOG_FILE };
+    const seedJson = `${JSON.stringify({ meta, golden: { sha256: goldenSha, bytes: golden.length }, catalog }, null, 2)}\n`;
+    commit = publish(golden, goldenPath, catalogCachePath(pin), seedJson);
     writeManifest({
       ...manifest,
+      catalog: pin,
       publicReadsSha256: base.publicReadsSha256,
+      publicReads: base.publicReads,
       meta,
-      golden: { branch: SEED_BRANCH, path: GOLDEN_FILE, sha256: goldenSha, bytes: golden.length, commit },
+      golden: { branch: SEED_BRANCH, path: GOLDEN_FILE, catalogPath: CATALOG_FILE, sha256: goldenSha, bytes: golden.length, commit },
     });
   }
-  console.log(JSON.stringify({ goldenSha256: goldenSha, bytes: golden.length, goldenPath, meta, publicReadsSha256: base.publicReadsSha256, commit }, null, 2));
+  console.log(
+    JSON.stringify(
+      { goldenSha256: goldenSha, bytes: golden.length, goldenPath, meta, publicReadsSha256: base.publicReadsSha256, publicReads: base.publicReads, commit },
+      null,
+      2,
+    ),
+  );
 }
 
 if (import.meta.main) {
