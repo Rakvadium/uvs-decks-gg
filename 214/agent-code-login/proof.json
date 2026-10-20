@@ -1,0 +1,31 @@
+[
+  {
+    "label": "1-first-use",
+    "outcome": "signed-in",
+    "finalPath": "/decks",
+    "finalUrlHasCode": false,
+    "hashClearedOnLoginPage": true,
+    "settingsPath": "/settings",
+    "settingsShowsPersona": true,
+    "settingsShowsEmail": true
+  },
+  {
+    "label": "2-reuse",
+    "outcome": "failed",
+    "finalPath": "/agent-login",
+    "finalUrlHasCode": false,
+    "hashClearedOnLoginPage": true,
+    "message": "Agent login Agent login failed Code rejected: it is invalid, expired or already used. Mint a new one."
+  },
+  {
+    "label": "3-expired",
+    "outcome": "failed",
+    "finalPath": "/agent-login",
+    "finalUrlHasCode": false,
+    "hashClearedOnLoginPage": true,
+    "message": "Agent login Agent login failed Code rejected: it is invalid, expired or already used. Mint a new one."
+  },
+  {
+    "nextLogContainsAnyCode": false
+  }
+]
