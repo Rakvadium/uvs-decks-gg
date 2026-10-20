@@ -1,0 +1,88 @@
+{
+  "issue": "197",
+  "label": "broken-saved-strict",
+  "port": 8131,
+  "chrome": "expressive",
+  "fullPage": false,
+  "strict": true,
+  "shots": [
+    {
+      "name": "pin-usermenu__desktop__cyberpunk__dark",
+      "route": "/decks",
+      "auth": "agent",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "dark",
+        "chrome": "expressive"
+      },
+      "finalPath": "/decks",
+      "loaded": true,
+      "stable": true,
+      "pin": {
+        "saved": null,
+        "patched": false,
+        "problems": [
+          "no sessions:getSession subscription was seen (renamed, or the page isn't signed in)"
+        ],
+        "pinned": "cyberpunk/dark/expressive",
+        "overridden": false,
+        "flagged": true
+      }
+    },
+    {
+      "name": "copy-link-toast__desktop__cyberpunk__dark",
+      "route": "/decks/kh7bt06q3w0x7j29fc6d07hvss8ba18p",
+      "auth": "agent",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "dark",
+        "chrome": "expressive"
+      },
+      "finalPath": "/decks/kh7bt06q3w0x7j29fc6d07hvss8ba18p",
+      "loaded": true,
+      "stable": true,
+      "pin": {
+        "saved": null,
+        "patched": false,
+        "problems": [
+          "no sessions:getSession subscription was seen (renamed, or the page isn't signed in)"
+        ],
+        "pinned": "cyberpunk/dark/expressive",
+        "overridden": false,
+        "flagged": true
+      }
+    },
+    {
+      "name": "guest-gallery__desktop__cyberpunk__dark",
+      "route": "/gallery",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "dark",
+        "chrome": "expressive"
+      },
+      "finalPath": "/gallery",
+      "loaded": true,
+      "stable": true,
+      "pin": null
+    }
+  ],
+  "gif": null,
+  "blockedConvexWrites": [
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus"
+  ],
+  "savedAppearance": [],
+  "pinFlagged": [
+    "pin-usermenu__desktop__cyberpunk__dark",
+    "copy-link-toast__desktop__cyberpunk__dark"
+  ]
+}
