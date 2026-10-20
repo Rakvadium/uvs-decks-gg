@@ -58,7 +58,7 @@ export function SegmentedControl({
   return (
     <div
       className={cn(
-        "tab-container overflow-hidden rounded-md border border-border/50 bg-muted/50 backdrop-blur-sm",
+        "tab-container overflow-hidden rounded-md border border-surface bg-muted-soft backdrop-blur-sm",
         orientation === "vertical"
           ? "tab-container-vertical flex w-full flex-col"
           : cn("items-stretch", fillRow ? "flex w-full" : "inline-flex justify-center"),
@@ -80,9 +80,9 @@ export function SegmentedControl({
             className={cn(
               "inline-flex items-center justify-center gap-2 border border-transparent chrome-label-case transition-colors duration-150",
               orientation === "vertical"
-                ? cn("w-full justify-start border-b border-border/50", isLast && "border-b-0")
+                ? cn("w-full justify-start border-b border-surface", isLast && "border-b-0")
                 : cn(
-                    "border-r border-border/50",
+                    "border-r border-surface",
                     isLast && "border-r-0",
                     fillRow && "min-w-0 flex-1"
                   ),
@@ -90,7 +90,7 @@ export function SegmentedControl({
               sizeStyles.item,
               isActive
                 ? "bg-background text-primary"
-                : "text-muted-foreground hover:bg-muted/80 hover:text-foreground",
+                : "text-muted-foreground hover:bg-muted-overlay hover:text-foreground",
               itemClassName
             )}
             aria-pressed={isActive}
@@ -103,7 +103,7 @@ export function SegmentedControl({
               <span
                 className={cn(
                   "shrink-0 rounded-md",
-                  isActive ? "bg-primary/20" : "bg-muted",
+                  isActive ? "bg-primary-selected" : "bg-muted",
                   sizeStyles.badge
                 )}
               >

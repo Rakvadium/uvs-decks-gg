@@ -1,0 +1,104 @@
+/*
+ * Named design-system ladders (docs/UI_UX_DESIGN.md § Named utilities).
+ * Each utility aliases one ladder step, so it emits the same CSS as the opacity class it
+ * replaces and composes with every variant (hover:, focus-visible:, dark:, group-hover:, ...).
+ */
+
+/* Tone ladder: wash /10, selected /20, soft border /40, strong border /60.
+   dim /90 is the hover of a solid fill (filled buttons).
+   Rings reuse the border steps ("strong border / active ring"). */
+@utility bg-primary-wash { @apply bg-primary/10; }
+@utility bg-primary-selected { @apply bg-primary/20; }
+@utility bg-primary-dim { @apply bg-primary/90; }
+@utility border-primary-soft { @apply border-primary/40; }
+@utility border-primary-strong { @apply border-primary/60; }
+@utility ring-primary-soft { @apply ring-primary/40; }
+@utility ring-primary-strong { @apply ring-primary/60; }
+
+@utility bg-secondary-wash { @apply bg-secondary/10; }
+@utility bg-secondary-selected { @apply bg-secondary/20; }
+@utility bg-secondary-dim { @apply bg-secondary/90; }
+@utility border-secondary-soft { @apply border-secondary/40; }
+@utility border-secondary-strong { @apply border-secondary/60; }
+@utility ring-secondary-soft { @apply ring-secondary/40; }
+@utility ring-secondary-strong { @apply ring-secondary/60; }
+
+@utility bg-accent-wash { @apply bg-accent/10; }
+@utility bg-accent-selected { @apply bg-accent/20; }
+@utility bg-accent-dim { @apply bg-accent/90; }
+@utility border-accent-soft { @apply border-accent/40; }
+@utility border-accent-strong { @apply border-accent/60; }
+@utility ring-accent-soft { @apply ring-accent/40; }
+@utility ring-accent-strong { @apply ring-accent/60; }
+
+@utility bg-success-wash { @apply bg-success/10; }
+@utility bg-success-selected { @apply bg-success/20; }
+@utility bg-success-dim { @apply bg-success/90; }
+@utility border-success-soft { @apply border-success/40; }
+@utility border-success-strong { @apply border-success/60; }
+@utility ring-success-soft { @apply ring-success/40; }
+@utility ring-success-strong { @apply ring-success/60; }
+
+@utility bg-warning-wash { @apply bg-warning/10; }
+@utility bg-warning-selected { @apply bg-warning/20; }
+@utility bg-warning-dim { @apply bg-warning/90; }
+@utility border-warning-soft { @apply border-warning/40; }
+@utility border-warning-strong { @apply border-warning/60; }
+@utility ring-warning-soft { @apply ring-warning/40; }
+@utility ring-warning-strong { @apply ring-warning/60; }
+
+@utility bg-info-wash { @apply bg-info/10; }
+@utility bg-info-selected { @apply bg-info/20; }
+@utility bg-info-dim { @apply bg-info/90; }
+@utility border-info-soft { @apply border-info/40; }
+@utility border-info-strong { @apply border-info/60; }
+@utility ring-info-soft { @apply ring-info/40; }
+@utility ring-info-strong { @apply ring-info/60; }
+
+@utility bg-destructive-wash { @apply bg-destructive/10; }
+@utility bg-destructive-selected { @apply bg-destructive/20; }
+@utility bg-destructive-dim { @apply bg-destructive/90; }
+@utility border-destructive-soft { @apply border-destructive/40; }
+@utility border-destructive-strong { @apply border-destructive/60; }
+@utility ring-destructive-soft { @apply ring-destructive/40; }
+@utility ring-destructive-strong { @apply ring-destructive/60; }
+
+/* Structural border ladder. Sets color only; width comes from border / border-t / ... */
+@utility border-hairline { @apply border-border/30; }
+@utility border-divider { @apply border-border/40; }
+@utility border-surface { @apply border-border/50; }
+@utility border-placeholder { @apply border-border/80; }
+
+/* Surface opacity ladder: tint / soft / elevated / near-opaque overlay. */
+@utility bg-card-tint { @apply bg-card/30; }
+@utility bg-card-soft { @apply bg-card/50; }
+@utility bg-card-elevated { @apply bg-card/80; }
+@utility bg-card-overlay { @apply bg-card/95; }
+
+@utility bg-background-tint { @apply bg-background/30; }
+@utility bg-background-soft { @apply bg-background/50; }
+@utility bg-background-elevated { @apply bg-background/80; }
+@utility bg-background-overlay { @apply bg-background/95; }
+
+@utility bg-muted-tint { @apply bg-muted/20; }
+@utility bg-muted-soft { @apply bg-muted/50; }
+@utility bg-muted-elevated { @apply bg-muted/60; }
+@utility bg-muted-overlay { @apply bg-muted/80; }
+
+@utility bg-popover-tint { @apply bg-popover/30; }
+@utility bg-popover-soft { @apply bg-popover/50; }
+@utility bg-popover-elevated { @apply bg-popover/80; }
+@utility bg-popover-overlay { @apply bg-popover/95; }
+
+/* Z-index stack. Local stacking inside a component stays z-10 / z-20. */
+@utility z-sticky { z-index: 30; }
+@utility z-shell { z-index: 40; }
+@utility z-modal { z-index: 50; }
+@utility z-dialog-float { z-index: 60; }
+@utility z-chrome { z-index: 100; }
+@utility z-popover { z-index: 200; }
+@utility z-select { z-index: 300; }
+@utility z-nested-overlay { z-index: 400; }
+@utility z-nested-dialog { z-index: 410; }
+@utility z-dock { z-index: 500; }
+@utility z-drag { z-index: 600; }

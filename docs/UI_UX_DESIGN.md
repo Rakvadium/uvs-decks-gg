@@ -105,6 +105,49 @@ Bare `rounded` and `rounded-sm` are off-ladder: `rounded` is a static 4px that i
 | Media dock | `z-[500]` |
 | Drag preview | `z-[600]` |
 
+## Named utilities
+
+The ladders above ship as named Tailwind utilities in `src/styles/system/ladders.css` (imported from `src/app/globals.css`). Each name aliases one step, so it emits the same CSS as the class it replaces and works with any variant (`hover:`, `focus-visible:`, `dark:`, `group-hover:`, `data-[…]:`, `md:`). Write the name, not the opacity class.
+
+`{tone}` = `primary` | `secondary` | `accent` | `success` | `warning` | `info` | `destructive`.
+
+| Old class | Named utility | Role |
+|-----------|---------------|------|
+| `bg-{tone}/10` | `bg-{tone}-wash` | Wash / hover fill |
+| `bg-{tone}/20` | `bg-{tone}-selected` | Selected fill / badge fill |
+| `bg-{tone}/90` | `bg-{tone}-dim` | Hover of a solid fill (filled buttons) |
+| `border-{tone}/40` | `border-{tone}-soft` | Soft border |
+| `border-{tone}/60` | `border-{tone}-strong` | Strong border / active |
+| `ring-{tone}/40` | `ring-{tone}-soft` | Invalid / quiet ring |
+| `ring-{tone}/60` | `ring-{tone}-strong` | Active / focus ring |
+| `border-border/30` | `border-hairline` | Hairline divider |
+| `border-border/40` | `border-divider` | Mid divider / inset split |
+| `border-border/50` | `border-surface` | Default surface |
+| `border-border/80` | `border-placeholder` | Dashed empty / placeholder |
+| `bg-card/30` · `bg-background/30` · `bg-popover/30` · `bg-muted/20` | `bg-{base}-tint` | Tint / inset |
+| `bg-card/50` · `bg-background/50` · `bg-popover/50` · `bg-muted/50` | `bg-{base}-soft` | Soft panel |
+| `bg-card/80` · `bg-background/80` · `bg-popover/80` · `bg-muted/60` | `bg-{base}-elevated` | Elevated panel |
+| `bg-card/95` · `bg-background/95` · `bg-popover/95` · `bg-muted/80` | `bg-{base}-overlay` | Near-opaque overlay |
+| `z-30` | `z-sticky` | Sticky headers |
+| `z-40` | `z-shell` | Shell chrome |
+| `z-50` | `z-modal` | Modal / sheet baseline |
+| `z-[60]` | `z-dialog-float` | In-dialog floating controls |
+| `z-[100]` | `z-chrome` | Skip link / dialog chrome / hover preview |
+| `z-[200]` | `z-popover` | Popovers, tooltips |
+| `z-[300]` | `z-select` | Select menus, dropdown menus |
+| `z-[400]` | `z-nested-overlay` | Nested dialog overlay |
+| `z-[410]` | `z-nested-dialog` | Nested dialog content |
+| `z-[500]` | `z-dock` | Media dock |
+| `z-[600]` | `z-drag` | Drag preview |
+
+`{base}` = `card` | `background` | `muted` | `popover`. Local stacking inside a component stays `z-10` / `z-20`.
+
+**Snapping legacy values.** Use the nearest step for the same role, and round ties up. Fills: `/5`, `/8` → `-wash`; `/15`, `/25`, `/30`, `/50` → `-selected`; `/70`, `/80` → `-dim`. Borders and rings: `/20`, `/25`, `/30`, `/35` → `-soft`; `/50` → `-strong`. A hover moves one step up (`-wash` → `-selected`, `-soft` → `-strong`). A fill already at `-selected` has no step above it, so its hover moves the border instead.
+
+**No named form.** Keep the raw class, at a ladder step, for gradient stops (`from-primary/10`), side-only border colors (`border-y-border/50`), and bases outside the ladders (`muted-foreground`, `foreground`, `ring`, `bg-border`).
+
+**Overriding.** `tailwind-merge` (`cn`) treats the color names as colors, so a call-site `bg-*` or `border-*` still replaces a primitive's. It does not know the `z-*` names. Do not override a primitive's z-index from a call site until `cn` is extended to know them.
+
 ## Motion
 
 Canonical ladder: [theme-chrome-guidelines.md](./theme-chrome-guidelines.md) § Motion. This app’s wiring:
