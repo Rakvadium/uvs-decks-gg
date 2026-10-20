@@ -42,7 +42,7 @@ Deliver a **credible, fast, and shareable** deck-building experience for UniVers
 1. **Reliability** — Search, deck validation, and edge cases around card faces and variants.
 2. **Community trust** — Moderation, abuse resistance, and transparent ranking methodology.
 3. **Performance** — Keep list and gallery interactions snappy; cache or snapshot where aggregation is heavy.
-4. **Contributor experience** — Documentation and issue queue that make agent and human contributors productive ([agent-os.md](./agent-os.md), [agent-onboarding.md](./agent-onboarding.md)).
+4. **Contributor experience** — Documentation and issue queue that make agent and human contributors productive ([`AGENTS.md`](../AGENTS.md)).
 
 
 
