@@ -1,0 +1,2247 @@
+{
+  "runs": {
+    "verify-pre201": {
+      "port": 8131,
+      "shots": [
+        {
+          "name": "default-brand__light__default",
+          "clip": {
+            "x": 472,
+            "y": 168,
+            "width": 122,
+            "height": 48
+          },
+          "text": "destructive",
+          "disabled": false,
+          "color": "rgb(255, 255, 255)",
+          "background": "oklch(0.577 0.245 27.325)",
+          "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-white hover:bg-destructive/90 shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive/50 h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+          "rect": {
+            "x": 476.734375,
+            "y": 172,
+            "w": 113.0625,
+            "h": 40
+          },
+          "textRect": {
+            "x": 497.734375,
+            "y": 183,
+            "w": 71.0625,
+            "h": 18
+          },
+          "destructiveFgVar": "oklch(0.985 0 0)",
+          "destructiveVar": "oklch(0.577 0.245 27.325)"
+        },
+        {
+          "name": "default-brand__light__sm",
+          "clip": {
+            "x": 472,
+            "y": 224,
+            "width": 118,
+            "height": 40
+          },
+          "text": "destructive sm",
+          "disabled": false,
+          "color": "rgb(255, 255, 255)",
+          "background": "oklch(0.577 0.245 27.325)",
+          "className": "group relative inline-flex items-center justify-center whitespace-nowrap font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-white hover:bg-destructive/90 shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive/50 h-8 rounded-md gap-1.5 px-3.5 text-xs has-[>svg]:px-2.5",
+          "rect": {
+            "x": 476.59375,
+            "y": 228,
+            "w": 109.171875,
+            "h": 32
+          },
+          "textRect": {
+            "x": 491.59375,
+            "y": 236,
+            "w": 79.171875,
+            "h": 15
+          },
+          "destructiveFgVar": "oklch(0.985 0 0)",
+          "destructiveVar": "oklch(0.577 0.245 27.325)"
+        },
+        {
+          "name": "default-brand__light__disabled",
+          "clip": {
+            "x": 472,
+            "y": 272,
+            "width": 122,
+            "height": 48
+          },
+          "text": "destructive",
+          "disabled": true,
+          "color": "rgb(255, 255, 255)",
+          "background": "oklch(0.577 0.245 27.325)",
+          "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-white hover:bg-destructive/90 shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive/50 h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+          "rect": {
+            "x": 476.734375,
+            "y": 276,
+            "w": 113.0625,
+            "h": 40
+          },
+          "textRect": {
+            "x": 497.734375,
+            "y": 287,
+            "w": 71.0625,
+            "h": 18
+          },
+          "destructiveFgVar": "oklch(0.985 0 0)",
+          "destructiveVar": "oklch(0.577 0.245 27.325)"
+        },
+        {
+          "name": "default-brand__dark__default",
+          "clip": {
+            "x": 472,
+            "y": 168,
+            "width": 122,
+            "height": 48
+          },
+          "text": "destructive",
+          "disabled": false,
+          "color": "rgb(255, 255, 255)",
+          "background": "oklch(0.62 0.22 25)",
+          "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-white hover:bg-destructive/90 shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive/50 h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+          "rect": {
+            "x": 476.734375,
+            "y": 172,
+            "w": 113.0625,
+            "h": 40
+          },
+          "textRect": {
+            "x": 497.734375,
+            "y": 183,
+            "w": 71.0625,
+            "h": 18
+          },
+          "destructiveFgVar": "oklch(0.98 0 0)",
+          "destructiveVar": "oklch(0.62 0.22 25)"
+        },
+        {
+          "name": "default-brand__dark__sm",
+          "clip": {
+            "x": 472,
+            "y": 224,
+            "width": 118,
+            "height": 40
+          },
+          "text": "destructive sm",
+          "disabled": false,
+          "color": "rgb(255, 255, 255)",
+          "background": "oklch(0.62 0.22 25)",
+          "className": "group relative inline-flex items-center justify-center whitespace-nowrap font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-white hover:bg-destructive/90 shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive/50 h-8 rounded-md gap-1.5 px-3.5 text-xs has-[>svg]:px-2.5",
+          "rect": {
+            "x": 476.59375,
+            "y": 228,
+            "w": 109.171875,
+            "h": 32
+          },
+          "textRect": {
+            "x": 491.59375,
+            "y": 236,
+            "w": 79.171875,
+            "h": 15
+          },
+          "destructiveFgVar": "oklch(0.98 0 0)",
+          "destructiveVar": "oklch(0.62 0.22 25)"
+        },
+        {
+          "name": "default-brand__dark__disabled",
+          "clip": {
+            "x": 472,
+            "y": 272,
+            "width": 122,
+            "height": 48
+          },
+          "text": "destructive",
+          "disabled": true,
+          "color": "rgb(255, 255, 255)",
+          "background": "oklch(0.62 0.22 25)",
+          "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-white hover:bg-destructive/90 shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive/50 h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+          "rect": {
+            "x": 476.734375,
+            "y": 276,
+            "w": 113.0625,
+            "h": 40
+          },
+          "textRect": {
+            "x": 497.734375,
+            "y": 287,
+            "w": 71.0625,
+            "h": 18
+          },
+          "destructiveFgVar": "oklch(0.98 0 0)",
+          "destructiveVar": "oklch(0.62 0.22 25)"
+        },
+        {
+          "name": "teal-cream__light__default",
+          "clip": {
+            "x": 472,
+            "y": 168,
+            "width": 122,
+            "height": 48
+          },
+          "text": "destructive",
+          "disabled": false,
+          "color": "rgb(255, 255, 255)",
+          "background": "oklch(0.577 0.245 27.325)",
+          "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-white hover:bg-destructive/90 shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive/50 h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+          "rect": {
+            "x": 476.734375,
+            "y": 172,
+            "w": 113.0625,
+            "h": 40
+          },
+          "textRect": {
+            "x": 497.734375,
+            "y": 183,
+            "w": 71.0625,
+            "h": 18
+          },
+          "destructiveFgVar": "oklch(0.985 0 0)",
+          "destructiveVar": "oklch(0.577 0.245 27.325)"
+        },
+        {
+          "name": "teal-cream__light__sm",
+          "clip": {
+            "x": 472,
+            "y": 224,
+            "width": 118,
+            "height": 40
+          },
+          "text": "destructive sm",
+          "disabled": false,
+          "color": "rgb(255, 255, 255)",
+          "background": "oklch(0.577 0.245 27.325)",
+          "className": "group relative inline-flex items-center justify-center whitespace-nowrap font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-white hover:bg-destructive/90 shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive/50 h-8 rounded-md gap-1.5 px-3.5 text-xs has-[>svg]:px-2.5",
+          "rect": {
+            "x": 476.59375,
+            "y": 228,
+            "w": 109.171875,
+            "h": 32
+          },
+          "textRect": {
+            "x": 491.59375,
+            "y": 236,
+            "w": 79.171875,
+            "h": 15
+          },
+          "destructiveFgVar": "oklch(0.985 0 0)",
+          "destructiveVar": "oklch(0.577 0.245 27.325)"
+        },
+        {
+          "name": "teal-cream__light__disabled",
+          "clip": {
+            "x": 472,
+            "y": 272,
+            "width": 122,
+            "height": 48
+          },
+          "text": "destructive",
+          "disabled": true,
+          "color": "rgb(255, 255, 255)",
+          "background": "oklch(0.577 0.245 27.325)",
+          "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-white hover:bg-destructive/90 shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive/50 h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+          "rect": {
+            "x": 476.734375,
+            "y": 276,
+            "w": 113.0625,
+            "h": 40
+          },
+          "textRect": {
+            "x": 497.734375,
+            "y": 287,
+            "w": 71.0625,
+            "h": 18
+          },
+          "destructiveFgVar": "oklch(0.985 0 0)",
+          "destructiveVar": "oklch(0.577 0.245 27.325)"
+        },
+        {
+          "name": "teal-cream__dark__default",
+          "clip": {
+            "x": 472,
+            "y": 168,
+            "width": 122,
+            "height": 48
+          },
+          "text": "destructive",
+          "disabled": false,
+          "color": "rgb(255, 255, 255)",
+          "background": "oklch(0.62 0.22 25)",
+          "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-white hover:bg-destructive/90 shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive/50 h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+          "rect": {
+            "x": 476.734375,
+            "y": 172,
+            "w": 113.0625,
+            "h": 40
+          },
+          "textRect": {
+            "x": 497.734375,
+            "y": 183,
+            "w": 71.0625,
+            "h": 18
+          },
+          "destructiveFgVar": "oklch(0.98 0 0)",
+          "destructiveVar": "oklch(0.62 0.22 25)"
+        },
+        {
+          "name": "teal-cream__dark__sm",
+          "clip": {
+            "x": 472,
+            "y": 224,
+            "width": 118,
+            "height": 40
+          },
+          "text": "destructive sm",
+          "disabled": false,
+          "color": "rgb(255, 255, 255)",
+          "background": "oklch(0.62 0.22 25)",
+          "className": "group relative inline-flex items-center justify-center whitespace-nowrap font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-white hover:bg-destructive/90 shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive/50 h-8 rounded-md gap-1.5 px-3.5 text-xs has-[>svg]:px-2.5",
+          "rect": {
+            "x": 476.59375,
+            "y": 228,
+            "w": 109.171875,
+            "h": 32
+          },
+          "textRect": {
+            "x": 491.59375,
+            "y": 236,
+            "w": 79.171875,
+            "h": 15
+          },
+          "destructiveFgVar": "oklch(0.98 0 0)",
+          "destructiveVar": "oklch(0.62 0.22 25)"
+        },
+        {
+          "name": "teal-cream__dark__disabled",
+          "clip": {
+            "x": 472,
+            "y": 272,
+            "width": 122,
+            "height": 48
+          },
+          "text": "destructive",
+          "disabled": true,
+          "color": "rgb(255, 255, 255)",
+          "background": "oklch(0.62 0.22 25)",
+          "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-white hover:bg-destructive/90 shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive/50 h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+          "rect": {
+            "x": 476.734375,
+            "y": 276,
+            "w": 113.0625,
+            "h": 40
+          },
+          "textRect": {
+            "x": 497.734375,
+            "y": 287,
+            "w": 71.0625,
+            "h": 18
+          },
+          "destructiveFgVar": "oklch(0.98 0 0)",
+          "destructiveVar": "oklch(0.62 0.22 25)"
+        },
+        {
+          "name": "deep-purple__light__default",
+          "clip": {
+            "x": 472,
+            "y": 168,
+            "width": 122,
+            "height": 48
+          },
+          "text": "destructive",
+          "disabled": false,
+          "color": "rgb(255, 255, 255)",
+          "background": "oklch(0.577 0.245 27.325)",
+          "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-white hover:bg-destructive/90 shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive/50 h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+          "rect": {
+            "x": 476.734375,
+            "y": 172,
+            "w": 113.0625,
+            "h": 40
+          },
+          "textRect": {
+            "x": 497.734375,
+            "y": 183,
+            "w": 71.0625,
+            "h": 18
+          },
+          "destructiveFgVar": "oklch(0.985 0 0)",
+          "destructiveVar": "oklch(0.577 0.245 27.325)"
+        },
+        {
+          "name": "deep-purple__light__sm",
+          "clip": {
+            "x": 472,
+            "y": 224,
+            "width": 118,
+            "height": 40
+          },
+          "text": "destructive sm",
+          "disabled": false,
+          "color": "rgb(255, 255, 255)",
+          "background": "oklch(0.577 0.245 27.325)",
+          "className": "group relative inline-flex items-center justify-center whitespace-nowrap font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-white hover:bg-destructive/90 shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive/50 h-8 rounded-md gap-1.5 px-3.5 text-xs has-[>svg]:px-2.5",
+          "rect": {
+            "x": 476.59375,
+            "y": 228,
+            "w": 109.171875,
+            "h": 32
+          },
+          "textRect": {
+            "x": 491.59375,
+            "y": 236,
+            "w": 79.171875,
+            "h": 15
+          },
+          "destructiveFgVar": "oklch(0.985 0 0)",
+          "destructiveVar": "oklch(0.577 0.245 27.325)"
+        },
+        {
+          "name": "deep-purple__light__disabled",
+          "clip": {
+            "x": 472,
+            "y": 272,
+            "width": 122,
+            "height": 48
+          },
+          "text": "destructive",
+          "disabled": true,
+          "color": "rgb(255, 255, 255)",
+          "background": "oklch(0.577 0.245 27.325)",
+          "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-white hover:bg-destructive/90 shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive/50 h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+          "rect": {
+            "x": 476.734375,
+            "y": 276,
+            "w": 113.0625,
+            "h": 40
+          },
+          "textRect": {
+            "x": 497.734375,
+            "y": 287,
+            "w": 71.0625,
+            "h": 18
+          },
+          "destructiveFgVar": "oklch(0.985 0 0)",
+          "destructiveVar": "oklch(0.577 0.245 27.325)"
+        },
+        {
+          "name": "deep-purple__dark__default",
+          "clip": {
+            "x": 472,
+            "y": 168,
+            "width": 122,
+            "height": 48
+          },
+          "text": "destructive",
+          "disabled": false,
+          "color": "rgb(255, 255, 255)",
+          "background": "oklch(0.62 0.22 25)",
+          "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-white hover:bg-destructive/90 shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive/50 h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+          "rect": {
+            "x": 476.734375,
+            "y": 172,
+            "w": 113.0625,
+            "h": 40
+          },
+          "textRect": {
+            "x": 497.734375,
+            "y": 183,
+            "w": 71.0625,
+            "h": 18
+          },
+          "destructiveFgVar": "oklch(0.98 0 0)",
+          "destructiveVar": "oklch(0.62 0.22 25)"
+        },
+        {
+          "name": "deep-purple__dark__sm",
+          "clip": {
+            "x": 472,
+            "y": 224,
+            "width": 118,
+            "height": 40
+          },
+          "text": "destructive sm",
+          "disabled": false,
+          "color": "rgb(255, 255, 255)",
+          "background": "oklch(0.62 0.22 25)",
+          "className": "group relative inline-flex items-center justify-center whitespace-nowrap font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-white hover:bg-destructive/90 shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive/50 h-8 rounded-md gap-1.5 px-3.5 text-xs has-[>svg]:px-2.5",
+          "rect": {
+            "x": 476.59375,
+            "y": 228,
+            "w": 109.171875,
+            "h": 32
+          },
+          "textRect": {
+            "x": 491.59375,
+            "y": 236,
+            "w": 79.171875,
+            "h": 15
+          },
+          "destructiveFgVar": "oklch(0.98 0 0)",
+          "destructiveVar": "oklch(0.62 0.22 25)"
+        },
+        {
+          "name": "deep-purple__dark__disabled",
+          "clip": {
+            "x": 472,
+            "y": 272,
+            "width": 122,
+            "height": 48
+          },
+          "text": "destructive",
+          "disabled": true,
+          "color": "rgb(255, 255, 255)",
+          "background": "oklch(0.62 0.22 25)",
+          "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-white hover:bg-destructive/90 shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive/50 h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+          "rect": {
+            "x": 476.734375,
+            "y": 276,
+            "w": 113.0625,
+            "h": 40
+          },
+          "textRect": {
+            "x": 497.734375,
+            "y": 287,
+            "w": 71.0625,
+            "h": 18
+          },
+          "destructiveFgVar": "oklch(0.98 0 0)",
+          "destructiveVar": "oklch(0.62 0.22 25)"
+        },
+        {
+          "name": "pale-yellow__light__default",
+          "clip": {
+            "x": 472,
+            "y": 168,
+            "width": 122,
+            "height": 48
+          },
+          "text": "destructive",
+          "disabled": false,
+          "color": "rgb(255, 255, 255)",
+          "background": "oklch(0.577 0.245 27.325)",
+          "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-white hover:bg-destructive/90 shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive/50 h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+          "rect": {
+            "x": 476.734375,
+            "y": 172,
+            "w": 113.0625,
+            "h": 40
+          },
+          "textRect": {
+            "x": 497.734375,
+            "y": 183,
+            "w": 71.0625,
+            "h": 18
+          },
+          "destructiveFgVar": "oklch(0.985 0 0)",
+          "destructiveVar": "oklch(0.577 0.245 27.325)"
+        },
+        {
+          "name": "pale-yellow__light__sm",
+          "clip": {
+            "x": 472,
+            "y": 224,
+            "width": 118,
+            "height": 40
+          },
+          "text": "destructive sm",
+          "disabled": false,
+          "color": "rgb(255, 255, 255)",
+          "background": "oklch(0.577 0.245 27.325)",
+          "className": "group relative inline-flex items-center justify-center whitespace-nowrap font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-white hover:bg-destructive/90 shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive/50 h-8 rounded-md gap-1.5 px-3.5 text-xs has-[>svg]:px-2.5",
+          "rect": {
+            "x": 476.59375,
+            "y": 228,
+            "w": 109.171875,
+            "h": 32
+          },
+          "textRect": {
+            "x": 491.59375,
+            "y": 236,
+            "w": 79.171875,
+            "h": 15
+          },
+          "destructiveFgVar": "oklch(0.985 0 0)",
+          "destructiveVar": "oklch(0.577 0.245 27.325)"
+        },
+        {
+          "name": "pale-yellow__light__disabled",
+          "clip": {
+            "x": 472,
+            "y": 272,
+            "width": 122,
+            "height": 48
+          },
+          "text": "destructive",
+          "disabled": true,
+          "color": "rgb(255, 255, 255)",
+          "background": "oklch(0.577 0.245 27.325)",
+          "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-white hover:bg-destructive/90 shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive/50 h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+          "rect": {
+            "x": 476.734375,
+            "y": 276,
+            "w": 113.0625,
+            "h": 40
+          },
+          "textRect": {
+            "x": 497.734375,
+            "y": 287,
+            "w": 71.0625,
+            "h": 18
+          },
+          "destructiveFgVar": "oklch(0.985 0 0)",
+          "destructiveVar": "oklch(0.577 0.245 27.325)"
+        },
+        {
+          "name": "pale-yellow__dark__default",
+          "clip": {
+            "x": 472,
+            "y": 168,
+            "width": 122,
+            "height": 48
+          },
+          "text": "destructive",
+          "disabled": false,
+          "color": "rgb(255, 255, 255)",
+          "background": "oklch(0.62 0.22 25)",
+          "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-white hover:bg-destructive/90 shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive/50 h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+          "rect": {
+            "x": 476.734375,
+            "y": 172,
+            "w": 113.0625,
+            "h": 40
+          },
+          "textRect": {
+            "x": 497.734375,
+            "y": 183,
+            "w": 71.0625,
+            "h": 18
+          },
+          "destructiveFgVar": "oklch(0.98 0 0)",
+          "destructiveVar": "oklch(0.62 0.22 25)"
+        },
+        {
+          "name": "pale-yellow__dark__sm",
+          "clip": {
+            "x": 472,
+            "y": 224,
+            "width": 118,
+            "height": 40
+          },
+          "text": "destructive sm",
+          "disabled": false,
+          "color": "rgb(255, 255, 255)",
+          "background": "oklch(0.62 0.22 25)",
+          "className": "group relative inline-flex items-center justify-center whitespace-nowrap font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-white hover:bg-destructive/90 shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive/50 h-8 rounded-md gap-1.5 px-3.5 text-xs has-[>svg]:px-2.5",
+          "rect": {
+            "x": 476.59375,
+            "y": 228,
+            "w": 109.171875,
+            "h": 32
+          },
+          "textRect": {
+            "x": 491.59375,
+            "y": 236,
+            "w": 79.171875,
+            "h": 15
+          },
+          "destructiveFgVar": "oklch(0.98 0 0)",
+          "destructiveVar": "oklch(0.62 0.22 25)"
+        },
+        {
+          "name": "pale-yellow__dark__disabled",
+          "clip": {
+            "x": 472,
+            "y": 272,
+            "width": 122,
+            "height": 48
+          },
+          "text": "destructive",
+          "disabled": true,
+          "color": "rgb(255, 255, 255)",
+          "background": "oklch(0.62 0.22 25)",
+          "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-white hover:bg-destructive/90 shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive/50 h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+          "rect": {
+            "x": 476.734375,
+            "y": 276,
+            "w": 113.0625,
+            "h": 40
+          },
+          "textRect": {
+            "x": 497.734375,
+            "y": 287,
+            "w": 71.0625,
+            "h": 18
+          },
+          "destructiveFgVar": "oklch(0.98 0 0)",
+          "destructiveVar": "oklch(0.62 0.22 25)"
+        }
+      ],
+      "pages": [
+        {
+          "tag": "default-brand__light",
+          "providerDestructiveFg": [
+            "oklch(0.98 0 0)",
+            "oklch(0.985 0 0)"
+          ],
+          "styleIds": [
+            "verify-no-motion",
+            "appearance-custom-vars"
+          ],
+          "chrome": "calm"
+        },
+        {
+          "tag": "default-brand__dark",
+          "providerDestructiveFg": [
+            "oklch(0.98 0 0)",
+            "oklch(0.985 0 0)"
+          ],
+          "styleIds": [
+            "verify-no-motion",
+            "appearance-custom-vars"
+          ],
+          "chrome": "calm"
+        },
+        {
+          "tag": "teal-cream__light",
+          "providerDestructiveFg": [
+            "oklch(0.98 0 0)",
+            "oklch(0.985 0 0)"
+          ],
+          "styleIds": [
+            "verify-no-motion",
+            "appearance-custom-vars"
+          ],
+          "chrome": "calm"
+        },
+        {
+          "tag": "teal-cream__dark",
+          "providerDestructiveFg": [
+            "oklch(0.98 0 0)",
+            "oklch(0.985 0 0)"
+          ],
+          "styleIds": [
+            "verify-no-motion",
+            "appearance-custom-vars"
+          ],
+          "chrome": "calm"
+        },
+        {
+          "tag": "deep-purple__light",
+          "providerDestructiveFg": [
+            "oklch(0.98 0 0)",
+            "oklch(0.985 0 0)"
+          ],
+          "styleIds": [
+            "verify-no-motion",
+            "appearance-custom-vars"
+          ],
+          "chrome": "calm"
+        },
+        {
+          "tag": "deep-purple__dark",
+          "providerDestructiveFg": [
+            "oklch(0.98 0 0)",
+            "oklch(0.985 0 0)"
+          ],
+          "styleIds": [
+            "verify-no-motion",
+            "appearance-custom-vars"
+          ],
+          "chrome": "calm"
+        },
+        {
+          "tag": "pale-yellow__light",
+          "providerDestructiveFg": [
+            "oklch(0.98 0 0)",
+            "oklch(0.985 0 0)"
+          ],
+          "styleIds": [
+            "verify-no-motion",
+            "appearance-custom-vars"
+          ],
+          "chrome": "calm"
+        },
+        {
+          "tag": "pale-yellow__dark",
+          "providerDestructiveFg": [
+            "oklch(0.98 0 0)",
+            "oklch(0.985 0 0)"
+          ],
+          "styleIds": [
+            "verify-no-motion",
+            "appearance-custom-vars"
+          ],
+          "chrome": "calm"
+        }
+      ]
+    },
+    "verify-pr": {
+      "port": 8130,
+      "shots": [
+        {
+          "name": "default-brand__light__default",
+          "clip": {
+            "x": 472,
+            "y": 168,
+            "width": 122,
+            "height": 48
+          },
+          "text": "destructive",
+          "disabled": false,
+          "color": "rgb(255, 255, 255)",
+          "background": "oklch(0.577 0.245 27.325)",
+          "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-destructive-foreground hover:bg-destructive-dim shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+          "rect": {
+            "x": 476.734375,
+            "y": 172,
+            "w": 113.0625,
+            "h": 40
+          },
+          "textRect": {
+            "x": 497.734375,
+            "y": 183,
+            "w": 71.0625,
+            "h": 18
+          },
+          "destructiveFgVar": "#fff",
+          "destructiveVar": "oklch(0.577 0.245 27.325)",
+          "oldTokenColor": "oklch(0.985 0 0)"
+        },
+        {
+          "name": "default-brand__light__sm",
+          "clip": {
+            "x": 472,
+            "y": 224,
+            "width": 118,
+            "height": 40
+          },
+          "text": "destructive sm",
+          "disabled": false,
+          "color": "rgb(255, 255, 255)",
+          "background": "oklch(0.577 0.245 27.325)",
+          "className": "group relative inline-flex items-center justify-center whitespace-nowrap font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-destructive-foreground hover:bg-destructive-dim shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive-strong h-8 rounded-md gap-1.5 px-3.5 text-xs has-[>svg]:px-2.5",
+          "rect": {
+            "x": 476.59375,
+            "y": 228,
+            "w": 109.171875,
+            "h": 32
+          },
+          "textRect": {
+            "x": 491.59375,
+            "y": 236,
+            "w": 79.171875,
+            "h": 15
+          },
+          "destructiveFgVar": "#fff",
+          "destructiveVar": "oklch(0.577 0.245 27.325)",
+          "oldTokenColor": "oklch(0.985 0 0)"
+        },
+        {
+          "name": "default-brand__light__disabled",
+          "clip": {
+            "x": 472,
+            "y": 272,
+            "width": 122,
+            "height": 48
+          },
+          "text": "destructive",
+          "disabled": true,
+          "color": "rgb(255, 255, 255)",
+          "background": "oklch(0.577 0.245 27.325)",
+          "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-destructive-foreground hover:bg-destructive-dim shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+          "rect": {
+            "x": 476.734375,
+            "y": 276,
+            "w": 113.0625,
+            "h": 40
+          },
+          "textRect": {
+            "x": 497.734375,
+            "y": 287,
+            "w": 71.0625,
+            "h": 18
+          },
+          "destructiveFgVar": "#fff",
+          "destructiveVar": "oklch(0.577 0.245 27.325)",
+          "oldTokenColor": "oklch(0.985 0 0)"
+        },
+        {
+          "name": "default-brand__dark__default",
+          "clip": {
+            "x": 472,
+            "y": 168,
+            "width": 122,
+            "height": 48
+          },
+          "text": "destructive",
+          "disabled": false,
+          "color": "rgb(255, 255, 255)",
+          "background": "oklch(0.62 0.22 25)",
+          "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-destructive-foreground hover:bg-destructive-dim shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+          "rect": {
+            "x": 476.734375,
+            "y": 172,
+            "w": 113.0625,
+            "h": 40
+          },
+          "textRect": {
+            "x": 497.734375,
+            "y": 183,
+            "w": 71.0625,
+            "h": 18
+          },
+          "destructiveFgVar": "#fff",
+          "destructiveVar": "oklch(0.62 0.22 25)",
+          "oldTokenColor": "oklch(0.98 0 0)"
+        },
+        {
+          "name": "default-brand__dark__sm",
+          "clip": {
+            "x": 472,
+            "y": 224,
+            "width": 118,
+            "height": 40
+          },
+          "text": "destructive sm",
+          "disabled": false,
+          "color": "rgb(255, 255, 255)",
+          "background": "oklch(0.62 0.22 25)",
+          "className": "group relative inline-flex items-center justify-center whitespace-nowrap font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-destructive-foreground hover:bg-destructive-dim shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive-strong h-8 rounded-md gap-1.5 px-3.5 text-xs has-[>svg]:px-2.5",
+          "rect": {
+            "x": 476.59375,
+            "y": 228,
+            "w": 109.171875,
+            "h": 32
+          },
+          "textRect": {
+            "x": 491.59375,
+            "y": 236,
+            "w": 79.171875,
+            "h": 15
+          },
+          "destructiveFgVar": "#fff",
+          "destructiveVar": "oklch(0.62 0.22 25)",
+          "oldTokenColor": "oklch(0.98 0 0)"
+        },
+        {
+          "name": "default-brand__dark__disabled",
+          "clip": {
+            "x": 472,
+            "y": 272,
+            "width": 122,
+            "height": 48
+          },
+          "text": "destructive",
+          "disabled": true,
+          "color": "rgb(255, 255, 255)",
+          "background": "oklch(0.62 0.22 25)",
+          "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-destructive-foreground hover:bg-destructive-dim shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+          "rect": {
+            "x": 476.734375,
+            "y": 276,
+            "w": 113.0625,
+            "h": 40
+          },
+          "textRect": {
+            "x": 497.734375,
+            "y": 287,
+            "w": 71.0625,
+            "h": 18
+          },
+          "destructiveFgVar": "#fff",
+          "destructiveVar": "oklch(0.62 0.22 25)",
+          "oldTokenColor": "oklch(0.98 0 0)"
+        },
+        {
+          "name": "teal-cream__light__default",
+          "clip": {
+            "x": 472,
+            "y": 168,
+            "width": 122,
+            "height": 48
+          },
+          "text": "destructive",
+          "disabled": false,
+          "color": "rgb(255, 255, 255)",
+          "background": "oklch(0.577 0.245 27.325)",
+          "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-destructive-foreground hover:bg-destructive-dim shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+          "rect": {
+            "x": 476.734375,
+            "y": 172,
+            "w": 113.0625,
+            "h": 40
+          },
+          "textRect": {
+            "x": 497.734375,
+            "y": 183,
+            "w": 71.0625,
+            "h": 18
+          },
+          "destructiveFgVar": "#fff",
+          "destructiveVar": "oklch(0.577 0.245 27.325)",
+          "oldTokenColor": "oklch(0.985 0 0)"
+        },
+        {
+          "name": "teal-cream__light__sm",
+          "clip": {
+            "x": 472,
+            "y": 224,
+            "width": 118,
+            "height": 40
+          },
+          "text": "destructive sm",
+          "disabled": false,
+          "color": "rgb(255, 255, 255)",
+          "background": "oklch(0.577 0.245 27.325)",
+          "className": "group relative inline-flex items-center justify-center whitespace-nowrap font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-destructive-foreground hover:bg-destructive-dim shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive-strong h-8 rounded-md gap-1.5 px-3.5 text-xs has-[>svg]:px-2.5",
+          "rect": {
+            "x": 476.59375,
+            "y": 228,
+            "w": 109.171875,
+            "h": 32
+          },
+          "textRect": {
+            "x": 491.59375,
+            "y": 236,
+            "w": 79.171875,
+            "h": 15
+          },
+          "destructiveFgVar": "#fff",
+          "destructiveVar": "oklch(0.577 0.245 27.325)",
+          "oldTokenColor": "oklch(0.985 0 0)"
+        },
+        {
+          "name": "teal-cream__light__disabled",
+          "clip": {
+            "x": 472,
+            "y": 272,
+            "width": 122,
+            "height": 48
+          },
+          "text": "destructive",
+          "disabled": true,
+          "color": "rgb(255, 255, 255)",
+          "background": "oklch(0.577 0.245 27.325)",
+          "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-destructive-foreground hover:bg-destructive-dim shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+          "rect": {
+            "x": 476.734375,
+            "y": 276,
+            "w": 113.0625,
+            "h": 40
+          },
+          "textRect": {
+            "x": 497.734375,
+            "y": 287,
+            "w": 71.0625,
+            "h": 18
+          },
+          "destructiveFgVar": "#fff",
+          "destructiveVar": "oklch(0.577 0.245 27.325)",
+          "oldTokenColor": "oklch(0.985 0 0)"
+        },
+        {
+          "name": "teal-cream__dark__default",
+          "clip": {
+            "x": 472,
+            "y": 168,
+            "width": 122,
+            "height": 48
+          },
+          "text": "destructive",
+          "disabled": false,
+          "color": "rgb(255, 255, 255)",
+          "background": "oklch(0.62 0.22 25)",
+          "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-destructive-foreground hover:bg-destructive-dim shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+          "rect": {
+            "x": 476.734375,
+            "y": 172,
+            "w": 113.0625,
+            "h": 40
+          },
+          "textRect": {
+            "x": 497.734375,
+            "y": 183,
+            "w": 71.0625,
+            "h": 18
+          },
+          "destructiveFgVar": "#fff",
+          "destructiveVar": "oklch(0.62 0.22 25)",
+          "oldTokenColor": "oklch(0.98 0 0)"
+        },
+        {
+          "name": "teal-cream__dark__sm",
+          "clip": {
+            "x": 472,
+            "y": 224,
+            "width": 118,
+            "height": 40
+          },
+          "text": "destructive sm",
+          "disabled": false,
+          "color": "rgb(255, 255, 255)",
+          "background": "oklch(0.62 0.22 25)",
+          "className": "group relative inline-flex items-center justify-center whitespace-nowrap font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-destructive-foreground hover:bg-destructive-dim shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive-strong h-8 rounded-md gap-1.5 px-3.5 text-xs has-[>svg]:px-2.5",
+          "rect": {
+            "x": 476.59375,
+            "y": 228,
+            "w": 109.171875,
+            "h": 32
+          },
+          "textRect": {
+            "x": 491.59375,
+            "y": 236,
+            "w": 79.171875,
+            "h": 15
+          },
+          "destructiveFgVar": "#fff",
+          "destructiveVar": "oklch(0.62 0.22 25)",
+          "oldTokenColor": "oklch(0.98 0 0)"
+        },
+        {
+          "name": "teal-cream__dark__disabled",
+          "clip": {
+            "x": 472,
+            "y": 272,
+            "width": 122,
+            "height": 48
+          },
+          "text": "destructive",
+          "disabled": true,
+          "color": "rgb(255, 255, 255)",
+          "background": "oklch(0.62 0.22 25)",
+          "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-destructive-foreground hover:bg-destructive-dim shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+          "rect": {
+            "x": 476.734375,
+            "y": 276,
+            "w": 113.0625,
+            "h": 40
+          },
+          "textRect": {
+            "x": 497.734375,
+            "y": 287,
+            "w": 71.0625,
+            "h": 18
+          },
+          "destructiveFgVar": "#fff",
+          "destructiveVar": "oklch(0.62 0.22 25)",
+          "oldTokenColor": "oklch(0.98 0 0)"
+        },
+        {
+          "name": "deep-purple__light__default",
+          "clip": {
+            "x": 472,
+            "y": 168,
+            "width": 122,
+            "height": 48
+          },
+          "text": "destructive",
+          "disabled": false,
+          "color": "rgb(255, 255, 255)",
+          "background": "oklch(0.577 0.245 27.325)",
+          "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-destructive-foreground hover:bg-destructive-dim shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+          "rect": {
+            "x": 476.734375,
+            "y": 172,
+            "w": 113.0625,
+            "h": 40
+          },
+          "textRect": {
+            "x": 497.734375,
+            "y": 183,
+            "w": 71.0625,
+            "h": 18
+          },
+          "destructiveFgVar": "#fff",
+          "destructiveVar": "oklch(0.577 0.245 27.325)",
+          "oldTokenColor": "oklch(0.985 0 0)"
+        },
+        {
+          "name": "deep-purple__light__sm",
+          "clip": {
+            "x": 472,
+            "y": 224,
+            "width": 118,
+            "height": 40
+          },
+          "text": "destructive sm",
+          "disabled": false,
+          "color": "rgb(255, 255, 255)",
+          "background": "oklch(0.577 0.245 27.325)",
+          "className": "group relative inline-flex items-center justify-center whitespace-nowrap font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-destructive-foreground hover:bg-destructive-dim shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive-strong h-8 rounded-md gap-1.5 px-3.5 text-xs has-[>svg]:px-2.5",
+          "rect": {
+            "x": 476.59375,
+            "y": 228,
+            "w": 109.171875,
+            "h": 32
+          },
+          "textRect": {
+            "x": 491.59375,
+            "y": 236,
+            "w": 79.171875,
+            "h": 15
+          },
+          "destructiveFgVar": "#fff",
+          "destructiveVar": "oklch(0.577 0.245 27.325)",
+          "oldTokenColor": "oklch(0.985 0 0)"
+        },
+        {
+          "name": "deep-purple__light__disabled",
+          "clip": {
+            "x": 472,
+            "y": 272,
+            "width": 122,
+            "height": 48
+          },
+          "text": "destructive",
+          "disabled": true,
+          "color": "rgb(255, 255, 255)",
+          "background": "oklch(0.577 0.245 27.325)",
+          "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-destructive-foreground hover:bg-destructive-dim shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+          "rect": {
+            "x": 476.734375,
+            "y": 276,
+            "w": 113.0625,
+            "h": 40
+          },
+          "textRect": {
+            "x": 497.734375,
+            "y": 287,
+            "w": 71.0625,
+            "h": 18
+          },
+          "destructiveFgVar": "#fff",
+          "destructiveVar": "oklch(0.577 0.245 27.325)",
+          "oldTokenColor": "oklch(0.985 0 0)"
+        },
+        {
+          "name": "deep-purple__dark__default",
+          "clip": {
+            "x": 472,
+            "y": 168,
+            "width": 122,
+            "height": 48
+          },
+          "text": "destructive",
+          "disabled": false,
+          "color": "rgb(255, 255, 255)",
+          "background": "oklch(0.62 0.22 25)",
+          "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-destructive-foreground hover:bg-destructive-dim shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+          "rect": {
+            "x": 476.734375,
+            "y": 172,
+            "w": 113.0625,
+            "h": 40
+          },
+          "textRect": {
+            "x": 497.734375,
+            "y": 183,
+            "w": 71.0625,
+            "h": 18
+          },
+          "destructiveFgVar": "#fff",
+          "destructiveVar": "oklch(0.62 0.22 25)",
+          "oldTokenColor": "oklch(0.98 0 0)"
+        },
+        {
+          "name": "deep-purple__dark__sm",
+          "clip": {
+            "x": 472,
+            "y": 224,
+            "width": 118,
+            "height": 40
+          },
+          "text": "destructive sm",
+          "disabled": false,
+          "color": "rgb(255, 255, 255)",
+          "background": "oklch(0.62 0.22 25)",
+          "className": "group relative inline-flex items-center justify-center whitespace-nowrap font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-destructive-foreground hover:bg-destructive-dim shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive-strong h-8 rounded-md gap-1.5 px-3.5 text-xs has-[>svg]:px-2.5",
+          "rect": {
+            "x": 476.59375,
+            "y": 228,
+            "w": 109.171875,
+            "h": 32
+          },
+          "textRect": {
+            "x": 491.59375,
+            "y": 236,
+            "w": 79.171875,
+            "h": 15
+          },
+          "destructiveFgVar": "#fff",
+          "destructiveVar": "oklch(0.62 0.22 25)",
+          "oldTokenColor": "oklch(0.98 0 0)"
+        },
+        {
+          "name": "deep-purple__dark__disabled",
+          "clip": {
+            "x": 472,
+            "y": 272,
+            "width": 122,
+            "height": 48
+          },
+          "text": "destructive",
+          "disabled": true,
+          "color": "rgb(255, 255, 255)",
+          "background": "oklch(0.62 0.22 25)",
+          "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-destructive-foreground hover:bg-destructive-dim shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+          "rect": {
+            "x": 476.734375,
+            "y": 276,
+            "w": 113.0625,
+            "h": 40
+          },
+          "textRect": {
+            "x": 497.734375,
+            "y": 287,
+            "w": 71.0625,
+            "h": 18
+          },
+          "destructiveFgVar": "#fff",
+          "destructiveVar": "oklch(0.62 0.22 25)",
+          "oldTokenColor": "oklch(0.98 0 0)"
+        },
+        {
+          "name": "pale-yellow__light__default",
+          "clip": {
+            "x": 472,
+            "y": 168,
+            "width": 122,
+            "height": 48
+          },
+          "text": "destructive",
+          "disabled": false,
+          "color": "rgb(255, 255, 255)",
+          "background": "oklch(0.577 0.245 27.325)",
+          "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-destructive-foreground hover:bg-destructive-dim shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+          "rect": {
+            "x": 476.734375,
+            "y": 172,
+            "w": 113.0625,
+            "h": 40
+          },
+          "textRect": {
+            "x": 497.734375,
+            "y": 183,
+            "w": 71.0625,
+            "h": 18
+          },
+          "destructiveFgVar": "#fff",
+          "destructiveVar": "oklch(0.577 0.245 27.325)",
+          "oldTokenColor": "oklch(0.985 0 0)"
+        },
+        {
+          "name": "pale-yellow__light__sm",
+          "clip": {
+            "x": 472,
+            "y": 224,
+            "width": 118,
+            "height": 40
+          },
+          "text": "destructive sm",
+          "disabled": false,
+          "color": "rgb(255, 255, 255)",
+          "background": "oklch(0.577 0.245 27.325)",
+          "className": "group relative inline-flex items-center justify-center whitespace-nowrap font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-destructive-foreground hover:bg-destructive-dim shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive-strong h-8 rounded-md gap-1.5 px-3.5 text-xs has-[>svg]:px-2.5",
+          "rect": {
+            "x": 476.59375,
+            "y": 228,
+            "w": 109.171875,
+            "h": 32
+          },
+          "textRect": {
+            "x": 491.59375,
+            "y": 236,
+            "w": 79.171875,
+            "h": 15
+          },
+          "destructiveFgVar": "#fff",
+          "destructiveVar": "oklch(0.577 0.245 27.325)",
+          "oldTokenColor": "oklch(0.985 0 0)"
+        },
+        {
+          "name": "pale-yellow__light__disabled",
+          "clip": {
+            "x": 472,
+            "y": 272,
+            "width": 122,
+            "height": 48
+          },
+          "text": "destructive",
+          "disabled": true,
+          "color": "rgb(255, 255, 255)",
+          "background": "oklch(0.577 0.245 27.325)",
+          "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-destructive-foreground hover:bg-destructive-dim shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+          "rect": {
+            "x": 476.734375,
+            "y": 276,
+            "w": 113.0625,
+            "h": 40
+          },
+          "textRect": {
+            "x": 497.734375,
+            "y": 287,
+            "w": 71.0625,
+            "h": 18
+          },
+          "destructiveFgVar": "#fff",
+          "destructiveVar": "oklch(0.577 0.245 27.325)",
+          "oldTokenColor": "oklch(0.985 0 0)"
+        },
+        {
+          "name": "pale-yellow__dark__default",
+          "clip": {
+            "x": 472,
+            "y": 168,
+            "width": 122,
+            "height": 48
+          },
+          "text": "destructive",
+          "disabled": false,
+          "color": "rgb(255, 255, 255)",
+          "background": "oklch(0.62 0.22 25)",
+          "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-destructive-foreground hover:bg-destructive-dim shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+          "rect": {
+            "x": 476.734375,
+            "y": 172,
+            "w": 113.0625,
+            "h": 40
+          },
+          "textRect": {
+            "x": 497.734375,
+            "y": 183,
+            "w": 71.0625,
+            "h": 18
+          },
+          "destructiveFgVar": "#fff",
+          "destructiveVar": "oklch(0.62 0.22 25)",
+          "oldTokenColor": "oklch(0.98 0 0)"
+        },
+        {
+          "name": "pale-yellow__dark__sm",
+          "clip": {
+            "x": 472,
+            "y": 224,
+            "width": 118,
+            "height": 40
+          },
+          "text": "destructive sm",
+          "disabled": false,
+          "color": "rgb(255, 255, 255)",
+          "background": "oklch(0.62 0.22 25)",
+          "className": "group relative inline-flex items-center justify-center whitespace-nowrap font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-destructive-foreground hover:bg-destructive-dim shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive-strong h-8 rounded-md gap-1.5 px-3.5 text-xs has-[>svg]:px-2.5",
+          "rect": {
+            "x": 476.59375,
+            "y": 228,
+            "w": 109.171875,
+            "h": 32
+          },
+          "textRect": {
+            "x": 491.59375,
+            "y": 236,
+            "w": 79.171875,
+            "h": 15
+          },
+          "destructiveFgVar": "#fff",
+          "destructiveVar": "oklch(0.62 0.22 25)",
+          "oldTokenColor": "oklch(0.98 0 0)"
+        },
+        {
+          "name": "pale-yellow__dark__disabled",
+          "clip": {
+            "x": 472,
+            "y": 272,
+            "width": 122,
+            "height": 48
+          },
+          "text": "destructive",
+          "disabled": true,
+          "color": "rgb(255, 255, 255)",
+          "background": "oklch(0.62 0.22 25)",
+          "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-destructive-foreground hover:bg-destructive-dim shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+          "rect": {
+            "x": 476.734375,
+            "y": 276,
+            "w": 113.0625,
+            "h": 40
+          },
+          "textRect": {
+            "x": 497.734375,
+            "y": 287,
+            "w": 71.0625,
+            "h": 18
+          },
+          "destructiveFgVar": "#fff",
+          "destructiveVar": "oklch(0.62 0.22 25)",
+          "oldTokenColor": "oklch(0.98 0 0)"
+        }
+      ],
+      "pages": [
+        {
+          "tag": "default-brand__light",
+          "providerDestructiveFg": [
+            "#fff",
+            "#fff"
+          ],
+          "styleIds": [
+            "verify-no-motion",
+            "appearance-custom-vars"
+          ],
+          "chrome": "calm"
+        },
+        {
+          "tag": "default-brand__dark",
+          "providerDestructiveFg": [
+            "#fff",
+            "#fff"
+          ],
+          "styleIds": [
+            "verify-no-motion",
+            "appearance-custom-vars"
+          ],
+          "chrome": "calm"
+        },
+        {
+          "tag": "teal-cream__light",
+          "providerDestructiveFg": [
+            "#fff",
+            "#fff"
+          ],
+          "styleIds": [
+            "verify-no-motion",
+            "appearance-custom-vars"
+          ],
+          "chrome": "calm"
+        },
+        {
+          "tag": "teal-cream__dark",
+          "providerDestructiveFg": [
+            "#fff",
+            "#fff"
+          ],
+          "styleIds": [
+            "verify-no-motion",
+            "appearance-custom-vars"
+          ],
+          "chrome": "calm"
+        },
+        {
+          "tag": "deep-purple__light",
+          "providerDestructiveFg": [
+            "#fff",
+            "#fff"
+          ],
+          "styleIds": [
+            "verify-no-motion",
+            "appearance-custom-vars"
+          ],
+          "chrome": "calm"
+        },
+        {
+          "tag": "deep-purple__dark",
+          "providerDestructiveFg": [
+            "#fff",
+            "#fff"
+          ],
+          "styleIds": [
+            "verify-no-motion",
+            "appearance-custom-vars"
+          ],
+          "chrome": "calm"
+        },
+        {
+          "tag": "pale-yellow__light",
+          "providerDestructiveFg": [
+            "#fff",
+            "#fff"
+          ],
+          "styleIds": [
+            "verify-no-motion",
+            "appearance-custom-vars"
+          ],
+          "chrome": "calm"
+        },
+        {
+          "tag": "pale-yellow__dark",
+          "providerDestructiveFg": [
+            "#fff",
+            "#fff"
+          ],
+          "styleIds": [
+            "verify-no-motion",
+            "appearance-custom-vars"
+          ],
+          "chrome": "calm"
+        }
+      ]
+    }
+  },
+  "palettes": {
+    "default-brand": {
+      "light": {
+        "primary": "#ff5000",
+        "secondary": "#272b27"
+      },
+      "dark": {
+        "primary": "#ff5000",
+        "secondary": "#272b27"
+      }
+    },
+    "teal-cream": {
+      "light": {
+        "primary": "#00b3a4",
+        "secondary": "#f4f1e8"
+      },
+      "dark": {
+        "primary": "#00b3a4",
+        "secondary": "#0f1f1d"
+      }
+    },
+    "deep-purple": {
+      "light": {
+        "primary": "#4c1d95",
+        "secondary": "#ede4f7"
+      },
+      "dark": {
+        "primary": "#7c3aed",
+        "secondary": "#140b22"
+      }
+    },
+    "pale-yellow": {
+      "light": {
+        "primary": "#f5e663",
+        "secondary": "#ffffff"
+      },
+      "dark": {
+        "primary": "#f5e663",
+        "secondary": "#000000"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "name": "default-brand__light__default",
+      "preColor": "rgb(255, 255, 255)",
+      "prColor": "rgb(255, 255, 255)",
+      "prOldTokenColor": "oklch(0.985 0 0)",
+      "preFgVar": "oklch(0.985 0 0)",
+      "prFgVar": "#fff",
+      "sameGeometry": true,
+      "labelBoxPixels": 1480,
+      "labelPreVsPr": {
+        "pixels": 0,
+        "maxDelta": 0
+      },
+      "labelPreVsOldToken": {
+        "pixels": 474,
+        "maxDelta": 5
+      },
+      "cropPreVsPr": {
+        "pixels": 23,
+        "maxDelta": 1
+      }
+    },
+    {
+      "name": "default-brand__light__sm",
+      "preColor": "rgb(255, 255, 255)",
+      "prColor": "rgb(255, 255, 255)",
+      "prOldTokenColor": "oklch(0.985 0 0)",
+      "preFgVar": "oklch(0.985 0 0)",
+      "prFgVar": "#fff",
+      "sameGeometry": true,
+      "labelBoxPixels": 1394,
+      "labelPreVsPr": {
+        "pixels": 0,
+        "maxDelta": 0
+      },
+      "labelPreVsOldToken": {
+        "pixels": 460,
+        "maxDelta": 5
+      },
+      "cropPreVsPr": {
+        "pixels": 27,
+        "maxDelta": 1
+      }
+    },
+    {
+      "name": "default-brand__light__disabled",
+      "preColor": "rgb(255, 255, 255)",
+      "prColor": "rgb(255, 255, 255)",
+      "prOldTokenColor": "oklch(0.985 0 0)",
+      "preFgVar": "oklch(0.985 0 0)",
+      "prFgVar": "#fff",
+      "sameGeometry": true,
+      "labelBoxPixels": 1480,
+      "labelPreVsPr": {
+        "pixels": 0,
+        "maxDelta": 0
+      },
+      "labelPreVsOldToken": {
+        "pixels": 455,
+        "maxDelta": 3
+      },
+      "cropPreVsPr": {
+        "pixels": 16,
+        "maxDelta": 1
+      }
+    },
+    {
+      "name": "default-brand__dark__default",
+      "preColor": "rgb(255, 255, 255)",
+      "prColor": "rgb(255, 255, 255)",
+      "prOldTokenColor": "oklch(0.98 0 0)",
+      "preFgVar": "oklch(0.98 0 0)",
+      "prFgVar": "#fff",
+      "sameGeometry": true,
+      "labelBoxPixels": 1480,
+      "labelPreVsPr": {
+        "pixels": 0,
+        "maxDelta": 0
+      },
+      "labelPreVsOldToken": {
+        "pixels": 474,
+        "maxDelta": 7
+      },
+      "cropPreVsPr": {
+        "pixels": 310,
+        "maxDelta": 2
+      }
+    },
+    {
+      "name": "default-brand__dark__sm",
+      "preColor": "rgb(255, 255, 255)",
+      "prColor": "rgb(255, 255, 255)",
+      "prOldTokenColor": "oklch(0.98 0 0)",
+      "preFgVar": "oklch(0.98 0 0)",
+      "prFgVar": "#fff",
+      "sameGeometry": true,
+      "labelBoxPixels": 1394,
+      "labelPreVsPr": {
+        "pixels": 0,
+        "maxDelta": 0
+      },
+      "labelPreVsOldToken": {
+        "pixels": 460,
+        "maxDelta": 7
+      },
+      "cropPreVsPr": {
+        "pixels": 295,
+        "maxDelta": 2
+      }
+    },
+    {
+      "name": "default-brand__dark__disabled",
+      "preColor": "rgb(255, 255, 255)",
+      "prColor": "rgb(255, 255, 255)",
+      "prOldTokenColor": "oklch(0.98 0 0)",
+      "preFgVar": "oklch(0.98 0 0)",
+      "prFgVar": "#fff",
+      "sameGeometry": true,
+      "labelBoxPixels": 1480,
+      "labelPreVsPr": {
+        "pixels": 0,
+        "maxDelta": 0
+      },
+      "labelPreVsOldToken": {
+        "pixels": 459,
+        "maxDelta": 4
+      },
+      "cropPreVsPr": {
+        "pixels": 184,
+        "maxDelta": 1
+      }
+    },
+    {
+      "name": "teal-cream__light__default",
+      "preColor": "rgb(255, 255, 255)",
+      "prColor": "rgb(255, 255, 255)",
+      "prOldTokenColor": "oklch(0.985 0 0)",
+      "preFgVar": "oklch(0.985 0 0)",
+      "prFgVar": "#fff",
+      "sameGeometry": true,
+      "labelBoxPixels": 1480,
+      "labelPreVsPr": {
+        "pixels": 0,
+        "maxDelta": 0
+      },
+      "labelPreVsOldToken": {
+        "pixels": 474,
+        "maxDelta": 5
+      },
+      "cropPreVsPr": {
+        "pixels": 23,
+        "maxDelta": 1
+      }
+    },
+    {
+      "name": "teal-cream__light__sm",
+      "preColor": "rgb(255, 255, 255)",
+      "prColor": "rgb(255, 255, 255)",
+      "prOldTokenColor": "oklch(0.985 0 0)",
+      "preFgVar": "oklch(0.985 0 0)",
+      "prFgVar": "#fff",
+      "sameGeometry": true,
+      "labelBoxPixels": 1394,
+      "labelPreVsPr": {
+        "pixels": 0,
+        "maxDelta": 0
+      },
+      "labelPreVsOldToken": {
+        "pixels": 460,
+        "maxDelta": 5
+      },
+      "cropPreVsPr": {
+        "pixels": 27,
+        "maxDelta": 1
+      }
+    },
+    {
+      "name": "teal-cream__light__disabled",
+      "preColor": "rgb(255, 255, 255)",
+      "prColor": "rgb(255, 255, 255)",
+      "prOldTokenColor": "oklch(0.985 0 0)",
+      "preFgVar": "oklch(0.985 0 0)",
+      "prFgVar": "#fff",
+      "sameGeometry": true,
+      "labelBoxPixels": 1480,
+      "labelPreVsPr": {
+        "pixels": 0,
+        "maxDelta": 0
+      },
+      "labelPreVsOldToken": {
+        "pixels": 458,
+        "maxDelta": 3
+      },
+      "cropPreVsPr": {
+        "pixels": 6,
+        "maxDelta": 1
+      }
+    },
+    {
+      "name": "teal-cream__dark__default",
+      "preColor": "rgb(255, 255, 255)",
+      "prColor": "rgb(255, 255, 255)",
+      "prOldTokenColor": "oklch(0.98 0 0)",
+      "preFgVar": "oklch(0.98 0 0)",
+      "prFgVar": "#fff",
+      "sameGeometry": true,
+      "labelBoxPixels": 1480,
+      "labelPreVsPr": {
+        "pixels": 0,
+        "maxDelta": 0
+      },
+      "labelPreVsOldToken": {
+        "pixels": 474,
+        "maxDelta": 7
+      },
+      "cropPreVsPr": {
+        "pixels": 312,
+        "maxDelta": 2
+      }
+    },
+    {
+      "name": "teal-cream__dark__sm",
+      "preColor": "rgb(255, 255, 255)",
+      "prColor": "rgb(255, 255, 255)",
+      "prOldTokenColor": "oklch(0.98 0 0)",
+      "preFgVar": "oklch(0.98 0 0)",
+      "prFgVar": "#fff",
+      "sameGeometry": true,
+      "labelBoxPixels": 1394,
+      "labelPreVsPr": {
+        "pixels": 0,
+        "maxDelta": 0
+      },
+      "labelPreVsOldToken": {
+        "pixels": 460,
+        "maxDelta": 7
+      },
+      "cropPreVsPr": {
+        "pixels": 291,
+        "maxDelta": 2
+      }
+    },
+    {
+      "name": "teal-cream__dark__disabled",
+      "preColor": "rgb(255, 255, 255)",
+      "prColor": "rgb(255, 255, 255)",
+      "prOldTokenColor": "oklch(0.98 0 0)",
+      "preFgVar": "oklch(0.98 0 0)",
+      "prFgVar": "#fff",
+      "sameGeometry": true,
+      "labelBoxPixels": 1480,
+      "labelPreVsPr": {
+        "pixels": 0,
+        "maxDelta": 0
+      },
+      "labelPreVsOldToken": {
+        "pixels": 459,
+        "maxDelta": 4
+      },
+      "cropPreVsPr": {
+        "pixels": 208,
+        "maxDelta": 1
+      }
+    },
+    {
+      "name": "deep-purple__light__default",
+      "preColor": "rgb(255, 255, 255)",
+      "prColor": "rgb(255, 255, 255)",
+      "prOldTokenColor": "oklch(0.985 0 0)",
+      "preFgVar": "oklch(0.985 0 0)",
+      "prFgVar": "#fff",
+      "sameGeometry": true,
+      "labelBoxPixels": 1480,
+      "labelPreVsPr": {
+        "pixels": 0,
+        "maxDelta": 0
+      },
+      "labelPreVsOldToken": {
+        "pixels": 474,
+        "maxDelta": 5
+      },
+      "cropPreVsPr": {
+        "pixels": 23,
+        "maxDelta": 1
+      }
+    },
+    {
+      "name": "deep-purple__light__sm",
+      "preColor": "rgb(255, 255, 255)",
+      "prColor": "rgb(255, 255, 255)",
+      "prOldTokenColor": "oklch(0.985 0 0)",
+      "preFgVar": "oklch(0.985 0 0)",
+      "prFgVar": "#fff",
+      "sameGeometry": true,
+      "labelBoxPixels": 1394,
+      "labelPreVsPr": {
+        "pixels": 0,
+        "maxDelta": 0
+      },
+      "labelPreVsOldToken": {
+        "pixels": 460,
+        "maxDelta": 5
+      },
+      "cropPreVsPr": {
+        "pixels": 27,
+        "maxDelta": 1
+      }
+    },
+    {
+      "name": "deep-purple__light__disabled",
+      "preColor": "rgb(255, 255, 255)",
+      "prColor": "rgb(255, 255, 255)",
+      "prOldTokenColor": "oklch(0.985 0 0)",
+      "preFgVar": "oklch(0.985 0 0)",
+      "prFgVar": "#fff",
+      "sameGeometry": true,
+      "labelBoxPixels": 1480,
+      "labelPreVsPr": {
+        "pixels": 0,
+        "maxDelta": 0
+      },
+      "labelPreVsOldToken": {
+        "pixels": 455,
+        "maxDelta": 3
+      },
+      "cropPreVsPr": {
+        "pixels": 4,
+        "maxDelta": 1
+      }
+    },
+    {
+      "name": "deep-purple__dark__default",
+      "preColor": "rgb(255, 255, 255)",
+      "prColor": "rgb(255, 255, 255)",
+      "prOldTokenColor": "oklch(0.98 0 0)",
+      "preFgVar": "oklch(0.98 0 0)",
+      "prFgVar": "#fff",
+      "sameGeometry": true,
+      "labelBoxPixels": 1480,
+      "labelPreVsPr": {
+        "pixels": 0,
+        "maxDelta": 0
+      },
+      "labelPreVsOldToken": {
+        "pixels": 474,
+        "maxDelta": 7
+      },
+      "cropPreVsPr": {
+        "pixels": 310,
+        "maxDelta": 2
+      }
+    },
+    {
+      "name": "deep-purple__dark__sm",
+      "preColor": "rgb(255, 255, 255)",
+      "prColor": "rgb(255, 255, 255)",
+      "prOldTokenColor": "oklch(0.98 0 0)",
+      "preFgVar": "oklch(0.98 0 0)",
+      "prFgVar": "#fff",
+      "sameGeometry": true,
+      "labelBoxPixels": 1394,
+      "labelPreVsPr": {
+        "pixels": 0,
+        "maxDelta": 0
+      },
+      "labelPreVsOldToken": {
+        "pixels": 460,
+        "maxDelta": 7
+      },
+      "cropPreVsPr": {
+        "pixels": 288,
+        "maxDelta": 2
+      }
+    },
+    {
+      "name": "deep-purple__dark__disabled",
+      "preColor": "rgb(255, 255, 255)",
+      "prColor": "rgb(255, 255, 255)",
+      "prOldTokenColor": "oklch(0.98 0 0)",
+      "preFgVar": "oklch(0.98 0 0)",
+      "prFgVar": "#fff",
+      "sameGeometry": true,
+      "labelBoxPixels": 1480,
+      "labelPreVsPr": {
+        "pixels": 0,
+        "maxDelta": 0
+      },
+      "labelPreVsOldToken": {
+        "pixels": 462,
+        "maxDelta": 4
+      },
+      "cropPreVsPr": {
+        "pixels": 285,
+        "maxDelta": 1
+      }
+    },
+    {
+      "name": "pale-yellow__light__default",
+      "preColor": "rgb(255, 255, 255)",
+      "prColor": "rgb(255, 255, 255)",
+      "prOldTokenColor": "oklch(0.985 0 0)",
+      "preFgVar": "oklch(0.985 0 0)",
+      "prFgVar": "#fff",
+      "sameGeometry": true,
+      "labelBoxPixels": 1480,
+      "labelPreVsPr": {
+        "pixels": 0,
+        "maxDelta": 0
+      },
+      "labelPreVsOldToken": {
+        "pixels": 474,
+        "maxDelta": 5
+      },
+      "cropPreVsPr": {
+        "pixels": 23,
+        "maxDelta": 1
+      }
+    },
+    {
+      "name": "pale-yellow__light__sm",
+      "preColor": "rgb(255, 255, 255)",
+      "prColor": "rgb(255, 255, 255)",
+      "prOldTokenColor": "oklch(0.985 0 0)",
+      "preFgVar": "oklch(0.985 0 0)",
+      "prFgVar": "#fff",
+      "sameGeometry": true,
+      "labelBoxPixels": 1394,
+      "labelPreVsPr": {
+        "pixels": 0,
+        "maxDelta": 0
+      },
+      "labelPreVsOldToken": {
+        "pixels": 460,
+        "maxDelta": 5
+      },
+      "cropPreVsPr": {
+        "pixels": 27,
+        "maxDelta": 1
+      }
+    },
+    {
+      "name": "pale-yellow__light__disabled",
+      "preColor": "rgb(255, 255, 255)",
+      "prColor": "rgb(255, 255, 255)",
+      "prOldTokenColor": "oklch(0.985 0 0)",
+      "preFgVar": "oklch(0.985 0 0)",
+      "prFgVar": "#fff",
+      "sameGeometry": true,
+      "labelBoxPixels": 1480,
+      "labelPreVsPr": {
+        "pixels": 0,
+        "maxDelta": 0
+      },
+      "labelPreVsOldToken": {
+        "pixels": 459,
+        "maxDelta": 3
+      },
+      "cropPreVsPr": {
+        "pixels": 5,
+        "maxDelta": 1
+      }
+    },
+    {
+      "name": "pale-yellow__dark__default",
+      "preColor": "rgb(255, 255, 255)",
+      "prColor": "rgb(255, 255, 255)",
+      "prOldTokenColor": "oklch(0.98 0 0)",
+      "preFgVar": "oklch(0.98 0 0)",
+      "prFgVar": "#fff",
+      "sameGeometry": true,
+      "labelBoxPixels": 1480,
+      "labelPreVsPr": {
+        "pixels": 0,
+        "maxDelta": 0
+      },
+      "labelPreVsOldToken": {
+        "pixels": 474,
+        "maxDelta": 7
+      },
+      "cropPreVsPr": {
+        "pixels": 314,
+        "maxDelta": 2
+      }
+    },
+    {
+      "name": "pale-yellow__dark__sm",
+      "preColor": "rgb(255, 255, 255)",
+      "prColor": "rgb(255, 255, 255)",
+      "prOldTokenColor": "oklch(0.98 0 0)",
+      "preFgVar": "oklch(0.98 0 0)",
+      "prFgVar": "#fff",
+      "sameGeometry": true,
+      "labelBoxPixels": 1394,
+      "labelPreVsPr": {
+        "pixels": 0,
+        "maxDelta": 0
+      },
+      "labelPreVsOldToken": {
+        "pixels": 460,
+        "maxDelta": 7
+      },
+      "cropPreVsPr": {
+        "pixels": 295,
+        "maxDelta": 2
+      }
+    },
+    {
+      "name": "pale-yellow__dark__disabled",
+      "preColor": "rgb(255, 255, 255)",
+      "prColor": "rgb(255, 255, 255)",
+      "prOldTokenColor": "oklch(0.98 0 0)",
+      "preFgVar": "oklch(0.98 0 0)",
+      "prFgVar": "#fff",
+      "sameGeometry": true,
+      "labelBoxPixels": 1480,
+      "labelPreVsPr": {
+        "pixels": 0,
+        "maxDelta": 0
+      },
+      "labelPreVsOldToken": {
+        "pixels": 456,
+        "maxDelta": 4
+      },
+      "cropPreVsPr": {
+        "pixels": 270,
+        "maxDelta": 1
+      }
+    }
+  ],
+  "pageControl": [
+    {
+      "tag": "default-brand__light",
+      "size": [
+        1280,
+        800,
+        1280,
+        800
+      ],
+      "diffInsideDestructiveButtons": 1389,
+      "diffElsewhere": 0
+    },
+    {
+      "tag": "default-brand__dark",
+      "size": [
+        1280,
+        800,
+        1280,
+        800
+      ],
+      "diffInsideDestructiveButtons": 1393,
+      "diffElsewhere": 0
+    },
+    {
+      "tag": "teal-cream__light",
+      "size": [
+        1280,
+        800,
+        1280,
+        800
+      ],
+      "diffInsideDestructiveButtons": 1392,
+      "diffElsewhere": 0
+    },
+    {
+      "tag": "teal-cream__dark",
+      "size": [
+        1280,
+        800,
+        1280,
+        800
+      ],
+      "diffInsideDestructiveButtons": 1393,
+      "diffElsewhere": 0
+    },
+    {
+      "tag": "deep-purple__light",
+      "size": [
+        1280,
+        800,
+        1280,
+        800
+      ],
+      "diffInsideDestructiveButtons": 1389,
+      "diffElsewhere": 0
+    },
+    {
+      "tag": "deep-purple__dark",
+      "size": [
+        1280,
+        800,
+        1280,
+        800
+      ],
+      "diffInsideDestructiveButtons": 1396,
+      "diffElsewhere": 0
+    },
+    {
+      "tag": "pale-yellow__light",
+      "size": [
+        1280,
+        800,
+        1280,
+        800
+      ],
+      "diffInsideDestructiveButtons": 1393,
+      "diffElsewhere": 0
+    },
+    {
+      "tag": "pale-yellow__dark",
+      "size": [
+        1280,
+        800,
+        1280,
+        800
+      ],
+      "diffInsideDestructiveButtons": 1390,
+      "diffElsewhere": 0
+    }
+  ],
+  "blockedConvexWrites": [
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:rateLimit:claimCatalogSyncBudget"
+  ],
+  "sessionRewrites": 16,
+  "userRewrites": 30
+}
