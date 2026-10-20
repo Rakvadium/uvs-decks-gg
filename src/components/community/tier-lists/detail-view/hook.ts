@@ -34,6 +34,7 @@ import {
   serializeLaneMap,
   tierListCardMatchesPool,
 } from "../utils";
+import { isTierListCardCatalogReady, syncTierListLaneMap } from "./lane-map-sync";
 
 type TierListDraftSnapshot = {
   title: string;
@@ -50,7 +51,8 @@ export function useCommunityTierListDetailModel(tierListId: string) {
   const detail = useQuery(api.tierLists.getDetail, { tierListId: tierListId as Id<"tierLists"> });
   const saveTierList = useMutation(api.tierLists.save);
   const deleteTierList = useMutation(api.tierLists.remove);
-  const { cards } = useCardCatalog();
+  const { cards, isCatalogDataLoading } = useCardCatalog();
+  const isCatalogReady = isTierListCardCatalogReady({ cards, isCatalogDataLoading });
   const { sets } = useCardReferenceData();
 
   const [title, setTitle] = useState("Untitled Tier List");
@@ -70,13 +72,14 @@ export function useCommunityTierListDetailModel(tierListId: string) {
   const [isPoolDialogOpen, setIsPoolDialogOpen] = useState(false);
   const [isPresentationMode, setIsPresentationMode] = useState(false);
   const [pendingRankingScopeChange, setPendingRankingScopeChange] = useState<CommunityTierRankingScope | null>(null);
-  const hydratedTierListIdRef = useRef<string | null>(null);
+  const [hydratedTierListId, setHydratedTierListId] = useState<string | null>(null);
   const latestDraftRef = useRef<TierListDraftSnapshot | null>(null);
   const pendingAutoSaveDraftRef = useRef<TierListDraftSnapshot | null>(null);
   const isSavingRef = useRef(false);
 
   const cardMap = useMemo(() => buildCardMap(cards), [cards]);
   const canEdit = detail?.canEdit ?? false;
+  const detailTierListId = detail ? detail.tierList._id.toString() : null;
 
   const getDraftSnapshot = (overrides?: Partial<TierListDraftSnapshot>): TierListDraftSnapshot => {
     const base = latestDraftRef.current ?? {
@@ -106,7 +109,7 @@ export function useCommunityTierListDetailModel(tierListId: string) {
     }
 
     const currentId = detail.tierList._id.toString();
-    if (hydratedTierListIdRef.current === currentId) {
+    if (hydratedTierListId === currentId) {
       return;
     }
 
@@ -142,8 +145,8 @@ export function useCommunityTierListDetailModel(tierListId: string) {
     }
     setTiers(nextTiers);
     setLaneMap(reconcileLaneMap(detail.items.map((item) => item.cardId), nextTiers, nextLaneMap));
-    hydratedTierListIdRef.current = currentId;
-  }, [detail]);
+    setHydratedTierListId(currentId);
+  }, [detail, hydratedTierListId]);
 
   useEffect(() => {
     latestDraftRef.current = {
@@ -182,8 +185,16 @@ export function useCommunityTierListDetailModel(tierListId: string) {
   const tierSignature = useMemo(() => tiers.map((tier) => tier.id).join("|"), [tiers]);
 
   useEffect(() => {
-    setLaneMap((current) => reconcileLaneMap(sourceCardIds, tiers, current));
-  }, [sourceCardSignature, tierSignature, sourceCardIds, tiers]);
+    setLaneMap((current) =>
+      syncTierListLaneMap(current, {
+        isCatalogReady,
+        hydratedTierListId,
+        tierListId: detailTierListId,
+        sourceCardIds,
+        tiers,
+      })
+    );
+  }, [detailTierListId, hydratedTierListId, isCatalogReady, sourceCardSignature, tierSignature, sourceCardIds, tiers]);
 
   const selectedCards = useMemo(
     () =>
