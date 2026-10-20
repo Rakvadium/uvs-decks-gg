@@ -91,7 +91,7 @@ export function requireLabel(value: string | true | undefined, flag: string): st
   return value;
 }
 
-export function git(args: string[], options: { input?: string; env?: NodeJS.ProcessEnv } = {}): string {
+export function git(args: string[], options: { input?: string | Buffer; env?: NodeJS.ProcessEnv } = {}): string {
   return execFileSync("git", args, {
     encoding: "utf8",
     input: options.input,

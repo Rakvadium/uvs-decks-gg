@@ -1,6 +1,13 @@
 import { describe, expect, test } from "bun:test";
+import { execFileSync, spawnSync } from "node:child_process";
+import crypto from "node:crypto";
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
+import zlib from "node:zlib";
 import { agentLogin, newCaptureContext, stableScreenshot } from "../scripts/pr-capture/browser";
 import { convexHostFromEnv, createSocketGuard, isConvexSocket } from "../scripts/pr-capture/guard";
+import { inflatedPngText } from "../scripts/pr-capture/publish";
 import { UNSETTLED_PROBLEM, appearanceKey, createSessionPin, pinFlagged, shotPin, stillPin, type Appearance, type PinReport } from "../scripts/pr-capture/pin";
 import {
   cachedLoad,
@@ -11,6 +18,7 @@ import {
   requireLabel,
   shotName,
 } from "../scripts/pr-capture/shared";
+import { loadManifest } from "../scripts/secret-scan/shared";
 
 describe("pr-capture args", () => {
   test("parses spaced, inline, and boolean flags", () => {
@@ -598,6 +606,37 @@ function emitter() {
   };
 }
 
+type InitScript = { script: (arg: never) => unknown; arg?: unknown };
+type HookedContext = { initScripts: InitScript[]; bindingNames: string[]; bindings: ((source: unknown, url: string) => void)[] };
+
+/**
+ * Runs the context's SharedWorker init script against a stand-in `SharedWorker` global, the way the browser
+ * would at document start, with each exposed binding wired to its handler, then starts a
+ * SharedWorker. Proves the context installs the hook and that it reports through its own binding.
+ * Returns the URLs the stand-in constructor saw (the real worker must still start).
+ */
+function startSharedWorker(context: HookedContext, url: string) {
+  const g = globalThis as unknown as Record<string, unknown>;
+  const saved = { SharedWorker: g.SharedWorker, bindings: context.bindingNames.map((name) => g[name]) };
+  const started: string[] = [];
+  g.SharedWorker = class {
+    constructor(workerUrl: string | URL) {
+      started.push(String(workerUrl));
+    }
+  };
+  context.bindingNames.forEach((name, i) => (g[name] = (u: string) => context.bindings[i]({}, u)));
+  try {
+    // The hook is the init script handed a binding's name (the others need a DOM).
+    const hooks = context.initScripts.filter(({ arg }) => context.bindingNames.includes(arg as string));
+    for (const { script, arg } of hooks) (script as (arg: unknown) => unknown)(arg);
+    new (g.SharedWorker as new (url: string) => unknown)(url);
+  } finally {
+    g.SharedWorker = saved.SharedWorker;
+    context.bindingNames.forEach((name, i) => (g[name] = saved.bindings[i]));
+  }
+  return started;
+}
+
 /** Just enough of Playwright's Browser/BrowserContext/Page to drive newCaptureContext's wiring. */
 function fakeBrowser() {
   const fakePage = () => {
@@ -611,17 +650,24 @@ function fakeBrowser() {
   const fakeContext = () => {
     const events = emitter();
     const bindings: ((source: unknown, url: string) => void)[] = [];
+    const bindingNames: string[] = [];
+    const initScripts: InitScript[] = [];
     const pages: ReturnType<typeof fakePage>[] = [];
     let wsRoute: ((ws: unknown) => void) | undefined;
     return {
       ...events,
       pages,
       bindings,
+      bindingNames,
+      initScripts,
       routeWebSocket: async (_pattern: RegExp, handler: (ws: unknown) => void) => void (wsRoute = handler),
       routeSocket: (ws: unknown) => wsRoute!(ws),
       route: async () => {},
-      addInitScript: async () => {},
-      exposeBinding: async (_name: string, fn: (source: unknown, url: string) => void) => void bindings.push(fn),
+      addInitScript: async (script: InitScript["script"], arg?: unknown) => void initScripts.push({ script, arg }),
+      exposeBinding: async (name: string, fn: (source: unknown, url: string) => void) => {
+        bindingNames.push(name);
+        bindings.push(fn);
+      },
       async newPage() {
         const page = fakePage();
         pages.push(page);
@@ -758,6 +804,13 @@ describe("pr-capture capture context wiring", () => {
     ]);
   });
 
+  test("the context installs the SharedWorker hook, and a SharedWorker the page starts is flagged", async () => {
+    const { guard, context } = await open();
+    expect(guard.problems()).toEqual([]);
+    expect(startSharedWorker(context, "/shared.js")).toEqual(["/shared.js"]);
+    expect(guard.problems()).toEqual([expect.stringContaining("a SharedWorker started (/shared.js)")]);
+  });
+
   test("the guard flags a SharedWorker (reported by the init-script binding) and a service worker", async () => {
     const { guard, context } = await open();
     expect(context.bindings).toHaveLength(1);
@@ -771,7 +824,10 @@ describe("pr-capture capture context wiring", () => {
 });
 
 describe("pr-capture agent login", () => {
-  const loginBrowser = (options: { fail?: boolean } = {}) => {
+  type Emitter = ReturnType<typeof emitter>;
+  /** Runs while the sign-in page loads, like something the page or a worker it starts would do. */
+  type During = (context: Emitter & HookedContext, page: Emitter) => void;
+  const loginBrowser = (options: { fail?: boolean; during?: During } = {}) => {
     const contexts: { closed: boolean; state: object }[] = [];
     return {
       contexts,
@@ -779,24 +835,37 @@ describe("pr-capture agent login", () => {
         const record = { closed: false, state: { cookies: [{ name: "__convexAuthRefreshToken", value: `t${contexts.length}` }] } };
         contexts.push(record);
         let at = "about:blank";
-        return {
+        const context = {
           ...emitter(),
+          initScripts: [] as InitScript[],
+          bindingNames: [] as string[],
+          bindings: [] as ((source: unknown, url: string) => void)[],
           route: async () => {},
           routeWebSocket: async () => {},
-          addInitScript: async () => {},
-          exposeBinding: async () => {},
+          addInitScript: async (script: InitScript["script"], arg?: unknown) => void context.initScripts.push({ script, arg }),
+          exposeBinding: async (name: string, fn: (source: unknown, url: string) => void) => {
+            context.bindingNames.push(name);
+            context.bindings.push(fn);
+          },
           storageState: async () => record.state,
           close: async () => void (record.closed = true),
-          newPage: async () => ({
-            url: () => at,
-            goto: async (url: string) => {
-              at = url;
-              if (options.fail) throw new Error(`timeout navigating to ${url}`);
-              at = "http://localhost:8131/decks";
-            },
-            waitForURL: async () => {},
-          }),
+          newPage: async () => {
+            const page = {
+              ...emitter(),
+              url: () => at,
+              goto: async (url: string) => {
+                at = url;
+                options.during?.(context, page);
+                if (options.fail) throw new Error(`timeout navigating to ${url}`);
+                at = "http://localhost:8131/decks";
+              },
+              waitForURL: async () => {},
+            };
+            context.emit("page", page);
+            return page;
+          },
         };
+        return context;
       },
     };
   };
@@ -824,6 +893,25 @@ describe("pr-capture agent login", () => {
       expect([first.unproxied, second.unproxied]).toEqual([[], []]);
     }));
 
+  test("unproxied is the sign-in context's own guard result: worker sockets, SharedWorkers, service workers", () =>
+    withSecret(async () => {
+      const login = (during: During) =>
+        agentLogin(loginBrowser({ during }) as unknown as Parameters<typeof agentLogin>[0], "http://localhost:8131", []);
+      const worker = await login((_context, page) => {
+        const socket = nativeSocket("wss://x.convex.cloud/api/1.0/sync"); // a dedicated worker's socket: never proxied
+        page.emit("websocket", socket);
+        socket.send(JSON.stringify({ type: "Connect", sessionId: "w" }));
+      });
+      expect(worker.unproxied).toEqual([
+        expect.stringContaining("1 frame(s) (Connect ×1) were sent on a Convex WebSocket the capture proxy never saw"),
+        expect.stringContaining("1 more Convex WebSocket(s) were opened than the capture proxy saw"),
+      ]);
+      const shared = await login((context) => void startSharedWorker(context, "/shared.js"));
+      expect(shared.unproxied).toEqual([expect.stringContaining("a SharedWorker started (/shared.js)")]);
+      const service = await login((context) => context.emit("serviceworker", { url: () => "http://localhost:8131/sw.js" }));
+      expect(service.unproxied).toEqual([expect.stringContaining("a service worker started (http://localhost:8131/sw.js)")]);
+    }));
+
   test("a failed sign-in closes its context and never echoes the token", () =>
     withSecret(async () => {
       const browser = loginBrowser({ fail: true });
@@ -835,4 +923,277 @@ describe("pr-capture agent login", () => {
       expect((error as Error).message).not.toContain("s3cret");
       expect(browser.contexts[0].closed).toBe(true);
     }));
+});
+
+const PUBLISH = path.join(import.meta.dir, "../scripts/pr-capture/publish.ts");
+const MANIFEST = loadManifest();
+const REQUIRED = MANIFEST.names.filter((name) => !MANIFEST.optional.includes(name) && !MANIFEST.ciOnly.includes(name));
+/** Fake values only, random per run, so nothing here can match a real secret. */
+const fakeValue = (name: string) => `fake${name.replace(/_/g, "").toLowerCase()}${crypto.randomBytes(12).toString("hex")}`;
+const FAKE_ENV = Object.fromEntries(REQUIRED.map((name) => [name, fakeValue(name)]));
+const PLANTED = FAKE_ENV.AGENT_AUTH_PASSWORD;
+const envText = (names: string[]) => names.map((name) => `${name}=${FAKE_ENV[name]}`).join("\n") + "\n";
+
+const CRC_TABLE = Array.from({ length: 256 }, (_, n) => {
+  let c = n;
+  for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
+  return c >>> 0;
+});
+function pngChunk(type: string, data: Buffer) {
+  const body = Buffer.concat([Buffer.from(type, "latin1"), data]);
+  let crc = 0xffffffff;
+  for (const byte of body) crc = CRC_TABLE[(crc ^ byte) & 0xff] ^ (crc >>> 8);
+  const head = Buffer.alloc(4);
+  head.writeUInt32BE(data.length);
+  const tail = Buffer.alloc(4);
+  tail.writeUInt32BE((crc ^ 0xffffffff) >>> 0);
+  return Buffer.concat([head, body, tail]);
+}
+/** A valid 1×1 RGB PNG with `chunks` (e.g. text chunks) before IEND. */
+function png(...chunks: Buffer[]) {
+  const ihdr = Buffer.from([0, 0, 0, 1, 0, 0, 0, 1, 8, 2, 0, 0, 0]);
+  return Buffer.concat([
+    Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
+    pngChunk("IHDR", ihdr),
+    pngChunk("IDAT", zlib.deflateSync(Buffer.from([0, 0, 0, 0]))),
+    ...chunks,
+    pngChunk("IEND", Buffer.alloc(0)),
+  ]);
+}
+const tEXt = (text: string) => pngChunk("tEXt", Buffer.concat([Buffer.from("Comment\0"), Buffer.from(text, "latin1")]));
+const zTXt = (text: string) => pngChunk("zTXt", Buffer.concat([Buffer.from("Comment\0\0"), zlib.deflateSync(Buffer.from(text))]));
+const iTXt = (text: string, compressed: boolean) =>
+  pngChunk(
+    "iTXt",
+    Buffer.concat([
+      Buffer.from(`Comment\0${compressed ? "\x01" : "\0"}\0en\0Comment\0`, "latin1"),
+      compressed ? zlib.deflateSync(Buffer.from(text)) : Buffer.from(text),
+    ]),
+  );
+
+/** A work repo whose `origin` is a local bare repo (under a `github.com/<owner>/<repo>` path, for the raw URL). */
+function mediaRepo() {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "pr-capture-publish-"));
+  const globalConfig = path.join(root, "gitconfig");
+  fs.writeFileSync(globalConfig, "");
+  const strip = new Set(MANIFEST.names);
+  const env: NodeJS.ProcessEnv = { ...process.env };
+  for (const key of Object.keys(env)) if (strip.has(key) || key.toUpperCase().startsWith("GIT_")) delete env[key];
+  Object.assign(env, {
+    GIT_CONFIG_GLOBAL: globalConfig,
+    GIT_CONFIG_NOSYSTEM: "1",
+    GIT_AUTHOR_NAME: "test",
+    GIT_AUTHOR_EMAIL: "test@example.com",
+    GIT_COMMITTER_NAME: "test",
+    GIT_COMMITTER_EMAIL: "test@example.com",
+  });
+  const git = (cwd: string, ...args: string[]) => execFileSync("git", args, { cwd, env, stdio: "pipe" }).toString().trim();
+  const origin = path.join(root, "github.com", "test", "media.git");
+  fs.mkdirSync(origin, { recursive: true });
+  git(origin, "init", "-q", "--bare");
+  const work = path.join(root, "work");
+  fs.mkdirSync(work);
+  git(work, "init", "-q");
+  git(work, "remote", "add", "origin", origin.split(path.sep).join("/"));
+  git(work, "commit", "-q", "--allow-empty", "-m", "init");
+  const envFile = path.join(root, "fake.env");
+  fs.writeFileSync(envFile, envText(REQUIRED));
+
+  return {
+    root,
+    work,
+    envFile,
+    git,
+    capture(cwd: string, label: string, files: Record<string, string | Buffer>) {
+      const dir = path.join(cwd, ".pr-captures", "1", label);
+      fs.mkdirSync(dir, { recursive: true });
+      for (const [name, bytes] of Object.entries(files)) fs.writeFileSync(path.join(dir, name), bytes);
+    },
+    publish(cwd: string, ...args: string[]) {
+      const result = spawnSync(process.execPath, [PUBLISH, "--issue", "1", ...args], { cwd, env, encoding: "utf8" });
+      return { status: result.status, out: `${result.stdout}\n${result.stderr}` };
+    },
+    tip: () => {
+      try {
+        return git(origin, "rev-parse", "--verify", "-q", "refs/heads/pr-media");
+      } catch {
+        return null;
+      }
+    },
+    tree: () => git(origin, "ls-tree", "-r", "--name-only", "pr-media").split("\n"),
+    blob: (rel: string) => execFileSync("git", ["show", `pr-media:${rel}`], { cwd: origin, env, stdio: "pipe" }),
+    /** Every object in both repos, so a write before the abort (even an unreferenced blob) shows up. */
+    objects: () => [work, origin].map((dir) => git(dir, "count-objects", "-v")).join("\n"),
+    cleanup: () => fs.rmSync(root, { recursive: true, force: true }),
+  };
+}
+
+const CLEAN_FILES = () => ({
+  "shot.png": png(tEXt("Software: test")),
+  "manifest.json": JSON.stringify({ shots: ["shot.png"] }, null, 2),
+  "summary.md": "| a | b |\r\n| - | - |\r\n",
+});
+
+describe("pr-capture publish: secret-scan gate", () => {
+  test("a clean set publishes exactly its bytes; logs stay behind", () => {
+    const repo = mediaRepo();
+    try {
+      const files = CLEAN_FILES();
+      repo.capture(repo.work, "after", { ...files, "next-dev.log": `token=${PLANTED}` });
+      const result = repo.publish(repo.work, "--env-file", repo.envFile);
+      expect(result.status).toBe(0);
+      expect(result.out).toContain(`secret-scan: clean (${REQUIRED.length} values checked`);
+      expect(result.out).toContain("Pushed 3 files to pr-media");
+      expect(result.out).toContain("https://raw.githubusercontent.com/test/media/pr-media/1/");
+      expect(repo.tree()).toEqual(["1/after/manifest.json", "1/after/shot.png", "1/after/summary.md", "vercel.json"]);
+      for (const [name, bytes] of Object.entries(files)) expect(repo.blob(`1/after/${name}`).equals(Buffer.from(bytes))).toBe(true);
+      expect(JSON.parse(repo.blob("vercel.json").toString())).toEqual({ git: { deploymentEnabled: false } });
+    } finally {
+      repo.cleanup();
+    }
+  }, 60_000);
+
+  const planted: [string, Record<string, string | Buffer>, string][] = [
+    ["a PNG tEXt chunk", { "shot.png": png(tEXt(`token=${PLANTED}`)) }, "1/after/shot.png:"],
+    ["a PNG zTXt chunk (compressed)", { "shot.png": png(zTXt(`token=${PLANTED}`)) }, "_scan-only/1/after/shot.png.text-1.txt:"],
+    ["a compressed PNG iTXt chunk", { "shot.png": png(iTXt(`token=${PLANTED}`, true)) }, "_scan-only/1/after/shot.png.text-1.txt:"],
+    ["an uncompressed PNG iTXt chunk", { "shot.png": png(iTXt(`token=${PLANTED}`, false)) }, "1/after/shot.png:"],
+    ["manifest.json", { "manifest.json": JSON.stringify({ url: `http://localhost:8133/x?token=${PLANTED}` }) }, "1/after/manifest.json:"],
+    ["summary.md", { "summary.md": `| shot |\n| ${PLANTED} |\n` }, "1/after/summary.md:2"],
+    ["a .gif", { "x.gif": Buffer.concat([Buffer.from("GIF89a\0\0"), Buffer.from(PLANTED)]) }, "1/after/x.gif:"],
+  ];
+  for (const [where, files, hit] of planted) {
+    test(`a fake value in ${where} aborts before any git write; pr-media is untouched`, () => {
+      const repo = mediaRepo();
+      try {
+        repo.capture(repo.work, "before", CLEAN_FILES());
+        expect(repo.publish(repo.work, "--env-file", repo.envFile).status).toBe(0);
+        const tip = repo.tip();
+        const objects = repo.objects();
+        repo.capture(repo.work, "after", { ...CLEAN_FILES(), ...files });
+        const result = repo.publish(repo.work, "--env-file", repo.envFile);
+        expect(result.status).toBe(1);
+        expect(result.out).toContain(`AGENT_AUTH_PASSWORD ${hit}`);
+        expect(result.out).toContain("publish: aborted, secret-scan --strict exited 1");
+        expect(result.out).not.toContain(PLANTED);
+        expect(repo.tip()).toBe(tip);
+        expect(repo.objects()).toBe(objects);
+      } finally {
+        repo.cleanup();
+      }
+    }, 60_000);
+  }
+
+  test("a fake value in a label (a tree path and the commit message) aborts", () => {
+    const repo = mediaRepo();
+    try {
+      repo.capture(repo.work, PLANTED, CLEAN_FILES());
+      const result = repo.publish(repo.work, "--env-file", repo.envFile);
+      expect(result.status).toBe(1);
+      expect(result.out).toContain("AGENT_AUTH_PASSWORD _scan-only/paths-and-commit-message.txt:");
+      expect(repo.tip()).toBeNull();
+    } finally {
+      repo.cleanup();
+    }
+  }, 60_000);
+
+  test("a PNG text chunk that won't inflate aborts", () => {
+    const repo = mediaRepo();
+    try {
+      repo.capture(repo.work, "after", { "shot.png": png(pngChunk("zTXt", Buffer.from("Comment\0\0not zlib"))) });
+      const result = repo.publish(repo.work, "--env-file", repo.envFile);
+      expect(result.status).toBe(1);
+      expect(result.out).toContain("can't read the text chunks of 1/after/shot.png");
+      expect(result.out).toContain("exited 2");
+      expect(repo.tip()).toBeNull();
+    } finally {
+      repo.cleanup();
+    }
+  }, 60_000);
+
+  test("no values to scan with is exit 2, and publish aborts", () => {
+    const repo = mediaRepo();
+    try {
+      repo.capture(repo.work, "after", CLEAN_FILES());
+      const objects = repo.objects();
+      // No --env-file and no env files in the main checkout.
+      const none = repo.publish(repo.work);
+      expect(none.out).toContain("secret-scan: cannot read --env-file");
+      // An env file with no values.
+      const empty = path.join(repo.root, "empty.env");
+      fs.writeFileSync(empty, "# nothing\n");
+      const nothing = repo.publish(repo.work, "--env-file", empty);
+      expect(nothing.out).toContain("secret-scan: no secret values loaded");
+      // --strict: a required value missing.
+      const partial = path.join(repo.root, "partial.env");
+      fs.writeFileSync(partial, envText(REQUIRED.filter((name) => name !== "JWKS")));
+      const missing = repo.publish(repo.work, "--env-file", partial);
+      expect(missing.out).toContain("secret-scan: missing required value(s): JWKS");
+      for (const result of [none, nothing, missing]) {
+        expect(result.status).toBe(1);
+        expect(result.out).toContain("publish: aborted, secret-scan --strict exited 2 (the scan couldn't run completely)");
+      }
+      expect(repo.tip()).toBeNull();
+      expect(repo.objects()).toBe(objects);
+    } finally {
+      repo.cleanup();
+    }
+  }, 60_000);
+
+  test("without --env-file it scans with both of the main checkout's env files, also from a worktree", () => {
+    const repo = mediaRepo();
+    try {
+      // Split the values so the strict scan only passes when both files are read.
+      const half = Math.ceil(REQUIRED.length / 2);
+      fs.writeFileSync(path.join(repo.work, ".env.local.live-backup"), envText(REQUIRED.slice(0, half)));
+      fs.mkdirSync(path.join(repo.work, "data"));
+      fs.writeFileSync(path.join(repo.work, "data", "live-env-no-r2.txt"), envText(REQUIRED.slice(half)));
+      const worktree = path.join(repo.root, "wt");
+      repo.git(repo.work, "worktree", "add", "-q", "--detach", worktree);
+
+      repo.capture(worktree, "after", { ...CLEAN_FILES(), "summary.md": `${FAKE_ENV.JWKS}\n` });
+      const planted = repo.publish(worktree);
+      expect(planted.status).toBe(1);
+      expect(planted.out).toContain("JWKS 1/after/summary.md:1");
+      expect(repo.tip()).toBeNull();
+
+      repo.capture(worktree, "after", CLEAN_FILES());
+      const clean = repo.publish(worktree);
+      expect(clean.status).toBe(0);
+      expect(clean.out).toContain(`secret-scan: clean (${REQUIRED.length} values checked`);
+      expect(repo.tip()).not.toBeNull();
+    } finally {
+      repo.cleanup();
+    }
+  }, 60_000);
+
+  test("unknown flags and an empty --env-file are refused before anything is published", () => {
+    const repo = mediaRepo();
+    try {
+      repo.capture(repo.work, "after", CLEAN_FILES());
+      const unknown = repo.publish(repo.work, "--env-file", repo.envFile, "--skip-scan");
+      expect(unknown.status).not.toBe(0);
+      expect(unknown.out).toContain("Unknown option: --skip-scan");
+      const empty = repo.publish(repo.work, "--env-file=");
+      expect(empty.status).not.toBe(0);
+      expect(empty.out).toContain("--env-file needs a path");
+      expect(repo.tip()).toBeNull();
+    } finally {
+      repo.cleanup();
+    }
+  }, 60_000);
+});
+
+describe("pr-capture publish: PNG text chunks", () => {
+  test("inflates zTXt and compressed iTXt; plain text chunks are left to the raw scan", () => {
+    const texts = inflatedPngText(png(tEXt("a"), zTXt("b"), iTXt("c", true), iTXt("d", false)));
+    expect(texts.map((t) => t.toString())).toEqual(["b", "c"]);
+  });
+
+  test("a malformed or truncated PNG throws", () => {
+    expect(() => inflatedPngText(Buffer.from("not a png"))).toThrow("not a PNG");
+    const whole = png(zTXt("b"));
+    expect(() => inflatedPngText(whole.subarray(0, whole.length - 6))).toThrow("truncated");
+    expect(() => inflatedPngText(png(pngChunk("zTXt", Buffer.from("no keyword end"))))).toThrow("malformed zTXt");
+  });
 });
