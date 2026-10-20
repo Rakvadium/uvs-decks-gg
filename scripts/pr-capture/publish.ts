@@ -34,15 +34,39 @@ export function envFiles(argv: string[], git: Git = realGit): string[] {
   return [...new Set([...defaults.filter((file) => fs.existsSync(file)), ...given])];
 }
 
-/** Every zlib stream in `data`, back to back, inflated. Throws on anything left that isn't one. */
-function inflateAll(data: Buffer): Buffer[] {
+/** Most bytes one PNG chunk may inflate to (all its zlib streams together). */
+export const MAX_INFLATED_PER_CHUNK = 64 * 1024 * 1024;
+/** Most bytes all PNG chunks of one publish may inflate to. */
+export const MAX_INFLATED_PER_PUBLISH = 256 * 1024 * 1024;
+
+/** What's left of the publish's inflate allowance. Exceeding a cap throws, so publish exits 2. */
+export type InflateBudget = { left: number };
+export const newInflateBudget = (): InflateBudget => ({ left: MAX_INFLATED_PER_PUBLISH });
+
+/** Every zlib stream in `data`, back to back, inflated. Throws on anything left that isn't one, or past a cap. */
+function inflateAll(data: Buffer, budget: InflateBudget): Buffer[] {
   const out: Buffer[] = [];
+  let chunkLeft = MAX_INFLATED_PER_CHUNK;
   for (let rest = data; rest.length > 0; ) {
-    const { buffer, engine } = zlib.inflateSync(rest, { info: true }) as unknown as {
-      buffer: Buffer;
-      engine: { bytesWritten: number };
-    };
+    const limit = Math.min(chunkLeft, budget.left);
+    const over = () =>
+      new Error(
+        limit === budget.left
+          ? `inflated PNG data is over the ${MAX_INFLATED_PER_PUBLISH / 1024 / 1024} MiB per-publish cap`
+          : `a PNG chunk inflates to over the ${MAX_INFLATED_PER_CHUNK / 1024 / 1024} MiB per-chunk cap`,
+      );
+    if (limit < 1) throw over();
+    let inflated: { buffer: Buffer; engine: { bytesWritten: number } };
+    try {
+      inflated = zlib.inflateSync(rest, { info: true, maxOutputLength: limit }) as unknown as typeof inflated;
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code === "ERR_BUFFER_TOO_LARGE") throw over();
+      throw error;
+    }
+    const { buffer, engine } = inflated;
     if (!(engine.bytesWritten > 0 && engine.bytesWritten <= rest.length)) throw new Error("zlib stream didn't advance");
+    chunkLeft -= buffer.length;
+    budget.left -= buffer.length;
     out.push(buffer);
     rest = rest.subarray(engine.bytesWritten);
   }
@@ -50,7 +74,7 @@ function inflateAll(data: Buffer): Buffer[] {
 }
 
 /** The inflated compressed chunks of a PNG starting at `start`, parsed to the end of `bytes`. */
-function pngText(bytes: Buffer, start: number): Buffer[] {
+function pngText(bytes: Buffer, start: number, budget: InflateBudget): Buffer[] {
   const out: Buffer[] = [];
   for (let at = start + PNG_SIGNATURE.length; at < bytes.length; ) {
     if (at + 12 > bytes.length) throw new Error("truncated PNG chunk");
@@ -63,14 +87,16 @@ function pngText(bytes: Buffer, start: number): Buffer[] {
     if (type === "zTXt" || type === "iCCP") {
       // keyword (or profile name), NUL, compression method, then zlib data.
       if (keywordEnd === -1) throw new Error(`malformed ${type} chunk`);
-      out.push(...inflateAll(data.subarray(keywordEnd + 2)));
+      out.push(...inflateAll(data.subarray(keywordEnd + 2), budget));
     } else if (type === "iTXt") {
       if (keywordEnd === -1) throw new Error("malformed iTXt chunk");
-      if (data[keywordEnd + 1] !== 1) continue; // Uncompressed: the raw scan already reads it.
+      // Only flag 0 means uncompressed (the raw scan reads it). Decoders such as Pillow inflate any
+      // other flag, so every non-zero flag is inflated here too, and one that won't inflate aborts.
+      if (data[keywordEnd + 1] === 0) continue;
       const language = data.indexOf(0, keywordEnd + 3);
       const translated = language === -1 ? -1 : data.indexOf(0, language + 1);
       if (translated === -1) throw new Error("malformed iTXt chunk");
-      out.push(...inflateAll(data.subarray(translated + 1)));
+      out.push(...inflateAll(data.subarray(translated + 1), budget));
     }
   }
   return out;
@@ -78,15 +104,15 @@ function pngText(bytes: Buffer, start: number): Buffer[] {
 
 /**
  * The inflated contents of every compressed PNG text or profile chunk (`zTXt`, `iCCP`, and `iTXt`
- * with compression on) in any PNG inside `bytes`, whatever the file is named: each PNG signature
- * found is parsed from there to the end. Every zlib stream in a chunk is inflated. The scanner reads
- * raw bytes, so a value in one of these would otherwise be invisible. Throws on anything malformed,
- * so publish fails closed.
+ * with a non-zero compression flag) in any PNG inside `bytes`, whatever the file is named: each PNG
+ * signature found is parsed from there to the end. Every zlib stream in a chunk is inflated, within
+ * the caps above. The scanner reads raw bytes, so a value in one of these would otherwise be
+ * invisible. Throws on anything malformed or over a cap, so publish fails closed.
  */
-export function inflatedPngText(bytes: Buffer): Buffer[] {
+export function inflatedPngText(bytes: Buffer, budget: InflateBudget = newInflateBudget()): Buffer[] {
   const out: Buffer[] = [];
   for (let at = bytes.indexOf(PNG_SIGNATURE); at !== -1; at = bytes.indexOf(PNG_SIGNATURE, at + 1)) {
-    out.push(...pngText(bytes, at));
+    out.push(...pngText(bytes, at, budget));
   }
   return out;
 }
@@ -97,12 +123,13 @@ export function inflatedPngText(bytes: Buffer): Buffer[] {
  */
 export function scanSet(entries: Entry[], message: string): BufferedFile[] {
   const files: BufferedFile[] = [];
+  const budget = newInflateBudget();
   for (const { rel, bytes } of entries) {
     files.push({ path: rel, bytes });
     let texts: Buffer[];
     try {
       if (rel.endsWith(".png") && !bytes.subarray(0, PNG_SIGNATURE.length).equals(PNG_SIGNATURE)) throw new Error("a .png that isn't a PNG");
-      texts = inflatedPngText(bytes);
+      texts = inflatedPngText(bytes, budget);
     } catch (error) {
       throw new Error(`can't read the PNG text chunks of a file to publish (${(error as Error).message})`);
     }
@@ -169,9 +196,16 @@ export async function publish(argv: string[], options: { cwd?: string; git?: Git
   const git = options.git ?? realGit;
   const outputRoot = path.join(options.cwd ?? process.cwd(), ".pr-captures");
   refuseBareFlags(argv);
-  const args = parseArgs(argv);
-  const unknown = Object.keys(args).find((key) => !FLAGS.includes(key));
-  if (unknown) throw new Error(`Unknown option: --${unknown}`);
+  // Neither error names the argument: it could be a value the scan would have caught.
+  let args: Record<string, string | true>;
+  try {
+    args = parseArgs(argv);
+  } catch {
+    throw new Error(`unexpected argument (not printed). Flags: ${FLAGS.map((flag) => `--${flag}`).join(", ")}`);
+  }
+  if (Object.keys(args).some((key) => !FLAGS.includes(key))) {
+    throw new Error(`unknown flag (not printed). Flags: ${FLAGS.map((flag) => `--${flag}`).join(", ")}`);
+  }
   const issue = requireIssue(args);
   const issueDir = path.join(outputRoot, issue);
   if (!fs.existsSync(issueDir)) throw new Error(`Nothing to publish: ${issueDir} does not exist`);

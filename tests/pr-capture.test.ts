@@ -7,7 +7,7 @@ import path from "node:path";
 import zlib from "node:zlib";
 import { agentLogin, newCaptureContext, stableScreenshot } from "../scripts/pr-capture/browser";
 import { convexHostFromEnv, createSocketGuard, isConvexSocket } from "../scripts/pr-capture/guard";
-import { inflatedPngText, publish, type Git } from "../scripts/pr-capture/publish";
+import { MAX_INFLATED_PER_CHUNK, inflatedPngText, publish, type Git } from "../scripts/pr-capture/publish";
 import { UNSETTLED_PROBLEM, appearanceKey, createSessionPin, pinFlagged, shotPin, stillPin, type Appearance, type PinReport } from "../scripts/pr-capture/pin";
 import {
   cachedLoad,
@@ -971,6 +971,9 @@ const iTXt = (text: string, compressed: boolean) =>
       compressed ? zlib.deflateSync(Buffer.from(text)) : Buffer.from(text),
     ]),
   );
+/** An iTXt chunk with any compression flag byte and a raw payload. */
+const iTXtFlag = (flag: number, payload: Buffer) =>
+  pngChunk("iTXt", Buffer.concat([Buffer.from("Comment\0", "latin1"), Buffer.from([flag, 0]), Buffer.from("en\0Comment\0", "latin1"), payload]));
 
 /** A work repo whose `origin` is a local bare repo (under a `github.com/<owner>/<repo>` path, for the raw URL). */
 function mediaRepo() {
@@ -1194,7 +1197,15 @@ describe("pr-capture publish: secret-scan gate", () => {
       repo.capture(repo.work, "after", CLEAN_FILES());
       const unknown = repo.publish(repo.work, "--env-file", repo.envFile, "--skip-scan");
       expect(unknown.status).not.toBe(0);
-      expect(unknown.out).toContain("Unknown option: --skip-scan");
+      expect(unknown.out).toContain("publish: unknown flag (not printed)");
+      expect(unknown.out).not.toContain("skip-scan");
+      // Neither an unknown flag nor a positional argument is echoed: either could be a value.
+      for (const extra of [`--${PLANTED}`, PLANTED]) {
+        const echoed = repo.publish(repo.work, "--env-file", repo.envFile, extra);
+        expect(echoed.status).not.toBe(0);
+        expect(echoed.out).toMatch(/publish: (unknown flag|unexpected argument) \(not printed\)/);
+        expect(echoed.out).not.toContain(PLANTED);
+      }
       for (const args of [
         ["--env-file="],
         ["--env-file"],
@@ -1281,6 +1292,36 @@ describe("pr-capture publish: secret-scan gate", () => {
       "AGENT_AUTH_PASSWORD _scan-only/1/after/shot.png.text-1.txt:1",
     ],
     ["a .png that isn't a PNG", { "shot.png": Buffer.from("not a png at all") }, "a .png that isn't a PNG"],
+    ...[1, 2, 255].map((flag): [string, Record<string, string | Buffer>, string] => [
+      `an iTXt chunk with compression flag ${flag} (any non-zero flag means compressed)`,
+      { "shot.png": png(iTXtFlag(flag, zlib.deflateSync(`token=${PLANTED}`))) },
+      "AGENT_AUTH_PASSWORD _scan-only/1/after/shot.png.text-1.txt:1",
+    ]),
+    [
+      "an iTXt chunk with compression flag 2 that won't inflate",
+      { "shot.png": png(iTXtFlag(2, Buffer.from(`token=${PLANTED}`))) },
+      "exited 2",
+    ],
+    [
+      "a PNG nested inside another PNG's tEXt chunk, with the value in its zTXt",
+      { "shot.png": png(pngChunk("tEXt", Buffer.concat([Buffer.from("Comment\0"), png(zTXt(`token=${PLANTED}`))]))) },
+      "publish: aborted",
+    ],
+    [
+      "a decompression bomb: one chunk inflating past the 64 MiB per-chunk cap",
+      { "shot.png": png(pngChunk("zTXt", Buffer.concat([Buffer.from("Comment\0\0"), zlib.deflateSync(Buffer.alloc(MAX_INFLATED_PER_CHUNK + 1))]))) },
+      "a PNG chunk inflates to over the 64 MiB per-chunk cap",
+    ],
+    [
+      "a decompression bomb: chunks under the per-chunk cap that add up past the 256 MiB per-publish cap",
+      Object.fromEntries(
+        Array.from({ length: 5 }, (_, i) => [
+          `b${i}.png`,
+          png(pngChunk("iCCP", Buffer.concat([Buffer.from("icc\0\0"), zlib.deflateSync(Buffer.alloc(60 * 1024 * 1024))]))),
+        ]),
+      ),
+      "inflated PNG data is over the 256 MiB per-publish cap",
+    ],
     [
       "a zTXt chunk with undecodable data after its zlib stream",
       { "shot.png": png(pngChunk("zTXt", Buffer.concat([Buffer.from("Comment\0\0"), zlib.deflateSync("clean"), Buffer.from(PLANTED)]))) },
@@ -1393,6 +1434,29 @@ describe("pr-capture publish: PNG text chunks", () => {
     expect(inflatedPngText(png(twoStreams)).map(String)).toEqual(["one", "two"]);
     expect(inflatedPngText(Buffer.concat([Buffer.from("GIF89a"), png(zTXt("inner"))])).map(String)).toEqual(["inner"]);
     expect(inflatedPngText(Buffer.from("not a png"))).toEqual([]);
+  });
+
+  test("a second PNG is read too, not just the first: one nested in a tEXt chunk throws", () => {
+    const nested = png(pngChunk("tEXt", Buffer.concat([Buffer.from("Comment\0"), png(zTXt("inner"))])));
+    expect(() => inflatedPngText(nested)).toThrow();
+  });
+
+  test("iTXt: flag 0 is left to the raw scan, every other flag is inflated", () => {
+    expect(inflatedPngText(png(iTXtFlag(0, Buffer.from("plain"))))).toEqual([]);
+    for (const flag of [1, 2, 255]) expect(inflatedPngText(png(iTXtFlag(flag, zlib.deflateSync("z")))).map(String)).toEqual(["z"]);
+    expect(() => inflatedPngText(png(iTXtFlag(2, Buffer.from("not zlib"))))).toThrow();
+  });
+
+  test("the inflate caps: per chunk, and shared across a publish", () => {
+    const big = (bytes: number) => png(pngChunk("zTXt", Buffer.concat([Buffer.from("C\0\0"), zlib.deflateSync(Buffer.alloc(bytes))])));
+    expect(inflatedPngText(big(MAX_INFLATED_PER_CHUNK))[0].length).toBe(MAX_INFLATED_PER_CHUNK);
+    expect(() => inflatedPngText(big(MAX_INFLATED_PER_CHUNK + 1))).toThrow("per-chunk cap");
+    // Two streams in one chunk count together.
+    const half = zlib.deflateSync(Buffer.alloc(MAX_INFLATED_PER_CHUNK / 2 + 1));
+    expect(() => inflatedPngText(png(pngChunk("zTXt", Buffer.concat([Buffer.from("C\0\0"), half, half]))))).toThrow("per-chunk cap");
+    const budget = { left: 1024 };
+    expect(inflatedPngText(big(1000), budget)[0].length).toBe(1000);
+    expect(() => inflatedPngText(big(100), budget)).toThrow("per-publish cap");
   });
 
   test("a malformed or truncated PNG, or leftover bytes after a zlib stream, throws", () => {
