@@ -25,7 +25,7 @@ bun run capture --issue 191 --label after --port 8101 \
 # 3. Side-by-side + diff PNGs + summary.md
 bun run capture:compare --issue 191 --base before --head after
 
-# 4. Push everything under .pr-captures/191/ to pr-media
+# 4. Secret-scan everything under .pr-captures/191/, then push it to pr-media
 bun run capture:publish --issue 191
 ```
 
@@ -89,7 +89,7 @@ Steps: `click`, `hover`, `fill` (+ `value`), `waitFor` (all take Playwright sele
 
 1. **JS state.** The WebSocket proxy rewrites the `sessions:getSession` result the browser receives (`theme`, `chrome`, `colorSource`), so `ColorSchemeProvider`'s `isDark`, `chrome`, and `colorPreset` match the pin. That covers what reads them in JS: the user-menu Light/Dark label and preset checkmark, the mobile profile sheet switch and preset label, Sonner toasts, neon-chrome forks (frosted card controls, `.scanlines`). It also reassembles chunked transitions. The stored session row is untouched. Each signed-in shot (and the GIF) gets a `pin` entry in `manifest.json`: `saved` (the real stored `preset/mode/chrome`), `pinned`, `patched`, `overridden` (patched and different from saved), `problems` and `flagged`. Guest shots have `pin: null`. The top-level `savedAppearance` lists the saved values seen.
 
-   If the rewrite can't apply, it says so instead of quietly falling back. The proxy tracks every `sessions:getSession` subscription of the page being shot, per socket. That page has its own WebSocket route and pin state, installed before it navigates. Any other page in the context (a popup a step opened) falls through to the context's route: its results are rewritten the same way, but they are tracked separately and never reported, so a popup that stays subscribed can't hide the shot page losing its subscription. When a socket closes (either side), its subscriptions stop counting, so after a reconnect or reload only the live socket's subscriptions matter. A shot only counts as `patched` when every live subscription's latest result was a `QueryUpdated` with all of `theme` (`light`/`dark`/`system`), `chrome` and `colorSource` (a `preset` with a name, or `custom`) present and valid, and was rewritten. Anything else is a problem:
+   If the rewrite can't apply, it says so instead of quietly falling back. The proxy tracks every `sessions:getSession` subscription of the page being shot, per socket. That page has its own WebSocket route and pin state, installed before it navigates. Any other page in the context (a popup a step opened) falls through to the context's route: its results are rewritten the same way, but they are tracked separately and never reported, so a popup that stays subscribed can't hide the shot page losing its subscription. Tracking is per page, not per frame: an app iframe inside the shot page goes through the page's route and pin, so its subscription counts toward the shot. If the main frame lost its subscription while an app iframe kept one, the shot would still read as `patched`. The app never iframes itself (its only iframes are Twitch and YouTube embeds, which open no Convex socket), and spec steps can't add one. When a socket closes (either side), its subscriptions stop counting, so after a reconnect or reload only the live socket's subscriptions matter. A shot only counts as `patched` when every live subscription's latest result was a `QueryUpdated` with all of `theme` (`light`/`dark`/`system`), `chrome` and `colorSource` (a `preset` with a name, or `custom`) present and valid, and was rewritten. Anything else is a problem:
    - the page never subscribes (renamed query)
    - a subscription has no rewritten result yet (none arrived, or the sync protocol changed shape)
    - no live subscription is left: every one was removed (client `Remove` or server `QueryRemoved`) or its socket closed (e.g. the page signed out, reloaded without re-subscribing, or the provider unmounted)
@@ -131,7 +131,32 @@ If the two shots differ in height, both are padded to the larger one. Unpaired s
 
 ## Publish
 
-`capture:publish --issue N [--labels before,after,...]` pushes every `png/gif/webm/md/json` under `.pr-captures/<issue>/` to `pr-media:<issue>/<label>/`. Re-publishing a label replaces its folder. Other issues and labels are untouched.
+`capture:publish --issue N [--labels before,after,...] [--env-file <file>]...` pushes every `png/gif/webm/md/json` under `.pr-captures/<issue>/` to `pr-media:<issue>/<label>/`. Logs (`next-dev.log`) and other extensions stay behind. Re-publishing a label replaces its folder. Other issues and labels are untouched.
+
+### Secret scan before publishing
+
+`pr-media` is public the moment it's pushed, and CI never scans it. So publish runs the secret scan with `--strict` on exactly what it is about to publish, **before any git write** (no `hash-object`, no commit, no push):
+
+1. It reads each file once into memory. Folders, symlinks and other non-regular files with a media extension abort the publish.
+2. It hands those bytes, plus the root `vercel.json`, to the scanner's in-process [`scanBuffers`](../secret-scan/README.md#scanbuffers-in-process), under the paths they'll have on `pr-media`. `scanBuffers` matches and decodes the same way `--path` does, but nothing walks a folder, so no label is skipped. `--path` would skip a label named `node_modules`. It also gets scan-only entries, reported under `_scan-only/`:
+   - every tree path and the commit message, since labels end up in both
+   - the inflated contents of every compressed PNG text or profile chunk (`zTXt`, `iCCP`, and `iTXt` with any compression flag other than 0, as decoders like Pillow treat every non-zero flag as compressed), in any file to be published, whatever its name. Every PNG signature in the bytes is parsed from there to the end, and a `.png` file that doesn't start with one aborts. Every zlib stream in a chunk is inflated in turn, until the chunk's data is used up. The scanner reads raw bytes, so it can't see inside these. A PNG whose chunks can't be parsed, a stream that won't inflate, or leftover bytes after the last stream abort the publish. Inflating is capped at **64 MiB per chunk** (all its streams together) and **256 MiB per publish**. Going over either cap is exit 2, before any git write, so a decompression bomb can't exhaust memory. A real capture's PNGs have no compressed chunks at all.
+3. The process env is checked too.
+4. **Any non-zero exit aborts**, before anything is written to git:
+   - `1`: a hit, printed as `VAR_NAME <path>:<line>`, never the value
+   - `2`: the scan couldn't run completely: an unreadable env file, zero values loaded, or a missing required value
+
+   The blobs are then written from the same in-memory bytes, so what was scanned is what gets published. `--stdin` hashing applies no CRLF or attribute filters.
+
+Errors before the scan never print a label, file name, unknown flag or stray argument, since any of them could hold a value. For example, a `--labels` name that isn't a folder is reported by count only, and an unknown flag as `unknown flag (not printed)`.
+
+**Env files.** The main checkout's two files, `.env.local.live-backup` and `data/live-env-no-r2.txt`, are always used when they exist. Publish finds the main checkout with `git rev-parse --git-common-dir`, so this also works from a worktree. Each `--env-file` (repeatable; a bare `--env-file` is refused) **adds** to them and never replaces them, so an env file of dummy values can't hide the real ones. With no `--env-file`, both default files are required: if either is missing, the scan exits 2 and nothing is published. There is **no flag to skip the scan**. Without a main checkout's env files (for example, a cloud agent), you can only publish with an `--env-file` that holds every required value.
+
+**Not covered.** The scanner's own limits apply ([What is not detected](../secret-scan/README.md#what-is-not-detected)). For media, the ones that matter are:
+- values drawn into pixels (a screenshot of a token), including GIF and WebM frames
+- other compressed data: PNG image data (`IDAT`, APNG `fdAT`), compressed data outside a PNG chunk (for example, a raw zlib stream inside a `.json`), and anything inside a WebM stream
+
+Don't capture pages that show secret values.
 
 It uses git plumbing only (`hash-object`, a throwaway `GIT_INDEX_FILE`, `commit-tree`, `push <sha>:refs/heads/pr-media`). Your branch, index, and working tree are never touched. If `pr-media` doesn't exist yet, the first commit creates it as an orphan. On a rejected push (another agent published first) it re-reads the remote tip, rebuilds on top, and retries with backoff (up to 6 attempts). Every commit also carries a root `vercel.json` with `{"git":{"deploymentEnabled":false}}`. Without it, each push to `pr-media` (which contains no app) triggers a failing Vercel preview deployment.
 

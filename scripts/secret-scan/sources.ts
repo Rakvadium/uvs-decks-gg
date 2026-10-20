@@ -3,7 +3,8 @@ import fs from "node:fs";
 import path from "node:path";
 import type { Target } from "./match.ts";
 
-const SKIP_DIRS = new Set([".git", "node_modules"]);
+/** Folder names `--path` never descends into. `scanBuffers` has no walk, so it skips nothing. */
+export const SKIP_DIRS: ReadonlySet<string> = new Set([".git", "node_modules"]);
 const EMPTY_TREE = "4b825dc642cb6eb9a060e54bf8d69288fbee4904";
 const SUBMODULE_MODE = "160000";
 /**

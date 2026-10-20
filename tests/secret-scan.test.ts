@@ -5,7 +5,8 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
-import { run } from "../scripts/secret-scan/index";
+import { run, scanBuffers, type BufferedFile } from "../scripts/secret-scan/index";
+import { SKIP_DIRS } from "../scripts/secret-scan/sources";
 import { buildMatcher, scanTarget, utf16Encoding, type Hit } from "../scripts/secret-scan/match";
 import {
   encodedForms,
@@ -755,5 +756,61 @@ describe("secret-scan output never contains a value", () => {
     expect(output).toContain("ADMIN_API_KEY");
     expect(output).toContain("::error file=");
     expect(output).not.toContain(FAKE);
+  });
+});
+
+describe("scanBuffers", () => {
+  const scanned = (files: BufferedFile[], config: { envFiles?: string[]; strict?: boolean }, env: Record<string, string>) => {
+    const lines: string[] = [];
+    const dir = tempDir();
+    const code = scanBuffers(files, config, { env, cwd: dir, manifest: manifestIn(dir), out: (l) => lines.push(l), err: (l) => lines.push(l) });
+    return { code, output: lines.join("\n") };
+  };
+  const both = { FAKE_TOKEN: FAKE, OTHER_TOKEN: LONG };
+
+  test("paths under every SKIP_DIRS folder are scanned: there is no walk to skip them", () => {
+    expect([...SKIP_DIRS].sort()).toEqual([".git", "node_modules"]);
+    const files = [...SKIP_DIRS].flatMap((dir) => [
+      { path: `${dir}/a.json`, bytes: Buffer.from(`{"t":"${FAKE}"}`) },
+      { path: `1/${dir}/b.md`, bytes: Buffer.from(`x\n${FAKE}\n`) },
+    ]);
+    const { code, output } = scanned(files, { strict: true }, both);
+    expect(code).toBe(1);
+    for (const dir of SKIP_DIRS) {
+      expect(output).toContain(`FAKE_TOKEN ${dir}/a.json:1`);
+      expect(output).toContain(`FAKE_TOKEN 1/${dir}/b.md:2`);
+    }
+    expect(output).not.toContain(FAKE);
+  });
+
+  test("same decoders as --path: UTF-16, base64 and a wrapped value", () => {
+    const files = [
+      { path: "u16.md", bytes: Buffer.concat([Buffer.from([0xff, 0xfe]), Buffer.from(`v=${FAKE}`, "utf16le")]) },
+      { path: "b64.json", bytes: Buffer.from(Buffer.from(FAKE).toString("base64")) },
+      { path: "wrapped.md", bytes: Buffer.from(`${LONG.slice(0, 20)}\n${LONG.slice(20)}`) },
+    ];
+    const { code, output } = scanned(files, {}, both);
+    expect(code).toBe(1);
+    expect(output).toContain("FAKE_TOKEN u16.md:1");
+    expect(output).toContain("FAKE_TOKEN b64.json:1");
+    expect(output).toContain("OTHER_TOKEN wrapped.md:1");
+  });
+
+  test("clean, then the CLI's exit-2 cases: no values, a missing --strict value, an unreadable env file", () => {
+    const files = [{ path: "a.md", bytes: Buffer.from("nothing here") }];
+    expect(scanned(files, { strict: true }, both)).toMatchObject({ code: 0, output: expect.stringContaining("clean (2 values checked across 1 files") });
+    expect(scanned(files, {}, {})).toMatchObject({ code: 2, output: expect.stringContaining("no secret values loaded") });
+    expect(scanned(files, { strict: true }, { FAKE_TOKEN: FAKE })).toMatchObject({
+      code: 2,
+      output: expect.stringContaining("missing required value(s): OTHER_TOKEN"),
+    });
+    expect(scanned(files, { envFiles: [path.join(tempDir(), "missing.env")] }, both)).toMatchObject({
+      code: 2,
+      output: expect.stringContaining("cannot read --env-file"),
+    });
+    const envFile = path.join(tempDir(), "x.env");
+    fs.writeFileSync(envFile, `FAKE_TOKEN=${FAKE}\nOTHER_TOKEN=${LONG}\n`);
+    const fromFile = scanned([{ path: "a.md", bytes: Buffer.from(FAKE) }], { envFiles: [envFile], strict: true }, {});
+    expect(fromFile).toMatchObject({ code: 1, output: expect.stringContaining("FAKE_TOKEN a.md:1") });
   });
 });
