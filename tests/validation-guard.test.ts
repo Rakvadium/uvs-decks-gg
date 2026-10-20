@@ -731,7 +731,9 @@ describe("pinned local backend version (#221)", () => {
         fs.rmSync(path.join(state, "config.json"));
         // A tree deeper than PATH_MAX: the walk can't resolve or read it, so it refuses.
         const name = "d".repeat(200);
-        expect(sh(`cd '${backendDir(8182, root)}' && for i in $(seq 1 25); do mkdir ${name} && cd ${name} || exit 1; done && ln -s '${owner.realHome}' x`).status).toBe(0);
+        // bash, not sh: dash can't `cd` once the path passes PATH_MAX.
+        const deep = spawnSync("bash", ["-c", `cd '${backendDir(8182, root)}' && for i in $(seq 1 25); do mkdir ${name} && cd ${name} || exit 1; done && ln -s '${owner.realHome}' x`]);
+        expect(deep.status).toBe(0);
         expect(homeProblems().some((m) => /could not be (read|resolved)/.test(m))).toBe(true);
         sh(`cd '${backendDir(8182, root)}' && rm -rf ${name}`);
       });
