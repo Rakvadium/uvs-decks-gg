@@ -20,6 +20,8 @@
     "capture": "node --disable-warning=ExperimentalWarning scripts/pr-capture/capture.ts",
     "capture:compare": "bun scripts/pr-capture/compare.ts",
     "capture:publish": "bun scripts/pr-capture/publish.ts",
+    "secret-scan": "bun scripts/secret-scan/index.ts",
+    "secret-scan:sync-ci": "bun scripts/secret-scan/sync-ci.ts",
     "vconvex": "bun scripts/validation/convex.ts",
     "validation:backend": "bun scripts/validation/backend.ts",
     "validation:seed:build": "bun scripts/validation/not-implemented.ts validation:seed:build",
