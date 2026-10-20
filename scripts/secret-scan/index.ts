@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import {
+  flagValues,
   formatHit,
   loadManifest,
   loadSecrets,
@@ -12,7 +13,7 @@ import {
 } from "./shared.ts";
 import { pathSources, rangeSources, stagedSources } from "./sources.ts";
 
-const USAGE = `Usage: bun run secret-scan [--diff <base>..<head>] [--staged] [--path <dir>] [--env-file <file>]
+const USAGE = `Usage: bun run secret-scan [--diff <base>..<head>] [--staged] [--path <dir>] [--env-file <file>]...
 
 Scans for the values of the env vars in scripts/secret-scan/secrets.json.
 Prints VAR_NAME file:line for each hit, never the value. Exit 1 on any hit.`;
@@ -50,17 +51,17 @@ export function run(argv: string[], options: RunOptions = {}): number {
     return 2;
   }
 
-  let values: Record<string, string | undefined> = env;
-  if (typeof args["env-file"] === "string") {
+  const envs: Record<string, string | undefined>[] = [env];
+  for (const file of flagValues(argv, "env-file")) {
     try {
-      values = { ...env, ...parseEnvFile(fs.readFileSync(path.resolve(cwd, args["env-file"]), "utf8")) };
+      envs.push(parseEnvFile(fs.readFileSync(path.resolve(cwd, file), "utf8")));
     } catch {
-      err(`Cannot read --env-file ${args["env-file"]}`);
+      err(`Cannot read --env-file ${file}`);
       return 2;
     }
   }
 
-  const { secrets, missing, short } = loadSecrets(loadManifest(options.manifest), values);
+  const { secrets, missing, short } = loadSecrets(loadManifest(options.manifest), envs);
   const warn = (message: string) => err(ci ? `::warning title=secret-scan::${message}` : `secret-scan: warning: ${message}`);
   if (missing.length > 0) warn(`no value, not checked: ${missing.join(", ")}`);
   if (short.length > 0) warn(`value shorter than 8 chars, not checked: ${short.join(", ")}`);

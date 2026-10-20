@@ -2,13 +2,13 @@
 
 Finds the **values** of this project's real secrets in diffs, commit messages and files before they go public. Generic scanners can't recognize custom strings like the agent password or login token. This tool knows the actual values, so it can.
 
-The secrets it checks are listed **by name** in [`secrets.json`](secrets.json). It reads their values from the process env, or from an env file. It never prints a value. Each hit is reported as `VAR_NAME file:line`.
+The secrets it checks are listed **by name** in [`secrets.json`](secrets.json). It reads their values from the process env and from any `--env-file` you pass. It never prints a value. Each hit is reported as `VAR_NAME file:line`.
 
 ## Usage
 
 ```bash
 # Every commit on your branch: added lines and commit messages
-bun run secret-scan --diff origin/dev..HEAD --env-file .env.local.live-backup
+bun run secret-scan --diff origin/dev..HEAD --env-file .env.local.live-backup --env-file data/live-env-no-r2.txt
 
 # The staged diff (works as a pre-commit check)
 bun run secret-scan --staged --env-file .env.local.live-backup
@@ -17,7 +17,7 @@ bun run secret-scan --staged --env-file .env.local.live-backup
 bun run secret-scan --path .pr-captures --env-file .env.local.live-backup
 ```
 
-Flags can be combined. In a worktree, the env file lives in the main checkout, so pass its full path.
+Flags can be combined, and `--env-file` can be repeated. Production Convex values (`JWT_PRIVATE_KEY`, `JWKS`, `YOUTUBE_DATA_API_KEY`, ...) live in `data/live-env-no-r2.txt`, so pass it too. If a name has different values in different sources, every value is checked. In a worktree, the env files live in the main checkout, so pass their full paths.
 
 | Exit | Meaning |
 | --- | --- |
@@ -33,6 +33,7 @@ For each value of 8 or more chars, the scan looks for:
 - its URL-encoded form (upper- and lower-case escapes, `+` for spaces)
 - its JSON-escaped form (multi-line keys)
 - base64 and base64url, including when the value sits inside a longer base64 string such as `Basic user:pass`
+- each line of 32 or more chars in a multi-line or space-joined value, such as a PEM key's body lines (`-----BEGIN/END-----` lines are skipped), so a partial paste is caught
 
 `--diff A..B` scans the commits in `A..B`, the commits reachable from `B` but not from `A`. That is the branch's own work since its merge-base with `A`. Each commit's added lines are diffed against that commit's parent, and its message is scanned too. This is not `git diff A..B`: changes made on `A` after the branch point, such as `dev` removing a credential, never show up reversed as additions. A merge commit contributes only what its conflict resolution added (`--remerge-diff`), not the branch it merged in.
 
@@ -48,13 +49,13 @@ The `gitleaks` job adds pattern-based detection for well-known token formats. On
 
 ## Syncing Actions secrets
 
-After you rotate a secret, update the env file, then run:
+After you rotate a secret, update the env files, then run:
 
 ```bash
-bun run secret-scan:sync-ci --env-file /path/to/.env.local.live-backup [--repo Rakvadium/uvs-decks-gg] [--dry-run]
+bun run secret-scan:sync-ci [--env-file <file>]... [--repo Rakvadium/uvs-decks-gg] [--dry-run]
 ```
 
-This sets each manifest name that has a value in the file. Values go to `gh secret set NAME` on stdin and never reach the command line or the output. Names that aren't in the file are listed and left as they are. You need `gh` logged in with admin access to the repo.
+Without `--env-file`, it reads `.env.local.live-backup` and `data/live-env-no-r2.txt` from the current directory. From a worktree, pass both with full paths. It sets each manifest name that has a value in a file. If files disagree, the last file wins, and the name is reported. Values go to `gh secret set NAME` on stdin and never reach the command line or the output. Names that aren't in any file are listed and left as they are. You need `gh` logged in with admin access to the repo.
 
 ## Adding a secret
 

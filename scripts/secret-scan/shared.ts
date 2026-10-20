@@ -3,6 +3,8 @@ import { fileURLToPath } from "node:url";
 
 /** Values shorter than this are skipped: too likely to match ordinary text. */
 export const MIN_SECRET_LENGTH = 8;
+/** Single lines of a multi-line value (e.g. a PEM body line) are matched from this length. */
+export const MIN_FRAGMENT_LENGTH = 32;
 export const MANIFEST_PATH = fileURLToPath(new URL("./secrets.json", import.meta.url));
 
 const NAME = /^[A-Za-z_][A-Za-z0-9_]*$/;
@@ -96,15 +98,32 @@ function base64Forms(bytes: Buffer): string[] {
   return forms;
 }
 
+/**
+ * Lines of a multi-line or space-joined value (a PEM key) that are long enough to identify it on
+ * their own, so a partial paste is caught. `-----BEGIN/END-----` lines are skipped.
+ */
+export function valueFragments(value: string): string[] {
+  return value
+    .split(/\s+|\\n/)
+    .filter((part) => part !== value && part.length >= MIN_FRAGMENT_LENGTH && !part.includes("-----"));
+}
+
 export type LoadedSecrets = { secrets: Secret[]; missing: string[]; short: string[] };
 
-export function loadSecrets(names: string[], env: Record<string, string | undefined>): LoadedSecrets {
+type Env = Record<string, string | undefined>;
+
+/** Every distinct value of each name across `envs` is checked; values under 8 chars are skipped. */
+export function loadSecrets(names: string[], envs: Env | Env[]): LoadedSecrets {
   const loaded: LoadedSecrets = { secrets: [], missing: [], short: [] };
   for (const name of names) {
-    const value = env[name];
-    if (!value) loaded.missing.push(name);
-    else if (value.length < MIN_SECRET_LENGTH) loaded.short.push(name);
-    else loaded.secrets.push({ name, needles: encodedForms(value) });
+    const values = new Set([envs].flat().map((env) => env[name]).filter((value): value is string => !!value));
+    const usable = [...values].filter((value) => value.length >= MIN_SECRET_LENGTH);
+    if (values.size === 0) loaded.missing.push(name);
+    else if (usable.length === 0) loaded.short.push(name);
+    else {
+      const needles = usable.flatMap((value) => [value, ...valueFragments(value)].flatMap(encodedForms));
+      loaded.secrets.push({ name, needles: [...new Set(needles)] });
+    }
   }
   return loaded;
 }
@@ -149,6 +168,17 @@ export function formatHit(hit: Hit): string {
   return hit.commit ? `${where} @${hit.commit.slice(0, 7)}` : where;
 }
 
+/** Every value of a repeatable flag: `--env-file a --env-file=b` → `["a", "b"]`. */
+export function flagValues(argv: string[], key: string): string[] {
+  const values: string[] = [];
+  for (let i = 0; i < argv.length; i++) {
+    if (argv[i].startsWith(`--${key}=`)) values.push(argv[i].slice(key.length + 3));
+    else if (argv[i] === `--${key}` && argv[i + 1] && !argv[i + 1].startsWith("--")) values.push(argv[++i]);
+  }
+  return values;
+}
+
+/** Repeated flags keep their last value; use `flagValues` for repeatable ones. */
 export function parseArgs(argv: string[]): Record<string, string | true> {
   const out: Record<string, string | true> = {};
   for (let i = 0; i < argv.length; i++) {

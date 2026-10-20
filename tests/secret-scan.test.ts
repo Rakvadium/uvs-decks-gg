@@ -6,11 +6,13 @@ import path from "node:path";
 import { run } from "../scripts/secret-scan/index";
 import {
   encodedForms,
+  flagValues,
   loadManifest,
   loadSecrets,
   parseEnvFile,
   scanSource,
   type Source,
+  valueFragments,
 } from "../scripts/secret-scan/shared";
 import { parseDiff, rangeSources } from "../scripts/secret-scan/sources";
 
@@ -62,6 +64,27 @@ describe("secret-scan matching", () => {
     expect(scanSource(latin1(`x=${value}`), s)).toHaveLength(1);
   });
 
+  test("PEM key stored space-joined: each body line of 32+ chars matches on its own", () => {
+    const body = Array.from({ length: 4 }, (_, i) => Buffer.alloc(48, i + 1).toString("base64"));
+    const tail = "c2hvcnQtdGFpbC1saW5l";
+    // Built from parts so gitleaks' private-key rule doesn't flag this fake key.
+    const armor = (edge: string) => `-----${edge} ${["PRIVATE", "KEY"].join(" ")}-----`;
+    const pem = `${armor("BEGIN")} ${body.join(" ")} ${tail} ${armor("END")}`;
+    expect(valueFragments(pem)).toEqual(body);
+    const pemSecrets = loadSecrets(["JWT_PRIVATE_KEY"], { JWT_PRIVATE_KEY: pem }).secrets;
+    const partial = `const key = \`${armor("BEGIN")}\n${body[1]}\n${body[2]}\n\`;`;
+    expect(scanSource(latin1(partial), pemSecrets).map((h) => h.line)).toEqual([2, 3]);
+    expect(scanSource(latin1(`x ${tail} BEGIN PRIVATE KEY`), pemSecrets)).toEqual([]);
+    expect(valueFragments("single-token-value-that-is-quite-long-indeed")).toEqual([]);
+  });
+
+  test("checks every distinct value of a name across env sources", () => {
+    const loaded = loadSecrets(["KEY", "ONLY_B"], [{ KEY: "first-value-1" }, { KEY: "second-value-2", ONLY_B: "only-in-b-123" }]);
+    expect(loaded.missing).toEqual([]);
+    const key = loaded.secrets.filter((s) => s.name === "KEY");
+    expect(scanSource(latin1("a first-value-1\nb second-value-2"), key).map((h) => h.line)).toEqual([1, 2]);
+  });
+
   test("skips values shorter than 8 chars and reports missing ones", () => {
     const loaded = loadSecrets(["SHORT", "OK", "UNSET", "EMPTY"], { SHORT: "1234567", OK: "12345678", EMPTY: "" });
     expect(loaded.secrets.map((s) => s.name)).toEqual(["OK"]);
@@ -90,6 +113,10 @@ describe("secret-scan env file and manifest", () => {
       MULTI: "a\nb",
       CONVEX_DEPLOYMENT: "dev:x",
     });
+  });
+
+  test("repeatable flags", () => {
+    expect(flagValues(["--env-file", "a", "--diff", "x..y", "--env-file=b"], "env-file")).toEqual(["a", "b"]);
   });
 
   test("manifest has the issue's names, no username or public bucket", () => {
@@ -169,7 +196,7 @@ describe("secret-scan CLI", () => {
     expect(capture(["--bogus", "x"], {}, tempDir()).code).toBe(2);
   });
 
-  test("--diff scans every commit's added lines and messages; --env-file loads values", () => {
+  test("--diff scans every commit's added lines and messages; repeated --env-file values all load", () => {
     const dir = tempDir();
     const git = (...args: string[]) => execFileSync("git", args, { cwd: dir, stdio: "pipe" }).toString().trim();
     git("init", "-q", "-b", "main");
@@ -183,10 +210,11 @@ describe("secret-scan CLI", () => {
     git("commit", "-qam", `add\n\nmessage mentions ${Buffer.from(FAKE).toString("base64")}`);
     fs.writeFileSync(path.join(dir, "a.txt"), "base\n");
     git("commit", "-qam", "remove it again");
-    fs.writeFileSync(path.join(dir, ".env.test"), `SECRET_SCAN_CANARY=${FAKE}\n`);
+    fs.writeFileSync(path.join(dir, ".env.test"), "OPENAI_API_KEY=unrelated-value\n");
+    fs.writeFileSync(path.join(dir, ".env.second"), `SECRET_SCAN_CANARY=${FAKE}\n`);
 
     expect(rangeSources(`${base}..HEAD`, dir).filter((s) => s.location === "commit-message")).toHaveLength(2);
-    const { code, output } = capture(["--diff", `${base}..HEAD`, "--env-file", ".env.test"], {}, path.resolve(dir));
+    const { code, output } = capture(["--diff", `${base}..HEAD`, "--env-file", ".env.test", "--env-file", ".env.second"], {}, dir);
     expect(code).toBe(1);
     expect(output).toMatch(/SECRET_SCAN_CANARY a\.txt:2 @[0-9a-f]{7}/);
     expect(output).toMatch(/SECRET_SCAN_CANARY commit-message:3 @[0-9a-f]{7}/);
