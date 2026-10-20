@@ -4,23 +4,26 @@ export type Appearance = { theme: string; mode: Mode; chrome: string };
 
 const SESSION_QUERY = /^sessions(\.js)?:getSession$/;
 const PREF_KEYS = ["theme", "chrome", "colorSource"] as const;
+/** Every server-to-client frame and modification type in Convex's sync protocol (`WireServerMessage`). */
+const SERVER_FRAME_TYPES = new Set(["Transition", "TransitionChunk", "MutationResponse", "ActionResponse", "FatalError", "AuthError", "Ping"]);
+const MODIFICATION_TYPES = new Set(["QueryUpdated", "QueryFailed", "QueryRemoved"]);
 
 /** Test-only: makes the rewrite miss `sessions:getSession`, as if the query had been renamed. */
 export const BREAK_PIN_ENV = "PR_CAPTURE_TEST_BREAK_PIN";
 
-/** What one capture context's `sessions:getSession` rewrite did. Recorded per shot in manifest.json. */
+/** What one capture context's `sessions:getSession` rewrite had done at one moment. Recorded per shot in manifest.json. */
 export type PinReport = {
-  /** The agent's stored `preset/mode/chrome`, read before the rewrite. null if no result was read. */
+  /** The agent's stored `preset/mode/chrome`, read before the rewrite. null if no valid result was read. */
   saved: string | null;
-  /** At least one session result was rewritten to the pin. */
+  /** Every live `sessions:getSession` subscription's latest result was rewritten to the pin. */
   patched: boolean;
-  /** Why the rewrite may not have applied. Empty when it did. */
+  /** Why the page's JS may not follow the pin. Empty when it does. */
   problems: string[];
 };
 
 export type ClientFrame = { type?: string; modifications?: { type: string; queryId: number; udfPath?: string }[] };
 type Modification = { type: string; queryId: number; value?: unknown; errorMessage?: string };
-type Transition = { type: "Transition"; modifications: Modification[] };
+type Transition = { type: "Transition"; modifications?: Modification[] };
 type SessionPrefs = { theme?: string; chrome?: string; colorSource?: { kind?: string; preset?: string } };
 
 export function parseFrame<T>(message: string): T | null {
@@ -57,54 +60,80 @@ export function readSavedAppearance(value: object): { saved: string } | { invali
 
 /**
  * Rewrites the `sessions:getSession` result the browser receives so ColorSchemeProvider's JS state
- * (isDark, chrome, preset) follows the pin, and records in `report` whenever that can't happen.
+ * (isDark, chrome, preset) follows the pin, and tracks every session subscription in the context
+ * so `report()` can say whether, at that moment, the page's JS state follows the pin.
  * One per capture context; call `socket()` once per Convex sync WebSocket.
  */
 export function createSessionPin(appearance: Appearance, options: { broken?: boolean } = {}) {
   const pinned = { theme: appearance.mode, chrome: appearance.chrome, colorSource: { kind: "preset", preset: appearance.theme } };
-  const report: PinReport = { saved: null, patched: false, problems: [] };
-  let subscribed = false;
+  /** Live subscriptions, keyed `socket:queryId`. `rewritten` = its latest result was rewritten to the pin. */
+  const subscriptions = new Map<string, { rewritten: boolean }>();
+  const problems: string[] = [];
+  let everSubscribed = false;
+  let saved: string | null = null;
+  let sockets = 0;
   const problem = (text: string) => {
-    if (!report.problems.includes(text)) report.problems.push(text);
+    if (!problems.includes(text)) problems.push(text);
   };
 
   return {
     /**
-     * The final report. A context that rewrote nothing always has a problem: either it never
-     * subscribed, or it subscribed but no recognisable result was rewritten (no result before the
-     * shot, or the sync protocol changed shape).
+     * A snapshot of what had been forwarded to the page so far. Take it at screenshot time: only
+     * results forwarded before then count. Any problem means the page's JS may show the saved
+     * prefs or the app defaults instead of the pin.
      */
     report(): PinReport {
-      if (!subscribed) problem("no sessions:getSession subscription was seen (renamed, or the page isn't signed in)");
-      else if (!report.patched && !report.problems.length) {
-        problem("subscribed to sessions:getSession but no result was rewritten (none arrived, or the sync protocol changed)");
+      const now = [...problems];
+      const pending = [...subscriptions.values()].filter((sub) => !sub.rewritten).length;
+      if (!everSubscribed) now.push("no sessions:getSession subscription was seen (renamed, or the page isn't signed in)");
+      else if (pending) {
+        now.push(
+          `${pending} of ${subscriptions.size} sessions:getSession subscription(s) had no rewritten result ` +
+            "(none arrived yet, or the sync protocol changed)",
+        );
       }
-      return report;
+      return { saved, patched: everSubscribed && subscriptions.size > 0 && !pending, problems: now };
     },
 
-    /** Convex query ids are scoped to one connection, so track them per socket. */
+    /** Convex query ids are scoped to one connection, so subscriptions are tracked per socket. */
     socket() {
-      const sessionQueryIds = new Set<number>();
+      const socketId = sockets++;
+      const key = (queryId: number) => `${socketId}:${queryId}`;
+      const hasSession = () => [...subscriptions.keys()].some((k) => k.startsWith(`${socketId}:`));
       let chunks: string[] = [];
 
       const patch = (transition: Transition) => {
-        for (const mod of transition.modifications ?? []) {
-          if (!sessionQueryIds.has(mod.queryId)) continue;
-          if (mod.type === "QueryFailed") {
+        if (!Array.isArray(transition.modifications)) {
+          if (hasSession()) problem("a Transition without a `modifications` list was forwarded unpatched (protocol changed?)");
+          return JSON.stringify(transition);
+        }
+        for (const mod of transition.modifications) {
+          const sub = subscriptions.get(key(mod.queryId));
+          if (!sub) continue;
+          if (!MODIFICATION_TYPES.has(mod.type)) {
+            sub.rewritten = false;
+            problem(`unrecognised modification type "${mod.type}" for sessions:getSession was forwarded unpatched`);
+          } else if (mod.type === "QueryRemoved") {
+            subscriptions.delete(key(mod.queryId));
+          } else if (mod.type === "QueryFailed") {
+            sub.rewritten = false;
             problem(`sessions:getSession failed: ${mod.errorMessage ?? "unknown error"}`);
-          } else if (mod.type === "QueryUpdated") {
+          } else {
             const value = mod.value;
-            if (value === null || value === undefined) {
-              problem("sessions:getSession returned null, so there was nothing to rewrite");
+            const read =
+              value === null || value === undefined
+                ? null
+                : typeof value === "object" && !Array.isArray(value)
+                  ? readSavedAppearance(value)
+                  : { invalid: [...PREF_KEYS] };
+            sub.rewritten = false;
+            if (!read) problem("sessions:getSession returned null, so there was nothing to rewrite");
+            else if ("invalid" in read) {
+              problem(`sessions:getSession result is missing or has invalid ${read.invalid.join("/")} (shape changed?)`);
             } else {
-              const read = typeof value === "object" ? readSavedAppearance(value) : { invalid: [...PREF_KEYS] };
-              if ("invalid" in read) {
-                problem(`sessions:getSession result is missing or has invalid ${read.invalid.join("/")} (shape changed?)`);
-              } else {
-                report.saved = read.saved;
-                report.patched = true;
-                mod.value = { ...(value as object), ...pinned };
-              }
+              saved = read.saved;
+              sub.rewritten = true;
+              mod.value = { ...(value as object), ...pinned };
             }
           }
         }
@@ -112,22 +141,31 @@ export function createSessionPin(appearance: Appearance, options: { broken?: boo
       };
 
       return {
-        /** Call with each client-to-server frame so the session query's id is known. */
+        /** Call with each client-to-server frame so session subscriptions are known. */
         fromClient(frame: ClientFrame | null) {
           if (frame?.type !== "ModifyQuerySet" || options.broken) return;
           for (const mod of frame.modifications ?? []) {
             if (mod.type === "Add" && SESSION_QUERY.test(mod.udfPath ?? "")) {
-              sessionQueryIds.add(mod.queryId);
-              subscribed = true;
-            }
+              subscriptions.set(key(mod.queryId), { rewritten: false });
+              everSubscribed = true;
+            } else if (mod.type === "Remove") subscriptions.delete(key(mod.queryId));
           }
         },
 
         /** Returns the messages to forward to the browser for one server-to-client message. */
-        fromServer(message: string): string[] {
+        fromServer<M extends string | Buffer>(message: M): (M | string)[] {
+          if (typeof message !== "string") {
+            if (hasSession()) problem("a binary sync frame was forwarded unpatched (protocol changed?)");
+            return [message];
+          }
           const frame = parseFrame<{ type?: string; totalParts?: number; chunk?: string }>(message);
           if (frame?.type === "Transition") return [patch(frame as Transition)];
-          if (frame?.type !== "TransitionChunk") return [message];
+          if (frame?.type !== "TransitionChunk") {
+            if (hasSession() && !SERVER_FRAME_TYPES.has(frame?.type ?? "")) {
+              problem(`unrecognised sync frame type "${frame?.type ?? "unparseable"}" was forwarded unpatched`);
+            }
+            return [message];
+          }
           // Large transitions arrive in parts; reassemble so the session result can be patched.
           chunks.push(message);
           if (chunks.length < (frame.totalParts ?? 1)) return [];
@@ -135,7 +173,7 @@ export function createSessionPin(appearance: Appearance, options: { broken?: boo
           chunks = [];
           const whole = parseFrame<Transition>(parts.map((part) => parseFrame<{ chunk?: string }>(part)?.chunk ?? "").join(""));
           if (whole) return [patch(whole)];
-          if (sessionQueryIds.size) problem("a chunked transition couldn't be reassembled and was forwarded unpatched");
+          if (hasSession()) problem("a chunked transition couldn't be reassembled and was forwarded unpatched");
           return parts;
         },
       };
@@ -146,12 +184,10 @@ export function createSessionPin(appearance: Appearance, options: { broken?: boo
 export type SessionPin = ReturnType<typeof createSessionPin>;
 
 /**
- * A signed-in shot is flagged when the rewrite reported a problem and the pin differs from the
- * agent's saved appearance (or the saved value is unknown), because its JS-driven UI (menus,
- * toasts, neon forks) may then show the saved theme instead of the pin.
- * `runSaved` is any saved value another shot in the run read, used when this shot read none.
+ * A signed-in shot is flagged whenever the rewrite reported a problem, even if the pin equals the
+ * saved appearance: a page that never received a session value falls back to the app defaults
+ * (`system`/`calm`/`default`), not to the saved prefs.
  */
-export function pinFlagged(report: PinReport, appearance: Appearance, runSaved: string | null) {
-  const saved = report.saved ?? runSaved;
-  return report.problems.length > 0 && saved !== appearanceKey(appearance);
+export function pinFlagged(report: PinReport) {
+  return report.problems.length > 0;
 }

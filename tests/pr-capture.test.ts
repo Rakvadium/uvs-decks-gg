@@ -101,6 +101,8 @@ const update = (value: unknown) =>
 const chunk = (text: string, partNumber: number) =>
   JSON.stringify({ type: "TransitionChunk", chunk: text, partNumber, totalParts: 2, transitionId: "t" });
 
+const has = (report: { problems: string[] }, text: string) => report.problems.some((p) => p.includes(text));
+
 function subscribedPin(options?: { broken?: boolean }) {
   const pin = createSessionPin(PIN, options);
   const socket = pin.socket();
@@ -137,15 +139,19 @@ describe("pr-capture session pin", () => {
     expect(pin.report()).toMatchObject({ patched: false, problems: [expect.stringContaining("no sessions:getSession")] });
   });
 
+
   test("the test-only break switch forwards the saved prefs and reports it", () => {
     const { pin, socket } = subscribedPin({ broken: true });
     expect(JSON.parse(socket.fromServer(update(SAVED))[0]).modifications[0].value).toEqual(SAVED);
-    expect(pin.report()).toMatchObject({ saved: null, patched: false, problems: [expect.stringContaining("no sessions:getSession")] });
+    const report = pin.report();
+    expect([report.saved, report.patched, pinFlagged(report)]).toEqual([null, false, true]);
+    expect(has(report, "no sessions:getSession")).toBe(true);
   });
 
   test.each([
     ["a null result", update(null), "returned null"],
     ["a shape change", update({ _id: "s1", appearance: { theme: "dark" } }), "shape changed"],
+    ["an array result", update([1, 2]), "shape changed"],
     [
       "a failed query",
       JSON.stringify({ type: "Transition", modifications: [{ type: "QueryFailed", queryId: 3, errorMessage: "boom" }] }),
@@ -154,7 +160,9 @@ describe("pr-capture session pin", () => {
   ])("reports %s", (_, message, problem) => {
     const { pin, socket } = subscribedPin();
     socket.fromServer(message);
-    expect(pin.report()).toMatchObject({ patched: false, problems: [expect.stringContaining(problem)] });
+    const report = pin.report();
+    expect([report.saved, report.patched, pinFlagged(report)]).toEqual([null, false, true]);
+    expect(has(report, problem)).toBe(true);
   });
 
   test.each([
@@ -165,10 +173,8 @@ describe("pr-capture session pin", () => {
     const { pin, socket } = subscribedPin();
     expect(JSON.parse(socket.fromServer(update(value))[0]).modifications[0].value).toEqual(JSON.parse(JSON.stringify(value)));
     const report = pin.report();
-    expect(pinFlagged(report, PIN, null)).toBe(true);
-    expect([report.saved, report.patched, report.problems.length]).toEqual([null, false, 1]);
-    expect(report.problems[0]).toContain("shape changed");
-    expect(report.problems[0]).toContain(field);
+    expect([report.saved, report.patched, pinFlagged(report)]).toEqual([null, false, true]);
+    expect(report.problems.some((p) => p.includes("shape changed") && p.includes(field))).toBe(true);
   });
 
   test("records a custom colorSource as saved preset `custom`", () => {
@@ -178,21 +184,29 @@ describe("pr-capture session pin", () => {
   });
 
   test.each([
-    ["no result before the shot", []],
+    ["no result before the shot", [], "no rewritten result"],
     [
       "a renamed update type",
       [JSON.stringify({ type: "Transition", modifications: [{ type: "QueryResult", queryId: 3, value: SAVED }] })],
+      'unrecognised modification type "QueryResult"',
     ],
-    ["an unknown frame type", [JSON.stringify({ type: "TransitionV2", modifications: [{ type: "QueryUpdated", queryId: 3, value: SAVED }] })]],
-    ["a renamed modifications key", [JSON.stringify({ type: "Transition", changes: [{ type: "QueryUpdated", queryId: 3, value: SAVED }] })]],
-  ])("subscribed but nothing rewritten (%s) is a problem and flags the shot", (_, messages) => {
+    [
+      "an unknown frame type",
+      [JSON.stringify({ type: "TransitionV2", modifications: [{ type: "QueryUpdated", queryId: 3, value: SAVED }] })],
+      'unrecognised sync frame type "TransitionV2"',
+    ],
+    [
+      "a renamed modifications key",
+      [JSON.stringify({ type: "Transition", changes: [{ type: "QueryUpdated", queryId: 3, value: SAVED }] })],
+      "without a `modifications` list",
+    ],
+  ])("subscribed but nothing rewritten (%s) is a problem and flags the shot", (_, messages, problem) => {
     const { pin, socket } = subscribedPin();
     for (const message of messages) socket.fromServer(message);
     const report = pin.report();
-    expect(pinFlagged(report, PIN, null)).toBe(true);
-    expect(pinFlagged(report, PIN, "cyberpunk/dark/expressive")).toBe(true);
-    expect([report.saved, report.patched, report.problems.length]).toEqual([null, false, 1]);
-    expect(report.problems[0]).toContain("no result was rewritten");
+    expect([report.saved, report.patched, pinFlagged(report)]).toEqual([null, false, true]);
+    expect(has(report, "no rewritten result")).toBe(true);
+    expect(has(report, problem)).toBe(true);
   });
 
   test("reports a chunked transition that can't be reassembled, and forwards it as-is", () => {
@@ -200,14 +214,120 @@ describe("pr-capture session pin", () => {
     const parts = [chunk("{not json", 0), chunk("either", 1)];
     expect(socket.fromServer(parts[0])).toEqual([]);
     expect(socket.fromServer(parts[1])).toEqual(parts);
-    expect(pin.report().problems.join()).toContain("couldn't be reassembled");
+    expect(has(pin.report(), "couldn't be reassembled")).toBe(true);
   });
 
-  test("flags a shot only when a miss could change what it shows", () => {
-    const miss = { saved: null, patched: false, problems: ["x"] };
-    expect(pinFlagged(miss, PIN, null)).toBe(true);
-    expect(pinFlagged(miss, PIN, "cyberpunk/dark/expressive")).toBe(true);
-    expect(pinFlagged(miss, PIN, appearanceKey(PIN))).toBe(false);
-    expect(pinFlagged({ saved: "cyberpunk/dark/expressive", patched: true, problems: [] }, PIN, null)).toBe(false);
+  test("Ping frames and unknown frames on sockets without a session subscription are not problems", () => {
+    const { pin, socket } = subscribedPin();
+    socket.fromServer(JSON.stringify({ type: "Ping" }));
+    socket.fromServer(update(SAVED));
+    pin.socket().fromServer(JSON.stringify({ type: "TransitionV2" }));
+    expect(pin.report()).toEqual({ saved: "cyberpunk/dark/expressive", patched: true, problems: [] });
+  });
+});
+
+describe("pr-capture session pin: every subscription, every result", () => {
+  const SAVED_PIN: Appearance = { theme: "cyberpunk", mode: "dark", chrome: "expressive" };
+  const add = (queryId: number) => ({ type: "ModifyQuerySet", modifications: [{ type: "Add", queryId, udfPath: "sessions:getSession" }] });
+  const updateFor = (queryId: number, value: unknown, type = "QueryUpdated") =>
+    JSON.stringify({ type: "Transition", modifications: [{ type, queryId, value }] });
+
+  test.each<[string, (pin: ReturnType<typeof createSessionPin>) => void]>([
+    ["subscribed, no result before the shot", (pin) => pin.socket().fromClient(add(3))],
+    ["a null result", (pin) => { const s = pin.socket(); s.fromClient(add(3)); s.fromServer(updateFor(3, null)); }],
+    ["never subscribed", (pin) => void pin.socket()],
+    [
+      "a failed query",
+      (pin) => {
+        const s = pin.socket();
+        s.fromClient(add(3));
+        s.fromServer(JSON.stringify({ type: "Transition", modifications: [{ type: "QueryFailed", queryId: 3, errorMessage: "boom" }] }));
+      },
+    ],
+  ])("pin == saved is still flagged when no session value reached the page (%s)", (_, drive) => {
+    // The app then shows its defaults (system/calm/default), not the saved prefs.
+    const pin = createSessionPin(SAVED_PIN);
+    drive(pin);
+    expect(pinFlagged(pin.report())).toBe(true);
+  });
+
+  test("a second subscription with no result is a problem", () => {
+    const pin = createSessionPin(PIN);
+    const s = pin.socket();
+    s.fromClient(add(3));
+    s.fromClient(add(4));
+    s.fromServer(updateFor(3, SAVED));
+    const report = pin.report();
+    expect([report.patched, pinFlagged(report)]).toEqual([false, true]);
+    expect(has(report, "1 of 2 sessions:getSession subscription(s) had no rewritten result")).toBe(true);
+  });
+
+  test("a second subscription whose result uses an unknown type is a problem", () => {
+    const pin = createSessionPin(PIN);
+    const s = pin.socket();
+    s.fromClient(add(3));
+    s.fromClient(add(4));
+    s.fromServer(updateFor(3, SAVED));
+    s.fromServer(updateFor(4, SAVED, "QueryResult"));
+    expect(pinFlagged(pin.report())).toBe(true);
+  });
+
+  test("a later update in an unknown format, after a rewrite, is a problem", () => {
+    for (const later of [
+      updateFor(3, SAVED, "QueryResult"),
+      JSON.stringify({ type: "TransitionV2", modifications: [{ type: "QueryUpdated", queryId: 3, value: SAVED }] }),
+      updateFor(3, null),
+    ]) {
+      const pin = createSessionPin(PIN);
+      const s = pin.socket();
+      s.fromClient(add(3));
+      s.fromServer(updateFor(3, SAVED));
+      expect(pinFlagged(pin.report())).toBe(false);
+      s.fromServer(later);
+      expect(pinFlagged(pin.report())).toBe(true);
+    }
+  });
+
+  test("a reconnect is clean only if the new socket's result is rewritten too", () => {
+    const reconnect = (second: (s: ReturnType<ReturnType<typeof createSessionPin>["socket"]>) => void) => {
+      const pin = createSessionPin(PIN);
+      const first = pin.socket();
+      first.fromClient(add(3));
+      first.fromServer(updateFor(3, SAVED));
+      const next = pin.socket();
+      next.fromClient(add(0));
+      second(next);
+      return pin.report();
+    };
+    expect(pinFlagged(reconnect(() => {}))).toBe(true);
+    expect(
+      pinFlagged(reconnect((s) => s.fromServer(JSON.stringify({ type: "TransitionV2", modifications: [{ type: "QueryUpdated", queryId: 0, value: SAVED }] })))),
+    ).toBe(true);
+    expect(reconnect((s) => s.fromServer(updateFor(0, SAVED)))).toEqual({ saved: "cyberpunk/dark/expressive", patched: true, problems: [] });
+  });
+
+  test("a removed subscription no longer needs a result", () => {
+    const pin = createSessionPin(PIN);
+    const s = pin.socket();
+    s.fromClient(add(3));
+    s.fromClient({ type: "ModifyQuerySet", modifications: [{ type: "Remove", queryId: 3 }] });
+    s.fromClient(add(4));
+    s.fromServer(updateFor(4, SAVED));
+    expect(pin.report()).toEqual({ saved: "cyberpunk/dark/expressive", patched: true, problems: [] });
+  });
+
+  test("a report is a snapshot: a result that arrives after it doesn't count", () => {
+    const pin = createSessionPin(PIN);
+    const s = pin.socket();
+    s.fromClient(add(3));
+    const atScreenshot = pin.report();
+    s.fromServer(updateFor(3, SAVED));
+    expect([atScreenshot.patched, pinFlagged(atScreenshot)]).toEqual([false, true]);
+    expect(pin.report()).toEqual({ saved: "cyberpunk/dark/expressive", patched: true, problems: [] });
+  });
+
+  test("a clean report has no problems, so it isn't flagged", () => {
+    expect(pinFlagged({ saved: appearanceKey(PIN), patched: true, problems: [] })).toBe(false);
+    expect(pinFlagged({ saved: appearanceKey(PIN), patched: false, problems: ["x"] })).toBe(true);
   });
 });

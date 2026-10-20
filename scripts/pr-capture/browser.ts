@@ -31,7 +31,6 @@ async function proxyConvexSocket(context: BrowserContext, blocked: string[], pin
 
     if (!socket) return;
     server.onMessage((message) => {
-      if (typeof message !== "string") return ws.send(message);
       for (const out of socket.fromServer(message)) ws.send(out);
     });
   });
@@ -219,17 +218,24 @@ ${HIDE_DEV_OVERLAY_CSS}
 const QUIET_MS = 2_000;
 const SHOT_INTERVAL_MS = 400;
 
-export async function stableScreenshot(page: Page, fullPage: boolean) {
+/**
+ * `snapshot` runs just before each screenshot. The returned `at` belongs to the returned `png`, so
+ * callers can tell what state (e.g. the theme pin) the page was in when that image was taken.
+ */
+export async function stableScreenshot<T = undefined>(page: Page, fullPage: boolean, snapshot?: () => T) {
   await page.addStyleTag({ content: FREEZE_CSS });
-  const shoot = () => page.screenshot({ animations: "disabled", caret: "hide", fullPage });
+  const shoot = async () => {
+    const at = snapshot?.();
+    return { png: await page.screenshot({ animations: "disabled", caret: "hide", fullPage }), at };
+  };
   let previous = await shoot();
   let quietSince = Date.now();
   for (const deadline = Date.now() + 30_000; Date.now() < deadline; ) {
     await page.waitForTimeout(SHOT_INTERVAL_MS);
     const next = await shoot();
-    if (!next.equals(previous)) quietSince = Date.now();
-    else if (Date.now() - quietSince >= QUIET_MS) return { png: next, stable: true };
+    if (!next.png.equals(previous.png)) quietSince = Date.now();
+    else if (Date.now() - quietSince >= QUIET_MS) return { ...next, stable: true };
     previous = next;
   }
-  return { png: previous, stable: false };
+  return { ...previous, stable: false };
 }

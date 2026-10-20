@@ -13,7 +13,7 @@ import {
   stableScreenshot,
 } from "./browser.ts";
 import { recordFrames, writeGif } from "./gif.ts";
-import { BREAK_PIN_ENV, appearanceKey, pinFlagged, type Appearance, type PinReport, type SessionPin } from "./pin.ts";
+import { BREAK_PIN_ENV, appearanceKey, pinFlagged, type Appearance, type PinReport } from "./pin.ts";
 import {
   OUTPUT_ROOT,
   VIEWPORTS,
@@ -115,12 +115,20 @@ async function ensureServer(): Promise<ChildProcess | null> {
 
 type ShotPin = PinReport & { pinned: string; overridden: boolean; flagged: boolean };
 
-/** Signed-in shots only: what the session rewrite did in this shot's context. `flagged` is set when the run ends. */
-function readPin(pin: SessionPin, auth: RouteSpec["auth"], appearance: Appearance): ShotPin | null {
+/**
+ * Signed-in shots only. `snapshots` are pin reports taken at screenshot time (the still, or the
+ * GIF's first and last frame), so a session result that arrives after the image doesn't count.
+ */
+function shotPin(snapshots: (PinReport | undefined)[], auth: RouteSpec["auth"], appearance: Appearance): ShotPin | null {
   if (auth !== "agent") return null;
-  const report = pin.report();
+  const taken = snapshots.filter((report): report is PinReport => report !== undefined);
+  const problems = [...new Set(taken.flatMap((report) => report.problems))];
+  if (!taken.length) problems.push("no pin snapshot was taken (no frame captured)");
+  const saved = taken.findLast((report) => report.saved)?.saved ?? null;
+  const patched = taken.length > 0 && taken.every((report) => report.patched);
   const pinned = appearanceKey(appearance);
-  return { ...report, pinned, overridden: report.patched && report.saved !== pinned, flagged: false };
+  const report = { saved, patched, problems };
+  return { ...report, pinned, overridden: patched && saved !== pinned, flagged: pinFlagged(report) };
 }
 
 function warnPin(pin: ShotPin | null) {
@@ -155,7 +163,7 @@ async function captureStill(
     await settle(page);
     await runSteps(page, route.steps);
     const loaded = await settle(page);
-    const { png, stable } = await stableScreenshot(page, fullPage);
+    const { png, stable, at } = await stableScreenshot(page, fullPage, route.auth === "agent" ? pin.report : undefined);
     fs.writeFileSync(path.join(outDir, `${name}.png`), png);
     const finalPath = new URL(page.url()).pathname;
     const notes = [
@@ -164,9 +172,9 @@ async function captureStill(
       finalPath !== route.path && `landed on ${finalPath}`,
     ].filter(Boolean);
     console.log(`  ${name}.png${notes.length ? `  (${notes.join("; ")})` : ""}`);
-    const shotPin = readPin(pin, route.auth, appearance);
-    warnPin(shotPin);
-    return { name, route: route.path, auth: route.auth, appearance, finalPath, loaded, stable, pin: shotPin };
+    const report = shotPin([at], route.auth, appearance);
+    warnPin(report);
+    return { name, route: route.path, auth: route.auth, appearance, finalPath, loaded, stable, pin: report };
   } finally {
     await context.close();
   }
@@ -191,16 +199,16 @@ async function captureGif(
     videoDir,
   });
   const page = await context.newPage();
-  let frames: Awaited<ReturnType<typeof recordFrames>> = [];
+  let frames: Awaited<ReturnType<typeof recordFrames<PinReport>>> = [];
   try {
     await page.goto(baseUrl + gif.path, { timeout: 180_000 });
     await settle(page);
     await page.addStyleTag({ content: HIDE_DEV_OVERLAY_CSS });
-    frames = await recordFrames(page, gif.steps ?? []);
+    frames = await recordFrames(page, gif.steps ?? [], gif.auth === "agent" ? pin.report : undefined);
   } finally {
     await context.close();
   }
-  const gifPin = readPin(pin, gif.auth, appearance);
+  const gifPin = shotPin([frames[0]?.snapshot, frames.at(-1)?.snapshot], gif.auth, appearance);
   await page.video()?.saveAs(path.join(outDir, `${name}.webm`));
   fs.rmSync(videoDir, { recursive: true, force: true });
   await writeGif(frames, path.join(outDir, `${name}.gif`), gifWidth);
@@ -245,7 +253,6 @@ async function main() {
 
   const signedIn = [...shots, ...(gifShot ? [gifShot] : [])].flatMap((shot) => (shot.pin ? [{ ...shot, pin: shot.pin }] : []));
   const savedAppearance = [...new Set(signedIn.flatMap((shot) => (shot.pin.saved ? [shot.pin.saved] : [])))];
-  for (const { pin, appearance } of signedIn) pin.flagged = pinFlagged(pin, appearance, savedAppearance[0] ?? null);
   const flagged = signedIn.filter((shot) => shot.pin.flagged).map((shot) => shot.name);
 
   fs.writeFileSync(
@@ -282,8 +289,8 @@ async function main() {
   }
   if (flagged.length) {
     console.warn(
-      `WARNING: ${flagged.length} signed-in shot(s) may show the agent's saved theme in JS-driven UI (menus, toasts, ` +
-        `neon forks) instead of the pin: ${flagged.join(", ")}. See \`pin.problems\` in manifest.json.`,
+      `WARNING: ${flagged.length} signed-in shot(s) may show the agent's saved theme or the app defaults in JS-driven UI ` +
+        `(menus, toasts, neon forks) instead of the pin: ${flagged.join(", ")}. See \`pin.problems\` in manifest.json.`,
     );
     if (strict) throw new Error("--strict: failing because the JS theme pin did not apply to every signed-in shot.");
   }
