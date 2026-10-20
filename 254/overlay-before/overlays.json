@@ -1,0 +1,38 @@
+{
+  "decks-new-deck__desktop__default__dark.png": {
+    "overlays": 2,
+    "blocked": [
+      "Action:communityLive:refreshLiveStatus"
+    ]
+  },
+  "deck-duplicate__desktop__default__dark.png": {
+    "overlays": 0,
+    "blocked": [
+      "Action:communityLive:refreshLiveStatus"
+    ]
+  },
+  "tier-lists-create__desktop__default__dark.png": {
+    "overlays": 2,
+    "blocked": [
+      "Action:communityLive:refreshLiveStatus"
+    ]
+  },
+  "decks-new-deck__mobile__default__dark.png": {
+    "overlays": 2,
+    "blocked": [
+      "Action:communityLive:refreshLiveStatus"
+    ]
+  },
+  "deck-duplicate__mobile__default__dark.png": {
+    "overlays": 0,
+    "blocked": [
+      "Action:communityLive:refreshLiveStatus"
+    ]
+  },
+  "tier-lists-create__mobile__default__dark.png": {
+    "overlays": 2,
+    "blocked": [
+      "Action:communityLive:refreshLiveStatus"
+    ]
+  }
+}

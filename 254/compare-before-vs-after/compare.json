@@ -1,0 +1,199 @@
+{
+  "base": "before",
+  "head": "after",
+  "threshold": 0.1,
+  "results": [
+    {
+      "name": "guest-community__desktop__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-community__desktop__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-community__desktop__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-community__desktop__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-community__mobile__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-community__mobile__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-community__mobile__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-community__mobile__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-decks-nh7f0kqdg3hwnpjpmga3tavb5sx4nzwf__desktop__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-decks-nh7f0kqdg3hwnpjpmga3tavb5sx4nzwf__desktop__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-decks-nh7f0kqdg3hwnpjpmga3tavb5sx4nzwf__desktop__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-decks-nh7f0kqdg3hwnpjpmga3tavb5sx4nzwf__desktop__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-decks-nh7f0kqdg3hwnpjpmga3tavb5sx4nzwf__mobile__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-decks-nh7f0kqdg3hwnpjpmga3tavb5sx4nzwf__mobile__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-decks-nh7f0kqdg3hwnpjpmga3tavb5sx4nzwf__mobile__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-decks-nh7f0kqdg3hwnpjpmga3tavb5sx4nzwf__mobile__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-decks__desktop__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-decks__desktop__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-decks__desktop__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-decks__desktop__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-decks__mobile__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-decks__mobile__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-decks__mobile__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-decks__mobile__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-gallery__desktop__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-gallery__desktop__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-gallery__desktop__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-gallery__desktop__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-gallery__mobile__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-gallery__mobile__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-gallery__mobile__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-gallery__mobile__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-settings__desktop__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-settings__desktop__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-settings__desktop__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-settings__desktop__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-settings__mobile__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-settings__mobile__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-settings__mobile__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-settings__mobile__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-teams__desktop__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-teams__desktop__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-teams__desktop__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-teams__desktop__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-teams__mobile__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-teams__mobile__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-teams__mobile__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-teams__mobile__default__light",
+      "diffPercent": 0
+    }
+  ]
+}
