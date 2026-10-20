@@ -3,7 +3,8 @@ import { v } from "convex/values";
 import type { Doc, Id } from "./_generated/dataModel";
 import type { MutationCtx } from "./_generated/server";
 import { mutation, query } from "./_generated/server";
-import { buildAdminSearchText, isAdminRole } from "./lib/accountStatus";
+import { buildAdminSearchText, isEffectiveAdmin } from "./lib/accountStatus";
+import { isReservedAgentUser } from "./lib/reservedIdentity";
 import { requireAdmin } from "./utils/validation";
 
 const accountStatusFilterValidator = v.union(
@@ -69,7 +70,7 @@ function matchesFilters(u: Doc<"users">, filters: FilterState) {
     return false;
   }
   if (filters.role !== "all") {
-    const r = isAdminRole(u.role) ? "Admin" : "user";
+    const r = isEffectiveAdmin(u) ? "Admin" : "user";
     if (r !== filters.role) return false;
   }
   if (filters.hasVerifiedEmail !== "all") {
@@ -125,7 +126,7 @@ async function countAdmins(ctx: MutationCtx) {
     .query("users")
     .withIndex("by_role", (q) => q.eq("role", "Admin"))
     .collect();
-  return rows.length;
+  return rows.filter(isEffectiveAdmin).length;
 }
 
 export const runUserDirectoryBackfillBatch = mutation({
@@ -379,7 +380,7 @@ export const setAccountStatus = mutation({
     }
     const target = await ctx.db.get(args.targetUserId);
     if (!target) throw new Error("User not found");
-    if (isAdminRole(target.role) && args.nextStatus !== "active") {
+    if (isEffectiveAdmin(target) && args.nextStatus !== "active") {
       const n = await countAdmins(ctx);
       if (n <= 1) {
         throw new Error("The last admin account cannot be restricted.");
@@ -443,7 +444,10 @@ export const setUserRole = mutation({
     }
     const target = await ctx.db.get(args.targetUserId);
     if (!target) throw new Error("User not found");
-    if (isAdminRole(target.role) && args.role === "user") {
+    if (args.role === "Admin" && isReservedAgentUser(target)) {
+      throw new Error("Reserved test accounts cannot be promoted to Admin.");
+    }
+    if (isEffectiveAdmin(target) && args.role === "user") {
       const n = await countAdmins(ctx);
       if (n <= 1) {
         throw new Error("The last admin cannot be demoted.");

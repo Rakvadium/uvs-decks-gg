@@ -4,6 +4,7 @@ import { getAuthUserId } from "@convex-dev/auth/server";
 import {
   effectiveAccountStatus,
   isDocAccountActiveForQuery,
+  isEffectiveAdmin,
   userCanPostContent,
   userCanUpdateProfile,
 } from "../lib/accountStatus";
@@ -69,7 +70,7 @@ export async function requireAdmin(ctx: QueryCtx | MutationCtx): Promise<Id<"use
     await applyLazyExpireForUserIfNeeded(ctx, userId);
   }
   const user = await ctx.db.get(userId);
-  if (!user || user.role !== "Admin") {
+  if (!user || !isEffectiveAdmin(user)) {
     throw new Error("Admin role required");
   }
   if (!isDocAccountActiveForQuery(user)) {

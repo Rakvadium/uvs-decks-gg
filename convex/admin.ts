@@ -17,7 +17,7 @@ import {
   setLegalityValidator,
 } from "./validators";
 import { requireAdmin } from "./utils/validation";
-import { isDocAccountActiveForQuery } from "./lib/accountStatus";
+import { isDocAccountActiveForQuery, isEffectiveAdmin } from "./lib/accountStatus";
 import { runCatalogAggregateRefresh } from "./cardFacets";
 import {
   syncSetCardCountByCode,
@@ -1089,7 +1089,7 @@ export const ensureAdminForAction = internalMutation({
   returns: v.null(),
   handler: async (ctx, args) => {
     const user = await ctx.db.get(args.userId);
-    if (!user || user.role !== "Admin") {
+    if (!user || !isEffectiveAdmin(user)) {
       throw new Error("Admin role required");
     }
     if (!isDocAccountActiveForQuery(user)) {
