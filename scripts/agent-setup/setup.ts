@@ -1,16 +1,29 @@
 /**
  * `agent:setup` after dependencies are installed: env-file refusal, port claim, `.env.local`
- * template, backend start, seed check and smoke test. Every env file is read through guard.ts
- * (the CLI's own dotenv), and every Convex call goes through `vconvex` / `validation:backend`.
+ * template, backend start, seed check and smoke test. Env files are read through guard.ts (the
+ * CLI's own dotenv) and through Next.js's own loader, and every Convex call goes through
+ * `vconvex` / `validation:backend`.
  */
 import { spawn } from "node:child_process";
 import fs from "node:fs";
+import { createRequire } from "node:module";
 import path from "node:path";
 import { ConvexHttpClient } from "convex/browser";
 import { makeFunctionReference } from "convex/server";
 import { isPortFree, status } from "../validation/backend";
-import { checkInvocation, formatCheck } from "../validation/convex";
-import { ANONYMOUS_DEPLOYMENT, envFileAmbiguities, envViolations, loadCliDotenv, readCliEnvFiles } from "../validation/guard";
+import { REPO_ROOT, checkInvocation, formatCheck } from "../validation/convex";
+import {
+  ANONYMOUS_DEPLOYMENT,
+  dotenvEntries,
+  envFileAmbiguities,
+  envViolations,
+  loadCliDotenv,
+  naiveEntries,
+  parseDotenv,
+  readCliEnvFiles,
+  valuesFor,
+  type EnvFile,
+} from "../validation/guard";
 import {
   backendDir,
   claimPort,
@@ -22,7 +35,7 @@ import {
   registryPath,
 } from "../validation/ports";
 import { parseRunOutput, readManifest, type SeedMeta } from "../validation/seed/manifest";
-import type { SetupArgs } from "./preflight";
+import { shellNodeEnvProblems, type EnvVars, type SetupArgs } from "./preflight";
 
 const say = (message: string) => console.error(`[agent:setup] ${message}`);
 
@@ -42,42 +55,168 @@ export const PRODUCTION_SECRET_NAMES = [
 ];
 
 /**
- * Problems with the env files the Convex CLI would load from `cwd` (`.env.local`, `.env`), checked
- * with guard.ts's own rules: forbidden names, a non-`anonymous:` deployment, a non-loopback Convex
- * URL, ambiguous lines, vault files, a project-linked convex.json. Plus any production secret name.
- * Messages carry names, never secret values. No files → no problems.
+ * The only names an agent worktree's env files may set. `bun install`, `bun run` and every tool they
+ * start load these files themselves (Bun 1.3 can't be told not to), so anything else could steer
+ * them: download hosts, registries, proxies, `NODE_OPTIONS`, binary paths, `GIT_*`, `NODE_ENV`.
+ * Convex names are checked for loopback/anonymous by guard.ts.
  */
-export function envFileProblems(cwd: string): string[] {
-  const files = readCliEnvFiles(cwd);
-  const out: string[] = [];
+export const ALLOWED_ENV_FILE_NAMES = [
+  /^CONVEX_DEPLOYMENT$/,
+  /^CONVEX_(SITE_)?URL$/,
+  /^NEXT_PUBLIC_[A-Z0-9_]+$/,
+  /^AGENT_AUTH_(SECRET|EMAIL|USERNAME)$/,
+];
+
+export const NEXT_ENV_MODES = ["development", "production", "test"] as const;
+export type NextEnvMode = (typeof NEXT_ENV_MODES)[number];
+
+/**
+ * The files `loadEnvConfig` in @next/env 16.0.8 (the installed `next`) reads, highest priority
+ * first: `.env.<mode>.local`, `.env.local` (not in test), `.env.<mode>`, `.env`. The mode is `test`
+ * when NODE_ENV is `test`, else `development` for `next dev` and `production` otherwise.
+ */
+export function nextEnvFiles(mode: NextEnvMode): string[] {
+  return [`.env.${mode}.local`, ...(mode === "test" ? [] : [".env.local"]), `.env.${mode}`, ".env"];
+}
+
+/** Every env file Next.js can load, whatever NODE_ENV is. */
+export const NEXT_ENV_FILES = [...new Set(NEXT_ENV_MODES.flatMap(nextEnvFiles))];
+
+const NEXT_ENV_MODULE = path.join(REPO_ROOT, "node_modules", "@next", "env");
+
+function linkKind(stat: fs.Stats): string {
+  if (stat.isSymbolicLink()) return "a symlink or junction";
+  if (stat.isDirectory()) return "a directory";
+  return "not a regular file";
+}
+
+/**
+ * Every `.env*` entry in `cwd` that isn't a regular file (refused: nothing is read or written
+ * through a link), and the text of each Next.js env file that is.
+ */
+export function readEnvFiles(cwd: string): { files: EnvFile[]; problems: string[] } {
+  const problems: string[] = [];
+  for (const name of fs.existsSync(cwd) ? fs.readdirSync(cwd) : []) {
+    if (!/^\.env/i.test(name)) continue;
+    const stat = fs.lstatSync(path.join(cwd, name));
+    if (!stat.isFile()) problems.push(`${name} is ${linkKind(stat)}; env files must be regular files, never links.`);
+  }
+  const files: EnvFile[] = [];
+  for (const name of NEXT_ENV_FILES) {
+    const full = path.join(cwd, name);
+    let stat: fs.Stats;
+    try {
+      stat = fs.lstatSync(full);
+    } catch {
+      continue;
+    }
+    if (stat.isFile()) files.push({ name, text: fs.readFileSync(full, "utf8") });
+  }
+  return { files, problems };
+}
+
+/** Every assignment either view of the file finds (dotenv's and a plain line read), as guard.ts checks. */
+function fileEntries(file: EnvFile): [string, string][] {
+  return [...dotenvEntries(file.text), ...naiveEntries(file.text)];
+}
+
+export type NextResolved = { mode: NextEnvMode; files: string[]; env: Record<string, string>; errors: number };
+
+type NextEnvModule = {
+  loadEnvConfig(
+    dir: string,
+    dev?: boolean,
+    log?: { info: (...a: unknown[]) => void; error: (...a: unknown[]) => void },
+    forceReload?: boolean,
+  ): { parsedEnv?: Record<string, string>; loadedEnvFiles: { path: string }[] };
+};
+
+/** Replaces every entry of process.env with `next` (Next's loader writes into process.env). */
+function replaceProcessEnv(next: EnvVars): void {
+  for (const key of Object.keys(process.env)) delete process.env[key];
+  for (const [key, value] of Object.entries(next)) if (value !== undefined) process.env[key] = value;
+}
+
+/**
+ * What `next dev` (development), `next build`/`next start` (production) and tests (test) would read
+ * from `cwd`'s env files, from Next.js's own loader (@next/env, with its dotenv and variable
+ * expansion). In this process, synchronously: each mode gets a fresh copy of the module (it caches
+ * the first env it sees) and a process.env holding only PATH/SystemRoot (plus NODE_ENV=test for the
+ * test mode), so expansion can't borrow shell values. process.env is restored afterwards. A child
+ * process would do too, but Bun 1.3 on Windows intermittently fails spawns after many others.
+ */
+export function nextResolvedEnv(cwd: string, nextEnvModule = NEXT_ENV_MODULE): NextResolved[] {
+  const saved: EnvVars = { ...process.env };
+  const minimal: EnvVars = {};
+  for (const name of ["PATH", "SystemRoot"]) {
+    const value = valuesFor(saved, name)[0];
+    if (value !== undefined) minimal[name] = value;
+  }
+  const req = createRequire(import.meta.url);
+  const resolved = req.resolve(nextEnvModule);
+  try {
+    return NEXT_ENV_MODES.map((mode) => {
+      replaceProcessEnv(mode === "test" ? { ...minimal, NODE_ENV: "test" } : minimal);
+      delete req.cache[resolved];
+      const { loadEnvConfig } = req(resolved) as NextEnvModule;
+      let errors = 0;
+      const r = loadEnvConfig(cwd, mode === "development", { info() {}, error() { errors++; } }, true);
+      return { mode, files: r.loadedEnvFiles.map((f) => f.path), env: { ...(r.parsedEnv ?? {}) }, errors };
+    });
+  } finally {
+    delete req.cache[resolved];
+    replaceProcessEnv(saved);
+  }
+}
+
+/**
+ * Problems with the env files in `cwd`: every file Next.js can load (see NEXT_ENV_FILES; the CLI's
+ * `.env.local` and `.env` are among them), whatever NODE_ENV is. Each is checked with guard.ts's
+ * rules (forbidden names, a non-`anonymous:` deployment, a non-loopback Convex URL, ambiguous
+ * lines), the production secret names and the name allowlist. Then each mode as Next.js itself
+ * resolves it. Plus links, vault files and a project-linked convex.json. Names, never secret values.
+ */
+export function envFileProblems(cwd: string, nextEnvModule = NEXT_ENV_MODULE): string[] {
+  const { files, problems: out } = readEnvFiles(cwd);
+  const cli = readCliEnvFiles(cwd);
   let cliParse: ((src: string) => Record<string, string>) | undefined;
-  if (files.parserError) out.push(`The CLI's bundled dotenv could not be loaded (${files.parserError}).`);
-  else if (files.envFiles.length > 0) cliParse = loadCliDotenv().parse;
-  for (const source of files.sources) {
-    out.push(...envViolations(source));
-    const names = new Set((source.entries ?? Object.entries(source.env)).map(([k]) => k.toUpperCase()));
-    for (const name of PRODUCTION_SECRET_NAMES) {
-      if (names.has(name)) out.push(`${name} is set in ${source.name}: that is a cloud deployment secret.`);
+  if (cli.parserError) out.push(`The CLI's bundled dotenv could not be loaded (${cli.parserError}).`);
+  else if (files.length > 0) cliParse = loadCliDotenv().parse;
+  for (const file of files) {
+    out.push(...envViolations({ name: file.name, env: parseDotenv(file.text), entries: fileEntries(file) }));
+    for (const name of new Set(fileEntries(file).map(([k]) => k.toUpperCase()))) {
+      if (PRODUCTION_SECRET_NAMES.includes(name)) out.push(`${name} is set in ${file.name}: that is a cloud deployment secret.`);
+      else if (!ALLOWED_ENV_FILE_NAMES.some((re) => re.test(name))) {
+        out.push(`${name} is set in ${file.name}; agent worktree env files may only set CONVEX_DEPLOYMENT, CONVEX_URL, CONVEX_SITE_URL, NEXT_PUBLIC_* and AGENT_AUTH_SECRET/EMAIL/USERNAME.`);
+      }
+    }
+    out.push(...envFileAmbiguities(file, cliParse));
+  }
+  for (const vault of cli.vaultFiles) out.push(`${vault} exists; dotenv can decrypt it into the CLI's env.`);
+  if (cli.projectLinked) out.push("convex.json links a team/project (or can't be read), a CLI fallback to the cloud.");
+  // Each file passed on its own; now check what Next.js makes of them together, per mode.
+  if (out.length === 0 && files.length > 0) {
+    for (const resolved of nextResolvedEnv(cwd, nextEnvModule)) {
+      const name = `Next.js ${resolved.mode} env (${resolved.files.join(" + ") || "no files"})`;
+      if (resolved.errors > 0) out.push(`${name}: Next.js could not load ${resolved.errors} file(s).`);
+      out.push(...envViolations({ name, env: resolved.env }));
     }
   }
-  for (const file of files.envFiles) out.push(...envFileAmbiguities(file, cliParse));
-  for (const vault of files.vaultFiles) out.push(`${vault} exists; dotenv can decrypt it into the CLI's env.`);
-  if (files.projectLinked) out.push("convex.json links a team/project (or can't be read), a CLI fallback to the cloud.");
   return [...new Set(out)];
 }
 
 /**
  * Step 2: refuse, before anything else runs, when an env file, or the shell agent:setup runs in,
- * could point anywhere but a local backend. `bun run` loads `.env.local` into `env` too, so shell
- * entries with the same name and value as an env file entry are left to the file check.
+ * could point anywhere but a local backend. `bun run` loads env files into `env` too, so shell
+ * entries with the same name and value as an env file entry are left to the file check. A shell
+ * NODE_ENV other than `development` is refused: it makes Bun and Next.js pick other env files and
+ * modes than the ones `next dev` uses.
  */
 export function assertEnvFilesLocal(cwd: string, env: Record<string, string | undefined> = process.env): void {
   const fileProblems = envFileProblems(cwd);
-  const fromFiles = new Set(
-    readCliEnvFiles(cwd).sources.flatMap((s) => (s.entries ?? Object.entries(s.env)).map(([k, v]) => `${k.toUpperCase()}=${v}`)),
-  );
+  const fromFiles = new Set(readEnvFiles(cwd).files.flatMap((f) => fileEntries(f).map(([k, v]) => `${k.toUpperCase()}=${v}`)));
   const shellOnly = Object.fromEntries(Object.entries(env).filter(([k, v]) => !fromFiles.has(`${k.toUpperCase()}=${v}`)));
-  const shellProblems = envViolations({ name: "the caller's environment", env: shellOnly });
+  const shellProblems = [...envViolations({ name: "the caller's environment", env: shellOnly }), ...shellNodeEnvProblems(env)];
   if (fileProblems.length === 0 && shellProblems.length === 0) return;
   throw new Error(
     [
@@ -85,7 +224,7 @@ export function assertEnvFilesLocal(cwd: string, env: Record<string, string | un
       ...[...fileProblems, ...shellProblems].map((p) => `  - ${p}`),
       ...(fileProblems.length > 0
         ? [
-            "A worktree's .env.local must never be a copy of the main checkout's. Move it aside (it may hold live secrets) and rerun;",
+            "A worktree's env files must never be copies of the main checkout's. Move them aside (they may hold live secrets) and rerun;",
             "agent:setup then writes a loopback-only .env.local from its template.",
           ]
         : []),
@@ -94,6 +233,21 @@ export function assertEnvFilesLocal(cwd: string, env: Record<string, string | un
         : []),
     ].join("\n"),
   );
+}
+
+/**
+ * The env for the install steps: `env` minus every name any `.env*` file in `cwd` assigns, so
+ * nothing from a worktree file reaches them through this process. (`bun install` still reads the
+ * files itself; by then they have passed assertEnvFilesLocal, allowlist included.)
+ */
+export function installEnv(cwd: string, env: EnvVars = process.env): EnvVars {
+  const names = new Set<string>();
+  for (const name of fs.existsSync(cwd) ? fs.readdirSync(cwd) : []) {
+    const full = path.join(cwd, name);
+    if (!/^\.env/i.test(name) || !fs.lstatSync(full).isFile()) continue;
+    for (const [k] of fileEntries({ name, text: fs.readFileSync(full, "utf8") })) names.add(k.toUpperCase());
+  }
+  return Object.fromEntries(Object.entries(env).filter(([k]) => !names.has(k.toUpperCase())));
 }
 
 /** The `.env.local` agent:setup writes when there is none: the anonymous deployment and loopback URLs only. */
@@ -109,12 +263,25 @@ export function envLocalTemplate(appPort: number): string {
   ].join("\n");
 }
 
-/** Writes the template when `.env.local` is missing (never overwrites), then re-checks it. */
+/**
+ * Writes the template when there is no `.env.local` at all (lstat: a dangling link counts as
+ * present and is refused, never written through), then re-checks the result.
+ */
 export function ensureEnvLocal(cwd: string, appPort: number): "written" | "kept" {
   const file = path.join(cwd, ".env.local");
-  if (fs.existsSync(file)) return "kept";
+  let existing: fs.Stats | null = null;
+  try {
+    existing = fs.lstatSync(file);
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code !== "ENOENT") throw err;
+  }
+  if (existing) {
+    if (!existing.isFile()) throw new Error(`.env.local is ${linkKind(existing)}; agent:setup never writes through a link.`);
+    return "kept";
+  }
   fs.writeFileSync(file, envLocalTemplate(appPort), { flag: "wx" });
-  const problems = envFileProblems(cwd);
+  const written = fs.lstatSync(file);
+  const problems = [...(written.isFile() ? [] : [`.env.local is ${linkKind(written)}`]), ...envFileProblems(cwd)];
   if (problems.length > 0) throw new Error(`The .env.local template failed the guard:\n${problems.map((p) => `  - ${p}`).join("\n")}`);
   say(`wrote .env.local from the template (app port ${appPort})`);
   return "written";
