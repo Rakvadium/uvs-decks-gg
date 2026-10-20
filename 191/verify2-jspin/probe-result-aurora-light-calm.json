@@ -1,0 +1,67 @@
+{
+  "pin": {
+    "theme": "aurora",
+    "mode": "light",
+    "chrome": "calm"
+  },
+  "galleryFrosted": 0,
+  "galleryScanlines": 0,
+  "menuItems": [
+    "Dark mode",
+    "Color preset",
+    "Settings",
+    "Log out",
+    "Default",
+    "Calm Storm",
+    "Cyberpunk",
+    "Cotton Candy",
+    "Caffeine",
+    "Aurora",
+    "Sorbet",
+    "Singularity",
+    "Custom colors…"
+  ],
+  "menuChecked": [
+    "Aurora"
+  ],
+  "desktopHtml": {
+    "theme": "aurora",
+    "chrome": "calm",
+    "dark": false
+  },
+  "deckPath": "/decks/kh7bt06q3w0x7j29fc6d07hvss8ba18p",
+  "toast": {
+    "toasterTheme": "light",
+    "text": "Export copied to clipboard."
+  },
+  "deckFrosted": 0,
+  "mobileSwitch": "false",
+  "mobilePresetRow": "Color preset\nAurora",
+  "mobileHtml": {
+    "theme": "aurora",
+    "chrome": "calm",
+    "dark": false
+  },
+  "savedAppearances": [
+    "cyberpunk/dark/expressive"
+  ],
+  "blockedDuringLogin": [
+    "Mutation:sessions:ensureAppearanceMigrated"
+  ],
+  "blockedDuringProbe": [
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus"
+  ],
+  "nonGetRequests": [
+    "POST /api/auth {\"action\":\"auth:signIn\",\"args\":{\"refreshToken\":\"<x>\"}}",
+    "POST /api/auth {\"action\":\"auth:signIn\",\"args\":{\"refreshToken\":\"<x>\"}}",
+    "POST /api/auth {\"action\":\"auth:signIn\",\"args\":{\"refreshToken\":\"<x>\"}}"
+  ]
+}
