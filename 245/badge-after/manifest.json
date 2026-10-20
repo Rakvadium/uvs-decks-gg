@@ -1,0 +1,21 @@
+{
+  "label": "after",
+  "blockedWrites": {
+    "Action:communityLive:refreshLiveStatus": 24,
+    "Mutation:rateLimit:claimCatalogSyncBudget": 12
+  },
+  "renderedContrast": {
+    "detail-rejected__default__light.png": 12.32,
+    "card-rejected__default__light.png": 13.17,
+    "detail-rejected__default__dark.png": 15.19,
+    "card-rejected__default__dark.png": 13.75,
+    "detail-rejected__sorbet__light.png": 5.08,
+    "card-rejected__sorbet__light.png": 5.22,
+    "detail-pending__default__light.png": 13.5,
+    "card-pending__default__light.png": 14.41,
+    "detail-pending__default__dark.png": 13.78,
+    "card-pending__default__dark.png": 12.28,
+    "detail-pending__sorbet__light.png": 5.12,
+    "card-pending__sorbet__light.png": 5.27
+  }
+}
