@@ -53,6 +53,7 @@ import type * as lib_moderation_providers from "../lib/moderation/providers.js";
 import type * as lib_moderation_textPublish from "../lib/moderation/textPublish.js";
 import type * as lib_r2Keys from "../lib/r2Keys.js";
 import type * as lib_username from "../lib/username.js";
+import type * as lib_validationBackend from "../lib/validationBackend.js";
 import type * as mediaAssetActions from "../mediaAssetActions.js";
 import type * as mediaAssets from "../mediaAssets.js";
 import type * as migrations_migrateDeckSchema from "../migrations/migrateDeckSchema.js";
@@ -142,6 +143,7 @@ declare const fullApi: ApiFromModules<{
   "lib/moderation/textPublish": typeof lib_moderation_textPublish;
   "lib/r2Keys": typeof lib_r2Keys;
   "lib/username": typeof lib_username;
+  "lib/validationBackend": typeof lib_validationBackend;
   mediaAssetActions: typeof mediaAssetActions;
   mediaAssets: typeof mediaAssets;
   "migrations/migrateDeckSchema": typeof migrations_migrateDeckSchema;
