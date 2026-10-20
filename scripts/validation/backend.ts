@@ -1,7 +1,7 @@
 /**
  * Per-port validation backend lifecycle:
  *
- *   bun run validation:backend -- start  --app-port P [--timeout 60] [--repoint-env-local]
+ *   bun run validation:backend -- start  --app-port P [--timeout 60] [--repoint-env-local] [--fetch-pinned-backend]
  *   bun run validation:backend -- stop   --app-port P
  *   bun run validation:backend -- status [--app-port P]
  *
@@ -15,11 +15,14 @@ import net from "node:net";
 import path from "node:path";
 import {
   REPO_ROOT,
+  formatReverted,
   formatTarget,
   killBackendExecutors,
   killBackendProcesses,
   killProcessTree,
   prepareInvocation,
+  preparePinnedBackend,
+  revertBackupDir,
   runConvex,
   restoreCliSnapshot,
   runConvexCapture,
@@ -59,16 +62,17 @@ function saveSnapshot(appPort: number): void {
 
 /**
  * `watcherRunning` skips `convex/_generated/*`: the watcher sees the rewrite, pushes again and
- * writes its own copy back, so those go back only once it is stopped.
+ * writes its own copy back, so those go back only once it is stopped. Bytes it overwrites are
+ * saved under `<backend dir>/reverted/<time>/` first.
  */
 function restoreSavedSnapshot(appPort: number, opts: { discard: boolean; watcherRunning?: boolean }): void {
   const file = snapshotFile(appPort);
   if (!fs.existsSync(file)) return;
   const saved = JSON.parse(fs.readFileSync(file, "utf8")) as SavedSnapshot;
   const entries = opts.watcherRunning ? saved.entries.filter((e) => e.mode === "exact") : saved.entries;
-  const reverted = restoreCliSnapshot(entries, saved.repoRoot);
+  const reverted = restoreCliSnapshot(entries, saved.repoRoot, { backupDir: revertBackupDir(backendDir(appPort)) });
   if (opts.discard) fs.rmSync(file, { force: true });
-  if (reverted.length > 0) console.error(`[validation] reverted CLI side-effect edits: ${reverted.join(", ")}`);
+  if (reverted.length > 0) console.error(`[validation] reverted CLI side-effect edits: ${formatReverted(reverted)}`);
 }
 
 function logSize(appPort: number): number {
@@ -218,7 +222,7 @@ async function stopWatcher(appPort: number, pid: number | null): Promise<void> {
  */
 export async function start(
   appPort: number,
-  opts: { timeoutSec?: number; repointEnvLocal?: boolean } = {},
+  opts: { timeoutSec?: number; repointEnvLocal?: boolean; fetchPinnedBackend?: boolean } = {},
 ): Promise<BackendStatus> {
   const ports = portsFor(appPort);
   const existing = readPid(appPort);
@@ -234,12 +238,27 @@ export async function start(
     if (!(await isPortFree(port))) throw new Error(`Port ${port} is already in use; the port ${appPort} backend cannot start`);
   }
 
-  const base = ["--app-port", String(appPort), ...(opts.repointEnvLocal ? ["--repoint-env-local"] : [])];
+  const base = [
+    "--app-port",
+    String(appPort),
+    ...(opts.repointEnvLocal ? ["--repoint-env-local"] : []),
+    ...(opts.fetchPinnedBackend ? ["--fetch-pinned-backend"] : []),
+  ];
   // Run the guard here too, so a refusal fails `start` loudly instead of only in the log.
   const inv = prepareInvocation({ argv: [...base, "dev"] });
   console.error(formatTarget(inv));
-
   fs.mkdirSync(inv.home, { recursive: true });
+  // The checks every wrapped `dev` runs, up front, so a missing pinned binary or a backend saved at
+  // another version fails `start` with the way out instead of only in the detached watcher's log.
+  preparePinnedBackend(inv, (message) => console.error(message));
+
+  // No backend is live here, so a snapshot left by a `start` that was killed holds the files as
+  // they were before that run. Put it back before taking a new one, or the new baseline would
+  // record whatever the crashed run left behind.
+  if (fs.existsSync(snapshotFile(appPort))) {
+    console.error(`[validation] restoring the snapshot an unfinished port ${appPort} start left behind`);
+    restoreSavedSnapshot(appPort, { discard: true });
+  }
   saveSnapshot(appPort);
   const log = logFile(appPort);
   const timeoutMs = (opts.timeoutSec ?? 60) * 1000;
@@ -340,6 +359,7 @@ async function main(argv: string[]) {
     case "start": {
       const result = await start(parseAppPort(portRaw), {
         repointEnvLocal: args.includes("--repoint-env-local"),
+        fetchPinnedBackend: args.includes("--fetch-pinned-backend"),
         timeoutSec: flag("--timeout") ? Number(flag("--timeout")) : undefined,
       });
       console.log(JSON.stringify(result, null, 2));
