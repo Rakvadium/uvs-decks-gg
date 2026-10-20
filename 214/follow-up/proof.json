@@ -1,0 +1,75 @@
+[
+  {
+    "label": "1-first-use",
+    "finalPath": "/decks",
+    "failedText": null,
+    "landedOnHome": false,
+    "navsWithCode": 2,
+    "atLoadContainsCode": true,
+    "historyLength": 2,
+    "samplesTotal": 56,
+    "samplesAfterLoadContainingCode": 0,
+    "lastHitMsAfterLoad": null
+  },
+  {
+    "label": "2-rejected-reuse",
+    "finalPath": "/agent-login",
+    "failedText": "Agent login failed Code rejected: it is invalid, expired or already used. Mint a new one.",
+    "landedOnHome": false,
+    "navsWithCode": 2,
+    "atLoadContainsCode": true,
+    "historyLength": 2,
+    "samplesTotal": 56,
+    "samplesAfterLoadContainingCode": 0,
+    "lastHitMsAfterLoad": null
+  },
+  {
+    "label": "3-failed-signin-call",
+    "finalPath": "/agent-login",
+    "failedText": "Agent login failed Failed to fetch",
+    "landedOnHome": false,
+    "navsWithCode": 2,
+    "atLoadContainsCode": true,
+    "historyLength": 2,
+    "samplesTotal": 56,
+    "samplesAfterLoadContainingCode": 0,
+    "lastHitMsAfterLoad": null
+  },
+  {
+    "label": "3b-unburned-code-still-valid",
+    "finalPath": "/decks",
+    "failedText": null,
+    "landedOnHome": false,
+    "navsWithCode": 2,
+    "atLoadContainsCode": true,
+    "historyLength": 2,
+    "samplesTotal": 56,
+    "samplesAfterLoadContainingCode": 0,
+    "lastHitMsAfterLoad": null,
+    "note": "code from step 3 never reached the backend"
+  },
+  {
+    "label": "4-signed-in-visit-new-code",
+    "finalPath": "/decks",
+    "failedText": null,
+    "landedOnHome": false,
+    "navsWithCode": 2,
+    "atLoadContainsCode": true,
+    "historyLength": 2,
+    "samplesTotal": 55,
+    "samplesAfterLoadContainingCode": 0,
+    "lastHitMsAfterLoad": null
+  },
+  {
+    "label": "5-reuse-after-signed-in-visit",
+    "finalPath": "/agent-login",
+    "failedText": "Agent login failed Code rejected: it is invalid, expired or already used. Mint a new one.",
+    "landedOnHome": false,
+    "navsWithCode": 2,
+    "atLoadContainsCode": true,
+    "historyLength": 2,
+    "samplesTotal": 56,
+    "samplesAfterLoadContainingCode": 0,
+    "lastHitMsAfterLoad": null
+  }
+]
