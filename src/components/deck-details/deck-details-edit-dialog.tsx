@@ -23,8 +23,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { useMobileShellOptional } from "@/components/shell/mobile-shell-context";
-import { useIsMobile } from "@/hooks/useIsMobile";
 import type { DeckTeamSharing, DeckVisibility } from "@/lib/deck/visibility";
 import {
   deckTeamSharingLabel,
@@ -32,7 +30,6 @@ import {
 } from "@/lib/deck/visibility";
 import { useDeckDetailsTopBarContext } from "./deck-details-top-bar/context";
 import { DeckDetailsTopBarDeleteAction } from "./deck-details-top-bar/delete-action";
-import { isActiveShellCopy } from "./deck-details-edit-dialog-shell";
 
 const FORMAT_NONE = "__format_none__";
 const SUBFORMAT_NONE = "__subformat_none__";
@@ -100,8 +97,6 @@ export function DeckDetailsEditDialog() {
   } = useDeckDetailsTopBarContext();
 
   const formats = useQuery(api.formats.list);
-  const inMobileShell = useMobileShellOptional() !== null;
-  const isMobileViewport = useIsMobile();
   // Opened from provider state, not a DialogTrigger, so Radix has no trigger to refocus on close.
   const returnFocusRef = useRef<HTMLElement | null>(null);
 
@@ -151,7 +146,7 @@ export function DeckDetailsEditDialog() {
     }
   };
 
-  if (!isOwner || !deck || !isActiveShellCopy(inMobileShell, isMobileViewport)) return null;
+  if (!isOwner || !deck) return null;
 
   return (
     <Dialog

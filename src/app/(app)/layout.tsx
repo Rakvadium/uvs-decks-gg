@@ -23,7 +23,7 @@ import {
 } from "@/components/shell";
 import { useMobileVisualViewportFrame } from "@/components/shell/use-mobile-visual-viewport";
 import { usePathname, useParams } from "next/navigation";
-import { useIsMobile } from "@/hooks/useIsMobile";
+import { useShellFrame } from "@/components/shell/use-shell-frame";
 import {
   Upload,
   Layers,
@@ -234,11 +234,9 @@ function routeScrollsItself(pathname: string): boolean {
 
 function MobileShellFrame({
   pathname,
-  isMobile,
   children,
 }: {
   pathname: string;
-  isMobile: boolean;
   children: ReactNode;
 }) {
   const { navBarHeight, tabBarHeight } = useMobileShell();
@@ -249,7 +247,7 @@ function MobileShellFrame({
   return (
     <div
       ref={frameRef}
-      className="fixed inset-0 flex min-h-0 w-full flex-col overflow-hidden bg-background md:hidden"
+      className="fixed inset-0 flex min-h-0 w-full flex-col overflow-hidden bg-background"
       style={
         {
           "--mobile-nav-h": `${navBarHeight}px`,
@@ -258,7 +256,7 @@ function MobileShellFrame({
       }
     >
       <main
-        id={isMobile ? "main-content" : undefined}
+        id="main-content"
         className="relative flex min-h-0 flex-1 flex-col overflow-hidden bg-background"
         style={{
           backgroundImage: "var(--chrome-page-bg)",
@@ -286,7 +284,7 @@ function MobileShellFrame({
 function ShellLayoutInner({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const params = useParams();
-  const isMobile = useIsMobile();
+  const frame = useShellFrame();
   const [leftSidebarCollapsed, setLeftSidebarCollapsed] = useState(() => {
     if (typeof window === "undefined") return false;
     const stored = window.localStorage.getItem(LEFT_SIDEBAR_KEY);
@@ -322,8 +320,10 @@ function ShellLayoutInner({ children }: { children: ReactNode }) {
     });
   };
 
+  // Only the frame matching the viewport mounts, so each page renders once. Crossing the
+  // breakpoint remounts the page; state in the providers above survives.
   const desktopLayout = (
-    <div className="relative hidden h-screen w-full overflow-hidden bg-sidebar md:flex">
+    <div className="relative flex h-screen w-full overflow-hidden bg-sidebar">
       {SHOW_DESKTOP_LEFT_SIDEBAR ? (
         <LeftSidebar
           collapsed={leftSidebarCollapsed}
@@ -332,7 +332,7 @@ function ShellLayoutInner({ children }: { children: ReactNode }) {
       ) : null}
       <div className="relative z-10 flex min-w-0 flex-1 flex-col overflow-hidden">
         <main
-          id={isMobile ? undefined : "main-content"}
+          id="main-content"
           className="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden"
         >
           <div
@@ -363,7 +363,7 @@ function ShellLayoutInner({ children }: { children: ReactNode }) {
 
   const mobileLayout = (
     <MobileShellProvider>
-      <MobileShellFrame pathname={pathname} isMobile={isMobile}>
+      <MobileShellFrame pathname={pathname}>
         {children}
       </MobileShellFrame>
     </MobileShellProvider>
@@ -378,8 +378,7 @@ function ShellLayoutInner({ children }: { children: ReactNode }) {
         Skip to main content
       </a>
       {pageType === "admin" ? <AdminSidebarSlotRegistration /> : null}
-      {desktopLayout}
-      {mobileLayout}
+      {frame === "mobile" ? mobileLayout : desktopLayout}
     </>
   );
 
