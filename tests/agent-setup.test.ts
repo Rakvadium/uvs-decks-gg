@@ -99,6 +99,21 @@ describe("env files", () => {
     expect(fs.existsSync(path.join(dir, ".env.local"))).toBe(false);
   });
 
+  test("values bun loaded from .env.local are reported once, as file problems", () => {
+    const dir = tmpDir("agent-setup-env-");
+    const cloud = "https://fake-deployment-123.convex.invalid";
+    write(dir, `NEXT_PUBLIC_CONVEX_URL=${cloud}\n`);
+    let message = "";
+    try {
+      assertEnvFilesLocal(dir, { NEXT_PUBLIC_CONVEX_URL: cloud, CONVEX_URL: cloud });
+    } catch (err) {
+      message = (err as Error).message;
+    }
+    expect(message).toContain("NEXT_PUBLIC_CONVEX_URL in .env.local is not a loopback URL");
+    expect(message).not.toContain("NEXT_PUBLIC_CONVEX_URL in the caller's environment");
+    expect(message).toContain("CONVEX_URL in the caller's environment is not a loopback URL");
+  });
+
   test("refuses production secret names next to a local deployment, without printing values", () => {
     const dir = tmpDir("agent-setup-env-");
     write(dir, `${envLocalTemplate(8170)}OPENAI_API_KEY=<placeholder-openai>\nagent_auth_password=<placeholder-password>\n`);

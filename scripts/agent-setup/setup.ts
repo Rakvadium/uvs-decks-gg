@@ -68,12 +68,16 @@ export function envFileProblems(cwd: string): string[] {
 
 /**
  * Step 2: refuse, before anything else runs, when an env file, or the shell agent:setup runs in,
- * could point anywhere but a local backend. Bun loads `.env.local` into `env` too, so a file
- * problem can show up twice, once per source.
+ * could point anywhere but a local backend. `bun run` loads `.env.local` into `env` too, so shell
+ * entries with the same name and value as an env file entry are left to the file check.
  */
 export function assertEnvFilesLocal(cwd: string, env: Record<string, string | undefined> = process.env): void {
   const fileProblems = envFileProblems(cwd);
-  const shellProblems = envViolations({ name: "the caller's environment", env: { ...env } });
+  const fromFiles = new Set(
+    readCliEnvFiles(cwd).sources.flatMap((s) => (s.entries ?? Object.entries(s.env)).map(([k, v]) => `${k.toUpperCase()}=${v}`)),
+  );
+  const shellOnly = Object.fromEntries(Object.entries(env).filter(([k, v]) => !fromFiles.has(`${k.toUpperCase()}=${v}`)));
+  const shellProblems = envViolations({ name: "the caller's environment", env: shellOnly });
   if (fileProblems.length === 0 && shellProblems.length === 0) return;
   throw new Error(
     [
