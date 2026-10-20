@@ -395,7 +395,8 @@ function plainDirChain(root: string, parts: string[], platform: NodeJS.Platform,
  * it would reach wherever it points (the owner's Convex cache or login dir, say).
  */
 export function sharedCacheProblems(root: string, platform: NodeJS.Platform = process.platform): string[] {
-  const chain = plainDirChain(root, ["cache"], platform, "the shared cache");
+  // `cache/convex` must be a dir too: the walk alone would accept a plain file there.
+  const chain = plainDirChain(root, ["cache", "convex"], platform, "the shared cache");
   if (chain.length > 0 || lstatOrNull(path.join(root, "cache")) === null) return chain;
   return plainTreeProblems(path.join(root, "cache"), "", { platform }).map(
     (p) => `${p}; nothing in the shared cache may be a link, so the owner's Convex cache stays untouched.`,

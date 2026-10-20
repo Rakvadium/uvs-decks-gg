@@ -1,4 +1,4 @@
-import { afterAll, describe, expect, test } from "bun:test";
+import { afterAll, describe, expect, setDefaultTimeout, test } from "bun:test";
 import { spawnSync } from "node:child_process";
 import fs from "node:fs";
 import os from "node:os";
@@ -68,6 +68,9 @@ function tmpDir(prefix: string): string {
   tmpRoots.push(dir);
   return dir;
 }
+// The git-backed restore tests spawn git many times; under load they can pass the 5s default.
+setDefaultTimeout(30_000);
+
 afterAll(() => {
   for (const dir of tmpRoots) fs.rmSync(dir, { recursive: true, force: true });
 });
@@ -579,6 +582,16 @@ describe("pinned local backend version (#221)", () => {
         fs.rmSync(path.join(owner.realHome, ".convex", "backends"), { recursive: true, force: true });
       });
     }
+    test("a plain file (a Windows .lnk shortcut, say) in place of cache/convex is refused", () => {
+      for (const platform of ["linux", "win32"] as const) {
+        const root = tmpDir("uvs-root-");
+        fs.mkdirSync(path.join(root, "cache"), { recursive: true });
+        fs.writeFileSync(path.join(root, "cache", "convex"), "shortcut bytes");
+        const childEnv = buildChildEnv({ parentEnv: {}, appPort: 8182, root, platform });
+        expect(guardViolations(input({ parentEnv: {}, childEnv, platform, root, appPort: 8182 })).some((v) => /cache[\\/]convex is not a dir/.test(v))).toBe(true);
+      }
+    });
+
     test("linux: the wrapper's own .cache/convex link passes only when it resolves to the shared cache", () => {
       const owner = ownerSetup("linux");
       const root = tmpDir("uvs-root-");
