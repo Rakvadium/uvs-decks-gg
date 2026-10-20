@@ -688,4 +688,12 @@ export default defineSchema({
     isAnonymous: v.boolean(),
     userId: v.optional(v.id("users")),
   }),
+
+  // Validation backends only (scripts/validation/seed): identifies the loaded golden seed.
+  // Always empty on cloud deployments.
+  validationSeedMeta: defineTable({
+    seedVersion: v.number(),
+    catalogVersion: v.number(),
+    sha256: v.string(),
+  }),
 });
