@@ -60,7 +60,7 @@ export function InputEntry() {
       <Preview>
         <div className="grid gap-x-5 gap-y-5 sm:grid-cols-2 xl:grid-cols-3">
           <StateCell label="Placeholder">
-            <Input placeholder="Deck name" aria-label="Deck name (placeholder)" />
+            <Input placeholder="Deck name…" aria-label="Deck name (placeholder)" />
           </StateCell>
           <StateCell label="Filled">
             <Input defaultValue="Spellbook Control" aria-label="Deck name (filled)" />
@@ -77,7 +77,7 @@ export function InputEntry() {
           <StateCell label="With Label">
             <div className="space-y-2">
               <Label htmlFor="catalog-input-label">Display name</Label>
-              <Input id="catalog-input-label" placeholder="agent" />
+              <Input id="catalog-input-label" placeholder="agent…" />
             </div>
           </StateCell>
           <StateCell label="Textarea" className="sm:col-span-2 xl:col-span-2">
@@ -122,7 +122,8 @@ export function FieldEntry() {
                   value={name}
                   onChange={(event) => setName(event.target.value)}
                   aria-invalid={invalid || undefined}
-                  placeholder="Type to clear the error"
+                  placeholder="Type a name to clear the error…"
+                  autoComplete="off"
                 />
                 {invalid ? <FieldError>Give the deck a name.</FieldError> : <FieldDescription>Shown on your profile.</FieldDescription>}
               </Field>
@@ -344,7 +345,7 @@ export function SearchFieldsEntry() {
                   value={prominent}
                   onChange={(event) => setProminent(event.target.value)}
                   onClear={() => setProminent("")}
-                  placeholder="Search cards"
+                  placeholder="Search cards…"
                 />
                 <button type="button" className={cn(galleryToolbarControlClassName, "inline-flex shrink-0 items-center gap-2 px-3")}>
                   <ArrowUpDown className="size-4" />
@@ -358,7 +359,7 @@ export function SearchFieldsEntry() {
                 value={quiet}
                 onChange={(event) => setQuiet(event.target.value)}
                 onClear={() => setQuiet("")}
-                placeholder="Filter your collection"
+                placeholder="Filter your collection…"
                 aria-label="Filter collection"
               />
             </StateCell>

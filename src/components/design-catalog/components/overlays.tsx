@@ -242,7 +242,7 @@ export function SheetEntry() {
                 </SheetHeader>
                 <div className="space-y-2 px-4">
                   <Label htmlFor={`catalog-sheet-${side}`}>Card name</Label>
-                  <Input id={`catalog-sheet-${side}`} placeholder="Search" />
+                  <Input id={`catalog-sheet-${side}`} placeholder="Search cards…" autoComplete="off" />
                 </div>
                 <SheetFooter className="gap-2 p-4">
                   <SheetClose asChild>

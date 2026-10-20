@@ -61,7 +61,7 @@ export function CodeBlock({
       {caption ? (
         <figcaption className="mb-1.5 text-xs text-muted-foreground">{caption}</figcaption>
       ) : null}
-      <pre className={cn("max-h-96 overflow-auto rounded-md border border-hairline bg-muted-tint py-3 pl-4 pr-12 text-[13px] leading-6 text-foreground [tab-size:2]", wrap && "whitespace-pre-wrap break-words")}>
+      <pre translate="no" className={cn("max-h-96 overflow-auto rounded-md border border-hairline bg-muted-tint py-3 pl-4 pr-12 text-[13px] leading-6 text-foreground [tab-size:2]", wrap && "whitespace-pre-wrap break-words")}>
         <code>{code}</code>
       </pre>
       <CopyButton value={code} className="absolute right-1.5 top-1.5" />
@@ -73,6 +73,7 @@ export function CodeBlock({
 export function Code({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
     <code
+      translate="no"
       className={cn(
         "whitespace-nowrap rounded-md border border-hairline bg-muted-soft px-1.5 py-px text-[12px] normal-case tracking-normal text-foreground",
         className,

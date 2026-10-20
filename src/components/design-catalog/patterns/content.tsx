@@ -116,7 +116,7 @@ export function FloatingIslandsEntry() {
             />
           }
           center={
-            <FloatingSearchCapsule value={query} onChange={setQuery} placeholder="Search decks" name="catalog-island-search" aria-label="Search decks" />
+            <FloatingSearchCapsule value={query} onChange={setQuery} placeholder="Search decks…" name="catalog-island-search" aria-label="Search decks" />
           }
           right={
             <FloatingActionPill>
