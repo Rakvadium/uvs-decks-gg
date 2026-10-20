@@ -1,0 +1,199 @@
+{
+  "base": "destructive-live-dev",
+  "head": "destructive-live-pr",
+  "threshold": 0,
+  "results": [
+    {
+      "name": "button-destructive__desktop__aurora__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "button-destructive__desktop__aurora__light",
+      "diffPercent": 2.622
+    },
+    {
+      "name": "button-destructive__desktop__caffeine__dark",
+      "diffPercent": 0.072
+    },
+    {
+      "name": "button-destructive__desktop__caffeine__light",
+      "diffPercent": 2.766
+    },
+    {
+      "name": "button-destructive__desktop__calm-storm__dark",
+      "diffPercent": 0.12
+    },
+    {
+      "name": "button-destructive__desktop__calm-storm__light",
+      "diffPercent": 2.874
+    },
+    {
+      "name": "button-destructive__desktop__cotton-candy__dark",
+      "diffPercent": 0.12
+    },
+    {
+      "name": "button-destructive__desktop__cotton-candy__light",
+      "diffPercent": 0.227
+    },
+    {
+      "name": "button-destructive__desktop__cyberpunk__dark",
+      "diffPercent": 0.347
+    },
+    {
+      "name": "button-destructive__desktop__cyberpunk__light",
+      "diffPercent": 2.443
+    },
+    {
+      "name": "button-destructive__desktop__default__dark",
+      "diffPercent": 0.084
+    },
+    {
+      "name": "button-destructive__desktop__default__light",
+      "diffPercent": 0.084
+    },
+    {
+      "name": "button-destructive__desktop__singularity__dark",
+      "diffPercent": 0.024
+    },
+    {
+      "name": "button-destructive__desktop__singularity__light",
+      "diffPercent": 0.287
+    },
+    {
+      "name": "button-destructive__desktop__sorbet__dark",
+      "diffPercent": 0.156
+    },
+    {
+      "name": "button-destructive__desktop__sorbet__light",
+      "diffPercent": 0.275
+    },
+    {
+      "name": "tierlist-delete-dialog__desktop__aurora__dark",
+      "diffPercent": 0.036
+    },
+    {
+      "name": "tierlist-delete-dialog__desktop__aurora__dark__button",
+      "diffPercent": 2.134
+    },
+    {
+      "name": "tierlist-delete-dialog__desktop__aurora__light",
+      "diffPercent": 22.421
+    },
+    {
+      "name": "tierlist-delete-dialog__desktop__aurora__light__button",
+      "diffPercent": 0.243
+    },
+    {
+      "name": "tierlist-delete-dialog__desktop__caffeine__dark",
+      "diffPercent": 0.029
+    },
+    {
+      "name": "tierlist-delete-dialog__desktop__caffeine__dark__button",
+      "diffPercent": 2.117
+    },
+    {
+      "name": "tierlist-delete-dialog__desktop__caffeine__light",
+      "diffPercent": 0.044
+    },
+    {
+      "name": "tierlist-delete-dialog__desktop__caffeine__light__button",
+      "diffPercent": 2.325
+    },
+    {
+      "name": "tierlist-delete-dialog__desktop__calm-storm__dark",
+      "diffPercent": 0.031
+    },
+    {
+      "name": "tierlist-delete-dialog__desktop__calm-storm__dark__button",
+      "diffPercent": 2.16
+    },
+    {
+      "name": "tierlist-delete-dialog__desktop__calm-storm__light",
+      "diffPercent": 0.003
+    },
+    {
+      "name": "tierlist-delete-dialog__desktop__calm-storm__light__button",
+      "diffPercent": 0.243
+    },
+    {
+      "name": "tierlist-delete-dialog__desktop__cotton-candy__dark",
+      "diffPercent": 22.339
+    },
+    {
+      "name": "tierlist-delete-dialog__desktop__cotton-candy__dark__button",
+      "diffPercent": 2.221
+    },
+    {
+      "name": "tierlist-delete-dialog__desktop__cotton-candy__light",
+      "diffPercent": 0.011
+    },
+    {
+      "name": "tierlist-delete-dialog__desktop__cotton-candy__light__button",
+      "diffPercent": 0.243
+    },
+    {
+      "name": "tierlist-delete-dialog__desktop__cyberpunk__dark",
+      "diffPercent": 0.003
+    },
+    {
+      "name": "tierlist-delete-dialog__desktop__cyberpunk__dark__button",
+      "diffPercent": 0.173
+    },
+    {
+      "name": "tierlist-delete-dialog__desktop__cyberpunk__light",
+      "diffPercent": 0.028
+    },
+    {
+      "name": "tierlist-delete-dialog__desktop__cyberpunk__light__button",
+      "diffPercent": 2.359
+    },
+    {
+      "name": "tierlist-delete-dialog__desktop__default__dark",
+      "diffPercent": 0.029
+    },
+    {
+      "name": "tierlist-delete-dialog__desktop__default__dark__button",
+      "diffPercent": 2.117
+    },
+    {
+      "name": "tierlist-delete-dialog__desktop__default__light",
+      "diffPercent": 0.028
+    },
+    {
+      "name": "tierlist-delete-dialog__desktop__default__light__button",
+      "diffPercent": 2.342
+    },
+    {
+      "name": "tierlist-delete-dialog__desktop__singularity__dark",
+      "diffPercent": 22.291
+    },
+    {
+      "name": "tierlist-delete-dialog__desktop__singularity__dark__button",
+      "diffPercent": 2.169
+    },
+    {
+      "name": "tierlist-delete-dialog__desktop__singularity__light",
+      "diffPercent": 0.015
+    },
+    {
+      "name": "tierlist-delete-dialog__desktop__singularity__light__button",
+      "diffPercent": 0.208
+    },
+    {
+      "name": "tierlist-delete-dialog__desktop__sorbet__dark",
+      "diffPercent": 0.03
+    },
+    {
+      "name": "tierlist-delete-dialog__desktop__sorbet__dark__button",
+      "diffPercent": 2.212
+    },
+    {
+      "name": "tierlist-delete-dialog__desktop__sorbet__light",
+      "diffPercent": 0.039
+    },
+    {
+      "name": "tierlist-delete-dialog__desktop__sorbet__light__button",
+      "diffPercent": 2.299
+    }
+  ]
+}
