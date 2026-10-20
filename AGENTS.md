@@ -16,24 +16,27 @@ For any non-trivial change to `src/` or `convex/`, start with **`project-context
 
 ## Secrets and live data
 
-The cloud Convex deployment (the one Convex calls "dev") serves the live site. A write or deploy there is a production change. A local backend (`127.0.0.1`/`localhost`) is yours to write to.
+The cloud Convex deployment (the one Convex calls "dev") serves the live site. A write or deploy there is a production change. Data in a local backend (`127.0.0.1`/`localhost`) is yours to write. Convex CLI commands follow the rules below either way.
 
 - Write env var **names**, never values, in tracked files, commit messages, PR text, comments and published media. Docs and tests use `<placeholder>` values.
 - Keep secrets out of URLs and logs. The one exception is `/agent-login?token=` on `http://localhost:<port>` under `next dev` (the route only works when `NODE_ENV=development` and `VERCEL!=1`). Open it only in your own browser. `next dev` output logs that URL with the token, so redact `token=` before you share dev-server output.
 - Leave live data as you found it: read only. Signing in as the agent user (its own auth session) is the only write allowed.
-- Get explicit human approval for this task before any `convex` command that changes the cloud deployment: `dev`, `deploy`, `run`, `import`, `env set`, `env remove`, or a migration. The same commands against a local backend (`127.0.0.1`/`localhost`, e.g. `convex dev --local`) are allowed.
-- Before any of those write or deploy commands, prove the target is local, printing no values. Read-only commands that `hardened-convex-ops` allows (`logs`, `function-spec`, `env list` names only) are exempt.
-  1. `CONVEX_DEPLOY_KEY` is unset in your shell. An injected deploy key targets the cloud whatever `.env.local` says.
-  2. `CONVEX_DEPLOYMENT`, in the shell or `.env.local`, starts with `local:` or `anonymous:`.
-  3. `CONVEX_URL` and `NEXT_PUBLIC_CONVEX_URL`, in the shell or `.env.local`, have host `127.0.0.1` or `localhost`.
+- Convex commands:
+  - **Read-only, allowed:** `convex logs`, `convex function-spec`, and env var names via the filter below. Never run `env get` or an unfiltered `env list`, and never redirect their output to a file.
 
-  Run this from the checkout root; it prints only three booleans, and all three must be `true`:
+    ```bash
+    bunx convex env list | sed -nE 's/^([A-Z][A-Z0-9_]*)=.*/\1/p'
+    ```
+
+  - **Always need explicit human approval:** `convex deploy` (it always targets a cloud deployment, prod by default), and any command with `--prod`, `--url`, `--deployment-name`, `--env-file`, `--admin-key` or `--preview-*`.
+  - **Every other write** (`dev`, `run`, `import`, `env set`, `env remove`, migrations) runs only through `bun run vconvex -- …` once #210 merges. Until then, it also needs explicit human approval for this task.
+- Sanity check before an approved local run. It is not a permission. In bash (Git Bash on Windows), from the checkout root, it prints only three booleans. Any `false` means the CLI may target the cloud, so stop and tell the human.
 
   ```bash
-  node -e 'const fs=require("fs");const t=fs.existsSync(".env.local")?fs.readFileSync(".env.local","utf8"):"";const g=k=>(process.env[k]||(t.match(new RegExp("^"+k+"=(.*)$","m"))||[])[1]||"").trim().replace(/^"|"$/g,"");const urls=["CONVEX_URL","NEXT_PUBLIC_CONVEX_URL"].map(g).filter(Boolean);console.log({noDeployKey:!process.env.CONVEX_DEPLOY_KEY,localDeployment:/^(local|anonymous):/.test(g("CONVEX_DEPLOYMENT")),localUrl:urls.length>0&&urls.every(u=>/^https?:\/\/(127\.0\.0\.1|localhost)(:|\/|$)/.test(u))})'
+  node -e 'const fs=require("fs");const rd=f=>fs.existsSync(f)?fs.readFileSync(f,"utf8"):"";const t=rd(".env.local")+"\n"+rd(".env");const g=k=>(process.env[k]||(t.match(new RegExp("^\\s*(?:export\\s+)?"+k+"\\s*[=:]\\s*(.*)$","m"))||[])[1]||"").trim().replace(/^["\x27]|["\x27]$/g,"");const key=/^\s*(?:export\s+)?(convex_deploy_key|dotenv_key)\s*[=:]/im;const urls=["CONVEX_URL","NEXT_PUBLIC_CONVEX_URL"].map(g).filter(Boolean);console.log({noDeployKey:!Object.keys(process.env).some(k=>/^(convex_deploy_key|dotenv_key)$/i.test(k))&&!key.test(t)&&!fs.existsSync(".env.vault"),localDeployment:/^(local|anonymous):/.test(g("CONVEX_DEPLOYMENT")),localUrl:urls.length>0&&urls.every(u=>/^https?:\/\/(127\.0\.0\.1|localhost)(:|\/|$)/.test(u))})'
   ```
 
-  If any check fails or is unclear, the target is the live cloud deployment: get approval first. Once merged, the guarded `bun run vconvex` wrapper (#207) enforces these checks.
+  `noDeployKey` checks for a deploy key or `DOTENV_KEY` in the shell, in `.env.local` and in `.env` (any case, `=` or `:`), and for a `.env.vault` file.
 
 Per-PR checklist: `hardened-coding` § Security & side effects. Verifiers rerun it through `pr-issue-verify`.
 
@@ -77,7 +80,7 @@ Two dev services (no combined script — run each in its own tmux session):
 
 Convex deployment + secrets (already provisioned; do not re-provision):
 - The Cloud env injects `CONVEX_DEPLOY_KEY`, `CONVEX_URL`, and `NEXT_PUBLIC_CONVEX_URL` as secrets, so Convex CLI targets a real cloud **dev** deployment and Next.js can reach it even before `.env.local` exists. `bunx convex dev` (re)writes `.env.local` with the matching `CONVEX_DEPLOYMENT`/`NEXT_PUBLIC_CONVEX_URL`.
-- That deployment already has its env vars set (`JWKS`, `JWT_PRIVATE_KEY` for Convex Auth, plus `R2_*`, `OPENAI_API_KEY`, `YOUTUBE_DATA_API_KEY`, `ADMIN_API_KEY`, `AUTH_RESEND_KEY`). `bunx convex env list` prints values, so keep its output out of logs, PRs and comments. Auth works out of the box — no `@convex-dev/auth` init needed.
+- That deployment already has its env vars set (`JWKS`, `JWT_PRIVATE_KEY` for Convex Auth, plus `R2_*`, `OPENAI_API_KEY`, `YOUTUBE_DATA_API_KEY`, `ADMIN_API_KEY`, `AUTH_RESEND_KEY`). `bunx convex env list` prints values. List names only with the filter in Secrets and live data. Auth works out of the box — no `@convex-dev/auth` init needed.
 - This is a **shared** cloud dev deployment, and it serves the live site (see Secrets and live data). `bunx convex dev` deploys your local function changes to it, so schema/function edits go live.
 
 Authenticated testing via agent login (dev only; see [docs/agent-onboarding.md](docs/agent-onboarding.md) §6):

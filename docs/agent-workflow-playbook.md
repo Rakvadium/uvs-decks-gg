@@ -106,7 +106,7 @@ A coordinator hands one issue to a builder agent, then the PR to a different ver
 Both briefs rely on these setup rules:
 
 - **One agent, one worktree, one port range.** Concurrent dev servers never share a checkout: Next allows one `next dev` per checkout (`.next/dev/lock`). Builder and verifier get different ranges, and both stay off the default port 8090 (`bunx next dev -p <port>`).
-- **Choose the worktree's env on purpose.** A new worktree has no `.env.local`, and the main checkout's copy may point at a local Convex instead of the cloud deployment. The brief names the target (`cloud` or `local`). Copy the main `.env.local` only after checking that its `NEXT_PUBLIC_CONVEX_URL` host matches that target, without printing the value (for example, `grep -c` for the local host).
+- **Choose the worktree's env on purpose.** A new worktree has no `.env.local`, and the main checkout's copy may point at a local Convex instead of the cloud deployment. The brief names the target (`cloud` or `local`). Copy the main `.env.local` only after checking that its `NEXT_PUBLIC_CONVEX_URL` host matches that target, without printing the value. The sanity check in `AGENTS.md` § Secrets and live data prints all `true` only for a local target.
 
 ### Builder brief
 
@@ -204,7 +204,7 @@ Use project-context-gate, then hardened-convex-ops.
 Symptom: <…>
 Environment: <local (127.0.0.1/localhost) | cloud (serves the live site) | unknown>
 The cloud deployment serves the live site: read only there.
-Write, deploy or migrate only on a local backend (127.0.0.1/localhost) unless I approve the exact command.
+Follow the Convex command rules in AGENTS.md § Secrets and live data: deploy and target flags always need my approval; other writes go through `bun run vconvex -- …` once #210 merges, and need my approval until then.
 ```
 
 ### D) PR babysit

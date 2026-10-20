@@ -111,7 +111,7 @@ Every implementation path starts with **`project-context-gate`** (Context Brief 
 | `scheduled-reviewer` | Find problems; file issues only | Cap findings; prefer `needs-human`; no code changes |
 | `project-context-gate` | Investigate before coding | Docs + neighbors + placement/visual plan |
 | `hardened-coding` | Ship a change | Brief → slices → adversary → lint/build → UI visual verify |
-| `hardened-convex-ops` | Fix Convex/ops with evidence | Cloud deployment is live: read only, writes on local `127.0.0.1`/`localhost` or with approval; logs/insights/repro; no auth weakening |
+| `hardened-convex-ops` | Fix Convex/ops with evidence | Cloud deployment is live: read only; Convex writes per AGENTS.md § Secrets and live data; logs/insights/repro; no auth weakening |
 | `ui-ux-adversary` | Scrutinize UI | Placement, tokens, neighbors, BEFORE/AFTER images |
 | `hardened-pr-babysit` | Merge-ready PR | Conflicts → CI → comments → UI check if needed |
 | `pr-issue-verify` | Issue completion on a PR | Each Done when item evidenced; PR comment verdict |
