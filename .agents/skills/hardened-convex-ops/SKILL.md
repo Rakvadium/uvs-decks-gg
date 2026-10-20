@@ -34,8 +34,8 @@ No mutations or code edits before the Context Brief exists.
 
 1. Follow the Convex command rules in `AGENTS.md` § Secrets and live data. The cloud deployment (the one Convex calls "dev") serves the live site.
    - **Read only, allowed:** only `convex logs`, `convex function-spec`, and env var names through the `AGENTS.md` filter. Every other `convex` command is a write, including `export`, `data`, `mcp start`, `integration`, and any Convex MCP server pointed at the cloud deployment.
-   - **Always needs explicit human approval of the exact command:** `convex deploy`, and any target flag (`--prod`, `--url`, `--deployment-name`, `--env-file`, `--admin-key`, `--preview-*`).
-   - **Other writes** (`dev`, `run`, `import`, `env set`/`remove`, migrations, and the commands above): once #210 merges, only through `bun run vconvex -- …` against a local backend, after `bun run vconvex -- --check` reports `local`. Until then there is no self-check, so they need explicit human approval of the exact command.
+   - **Any write or deploy that reaches the cloud, by any route, needs explicit human approval of the exact command.** That includes `convex deploy`, any target flag (`--prod`, `--url`, `--deployment-name`, `--env-file`, `--admin-key`, `--preview-*`), and `mcp`/`integration`, which `vconvex` refuses.
+   - **Local Convex work goes only through `vconvex`** on your app port `P` (8100–8199). Start the backend with `bun run validation:backend -- start --app-port <P>`. Self-check with `bun run vconvex -- --app-port <P> --check <convex args>`; a pass is `target=local`, `OK: …` and exit 0. Then run `bun run vconvex -- --app-port <P> <convex args>`. Full commands: `AGENTS.md` and `scripts/validation/README.md`.
 2. Build `failures` queue from failure logs, insights (OCC / read limits), readonly repro.
 3. Note forbidden: unapproved writes or deploys to the cloud deployment, auth weakening, broad deletes, secret dumping.
 

@@ -105,8 +105,10 @@ A coordinator hands one issue to a builder agent, then the PR to a different ver
 
 Both briefs rely on these setup rules:
 
-- **One agent, one worktree, one port range.** Concurrent dev servers never share a checkout: Next allows one `next dev` per checkout (`.next/dev/lock`). Builder and verifier get different ranges, and both stay off the default port 8090 (`bunx next dev -p <port>`).
-- **Choose the worktree's env on purpose.** A new worktree has no `.env.local`, and the main checkout's copy may point at a local Convex instead of the cloud deployment. The brief names the target (`cloud` or `local`). Copy the main `.env.local` in when the app needs it, but don't hand-parse env files to decide the target. Once #210 merges, `bun run vconvex -- --check` prints the resolved target class without values. Until then, treat the target as cloud, and every Convex write needs human approval.
+- **One agent, one worktree, one port range.** Concurrent dev servers never share a checkout: Next allows one `next dev` per checkout (`.next/dev/lock`). Builder and verifier get different ranges inside the validation range 8100–8199, and both stay off the default port 8090. Use the same number `P` for `bunx next dev -p <P>` and for `--app-port <P>`, so the app and its local backend pair up.
+- **Choose the worktree's env on purpose.** A new worktree has no `.env.local`, and the main checkout's copy may point at a local Convex instead of the cloud deployment. The brief names the target (`cloud` or `local`).
+  - For `local`, `bun run validation:backend -- start --app-port <P>` points the worktree's `.env.local` at its own backend.
+  - Don't hand-parse env files to decide the target: `bun run vconvex -- --app-port <P> --check` prints the resolved target class without values. If it doesn't pass (`target=local`, `OK: …`, exit 0), treat the target as cloud, and every Convex write needs human approval of the exact command.
 
 ### Builder brief
 
@@ -115,7 +117,7 @@ You are the BUILDER for issue #<n> (`gh issue view <n>`). A separate agent will 
 
 Setup
 1. `git fetch origin && git checkout -B agent/<n>-<slug> origin/dev` in your own worktree.
-2. Ports <first>–<last> only. Convex target: <cloud | local | none>; set up env per docs/agent-workflow-playbook.md § Coordinator brief templates.
+2. Ports <first>–<last> only, inside 8100–8199. Convex target: <cloud | local | none>; set up env per docs/agent-workflow-playbook.md § Coordinator brief templates.
 3. Allowed files: <globs>. Other agents are editing <globs>.
 
 Bans
@@ -143,7 +145,7 @@ You are the VERIFIER for PR #<pr> (issue #<n>), round <k>. You did not build it.
 
 Setup
 1. Your own worktree at the PR head (`gh pr checkout <pr>`). Record the head SHA.
-2. Ports <first>–<last>, different from the builder's. Convex target: <same as builder>; same env rule.
+2. Ports <first>–<last> inside 8100–8199, different from the builder's. Convex target: <same as builder>; same env rule.
 3. Allowed files: <globs>. Any other changed path fails the scope check.
 
 Bans
@@ -204,7 +206,7 @@ Use project-context-gate, then hardened-convex-ops.
 Symptom: <…>
 Environment: <local (127.0.0.1/localhost) | cloud (serves the live site) | unknown>
 The cloud deployment serves the live site: read only there.
-Follow the Convex command rules in AGENTS.md § Secrets and live data: deploy and target flags always need my approval of the exact command; other writes go through `bun run vconvex -- …` against a local backend once #210 merges, and need my approval of the exact command until then.
+Follow the Convex command rules in AGENTS.md § Secrets and live data: any write or deploy that reaches the cloud needs my approval of the exact command; local writes go only through `bun run vconvex -- --app-port <P> …` after `--check` passes.
 ```
 
 ### D) PR babysit
