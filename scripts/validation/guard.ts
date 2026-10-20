@@ -323,7 +323,12 @@ function resolvedRoot(root: string): string {
 export function plainTreeProblems(
   base: string,
   rel = "",
-  opts: { platform?: NodeJS.Platform; onLink?: (full: string) => string | null } = {},
+  opts: {
+    platform?: NodeJS.Platform;
+    onLink?: (full: string) => string | null;
+    /** Allow sockets, FIFOs and devices (the backend's node executor makes a Unix socket in its temp dir). */
+    allowSpecialFiles?: boolean;
+  } = {},
 ): string[] {
   const platform = opts.platform ?? process.platform;
   const out: string[] = [];
@@ -358,7 +363,7 @@ export function plainTreeProblems(
         kind = stat.isSymbolicLink() ? "link" : stat.isDirectory() ? "dir" : stat.isFile() ? "file" : "other";
       }
       if (kind === "link") onLink(full);
-      else if (kind === "other") out.push(`${full} is not a regular file or dir`);
+      else if (kind === "other" && !opts.allowSpecialFiles) out.push(`${full} is not a regular file or dir`);
       else if (kind === "dir") {
         const real = realpathOrNull(full);
         if (real === null) continue;
@@ -443,6 +448,8 @@ export function backendHomeProblems(input: BackendHomeInput): string[] {
   const shared = path.join(sharedCacheDir(base), "convex");
   return plainTreeProblems(home, "", {
     platform,
+    // A socket or FIFO can't redirect a path; only links can point the CLI at the owner's files.
+    allowSpecialFiles: true,
     onLink: (full) => {
       if (platform === "win32" || !samePath(full, sharedLink, platform)) {
         return `${full} is a symlink or junction; nothing in the backend home may be a link, so the owner's login stays hidden.`;

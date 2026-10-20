@@ -605,6 +605,25 @@ describe("pinned local backend version (#221)", () => {
       const win = buildChildEnv({ parentEnv: {}, appPort: 8182, root, platform: "win32" });
       expect(guardViolations(input({ parentEnv: {}, childEnv: win, platform: "win32", root, realHome: owner.realHome, appPort: 8182 })).some((v) => /nothing in the backend home may be a link/.test(v))).toBe(true);
     });
+    test.skipIf(process.platform === "win32")("linux host: the node executor's socket is fine in the backend home, not in the shared cache", async () => {
+      const owner = ownerSetup("linux");
+      const root = tmpDir("uvs-root-");
+      const listenOn = async (dir: string) => {
+        fs.mkdirSync(dir, { recursive: true });
+        const server = (await import("node:net")).createServer();
+        await new Promise<void>((resolve) => server.listen(path.join(dir, ".executor.sock"), resolve));
+        return server;
+      };
+      const inHome = await listenOn(path.join(backendDir(8182, root), "tmp", ".tmpabc"));
+      const childEnv = buildChildEnv({ parentEnv: {}, appPort: 8182, root, platform: "linux" });
+      const guarded = () => guardViolations(input({ parentEnv: {}, childEnv, platform: "linux", root, realHome: owner.realHome, appPort: 8182 }));
+      expect(guarded()).toEqual([]);
+      const inCache = await listenOn(path.join(root, "cache", "convex", "dashboard"));
+      expect(guarded().some((v) => /\.executor\.sock is not a regular file or dir/.test(v))).toBe(true);
+      inHome.close();
+      inCache.close();
+    });
+
     test.skipIf(process.platform === "win32")("linux host: a file symlink inside the shared binary dir is refused", () => {
       const owner = ownerSetup("linux");
       const root = tmpDir("uvs-root-");
