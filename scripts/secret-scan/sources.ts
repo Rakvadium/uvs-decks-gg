@@ -1,107 +1,124 @@
 import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
-import type { Source } from "./shared.ts";
+import type { Target } from "./match.ts";
 
 const SKIP_DIRS = new Set([".git", "node_modules"]);
+const EMPTY_TREE = "4b825dc642cb6eb9a060e54bf8d69288fbee4904";
+const SUBMODULE_MODE = "160000";
 
-function git(args: string[], cwd: string): string {
-  return execFileSync("git", ["-c", "core.quotePath=false", ...args], {
+function git(args: string[], cwd: string, input?: string): Buffer {
+  return execFileSync("git", args, {
     cwd,
-    maxBuffer: 1024 * 1024 * 1024,
-    stdio: ["ignore", "pipe", "inherit"],
-  }).toString("latin1");
+    input,
+    maxBuffer: 2 * 1024 * 1024 * 1024,
+    stdio: ["pipe", "pipe", "inherit"],
+  });
 }
 
-/** Byte-string path from git output → readable UTF-8 path. */
-function displayPath(raw: string): string {
-  const unquoted = raw.startsWith('"') && raw.endsWith('"') ? raw.slice(1, -1) : raw;
-  return Buffer.from(unquoted.replace(/^b\//, ""), "latin1").toString("utf8");
+type Change = { path: string; oldSha: string; newSha: string };
+
+/** `git diff-tree`/`diff-index -z` raw output → changes that leave a blob behind. */
+export function parseRawDiff(out: Buffer): Change[] {
+  const parts = out.toString("latin1").split("\0");
+  const changes: Change[] = [];
+  for (let i = 0; i + 1 < parts.length; i++) {
+    if (!parts[i].startsWith(":")) continue;
+    const [, newMode, oldSha, newSha] = parts[i].slice(1).split(" ");
+    const file = Buffer.from(parts[++i], "latin1").toString("utf8");
+    if (/^0+$/.test(newSha) || newMode === SUBMODULE_MODE) continue;
+    changes.push({ path: file, oldSha, newSha });
+  }
+  return changes;
+}
+
+/** Full contents of many objects in one `git cat-file --batch` call. Missing objects are left out. */
+function readObjects(shas: Iterable<string>, cwd: string): Map<string, Buffer> {
+  const wanted = [...new Set(shas)].filter((sha) => !/^0+$/.test(sha));
+  const objects = new Map<string, Buffer>();
+  if (wanted.length === 0) return objects;
+  const out = git(["cat-file", "--batch"], cwd, `${wanted.join("\n")}\n`);
+  let at = 0;
+  while (at < out.length) {
+    const newline = out.indexOf(0x0a, at);
+    const [sha, type, size] = out.subarray(at, newline).toString("latin1").split(" ");
+    at = newline + 1;
+    if (type === "missing" || size === undefined) continue;
+    objects.set(sha, out.subarray(at, at + Number(size)));
+    at += Number(size) + 1;
+  }
+  return objects;
 }
 
 /**
- * Added lines from a `--unified=0` diff, one source per file. Hunk line counts decide what is
- * content, so an added line that looks like a `+++` header is still scanned.
+ * The full new blob of every file a commit changes, plus its message. Blobs are read raw, so
+ * binary files and `.gitattributes` (`binary`, `-diff`) don't hide anything. A merge commit
+ * contributes only paths that differ from every parent (its conflict resolutions).
  */
-export function parseDiff(diff: string, commit?: string): Source[] {
-  const files = new Map<string, { added: string[]; lines: number[] }>();
-  const lines = diff.split("\n");
-  let file: string | null = null;
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
-    if (line.startsWith("+++ ")) {
-      const target = line.slice(4);
-      file = target === "/dev/null" ? null : displayPath(target);
-      continue;
-    }
-    const hunk = line.match(/^@@ -\d+(?:,(\d+))? \+(\d+)(?:,(\d+))? @@/);
-    if (!hunk) continue;
-    let oldLeft = hunk[1] === undefined ? 1 : Number(hunk[1]);
-    let newLeft = hunk[3] === undefined ? 1 : Number(hunk[3]);
-    let lineNo = Number(hunk[2]);
-    while ((oldLeft > 0 || newLeft > 0) && i + 1 < lines.length) {
-      const body = lines[++i];
-      if (body.startsWith("\\")) continue;
-      if (body.startsWith("-")) oldLeft--;
-      else if (body.startsWith(" ")) {
-        oldLeft--;
-        newLeft--;
-        lineNo++;
-      } else if (body.startsWith("+")) {
-        if (file !== null) {
-          let entry = files.get(file);
-          if (!entry) {
-            entry = { added: [], lines: [] };
-            files.set(file, entry);
-          }
-          entry.added.push(body.slice(1));
-          entry.lines.push(lineNo);
-        }
-        newLeft--;
-        lineNo++;
-      } else {
-        i--;
-        break;
-      }
+export function rangeTargets(range: string, cwd = process.cwd()): Target[] {
+  if (range.startsWith("-") || !/\.\.|\^!/.test(range)) {
+    throw new Error(`--diff needs a commit range like base..head (got ${range})`);
+  }
+  const commits = git(["rev-list", "--parents", range, "--"], cwd)
+    .toString("latin1")
+    .split("\n")
+    .filter(Boolean)
+    .map((line) => line.split(" "));
+
+  const perCommit = commits.map(([commit, ...parents]) => {
+    const diffs = parents.length === 0
+      ? [parseRawDiff(git(["diff-tree", "-r", "-z", "--no-renames", "--no-commit-id", "--root", commit], cwd))]
+      : parents.map((parent) => parseRawDiff(git(["diff-tree", "-r", "-z", "--no-renames", parent, commit], cwd)));
+    const byPath = diffs.map((changes) => new Map(changes.map((c) => [c.path, c])));
+    const changes = diffs[0]
+      .filter((change) => byPath.every((map) => map.has(change.path)))
+      .map((change) => ({ ...change, oldShas: byPath.map((map) => map.get(change.path)!.oldSha) }));
+    return { commit, changes };
+  });
+
+  const objects = readObjects(
+    perCommit.flatMap(({ commit, changes }) => [commit, ...changes.flatMap((c) => [c.newSha, ...c.oldShas])]),
+    cwd,
+  );
+  const targets: Target[] = [];
+  for (const { commit, changes } of perCommit) {
+    const raw = objects.get(commit);
+    if (!raw) throw new Error(`cannot read commit ${commit}`);
+    const split = raw.indexOf("\n\n");
+    targets.push({ location: "commit-message", commit, bytes: split === -1 ? Buffer.alloc(0) : raw.subarray(split + 2) });
+    for (const change of changes) {
+      targets.push({ location: change.path, commit, bytes: blob(objects, change.newSha), before: change.oldShas.map((sha) => blob(objects, sha)) });
     }
   }
-  return [...files].map(([location, { added, lines: numbers }]) => ({
-    location,
-    commit,
-    text: added.join("\n"),
-    lines: numbers,
+  return targets;
+}
+
+function blob(objects: Map<string, Buffer>, sha: string): Buffer {
+  if (/^0+$/.test(sha)) return Buffer.alloc(0);
+  const bytes = objects.get(sha);
+  if (!bytes) throw new Error(`cannot read blob ${sha}`);
+  return bytes;
+}
+
+/** Every staged file's full index blob, compared with HEAD's. */
+export function stagedTargets(cwd = process.cwd()): Target[] {
+  let head = EMPTY_TREE;
+  try {
+    head = git(["rev-parse", "--verify", "-q", "HEAD"], cwd).toString().trim();
+  } catch {
+    // No commits yet: compare with the empty tree.
+  }
+  const changes = parseRawDiff(git(["diff-index", "--cached", "-r", "-z", "--no-renames", head], cwd));
+  const objects = readObjects(changes.flatMap((c) => [c.newSha, c.oldSha]), cwd);
+  return changes.map((change) => ({
+    location: change.path,
+    bytes: blob(objects, change.newSha),
+    before: [blob(objects, change.oldSha)],
   }));
 }
 
-/**
- * Added lines and the message of every commit in `range`, commit by commit: the repo merges with
- * merge commits, so a value added and later removed inside a PR still lands in history.
- * `--remerge-diff` shows what a merge commit's conflict resolution added.
- */
-export function rangeSources(range: string, cwd = process.cwd()): Source[] {
-  if (range.startsWith("-")) throw new Error(`Invalid --diff range: ${range}`);
-  const out = git(
-    ["log", "-p", "--no-color", "--no-ext-diff", "--unified=0", "--remerge-diff", "--format=%x00%H%n%B%x00", range, "--"],
-    cwd,
-  );
-  const parts = out.split("\0");
-  const sources: Source[] = [];
-  for (let i = 1; i < parts.length; i += 2) {
-    const newline = parts[i].indexOf("\n");
-    const commit = newline === -1 ? parts[i] : parts[i].slice(0, newline);
-    const message = newline === -1 ? "" : parts[i].slice(newline + 1);
-    sources.push({ location: "commit-message", commit, text: message });
-    sources.push(...parseDiff(parts[i + 1] ?? "", commit));
-  }
-  return sources;
-}
-
-export function stagedSources(cwd = process.cwd()): Source[] {
-  return parseDiff(git(["diff", "--cached", "--no-color", "--no-ext-diff", "--unified=0"], cwd));
-}
-
 /** Every file under `dir` (text or binary), skipping `.git` and `node_modules`. */
-export function* pathSources(dir: string, cwd = process.cwd()): Generator<Source> {
+export function* pathTargets(dir: string, cwd = process.cwd()): Generator<Target> {
   const root = path.resolve(cwd, dir);
   if (!fs.statSync(root).isDirectory()) throw new Error(`--path is not a directory: ${dir}`);
   const pending = [root];
@@ -112,8 +129,7 @@ export function* pathSources(dir: string, cwd = process.cwd()): Generator<Source
       if (entry.isDirectory()) {
         if (!SKIP_DIRS.has(entry.name)) pending.push(full);
       } else if (entry.isFile()) {
-        const location = path.relative(cwd, full).split(path.sep).join("/");
-        yield { location, text: fs.readFileSync(full).toString("latin1") };
+        yield { location: path.relative(cwd, full).split(path.sep).join("/"), bytes: fs.readFileSync(full) };
       }
     }
   }

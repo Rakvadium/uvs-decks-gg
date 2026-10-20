@@ -4,11 +4,13 @@
  *
  *   bun run secret-scan:sync-ci [--env-file <file>]... [--repo owner/name] [--dry-run]
  *
- * Without --env-file, reads .env.local.live-backup and data/live-env-no-r2.txt.
+ * Without --env-file, reads .env.local.live-backup and data/live-env-no-r2.txt. When files hold
+ * different values for one name, every distinct value is stored, joined by VALUE_SEPARATOR, and
+ * the scanner splits them again. ciOnly names (the canary) are set by hand; see the README.
  */
 import { spawnSync } from "node:child_process";
 import fs from "node:fs";
-import { flagValues, loadManifest, parseArgs, parseEnvFile } from "./shared.ts";
+import { flagValues, loadManifest, parseArgs, parseEnvFile, splitValues, VALUE_SEPARATOR } from "./shared.ts";
 
 const DEFAULT_ENV_FILES = [".env.local.live-backup", "data/live-env-no-r2.txt"];
 
@@ -24,36 +26,26 @@ if (unreadable.length > 0) {
   process.exit(2);
 }
 
-/** Later files win; a name whose value differs between files is reported by name. */
-const values: Record<string, string> = {};
-const conflicts = new Set<string>();
-for (const file of envFiles) {
-  for (const [name, value] of Object.entries(parseEnvFile(fs.readFileSync(file, "utf8")))) {
-    if (!value) continue;
-    if (values[name] !== undefined && values[name] !== value) conflicts.add(name);
-    values[name] = value;
-  }
-}
-
-const names = loadManifest();
-const present = names.filter((name) => values[name]);
-const absent = names.filter((name) => !values[name]);
-const clashing = present.filter((name) => conflicts.has(name));
-if (clashing.length > 0) {
-  console.warn(`warning: value differs between env files, using the last file's: ${clashing.join(", ")}`);
-}
+const envs = envFiles.map((file) => parseEnvFile(fs.readFileSync(file, "utf8")));
+const manifest = loadManifest();
+const names = manifest.names.filter((name) => !manifest.ciOnly.includes(name));
+const values = new Map(names.map((name) => [name, [...new Set(envs.flatMap((env) => splitValues(env[name])))]]));
+const present = names.filter((name) => values.get(name)!.length > 0);
+const absent = names.filter((name) => values.get(name)!.length === 0);
 
 let failed = 0;
 for (const name of present) {
+  const distinct = values.get(name)!;
+  const label = distinct.length > 1 ? `${name} (${distinct.length} distinct values)` : name;
   if (args["dry-run"]) {
-    console.log(`would set ${name}`);
+    console.log(`would set ${label}`);
     continue;
   }
   const result = spawnSync("gh", ["secret", "set", name, ...repoArgs], {
-    input: values[name],
+    input: distinct.join(VALUE_SEPARATOR),
     stdio: ["pipe", "ignore", "inherit"],
   });
-  if (result.status === 0) console.log(`set ${name}`);
+  if (result.status === 0) console.log(`set ${label}`);
   else {
     failed++;
     console.error(`failed ${name}`);

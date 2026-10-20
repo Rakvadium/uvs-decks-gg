@@ -1,22 +1,19 @@
 import fs from "node:fs";
 import path from "node:path";
-import {
-  flagValues,
-  formatHit,
-  loadManifest,
-  loadSecrets,
-  parseArgs,
-  parseEnvFile,
-  scanSource,
-  type Hit,
-  type Source,
-} from "./shared.ts";
-import { pathSources, rangeSources, stagedSources } from "./sources.ts";
+import { buildMatcher, formatHit, scanTarget, type Hit, type Target } from "./match.ts";
+import { flagValues, loadManifest, loadSecrets, parseArgs, parseEnvFile } from "./shared.ts";
+import { pathTargets, rangeTargets, stagedTargets } from "./sources.ts";
 
-const USAGE = `Usage: bun run secret-scan [--diff <base>..<head>] [--staged] [--path <dir>] [--env-file <file>]...
+const USAGE = `Usage: bun run secret-scan [--diff <base>..<head>] [--staged] [--path <dir>]
+                           [--env-file <file>]... [--strict] [--ci]
 
 Scans for the values of the env vars in scripts/secret-scan/secrets.json.
-Prints VAR_NAME file:line for each hit, never the value. Exit 1 on any hit.`;
+Prints VAR_NAME file:line for each hit, never the value.
+Exit 0 clean, 1 hits, 2 the scan could not run completely (bad usage, no values loaded,
+or --strict with a required value missing).`;
+
+const FLAGS = ["diff", "staged", "path", "env-file", "strict", "ci", "help"];
+const VALUE_FLAGS = ["diff", "path", "env-file"];
 
 export type RunOptions = {
   env?: Record<string, string | undefined>;
@@ -26,13 +23,18 @@ export type RunOptions = {
   err?: (line: string) => void;
 };
 
-/** Returns the exit code: 0 clean, 1 hits, 2 usage error. */
+/** Returns the exit code: 0 clean, 1 hits, 2 incomplete scan. */
 export function run(argv: string[], options: RunOptions = {}): number {
   const env = options.env ?? process.env;
   const cwd = options.cwd ?? process.cwd();
   const out = options.out ?? ((line: string) => console.log(line));
   const err = options.err ?? ((line: string) => console.error(line));
-  const ci = env.GITHUB_ACTIONS === "true";
+  const actions = env.GITHUB_ACTIONS === "true";
+  const warn = (message: string) => err(actions ? `::warning title=secret-scan::${message}` : `secret-scan: warning: ${message}`);
+  const fail = (message: string) => {
+    err(`secret-scan: ${message}`);
+    if (actions) err(`::error title=secret-scan::${message}`);
+  };
 
   let args: Record<string, string | true>;
   try {
@@ -56,40 +58,46 @@ export function run(argv: string[], options: RunOptions = {}): number {
     try {
       envs.push(parseEnvFile(fs.readFileSync(path.resolve(cwd, file), "utf8")));
     } catch {
-      err(`Cannot read --env-file ${file}`);
+      fail(`cannot read --env-file ${file}`);
       return 2;
     }
   }
 
-  const { secrets, missing, short } = loadSecrets(loadManifest(options.manifest), envs);
-  const warn = (message: string) => err(ci ? `::warning title=secret-scan::${message}` : `secret-scan: warning: ${message}`);
-  if (missing.length > 0) warn(`no value, not checked: ${missing.join(", ")}`);
+  const manifest = loadManifest(options.manifest);
+  const { secrets, missing, short } = loadSecrets(manifest.names, envs);
+  const ignored = new Set([...(args.ci ? [] : manifest.ciOnly)]);
+  const unavailable = [...missing, ...short].filter((name) => !ignored.has(name));
+  const required = unavailable.filter((name) => !manifest.optional.includes(name));
   if (short.length > 0) warn(`value shorter than 8 chars, not checked: ${short.join(", ")}`);
-  if (secrets.length === 0) {
-    warn("no secret values available; nothing scanned.");
-    return 0;
+  if (secrets.filter((s) => !ignored.has(s.name)).length === 0) {
+    fail("no secret values loaded, nothing to scan. Pass --env-file, or set the values in the environment.");
+    return 2;
   }
+  if (args.strict && required.length > 0) fail(`missing required value(s): ${required.join(", ")}`);
+  const notChecked = args.strict ? unavailable.filter((n) => !required.includes(n)) : unavailable;
+  if (notChecked.length > 0) warn(`no value, not checked: ${notChecked.join(", ")}`);
 
+  const matcher = buildMatcher(secrets);
   const hits: Hit[] = [];
   let scanned = 0;
-  const scan = (sources: Iterable<Source>) => {
-    for (const source of sources) {
+  const scan = (targets: Iterable<Target>) => {
+    for (const target of targets) {
       scanned++;
-      hits.push(...scanSource(source, secrets));
+      hits.push(...scanTarget(target, matcher));
     }
   };
   try {
-    if (typeof args.diff === "string") scan(rangeSources(args.diff, cwd));
-    if (args.staged) scan(stagedSources(cwd));
-    if (typeof args.path === "string") scan(pathSources(args.path, cwd));
+    if (typeof args.diff === "string") scan(rangeTargets(args.diff, cwd));
+    if (args.staged) scan(stagedTargets(cwd));
+    if (typeof args.path === "string") scan(pathTargets(args.path, cwd));
   } catch (error) {
-    err(`secret-scan: ${(error as Error).message.split("\n")[0]}`);
+    fail((error as Error).message.split("\n")[0]);
     return 2;
   }
 
   for (const hit of hits) {
     out(formatHit(hit));
-    if (ci && hit.location !== "commit-message") {
+    if (actions && hit.location !== "commit-message") {
       out(`::error file=${hit.location},line=${hit.line},title=secret-scan::${hit.name} value found`);
     }
   }
@@ -97,15 +105,18 @@ export function run(argv: string[], options: RunOptions = {}): number {
     err(`secret-scan: ${hits.length} hit(s). Remove the value, and rotate the secret if it was pushed.`);
     return 1;
   }
-  out(`secret-scan: clean (${secrets.length} values checked across ${scanned} sources)`);
+  if (args.strict && required.length > 0) return 2;
+  out(`secret-scan: clean (${secrets.length} values checked across ${scanned} files and messages)`);
   return 0;
 }
 
 function usageProblem(args: Record<string, string | true>): string | undefined {
-  const unknown = Object.keys(args).find((key) => !["diff", "staged", "path", "env-file"].includes(key));
+  const unknown = Object.keys(args).find((key) => !FLAGS.includes(key));
   if (unknown) return `Unknown option: --${unknown}`;
-  const bare = ["diff", "path", "env-file"].find((key) => args[key] === true);
+  const bare = VALUE_FLAGS.find((key) => args[key] === true);
   if (bare) return `--${bare} needs a value`;
+  const valued = ["staged", "strict", "ci"].find((key) => typeof args[key] === "string");
+  if (valued) return `--${valued} takes no value`;
   if (!(args.diff || args.staged || args.path)) return "Pick at least one of --diff, --staged, --path.";
 }
 

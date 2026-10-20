@@ -5,30 +5,45 @@ import { fileURLToPath } from "node:url";
 export const MIN_SECRET_LENGTH = 8;
 /** Single lines of a multi-line value (e.g. a PEM body line) are matched from this length. */
 export const MIN_FRAGMENT_LENGTH = 32;
+/** Values at least this long are also matched by any `WINDOW`-char slice, to catch split strings. */
+export const MIN_WINDOW_VALUE = 32;
+export const WINDOW = 24;
+/** The DER header at the start of a PEM body is the same in every key of a type, so skip it. */
+const PEM_HEADER_CHARS = 64;
+/** `sync-ci` stores several distinct values of one name in one Actions secret, joined by this. */
+export const VALUE_SEPARATOR = "\n--secret-scan-next-value--\n";
 export const MANIFEST_PATH = fileURLToPath(new URL("./secrets.json", import.meta.url));
 
 const NAME = /^[A-Za-z_][A-Za-z0-9_]*$/;
+const TOKEN_RUN = /[A-Za-z0-9+/=_.~-]+/g;
 
 /**
- * A secret to look for. `needles` are byte strings (UTF-8 bytes decoded as latin1) so text and
- * binary sources are matched the same way. Never print a needle.
+ * A secret to look for. `needles` are exact byte sequences (encoded forms of the value);
+ * `windows` are `WINDOW`-byte slices of it. Never print either.
  */
-export type Secret = { name: string; needles: string[] };
+export type Secret = { name: string; needles: Buffer[]; windows: Buffer[] };
 
-/**
- * Text to scan, as a latin1 byte string. `lines[i]` is the real line number of the i-th line of
- * `text` (diffs only carry added lines); without it, line i is i + 1.
- */
-export type Source = { location: string; commit?: string; text: string; lines?: number[] };
+export type Manifest = {
+  names: string[];
+  /** May be absent anywhere, even under `--strict`. */
+  optional: string[];
+  /** Required only under `--ci` (e.g. the CI canary); ignored locally. */
+  ciOnly: string[];
+};
 
-export type Hit = { name: string; location: string; line: number; commit?: string };
-
-export function loadManifest(file = MANIFEST_PATH): string[] {
-  const names: unknown = JSON.parse(fs.readFileSync(file, "utf8")).names;
-  if (!Array.isArray(names) || !names.every((n) => typeof n === "string" && NAME.test(n))) {
-    throw new Error(`${file}: "names" must be an array of env var names`);
-  }
-  return names;
+export function loadManifest(file = MANIFEST_PATH): Manifest {
+  const json = JSON.parse(fs.readFileSync(file, "utf8"));
+  const list = (key: string): string[] => {
+    const value: unknown = json[key] ?? [];
+    if (!Array.isArray(value) || !value.every((n) => typeof n === "string" && NAME.test(n))) {
+      throw new Error(`${file}: "${key}" must be an array of env var names`);
+    }
+    return value;
+  };
+  const manifest = { names: list("names"), optional: list("optional"), ciOnly: list("ciOnly") };
+  const stray = [...manifest.optional, ...manifest.ciOnly].filter((n) => !manifest.names.includes(n));
+  if (stray.length > 0) throw new Error(`${file}: not in "names": ${stray.join(", ")}`);
+  return manifest;
 }
 
 /** Minimal dotenv: `NAME=value`, optional `export`, quotes (multi-line), inline `#` comments. */
@@ -69,7 +84,7 @@ function unescapeDouble(raw: string): string {
   return raw.replace(/\\(.)/g, (_, c: string) => map[c] ?? c);
 }
 
-/** Raw, URL-encoded, JSON-escaped, and base64/base64url forms of a value, as byte strings. */
+/** Raw, URL-encoded, JSON-escaped, and base64/base64url forms of a value. */
 export function encodedForms(value: string): string[] {
   const forms = new Set<string>([value]);
   const url = encodeURIComponent(value);
@@ -81,7 +96,7 @@ export function encodedForms(value: string): string[] {
     forms.add(b64);
     forms.add(b64.replace(/\+/g, "-").replace(/\//g, "_"));
   }
-  return [...forms].map((form) => Buffer.from(form, "utf8").toString("latin1"));
+  return [...forms];
 }
 
 /**
@@ -108,64 +123,67 @@ export function valueFragments(value: string): string[] {
     .filter((part) => part !== value && part.length >= MIN_FRAGMENT_LENGTH && !part.includes("-----"));
 }
 
+/** Every byte sequence that counts as the value: encoded forms, PEM lines, UTF-16. */
+export function needlesFor(value: string): Buffer[] {
+  const compact = value.replace(/\s+/g, "");
+  const parts = [value, ...valueFragments(value), ...(compact !== value ? [compact] : [])];
+  const forms = new Set(parts.flatMap(encodedForms));
+  const needles = [...forms].map((form) => Buffer.from(form, "utf8"));
+  const utf16 = Buffer.from(value, "utf16le");
+  needles.push(utf16, Buffer.from(utf16).swap16());
+  return needles;
+}
+
+/**
+ * `WINDOW`-char slices of a long value's token runs (base64/hex/key characters), so a value split
+ * into concatenated parts is still caught. Structural text (JSON keys, PEM armor and DER header)
+ * is left out because it is shared with unrelated keys.
+ */
+export function windowsFor(value: string): string[] {
+  if (value.length < MIN_WINDOW_VALUE) return [];
+  const pem = value.match(/-----BEGIN [^-]+-----([\s\S]*?)-----END [^-]+-----/);
+  const runs = pem ? [pem[1].replace(/\s+/g, "").slice(PEM_HEADER_CHARS)] : (value.match(TOKEN_RUN) ?? []);
+  const windows = new Set<string>();
+  for (const run of runs) {
+    for (let i = 0; i + WINDOW <= run.length; i++) windows.add(run.slice(i, i + WINDOW));
+  }
+  return [...windows];
+}
+
 export type LoadedSecrets = { secrets: Secret[]; missing: string[]; short: string[] };
 
 type Env = Record<string, string | undefined>;
 
-/** Every distinct value of each name across `envs` is checked; values under 8 chars are skipped. */
+/**
+ * Every distinct value of each name across `envs` is checked (a value may hold several, joined by
+ * `VALUE_SEPARATOR`). Values under 8 chars are skipped.
+ */
 export function loadSecrets(names: string[], envs: Env | Env[]): LoadedSecrets {
   const loaded: LoadedSecrets = { secrets: [], missing: [], short: [] };
   for (const name of names) {
-    const values = new Set([envs].flat().map((env) => env[name]).filter((value): value is string => !!value));
+    const values = new Set([envs].flat().flatMap((env) => splitValues(env[name])));
     const usable = [...values].filter((value) => value.length >= MIN_SECRET_LENGTH);
     if (values.size === 0) loaded.missing.push(name);
     else if (usable.length === 0) loaded.short.push(name);
     else {
-      const needles = usable.flatMap((value) => [value, ...valueFragments(value)].flatMap(encodedForms));
-      loaded.secrets.push({ name, needles: [...new Set(needles)] });
+      loaded.secrets.push({
+        name,
+        needles: dedupe(usable.flatMap(needlesFor)),
+        windows: dedupe(usable.flatMap(windowsFor).map((w) => Buffer.from(w, "latin1"))),
+      });
     }
   }
   return loaded;
 }
 
-export function scanSource(source: Source, secrets: Secret[]): Hit[] {
-  const hits = new Map<string, Hit>();
-  let newlines: number[] | undefined;
-  for (const { name, needles } of secrets) {
-    for (const needle of needles) {
-      for (let at = source.text.indexOf(needle); at !== -1; at = source.text.indexOf(needle, at + 1)) {
-        newlines ??= newlineOffsets(source.text);
-        const index = countBelow(newlines, at);
-        const line = source.lines ? source.lines[index] : index + 1;
-        hits.set(`${name}\0${line}`, { name, location: source.location, line, commit: source.commit });
-      }
-    }
-  }
-  return [...hits.values()];
+export function splitValues(raw: string | undefined): string[] {
+  return raw ? raw.split(VALUE_SEPARATOR).filter(Boolean) : [];
 }
 
-function newlineOffsets(text: string): number[] {
-  const out: number[] = [];
-  for (let i = text.indexOf("\n"); i !== -1; i = text.indexOf("\n", i + 1)) out.push(i);
-  return out;
-}
-
-/** Number of sorted offsets below `at`, i.e. the 0-based line index of `at`. */
-function countBelow(sorted: number[], at: number): number {
-  let lo = 0;
-  let hi = sorted.length;
-  while (lo < hi) {
-    const mid = (lo + hi) >> 1;
-    if (sorted[mid] < at) lo = mid + 1;
-    else hi = mid;
-  }
-  return lo;
-}
-
-/** `VAR_NAME file:line`, plus the short commit for diff hits. Never includes the value. */
-export function formatHit(hit: Hit): string {
-  const where = `${hit.name} ${hit.location}:${hit.line}`;
-  return hit.commit ? `${where} @${hit.commit.slice(0, 7)}` : where;
+function dedupe(buffers: Buffer[]): Buffer[] {
+  const seen = new Map<string, Buffer>();
+  for (const buffer of buffers) seen.set(buffer.toString("latin1"), buffer);
+  return [...seen.values()];
 }
 
 /** Every value of a repeatable flag: `--env-file a --env-file=b` → `["a", "b"]`. */
