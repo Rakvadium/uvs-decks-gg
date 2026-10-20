@@ -1,5 +1,5 @@
 import { afterAll, describe, expect, test } from "bun:test";
-import { spawnSync } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -86,9 +86,17 @@ describe("env files", () => {
     const problems = envFileProblems(dir);
     expect(problems.some((p) => /CONVEX_DEPLOYMENT .*not an `anonymous:`/.test(p))).toBe(true);
     expect(problems.some((p) => /NEXT_PUBLIC_CONVEX_URL .*not a loopback URL/.test(p))).toBe(true);
-    expect(() => assertEnvFilesLocal(dir)).toThrow(/agent:setup refused/);
+    expect(() => assertEnvFilesLocal(dir, {})).toThrow(/agent:setup refused/);
     expect(ensureEnvLocal(dir, 8170)).toBe("kept");
     expect(fs.readFileSync(file, "utf8")).toBe(text);
+  });
+
+  test("refuses a shell that carries a deploy key or a cloud URL, even with a clean worktree", () => {
+    const dir = tmpDir("agent-setup-env-");
+    expect(() => assertEnvFilesLocal(dir, { PATH: "/bin" })).not.toThrow();
+    expect(() => assertEnvFilesLocal(dir, { CONVEX_DEPLOY_KEY: "<placeholder>" })).toThrow(/CONVEX_DEPLOY_KEY is set in the caller's environment/);
+    expect(() => assertEnvFilesLocal(dir, { CONVEX_URL: "https://fake-deployment-123.convex.invalid" })).toThrow(/not a loopback URL/);
+    expect(fs.existsSync(path.join(dir, ".env.local"))).toBe(false);
   });
 
   test("refuses production secret names next to a local deployment, without printing values", () => {
@@ -192,6 +200,17 @@ describe("port allocation", () => {
 });
 
 describe("registry lock", () => {
+  type Result = { code: number | null; stdout: string; stderr: string };
+  /** A bun child process; its output is collected as it arrives. */
+  const runBun = (args: string[]): Promise<Result> =>
+    new Promise((resolve) => {
+      const child = spawn(process.execPath, args, { stdio: ["ignore", "pipe", "pipe"] });
+      let stdout = "";
+      let stderr = "";
+      child.stdout.on("data", (c: Buffer) => (stdout += c.toString("utf8")));
+      child.stderr.on("data", (c: Buffer) => (stderr += c.toString("utf8")));
+      child.on("close", (code) => resolve({ code, stdout: stdout.trim(), stderr: stderr.trim() }));
+    });
   const claimScript = (dir: string) => {
     const file = path.join(dir, "claim.ts");
     fs.writeFileSync(
@@ -201,35 +220,44 @@ describe("registry lock", () => {
     );
     return file;
   };
-  const claim = (script: string, worktree: string, root: string) =>
-    Bun.spawn([process.execPath, script, worktree, root], { stdout: "pipe", stderr: "pipe" });
-
   test("concurrent claims from separate processes get distinct ports", async () => {
     const root = tmpDir("agent-setup-root-");
     const script = claimScript(tmpDir("agent-setup-script-"));
-    const procs = Array.from({ length: 6 }, (_, i) => claim(script, `/wt/parallel-${i}`, root));
-    const ports = await Promise.all(
-      procs.map(async (p) => {
-        expect(await p.exited).toBe(0);
-        return Number((await new Response(p.stdout).text()).trim());
-      }),
-    );
+    const results = await Promise.all(Array.from({ length: 6 }, (_, i) => runBun([script, `/wt/parallel-${i}`, root])));
+    for (const r of results) expect(r.code).toBe(0);
+    const ports = results.map((r) => Number(r.stdout));
     expect(new Set(ports).size).toBe(6);
     expect(ports.every((p) => p >= 8170 && p <= 8179)).toBe(true);
     expect(Object.keys(readRegistry(root))).toHaveLength(6);
   });
+
+  test("heavy contention: every claim rewrites the registry while others read it unlocked, with no failures", async () => {
+    const root = tmpDir("agent-setup-root-");
+    const dir = tmpDir("agent-setup-script-");
+    const script = path.join(dir, "churn.ts");
+    fs.writeFileSync(
+      script,
+      `import { claimPort, lookupRegisteredPort } from ${JSON.stringify(PORTS_MODULE)};\n` +
+        `const [root, id] = process.argv.slice(2); const n = Number(id); let errors = 0;\n` +
+        `for (let i = 0; i < 40; i++) { try { claimPort("/wt/churn-" + id, i % 2 ? 8100 + n : 8150 + n, root); lookupRegisteredPort("/wt/churn-" + ((n + 1) % 6), root); } catch (e) { errors++; console.error(String(e)); } }\n` +
+        `console.log(errors);\n`,
+    );
+    const results = await Promise.all(Array.from({ length: 6 }, (_, i) => runBun([script, root, String(i)])));
+    for (const r of results) expect(r).toEqual({ code: 0, stdout: "0", stderr: "" });
+    // The last claim (i = 39) is 8100 + n.
+    expect(Object.values(readRegistry(root)).sort()).toEqual([8100, 8101, 8102, 8103, 8104, 8105]);
+  }, 60_000);
 
   test("a claim waits while another process holds the lock, then proceeds", async () => {
     const root = tmpDir("agent-setup-root-");
     const script = claimScript(tmpDir("agent-setup-script-"));
     const lock = `${registryPath(root)}.lock`;
     fs.writeFileSync(lock, "");
-    const proc = claim(script, "/wt/waiting", root);
-    const early = await Promise.race([proc.exited, new Promise((r) => setTimeout(() => r("waiting"), 1500))]);
+    const run = runBun([script, "/wt/waiting", root]);
+    const early = await Promise.race([run, new Promise((r) => setTimeout(() => r("waiting"), 1500))]);
     expect(early).toBe("waiting");
     expect(fs.existsSync(registryPath(root))).toBe(false);
     fs.rmSync(lock);
-    expect(await proc.exited).toBe(0);
-    expect(Number((await new Response(proc.stdout).text()).trim())).toBe(8170);
+    expect(await run).toEqual({ code: 0, stdout: "8170", stderr: "" });
   });
 });

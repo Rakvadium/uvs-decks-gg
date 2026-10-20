@@ -88,8 +88,15 @@ function withRegistryLock<T>(root: string, fn: () => T): T {
       fs.closeSync(fs.openSync(lock, "wx"));
       break;
     } catch (err) {
-      if ((err as NodeJS.ErrnoException).code !== "EEXIST") throw err;
-      const age = Date.now() - fs.statSync(lock).mtimeMs;
+      const code = (err as NodeJS.ErrnoException).code;
+      // On Windows a lock file that is still being deleted can't be opened (EPERM) until it is gone.
+      if (code !== "EEXIST" && !(code === "EPERM" && process.platform === "win32")) throw err;
+      let age = 0;
+      try {
+        age = Date.now() - fs.statSync(lock).mtimeMs;
+      } catch {
+        // Released between the open and the stat: wait and retry.
+      }
       if (age > 30_000) fs.rmSync(lock, { force: true });
       else if (Date.now() > deadline) throw new Error(`Timed out waiting for ${lock}`);
       else Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 50);
@@ -136,7 +143,11 @@ export function claimPort(
       if (holder) throw new Error(`App port ${port} is already claimed by ${holder}`);
     }
     registry[key] = port;
-    fs.writeFileSync(registryPath(root), `${JSON.stringify(registry, null, 2)}\n`);
+    // Readers don't take the lock, so replace the file in one step rather than truncating it.
+    const file = registryPath(root);
+    const tmp = `${file}.${process.pid}.tmp`;
+    fs.writeFileSync(tmp, `${JSON.stringify(registry, null, 2)}\n`);
+    fs.renameSync(tmp, file);
     return port;
   });
 }

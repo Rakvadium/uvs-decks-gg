@@ -66,16 +66,28 @@ export function envFileProblems(cwd: string): string[] {
   return [...new Set(out)];
 }
 
-/** Step 2: refuse, before anything else runs, when an env file could point anywhere but a local backend. */
-export function assertEnvFilesLocal(cwd: string): void {
-  const problems = envFileProblems(cwd);
-  if (problems.length === 0) return;
+/**
+ * Step 2: refuse, before anything else runs, when an env file, or the shell agent:setup runs in,
+ * could point anywhere but a local backend. Bun loads `.env.local` into `env` too, so a file
+ * problem can show up twice, once per source.
+ */
+export function assertEnvFilesLocal(cwd: string, env: Record<string, string | undefined> = process.env): void {
+  const fileProblems = envFileProblems(cwd);
+  const shellProblems = envViolations({ name: "the caller's environment", env: { ...env } });
+  if (fileProblems.length === 0 && shellProblems.length === 0) return;
   throw new Error(
     [
-      "agent:setup refused: this worktree's env files are not local-only. Nothing was changed; .env.local was left as it is.",
-      ...problems.map((p) => `  - ${p}`),
-      "A worktree's .env.local must never be a copy of the main checkout's. Move it aside (it may hold live secrets) and rerun;",
-      "agent:setup then writes a loopback-only .env.local from its template.",
+      "agent:setup refused: this worktree's env is not local-only. Nothing was changed; .env.local was left as it is.",
+      ...[...fileProblems, ...shellProblems].map((p) => `  - ${p}`),
+      ...(fileProblems.length > 0
+        ? [
+            "A worktree's .env.local must never be a copy of the main checkout's. Move it aside (it may hold live secrets) and rerun;",
+            "agent:setup then writes a loopback-only .env.local from its template.",
+          ]
+        : []),
+      ...(shellProblems.length > 0
+        ? ["Unset those in this shell and rerun. A shell that injects cloud Convex credentials (Cursor Cloud) has no local Convex route."]
+        : []),
     ].join("\n"),
   );
 }
