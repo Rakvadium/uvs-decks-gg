@@ -15,10 +15,11 @@
  * 7. Smoke test: `vconvex --check` must pass, plus a public read that must return the seed's catalog.
  * 8. Prints a JSON summary on stdout (no secret values); progress goes to stderr.
  *
- * guard.ts needs `convex` from node_modules. When it is installed, step 2 runs before the install;
- * in a fresh worktree the install runs first, and nothing reads env files or calls Convex before
- * the guard has run.
+ * guard.ts needs `convex` from node_modules. When it is installed, step 2 runs before the install.
+ * In a fresh worktree the install runs first, then a new process runs everything from step 2 on,
+ * so nothing reads env files for Convex or calls Convex before the guard has run.
  */
+import { spawnSync } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { assertLinkedWorktree, hasInstalledCli, installDependencies, parseSetupArgs } from "./preflight";
@@ -28,13 +29,17 @@ const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..
 async function main(argv: string[]): Promise<void> {
   const args = parseSetupArgs(argv);
   assertLinkedWorktree(REPO_ROOT, args.allowMain);
-  if (hasInstalledCli(REPO_ROOT)) {
-    (await import("./setup")).assertEnvFilesLocal(REPO_ROOT);
-  } else if (!args.install) {
-    throw new Error("node_modules/convex is missing, so the guard can't run. Rerun without --no-install.");
-  } else {
+  if (!hasInstalledCli(REPO_ROOT)) {
+    if (!args.install) throw new Error("node_modules/convex is missing, so the guard can't run. Rerun without --no-install.");
     console.error("[agent:setup] fresh worktree: installing first, because the env-file guard needs the installed Convex CLI");
+    installDependencies(REPO_ROOT);
+    // Bun keeps the module lookups it made before node_modules existed, so the rest runs in a new
+    // process, which starts with the env-file guard.
+    const rest = spawnSync(process.execPath, [fileURLToPath(import.meta.url), ...argv, "--no-install"], { cwd: REPO_ROOT, stdio: "inherit" });
+    process.exitCode = rest.status ?? 1;
+    return;
   }
+  (await import("./setup")).assertEnvFilesLocal(REPO_ROOT);
   if (args.install) installDependencies(REPO_ROOT);
   const { runSetup } = await import("./setup");
   console.log(JSON.stringify(await runSetup(args, REPO_ROOT), null, 2));
