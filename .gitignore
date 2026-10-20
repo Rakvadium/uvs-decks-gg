@@ -48,6 +48,7 @@ next-env.d.ts
 !/scripts/ocr-calibration/
 !/scripts/pr-capture/
 !/scripts/secret-scan/
+!/scripts/design-codemod/
 !/scripts/gh-post/
 !/scripts/validation/
 !/scripts/agent-setup/
