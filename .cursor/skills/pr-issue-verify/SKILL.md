@@ -14,6 +14,11 @@ Canonical: `docs/agent-os.md`
 **Job:** Prove the PR completes the linked issue — or say clearly that it does not.  
 **Not the same as** `hardened-pr-babysit` (CI/conflicts). Run babysit only if merge-readiness is also requested.
 
+## Independence
+
+- The verifier is a different agent from the builder. If you built or edited this PR, stop and ask for another agent.
+- Reproduce, don't trust. Treat every claim in the PR body as something to re-run. Every PASS cites your own command output, capture or code reading, done at the PR head in your own worktree and on your own ports.
+
 ## Inputs
 
 - PR number/URL, or infer from automation event context
@@ -24,7 +29,7 @@ Canonical: `docs/agent-os.md`
 1. **Load context**
 
 ```bash
-gh pr view <pr> --json number,title,body,baseRefName,headRefName,files,commits,statusCheckRollup,url
+gh pr view <pr> --json number,title,body,baseRefName,headRefName,headRefOid,files,commits,statusCheckRollup,url
 gh pr diff <pr>
 ```
 
@@ -36,7 +41,7 @@ Resolve issue number from body. Then:
 gh issue view <n> --json number,title,body,labels,url
 ```
 
-Parse Goal, Done when, Context, Out of scope (and auth/viewport notes if present).
+Parse Goal, Done when, Context, Out of scope (and auth/viewport notes if present). On round 2 or later, also list every prior must-fix and should-fix by number.
 
 2. **Scope check**
    - Diff advances the Goal
@@ -44,48 +49,61 @@ Parse Goal, Done when, Context, Out of scope (and auth/viewport notes if present
    - One issue ↔ this PR (flag bundled unrelated work)
 
 3. **Done-when verification** (each checkbox)
-   - Map to code and/or runtime evidence
+   - Map to code and/or runtime evidence from your own runs
    - UI issues (`area/ui`, `area/shell`, or UI files in diff):
-     - Prefer checkout/PR branch in cloud/local env
+     - Check out the PR head in your own worktree
      - Repro from issue Context (auth + viewport if specified)
-     - Screenshot or short recording proving the fix
+     - Re-capture and compare against the builder's media (`scripts/pr-capture/README.md`)
    - Non-UI: tests, typecheck/lint output, or precise code citation
+   - Tooling: break it on purpose and confirm the failure is reported
 
-4. **CI signal** (secondary)
+4. **Security & side effects:** rerun every item of the checklist in `.agents/skills/hardened-coding/SKILL.md` § Security & side effects yourself, at the PR head. Scan the PR's published media, and scan your own media before you publish it. For new targets, look at the deployments and checks that actually ran on each new ref. Report each item in the check table.
+
+5. **CI signal** (secondary)
    - Note failing required checks; they block “fixes issue” if they prevent confidence
    - Do not rewrite CI to pass
 
-5. **Verdict**
-   - `fixes issue` — every Done when item passes with evidence
+6. **Verdict**
+   - **Must-fix:** a failed Done when item, a failed Security & side effects item, a wrong base, or a regression. For validation tooling (capture, scan, verify scripts), a should-fix that could hide a failure (silent fallback, false negative, exit 0 on error) is a must-fix.
+   - **PASS** = `fixes issue` with zero must-fix. Any must-fix = **FAIL**, even if every Done when box is ticked.
+   - `fixes issue` — every Done when item passes with your own evidence
    - `partial` — some items pass; list gaps
    - `does not fix` — Goal unmet or critical Done when failed
 
-6. **Comment on the PR** (required)
+7. **Comment on the PR** (required)
 
 ```markdown
-## Issue completion review
+## Independent verification (round <k>): PASS | FAIL
 **Issue:** #<n> — <title>
-**Verdict:** fixes issue | partial | does not fix
+**Verdict:** fixes issue | partial | does not fix. <m> must-fix, <s> should-fix.
+**Verified at:** `<head sha>`, own worktree, ports <ports>. Live data: no writes | <approved exception>. Base: `dev` | wrong (`master`/`main`).
+
+### Checks
+| # | Check | Result | Evidence (my own runs) |
+| --- | --- | --- | --- |
+| 1 | Scope (`git diff --name-only`) | PASS / FAIL | ... |
+| 2 | typecheck / test / lint / build | ... | exit codes and counts |
+| 3 | Security & side effects | ... | scan counts, CI triggered, Vercel check |
+| 4… | One row per Done when item, claim or prior finding | ... | ... |
 
 ### Done when
-- [x] or [ ] <item> — evidence: ...
-- [x] or [ ] <item> — evidence: ...
+- [x] or [ ] <item> — evidence: check #<k>
 
-### Scope
-- Base branch: `dev` | wrong (`master`/`main`) — ...
-- In scope: ...
-- Out of scope / drive-by: ...
+### Must-fix
+- None | 1. <finding, repro, suggested fix>
+
+### Should-fix
+- None | 1. ...
+
+### Nits
+- None | ...
 
 ### Artifacts
-- Screenshots/recordings: ... (or N/A)
-
-### Blockers
-- ...
+- Screenshots/recordings with raw URLs (or N/A), and where your media was published.
 ```
 
-7. **Fixing**
-   - Default: **do not implement** unless the user/automation says “fix gaps in this PR”
-   - If allowed: only fix clear gaps for this issue; re-run verification; do not merge unless asked
+8. **Hand back**
+   - Never edit or push to the PR. Report every gap as a must-fix or should-fix. The builder fixes it, and the coordinator then starts a new verification round.
 
 ## Automation prompt
 
@@ -95,9 +113,9 @@ Follow docs/agent-os.md.
 PR: from event context (or #<pr>).
 Resolve linked issue via Fixes/Closes #N.
 Confirm base branch is `dev` (flag master/main as blocker).
-Post the Issue completion review comment on the PR.
+Post the Independent verification comment on the PR.
 Do not merge.
-Do not implement unless the PR only needs a trivial gap fix and you state what you changed.
+Never edit or push to the PR; report every gap as must-fix or should-fix for the builder.
 For UI: repro with correct auth/viewport and attach screenshot/recording evidence.
 Model policy: prefer single-agent work; if sub-agents are required use composer-2.5 only; never Sonnet/Opus.
 ```
@@ -105,7 +123,8 @@ Model policy: prefer single-agent work; if sub-agents are required use composer-
 ## Forbidden
 
 - Merging without explicit ask
-- Approving “fixes issue” without evidence per Done when item
+- Verifying a PR you built, or editing the PR you are verifying
+- Approving “fixes issue” without your own evidence per Done when item
 - Ignoring wrong base branch (`master`/`main` instead of `dev`)
 - Ignoring Out of scope drive-by changes
 - Filing a new issue instead of reviewing (unless you discover a separate bug — then use create-task and still complete this review)

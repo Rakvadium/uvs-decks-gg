@@ -445,7 +445,8 @@ export function resolveCliTarget(input: {
     for (const [k, v] of Object.entries(source?.env ?? {})) if (!has(k)) env[k] = v;
   }
   const deployKey = get("CONVEX_DEPLOY_KEY");
-  if (deployKey !== undefined && deployKey !== DEPLOY_KEY_SENTINEL) return { target: "cloud", reason: "a deploy key is set" };
+  // The CLI treats an empty deploy key as unset; caller-env-clean still refuses one.
+  if (deployKey && deployKey !== DEPLOY_KEY_SENTINEL) return { target: "cloud", reason: "a deploy key is set" };
   if (get("CONVEX_OVERRIDE_ACCESS_TOKEN")) return { target: "cloud", reason: "an access token override is set" };
   if (get("CONVEX_PROVISION_HOST")) return { target: "unknown", reason: "CONVEX_PROVISION_HOST redirects the CLI" };
   const selfHosted = get("CONVEX_SELF_HOSTED_URL");

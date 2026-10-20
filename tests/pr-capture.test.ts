@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { stableScreenshot } from "../scripts/pr-capture/browser";
+import { agentLogin, newCaptureContext, stableScreenshot } from "../scripts/pr-capture/browser";
+import { convexHostFromEnv, createSocketGuard, isConvexSocket } from "../scripts/pr-capture/guard";
 import { UNSETTLED_PROBLEM, appearanceKey, createSessionPin, pinFlagged, shotPin, stillPin, type Appearance, type PinReport } from "../scripts/pr-capture/pin";
 import {
   cachedLoad,
@@ -509,4 +510,329 @@ describe("pr-capture session pin: socket close, unsettled shots, GIF churn", () 
     expect(b.unpinned).toBe(a.unpinned);
     expect(shotPin([a, b, pin.report()], PIN).flagged).toBe(false);
   });
+});
+
+describe("pr-capture socket guard", () => {
+  const connect = (sessionId: string) => JSON.stringify({ type: "Connect", sessionId, connectionCount: 0 });
+
+  test("a proxied socket is clean: each frame it sends was forwarded first", () => {
+    const guard = createSocketGuard();
+    guard.proxied();
+    guard.forwarded(connect("a"));
+    guard.opened();
+    guard.sent(connect("a"));
+    guard.forwarded("same");
+    guard.forwarded("same");
+    guard.sent("same");
+    guard.sent("same");
+    expect(guard.problems()).toEqual([]);
+  });
+
+  test("a frame on a socket the proxy never saw is a problem, and names its type", () => {
+    const guard = createSocketGuard();
+    guard.proxied();
+    guard.opened();
+    guard.opened(); // a worker's socket
+    guard.sent(connect("worker"));
+    guard.sent(JSON.stringify({ type: "Mutation", udfPath: "decks:create" }));
+    const problems = guard.problems();
+    expect(problems).toHaveLength(2);
+    expect(problems[0]).toContain("2 frame(s) (Connect ×1, Mutation ×1) were sent on a Convex WebSocket the capture proxy never saw");
+    expect(problems[1]).toContain("1 more Convex WebSocket(s) were opened than the capture proxy saw");
+  });
+
+  test("a repeated frame only matches as many times as it was forwarded", () => {
+    const guard = createSocketGuard();
+    guard.forwarded("ping");
+    guard.sent("ping");
+    expect(guard.problems()).toEqual([]);
+    guard.sent("ping");
+    expect(guard.problems()[0]).toContain("1 frame(s) (unparseable ×1)");
+  });
+
+  test("a silent unproxied socket is caught by the count; binary frames are compared too", () => {
+    const silent = createSocketGuard();
+    silent.opened();
+    expect(silent.problems()[0]).toContain("1 more Convex WebSocket(s) were opened");
+    const binary = createSocketGuard();
+    binary.forwarded(Buffer.from([1, 2]));
+    binary.sent(Buffer.from([1, 2]));
+    binary.sent(Buffer.from([3]));
+    expect(binary.problems()).toEqual([expect.stringContaining("1 frame(s) (binary ×1)")]);
+  });
+
+  test("a SharedWorker or service worker is a problem by itself", () => {
+    const guard = createSocketGuard();
+    guard.worker("SharedWorker", "/w.js");
+    guard.worker("SharedWorker", "/w.js");
+    guard.worker("service worker", "http://localhost/sw.js");
+    expect(guard.problems()).toEqual([
+      expect.stringContaining("a SharedWorker started (/w.js)"),
+      expect.stringContaining("a service worker started (http://localhost/sw.js)"),
+    ]);
+  });
+
+  test("Convex sockets: the sync path, or anything on the deployment host", () => {
+    const host = convexHostFromEnv({ NEXT_PUBLIC_CONVEX_URL: "https://happy-otter-123.convex.cloud" });
+    expect(host).toBe("happy-otter-123.convex.cloud");
+    expect(isConvexSocket("wss://happy-otter-123.convex.cloud/api/1.31.0/sync", host)).toBe(true);
+    expect(isConvexSocket("wss://happy-otter-123.convex.cloud/api/v2/stream", host)).toBe(true);
+    expect(isConvexSocket("ws://127.0.0.1:8132/api/probe/sync", host)).toBe(true);
+    expect(isConvexSocket("ws://localhost:8131/_next/webpack-hmr", host)).toBe(false);
+    expect(isConvexSocket("wss://other.convex.cloud/api/v2/stream")).toBe(false);
+    expect(convexHostFromEnv({})).toBeUndefined();
+  });
+});
+
+type Listener = (...args: never[]) => unknown;
+
+function emitter() {
+  const listeners = new Map<string, Listener[]>();
+  return {
+    on(event: string, fn: Listener) {
+      listeners.set(event, [...(listeners.get(event) ?? []), fn]);
+    },
+    emit(event: string, ...args: unknown[]) {
+      for (const fn of listeners.get(event) ?? []) (fn as (...a: unknown[]) => unknown)(...args);
+    },
+  };
+}
+
+/** Just enough of Playwright's Browser/BrowserContext/Page to drive newCaptureContext's wiring. */
+function fakeBrowser() {
+  const fakePage = () => {
+    let wsRoute: ((ws: unknown) => void) | undefined;
+    return {
+      ...emitter(),
+      routeWebSocket: async (_pattern: RegExp, handler: (ws: unknown) => void) => void (wsRoute = handler),
+      route: (ws: unknown) => wsRoute!(ws),
+    };
+  };
+  const fakeContext = () => {
+    const events = emitter();
+    const bindings: ((source: unknown, url: string) => void)[] = [];
+    const pages: ReturnType<typeof fakePage>[] = [];
+    let wsRoute: ((ws: unknown) => void) | undefined;
+    return {
+      ...events,
+      pages,
+      bindings,
+      routeWebSocket: async (_pattern: RegExp, handler: (ws: unknown) => void) => void (wsRoute = handler),
+      routeSocket: (ws: unknown) => wsRoute!(ws),
+      route: async () => {},
+      addInitScript: async () => {},
+      exposeBinding: async (_name: string, fn: (source: unknown, url: string) => void) => void bindings.push(fn),
+      async newPage() {
+        const page = fakePage();
+        pages.push(page);
+        events.emit("page", page);
+        return page;
+      },
+    };
+  };
+  const contexts: ReturnType<typeof fakeContext>[] = [];
+  return {
+    contexts,
+    newContext: async () => {
+      const context = fakeContext();
+      contexts.push(context);
+      return context;
+    },
+  };
+}
+
+/** A routed socket: frames from the page and the server, and what the proxy passed on. */
+function fakeSocketRoute(url = "wss://x.convex.cloud/api/1.0/sync") {
+  const toServer: unknown[] = [];
+  const toPage: unknown[] = [];
+  const handlers: Record<string, (...args: unknown[]) => void> = {};
+  const server = {
+    send: (m: unknown) => toServer.push(m),
+    onMessage: (h: (m: unknown) => void) => void (handlers.server = h as never),
+    onClose: (h: (code?: number, reason?: string) => void) => void (handlers.serverClose = h as never),
+    close: async () => {},
+  };
+  const ws = {
+    url: () => url,
+    connectToServer: () => server,
+    onMessage: (h: (m: unknown) => void) => void (handlers.page = h as never),
+    onClose: (h: (code?: number, reason?: string) => void) => void (handlers.pageClose = h as never),
+    send: (m: unknown) => toPage.push(m),
+    close: async () => {},
+  };
+  return {
+    ws,
+    toServer,
+    toPage,
+    fromPage: (m: unknown) => handlers.page(m),
+    fromServer: (m: unknown) => handlers.server(m),
+    serverClosed: () => handlers.serverClose(1006, ""),
+  };
+}
+
+/** A real (native) WebSocket as Playwright reports it on `page.on("websocket")`. */
+function nativeSocket(url: string) {
+  const events = new Map<string, (data: { payload: string | Buffer }) => void>();
+  return {
+    url: () => url,
+    on: (event: string, fn: (data: { payload: string | Buffer }) => void) => void events.set(event, fn),
+    send: (payload: string) => events.get("framesent")?.({ payload }),
+  };
+}
+
+describe("pr-capture capture context wiring", () => {
+  const subscribeFrame = JSON.stringify(subscribe);
+  const open = async () => {
+    const browser = fakeBrowser();
+    const blocked: string[] = [];
+    const made = await newCaptureContext(browser as unknown as Parameters<typeof newCaptureContext>[0], {
+      viewport: "desktop",
+      appearance: PIN,
+      blocked,
+      still: true,
+    });
+    const context = browser.contexts[0];
+    return { ...made, blocked, context, main: context.pages[0] };
+  };
+  const cleanSocket = (route: (ws: unknown) => void) => {
+    const s = fakeSocketRoute();
+    route(s.ws);
+    s.fromPage(subscribeFrame);
+    s.fromServer(update(SAVED));
+    return s;
+  };
+
+  test("the shot page has its own route and pin; a popup's clean subscription can't mask it losing its own", async () => {
+    const { pin, context, main } = await open();
+    expect(context.pages).toHaveLength(1);
+    const mainSocket = cleanSocket(main.route);
+    expect(pin.report()).toMatchObject({ patched: true, problems: [] });
+    // A popup has no page route, so its socket falls through to the context's route and pin.
+    const popup = cleanSocket(context.routeSocket);
+    expect(JSON.parse(popup.toPage[0] as string).modifications[0].value.colorSource.preset).toBe("aurora");
+    expect(pin.report()).toMatchObject({ patched: true, problems: [] });
+    mainSocket.serverClosed(); // the shot page left the app or signed out; the popup is still clean
+    const report = pin.report();
+    expect([report.patched, pinFlagged(report)]).toEqual([false, true]);
+    expect(has(report, "no live sessions:getSession subscription")).toBe(true);
+  });
+
+  test("a popup that never subscribes doesn't flag a clean shot page", async () => {
+    const { pin, context, main } = await open();
+    cleanSocket(main.route);
+    const popup = fakeSocketRoute();
+    context.routeSocket(popup.ws);
+    popup.serverClosed();
+    expect(pin.report()).toMatchObject({ patched: true, problems: [] });
+  });
+
+  test("writes are dropped on the shot page's route and on the context route", async () => {
+    const { blocked, context, main } = await open();
+    for (const route of [main.route, context.routeSocket]) {
+      const s = fakeSocketRoute();
+      route(s.ws);
+      s.fromPage(JSON.stringify({ type: "Mutation", udfPath: "decks:create" }));
+      s.fromPage(JSON.stringify({ type: "Action", udfPath: "x:y" }));
+      s.fromPage(subscribeFrame);
+      expect(s.toServer).toEqual([subscribeFrame]);
+    }
+    expect(blocked).toEqual(["Mutation:decks:create", "Action:x:y", "Mutation:decks:create", "Action:x:y"]);
+  });
+
+  test("the guard sees real sockets on every page: proxied ones are clean, a worker's isn't", async () => {
+    const { guard, context, main } = await open();
+    const routed = cleanSocket(main.route);
+    const native = nativeSocket(routed.ws.url());
+    main.emit("websocket", native);
+    native.send(subscribeFrame);
+    main.emit("websocket", nativeSocket("ws://localhost:8131/_next/webpack-hmr")); // not Convex
+    expect(guard.problems()).toEqual([]);
+
+    const popup = await context.newPage();
+    const worker = nativeSocket("wss://x.convex.cloud/api/1.0/sync"); // the popup's dedicated worker
+    popup.emit("websocket", worker);
+    worker.send(JSON.stringify({ type: "Connect", sessionId: "w" }));
+    expect(guard.problems()).toEqual([
+      expect.stringContaining("1 frame(s) (Connect ×1) were sent on a Convex WebSocket the capture proxy never saw"),
+      expect.stringContaining("1 more Convex WebSocket(s) were opened than the capture proxy saw"),
+    ]);
+  });
+
+  test("the guard flags a SharedWorker (reported by the init-script binding) and a service worker", async () => {
+    const { guard, context } = await open();
+    expect(context.bindings).toHaveLength(1);
+    context.bindings[0]({}, "/shared.js");
+    context.emit("serviceworker", { url: () => "http://localhost:8131/sw.js" });
+    expect(guard.problems()).toEqual([
+      expect.stringContaining("a SharedWorker started (/shared.js)"),
+      expect.stringContaining("a service worker started (http://localhost:8131/sw.js)"),
+    ]);
+  });
+});
+
+describe("pr-capture agent login", () => {
+  const loginBrowser = (options: { fail?: boolean } = {}) => {
+    const contexts: { closed: boolean; state: object }[] = [];
+    return {
+      contexts,
+      newContext: async () => {
+        const record = { closed: false, state: { cookies: [{ name: "__convexAuthRefreshToken", value: `t${contexts.length}` }] } };
+        contexts.push(record);
+        let at = "about:blank";
+        return {
+          ...emitter(),
+          route: async () => {},
+          routeWebSocket: async () => {},
+          addInitScript: async () => {},
+          exposeBinding: async () => {},
+          storageState: async () => record.state,
+          close: async () => void (record.closed = true),
+          newPage: async () => ({
+            url: () => at,
+            goto: async (url: string) => {
+              at = url;
+              if (options.fail) throw new Error(`timeout navigating to ${url}`);
+              at = "http://localhost:8131/decks";
+            },
+            waitForURL: async () => {},
+          }),
+        };
+      },
+    };
+  };
+  const withSecret = async (run: () => Promise<void>) => {
+    const previous = process.env.AGENT_AUTH_SECRET;
+    process.env.AGENT_AUTH_SECRET = "s3cret";
+    try {
+      await run();
+    } finally {
+      if (previous === undefined) delete process.env.AGENT_AUTH_SECRET;
+      else process.env.AGENT_AUTH_SECRET = previous;
+    }
+  };
+
+  test("every call is its own sign-in in its own throwaway context", () =>
+    withSecret(async () => {
+      const browser = loginBrowser();
+      const asBrowser = browser as unknown as Parameters<typeof agentLogin>[0];
+      const first = await agentLogin(asBrowser, "http://localhost:8131", []);
+      const second = await agentLogin(asBrowser, "http://localhost:8131", []);
+      expect(browser.contexts).toHaveLength(2);
+      expect(browser.contexts.every((context) => context.closed)).toBe(true);
+      expect(first.storageState as object).toBe(browser.contexts[0].state);
+      expect(second.storageState as object).toBe(browser.contexts[1].state);
+      expect([first.unproxied, second.unproxied]).toEqual([[], []]);
+    }));
+
+  test("a failed sign-in closes its context and never echoes the token", () =>
+    withSecret(async () => {
+      const browser = loginBrowser({ fail: true });
+      const error = await agentLogin(browser as unknown as Parameters<typeof agentLogin>[0], "http://localhost:8131", []).catch(
+        (e: unknown) => e,
+      );
+      expect(error).toBeInstanceOf(Error);
+      expect((error as Error).message).toContain("stuck on /agent-login");
+      expect((error as Error).message).not.toContain("s3cret");
+      expect(browser.contexts[0].closed).toBe(true);
+    }));
 });

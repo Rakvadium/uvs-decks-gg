@@ -67,7 +67,7 @@ Use browser preview snapshots (and short recordings only for interaction-heavy w
 
 **Before edits**
 
-1. App running (`bun run dev`, port **8090**).
+1. App running. `bun run dev` is fixed to port **8090**. To use your own port, run `bunx next dev -p <port>` (`capture --port` starts one for you).
 2. Sign in via agent-login if the route needs auth ([agent-onboarding.md](./agent-onboarding.md) §6).
 3. Snapshot BEFORE on each affected route: desktop + mobile.
 4. Same theme/chrome/auth state you will use for AFTER.
@@ -96,6 +96,76 @@ For UI PRs, use your own `--port` so you never collide with other agents:
 5. Paste `.pr-captures/<n>/compare-before-vs-after/summary.md` into the PR body. It holds Before, After, side-by-side, diff and diff % for every shot, plus any GIFs. A Before-only description is incomplete.
 
 Captures never write to Convex, and they set theme and mode in the browser only. See the README for how, and for how a verifier re-captures and diffs someone else's PR.
+
+---
+
+## Coordinator brief templates
+
+A coordinator hands one issue to a builder agent, then the PR to a different verifier agent, and repeats verify rounds until one passes. Fill every `<placeholder>` and delete lines that don't apply. Reference runs: #196 and #198 (capture tooling, multiple verification rounds), #201 (design foundation, builder and compare reference).
+
+Both briefs rely on these setup rules:
+
+- **One agent, one worktree, one port range.** Concurrent dev servers never share a checkout: Next allows one `next dev` per checkout (`.next/dev/lock`). Builder and verifier get different ranges inside the validation range 8100–8199, and both stay off the default port 8090. Use the same number `P` for `bunx next dev -p <P>` and for `--app-port <P>`, so the app and its local backend pair up.
+- **Choose the worktree's env on purpose.** A new worktree has no `.env.local`, and the main checkout's copy may point at a local Convex instead of the cloud deployment. The brief names the target (`cloud` or `local`).
+  - For `local`, `bun run validation:backend -- start --app-port <P>` points the worktree's `.env.local` at its own backend.
+  - Don't hand-parse env files to decide the target: `bun run vconvex -- --app-port <P> --check` prints the resolved target class without values. If it doesn't pass (`target=local`, `OK: …`, exit 0), treat the target as cloud, and every Convex write needs human approval of the exact command.
+
+### Builder brief
+
+```text
+You are the BUILDER for issue #<n> (`gh issue view <n>`). A separate agent will verify your PR.
+
+Setup
+1. `git fetch origin && git checkout -B agent/<n>-<slug> origin/dev` in your own worktree.
+2. Ports <first>–<last> only, inside 8100–8199. Convex target: <cloud | local | none>; set up env per docs/agent-workflow-playbook.md § Coordinator brief templates.
+3. Allowed files: <globs>. Other agents are editing <globs>.
+
+Bans
+- AGENTS.md § Secrets and live data. Approved exceptions: <none | command + reason>.
+- Push only to your PR branch<, and to pr-media for captures>. Don't merge.
+
+Process
+- Read the issue, AGENTS.md and every file you'll edit. project-context-gate, then hardened-coding.
+- Implement each Done when item. <Issue-specific constraints or lessons.>
+
+Checks
+- `bun run typecheck`, `bun test`, `bun run lint`, `bun run build`.
+- Every item in hardened-coding § Security & side effects.
+- UI: before/after captures on your ports (§ PR visual embeds).
+
+Output
+- `gh pr create --base dev` with `Fixes #<n>`, evidence per Done when item, and the security checklist results.
+- Final report (short): PR URL, Done when → evidence, anything uncertain.
+```
+
+### Verifier brief
+
+```text
+You are the VERIFIER for PR #<pr> (issue #<n>), round <k>. You did not build it.
+
+Setup
+1. Your own worktree at the PR head (`gh pr checkout <pr>`). Record the head SHA.
+2. Ports <first>–<last> inside 8100–8199, different from the builder's. Convex target: <same as builder>; same env rule.
+3. Allowed files: <globs>. Any other changed path fails the scope check.
+
+Bans
+- AGENTS.md § Secrets and live data. Approved exceptions: <none | command + reason>.
+- Never edit or push to the PR; report fixes as must-fix or should-fix. Publish your media only under `<n>/verify*` labels. Don't merge.
+
+Process
+- Use pr-issue-verify. Reproduce every PR-body claim with your own runs and captures.
+- Builder's open questions to rule on: <list from the builder's final report, or "none">. Answer each in the comment.
+- <Round 2+: re-check each prior must-fix and should-fix by number, then rerun the full check table.>
+- <Issue-specific probes, e.g. break the tool and confirm it fails loudly.>
+
+Checks
+- Each Done when item, typecheck/test/lint/build, and every item in hardened-coding § Security & side effects (pr-issue-verify step 4).
+
+Output
+- One PR comment in the pr-issue-verify format (check table, evidence, must-fix, should-fix, nits). Verdict rules: pr-issue-verify § Verdict.
+- Stop your dev servers and confirm your ports are free.
+- Final report (short): comment URL, verdict, must-fix list.
+```
 
 ---
 
@@ -134,8 +204,9 @@ Do not implement until I say apply UI fixes.
 Follow docs/agent-workflow-playbook.md.
 Use project-context-gate, then hardened-convex-ops.
 Symptom: <…>
-Environment: <dev | prod | unknown>
-Dev first. No prod mutations without approval.
+Environment: <local (127.0.0.1/localhost) | cloud (serves the live site) | unknown>
+The cloud deployment serves the live site: read only there.
+Follow the Convex command rules in AGENTS.md § Secrets and live data: any write or deploy that reaches the cloud needs my approval of the exact command; local writes go only through `bun run vconvex -- --app-port <P> …` after `--check` passes.
 ```
 
 ### D) PR babysit

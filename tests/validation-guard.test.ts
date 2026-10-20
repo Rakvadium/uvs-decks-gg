@@ -18,7 +18,9 @@ import {
   installedConvexVersion,
   prepareInvocation,
   repointEnvLocal,
+  restoreCliSnapshot,
   splitArgs,
+  takeCliSnapshot,
   withLocalPorts,
 } from "../scripts/validation/convex";
 import { buildBackendEnv } from "../scripts/validation/env";
@@ -435,6 +437,9 @@ describe("resolveCliTarget replays the CLI's selection", () => {
     expect(r({}, files("CONVEX_DEPLOYMENT=anonymous:anonymous-other\n"))).toBe("unknown");
     expect(r({}, files(`${LOCAL_BLOCK}CONVEX_ALLOW_ANONYMOUS=false\n`))).toBe("unknown");
     expect(r({})).toBe("unknown");
+    // The CLI treats an empty deploy key as unset.
+    expect(r({ CONVEX_DEPLOY_KEY: "" })).toBe("unknown");
+    expect(r({ CONVEX_DEPLOY_KEY: "" }, files(LOCAL_BLOCK))).toBe("local");
   });
   test("the wrapper's pins win over every file form", () => {
     const childEnv = buildChildEnv({ parentEnv: {}, appPort: 8150, root: ROOT, platform: "win32" });
@@ -462,6 +467,9 @@ describe("vconvex --check", () => {
     expect(cloud.rules.filter((x) => x.status === "fail").map((x) => x.rule)).toEqual(["env-files-clean", "env-files-unambiguous"]);
     expect(check({ ".env": `CONVEX_DEPLOY_KEY: ${FAKE_KEY}\n` })).toMatchObject({ ok: false, target: "cloud" });
     expect(check({ ".env.local": LOCAL_BLOCK }, { CONVEX_DEPLOYMENT: "" })).toMatchObject({ ok: false, target: "unknown" });
+    const emptyKey = check({ ".env.local": LOCAL_BLOCK }, { CONVEX_DEPLOY_KEY: "" });
+    expect(emptyKey).toMatchObject({ ok: false, target: "unknown" });
+    expect(emptyKey.rules.filter((x) => x.status === "fail").map((x) => x.rule)).toEqual(["caller-env-clean"]);
     expect(check({ ".env.local": `CONVEX_DEPLOYMENT:${ANONYMOUS_DEPLOYMENT}\n` })).toMatchObject({ ok: false, target: "unknown" });
     expect(check({ ".env.local": LOCAL_BLOCK, ".env.vault": "x\n" })).toMatchObject({ ok: false, target: "unknown" });
   });
@@ -680,6 +688,44 @@ describe("wrapper", () => {
     expect(
       parseDotenv('# c\nexport A=1\nB="two words" \nC=\'x#y\'\nD=val # trailing\nE: colon\nCONVEX_DEPLOYMENT=dev:x # team: t\n'),
     ).toEqual({ A: "1", B: "two words", C: "x#y", D: "val", E: "colon", CONVEX_DEPLOYMENT: "dev:x" });
+  });
+});
+
+describe("CLI side-effect restore", () => {
+  const write = (root: string, rel: string, body: string) => {
+    fs.mkdirSync(path.dirname(path.join(root, rel)), { recursive: true });
+    fs.writeFileSync(path.join(root, rel), body);
+  };
+  const read = (root: string, rel: string) => fs.readFileSync(path.join(root, rel), "utf8");
+
+  test("restores touched files exactly and generated files only when just the line endings changed", () => {
+    const root = tmpDir("uvs-repo-");
+    write(root, ".cursor/rules/convex_rules.mdc", "old rules\r\n");
+    write(root, "convex/_generated/api.js", "export {};\r\nconst a = 1;\r\n");
+    write(root, "convex/_generated/api.d.ts", "type A = 1;\r\n");
+    write(root, "convex/_generated/server.js", "same\n");
+    // A JSON round trip, as `start` saves it for `stop`.
+    const snapshot = JSON.parse(JSON.stringify(takeCliSnapshot(root))) as ReturnType<typeof takeCliSnapshot>;
+
+    write(root, ".cursor/rules/convex_rules.mdc", "new rules\n");
+    write(root, "convex/README.md", "scaffold\n");
+    write(root, "convex/_generated/api.js", "export {};\nconst a = 1;\n");
+    write(root, "convex/_generated/api.d.ts", "type A = 2;\n");
+    write(root, "convex/_generated/dataModel.d.ts", "new file\n");
+
+    expect(restoreCliSnapshot(snapshot, root).sort()).toEqual([
+      ".cursor/rules/convex_rules.mdc",
+      "convex/README.md",
+      "convex/_generated/api.js",
+    ]);
+    expect(read(root, ".cursor/rules/convex_rules.mdc")).toBe("old rules\r\n");
+    expect(fs.existsSync(path.join(root, "convex/README.md"))).toBe(false);
+    expect(read(root, "convex/_generated/api.js")).toBe("export {};\r\nconst a = 1;\r\n");
+    // Real codegen changes and new codegen files stay.
+    expect(read(root, "convex/_generated/api.d.ts")).toBe("type A = 2;\n");
+    expect(read(root, "convex/_generated/dataModel.d.ts")).toBe("new file\n");
+    expect(read(root, "convex/_generated/server.js")).toBe("same\n");
+    expect(restoreCliSnapshot(snapshot, root)).toEqual([]);
   });
 });
 

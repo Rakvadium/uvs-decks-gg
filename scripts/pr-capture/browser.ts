@@ -1,10 +1,9 @@
 import type { Browser, BrowserContext, BrowserContextOptions, Page, WebSocketRoute } from "playwright";
+import { CONVEX_SYNC_SOCKET, convexHostFromEnv, createSocketGuard, type SocketGuard } from "./guard.ts";
 import { BREAK_PIN_ENV, createSessionPin, parseFrame, type Appearance, type ClientFrame, type SessionPin } from "./pin.ts";
 import { VIEWPORTS, cachedLoad, type Step } from "./shared.ts";
 
 type StorageState = Exclude<BrowserContextOptions["storageState"], string | undefined>;
-
-const CONVEX_SYNC_SOCKET = /\/api\/[^/]+\/sync$/;
 
 /**
  * Proxies the Convex sync WebSocket:
@@ -13,9 +12,14 @@ const CONVEX_SYNC_SOCKET = /\/api\/[^/]+\/sync$/;
  * - with a `pin`, rewrites the `sessions:getSession` result the browser receives so
  *   ColorSchemeProvider's JS state (isDark, chrome, preset: menus, toasts, frosted controls) matches
  *   the pin, not the agent's saved prefs. The stored session is never touched.
+ * - tells `guard` about every socket and forwarded client frame, so it can spot sockets it never saw.
+ *
+ * On a page it handles that page's sockets. On a context it handles every page without its own
+ * route (Playwright checks page routes first).
  */
-async function proxyConvexSocket(context: BrowserContext, blocked: string[], pin?: SessionPin) {
-  await context.routeWebSocket(CONVEX_SYNC_SOCKET, (ws) => {
+async function proxyConvexSocket(target: BrowserContext | Page, blocked: string[], guard: SocketGuard, pin?: SessionPin) {
+  await target.routeWebSocket(CONVEX_SYNC_SOCKET, (ws) => {
+    guard.proxied();
     const server = ws.connectToServer();
     const socket = pin?.socket();
 
@@ -26,6 +30,7 @@ async function proxyConvexSocket(context: BrowserContext, blocked: string[], pin
         return;
       }
       socket?.fromClient(frame);
+      guard.forwarded(message);
       server.send(message);
     });
 
@@ -122,7 +127,7 @@ export async function newCaptureContext(
     still: boolean;
     videoDir?: string;
   },
-): Promise<{ context: BrowserContext; pin: SessionPin }> {
+): Promise<{ context: BrowserContext; page: Page; pin: SessionPin; guard: SocketGuard }> {
   const vp = VIEWPORTS[options.viewport];
   const context = await browser.newContext({
     viewport: { width: vp.width, height: vp.height },
@@ -138,33 +143,82 @@ export async function newCaptureContext(
       ? { dir: options.videoDir, size: { width: vp.width, height: vp.height } }
       : undefined,
   });
-  const pin = createSessionPin(options.appearance, { broken: process.env[BREAK_PIN_ENV] === "1" });
-  await proxyConvexSocket(context, options.blocked, pin);
+  const broken = process.env[BREAK_PIN_ENV] === "1";
+  const guard = await guardContext(context);
+  // Any page without its own route (a popup a step opened) gets this pin: rewritten the same way so
+  // its UI follows the pin too, but never reported, so its subscriptions can't stand in for the shot page's.
+  await proxyConvexSocket(context, options.blocked, guard, createSessionPin(options.appearance, { broken }));
   await allowStaticCatalog(context);
   await context.addInitScript(pinAppearance, options.appearance);
-  return { context, pin };
+  // The page that gets shot has its own route and pin, installed before it navigates anywhere.
+  const page = await context.newPage();
+  const pin = createSessionPin(options.appearance, { broken });
+  await proxyConvexSocket(page, options.blocked, guard, pin);
+  return { context, page, pin, guard };
 }
 
-/** Signs in once through /agent-login and returns the cookies/localStorage for reuse. */
-export async function agentStorageState(browser: Browser, baseUrl: string, blocked: string[]) {
+const SHARED_WORKER_BINDING = "__prCaptureSharedWorkerStarted";
+
+/** Init script: reports every SharedWorker the page starts (Playwright has no event for them). */
+function reportSharedWorkers(binding: string) {
+  const Native = globalThis.SharedWorker;
+  if (!Native) return;
+  globalThis.SharedWorker = class extends Native {
+    constructor(url: string | URL, options?: string | WorkerOptions) {
+      super(url, options);
+      (globalThis as unknown as Record<string, ((url: string) => unknown) | undefined>)[binding]?.(String(url));
+    }
+  };
+}
+
+/**
+ * Feeds the context's socket guard: every WebSocket (and its sent frames) Playwright reports on any
+ * page, which covers the page's dedicated workers, plus every SharedWorker and service worker started.
+ */
+async function guardContext(context: BrowserContext): Promise<SocketGuard> {
+  const guard = createSocketGuard(convexHostFromEnv());
+  context.on("page", (page) =>
+    page.on("websocket", (ws) => {
+      if (!guard.isConvexSocket(ws.url())) return;
+      guard.opened();
+      ws.on("framesent", ({ payload }) => guard.sent(payload));
+    }),
+  );
+  context.on("serviceworker", (worker) => guard.worker("service worker", worker.url()));
+  await context.exposeBinding(SHARED_WORKER_BINDING, (_source, url: string) => guard.worker("SharedWorker", url));
+  await context.addInitScript(reportSharedWorkers, SHARED_WORKER_BINDING);
+  return guard;
+}
+
+/**
+ * Signs in through /agent-login in a throwaway context and returns that sign-in's cookies/localStorage.
+ * Call it once per capture context: each sign-in is its own Convex Auth session, so a step that signs
+ * out or reloads (rotating the refresh token) in one context can't sign out the next one.
+ * `unproxied` is the sign-in context's own socket guard result.
+ */
+export async function agentLogin(browser: Browser, baseUrl: string, blocked: string[]) {
   const token = process.env.AGENT_AUTH_SECRET;
   if (!token) throw new Error("AGENT_AUTH_SECRET is missing (copy .env.local into this checkout)");
   const context = await browser.newContext();
-  await proxyConvexSocket(context, blocked);
-  await allowStaticCatalog(context);
-  const page = await context.newPage();
   try {
-    await page.goto(`${baseUrl}/agent-login?token=${encodeURIComponent(token)}&next=/decks`, {
-      timeout: 180_000,
-    });
-    await page.waitForURL((url) => !url.pathname.startsWith("/agent-login"), { timeout: 120_000 });
-  } catch {
-    // Playwright errors echo the URL, which contains the token.
-    throw new Error(`Agent login did not complete (stuck on ${new URL(page.url()).pathname})`);
+    const guard = await guardContext(context);
+    await proxyConvexSocket(context, blocked, guard);
+    await allowStaticCatalog(context);
+    const page = await context.newPage();
+    try {
+      await page.goto(`${baseUrl}/agent-login?token=${encodeURIComponent(token)}&next=/decks`, {
+        timeout: 180_000,
+      });
+      await page.waitForURL((url) => !url.pathname.startsWith("/agent-login"), { timeout: 120_000 });
+    } catch {
+      // Playwright errors echo the URL, which contains the token.
+      throw new Error(`Agent login did not complete (stuck on ${new URL(page.url()).pathname})`);
+    }
+    const storageState = await context.storageState();
+    return { storageState, unproxied: guard.problems() };
+  } finally {
+    await context.close();
   }
-  const state = await context.storageState();
-  await context.close();
-  return state;
 }
 
 export async function runSteps(page: Page, steps: Step[] = []) {
