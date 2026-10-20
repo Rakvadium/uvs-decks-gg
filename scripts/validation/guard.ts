@@ -303,9 +303,40 @@ export function homeViolations(input: GuardInput): string[] {
   return out;
 }
 
+/**
+ * macOS and Linux: the CLI caches under `$HOME/.cache/convex`, which the wrapper links to the
+ * shared cache. If that path exists, it must resolve inside the shared cache or the backend home.
+ */
+function posixCacheViolations(input: GuardInput, platform: NodeJS.Platform): string[] {
+  const home = backendDir(input.appPort, input.root);
+  const cache = path.join(home, ".cache", "convex");
+  const shared = path.join(sharedCacheDir(input.root), "convex");
+  const real = (p: string) => {
+    try {
+      return fs.realpathSync(p);
+    } catch {
+      return null;
+    }
+  };
+  const resolved = real(cache);
+  if (resolved === null) {
+    const exists = (() => {
+      try {
+        fs.lstatSync(cache);
+        return true;
+      } catch {
+        return false;
+      }
+    })();
+    return exists ? [`${cache} is a link that resolves nowhere; remove it so the wrapper can link it to ${shared}.`] : [];
+  }
+  const inside = [shared, home].some((dir) => isInside(resolved, real(dir) ?? dir, platform));
+  return inside ? [] : [`${cache} must resolve inside ${shared} or ${home} so the owner's Convex cache is untouched.`];
+}
+
 export function cacheViolations(input: GuardInput): string[] {
   const platform = input.platform ?? process.platform;
-  if (platform !== "win32") return [];
+  if (platform !== "win32") return posixCacheViolations(input, platform);
   const values = valuesFor(input.childEnv, "LOCALAPPDATA");
   return values.length !== 1 || !isInside(values[0], sharedCacheDir(input.root), platform)
     ? [`LOCALAPPDATA must be inside ${sharedCacheDir(input.root)} so the owner's Convex cache is untouched.`]

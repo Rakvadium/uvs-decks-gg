@@ -40,6 +40,19 @@ bun run vconvex -- --app-port 8150 dev --once           # one-shot push when no 
   current bytes to `~/.uvs-validation/backends/<P>/reverted/<time>/<path>` and prints that path in
   its `reverted CLI side-effect edits` line. An edit you made to one of those files during a
   session can be copied back from there.
+  - A backup identical to an older one replaces it, so the CLI's repeated identical rewrites keep
+    one copy, the latest, and a real edit's backup isn't buried under them.
+  - Each port keeps its newest 20 `reverted/<time>/` dirs. Older ones are deleted.
+- The snapshot records each file's git blob id at `HEAD`. If a file's blob at `HEAD` differs at
+  restore time, the file changed in git since the snapshot was taken, for example after a killed
+  `start` and then a branch switch or pull. The restore then keeps `HEAD`'s version instead of
+  putting the old bytes back:
+  - The snapshot's bytes go to `reverted/<time>/stale-snapshot/<path>`.
+  - A working copy that differs from `HEAD` is backed up and replaced with `HEAD`'s version.
+  - Codegen files are left as they are.
+  - The `did not restore an out-of-date snapshot` line names each file and both paths.
+
+  A snapshot saved by an older wrapper has no blob ids and is restored as before.
 
 ## Pinned local backend
 
@@ -49,9 +62,17 @@ backend release on every anonymous `dev`. That API allows 60 unauthenticated cal
 so parallel agents ran out. With the pin, `start` and `dev --once` use the cached binary and
 dashboard and never contact GitHub.
 
-- The binary and dashboard live in `~/.uvs-validation/cache/convex/` on Windows, or under the
-  backend home on other platforms. `dev` copies the pinned binary from the owner's own Convex
-  cache when the owner has it, and only reads from that cache.
+- The binary and dashboard live in `~/.uvs-validation/cache/convex/`, one copy per machine for
+  every port. On Windows the wrapped CLI reaches it through `LOCALAPPDATA`.
+- On macOS and Linux the CLI caches under `$HOME/.cache/convex`, and `HOME` is the backend dir.
+  Every wrapped `dev` links `~/.uvs-validation/backends/<P>/.cache/convex` to the shared dir.
+  - A real dir an older wrapper left there hands its pinned binary and dashboard to the shared
+    cache, and is then replaced by the link.
+  - A link aimed anywhere else, or a `.cache` that is itself a link, is refused. The
+    `owner-cache-untouched` rule checks that the path resolves inside the shared cache or the
+    backend home.
+- `dev` copies the pinned binary from the owner's own Convex cache when the owner has it, and
+  only reads from that cache.
 - If the pinned version isn't cached, `start` and `vconvex dev` fail and print the one-time fetch
   command:
 
@@ -88,7 +109,8 @@ See `guard.ts`. In short:
   names inside other values.
 - **Other fallbacks.** Any `.env*.vault` file, and a `convex.json` that links a team or project.
 - **Isolation.** The wrapped env must hide the owner's login: `USERPROFILE`/`HOME` set to the
-  backend dir and `LOCALAPPDATA` set to `~/.uvs-validation/cache`. Its credential vars are pinned:
+  backend dir, and `LOCALAPPDATA` set to `~/.uvs-validation/cache` on Windows. On macOS and Linux,
+  `<backend dir>/.cache/convex` must resolve inside that cache or the backend dir. Its credential vars are pinned:
   `CONVEX_DEPLOY_KEY=<ignore_deploy_key>`, `DISABLE_BEACON=1` and the others in
   `PINNED_CHILD_ENV`. The target the CLI would resolve from all of this must be the wrapper's own
   `anonymous:anonymous-agent`.

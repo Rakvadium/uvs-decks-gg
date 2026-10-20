@@ -16,8 +16,12 @@ import {
   checkSavedBackendVersion,
   checkSavedDeploymentPorts,
   formatCheck,
+  REVERTED_KEEP,
+  STALE_SNAPSHOT_DIR,
   formatReverted,
+  headBlobs,
   installedConvexVersion,
+  linkSharedConvexCache,
   pinnedBackendCacheProblems,
   pinnedBackendFetchHint,
   prepareInvocation,
@@ -323,6 +327,89 @@ describe("pinned local backend version (#221)", () => {
       PINNED_LOCAL_BACKEND_VERSION,
       "precompiled-2099-01-01-fffffff",
     ]);
+  });
+
+  describe("macOS/Linux share one cache per machine (#233)", () => {
+    // Simulated: platform "linux", temp dirs. On a Windows host the link is a junction.
+    const linuxExe = "convex-local-backend";
+    const fakePosixCache = (cache: string, opts: { binary?: boolean; dashboard?: string }) => {
+      if (opts.binary) {
+        fs.mkdirSync(path.join(cache, "binaries", PINNED_LOCAL_BACKEND_VERSION), { recursive: true });
+        fs.writeFileSync(path.join(cache, "binaries", PINNED_LOCAL_BACKEND_VERSION, linuxExe), "binary");
+      }
+      if (opts.dashboard) {
+        fs.mkdirSync(path.join(cache, "dashboard"), { recursive: true });
+        fs.writeFileSync(path.join(cache, "dashboard", "config.json"), JSON.stringify({ version: opts.dashboard }));
+      }
+    };
+    const linuxInv = (root: string, appPort: number) => {
+      const childEnv = buildChildEnv({ parentEnv: {}, appPort, root, platform: "linux" });
+      return { appPort, home: backendDir(appPort, root), childEnv, fetchPinnedBackend: false };
+    };
+    const real = (p: string) => fs.realpathSync(p);
+
+    test("a new port reuses what an earlier port fetched, with no fetch of its own", () => {
+      const root = tmpDir("uvs-root-");
+      const realHome = tmpDir("uvs-home-");
+      // The owner has the pinned binary but a dashboard at another version, as on the verifier's machine.
+      fakePosixCache(path.join(realHome, ".cache", "convex"), { binary: true, dashboard: "precompiled-2026-07-06-44f7aa7" });
+      const owner = { parentEnv: {}, realHome, platform: "linux" as const };
+      const said: string[] = [];
+      const first = linuxInv(root, 8182);
+      expect(() => preparePinnedBackend(first, (m) => said.push(m), owner)).toThrow(/dashboard is missing/);
+      const shared = path.join(sharedCacheDir(root), "convex");
+      const firstCache = path.join(first.home, ".cache", "convex");
+      expect(real(firstCache)).toBe(real(shared));
+      expect(fs.existsSync(path.join(shared, "binaries", PINNED_LOCAL_BACKEND_VERSION, linuxExe))).toBe(true);
+      // The one `--fetch-pinned-backend`: the CLI writes the dashboard through port 8182's link.
+      preparePinnedBackend({ ...first, fetchPinnedBackend: true }, (m) => said.push(m), owner);
+      fakePosixCache(firstCache, { dashboard: PINNED_LOCAL_BACKEND_VERSION });
+
+      const second = linuxInv(root, 8183);
+      said.length = 0;
+      expect(() => preparePinnedBackend(second, (m) => said.push(m), owner)).not.toThrow();
+      expect(said.some((m) => m.includes("--fetch-pinned-backend") || m.includes("seeded"))).toBe(false);
+      expect(real(path.join(second.home, ".cache", "convex"))).toBe(real(shared));
+      expect(pinnedBackendCacheProblems({ childEnv: second.childEnv, platform: "linux" })).toEqual([]);
+      // Linked once; later runs leave the link alone.
+      expect(linkSharedConvexCache(second.home, root, "linux")).toBeNull();
+      expect(guardViolations(input({ parentEnv: {}, childEnv: second.childEnv, platform: "linux", root, appPort: 8183 }))).toEqual([]);
+    });
+
+    test("a per-port cache from an older wrapper hands its pinned assets to the shared cache", () => {
+      const root = tmpDir("uvs-root-");
+      const inv = linuxInv(root, 8182);
+      const legacy = path.join(inv.home, ".cache", "convex");
+      fakePosixCache(legacy, { binary: true, dashboard: PINNED_LOCAL_BACKEND_VERSION });
+      const message = linkSharedConvexCache(inv.home, root, "linux");
+      expect(message).toContain("moved the backend binary and dashboard");
+      expect(fs.lstatSync(legacy).isSymbolicLink() && real(legacy) === real(path.join(sharedCacheDir(root), "convex"))).toBe(true);
+      expect(pinnedBackendCacheProblems({ childEnv: inv.childEnv, platform: "linux" })).toEqual([]);
+    });
+
+    test("a cache link aimed anywhere else is refused, and the owner's cache is never touched", () => {
+      const root = tmpDir("uvs-root-");
+      const realHome = tmpDir("uvs-home-");
+      const ownerCache = path.join(realHome, ".cache", "convex");
+      fakePosixCache(ownerCache, { binary: true, dashboard: PINNED_LOCAL_BACKEND_VERSION });
+      const linkType = process.platform === "win32" ? "junction" : "dir";
+      const guarded = (appPort: number) =>
+        guardViolations(input({ parentEnv: {}, childEnv: linuxInv(root, appPort).childEnv, platform: "linux", root, appPort }));
+
+      const a = linuxInv(root, 8182);
+      fs.mkdirSync(path.join(a.home, ".cache"), { recursive: true });
+      fs.symlinkSync(ownerCache, path.join(a.home, ".cache", "convex"), linkType);
+      expect(() => linkSharedConvexCache(a.home, root, "linux")).toThrow(/not the shared cache/);
+      expect(guarded(8182).some((v) => /must resolve inside/.test(v))).toBe(true);
+
+      const b = linuxInv(root, 8183);
+      fs.mkdirSync(b.home, { recursive: true });
+      fs.symlinkSync(path.join(realHome, ".cache"), path.join(b.home, ".cache"), linkType);
+      expect(() => linkSharedConvexCache(b.home, root, "linux")).toThrow(/must be a plain dir inside the backend home/);
+      expect(guarded(8183).some((v) => /must resolve inside/.test(v))).toBe(true);
+      expect(fs.readdirSync(ownerCache).sort()).toEqual(["binaries", "dashboard"]);
+      expect(fs.existsSync(path.join(ownerCache, "binaries", PINNED_LOCAL_BACKEND_VERSION, linuxExe))).toBe(true);
+    });
   });
 
   test("a backend saved at another version is refused with the way out", () => {
@@ -907,6 +994,121 @@ describe("CLI side-effect restore", () => {
     const again = revertBackupDir(home, new Date("2026-10-19T01:02:04.000Z"));
     expect(restoreCliSnapshot(snapshot, root, { backupDir: again })).toEqual([]);
     expect(fs.existsSync(again)).toBe(false);
+  });
+
+  const RULES = ".cursor/rules/convex_rules.mdc";
+  const git = (cwd: string, ...args: string[]) => {
+    const r = spawnSync("git", ["-c", "user.name=t", "-c", "user.email=t@example.invalid", ...args], { cwd, encoding: "utf8" });
+    if (r.status !== 0) throw new Error(`git ${args.join(" ")}: ${r.stderr}`);
+    return r.stdout;
+  };
+  const gitRepo = () => {
+    const root = tmpDir("uvs-repo-");
+    git(root, "init", "-q", "-b", "main");
+    git(root, "config", "core.autocrlf", "false");
+    write(root, RULES, "rules on main\n");
+    write(root, "convex/_generated/api.js", "api on main\n");
+    write(root, ".gitignore", "convex/README.md\nconvex/tsconfig.json\n");
+    git(root, "add", "-A");
+    git(root, "commit", "-q", "-m", "main");
+    git(root, "checkout", "-q", "-b", "other");
+    write(root, RULES, "rules on other\n");
+    write(root, "convex/_generated/api.js", "api on other\n");
+    git(root, "commit", "-q", "-am", "other");
+    git(root, "checkout", "-q", "main");
+    return root;
+  };
+  // `start` saves its snapshot as JSON and the next `start` or `stop` reads it back.
+  const saved = (root: string) => JSON.parse(JSON.stringify(takeCliSnapshot(root))) as ReturnType<typeof takeCliSnapshot>;
+
+  test("snapshots record each file's blob at HEAD", () => {
+    const root = gitRepo();
+    const blob = git(root, "rev-parse", `HEAD:${RULES}`).trim();
+    const byRel = Object.fromEntries(takeCliSnapshot(root).map((e) => [e.rel, e.head]));
+    expect(byRel[RULES]).toBe(blob);
+    expect(byRel["convex/README.md"]).toBeNull();
+    expect(headBlobs(tmpDir("uvs-not-git-"), [RULES])).toBeNull();
+    expect(takeCliSnapshot(tmpDir("uvs-not-git-")).every((e) => e.head === undefined)).toBe(true);
+  });
+
+  test("crash, then git checkout another branch, then start and stop: HEAD's version is kept (#233)", () => {
+    const root = gitRepo();
+    const home = tmpDir("uvs-home-");
+    // 1. `start` saves its snapshot on main, then is killed after the CLI rewrote the rules.
+    const leftover = saved(root);
+    write(root, RULES, "the CLI's rewrite\n");
+    write(root, "convex/README.md", "scaffold\n");
+    // 2. The owner discards that and switches branches. `other` commits different rules.
+    git(root, "checkout", "-q", "-f", "other");
+    expect(read(root, RULES)).toBe("rules on other\n");
+    // 3. The next `start` restores the leftover snapshot before taking its own.
+    const startDir = revertBackupDir(home, new Date("2026-10-19T02:00:00.000Z"));
+    const reverted = restoreCliSnapshot(leftover, root, { backupDir: startDir });
+    expect(read(root, RULES)).toBe("rules on other\n");
+    expect(read(root, "convex/_generated/api.js")).toBe("api on other\n");
+    const rules = reverted.find((r) => r.rel === RULES)!;
+    expect(rules.stale?.snapshotBackup).toBe(path.join(startDir, STALE_SNAPSHOT_DIR, RULES));
+    expect(fs.readFileSync(rules.stale!.snapshotBackup!, "utf8")).toBe("rules on main\n");
+    expect(rules.backup).toBeUndefined();
+    // The README was untracked on both branches, so the CLI's copy is still reverted as before.
+    expect(reverted.find((r) => r.rel === "convex/README.md")?.backup).toBeDefined();
+    expect(reverted.find((r) => r.rel === "convex/README.md")?.stale).toBeUndefined();
+    expect(fs.existsSync(path.join(root, "convex/README.md"))).toBe(false);
+    expect(formatReverted([rules])).toContain("changed in git since the snapshot was taken, so HEAD's version was kept");
+    // 4. That `start` snapshots `other`, the CLI rewrites again, and `stop` restores.
+    const fresh = saved(root);
+    write(root, RULES, "the CLI's rewrite\n");
+    restoreCliSnapshot(fresh, root, { backupDir: revertBackupDir(home, new Date("2026-10-19T02:05:00.000Z")) });
+    expect(read(root, RULES)).toBe("rules on other\n");
+    expect(git(root, "status", "--porcelain")).toBe("");
+  });
+
+  test("a stale file that differs from HEAD is backed up and put back to HEAD's version", () => {
+    const root = gitRepo();
+    const home = tmpDir("uvs-home-");
+    const leftover = saved(root);
+    git(root, "checkout", "-q", "other");
+    write(root, RULES, "edited on other\n");
+    const backupDir = revertBackupDir(home, new Date("2026-10-19T03:00:00.000Z"));
+    const [rules] = restoreCliSnapshot(leftover, root, { backupDir }).filter((r) => r.rel === RULES);
+    expect(read(root, RULES)).toBe("rules on other\n");
+    expect(fs.readFileSync(rules.backup!, "utf8")).toBe("edited on other\n");
+    expect(fs.readFileSync(rules.stale!.snapshotBackup!, "utf8")).toBe("rules on main\n");
+    expect(git(root, "status", "--porcelain")).toBe("");
+    // A snapshot saved by an older wrapper has no blob ids, and is restored as before.
+    const old = saved(root).map(({ head: _head, ...e }) => e);
+    write(root, RULES, "the CLI's rewrite\n");
+    restoreCliSnapshot(old, root);
+    expect(read(root, RULES)).toBe("rules on other\n");
+  });
+
+  test("identical backups are kept once, and only the newest dirs are kept per port", () => {
+    const root = tmpDir("uvs-repo-");
+    const home = tmpDir("uvs-home-");
+    write(root, RULES, "committed\n");
+    const snapshot = takeCliSnapshot(root);
+    let t = Date.parse("2026-10-19T04:00:00.000Z");
+    const restore = (body: string) => {
+      write(root, RULES, body);
+      return restoreCliSnapshot(snapshot, root, { backupDir: revertBackupDir(home, new Date((t += 1000))) });
+    };
+    const reverted = path.join(home, "reverted");
+    restore("a real edit\n");
+    for (let i = 0; i < 5; i++) restore("the CLI's rewrite\n");
+    // One dir for the real edit and one for the latest identical rewrite, not six.
+    const dirs = fs.readdirSync(reverted).sort();
+    expect(dirs).toHaveLength(2);
+    expect(fs.readFileSync(path.join(reverted, dirs[0], RULES), "utf8")).toBe("a real edit\n");
+    // The printed path is the copy that was kept.
+    const [last] = restore("the CLI's rewrite\n");
+    expect(fs.readFileSync(last.backup!, "utf8")).toBe("the CLI's rewrite\n");
+    expect(fs.readdirSync(reverted)).toHaveLength(2);
+
+    for (let i = 0; i < REVERTED_KEEP + 5; i++) restore(`edit ${i}\n`);
+    const kept = fs.readdirSync(reverted).sort();
+    expect(kept).toHaveLength(REVERTED_KEEP);
+    expect(fs.readFileSync(path.join(reverted, kept.at(-1)!, RULES), "utf8")).toBe(`edit ${REVERTED_KEEP + 4}\n`);
+    expect(fs.readFileSync(path.join(reverted, kept[0], RULES), "utf8")).toBe("edit 5\n");
   });
 });
 
