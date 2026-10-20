@@ -107,7 +107,14 @@ const noopMutation = () => Promise.resolve(null);
 const router = { push: () => {}, replace: () => {}, back: () => {}, refresh: () => {}, prefetch: () => {} };
 const noSets = { sets: [] };
 
+// bun's mock.module is process-wide and outlives this file, so each mock keeps the real module's
+// other exports for test files that run later.
+const realConvexReact = await import("convex/react");
+const realNavigation = await import("next/navigation");
+const realCardDataProvider = await import("../src/lib/universus/card-data-provider");
+
 mock.module("convex/react", () => ({
+  ...realConvexReact,
   useQuery: (_ref: unknown, args?: { tierListId?: string }) => {
     useStore();
     return args?.tierListId ? store.details.get(args.tierListId) : undefined;
@@ -117,8 +124,9 @@ mock.module("convex/react", () => ({
     return name.endsWith("save") ? saveTierList : noopMutation;
   },
 }));
-mock.module("next/navigation", () => ({ useRouter: () => router }));
+mock.module("next/navigation", () => ({ ...realNavigation, useRouter: () => router }));
 mock.module("../src/lib/universus/card-data-provider", () => ({
+  ...realCardDataProvider,
   useCardCatalog: () => {
     useStore();
     return store.catalog;
