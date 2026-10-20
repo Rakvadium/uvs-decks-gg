@@ -66,7 +66,7 @@ export function TierListBrowserCard({
         <CardHeader className="space-y-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex flex-wrap items-center gap-2">
-              {isHiddenByModeration(moderationStatus) ? (
+              {tierList.isPublic && isHiddenByModeration(moderationStatus) ? (
                 <TierListModerationBadge status={moderationStatus} />
               ) : (
                 <Badge variant={tierList.isPublic ? "default" : "outline"}>

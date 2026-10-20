@@ -5,6 +5,7 @@ import type { MutationCtx } from "./_generated/server";
 import { mutation, query } from "./_generated/server";
 import { buildAdminSearchText, isAdminRole } from "./lib/accountStatus";
 import { requireAdmin } from "./utils/validation";
+import { isTierListHiddenByModeration } from "./validators";
 import {
   getEligibleRankingScopeRefs,
   recomputeAffectedRankingScopes,
@@ -490,11 +491,17 @@ export const bulkSetTierListListModeration = mutation({
       const tl = await ctx.db.get(id);
       if (tl) {
         await ctx.db.patch(id, { listModerationStatus: args.listModerationStatus });
-        // Pending and rejected lists don't count toward rankings, so refresh the scope it leaves or joins.
-        affectedScopes.push(
-          ...getEligibleRankingScopeRefs(tl),
-          ...getEligibleRankingScopeRefs({ ...tl, listModerationStatus: args.listModerationStatus })
-        );
+        // Pending and rejected lists don't count toward rankings. Refresh the scope only when the list
+        // actually leaves or joins it: approved -> approved or rejected -> pending changes nothing.
+        if (
+          isTierListHiddenByModeration(tl.listModerationStatus) !==
+          isTierListHiddenByModeration(args.listModerationStatus)
+        ) {
+          affectedScopes.push(
+            ...getEligibleRankingScopeRefs(tl),
+            ...getEligibleRankingScopeRefs({ ...tl, listModerationStatus: args.listModerationStatus })
+          );
+        }
       }
     }
     await recomputeAffectedRankingScopes(ctx, affectedScopes);

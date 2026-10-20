@@ -173,7 +173,7 @@ function fakeCtx(signedInAs: Id<"users"> | null) {
       return null;
     },
   };
-  return { ctx, inserted, runMutationCalls };
+  return { ctx, inserted, runMutationCalls, tables };
 }
 
 type Handler = (ctx: unknown, args: unknown) => Promise<unknown>;
@@ -361,10 +361,18 @@ describe("community rankings", () => {
       expect(runMutationCalls).toEqual([{ scopeType: "global", scopeKey: "global" }]);
       expect((await ctx.db.get(id))?.listModerationStatus).toBe(next);
     }
-    // Rejected to pending: hidden before and after, so no ranking changes.
-    const { ctx, runMutationCalls } = fakeCtx(adminId);
-    await handlerOf(bulkSetTierListListModeration)(ctx, { tierListIds: [rejectedId], listModerationStatus: "pending" });
-    expect(runMutationCalls).toEqual([]);
+    // Visibility doesn't change, so no ranking work: rejected -> pending (hidden both sides),
+    // approved -> approved, and a legacy list with no status -> approved (visible both sides).
+    for (const [id, next] of [
+      [rejectedId, "pending"],
+      [approvedId, "approved"],
+      [legacyId, "approved"],
+    ] as const) {
+      const { ctx, runMutationCalls } = fakeCtx(adminId);
+      await handlerOf(bulkSetTierListListModeration)(ctx, { tierListIds: [id], listModerationStatus: next });
+      expect(runMutationCalls).toEqual([]);
+      expect((await ctx.db.get(id))?.listModerationStatus).toBe(next);
+    }
     // Members can't moderate.
     await expect(
       handlerOf(bulkSetTierListListModeration)(fakeCtx(memberId).ctx, {
@@ -372,5 +380,34 @@ describe("community rankings", () => {
         listModerationStatus: "rejected",
       })
     ).rejects.toThrow("Admin role required");
+  });
+
+  test("recompute calls match recomputeScope's args, even for a list stored without newer optional fields", async () => {
+    // Required args of the internal mutation, read from its own validator, so this follows any
+    // branch's signature (multi-game-platform adds a required `game`).
+    const spec = JSON.parse((recomputeScope as unknown as { exportArgs: () => string }).exportArgs()) as {
+      value: Record<string, { optional: boolean }>;
+    };
+    const required = Object.entries(spec.value)
+      .filter(([, field]) => !field.optional)
+      .map(([name]) => name)
+      .sort();
+
+    for (const [id, next] of [
+      [approvedId, "rejected"],
+      [rejectedId, "approved"],
+    ] as const) {
+      const { ctx, runMutationCalls, tables } = fakeCtx(adminId);
+      // A row written before a column existed has no such key (on multi-game-platform: no `game`).
+      const row = tables.tierLists.find((r) => r._id === id)!;
+      delete row.game;
+      await handlerOf(bulkSetTierListListModeration)(ctx, { tierListIds: [id], listModerationStatus: next });
+      expect(runMutationCalls).toHaveLength(1);
+      for (const call of runMutationCalls as Array<Record<string, unknown>>) {
+        for (const key of Object.keys(call)) expect(Object.keys(spec.value)).toContain(key);
+        for (const key of required) expect(call[key]).toBeDefined();
+      }
+    }
+    expect(required.length).toBeGreaterThan(0);
   });
 });
