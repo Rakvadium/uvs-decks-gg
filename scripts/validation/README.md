@@ -69,13 +69,24 @@ dashboard and never contact GitHub.
   - A real dir an older wrapper left there hands its pinned binary and dashboard to the shared
     cache, and is then replaced by the link. Only regular files and dirs are moved. A
     `binaries/<pin>` or `dashboard` that is a link, or holds one, is refused.
-  - A link aimed anywhere else, or a `.cache` that is itself a link, is refused. The
-    `owner-cache-untouched` rule checks that the path resolves to the shared cache or inside the
-    backend home.
-- On every platform, `~/.uvs-validation/cache` and `~/.uvs-validation/cache/convex` must be plain
-  dirs. `owner-cache-untouched` refuses a symlink or junction at either path, and so does every
-  wrapped `dev` before it seeds. Expected paths are built from the resolved `~/.uvs-validation`,
-  never from a link's own target.
+  - That link must resolve to the shared dir exactly. Any other target is refused.
+- **No links in the validation trees, at any depth, on any platform.** The guard walks
+  `~/.uvs-validation/cache/**` and `~/.uvs-validation/backends/<P>/**` and refuses every symlink,
+  junction or other reparse point. On macOS and Linux, the one exception is the wrapper's own
+  `<backend dir>/.cache/convex` link.
+  - `owner-cache-untouched` reports the shared cache. It also needs `cache` and `cache/convex` to
+    be plain dirs, and allows only regular files and dirs under them.
+  - `owner-login-hidden` reports the backend home:
+    - `backends` and `backends/<P>` must be plain dirs (checked with `lstat`) that resolve to the
+      path built from the resolved `~/.uvs-validation`.
+    - The home must not be, contain, or sit inside the owner's home or any owner Convex dir.
+    - Sockets the backend itself makes are allowed there.
+  - Every wrapped `dev` repeats both checks before it writes anything, and again after linking and
+    seeding.
+  - Expected paths are always built from the resolved `~/.uvs-validation`, never from a link's own
+    target. `~/.uvs-validation` itself may be a link.
+  - On the owner's machine, the walk takes about 4ms for the shared cache and 17ms (55ms at most)
+    for a backend home.
 - `dev` copies the pinned binary from the owner's own Convex cache when the owner has it, and
   only reads from that cache.
 - If the pinned version isn't cached, `start` and `vconvex dev` fail and print the one-time fetch
@@ -114,9 +125,10 @@ See `guard.ts`. In short:
   names inside other values.
 - **Other fallbacks.** Any `.env*.vault` file, and a `convex.json` that links a team or project.
 - **Isolation.** The wrapped env must hide the owner's login: `USERPROFILE`/`HOME` set to the
-  backend dir, and `LOCALAPPDATA` set to `~/.uvs-validation/cache` on Windows. `~/.uvs-validation/cache`
-  and its `convex` dir must not be links. On macOS and Linux, `<backend dir>/.cache/convex` must
-  resolve to the shared `cache/convex` or inside the backend dir. Its credential vars are pinned:
+  backend dir, and `LOCALAPPDATA` set to `~/.uvs-validation/cache` on Windows. The backend dir
+  must be a plain dir that doesn't overlap the owner's home or Convex dirs. Nothing under it or
+  under the shared cache may be a link, except the wrapper's own `.cache/convex` link on macOS and
+  Linux, which must resolve to the shared `cache/convex`. Its credential vars are pinned:
   `CONVEX_DEPLOY_KEY=<ignore_deploy_key>`, `DISABLE_BEACON=1` and the others in
   `PINNED_CHILD_ENV`. The target the CLI would resolve from all of this must be the wrapper's own
   `anonymous:anonymous-agent`.
