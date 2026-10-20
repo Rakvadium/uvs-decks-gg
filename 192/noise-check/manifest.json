@@ -1,0 +1,172 @@
+{
+  "issue": "192",
+  "label": "noise-check",
+  "port": 8121,
+  "chrome": "calm",
+  "fullPage": false,
+  "shots": [
+    {
+      "name": "community__desktop__default__light",
+      "route": "/community",
+      "auth": "agent",
+      "finalPath": "/community",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "community__desktop__default__dark",
+      "route": "/community",
+      "auth": "agent",
+      "finalPath": "/community",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "community__desktop__cyberpunk__light",
+      "route": "/community",
+      "auth": "agent",
+      "finalPath": "/community",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "community__desktop__cyberpunk__dark",
+      "route": "/community",
+      "auth": "agent",
+      "finalPath": "/community",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "community__desktop__aurora__light",
+      "route": "/community",
+      "auth": "agent",
+      "finalPath": "/community",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "community__desktop__aurora__dark",
+      "route": "/community",
+      "auth": "agent",
+      "finalPath": "/community",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "community__mobile__default__light",
+      "route": "/community",
+      "auth": "agent",
+      "finalPath": "/community",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "community__mobile__default__dark",
+      "route": "/community",
+      "auth": "agent",
+      "finalPath": "/community",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "community__mobile__cyberpunk__light",
+      "route": "/community",
+      "auth": "agent",
+      "finalPath": "/community",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "community__mobile__cyberpunk__dark",
+      "route": "/community",
+      "auth": "agent",
+      "finalPath": "/community",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "community__mobile__aurora__light",
+      "route": "/community",
+      "auth": "agent",
+      "finalPath": "/community",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "community__mobile__aurora__dark",
+      "route": "/community",
+      "auth": "agent",
+      "finalPath": "/community",
+      "loaded": true,
+      "stable": true
+    }
+  ],
+  "blockedConvexWrites": [
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityYoutube:bootstrapYoutubeCurationIds",
+    "Action:communityYoutube:bootstrapYoutubeCurationIds",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityYoutube:bootstrapYoutubeCurationIds",
+    "Action:communityYoutube:bootstrapYoutubeCurationIds",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityYoutube:bootstrapYoutubeCurationIds",
+    "Action:communityYoutube:bootstrapYoutubeCurationIds",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityYoutube:bootstrapYoutubeCurationIds",
+    "Action:communityYoutube:bootstrapYoutubeCurationIds",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityYoutube:bootstrapYoutubeCurationIds",
+    "Action:communityYoutube:bootstrapYoutubeCurationIds",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityYoutube:bootstrapYoutubeCurationIds",
+    "Action:communityYoutube:bootstrapYoutubeCurationIds",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityYoutube:bootstrapYoutubeCurationIds",
+    "Action:communityYoutube:bootstrapYoutubeCurationIds",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityYoutube:bootstrapYoutubeCurationIds",
+    "Action:communityYoutube:bootstrapYoutubeCurationIds",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityYoutube:bootstrapYoutubeCurationIds",
+    "Action:communityYoutube:bootstrapYoutubeCurationIds",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityYoutube:bootstrapYoutubeCurationIds",
+    "Action:communityYoutube:bootstrapYoutubeCurationIds",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityYoutube:bootstrapYoutubeCurationIds",
+    "Action:communityYoutube:bootstrapYoutubeCurationIds",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityYoutube:bootstrapYoutubeCurationIds",
+    "Action:communityYoutube:bootstrapYoutubeCurationIds",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus"
+  ],
+  "savedAppearance": [
+    "cyberpunk/dark/expressive"
+  ]
+}

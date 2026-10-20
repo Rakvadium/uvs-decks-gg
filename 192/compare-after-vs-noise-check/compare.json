@@ -1,0 +1,55 @@
+{
+  "base": "after",
+  "head": "noise-check",
+  "threshold": 0.1,
+  "results": [
+    {
+      "name": "community__desktop__aurora__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "community__desktop__aurora__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "community__desktop__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "community__desktop__cyberpunk__light",
+      "diffPercent": 14.29
+    },
+    {
+      "name": "community__desktop__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "community__desktop__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "community__mobile__aurora__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "community__mobile__aurora__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "community__mobile__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "community__mobile__cyberpunk__light",
+      "diffPercent": 15.829
+    },
+    {
+      "name": "community__mobile__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "community__mobile__default__light",
+      "diffPercent": 0
+    }
+  ]
+}
