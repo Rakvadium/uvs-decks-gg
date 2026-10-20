@@ -1,0 +1,297 @@
+{
+  "issue": "227",
+  "label": "verify231-dev",
+  "port": 8169,
+  "chrome": "calm",
+  "fullPage": false,
+  "strict": true,
+  "shots": [
+    {
+      "name": "guest-community__desktop__default__light",
+      "route": "/community",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/community",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "guest-community__desktop__default__dark",
+      "route": "/community",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/community",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "guest-community__mobile__default__light",
+      "route": "/community",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/community",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "guest-community__mobile__default__dark",
+      "route": "/community",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/community",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "guest-tier-lists-feed__desktop__default__light",
+      "route": "/community/tier-lists",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/community/tier-lists",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "guest-tier-lists-feed__desktop__default__dark",
+      "route": "/community/tier-lists",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/community/tier-lists",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "guest-tier-lists-feed__mobile__default__light",
+      "route": "/community/tier-lists",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/community/tier-lists",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "guest-tier-lists-feed__mobile__default__dark",
+      "route": "/community/tier-lists",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/community/tier-lists",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "guest-tier-list-detail__desktop__default__light",
+      "route": "/community/tier-lists/qs79cym6q521fdqc7c9qjf7dcqc27a3k",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/community/tier-lists/qs79cym6q521fdqc7c9qjf7dcqc27a3k",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "guest-tier-list-detail__desktop__default__dark",
+      "route": "/community/tier-lists/qs79cym6q521fdqc7c9qjf7dcqc27a3k",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/community/tier-lists/qs79cym6q521fdqc7c9qjf7dcqc27a3k",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "guest-tier-list-detail__mobile__default__light",
+      "route": "/community/tier-lists/qs79cym6q521fdqc7c9qjf7dcqc27a3k",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/community/tier-lists/qs79cym6q521fdqc7c9qjf7dcqc27a3k",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "guest-tier-list-detail__mobile__default__dark",
+      "route": "/community/tier-lists/qs79cym6q521fdqc7c9qjf7dcqc27a3k",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/community/tier-lists/qs79cym6q521fdqc7c9qjf7dcqc27a3k",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "guest-tier-list-detail-comments__desktop__default__light",
+      "route": "/community/tier-lists/qs79cym6q521fdqc7c9qjf7dcqc27a3k",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/community/tier-lists/qs79cym6q521fdqc7c9qjf7dcqc27a3k",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "guest-tier-list-detail-comments__desktop__default__dark",
+      "route": "/community/tier-lists/qs79cym6q521fdqc7c9qjf7dcqc27a3k",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/community/tier-lists/qs79cym6q521fdqc7c9qjf7dcqc27a3k",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "guest-tier-list-detail-comments__mobile__default__light",
+      "route": "/community/tier-lists/qs79cym6q521fdqc7c9qjf7dcqc27a3k",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/community/tier-lists/qs79cym6q521fdqc7c9qjf7dcqc27a3k",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "guest-tier-list-detail-comments__mobile__default__dark",
+      "route": "/community/tier-lists/qs79cym6q521fdqc7c9qjf7dcqc27a3k",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/community/tier-lists/qs79cym6q521fdqc7c9qjf7dcqc27a3k",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    }
+  ],
+  "gif": null,
+  "blockedConvexWrites": [
+    "Action:communityYoutube:bootstrapYoutubeCurationIds",
+    "Action:communityYoutube:bootstrapYoutubeCurationIds",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityYoutube:bootstrapYoutubeCurationIds",
+    "Action:communityYoutube:bootstrapYoutubeCurationIds",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityYoutube:bootstrapYoutubeCurationIds",
+    "Action:communityYoutube:bootstrapYoutubeCurationIds",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityYoutube:bootstrapYoutubeCurationIds",
+    "Action:communityYoutube:bootstrapYoutubeCurationIds",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus"
+  ],
+  "savedAppearance": [],
+  "pinFlagged": [],
+  "unstable": [],
+  "unproxiedSockets": []
+}

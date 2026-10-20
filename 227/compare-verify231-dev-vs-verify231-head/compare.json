@@ -1,0 +1,71 @@
+{
+  "base": "verify231-dev",
+  "head": "verify231-head",
+  "threshold": 0.1,
+  "results": [
+    {
+      "name": "guest-community__desktop__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-community__desktop__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-community__mobile__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-community__mobile__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-tier-list-detail-comments__desktop__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-tier-list-detail-comments__desktop__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-tier-list-detail-comments__mobile__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-tier-list-detail-comments__mobile__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-tier-list-detail__desktop__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-tier-list-detail__desktop__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-tier-list-detail__mobile__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-tier-list-detail__mobile__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-tier-lists-feed__desktop__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-tier-lists-feed__desktop__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-tier-lists-feed__mobile__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-tier-lists-feed__mobile__default__light",
+      "diffPercent": 0
+    }
+  ]
+}
