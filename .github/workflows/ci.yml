@@ -33,3 +33,70 @@ jobs:
 
       - name: Lint
         run: bun run lint
+
+  # Value-based scan: looks for the real values of the secrets named in
+  # scripts/secret-scan/secrets.json in the PR's added lines and commit messages.
+  secret-scan:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - name: Skip on fork PRs
+        if: github.event.pull_request.head.repo.full_name != github.repository
+        run: echo "::warning title=secret-scan skipped::Fork PRs get no Actions secrets, so the value scan cannot run. Run bun run secret-scan --diff locally before merging."
+
+      - name: Checkout
+        if: github.event.pull_request.head.repo.full_name == github.repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Bun
+        if: github.event.pull_request.head.repo.full_name == github.repository
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      # Keep this env list in sync with scripts/secret-scan/secrets.json (a test checks it).
+      - name: Scan PR commits for secret values
+        if: github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          AGENT_AUTH_SECRET: ${{ secrets.AGENT_AUTH_SECRET }}
+          AGENT_AUTH_EMAIL: ${{ secrets.AGENT_AUTH_EMAIL }}
+          AGENT_AUTH_PASSWORD: ${{ secrets.AGENT_AUTH_PASSWORD }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ADMIN_API_KEY: ${{ secrets.ADMIN_API_KEY }}
+          AUTH_RESEND_KEY: ${{ secrets.AUTH_RESEND_KEY }}
+          YOUTUBE_DATA_API_KEY: ${{ secrets.YOUTUBE_DATA_API_KEY }}
+          CONVEX_DEPLOY_KEY: ${{ secrets.CONVEX_DEPLOY_KEY }}
+          JWT_PRIVATE_KEY: ${{ secrets.JWT_PRIVATE_KEY }}
+          JWKS: ${{ secrets.JWKS }}
+          SECRET_SCAN_CANARY: ${{ secrets.SECRET_SCAN_CANARY }}
+        run: bun run secret-scan --diff "$BASE_SHA..$HEAD_SHA"
+
+  # Pattern-based scan for well-known token formats. On pull_request events the
+  # action scans only the PR's commits, so the old leak in history doesn't fail it.
+  gitleaks:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_ENABLE_COMMENTS: false

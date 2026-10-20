@@ -19,7 +19,9 @@
     "watch:uvs-releases": "bun scripts/watch-uvs-releases.ts",
     "capture": "node --disable-warning=ExperimentalWarning scripts/pr-capture/capture.ts",
     "capture:compare": "bun scripts/pr-capture/compare.ts",
-    "capture:publish": "bun scripts/pr-capture/publish.ts"
+    "capture:publish": "bun scripts/pr-capture/publish.ts",
+    "secret-scan": "bun scripts/secret-scan/index.ts",
+    "secret-scan:sync-ci": "bun scripts/secret-scan/sync-ci.ts"
   },
   "dependencies": {
     "@auth/core": "0.37.0",
