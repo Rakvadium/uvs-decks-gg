@@ -86,11 +86,13 @@ Use this when a browser agent (Cursor preview, Playwright, Computer Use, etc.) n
 1. In `.env.local` (never commit):
 
 ```bash
-AGENT_AUTH_SECRET=<set-in-env>
-AGENT_AUTH_EMAIL=<set-in-env>
-AGENT_AUTH_PASSWORD=<set-in-env>
-AGENT_AUTH_USERNAME=<set-in-env>
+AGENT_AUTH_SECRET=<long-random-string>   # e.g. openssl rand -hex 24
+AGENT_AUTH_EMAIL=<agent-account-email>
+AGENT_AUTH_PASSWORD=<8+ chars incl. a digit>
+AGENT_AUTH_USERNAME=agent
 ```
+
+For local dev you choose these values yourself. In cloud agent environments they are injected as secrets (see [AGENTS.md](../AGENTS.md)). `AGENT_AUTH_USERNAME` is optional and defaults to `agent`.
 
 Password must be at least 8 characters and include a number (same rules as normal signup).
 
