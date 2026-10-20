@@ -41,13 +41,13 @@ function SelectTrigger({
       data-slot="select-trigger"
       data-size={size}
       className={cn(
-        "flex w-fit items-center justify-between gap-2 rounded-md border border-[color:var(--control-dual-border)] bg-background/50 px-3 py-2 text-base md:text-sm whitespace-nowrap shadow-xs transition-[border-color,box-shadow,background-color,color] duration-200 outline-none",
+        "flex w-fit items-center justify-between gap-2 rounded-md border border-[color:var(--control-dual-border)] bg-background-soft px-3 py-2 text-base md:text-sm whitespace-nowrap shadow-xs transition-[border-color,box-shadow,background-color,color] duration-200 outline-none",
         "hover:border-[color:var(--control-dual-border-strong)] hover:bg-[color-mix(in_oklch,var(--primary)_6%,var(--secondary)_5%,var(--background)_89%)]",
         "focus-visible:border-[color:var(--control-dual-border-strong)] focus-visible:ring-2 focus-visible:ring-[color:color-mix(in_oklch,var(--primary)_28%,var(--secondary)_28%,transparent)] focus-visible:shadow-[var(--chrome-focus-shadow)]",
         "disabled:cursor-not-allowed disabled:opacity-50",
         "data-[placeholder]:text-muted-foreground",
         "[&_svg:not([class*='text-'])]:text-muted-foreground",
-        "aria-invalid:ring-destructive/20 aria-invalid:border-destructive",
+        "aria-invalid:ring-destructive-soft aria-invalid:border-destructive",
         "data-[size=default]:h-10 data-[size=sm]:h-8",
         "chrome-label-case text-base md:text-sm",
         compactValue
@@ -80,8 +80,8 @@ function SelectContent({
       <SelectPrimitive.Content
         data-slot="select-content"
         className={cn(
-          "relative z-[300] max-h-(--radix-select-content-available-height) min-w-[8rem] origin-(--radix-select-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-md border border-[color:var(--control-dual-border)]",
-          "bg-popover/95 text-popover-foreground backdrop-blur-lg",
+          "relative z-select max-h-(--radix-select-content-available-height) min-w-[8rem] origin-(--radix-select-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-md border border-[color:var(--control-dual-border)]",
+          "bg-popover-overlay text-popover-foreground backdrop-blur-lg",
           "shadow-[var(--chrome-popover-shadow),var(--popover-dual-glow)]",
           "data-[state=open]:animate-in data-[state=closed]:animate-out",
           "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
@@ -133,7 +133,7 @@ function SelectItem({
     <SelectPrimitive.Item
       data-slot="select-item"
       className={cn(
-        "relative flex w-full cursor-default items-center gap-2 rounded py-2 pr-8 pl-3 text-sm outline-hidden select-none transition-colors",
+        "relative flex w-full cursor-default items-center gap-2 rounded-md py-2 pr-8 pl-3 text-sm outline-hidden select-none transition-colors",
         "hover:bg-[color:var(--control-option-hover-bg)] hover:text-foreground focus:bg-[color:var(--control-option-hover-bg)] focus:text-foreground",
         "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
         "chrome-label-case text-xs",

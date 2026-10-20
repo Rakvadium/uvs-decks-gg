@@ -181,7 +181,7 @@ export function SearchBar({
 
           {hasFooter && (
             <div className={cn(
-              "flex shrink-0 items-center justify-between bg-muted/20 px-4 py-3 border-t"
+              "flex shrink-0 items-center justify-between bg-muted-tint px-4 py-3 border-t"
             )}>
               <div>
                 {leftButton && (
@@ -235,7 +235,7 @@ export function SearchBar({
             }
           >
             <div className="relative flex h-full min-h-0 flex-col">
-              <DialogHeader className="shrink-0 border-b border-border/50 px-6 pb-4 pt-6">
+              <DialogHeader className="shrink-0 border-b border-surface px-6 pb-4 pt-6">
                 <DialogTitle>{advancedFiltersTitle}</DialogTitle>
               </DialogHeader>
 
