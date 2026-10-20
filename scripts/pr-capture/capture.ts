@@ -13,7 +13,7 @@ import {
   stableScreenshot,
 } from "./browser.ts";
 import { recordFrames, writeGif } from "./gif.ts";
-import { BREAK_PIN_ENV, appearanceKey, pinFlagged, type Appearance, type PinReport } from "./pin.ts";
+import { BREAK_PIN_ENV, shotPin, type Appearance, type PinReport, type ShotPin } from "./pin.ts";
 import {
   OUTPUT_ROOT,
   VIEWPORTS,
@@ -113,22 +113,9 @@ async function ensureServer(): Promise<ChildProcess | null> {
   throw new Error(`next dev was not ready on port ${port} within 180s`);
 }
 
-type ShotPin = PinReport & { pinned: string; overridden: boolean; flagged: boolean };
-
-/**
- * Signed-in shots only. `snapshots` are pin reports taken at screenshot time (the still, or the
- * GIF's first and last frame), so a session result that arrives after the image doesn't count.
- */
-function shotPin(snapshots: (PinReport | undefined)[], auth: RouteSpec["auth"], appearance: Appearance): ShotPin | null {
-  if (auth !== "agent") return null;
-  const taken = snapshots.filter((report): report is PinReport => report !== undefined);
-  const problems = [...new Set(taken.flatMap((report) => report.problems))];
-  if (!taken.length) problems.push("no pin snapshot was taken (no frame captured)");
-  const saved = taken.findLast((report) => report.saved)?.saved ?? null;
-  const patched = taken.length > 0 && taken.every((report) => report.patched);
-  const pinned = appearanceKey(appearance);
-  const report = { saved, patched, problems };
-  return { ...report, pinned, overridden: patched && saved !== pinned, flagged: pinFlagged(report) };
+/** Signed-in shots only (guests have no session to pin). */
+function shotPinFor(snapshots: (PinReport | undefined)[], auth: RouteSpec["auth"], appearance: Appearance): ShotPin | null {
+  return auth === "agent" ? shotPin(snapshots, appearance) : null;
 }
 
 function warnPin(pin: ShotPin | null) {
@@ -172,7 +159,7 @@ async function captureStill(
       finalPath !== route.path && `landed on ${finalPath}`,
     ].filter(Boolean);
     console.log(`  ${name}.png${notes.length ? `  (${notes.join("; ")})` : ""}`);
-    const report = shotPin([at], route.auth, appearance);
+    const report = shotPinFor([at], route.auth, appearance);
     warnPin(report);
     return { name, route: route.path, auth: route.auth, appearance, finalPath, loaded, stable, pin: report };
   } finally {
@@ -208,7 +195,7 @@ async function captureGif(
   } finally {
     await context.close();
   }
-  const gifPin = shotPin([frames[0]?.snapshot, frames.at(-1)?.snapshot], gif.auth, appearance);
+  const gifPin = shotPinFor(frames.length ? frames.map((frame) => frame.snapshot) : [undefined], gif.auth, appearance);
   await page.video()?.saveAs(path.join(outDir, `${name}.webm`));
   fs.rmSync(videoDir, { recursive: true, force: true });
   await writeGif(frames, path.join(outDir, `${name}.gif`), gifWidth);

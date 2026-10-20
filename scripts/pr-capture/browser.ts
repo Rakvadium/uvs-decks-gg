@@ -220,7 +220,10 @@ const SHOT_INTERVAL_MS = 400;
 
 /**
  * `snapshot` runs just before each screenshot. The returned `at` belongs to the returned `png`, so
- * callers can tell what state (e.g. the theme pin) the page was in when that image was taken.
+ * callers can tell what state (e.g. the theme pin) the page was in when that image was taken. A
+ * change in the snapshot restarts the quiet window like a pixel change does, so the shot is only
+ * returned once the image and the snapshot have both been unchanged for QUIET_MS (a newly forwarded
+ * result gets time to render).
  */
 export async function stableScreenshot<T = undefined>(page: Page, fullPage: boolean, snapshot?: () => T) {
   await page.addStyleTag({ content: FREEZE_CSS });
@@ -233,7 +236,7 @@ export async function stableScreenshot<T = undefined>(page: Page, fullPage: bool
   for (const deadline = Date.now() + 30_000; Date.now() < deadline; ) {
     await page.waitForTimeout(SHOT_INTERVAL_MS);
     const next = await shoot();
-    if (!next.png.equals(previous.png)) quietSince = Date.now();
+    if (!next.png.equals(previous.png) || JSON.stringify(next.at) !== JSON.stringify(previous.at)) quietSince = Date.now();
     else if (Date.now() - quietSince >= QUIET_MS) return { ...next, stable: true };
     previous = next;
   }

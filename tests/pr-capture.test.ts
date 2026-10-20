@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { appearanceKey, createSessionPin, pinFlagged, type Appearance } from "../scripts/pr-capture/pin";
+import { stableScreenshot } from "../scripts/pr-capture/browser";
+import { appearanceKey, createSessionPin, pinFlagged, shotPin, type Appearance, type PinReport } from "../scripts/pr-capture/pin";
 import {
   cachedLoad,
   parseArgs,
@@ -330,4 +331,79 @@ describe("pr-capture session pin: every subscription, every result", () => {
     expect(pinFlagged({ saved: appearanceKey(PIN), patched: true, problems: [] })).toBe(false);
     expect(pinFlagged({ saved: appearanceKey(PIN), patched: false, problems: ["x"] })).toBe(true);
   });
+});
+
+describe("pr-capture session pin: removal, every GIF frame, stable window", () => {
+  const add = (queryId: number) => ({ type: "ModifyQuerySet", modifications: [{ type: "Add", queryId, udfPath: "sessions:getSession" }] });
+  const remove = (queryId: number) => ({ type: "ModifyQuerySet", modifications: [{ type: "Remove", queryId }] });
+  const updateFor = (queryId: number, value: unknown) =>
+    JSON.stringify({ type: "Transition", modifications: [{ type: "QueryUpdated", queryId, value }] });
+  const removed = (queryId: number) => JSON.stringify({ type: "Transition", modifications: [{ type: "QueryRemoved", queryId }] });
+  const clean: PinReport = { saved: "cyberpunk/dark/expressive", patched: true, problems: [] };
+
+  test.each<[string, (s: ReturnType<ReturnType<typeof createSessionPin>["socket"]>) => void]>([
+    ["client Remove after a rewrite, no re-Add (signed out)", (s) => { s.fromServer(updateFor(3, SAVED)); s.fromClient(remove(3)); }],
+    ["server QueryRemoved after a rewrite", (s) => { s.fromServer(updateFor(3, SAVED)); s.fromServer(removed(3)); }],
+    ["Remove before any result", (s) => s.fromClient(remove(3))],
+  ])("every subscription removed is a problem (%s)", (_, drive) => {
+    const pin = createSessionPin(PIN);
+    const s = pin.socket();
+    s.fromClient(add(3));
+    drive(s);
+    const report = pin.report();
+    expect([report.patched, pinFlagged(report)]).toEqual([false, true]);
+    expect(has(report, "every sessions:getSession subscription was removed")).toBe(true);
+    expect(shotPin([report], PIN).flagged).toBe(true);
+  });
+
+  test("a GIF is flagged if any frame, not just the first or last, had a gap", () => {
+    const pin = createSessionPin(PIN);
+    const s = pin.socket();
+    s.fromClient(add(3));
+    s.fromServer(updateFor(3, SAVED));
+    const first = pin.report();
+    s.fromClient(remove(3)); // signed out mid-GIF: the provider skips the query
+    const middle = pin.report();
+    s.fromClient(add(4));
+    s.fromServer(updateFor(4, SAVED));
+    const last = pin.report();
+    expect([pinFlagged(first), pinFlagged(last)]).toEqual([false, false]);
+    expect(shotPin([first, last], PIN).flagged).toBe(false);
+    const gif = shotPin([first, middle, last], PIN);
+    expect([gif.patched, gif.flagged]).toEqual([false, true]);
+    expect(has(gif, "every sessions:getSession subscription was removed")).toBe(true);
+  });
+
+  test("shotPin: a missing snapshot or an unexplained patched:false is a problem", () => {
+    expect(shotPin([clean, clean], PIN)).toMatchObject({ patched: true, flagged: false, overridden: true });
+    expect(shotPin([clean], { theme: "cyberpunk", mode: "dark", chrome: "expressive" })).toMatchObject({ flagged: false, overridden: false });
+    const missing = shotPin([clean, undefined], PIN);
+    expect([missing.patched, missing.flagged]).toEqual([false, true]);
+    expect(has(missing, "no pin snapshot")).toBe(true);
+    expect(shotPin([], PIN).flagged).toBe(true);
+    const silent = shotPin([{ saved: null, patched: false, problems: [] }], PIN);
+    expect(silent.flagged).toBe(true);
+    expect(has(silent, "not rewritten when the image was taken")).toBe(true);
+    expect(pinFlagged({ saved: null, patched: false, problems: [] })).toBe(true);
+  });
+
+  test("stableScreenshot restarts the quiet window when the snapshot changes", async () => {
+    const png = Buffer.from("same pixels every time");
+    let shots = 0;
+    let changedAt = 0;
+    const page = {
+      addStyleTag: async () => {},
+      screenshot: async () => png,
+      waitForTimeout: (ms: number) => new Promise((resolve) => setTimeout(resolve, ms)),
+    } as unknown as Parameters<typeof stableScreenshot>[0];
+    // The pixels never change, but the pin state changes on the 3rd shot (a result was forwarded).
+    const snapshot = () => {
+      if (++shots === 3) changedAt = Date.now();
+      return shots < 3 ? "pending" : "patched";
+    };
+    const result = await stableScreenshot(page, false, snapshot);
+    expect([result.stable, result.at]).toEqual([true, "patched"]);
+    // Pixels alone were quiet from the first shot; the change pushed the return to >= 2s after it.
+    expect(Date.now() - changedAt).toBeGreaterThanOrEqual(1_900);
+  }, 15_000);
 });

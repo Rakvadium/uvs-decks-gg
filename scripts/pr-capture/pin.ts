@@ -86,7 +86,9 @@ export function createSessionPin(appearance: Appearance, options: { broken?: boo
       const now = [...problems];
       const pending = [...subscriptions.values()].filter((sub) => !sub.rewritten).length;
       if (!everSubscribed) now.push("no sessions:getSession subscription was seen (renamed, or the page isn't signed in)");
-      else if (pending) {
+      else if (!subscriptions.size) {
+        now.push("every sessions:getSession subscription was removed (signed out, or the provider unmounted)");
+      } else if (pending) {
         now.push(
           `${pending} of ${subscriptions.size} sessions:getSession subscription(s) had no rewritten result ` +
             "(none arrived yet, or the sync protocol changed)",
@@ -184,10 +186,29 @@ export function createSessionPin(appearance: Appearance, options: { broken?: boo
 export type SessionPin = ReturnType<typeof createSessionPin>;
 
 /**
- * A signed-in shot is flagged whenever the rewrite reported a problem, even if the pin equals the
- * saved appearance: a page that never received a session value falls back to the app defaults
- * (`system`/`calm`/`default`), not to the saved prefs.
+ * A signed-in shot is flagged whenever the rewrite reported a problem or wasn't fully applied, even
+ * if the pin equals the saved appearance: a page that never received a session value falls back to
+ * the app defaults (`system`/`calm`/`default`), not to the saved prefs.
  */
 export function pinFlagged(report: PinReport) {
-  return report.problems.length > 0;
+  return report.problems.length > 0 || !report.patched;
+}
+
+export type ShotPin = PinReport & { pinned: string; overridden: boolean; flagged: boolean };
+
+/**
+ * Combines the pin reports snapshotted when a shot's images were taken (the still, or every GIF
+ * frame). Every snapshot must be patched with no problems; a missing snapshot, or `patched: false`
+ * without a recorded reason, is itself a problem, so no "nothing happened" state comes out clean.
+ */
+export function shotPin(snapshots: (PinReport | undefined)[], appearance: Appearance): ShotPin {
+  const taken = snapshots.filter((report): report is PinReport => report !== undefined);
+  const problems = [...new Set(taken.flatMap((report) => report.problems))];
+  if (taken.length < snapshots.length || !taken.length) problems.push("no pin snapshot was taken for an image");
+  const patched = taken.length > 0 && taken.length === snapshots.length && taken.every((report) => report.patched);
+  if (!patched && !problems.length) problems.push("the session result was not rewritten when the image was taken");
+  const saved = taken.findLast((report) => report.saved)?.saved ?? null;
+  const pinned = appearanceKey(appearance);
+  const report = { saved, patched, problems };
+  return { ...report, pinned, overridden: patched && saved !== pinned, flagged: pinFlagged(report) };
 }

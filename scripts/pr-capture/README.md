@@ -85,12 +85,13 @@ Steps: `click`, `hover`, `fill` (+ `value`), `waitFor` (all take Playwright sele
    If the rewrite can't apply, it says so instead of quietly falling back. The proxy tracks every `sessions:getSession` subscription in the context, on every socket (reconnects included). A shot only counts as `patched` when every live subscription's latest result was a `QueryUpdated` with all of `theme` (`light`/`dark`/`system`), `chrome` and `colorSource` (a `preset` with a name, or `custom`) present and valid, and was rewritten. Anything else is a problem:
    - the page never subscribes (renamed query)
    - a subscription has no rewritten result yet (none arrived, or the sync protocol changed shape)
+   - every subscription was removed (client `Remove` or server `QueryRemoved`, e.g. the page signed out or the provider unmounted)
    - a result is `null`, or is missing fields or has invalid ones (shape change)
    - the query fails
    - an unrecognised frame type, modification type, or a `Transition` without `modifications` arrives on a socket with a session subscription
    - a chunked transition can't be reassembled
 
-   `saved` stays `null` unless it was read from a valid result, so it is never filled in from defaults. The pin state is snapshotted just before the screenshot that produced the still, and at the GIF's first and last frames. A result forwarded after that moment doesn't count.
+   `saved` stays `null` unless it was read from a valid result, so it is never filled in from defaults. The pin state is snapshotted just before every screenshot. A still uses the snapshot taken with its image, and a change in the snapshot restarts the stability window just like a pixel change, so a newly forwarded result has time to render before the shot is accepted. The GIF uses every frame's snapshot, and one bad frame flags it. A result forwarded after the image doesn't count. A shot whose snapshot isn't `patched` is always flagged, even with no specific reason recorded.
 
    Any problem flags the shot, even when the pin equals the saved appearance: a page that never got a session value shows the app defaults (`system`/`calm`/`default`), not the saved prefs. The shot's `pin.problems` lists why, a `WARNING` prints under it, the shot is listed under `pinFlagged`, and a summary `WARNING` prints at the end. With `--strict` the run then exits 1. To see this path, run with `PR_CAPTURE_TEST_BREAK_PIN=1`, a test-only switch that makes the proxy ignore the session subscription, as if it had been renamed.
 2. **DOM.** An init script sets `data-color-theme`, `data-chrome`, `.dark`, and `color-scheme` on `<html>` before the app's scripts run, and a `MutationObserver` re-applies them. This covers first paint, before the session query answers. Playwright's `colorScheme` emulation matches the mode, so `system` mode agrees.
@@ -103,7 +104,7 @@ Parallel runs can pin different themes on the same `agent` user without affectin
 - `document.fonts.ready`
 - every on-screen image decoded
 
-Animations and transitions are then forced to 0s, the caret and the Next dev indicator are hidden, `prefers-reduced-motion` is set, and shots repeat until two in a row are byte-identical. Shots that never settle are flagged in the log and in `manifest.json` (`loaded` / `stable`). Two runs of the same state should differ by ~0%. Anything left over is live data changing on the shared deployment.
+Animations and transitions are then forced to 0s, the caret and the Next dev indicator are hidden, `prefers-reduced-motion` is set, and shots repeat until the image (and, for signed-in shots, the pin snapshot) has been unchanged for 2s. Shots that never settle are flagged in the log and in `manifest.json` (`loaded` / `stable`). Two runs of the same state should differ by ~0%. Anything left over is live data changing on the shared deployment.
 
 **Card catalog.** The R2 static catalog only sends CORS headers for the usual origins. On other ports the gallery would fall back to a rate-limited Convex sync, which these captures block. So the capture downloads `catalog/*.json.gz` once from Node and serves the same bytes to every capture context with `Access-Control-Allow-Origin` added. This is read-only and happens only inside the capture browser. A failed download (HTTP error, or 30s timeout) is not cached. The browser request fails immediately and a warning is printed. Only the failed download itself is evicted, so a context still waiting on it can't evict a newer retry. It also removes R2 latency, which used to make card-derived content (such as deck art on `/decks`) show up after the page already looked settled.
 
