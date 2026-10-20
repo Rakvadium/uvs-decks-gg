@@ -1,0 +1,60 @@
+{
+  "issue": "191",
+  "label": "fix-1",
+  "port": 8101,
+  "chrome": "calm",
+  "fullPage": false,
+  "shots": [
+    {
+      "name": "gallery__desktop__default__light",
+      "route": "/gallery",
+      "auth": "agent",
+      "finalPath": "/gallery",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "gallery__mobile__default__light",
+      "route": "/gallery",
+      "auth": "agent",
+      "finalPath": "/gallery",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "decks-user-menu-open__desktop__default__light",
+      "route": "/decks",
+      "auth": "agent",
+      "finalPath": "/decks",
+      "loaded": true,
+      "stable": true
+    },
+    {
+      "name": "decks-profile-sheet-open__mobile__default__light",
+      "route": "/decks",
+      "auth": "agent",
+      "finalPath": "/decks",
+      "loaded": true,
+      "stable": true
+    }
+  ],
+  "blockedConvexWrites": [
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus"
+  ],
+  "savedAppearance": [
+    "cyberpunk/dark/expressive"
+  ]
+}
