@@ -1,0 +1,2123 @@
+{
+  "rows": [
+    {
+      "shot": "button-destructive__desktop__default__light",
+      "sameRect": true,
+      "sameColor": true,
+      "sameFg": true,
+      "sameBg": true,
+      "contrast": [
+        4.77,
+        4.77
+      ],
+      "colors": [
+        "rgb(255, 255, 255)",
+        "rgb(255, 255, 255)"
+      ],
+      "border": [
+        "231,0,10",
+        "231,0,10"
+      ],
+      "interior": {
+        "n": 4,
+        "max": 1
+      },
+      "ring": {
+        "n": 17,
+        "max": 1
+      },
+      "outside": {
+        "n": 0,
+        "max": 0
+      }
+    },
+    {
+      "shot": "button-destructive-sm__desktop__default__light",
+      "sameRect": true,
+      "sameColor": true,
+      "sameFg": true,
+      "sameBg": true,
+      "contrast": [
+        4.77,
+        4.77
+      ],
+      "colors": [
+        "rgb(255, 255, 255)",
+        "rgb(255, 255, 255)"
+      ],
+      "border": [
+        "231,0,10",
+        "231,0,10"
+      ],
+      "interior": {
+        "n": 5,
+        "max": 1
+      },
+      "ring": {
+        "n": 22,
+        "max": 1
+      },
+      "outside": {
+        "n": 0,
+        "max": 0
+      }
+    },
+    {
+      "shot": "tierlist-delete__desktop__default__light",
+      "sameRect": true,
+      "sameColor": true,
+      "sameFg": true,
+      "sameBg": true,
+      "contrast": [
+        3.63,
+        3.63
+      ],
+      "colors": [
+        "lab(9.38335 5.37004 4.96888)",
+        "lab(9.38335 5.37004 4.96888)"
+      ],
+      "border": [
+        "145,24,27",
+        "128,29,30"
+      ],
+      "interior": {
+        "n": 0,
+        "max": 0
+      },
+      "ring": {
+        "n": 281,
+        "max": 17
+      },
+      "outside": {
+        "n": 0,
+        "max": 0
+      }
+    },
+    {
+      "shot": "button-destructive__desktop__default__dark",
+      "sameRect": true,
+      "sameColor": true,
+      "sameFg": true,
+      "sameBg": true,
+      "contrast": [
+        4.05,
+        4.05
+      ],
+      "colors": [
+        "rgb(255, 255, 255)",
+        "rgb(255, 255, 255)"
+      ],
+      "border": [
+        "238,52,59",
+        "238,51,58"
+      ],
+      "interior": {
+        "n": 4,
+        "max": 1
+      },
+      "ring": {
+        "n": 314,
+        "max": 2
+      },
+      "outside": {
+        "n": 0,
+        "max": 0
+      }
+    },
+    {
+      "shot": "button-destructive-sm__desktop__default__dark",
+      "sameRect": true,
+      "sameColor": true,
+      "sameFg": true,
+      "sameBg": true,
+      "contrast": [
+        4.05,
+        4.05
+      ],
+      "colors": [
+        "rgb(255, 255, 255)",
+        "rgb(255, 255, 255)"
+      ],
+      "border": [
+        "238,52,59",
+        "238,51,58"
+      ],
+      "interior": {
+        "n": 5,
+        "max": 1
+      },
+      "ring": {
+        "n": 290,
+        "max": 2
+      },
+      "outside": {
+        "n": 0,
+        "max": 0
+      }
+    },
+    {
+      "shot": "tierlist-delete__desktop__default__dark",
+      "sameRect": true,
+      "sameColor": true,
+      "sameFg": true,
+      "sameBg": true,
+      "contrast": [
+        3.61,
+        3.61
+      ],
+      "colors": [
+        "lab(95.3659 1.38789 4.33116)",
+        "lab(95.3659 1.38789 4.33116)"
+      ],
+      "border": [
+        "226,113,103",
+        "223,124,111"
+      ],
+      "interior": {
+        "n": 0,
+        "max": 0
+      },
+      "ring": {
+        "n": 280,
+        "max": 12
+      },
+      "outside": {
+        "n": 0,
+        "max": 0
+      }
+    },
+    {
+      "shot": "button-destructive__desktop__calm-storm__light",
+      "sameRect": true,
+      "sameColor": true,
+      "sameFg": true,
+      "sameBg": true,
+      "contrast": [
+        3.81,
+        3.81
+      ],
+      "colors": [
+        "rgb(255, 255, 255)",
+        "rgb(255, 255, 255)"
+      ],
+      "border": [
+        "251,44,54",
+        "251,43,53"
+      ],
+      "interior": {
+        "n": 5,
+        "max": 1
+      },
+      "ring": {
+        "n": 301,
+        "max": 2
+      },
+      "outside": {
+        "n": 0,
+        "max": 0
+      }
+    },
+    {
+      "shot": "button-destructive-sm__desktop__calm-storm__light",
+      "sameRect": true,
+      "sameColor": true,
+      "sameFg": true,
+      "sameBg": true,
+      "contrast": [
+        3.81,
+        3.81
+      ],
+      "colors": [
+        "rgb(255, 255, 255)",
+        "rgb(255, 255, 255)"
+      ],
+      "border": [
+        "251,44,54",
+        "251,43,53"
+      ],
+      "interior": {
+        "n": 5,
+        "max": 1
+      },
+      "ring": {
+        "n": 272,
+        "max": 2
+      },
+      "outside": {
+        "n": 0,
+        "max": 0
+      }
+    },
+    {
+      "shot": "tierlist-delete__desktop__calm-storm__light",
+      "sameRect": true,
+      "sameColor": true,
+      "sameFg": true,
+      "sameBg": true,
+      "contrast": [
+        5.23,
+        5.23
+      ],
+      "colors": [
+        "lab(2.51107 0.242703 -0.886115)",
+        "lab(2.51107 0.242703 -0.886115)"
+      ],
+      "border": [
+        "126,116,155",
+        "100,130,175"
+      ],
+      "interior": {
+        "n": 0,
+        "max": 0
+      },
+      "ring": {
+        "n": 284,
+        "max": 26
+      },
+      "outside": {
+        "n": 0,
+        "max": 0
+      }
+    },
+    {
+      "shot": "button-destructive__desktop__calm-storm__dark",
+      "sameRect": true,
+      "sameColor": true,
+      "sameFg": true,
+      "sameBg": true,
+      "contrast": [
+        3.81,
+        3.81
+      ],
+      "colors": [
+        "rgb(255, 255, 255)",
+        "rgb(255, 255, 255)"
+      ],
+      "border": [
+        "251,44,54",
+        "251,43,53"
+      ],
+      "interior": {
+        "n": 5,
+        "max": 1
+      },
+      "ring": {
+        "n": 296,
+        "max": 2
+      },
+      "outside": {
+        "n": 0,
+        "max": 0
+      }
+    },
+    {
+      "shot": "button-destructive-sm__desktop__calm-storm__dark",
+      "sameRect": true,
+      "sameColor": true,
+      "sameFg": true,
+      "sameBg": true,
+      "contrast": [
+        3.81,
+        3.81
+      ],
+      "colors": [
+        "rgb(255, 255, 255)",
+        "rgb(255, 255, 255)"
+      ],
+      "border": [
+        "251,44,54",
+        "251,43,53"
+      ],
+      "interior": {
+        "n": 5,
+        "max": 1
+      },
+      "ring": {
+        "n": 271,
+        "max": 2
+      },
+      "outside": {
+        "n": 0,
+        "max": 0
+      }
+    },
+    {
+      "shot": "tierlist-delete__desktop__calm-storm__dark",
+      "sameRect": true,
+      "sameColor": true,
+      "sameFg": true,
+      "sameBg": true,
+      "contrast": [
+        3.57,
+        3.57
+      ],
+      "colors": [
+        "lab(97.3623 -2.33799 -4.13098)",
+        "lab(97.3623 -2.33799 -4.13098)"
+      ],
+      "border": [
+        "125,105,149",
+        "100,117,168"
+      ],
+      "interior": {
+        "n": 0,
+        "max": 0
+      },
+      "ring": {
+        "n": 281,
+        "max": 25
+      },
+      "outside": {
+        "n": 0,
+        "max": 0
+      }
+    },
+    {
+      "shot": "button-destructive__desktop__cyberpunk__light",
+      "sameRect": true,
+      "sameColor": true,
+      "sameFg": true,
+      "sameBg": true,
+      "contrast": [
+        3.55,
+        3.55
+      ],
+      "colors": [
+        "rgb(255, 255, 255)",
+        "rgb(255, 255, 255)"
+      ],
+      "border": [
+        "254,61,0",
+        "255,61,0"
+      ],
+      "interior": {
+        "n": 6,
+        "max": 1
+      },
+      "ring": {
+        "n": 285,
+        "max": 1
+      },
+      "outside": {
+        "n": 0,
+        "max": 0
+      }
+    },
+    {
+      "shot": "button-destructive-sm__desktop__cyberpunk__light",
+      "sameRect": true,
+      "sameColor": true,
+      "sameFg": true,
+      "sameBg": true,
+      "contrast": [
+        3.55,
+        3.55
+      ],
+      "colors": [
+        "rgb(255, 255, 255)",
+        "rgb(255, 255, 255)"
+      ],
+      "border": [
+        "254,61,0",
+        "255,61,0"
+      ],
+      "interior": {
+        "n": 6,
+        "max": 1
+      },
+      "ring": {
+        "n": 263,
+        "max": 1
+      },
+      "outside": {
+        "n": 0,
+        "max": 0
+      }
+    },
+    {
+      "shot": "tierlist-delete__desktop__cyberpunk__light",
+      "sameRect": true,
+      "sameColor": true,
+      "sameFg": true,
+      "sameBg": true,
+      "contrast": [
+        5.45,
+        5.45
+      ],
+      "colors": [
+        "lab(3.79387 2.93769 -10.5157)",
+        "lab(3.79387 2.93769 -10.5157)"
+      ],
+      "border": [
+        "255,30,100",
+        "255,24,120"
+      ],
+      "interior": {
+        "n": 0,
+        "max": 0
+      },
+      "ring": {
+        "n": 284,
+        "max": 20
+      },
+      "outside": {
+        "n": 0,
+        "max": 0
+      }
+    },
+    {
+      "shot": "button-destructive__desktop__cyberpunk__dark",
+      "sameRect": true,
+      "sameColor": true,
+      "sameFg": true,
+      "sameBg": true,
+      "contrast": [
+        3.55,
+        3.55
+      ],
+      "colors": [
+        "rgb(255, 255, 255)",
+        "rgb(255, 255, 255)"
+      ],
+      "border": [
+        "254,61,0",
+        "255,61,0"
+      ],
+      "interior": {
+        "n": 6,
+        "max": 1
+      },
+      "ring": {
+        "n": 283,
+        "max": 1
+      },
+      "outside": {
+        "n": 0,
+        "max": 0
+      }
+    },
+    {
+      "shot": "button-destructive-sm__desktop__cyberpunk__dark",
+      "sameRect": true,
+      "sameColor": true,
+      "sameFg": true,
+      "sameBg": true,
+      "contrast": [
+        3.55,
+        3.55
+      ],
+      "colors": [
+        "rgb(255, 255, 255)",
+        "rgb(255, 255, 255)"
+      ],
+      "border": [
+        "254,61,0",
+        "255,61,0"
+      ],
+      "interior": {
+        "n": 6,
+        "max": 1
+      },
+      "ring": {
+        "n": 267,
+        "max": 1
+      },
+      "outside": {
+        "n": 0,
+        "max": 0
+      }
+    },
+    {
+      "shot": "tierlist-delete__desktop__cyberpunk__dark",
+      "sameRect": true,
+      "sameColor": true,
+      "sameFg": true,
+      "sameBg": true,
+      "contrast": [
+        3.08,
+        3.08
+      ],
+      "colors": [
+        "lab(94.3261 -0.358105 -2.77311)",
+        "lab(94.3261 -0.358105 -2.77311)"
+      ],
+      "border": [
+        "255,30,100",
+        "255,24,120"
+      ],
+      "interior": {
+        "n": 0,
+        "max": 0
+      },
+      "ring": {
+        "n": 282,
+        "max": 20
+      },
+      "outside": {
+        "n": 0,
+        "max": 0
+      }
+    },
+    {
+      "shot": "button-destructive__desktop__cotton-candy__light",
+      "sameRect": true,
+      "sameColor": true,
+      "sameFg": true,
+      "sameBg": true,
+      "contrast": [
+        4.42,
+        4.42
+      ],
+      "colors": [
+        "rgb(255, 255, 255)",
+        "rgb(255, 255, 255)"
+      ],
+      "border": [
+        "230,43,48",
+        "230,43,48"
+      ],
+      "interior": {
+        "n": 2,
+        "max": 1
+      },
+      "ring": {
+        "n": 27,
+        "max": 2
+      },
+      "outside": {
+        "n": 0,
+        "max": 0
+      }
+    },
+    {
+      "shot": "button-destructive-sm__desktop__cotton-candy__light",
+      "sameRect": true,
+      "sameColor": true,
+      "sameFg": true,
+      "sameBg": true,
+      "contrast": [
+        4.42,
+        4.42
+      ],
+      "colors": [
+        "rgb(255, 255, 255)",
+        "rgb(255, 255, 255)"
+      ],
+      "border": [
+        "230,43,48",
+        "230,43,48"
+      ],
+      "interior": {
+        "n": 4,
+        "max": 1
+      },
+      "ring": {
+        "n": 28,
+        "max": 1
+      },
+      "outside": {
+        "n": 0,
+        "max": 0
+      }
+    },
+    {
+      "shot": "tierlist-delete__desktop__cotton-candy__light",
+      "sameRect": true,
+      "sameColor": true,
+      "sameFg": true,
+      "sameBg": true,
+      "contrast": [
+        2.42,
+        2.42
+      ],
+      "colors": [
+        "lab(25.996 12.2909 -24.0776)",
+        "lab(25.996 12.2909 -24.0776)"
+      ],
+      "border": [
+        "226,73,114",
+        "225,79,127"
+      ],
+      "interior": {
+        "n": 0,
+        "max": 0
+      },
+      "ring": {
+        "n": 283,
+        "max": 13
+      },
+      "outside": {
+        "n": 0,
+        "max": 0
+      }
+    },
+    {
+      "shot": "button-destructive__desktop__cotton-candy__dark",
+      "sameRect": true,
+      "sameColor": true,
+      "sameFg": true,
+      "sameBg": true,
+      "contrast": [
+        3.7,
+        3.7
+      ],
+      "colors": [
+        "rgb(255, 255, 255)",
+        "rgb(255, 255, 255)"
+      ],
+      "border": [
+        "237,73,82",
+        "237,73,81"
+      ],
+      "interior": {
+        "n": 4,
+        "max": 1
+      },
+      "ring": {
+        "n": 300,
+        "max": 2
+      },
+      "outside": {
+        "n": 0,
+        "max": 0
+      }
+    },
+    {
+      "shot": "button-destructive-sm__desktop__cotton-candy__dark",
+      "sameRect": true,
+      "sameColor": true,
+      "sameFg": true,
+      "sameBg": true,
+      "contrast": [
+        3.7,
+        3.7
+      ],
+      "colors": [
+        "rgb(255, 255, 255)",
+        "rgb(255, 255, 255)"
+      ],
+      "border": [
+        "237,73,82",
+        "237,73,81"
+      ],
+      "interior": {
+        "n": 5,
+        "max": 1
+      },
+      "ring": {
+        "n": 283,
+        "max": 1
+      },
+      "outside": {
+        "n": 0,
+        "max": 0
+      }
+    },
+    {
+      "shot": "tierlist-delete__desktop__cotton-candy__dark",
+      "sameRect": true,
+      "sameColor": true,
+      "sameFg": true,
+      "sameBg": true,
+      "contrast": [
+        3.16,
+        3.16
+      ],
+      "colors": [
+        "lab(93.8615 5.32234 -9.73096)",
+        "lab(93.8615 5.32234 -9.73096)"
+      ],
+      "border": [
+        "243,119,150",
+        "245,128,163"
+      ],
+      "interior": {
+        "n": 0,
+        "max": 0
+      },
+      "ring": {
+        "n": 280,
+        "max": 14
+      },
+      "outside": {
+        "n": 0,
+        "max": 0
+      }
+    },
+    {
+      "shot": "button-destructive__desktop__caffeine__light",
+      "sameRect": true,
+      "sameColor": true,
+      "sameFg": true,
+      "sameBg": true,
+      "contrast": [
+        3.87,
+        3.87
+      ],
+      "colors": [
+        "rgb(255, 255, 255)",
+        "rgb(255, 255, 255)"
+      ],
+      "border": [
+        "229,77,46",
+        "229,76,46"
+      ],
+      "interior": {
+        "n": 2,
+        "max": 1
+      },
+      "ring": {
+        "n": 302,
+        "max": 1
+      },
+      "outside": {
+        "n": 0,
+        "max": 0
+      }
+    },
+    {
+      "shot": "button-destructive-sm__desktop__caffeine__light",
+      "sameRect": true,
+      "sameColor": true,
+      "sameFg": true,
+      "sameBg": true,
+      "contrast": [
+        3.87,
+        3.87
+      ],
+      "colors": [
+        "rgb(255, 255, 255)",
+        "rgb(255, 255, 255)"
+      ],
+      "border": [
+        "229,77,46",
+        "229,76,46"
+      ],
+      "interior": {
+        "n": 3,
+        "max": 1
+      },
+      "ring": {
+        "n": 278,
+        "max": 1
+      },
+      "outside": {
+        "n": 0,
+        "max": 0
+      }
+    },
+    {
+      "shot": "tierlist-delete__desktop__caffeine__light",
+      "sameRect": true,
+      "sameColor": true,
+      "sameFg": true,
+      "sameBg": true,
+      "contrast": [
+        4.21,
+        4.21
+      ],
+      "colors": [
+        "lab(12.246 0 0)",
+        "lab(12.246 0 0)"
+      ],
+      "border": [
+        "164,75,55",
+        "152,74,56"
+      ],
+      "interior": {
+        "n": 0,
+        "max": 0
+      },
+      "ring": {
+        "n": 280,
+        "max": 12
+      },
+      "outside": {
+        "n": 0,
+        "max": 0
+      }
+    },
+    {
+      "shot": "button-destructive__desktop__caffeine__dark",
+      "sameRect": true,
+      "sameColor": true,
+      "sameFg": true,
+      "sameBg": true,
+      "contrast": [
+        3.87,
+        3.87
+      ],
+      "colors": [
+        "rgb(255, 255, 255)",
+        "rgb(255, 255, 255)"
+      ],
+      "border": [
+        "229,77,46",
+        "229,76,46"
+      ],
+      "interior": {
+        "n": 2,
+        "max": 1
+      },
+      "ring": {
+        "n": 301,
+        "max": 1
+      },
+      "outside": {
+        "n": 0,
+        "max": 0
+      }
+    },
+    {
+      "shot": "button-destructive-sm__desktop__caffeine__dark",
+      "sameRect": true,
+      "sameColor": true,
+      "sameFg": true,
+      "sameBg": true,
+      "contrast": [
+        3.87,
+        3.87
+      ],
+      "colors": [
+        "rgb(255, 255, 255)",
+        "rgb(255, 255, 255)"
+      ],
+      "border": [
+        "229,77,46",
+        "229,76,46"
+      ],
+      "interior": {
+        "n": 3,
+        "max": 1
+      },
+      "ring": {
+        "n": 285,
+        "max": 1
+      },
+      "outside": {
+        "n": 0,
+        "max": 0
+      }
+    },
+    {
+      "shot": "tierlist-delete__desktop__caffeine__dark",
+      "sameRect": true,
+      "sameColor": true,
+      "sameFg": true,
+      "sameBg": true,
+      "contrast": [
+        3.33,
+        3.33
+      ],
+      "colors": [
+        "lab(94.0956 -0.0000298023 0.0000119209)",
+        "lab(94.0956 -0.0000298023 0.0000119209)"
+      ],
+      "border": [
+        "242,150,120",
+        "245,164,134"
+      ],
+      "interior": {
+        "n": 0,
+        "max": 0
+      },
+      "ring": {
+        "n": 280,
+        "max": 14
+      },
+      "outside": {
+        "n": 0,
+        "max": 0
+      }
+    },
+    {
+      "shot": "button-destructive__desktop__aurora__light",
+      "sameRect": true,
+      "sameColor": true,
+      "sameFg": true,
+      "sameBg": true,
+      "contrast": [
+        4.78,
+        4.78
+      ],
+      "colors": [
+        "rgb(255, 255, 255)",
+        "rgb(255, 255, 255)"
+      ],
+      "border": [
+        "230,0,34",
+        "230,0,35"
+      ],
+      "interior": {
+        "n": 2,
+        "max": 1
+      },
+      "ring": {
+        "n": 308,
+        "max": 2
+      },
+      "outside": {
+        "n": 0,
+        "max": 0
+      }
+    },
+    {
+      "shot": "button-destructive-sm__desktop__aurora__light",
+      "sameRect": true,
+      "sameColor": true,
+      "sameFg": true,
+      "sameBg": true,
+      "contrast": [
+        4.78,
+        4.78
+      ],
+      "colors": [
+        "rgb(255, 255, 255)",
+        "rgb(255, 255, 255)"
+      ],
+      "border": [
+        "230,0,34",
+        "230,0,35"
+      ],
+      "interior": {
+        "n": 4,
+        "max": 1
+      },
+      "ring": {
+        "n": 276,
+        "max": 2
+      },
+      "outside": {
+        "n": 0,
+        "max": 0
+      }
+    },
+    {
+      "shot": "tierlist-delete__desktop__aurora__light",
+      "sameRect": true,
+      "sameColor": true,
+      "sameFg": true,
+      "sameBg": true,
+      "contrast": [
+        3.77,
+        3.77
+      ],
+      "colors": [
+        "lab(7.16059 -0.970602 -7.04916)",
+        "lab(7.16059 -0.970602 -7.04916)"
+      ],
+      "border": [
+        "115,72,92",
+        "92,87,104"
+      ],
+      "interior": {
+        "n": 0,
+        "max": 0
+      },
+      "ring": {
+        "n": 284,
+        "max": 23
+      },
+      "outside": {
+        "n": 0,
+        "max": 0
+      }
+    },
+    {
+      "shot": "button-destructive__desktop__aurora__dark",
+      "sameRect": true,
+      "sameColor": true,
+      "sameFg": true,
+      "sameBg": true,
+      "contrast": [
+        4.13,
+        4.13
+      ],
+      "colors": [
+        "rgb(255, 255, 255)",
+        "rgb(255, 255, 255)"
+      ],
+      "border": [
+        "249,5,43",
+        "249,5,43"
+      ],
+      "interior": {
+        "n": 3,
+        "max": 1
+      },
+      "ring": {
+        "n": 29,
+        "max": 1
+      },
+      "outside": {
+        "n": 0,
+        "max": 0
+      }
+    },
+    {
+      "shot": "button-destructive-sm__desktop__aurora__dark",
+      "sameRect": true,
+      "sameColor": true,
+      "sameFg": true,
+      "sameBg": true,
+      "contrast": [
+        4.13,
+        4.13
+      ],
+      "colors": [
+        "rgb(255, 255, 255)",
+        "rgb(255, 255, 255)"
+      ],
+      "border": [
+        "249,5,43",
+        "249,5,43"
+      ],
+      "interior": {
+        "n": 4,
+        "max": 1
+      },
+      "ring": {
+        "n": 31,
+        "max": 1
+      },
+      "outside": {
+        "n": 0,
+        "max": 0
+      }
+    },
+    {
+      "shot": "tierlist-delete__desktop__aurora__dark",
+      "sameRect": true,
+      "sameColor": true,
+      "sameFg": true,
+      "sameBg": true,
+      "contrast": [
+        3.28,
+        3.28
+      ],
+      "colors": [
+        "lab(90.8413 -5.07414 -4.90415)",
+        "lab(90.8413 -5.07414 -4.90415)"
+      ],
+      "border": [
+        "124,110,130",
+        "100,132,148"
+      ],
+      "interior": {
+        "n": 0,
+        "max": 0
+      },
+      "ring": {
+        "n": 284,
+        "max": 24
+      },
+      "outside": {
+        "n": 0,
+        "max": 0
+      }
+    },
+    {
+      "shot": "button-destructive__desktop__sorbet__light",
+      "sameRect": true,
+      "sameColor": true,
+      "sameFg": true,
+      "sameBg": true,
+      "contrast": [
+        2.79,
+        2.79
+      ],
+      "colors": [
+        "rgb(255, 255, 255)",
+        "rgb(255, 255, 255)"
+      ],
+      "border": [
+        "249,111,112",
+        "249,111,112"
+      ],
+      "interior": {
+        "n": 3,
+        "max": 1
+      },
+      "ring": {
+        "n": 29,
+        "max": 1
+      },
+      "outside": {
+        "n": 0,
+        "max": 0
+      }
+    },
+    {
+      "shot": "button-destructive-sm__desktop__sorbet__light",
+      "sameRect": true,
+      "sameColor": true,
+      "sameFg": true,
+      "sameBg": true,
+      "contrast": [
+        2.79,
+        2.79
+      ],
+      "colors": [
+        "rgb(255, 255, 255)",
+        "rgb(255, 255, 255)"
+      ],
+      "border": [
+        "249,111,112",
+        "249,111,112"
+      ],
+      "interior": {
+        "n": 5,
+        "max": 1
+      },
+      "ring": {
+        "n": 30,
+        "max": 1
+      },
+      "outside": {
+        "n": 0,
+        "max": 0
+      }
+    },
+    {
+      "shot": "tierlist-delete__desktop__sorbet__light",
+      "sameRect": true,
+      "sameColor": true,
+      "sameFg": true,
+      "sameBg": true,
+      "contrast": [
+        2.44,
+        2.44
+      ],
+      "colors": [
+        "lab(38.6592 -0.0000149012 0)",
+        "lab(38.6592 -0.0000149012 0)"
+      ],
+      "border": [
+        "228,95,133",
+        "225,91,137"
+      ],
+      "interior": {
+        "n": 0,
+        "max": 0
+      },
+      "ring": {
+        "n": 275,
+        "max": 4
+      },
+      "outside": {
+        "n": 0,
+        "max": 0
+      }
+    },
+    {
+      "shot": "button-destructive__desktop__sorbet__dark",
+      "sameRect": true,
+      "sameColor": true,
+      "sameFg": true,
+      "sameBg": true,
+      "contrast": [
+        3.28,
+        3.28
+      ],
+      "colors": [
+        "rgb(255, 255, 255)",
+        "rgb(255, 255, 255)"
+      ],
+      "border": [
+        "227,94,164",
+        "227,93,163"
+      ],
+      "interior": {
+        "n": 6,
+        "max": 1
+      },
+      "ring": {
+        "n": 312,
+        "max": 2
+      },
+      "outside": {
+        "n": 0,
+        "max": 0
+      }
+    },
+    {
+      "shot": "button-destructive-sm__desktop__sorbet__dark",
+      "sameRect": true,
+      "sameColor": true,
+      "sameFg": true,
+      "sameBg": true,
+      "contrast": [
+        3.28,
+        3.28
+      ],
+      "colors": [
+        "rgb(255, 255, 255)",
+        "rgb(255, 255, 255)"
+      ],
+      "border": [
+        "227,94,164",
+        "227,93,163"
+      ],
+      "interior": {
+        "n": 5,
+        "max": 1
+      },
+      "ring": {
+        "n": 288,
+        "max": 1
+      },
+      "outside": {
+        "n": 0,
+        "max": 0
+      }
+    },
+    {
+      "shot": "tierlist-delete__desktop__sorbet__dark",
+      "sameRect": true,
+      "sameColor": true,
+      "sameFg": true,
+      "sameBg": true,
+      "contrast": [
+        2.65,
+        2.65
+      ],
+      "colors": [
+        "lab(91.6866 6.53416 -1.35535)",
+        "lab(91.6866 6.53416 -1.35535)"
+      ],
+      "border": [
+        "239,160,166",
+        "242,173,165"
+      ],
+      "interior": {
+        "n": 0,
+        "max": 0
+      },
+      "ring": {
+        "n": 281,
+        "max": 14
+      },
+      "outside": {
+        "n": 0,
+        "max": 0
+      }
+    },
+    {
+      "shot": "button-destructive__desktop__singularity__light",
+      "sameRect": true,
+      "sameColor": true,
+      "sameFg": true,
+      "sameBg": true,
+      "contrast": [
+        3.76,
+        3.76
+      ],
+      "colors": [
+        "rgb(255, 255, 255)",
+        "rgb(255, 255, 255)"
+      ],
+      "border": [
+        "239,68,68",
+        "239,68,68"
+      ],
+      "interior": {
+        "n": 2,
+        "max": 1
+      },
+      "ring": {
+        "n": 30,
+        "max": 1
+      },
+      "outside": {
+        "n": 0,
+        "max": 0
+      }
+    },
+    {
+      "shot": "button-destructive-sm__desktop__singularity__light",
+      "sameRect": true,
+      "sameColor": true,
+      "sameFg": true,
+      "sameBg": true,
+      "contrast": [
+        3.76,
+        3.76
+      ],
+      "colors": [
+        "rgb(255, 255, 255)",
+        "rgb(255, 255, 255)"
+      ],
+      "border": [
+        "239,68,68",
+        "239,68,68"
+      ],
+      "interior": {
+        "n": 4,
+        "max": 1
+      },
+      "ring": {
+        "n": 30,
+        "max": 1
+      },
+      "outside": {
+        "n": 0,
+        "max": 0
+      }
+    },
+    {
+      "shot": "tierlist-delete__desktop__singularity__light",
+      "sameRect": true,
+      "sameColor": true,
+      "sameFg": true,
+      "sameBg": true,
+      "contrast": [
+        4.71,
+        4.71
+      ],
+      "colors": [
+        "lab(8.15285 0.645563 -11.4852)",
+        "lab(8.15285 0.645563 -11.4852)"
+      ],
+      "border": [
+        "227,95,68",
+        "226,100,67"
+      ],
+      "interior": {
+        "n": 0,
+        "max": 0
+      },
+      "ring": {
+        "n": 277,
+        "max": 5
+      },
+      "outside": {
+        "n": 0,
+        "max": 0
+      }
+    },
+    {
+      "shot": "button-destructive__desktop__singularity__dark",
+      "sameRect": true,
+      "sameColor": true,
+      "sameFg": true,
+      "sameBg": true,
+      "contrast": [
+        3.96,
+        3.96
+      ],
+      "colors": [
+        "rgb(255, 255, 255)",
+        "rgb(255, 255, 255)"
+      ],
+      "border": [
+        "95,135,135",
+        "95,135,135"
+      ],
+      "interior": {
+        "n": 4,
+        "max": 1
+      },
+      "ring": {
+        "n": 29,
+        "max": 1
+      },
+      "outside": {
+        "n": 0,
+        "max": 0
+      }
+    },
+    {
+      "shot": "button-destructive-sm__desktop__singularity__dark",
+      "sameRect": true,
+      "sameColor": true,
+      "sameFg": true,
+      "sameBg": true,
+      "contrast": [
+        3.96,
+        3.96
+      ],
+      "colors": [
+        "rgb(255, 255, 255)",
+        "rgb(255, 255, 255)"
+      ],
+      "border": [
+        "95,135,135",
+        "95,135,135"
+      ],
+      "interior": {
+        "n": 5,
+        "max": 1
+      },
+      "ring": {
+        "n": 30,
+        "max": 1
+      },
+      "outside": {
+        "n": 0,
+        "max": 0
+      }
+    },
+    {
+      "shot": "tierlist-delete__desktop__singularity__dark",
+      "sameRect": true,
+      "sameColor": true,
+      "sameFg": true,
+      "sameBg": true,
+      "contrast": [
+        2.2,
+        2.2
+      ],
+      "colors": [
+        "lab(78.0644 0 0)",
+        "lab(78.0644 0 0)"
+      ],
+      "border": [
+        "163,136,109",
+        "177,137,104"
+      ],
+      "interior": {
+        "n": 0,
+        "max": 0
+      },
+      "ring": {
+        "n": 278,
+        "max": 14
+      },
+      "outside": {
+        "n": 0,
+        "max": 0
+      }
+    },
+    {
+      "shot": "tierlist-delete__mobile__default__light",
+      "sameRect": true,
+      "sameColor": true,
+      "sameFg": true,
+      "sameBg": true,
+      "contrast": [
+        3.63,
+        3.63
+      ],
+      "colors": [
+        "lab(9.38335 5.37004 4.96888)",
+        "lab(9.38335 5.37004 4.96888)"
+      ],
+      "border": [
+        "145,24,27",
+        "128,29,30"
+      ],
+      "interior": {
+        "n": 0,
+        "max": 0
+      },
+      "ring": {
+        "n": 3212,
+        "max": 17
+      },
+      "outside": {
+        "n": 0,
+        "max": 0
+      }
+    },
+    {
+      "shot": "tierlist-delete__mobile__default__dark",
+      "sameRect": true,
+      "sameColor": true,
+      "sameFg": true,
+      "sameBg": true,
+      "contrast": [
+        3.61,
+        3.61
+      ],
+      "colors": [
+        "lab(95.3659 1.38789 4.33116)",
+        "lab(95.3659 1.38789 4.33116)"
+      ],
+      "border": [
+        "226,113,103",
+        "223,124,111"
+      ],
+      "interior": {
+        "n": 0,
+        "max": 0
+      },
+      "ring": {
+        "n": 3215,
+        "max": 12
+      },
+      "outside": {
+        "n": 0,
+        "max": 0
+      }
+    },
+    {
+      "shot": "tierlist-delete__mobile__calm-storm__light",
+      "sameRect": true,
+      "sameColor": true,
+      "sameFg": true,
+      "sameBg": true,
+      "contrast": [
+        5.23,
+        5.23
+      ],
+      "colors": [
+        "lab(2.51107 0.242703 -0.886115)",
+        "lab(2.51107 0.242703 -0.886115)"
+      ],
+      "border": [
+        "126,116,155",
+        "100,130,175"
+      ],
+      "interior": {
+        "n": 0,
+        "max": 0
+      },
+      "ring": {
+        "n": 3222,
+        "max": 26
+      },
+      "outside": {
+        "n": 0,
+        "max": 0
+      }
+    },
+    {
+      "shot": "tierlist-delete__mobile__calm-storm__dark",
+      "sameRect": true,
+      "sameColor": true,
+      "sameFg": true,
+      "sameBg": true,
+      "contrast": [
+        3.57,
+        3.57
+      ],
+      "colors": [
+        "lab(97.3623 -2.33799 -4.13098)",
+        "lab(97.3623 -2.33799 -4.13098)"
+      ],
+      "border": [
+        "125,105,149",
+        "100,117,168"
+      ],
+      "interior": {
+        "n": 0,
+        "max": 0
+      },
+      "ring": {
+        "n": 3214,
+        "max": 25
+      },
+      "outside": {
+        "n": 0,
+        "max": 0
+      }
+    },
+    {
+      "shot": "tierlist-delete__mobile__cyberpunk__light",
+      "sameRect": true,
+      "sameColor": true,
+      "sameFg": true,
+      "sameBg": true,
+      "contrast": [
+        5.45,
+        5.45
+      ],
+      "colors": [
+        "lab(3.79387 2.93769 -10.5157)",
+        "lab(3.79387 2.93769 -10.5157)"
+      ],
+      "border": [
+        "255,30,100",
+        "255,24,120"
+      ],
+      "interior": {
+        "n": 0,
+        "max": 0
+      },
+      "ring": {
+        "n": 3215,
+        "max": 20
+      },
+      "outside": {
+        "n": 0,
+        "max": 0
+      }
+    },
+    {
+      "shot": "tierlist-delete__mobile__cyberpunk__dark",
+      "sameRect": true,
+      "sameColor": true,
+      "sameFg": true,
+      "sameBg": true,
+      "contrast": [
+        3.08,
+        3.08
+      ],
+      "colors": [
+        "lab(94.3261 -0.358105 -2.77311)",
+        "lab(94.3261 -0.358105 -2.77311)"
+      ],
+      "border": [
+        "255,30,100",
+        "255,24,120"
+      ],
+      "interior": {
+        "n": 0,
+        "max": 0
+      },
+      "ring": {
+        "n": 3218,
+        "max": 20
+      },
+      "outside": {
+        "n": 0,
+        "max": 0
+      }
+    },
+    {
+      "shot": "tierlist-delete__mobile__cotton-candy__light",
+      "sameRect": true,
+      "sameColor": true,
+      "sameFg": true,
+      "sameBg": true,
+      "contrast": [
+        2.42,
+        2.42
+      ],
+      "colors": [
+        "lab(25.996 12.2909 -24.0776)",
+        "lab(25.996 12.2909 -24.0776)"
+      ],
+      "border": [
+        "226,73,114",
+        "225,79,127"
+      ],
+      "interior": {
+        "n": 0,
+        "max": 0
+      },
+      "ring": {
+        "n": 3218,
+        "max": 13
+      },
+      "outside": {
+        "n": 0,
+        "max": 0
+      }
+    },
+    {
+      "shot": "tierlist-delete__mobile__cotton-candy__dark",
+      "sameRect": true,
+      "sameColor": true,
+      "sameFg": true,
+      "sameBg": true,
+      "contrast": [
+        3.16,
+        3.16
+      ],
+      "colors": [
+        "lab(93.8615 5.32234 -9.73096)",
+        "lab(93.8615 5.32234 -9.73096)"
+      ],
+      "border": [
+        "243,119,150",
+        "245,128,163"
+      ],
+      "interior": {
+        "n": 0,
+        "max": 0
+      },
+      "ring": {
+        "n": 3218,
+        "max": 14
+      },
+      "outside": {
+        "n": 0,
+        "max": 0
+      }
+    },
+    {
+      "shot": "tierlist-delete__mobile__caffeine__light",
+      "sameRect": true,
+      "sameColor": true,
+      "sameFg": true,
+      "sameBg": true,
+      "contrast": [
+        4.21,
+        4.21
+      ],
+      "colors": [
+        "lab(12.246 0 0)",
+        "lab(12.246 0 0)"
+      ],
+      "border": [
+        "164,75,55",
+        "152,74,56"
+      ],
+      "interior": {
+        "n": 0,
+        "max": 0
+      },
+      "ring": {
+        "n": 3207,
+        "max": 14
+      },
+      "outside": {
+        "n": 0,
+        "max": 0
+      }
+    },
+    {
+      "shot": "tierlist-delete__mobile__caffeine__dark",
+      "sameRect": true,
+      "sameColor": true,
+      "sameFg": true,
+      "sameBg": true,
+      "contrast": [
+        3.33,
+        3.33
+      ],
+      "colors": [
+        "lab(94.0956 -0.0000298023 0.0000119209)",
+        "lab(94.0956 -0.0000298023 0.0000119209)"
+      ],
+      "border": [
+        "242,150,120",
+        "245,164,134"
+      ],
+      "interior": {
+        "n": 0,
+        "max": 0
+      },
+      "ring": {
+        "n": 3217,
+        "max": 15
+      },
+      "outside": {
+        "n": 0,
+        "max": 0
+      }
+    },
+    {
+      "shot": "tierlist-delete__mobile__aurora__light",
+      "sameRect": true,
+      "sameColor": true,
+      "sameFg": true,
+      "sameBg": true,
+      "contrast": [
+        3.77,
+        3.77
+      ],
+      "colors": [
+        "lab(7.16059 -0.970602 -7.04916)",
+        "lab(7.16059 -0.970602 -7.04916)"
+      ],
+      "border": [
+        "115,72,92",
+        "92,87,104"
+      ],
+      "interior": {
+        "n": 0,
+        "max": 0
+      },
+      "ring": {
+        "n": 3216,
+        "max": 23
+      },
+      "outside": {
+        "n": 0,
+        "max": 0
+      }
+    },
+    {
+      "shot": "tierlist-delete__mobile__aurora__dark",
+      "sameRect": true,
+      "sameColor": true,
+      "sameFg": true,
+      "sameBg": true,
+      "contrast": [
+        3.28,
+        3.28
+      ],
+      "colors": [
+        "lab(90.8413 -5.07414 -4.90415)",
+        "lab(90.8413 -5.07414 -4.90415)"
+      ],
+      "border": [
+        "124,110,130",
+        "100,132,148"
+      ],
+      "interior": {
+        "n": 0,
+        "max": 0
+      },
+      "ring": {
+        "n": 3216,
+        "max": 24
+      },
+      "outside": {
+        "n": 0,
+        "max": 0
+      }
+    },
+    {
+      "shot": "tierlist-delete__mobile__sorbet__light",
+      "sameRect": true,
+      "sameColor": true,
+      "sameFg": true,
+      "sameBg": true,
+      "contrast": [
+        2.44,
+        2.44
+      ],
+      "colors": [
+        "lab(38.6592 -0.0000149012 0)",
+        "lab(38.6592 -0.0000149012 0)"
+      ],
+      "border": [
+        "228,95,133",
+        "225,91,137"
+      ],
+      "interior": {
+        "n": 0,
+        "max": 0
+      },
+      "ring": {
+        "n": 3197,
+        "max": 5
+      },
+      "outside": {
+        "n": 0,
+        "max": 0
+      }
+    },
+    {
+      "shot": "tierlist-delete__mobile__sorbet__dark",
+      "sameRect": true,
+      "sameColor": true,
+      "sameFg": true,
+      "sameBg": true,
+      "contrast": [
+        2.65,
+        2.65
+      ],
+      "colors": [
+        "lab(91.6866 6.53416 -1.35535)",
+        "lab(91.6866 6.53416 -1.35535)"
+      ],
+      "border": [
+        "239,160,166",
+        "242,173,165"
+      ],
+      "interior": {
+        "n": 0,
+        "max": 0
+      },
+      "ring": {
+        "n": 3217,
+        "max": 14
+      },
+      "outside": {
+        "n": 0,
+        "max": 0
+      }
+    },
+    {
+      "shot": "tierlist-delete__mobile__singularity__light",
+      "sameRect": true,
+      "sameColor": true,
+      "sameFg": true,
+      "sameBg": true,
+      "contrast": [
+        4.71,
+        4.71
+      ],
+      "colors": [
+        "lab(8.15285 0.645563 -11.4852)",
+        "lab(8.15285 0.645563 -11.4852)"
+      ],
+      "border": [
+        "227,95,68",
+        "226,100,67"
+      ],
+      "interior": {
+        "n": 0,
+        "max": 0
+      },
+      "ring": {
+        "n": 3195,
+        "max": 6
+      },
+      "outside": {
+        "n": 0,
+        "max": 0
+      }
+    },
+    {
+      "shot": "tierlist-delete__mobile__singularity__dark",
+      "sameRect": true,
+      "sameColor": true,
+      "sameFg": true,
+      "sameBg": true,
+      "contrast": [
+        2.2,
+        2.2
+      ],
+      "colors": [
+        "lab(78.0644 0 0)",
+        "lab(78.0644 0 0)"
+      ],
+      "border": [
+        "163,136,109",
+        "177,137,104"
+      ],
+      "interior": {
+        "n": 0,
+        "max": 0
+      },
+      "ring": {
+        "n": 3214,
+        "max": 14
+      },
+      "outside": {
+        "n": 0,
+        "max": 0
+      }
+    }
+  ],
+  "prOnly": [],
+  "errors": {
+    "dev": [
+      {
+        "shot": "button__mobile__default__light",
+        "error": "TimeoutError: locator.waitFor: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:text-is(\"destructive\")').first() to be visible\u001b[22m\n\u001b[2m    116 × locator resolved to hidden <button data-slot=\"button\" class=\"group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([c"
+      },
+      {
+        "shot": "button__mobile__default__dark",
+        "error": "TimeoutError: locator.waitFor: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:text-is(\"destructive\")').first() to be visible\u001b[22m\n\u001b[2m    116 × locator resolved to hidden <button data-slot=\"button\" class=\"group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([c"
+      },
+      {
+        "shot": "button__mobile__calm-storm__light",
+        "error": "TimeoutError: locator.waitFor: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:text-is(\"destructive\")').first() to be visible\u001b[22m\n\u001b[2m    116 × locator resolved to hidden <button data-slot=\"button\" class=\"group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([c"
+      },
+      {
+        "shot": "button__mobile__calm-storm__dark",
+        "error": "TimeoutError: locator.waitFor: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:text-is(\"destructive\")').first() to be visible\u001b[22m\n\u001b[2m    116 × locator resolved to hidden <button data-slot=\"button\" class=\"group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([c"
+      },
+      {
+        "shot": "button__mobile__cyberpunk__light",
+        "error": "TimeoutError: locator.waitFor: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:text-is(\"destructive\")').first() to be visible\u001b[22m\n\u001b[2m    116 × locator resolved to hidden <button data-slot=\"button\" class=\"group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([c"
+      },
+      {
+        "shot": "button__mobile__cyberpunk__dark",
+        "error": "TimeoutError: locator.waitFor: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:text-is(\"destructive\")').first() to be visible\u001b[22m\n\u001b[2m    111 × locator resolved to hidden <button data-slot=\"button\" class=\"group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([c"
+      },
+      {
+        "shot": "button__mobile__cotton-candy__light",
+        "error": "TimeoutError: locator.waitFor: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:text-is(\"destructive\")').first() to be visible\u001b[22m\n\u001b[2m    115 × locator resolved to hidden <button data-slot=\"button\" class=\"group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([c"
+      },
+      {
+        "shot": "button__mobile__cotton-candy__dark",
+        "error": "TimeoutError: locator.waitFor: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:text-is(\"destructive\")').first() to be visible\u001b[22m\n\u001b[2m    116 × locator resolved to hidden <button data-slot=\"button\" class=\"group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([c"
+      },
+      {
+        "shot": "button__mobile__caffeine__light",
+        "error": "TimeoutError: locator.waitFor: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:text-is(\"destructive\")').first() to be visible\u001b[22m\n\u001b[2m    116 × locator resolved to hidden <button data-slot=\"button\" class=\"group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([c"
+      },
+      {
+        "shot": "button__mobile__caffeine__dark",
+        "error": "TimeoutError: locator.waitFor: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:text-is(\"destructive\")').first() to be visible\u001b[22m\n\u001b[2m    116 × locator resolved to hidden <button data-slot=\"button\" class=\"group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([c"
+      },
+      {
+        "shot": "button__mobile__aurora__light",
+        "error": "TimeoutError: locator.waitFor: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:text-is(\"destructive\")').first() to be visible\u001b[22m\n\u001b[2m    116 × locator resolved to hidden <button data-slot=\"button\" class=\"group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([c"
+      },
+      {
+        "shot": "button__mobile__aurora__dark",
+        "error": "TimeoutError: locator.waitFor: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:text-is(\"destructive\")').first() to be visible\u001b[22m\n\u001b[2m    116 × locator resolved to hidden <button data-slot=\"button\" class=\"group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([c"
+      },
+      {
+        "shot": "button__mobile__sorbet__light",
+        "error": "TimeoutError: locator.waitFor: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:text-is(\"destructive\")').first() to be visible\u001b[22m\n\u001b[2m    115 × locator resolved to hidden <button data-slot=\"button\" class=\"group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([c"
+      },
+      {
+        "shot": "button__mobile__sorbet__dark",
+        "error": "TimeoutError: locator.waitFor: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:text-is(\"destructive\")').first() to be visible\u001b[22m\n\u001b[2m    115 × locator resolved to hidden <button data-slot=\"button\" class=\"group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([c"
+      },
+      {
+        "shot": "button__mobile__singularity__light",
+        "error": "TimeoutError: locator.waitFor: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:text-is(\"destructive\")').first() to be visible\u001b[22m\n\u001b[2m    116 × locator resolved to hidden <button data-slot=\"button\" class=\"group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([c"
+      },
+      {
+        "shot": "button__mobile__singularity__dark",
+        "error": "TimeoutError: locator.waitFor: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:text-is(\"destructive\")').first() to be visible\u001b[22m\n\u001b[2m    116 × locator resolved to hidden <button data-slot=\"button\" class=\"group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([c"
+      }
+    ],
+    "pr": [
+      {
+        "shot": "button__mobile__default__light",
+        "error": "TimeoutError: locator.waitFor: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:text-is(\"destructive\")').first() to be visible\u001b[22m\n\u001b[2m    116 × locator resolved to hidden <button data-slot=\"button\" class=\"group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([c"
+      },
+      {
+        "shot": "button__mobile__default__dark",
+        "error": "TimeoutError: locator.waitFor: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:text-is(\"destructive\")').first() to be visible\u001b[22m\n\u001b[2m    114 × locator resolved to hidden <button data-slot=\"button\" class=\"group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([c"
+      },
+      {
+        "shot": "button__mobile__calm-storm__light",
+        "error": "TimeoutError: locator.waitFor: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:text-is(\"destructive\")').first() to be visible\u001b[22m\n\u001b[2m    116 × locator resolved to hidden <button data-slot=\"button\" class=\"group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([c"
+      },
+      {
+        "shot": "button__mobile__calm-storm__dark",
+        "error": "TimeoutError: locator.waitFor: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:text-is(\"destructive\")').first() to be visible\u001b[22m\n\u001b[2m    116 × locator resolved to hidden <button data-slot=\"button\" class=\"group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([c"
+      },
+      {
+        "shot": "button__mobile__cyberpunk__light",
+        "error": "TimeoutError: locator.waitFor: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:text-is(\"destructive\")').first() to be visible\u001b[22m\n\u001b[2m    116 × locator resolved to hidden <button data-slot=\"button\" class=\"group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([c"
+      },
+      {
+        "shot": "button__mobile__cyberpunk__dark",
+        "error": "TimeoutError: locator.waitFor: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:text-is(\"destructive\")').first() to be visible\u001b[22m\n\u001b[2m    116 × locator resolved to hidden <button data-slot=\"button\" class=\"group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([c"
+      },
+      {
+        "shot": "button__mobile__cotton-candy__light",
+        "error": "TimeoutError: locator.waitFor: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:text-is(\"destructive\")').first() to be visible\u001b[22m\n\u001b[2m    115 × locator resolved to hidden <button data-slot=\"button\" class=\"group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([c"
+      },
+      {
+        "shot": "button__mobile__cotton-candy__dark",
+        "error": "TimeoutError: locator.waitFor: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:text-is(\"destructive\")').first() to be visible\u001b[22m\n\u001b[2m    116 × locator resolved to hidden <button data-slot=\"button\" class=\"group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([c"
+      },
+      {
+        "shot": "button__mobile__caffeine__light",
+        "error": "TimeoutError: locator.waitFor: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:text-is(\"destructive\")').first() to be visible\u001b[22m\n\u001b[2m    116 × locator resolved to hidden <button data-slot=\"button\" class=\"group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([c"
+      },
+      {
+        "shot": "button__mobile__caffeine__dark",
+        "error": "TimeoutError: locator.waitFor: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:text-is(\"destructive\")').first() to be visible\u001b[22m\n\u001b[2m    114 × locator resolved to hidden <button data-slot=\"button\" class=\"group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([c"
+      },
+      {
+        "shot": "button__mobile__aurora__light",
+        "error": "TimeoutError: locator.waitFor: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:text-is(\"destructive\")').first() to be visible\u001b[22m\n\u001b[2m    115 × locator resolved to hidden <button data-slot=\"button\" class=\"group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([c"
+      },
+      {
+        "shot": "button__mobile__aurora__dark",
+        "error": "TimeoutError: locator.waitFor: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:text-is(\"destructive\")').first() to be visible\u001b[22m\n\u001b[2m    115 × locator resolved to hidden <button data-slot=\"button\" class=\"group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([c"
+      },
+      {
+        "shot": "button__mobile__sorbet__light",
+        "error": "TimeoutError: locator.waitFor: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:text-is(\"destructive\")').first() to be visible\u001b[22m\n\u001b[2m    116 × locator resolved to hidden <button data-slot=\"button\" class=\"group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([c"
+      },
+      {
+        "shot": "button__mobile__sorbet__dark",
+        "error": "TimeoutError: locator.waitFor: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:text-is(\"destructive\")').first() to be visible\u001b[22m\n\u001b[2m    116 × locator resolved to hidden <button data-slot=\"button\" class=\"group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([c"
+      },
+      {
+        "shot": "button__mobile__singularity__light",
+        "error": "TimeoutError: locator.waitFor: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:text-is(\"destructive\")').first() to be visible\u001b[22m\n\u001b[2m    115 × locator resolved to hidden <button data-slot=\"button\" class=\"group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([c"
+      },
+      {
+        "shot": "button__mobile__singularity__dark",
+        "error": "TimeoutError: locator.waitFor: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:text-is(\"destructive\")').first() to be visible\u001b[22m\n\u001b[2m    116 × locator resolved to hidden <button data-slot=\"button\" class=\"group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([c"
+      }
+    ]
+  }
+}

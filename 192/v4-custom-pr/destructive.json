@@ -1,0 +1,87 @@
+{
+  "blocked": [
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus"
+  ],
+  "blockedCount": 12,
+  "rewrites": {
+    "canEdit": 0,
+    "role": 3
+  },
+  "results": [
+    {
+      "shot": "button-destructive__desktop__default__light",
+      "kind": "button",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-destructive-foreground hover:bg-destructive-dim shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+      "color": "oklch(0.985 0 0)",
+      "background": "oklch(0.577 0.245 27.325)",
+      "borderColor": "oklab(0.577 0.217662 0.112464 / 0.6)",
+      "radius": "8px",
+      "fg": [
+        250,
+        250,
+        250
+      ],
+      "bg": [
+        231,
+        0,
+        11
+      ],
+      "border": [
+        231,
+        0,
+        10
+      ],
+      "contrast": 4.57,
+      "rect": {
+        "x": 476.734375,
+        "y": 172,
+        "width": 113.0625,
+        "height": 40
+      },
+      "clip": {
+        "x": 464,
+        "y": 160,
+        "width": 138,
+        "height": 64
+      }
+    },
+    {
+      "shot": "button-destructive__desktop__default__dark",
+      "kind": "button",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-destructive-foreground hover:bg-destructive-dim shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive-strong h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+      "color": "oklch(0.98 0 0)",
+      "background": "oklch(0.62 0.22 25)",
+      "borderColor": "oklab(0.62 0.199388 0.092976 / 0.6)",
+      "radius": "8px",
+      "fg": [
+        248,
+        248,
+        248
+      ],
+      "bg": [
+        238,
+        52,
+        59
+      ],
+      "border": [
+        238,
+        51,
+        58
+      ],
+      "contrast": 3.81,
+      "rect": {
+        "x": 476.734375,
+        "y": 172,
+        "width": 113.0625,
+        "height": 40
+      },
+      "clip": {
+        "x": 464,
+        "y": 160,
+        "width": 138,
+        "height": 64
+      }
+    }
+  ]
+}

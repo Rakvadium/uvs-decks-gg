@@ -1,0 +1,617 @@
+{
+  "blocked": [
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated"
+  ],
+  "blockedCount": 144,
+  "rows": [
+    {
+      "theme": "default",
+      "mode": "light",
+      "dialog": {
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px",
+        "filter": "none",
+        "outline": "none",
+        "width": 1280
+      },
+      "checkboxRest": {
+        "border": "oklch(0.700499 0.0246864 42.5272)",
+        "fg": [
+          173,
+          154,
+          147
+        ],
+        "bg": [
+          252,
+          247,
+          247
+        ],
+        "contrast": 2.53
+      },
+      "checkboxHover": {
+        "border": "oklch(0.700499 0.0246864 42.5272)",
+        "fg": [
+          173,
+          154,
+          147
+        ],
+        "bg": [
+          244,
+          237,
+          234
+        ],
+        "contrast": 2.32
+      }
+    },
+    {
+      "theme": "default",
+      "mode": "dark",
+      "dialog": {
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px",
+        "filter": "none",
+        "outline": "none",
+        "width": 1280
+      },
+      "checkboxRest": {
+        "border": "oklab(0.779999 0.0084441 0.0181435 / 0.6)",
+        "fg": [
+          131,
+          121,
+          112
+        ],
+        "bg": [
+          38,
+          30,
+          26
+        ],
+        "contrast": 3.85
+      },
+      "checkboxHover": {
+        "border": "oklab(0.779999 0.0084441 0.0181435 / 0.6)",
+        "fg": [
+          132,
+          122,
+          113
+        ],
+        "bg": [
+          42,
+          33,
+          29
+        ],
+        "contrast": 3.75
+      }
+    },
+    {
+      "theme": "calm-storm",
+      "mode": "light",
+      "dialog": {
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px",
+        "filter": "none",
+        "outline": "none",
+        "width": 1280
+      },
+      "checkboxRest": {
+        "border": "oklch(0.589986 0.0757464 237.903)",
+        "fg": [
+          80,
+          132,
+          165
+        ],
+        "bg": [
+          248,
+          248,
+          249
+        ],
+        "contrast": 3.82
+      },
+      "checkboxHover": {
+        "border": "oklch(0.589986 0.0757464 237.903)",
+        "fg": [
+          80,
+          132,
+          165
+        ],
+        "bg": [
+          216,
+          239,
+          251
+        ],
+        "contrast": 3.41
+      }
+    },
+    {
+      "theme": "calm-storm",
+      "mode": "dark",
+      "dialog": {
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px",
+        "filter": "none",
+        "outline": "none",
+        "width": 1280
+      },
+      "checkboxRest": {
+        "border": "oklab(0.976997 -0.00716156 -0.0108323 / 0.6)",
+        "fg": [
+          146,
+          155,
+          160
+        ],
+        "bg": [
+          6,
+          15,
+          18
+        ],
+        "contrast": 6.84
+      },
+      "checkboxHover": {
+        "border": "oklab(0.976997 -0.00716156 -0.0108323 / 0.6)",
+        "fg": [
+          146,
+          162,
+          172
+        ],
+        "bg": [
+          6,
+          31,
+          46
+        ],
+        "contrast": 6.42
+      }
+    },
+    {
+      "theme": "cyberpunk",
+      "mode": "light",
+      "dialog": {
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px",
+        "filter": "none",
+        "outline": "none",
+        "width": 1280
+      },
+      "checkboxRest": {
+        "border": "oklch(0.855741 0.0994687 341.411)",
+        "fg": [
+          253,
+          182,
+          227
+        ],
+        "bg": [
+          254,
+          254,
+          255
+        ],
+        "contrast": 1.61
+      },
+      "checkboxHover": {
+        "border": "oklch(0.855741 0.0994687 341.411)",
+        "fg": [
+          253,
+          182,
+          227
+        ],
+        "bg": [
+          247,
+          247,
+          255
+        ],
+        "contrast": 1.52
+      }
+    },
+    {
+      "theme": "cyberpunk",
+      "mode": "dark",
+      "dialog": {
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px",
+        "filter": "none",
+        "outline": "none",
+        "width": 1280
+      },
+      "checkboxRest": {
+        "border": "oklab(0.624497 0.00704125 -0.0494834 / 0.6)",
+        "fg": [
+          88,
+          91,
+          125
+        ],
+        "bg": [
+          29,
+          29,
+          63
+        ],
+        "contrast": 2.47
+      },
+      "checkboxHover": {
+        "border": "oklab(0.624497 0.00704125 -0.0494834 / 0.6)",
+        "fg": [
+          87,
+          90,
+          122
+        ],
+        "bg": [
+          25,
+          25,
+          55
+        ],
+        "contrast": 2.55
+      }
+    },
+    {
+      "theme": "cotton-candy",
+      "mode": "light",
+      "dialog": {
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px",
+        "filter": "none",
+        "outline": "none",
+        "width": 1280
+      },
+      "checkboxRest": {
+        "border": "oklch(0.680397 0.116422 274.006)",
+        "fg": [
+          130,
+          146,
+          224
+        ],
+        "bg": [
+          242,
+          254,
+          255
+        ],
+        "contrast": 2.86
+      },
+      "checkboxHover": {
+        "border": "oklch(0.680397 0.116422 274.006)",
+        "fg": [
+          130,
+          146,
+          224
+        ],
+        "bg": [
+          223,
+          245,
+          255
+        ],
+        "contrast": 2.61
+      }
+    },
+    {
+      "theme": "cotton-candy",
+      "mode": "dark",
+      "dialog": {
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px",
+        "filter": "none",
+        "outline": "none",
+        "width": 1280
+      },
+      "checkboxRest": {
+        "border": "oklab(0.819995 -0.0468446 -0.0519991 / 0.6)",
+        "fg": [
+          95,
+          136,
+          161
+        ],
+        "bg": [
+          16,
+          31,
+          57
+        ],
+        "contrast": 4.32
+      },
+      "checkboxHover": {
+        "border": "oklab(0.819995 -0.0468446 -0.0519991 / 0.6)",
+        "fg": [
+          99,
+          140,
+          164
+        ],
+        "bg": [
+          25,
+          40,
+          64
+        ],
+        "contrast": 4.1
+      }
+    },
+    {
+      "theme": "caffeine",
+      "mode": "light",
+      "dialog": {
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px",
+        "filter": "none",
+        "outline": "none",
+        "width": 1280
+      },
+      "checkboxRest": {
+        "border": "oklch(0.755007 0.0323464 58.196)",
+        "fg": [
+          192,
+          171,
+          156
+        ],
+        "bg": [
+          252,
+          251,
+          250
+        ],
+        "contrast": 2.13
+      },
+      "checkboxHover": {
+        "border": "oklch(0.755007 0.0323464 58.196)",
+        "fg": [
+          192,
+          171,
+          156
+        ],
+        "bg": [
+          246,
+          245,
+          245
+        ],
+        "contrast": 2.02
+      }
+    },
+    {
+      "theme": "caffeine",
+      "mode": "dark",
+      "dialog": {
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px",
+        "filter": "none",
+        "outline": "none",
+        "width": 1280
+      },
+      "checkboxRest": {
+        "border": "oklab(0.769898 -0.00000777841 0.0000180602 / 0.6)",
+        "fg": [
+          118,
+          118,
+          118
+        ],
+        "bg": [
+          25,
+          25,
+          25
+        ],
+        "contrast": 3.87
+      },
+      "checkboxHover": {
+        "border": "oklab(0.769898 -0.00000777841 0.0000180602 / 0.6)",
+        "fg": [
+          119,
+          119,
+          119
+        ],
+        "bg": [
+          29,
+          29,
+          29
+        ],
+        "contrast": 3.76
+      }
+    },
+    {
+      "theme": "aurora",
+      "mode": "light",
+      "dialog": {
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px",
+        "filter": "none",
+        "outline": "none",
+        "width": 1280
+      },
+      "checkboxRest": {
+        "border": "oklch(0.635696 0.138482 253.44)",
+        "fg": [
+          72,
+          141,
+          220
+        ],
+        "bg": [
+          246,
+          251,
+          255
+        ],
+        "contrast": 3.29
+      },
+      "checkboxHover": {
+        "border": "oklch(0.635696 0.138482 253.44)",
+        "fg": [
+          72,
+          141,
+          220
+        ],
+        "bg": [
+          235,
+          242,
+          250
+        ],
+        "contrast": 3.04
+      }
+    },
+    {
+      "theme": "aurora",
+      "mode": "dark",
+      "dialog": {
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px",
+        "filter": "none",
+        "outline": "none",
+        "width": 1280
+      },
+      "checkboxRest": {
+        "border": "oklab(0.699996 -0.038307 -0.0321219 / 0.6)",
+        "fg": [
+          79,
+          107,
+          118
+        ],
+        "bg": [
+          13,
+          18,
+          27
+        ],
+        "contrast": 3.3
+      },
+      "checkboxHover": {
+        "border": "oklab(0.699996 -0.038307 -0.0321219 / 0.6)",
+        "fg": [
+          82,
+          110,
+          123
+        ],
+        "bg": [
+          20,
+          27,
+          39
+        ],
+        "contrast": 3.19
+      }
+    },
+    {
+      "theme": "sorbet",
+      "mode": "light",
+      "dialog": {
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px",
+        "filter": "none",
+        "outline": "none",
+        "width": 1280
+      },
+      "checkboxRest": {
+        "border": "oklch(0.679367 0.145764 301.652)",
+        "fg": [
+          169,
+          128,
+          227
+        ],
+        "bg": [
+          254,
+          248,
+          238
+        ],
+        "contrast": 2.89
+      },
+      "checkboxHover": {
+        "border": "oklch(0.679367 0.145764 301.652)",
+        "fg": [
+          169,
+          128,
+          227
+        ],
+        "bg": [
+          216,
+          237,
+          237
+        ],
+        "contrast": 2.51
+      }
+    },
+    {
+      "theme": "sorbet",
+      "mode": "dark",
+      "dialog": {
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px",
+        "filter": "none",
+        "outline": "none",
+        "width": 1280
+      },
+      "checkboxRest": {
+        "border": "oklab(0.7794 0.0800768 0.00580668 / 0.6)",
+        "fg": [
+          147,
+          115,
+          128
+        ],
+        "bg": [
+          26,
+          45,
+          55
+        ],
+        "contrast": 3.39
+      },
+      "checkboxHover": {
+        "border": "oklab(0.7794 0.0800768 0.00580668 / 0.6)",
+        "fg": [
+          149,
+          113,
+          125
+        ],
+        "bg": [
+          31,
+          42,
+          49
+        ],
+        "contrast": 3.44
+      }
+    },
+    {
+      "theme": "singularity",
+      "mode": "light",
+      "dialog": {
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px",
+        "filter": "none",
+        "outline": "none",
+        "width": 1280
+      },
+      "checkboxRest": {
+        "border": "oklch(0.726844 0.0569411 122.265)",
+        "fg": [
+          160,
+          173,
+          133
+        ],
+        "bg": [
+          254,
+          254,
+          255
+        ],
+        "contrast": 2.36
+      },
+      "checkboxHover": {
+        "border": "oklch(0.726844 0.0569411 122.265)",
+        "fg": [
+          160,
+          173,
+          133
+        ],
+        "bg": [
+          249,
+          249,
+          250
+        ],
+        "contrast": 2.27
+      }
+    },
+    {
+      "theme": "singularity",
+      "mode": "dark",
+      "dialog": {
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px",
+        "filter": "none",
+        "outline": "none",
+        "width": 1280
+      },
+      "checkboxRest": {
+        "border": "oklab(0.626799 -0.00000616908 0.0000146031 / 0.6)",
+        "fg": [
+          88,
+          88,
+          89
+        ],
+        "bg": [
+          16,
+          16,
+          18
+        ],
+        "contrast": 2.67
+      },
+      "checkboxHover": {
+        "border": "oklab(0.626799 -0.00000616908 0.0000146031 / 0.6)",
+        "fg": [
+          92,
+          92,
+          92
+        ],
+        "bg": [
+          25,
+          25,
+          26
+        ],
+        "contrast": 2.63
+      }
+    }
+  ]
+}

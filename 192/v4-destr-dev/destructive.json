@@ -1,0 +1,2445 @@
+{
+  "blocked": [
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus"
+  ],
+  "blockedCount": 236,
+  "rewrites": {
+    "canEdit": 41,
+    "role": 81
+  },
+  "results": [
+    {
+      "shot": "button-destructive__desktop__default__light",
+      "kind": "button",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-white hover:bg-destructive/90 shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive/50 h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+      "color": "rgb(255, 255, 255)",
+      "background": "lab(48.4493 77.4328 61.5452)",
+      "borderColor": "oklab(0.57701 0.217634 0.112472 / 0.5)",
+      "radius": "8px",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        231,
+        0,
+        11
+      ],
+      "border": [
+        231,
+        0,
+        10
+      ],
+      "contrast": 4.77,
+      "rect": {
+        "x": 476.734375,
+        "y": 172,
+        "width": 113.0625,
+        "height": 40
+      },
+      "clip": {
+        "x": 464,
+        "y": 160,
+        "width": 138,
+        "height": 64
+      }
+    },
+    {
+      "shot": "button-destructive-sm__desktop__default__light",
+      "kind": "button",
+      "className": "group relative inline-flex items-center justify-center whitespace-nowrap font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-white hover:bg-destructive/90 shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive/50 h-8 rounded-md gap-1.5 px-3.5 text-xs has-[>svg]:px-2.5",
+      "color": "rgb(255, 255, 255)",
+      "background": "lab(48.4493 77.4328 61.5452)",
+      "borderColor": "oklab(0.57701 0.217634 0.112472 / 0.5)",
+      "radius": "8px",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        231,
+        0,
+        11
+      ],
+      "border": [
+        231,
+        0,
+        10
+      ],
+      "contrast": 4.77,
+      "rect": {
+        "x": 476.59375,
+        "y": 228,
+        "width": 109.171875,
+        "height": 32
+      },
+      "clip": {
+        "x": 464,
+        "y": 216,
+        "width": 134,
+        "height": 56
+      }
+    },
+    {
+      "shot": "tierlist-delete__desktop__default__light",
+      "kind": "tierlist",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary/50 h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(9.38335 5.37004 4.96888)",
+      "background": "lab(48.4493 77.4328 61.5452)",
+      "borderColor": "oklab(0.32 0.0153167 0.0128628 / 0.5)",
+      "radius": "8px",
+      "fg": [
+        35,
+        24,
+        20
+      ],
+      "bg": [
+        231,
+        0,
+        11
+      ],
+      "border": [
+        145,
+        24,
+        27
+      ],
+      "contrast": 3.63,
+      "rect": {
+        "x": 788.1875,
+        "y": 426,
+        "width": 83.8125,
+        "height": 40
+      },
+      "clip": {
+        "x": 776,
+        "y": 414,
+        "width": 108,
+        "height": 64
+      }
+    },
+    {
+      "shot": "button-destructive__desktop__default__dark",
+      "kind": "button",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-white hover:bg-destructive/90 shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive/50 h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+      "color": "rgb(255, 255, 255)",
+      "background": "lab(53.6853 69.6775 43.7724)",
+      "borderColor": "oklab(0.620008 0.199362 0.0929873 / 0.5)",
+      "radius": "8px",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        238,
+        52,
+        59
+      ],
+      "border": [
+        238,
+        52,
+        59
+      ],
+      "contrast": 4.05,
+      "rect": {
+        "x": 476.734375,
+        "y": 172,
+        "width": 113.0625,
+        "height": 40
+      },
+      "clip": {
+        "x": 464,
+        "y": 160,
+        "width": 138,
+        "height": 64
+      }
+    },
+    {
+      "shot": "button-destructive-sm__desktop__default__dark",
+      "kind": "button",
+      "className": "group relative inline-flex items-center justify-center whitespace-nowrap font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-white hover:bg-destructive/90 shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive/50 h-8 rounded-md gap-1.5 px-3.5 text-xs has-[>svg]:px-2.5",
+      "color": "rgb(255, 255, 255)",
+      "background": "lab(53.6853 69.6775 43.7724)",
+      "borderColor": "oklab(0.620008 0.199362 0.0929873 / 0.5)",
+      "radius": "8px",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        238,
+        52,
+        59
+      ],
+      "border": [
+        238,
+        52,
+        59
+      ],
+      "contrast": 4.05,
+      "rect": {
+        "x": 476.59375,
+        "y": 228,
+        "width": 109.171875,
+        "height": 32
+      },
+      "clip": {
+        "x": 464,
+        "y": 216,
+        "width": 134,
+        "height": 56
+      }
+    },
+    {
+      "shot": "tierlist-delete__desktop__default__dark",
+      "kind": "tierlist",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary/50 h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(95.3659 1.38789 4.33116)",
+      "background": "lab(53.6853 69.6775 43.7724)",
+      "borderColor": "oklab(0.780001 0.0344046 0.0491651 / 0.5)",
+      "radius": "8px",
+      "fg": [
+        247,
+        241,
+        233
+      ],
+      "bg": [
+        238,
+        52,
+        59
+      ],
+      "border": [
+        226,
+        113,
+        103
+      ],
+      "contrast": 3.61,
+      "rect": {
+        "x": 788.1875,
+        "y": 426,
+        "width": 83.8125,
+        "height": 40
+      },
+      "clip": {
+        "x": 776,
+        "y": 414,
+        "width": 108,
+        "height": 64
+      }
+    },
+    {
+      "shot": "button-destructive__desktop__calm-storm__light",
+      "kind": "button",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-white hover:bg-destructive/90 shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive/50 h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+      "color": "rgb(255, 255, 255)",
+      "background": "lab(55.4814 75.0732 48.8528)",
+      "borderColor": "oklab(0.637009 0.214185 0.101411 / 0.5)",
+      "radius": "8px",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        251,
+        44,
+        54
+      ],
+      "border": [
+        251,
+        44,
+        54
+      ],
+      "contrast": 3.81,
+      "rect": {
+        "x": 476.734375,
+        "y": 172,
+        "width": 113.0625,
+        "height": 40
+      },
+      "clip": {
+        "x": 464,
+        "y": 160,
+        "width": 138,
+        "height": 64
+      }
+    },
+    {
+      "shot": "button-destructive-sm__desktop__calm-storm__light",
+      "kind": "button",
+      "className": "group relative inline-flex items-center justify-center whitespace-nowrap font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-white hover:bg-destructive/90 shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive/50 h-8 rounded-md gap-1.5 px-3.5 text-xs has-[>svg]:px-2.5",
+      "color": "rgb(255, 255, 255)",
+      "background": "lab(55.4814 75.0732 48.8528)",
+      "borderColor": "oklab(0.637009 0.214185 0.101411 / 0.5)",
+      "radius": "8px",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        251,
+        44,
+        54
+      ],
+      "border": [
+        251,
+        44,
+        54
+      ],
+      "contrast": 3.81,
+      "rect": {
+        "x": 476.59375,
+        "y": 228,
+        "width": 109.171875,
+        "height": 32
+      },
+      "clip": {
+        "x": 464,
+        "y": 216,
+        "width": 134,
+        "height": 56
+      }
+    },
+    {
+      "shot": "tierlist-delete__desktop__calm-storm__light",
+      "kind": "tierlist",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary/50 h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(2.51107 0.242703 -0.886115)",
+      "background": "lab(55.4814 75.0732 48.8528)",
+      "borderColor": "oklab(0.745991 -0.0970495 -0.127188 / 0.5)",
+      "radius": "8px",
+      "fg": [
+        9,
+        9,
+        11
+      ],
+      "bg": [
+        251,
+        44,
+        54
+      ],
+      "border": [
+        126,
+        116,
+        155
+      ],
+      "contrast": 5.23,
+      "rect": {
+        "x": 788.1875,
+        "y": 426,
+        "width": 83.8125,
+        "height": 40
+      },
+      "clip": {
+        "x": 776,
+        "y": 414,
+        "width": 108,
+        "height": 64
+      }
+    },
+    {
+      "shot": "button-destructive__desktop__calm-storm__dark",
+      "kind": "button",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-white hover:bg-destructive/90 shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive/50 h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+      "color": "rgb(255, 255, 255)",
+      "background": "lab(55.4814 75.0732 48.8528)",
+      "borderColor": "oklab(0.637009 0.214185 0.101411 / 0.5)",
+      "radius": "8px",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        251,
+        44,
+        54
+      ],
+      "border": [
+        251,
+        44,
+        54
+      ],
+      "contrast": 3.81,
+      "rect": {
+        "x": 476.734375,
+        "y": 172,
+        "width": 113.0625,
+        "height": 40
+      },
+      "clip": {
+        "x": 464,
+        "y": 160,
+        "width": 138,
+        "height": 64
+      }
+    },
+    {
+      "shot": "button-destructive-sm__desktop__calm-storm__dark",
+      "kind": "button",
+      "className": "group relative inline-flex items-center justify-center whitespace-nowrap font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-white hover:bg-destructive/90 shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive/50 h-8 rounded-md gap-1.5 px-3.5 text-xs has-[>svg]:px-2.5",
+      "color": "rgb(255, 255, 255)",
+      "background": "lab(55.4814 75.0732 48.8528)",
+      "borderColor": "oklab(0.637009 0.214185 0.101411 / 0.5)",
+      "radius": "8px",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        251,
+        44,
+        54
+      ],
+      "border": [
+        251,
+        44,
+        54
+      ],
+      "contrast": 3.81,
+      "rect": {
+        "x": 476.59375,
+        "y": 228,
+        "width": 109.171875,
+        "height": 32
+      },
+      "clip": {
+        "x": 464,
+        "y": 216,
+        "width": 134,
+        "height": 56
+      }
+    },
+    {
+      "shot": "tierlist-delete__desktop__calm-storm__dark",
+      "kind": "tierlist",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary/50 h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(97.3623 -2.33799 -4.13098)",
+      "background": "lab(55.4814 75.0732 48.8528)",
+      "borderColor": "oklab(0.684991 -0.0912492 -0.142231 / 0.5)",
+      "radius": "8px",
+      "fg": [
+        240,
+        249,
+        255
+      ],
+      "bg": [
+        251,
+        44,
+        54
+      ],
+      "border": [
+        125,
+        105,
+        149
+      ],
+      "contrast": 3.57,
+      "rect": {
+        "x": 788.1875,
+        "y": 426,
+        "width": 83.8125,
+        "height": 40
+      },
+      "clip": {
+        "x": 776,
+        "y": 414,
+        "width": 108,
+        "height": 64
+      }
+    },
+    {
+      "shot": "button-destructive__desktop__cyberpunk__light",
+      "kind": "button",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-white hover:bg-destructive/90 shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive/50 h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+      "color": "rgb(255, 255, 255)",
+      "background": "lab(57.6471 71.5278 70.6416)",
+      "borderColor": "oklab(0.653509 0.194549 0.131432 / 0.5)",
+      "radius": "8px",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        255,
+        61,
+        0
+      ],
+      "border": [
+        254,
+        61,
+        0
+      ],
+      "contrast": 3.55,
+      "rect": {
+        "x": 476.734375,
+        "y": 172,
+        "width": 113.0625,
+        "height": 40
+      },
+      "clip": {
+        "x": 464,
+        "y": 160,
+        "width": 138,
+        "height": 64
+      }
+    },
+    {
+      "shot": "button-destructive-sm__desktop__cyberpunk__light",
+      "kind": "button",
+      "className": "group relative inline-flex items-center justify-center whitespace-nowrap font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-white hover:bg-destructive/90 shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive/50 h-8 rounded-md gap-1.5 px-3.5 text-xs has-[>svg]:px-2.5",
+      "color": "rgb(255, 255, 255)",
+      "background": "lab(57.6471 71.5278 70.6416)",
+      "borderColor": "oklab(0.653509 0.194549 0.131432 / 0.5)",
+      "radius": "8px",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        255,
+        61,
+        0
+      ],
+      "border": [
+        254,
+        61,
+        0
+      ],
+      "contrast": 3.55,
+      "rect": {
+        "x": 476.59375,
+        "y": 228,
+        "width": 109.171875,
+        "height": 32
+      },
+      "clip": {
+        "x": 464,
+        "y": 216,
+        "width": 134,
+        "height": 56
+      }
+    },
+    {
+      "shot": "tierlist-delete__desktop__cyberpunk__light",
+      "kind": "tierlist",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary/50 h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(3.79387 2.93769 -10.5157)",
+      "background": "lab(57.6471 71.5278 70.6416)",
+      "borderColor": "oklab(0.672604 0.275214 -0.0925595 / 0.5)",
+      "radius": "8px",
+      "fg": [
+        12,
+        12,
+        29
+      ],
+      "bg": [
+        255,
+        61,
+        0
+      ],
+      "border": [
+        255,
+        30,
+        100
+      ],
+      "contrast": 5.45,
+      "rect": {
+        "x": 788.1875,
+        "y": 426,
+        "width": 83.8125,
+        "height": 40
+      },
+      "clip": {
+        "x": 776,
+        "y": 414,
+        "width": 108,
+        "height": 64
+      }
+    },
+    {
+      "shot": "button-destructive__desktop__cyberpunk__dark",
+      "kind": "button",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-white hover:bg-destructive/90 shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive/50 h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+      "color": "rgb(255, 255, 255)",
+      "background": "lab(57.6471 71.5278 70.6416)",
+      "borderColor": "oklab(0.653509 0.194549 0.131432 / 0.5)",
+      "radius": "8px",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        255,
+        61,
+        0
+      ],
+      "border": [
+        254,
+        61,
+        0
+      ],
+      "contrast": 3.55,
+      "rect": {
+        "x": 476.734375,
+        "y": 172,
+        "width": 113.0625,
+        "height": 40
+      },
+      "clip": {
+        "x": 464,
+        "y": 160,
+        "width": 138,
+        "height": 64
+      }
+    },
+    {
+      "shot": "button-destructive-sm__desktop__cyberpunk__dark",
+      "kind": "button",
+      "className": "group relative inline-flex items-center justify-center whitespace-nowrap font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-white hover:bg-destructive/90 shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive/50 h-8 rounded-md gap-1.5 px-3.5 text-xs has-[>svg]:px-2.5",
+      "color": "rgb(255, 255, 255)",
+      "background": "lab(57.6471 71.5278 70.6416)",
+      "borderColor": "oklab(0.653509 0.194549 0.131432 / 0.5)",
+      "radius": "8px",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        255,
+        61,
+        0
+      ],
+      "border": [
+        254,
+        61,
+        0
+      ],
+      "contrast": 3.55,
+      "rect": {
+        "x": 476.59375,
+        "y": 228,
+        "width": 109.171875,
+        "height": 32
+      },
+      "clip": {
+        "x": 464,
+        "y": 216,
+        "width": 134,
+        "height": 56
+      }
+    },
+    {
+      "shot": "tierlist-delete__desktop__cyberpunk__dark",
+      "kind": "tierlist",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary/50 h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(94.3261 -0.358105 -2.77311)",
+      "background": "lab(57.6471 71.5278 70.6416)",
+      "borderColor": "oklab(0.672604 0.275214 -0.0925595 / 0.5)",
+      "radius": "8px",
+      "fg": [
+        236,
+        239,
+        244
+      ],
+      "bg": [
+        255,
+        61,
+        0
+      ],
+      "border": [
+        255,
+        30,
+        100
+      ],
+      "contrast": 3.08,
+      "rect": {
+        "x": 788.1875,
+        "y": 426,
+        "width": 83.8125,
+        "height": 40
+      },
+      "clip": {
+        "x": 776,
+        "y": 414,
+        "width": 108,
+        "height": 64
+      }
+    },
+    {
+      "shot": "button-destructive__desktop__cotton-candy__light",
+      "kind": "button",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-white hover:bg-destructive/90 shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive/50 h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+      "color": "rgb(255, 255, 255)",
+      "background": "lab(51.3806 69.5087 46.4972)",
+      "borderColor": "oklab(0.600008 0.197709 0.0964521 / 0.5)",
+      "radius": "8px",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        230,
+        43,
+        48
+      ],
+      "border": [
+        230,
+        43,
+        48
+      ],
+      "contrast": 4.42,
+      "rect": {
+        "x": 476.734375,
+        "y": 172,
+        "width": 113.0625,
+        "height": 40
+      },
+      "clip": {
+        "x": 464,
+        "y": 160,
+        "width": 138,
+        "height": 64
+      }
+    },
+    {
+      "shot": "button-destructive-sm__desktop__cotton-candy__light",
+      "kind": "button",
+      "className": "group relative inline-flex items-center justify-center whitespace-nowrap font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-white hover:bg-destructive/90 shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive/50 h-8 rounded-md gap-1.5 px-3.5 text-xs has-[>svg]:px-2.5",
+      "color": "rgb(255, 255, 255)",
+      "background": "lab(51.3806 69.5087 46.4972)",
+      "borderColor": "oklab(0.600008 0.197709 0.0964521 / 0.5)",
+      "radius": "8px",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        230,
+        43,
+        48
+      ],
+      "border": [
+        230,
+        43,
+        48
+      ],
+      "contrast": 4.42,
+      "rect": {
+        "x": 476.59375,
+        "y": 228,
+        "width": 109.171875,
+        "height": 32
+      },
+      "clip": {
+        "x": 464,
+        "y": 216,
+        "width": 134,
+        "height": 56
+      }
+    },
+    {
+      "shot": "tierlist-delete__desktop__cotton-candy__light",
+      "kind": "tierlist",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary/50 h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(25.996 12.2909 -24.0776)",
+      "background": "lab(51.3806 69.5087 46.4972)",
+      "borderColor": "oklab(0.680001 0.16255 -0.0496815 / 0.5)",
+      "radius": "8px",
+      "fg": [
+        65,
+        56,
+        98
+      ],
+      "bg": [
+        230,
+        43,
+        48
+      ],
+      "border": [
+        226,
+        73,
+        114
+      ],
+      "contrast": 2.42,
+      "rect": {
+        "x": 788.1875,
+        "y": 426,
+        "width": 83.8125,
+        "height": 40
+      },
+      "clip": {
+        "x": 776,
+        "y": 414,
+        "width": 108,
+        "height": 64
+      }
+    },
+    {
+      "shot": "button-destructive__desktop__cotton-candy__dark",
+      "kind": "button",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-white hover:bg-destructive/90 shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive/50 h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+      "color": "rgb(255, 255, 255)",
+      "background": "lab(56.1657 63.7783 33.3305)",
+      "borderColor": "oklab(0.640007 0.185413 0.0749345 / 0.5)",
+      "radius": "8px",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        237,
+        73,
+        82
+      ],
+      "border": [
+        237,
+        73,
+        82
+      ],
+      "contrast": 3.7,
+      "rect": {
+        "x": 476.734375,
+        "y": 172,
+        "width": 113.0625,
+        "height": 40
+      },
+      "clip": {
+        "x": 464,
+        "y": 160,
+        "width": 138,
+        "height": 64
+      }
+    },
+    {
+      "shot": "button-destructive-sm__desktop__cotton-candy__dark",
+      "kind": "button",
+      "className": "group relative inline-flex items-center justify-center whitespace-nowrap font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-white hover:bg-destructive/90 shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive/50 h-8 rounded-md gap-1.5 px-3.5 text-xs has-[>svg]:px-2.5",
+      "color": "rgb(255, 255, 255)",
+      "background": "lab(56.1657 63.7783 33.3305)",
+      "borderColor": "oklab(0.640007 0.185413 0.0749345 / 0.5)",
+      "radius": "8px",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        237,
+        73,
+        82
+      ],
+      "border": [
+        237,
+        73,
+        82
+      ],
+      "contrast": 3.7,
+      "rect": {
+        "x": 476.59375,
+        "y": 228,
+        "width": 109.171875,
+        "height": 32
+      },
+      "clip": {
+        "x": 464,
+        "y": 216,
+        "width": 134,
+        "height": 56
+      }
+    },
+    {
+      "shot": "tierlist-delete__desktop__cotton-candy__dark",
+      "kind": "tierlist",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary/50 h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(93.8615 5.32234 -9.73096)",
+      "background": "lab(56.1657 63.7783 33.3305)",
+      "borderColor": "oklab(0.820001 0.114109 -0.0370587 / 0.5)",
+      "radius": "8px",
+      "fg": [
+        241,
+        234,
+        255
+      ],
+      "bg": [
+        237,
+        73,
+        82
+      ],
+      "border": [
+        243,
+        119,
+        150
+      ],
+      "contrast": 3.16,
+      "rect": {
+        "x": 788.1875,
+        "y": 426,
+        "width": 83.8125,
+        "height": 40
+      },
+      "clip": {
+        "x": 776,
+        "y": 414,
+        "width": 108,
+        "height": 64
+      }
+    },
+    {
+      "shot": "button-destructive__desktop__caffeine__light",
+      "kind": "button",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-white hover:bg-destructive/90 shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive/50 h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+      "color": "rgb(255, 255, 255)",
+      "background": "lab(54.9915 58.7064 50.9473)",
+      "borderColor": "oklab(0.627107 0.161719 0.10641 / 0.5)",
+      "radius": "8px",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        229,
+        77,
+        46
+      ],
+      "border": [
+        229,
+        77,
+        46
+      ],
+      "contrast": 3.87,
+      "rect": {
+        "x": 476.734375,
+        "y": 172,
+        "width": 113.0625,
+        "height": 40
+      },
+      "clip": {
+        "x": 464,
+        "y": 160,
+        "width": 138,
+        "height": 64
+      }
+    },
+    {
+      "shot": "button-destructive-sm__desktop__caffeine__light",
+      "kind": "button",
+      "className": "group relative inline-flex items-center justify-center whitespace-nowrap font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-white hover:bg-destructive/90 shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive/50 h-8 rounded-md gap-1.5 px-3.5 text-xs has-[>svg]:px-2.5",
+      "color": "rgb(255, 255, 255)",
+      "background": "lab(54.9915 58.7064 50.9473)",
+      "borderColor": "oklab(0.627107 0.161719 0.10641 / 0.5)",
+      "radius": "8px",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        229,
+        77,
+        46
+      ],
+      "border": [
+        229,
+        77,
+        46
+      ],
+      "contrast": 3.87,
+      "rect": {
+        "x": 476.59375,
+        "y": 228,
+        "width": 109.171875,
+        "height": 32
+      },
+      "clip": {
+        "x": 464,
+        "y": 216,
+        "width": 134,
+        "height": 56
+      }
+    },
+    {
+      "shot": "tierlist-delete__desktop__caffeine__light",
+      "kind": "tierlist",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary/50 h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(12.246 0 0)",
+      "background": "lab(54.9915 58.7064 50.9473)",
+      "borderColor": "oklab(0.4341 0.0291276 0.0262357 / 0.5)",
+      "radius": "8px",
+      "fg": [
+        32,
+        32,
+        32
+      ],
+      "bg": [
+        229,
+        77,
+        46
+      ],
+      "border": [
+        164,
+        75,
+        55
+      ],
+      "contrast": 4.21,
+      "rect": {
+        "x": 788.1875,
+        "y": 426,
+        "width": 83.8125,
+        "height": 40
+      },
+      "clip": {
+        "x": 776,
+        "y": 414,
+        "width": 108,
+        "height": 64
+      }
+    },
+    {
+      "shot": "button-destructive__desktop__caffeine__dark",
+      "kind": "button",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-white hover:bg-destructive/90 shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive/50 h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+      "color": "rgb(255, 255, 255)",
+      "background": "lab(54.9915 58.7064 50.9473)",
+      "borderColor": "oklab(0.627107 0.161719 0.10641 / 0.5)",
+      "radius": "8px",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        229,
+        77,
+        46
+      ],
+      "border": [
+        229,
+        77,
+        46
+      ],
+      "contrast": 3.87,
+      "rect": {
+        "x": 476.734375,
+        "y": 172,
+        "width": 113.0625,
+        "height": 40
+      },
+      "clip": {
+        "x": 464,
+        "y": 160,
+        "width": 138,
+        "height": 64
+      }
+    },
+    {
+      "shot": "button-destructive-sm__desktop__caffeine__dark",
+      "kind": "button",
+      "className": "group relative inline-flex items-center justify-center whitespace-nowrap font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-white hover:bg-destructive/90 shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive/50 h-8 rounded-md gap-1.5 px-3.5 text-xs has-[>svg]:px-2.5",
+      "color": "rgb(255, 255, 255)",
+      "background": "lab(54.9915 58.7064 50.9473)",
+      "borderColor": "oklab(0.627107 0.161719 0.10641 / 0.5)",
+      "radius": "8px",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        229,
+        77,
+        46
+      ],
+      "border": [
+        229,
+        77,
+        46
+      ],
+      "contrast": 3.87,
+      "rect": {
+        "x": 476.59375,
+        "y": 228,
+        "width": 109.171875,
+        "height": 32
+      },
+      "clip": {
+        "x": 464,
+        "y": 216,
+        "width": 134,
+        "height": 56
+      }
+    },
+    {
+      "shot": "tierlist-delete__desktop__caffeine__dark",
+      "kind": "tierlist",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary/50 h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(94.0956 -0.0000298023 0.0000119209)",
+      "background": "lab(54.9915 58.7064 50.9473)",
+      "borderColor": "oklab(0.9247 0.0211577 0.0479531 / 0.5)",
+      "radius": "8px",
+      "fg": [
+        238,
+        238,
+        238
+      ],
+      "bg": [
+        229,
+        77,
+        46
+      ],
+      "border": [
+        242,
+        150,
+        120
+      ],
+      "contrast": 3.33,
+      "rect": {
+        "x": 788.1875,
+        "y": 426,
+        "width": 83.8125,
+        "height": 40
+      },
+      "clip": {
+        "x": 776,
+        "y": 414,
+        "width": 108,
+        "height": 64
+      }
+    },
+    {
+      "shot": "button-destructive__desktop__aurora__light",
+      "kind": "button",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-white hover:bg-destructive/90 shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive/50 h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+      "color": "rgb(255, 255, 255)",
+      "background": "lab(48.8037 76.3079 51.5884)",
+      "borderColor": "oklab(0.58001 0.217486 0.101438 / 0.5)",
+      "radius": "8px",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        230,
+        0,
+        35
+      ],
+      "border": [
+        230,
+        0,
+        34
+      ],
+      "contrast": 4.78,
+      "rect": {
+        "x": 476.734375,
+        "y": 172,
+        "width": 113.0625,
+        "height": 40
+      },
+      "clip": {
+        "x": 464,
+        "y": 160,
+        "width": 138,
+        "height": 64
+      }
+    },
+    {
+      "shot": "button-destructive-sm__desktop__aurora__light",
+      "kind": "button",
+      "className": "group relative inline-flex items-center justify-center whitespace-nowrap font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-white hover:bg-destructive/90 shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive/50 h-8 rounded-md gap-1.5 px-3.5 text-xs has-[>svg]:px-2.5",
+      "color": "rgb(255, 255, 255)",
+      "background": "lab(48.8037 76.3079 51.5884)",
+      "borderColor": "oklab(0.58001 0.217486 0.101438 / 0.5)",
+      "radius": "8px",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        230,
+        0,
+        35
+      ],
+      "border": [
+        230,
+        0,
+        34
+      ],
+      "contrast": 4.78,
+      "rect": {
+        "x": 476.59375,
+        "y": 228,
+        "width": 109.171875,
+        "height": 32
+      },
+      "clip": {
+        "x": 464,
+        "y": 216,
+        "width": 134,
+        "height": 56
+      }
+    },
+    {
+      "shot": "tierlist-delete__desktop__aurora__light",
+      "kind": "tierlist",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary/50 h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(7.16059 -0.970602 -7.04916)",
+      "background": "lab(48.8037 76.3079 51.5884)",
+      "borderColor": "oklab(0.549993 -0.19318 -0.0517513 / 0.5)",
+      "radius": "8px",
+      "fg": [
+        16,
+        23,
+        31
+      ],
+      "bg": [
+        230,
+        0,
+        35
+      ],
+      "border": [
+        115,
+        72,
+        92
+      ],
+      "contrast": 3.77,
+      "rect": {
+        "x": 788.1875,
+        "y": 426,
+        "width": 83.8125,
+        "height": 40
+      },
+      "clip": {
+        "x": 776,
+        "y": 414,
+        "width": 108,
+        "height": 64
+      }
+    },
+    {
+      "shot": "button-destructive__desktop__aurora__dark",
+      "kind": "button",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-white hover:bg-destructive/90 shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive/50 h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+      "color": "rgb(255, 255, 255)",
+      "background": "lab(53.3476 79.4347 52.8628)",
+      "borderColor": "oklab(0.620009 0.226548 0.105665 / 0.5)",
+      "radius": "8px",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        249,
+        5,
+        43
+      ],
+      "border": [
+        249,
+        5,
+        43
+      ],
+      "contrast": 4.13,
+      "rect": {
+        "x": 476.734375,
+        "y": 172,
+        "width": 113.0625,
+        "height": 40
+      },
+      "clip": {
+        "x": 464,
+        "y": 160,
+        "width": 138,
+        "height": 64
+      }
+    },
+    {
+      "shot": "button-destructive-sm__desktop__aurora__dark",
+      "kind": "button",
+      "className": "group relative inline-flex items-center justify-center whitespace-nowrap font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-white hover:bg-destructive/90 shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive/50 h-8 rounded-md gap-1.5 px-3.5 text-xs has-[>svg]:px-2.5",
+      "color": "rgb(255, 255, 255)",
+      "background": "lab(53.3476 79.4347 52.8628)",
+      "borderColor": "oklab(0.620009 0.226548 0.105665 / 0.5)",
+      "radius": "8px",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        249,
+        5,
+        43
+      ],
+      "border": [
+        249,
+        5,
+        43
+      ],
+      "contrast": 4.13,
+      "rect": {
+        "x": 476.59375,
+        "y": 228,
+        "width": 109.171875,
+        "height": 32
+      },
+      "clip": {
+        "x": 464,
+        "y": 216,
+        "width": 134,
+        "height": 56
+      }
+    },
+    {
+      "shot": "tierlist-delete__desktop__aurora__dark",
+      "kind": "tierlist",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary/50 h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(90.8413 -5.07414 -4.90415)",
+      "background": "lab(53.3476 79.4347 52.8628)",
+      "borderColor": "oklab(0.779992 -0.173864 -0.0465695 / 0.5)",
+      "radius": "8px",
+      "fg": [
+        215,
+        232,
+        238
+      ],
+      "bg": [
+        249,
+        5,
+        43
+      ],
+      "border": [
+        124,
+        110,
+        130
+      ],
+      "contrast": 3.28,
+      "rect": {
+        "x": 788.1875,
+        "y": 426,
+        "width": 83.8125,
+        "height": 40
+      },
+      "clip": {
+        "x": 776,
+        "y": 414,
+        "width": 108,
+        "height": 64
+      }
+    },
+    {
+      "shot": "button-destructive__desktop__sorbet__light",
+      "kind": "button",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-white hover:bg-destructive/90 shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive/50 h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+      "color": "rgb(255, 255, 255)",
+      "background": "lab(64.5223 53.9312 26.9975)",
+      "borderColor": "oklab(0.709106 0.157372 0.0634629 / 0.5)",
+      "radius": "8px",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        249,
+        111,
+        112
+      ],
+      "border": [
+        249,
+        111,
+        112
+      ],
+      "contrast": 2.79,
+      "rect": {
+        "x": 476.734375,
+        "y": 172,
+        "width": 113.0625,
+        "height": 40
+      },
+      "clip": {
+        "x": 464,
+        "y": 160,
+        "width": 138,
+        "height": 64
+      }
+    },
+    {
+      "shot": "button-destructive-sm__desktop__sorbet__light",
+      "kind": "button",
+      "className": "group relative inline-flex items-center justify-center whitespace-nowrap font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-white hover:bg-destructive/90 shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive/50 h-8 rounded-md gap-1.5 px-3.5 text-xs has-[>svg]:px-2.5",
+      "color": "rgb(255, 255, 255)",
+      "background": "lab(64.5223 53.9312 26.9975)",
+      "borderColor": "oklab(0.709106 0.157372 0.0634629 / 0.5)",
+      "radius": "8px",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        249,
+        111,
+        112
+      ],
+      "border": [
+        249,
+        111,
+        112
+      ],
+      "contrast": 2.79,
+      "rect": {
+        "x": 476.59375,
+        "y": 228,
+        "width": 109.171875,
+        "height": 32
+      },
+      "clip": {
+        "x": 464,
+        "y": 216,
+        "width": 134,
+        "height": 56
+      }
+    },
+    {
+      "shot": "tierlist-delete__desktop__sorbet__light",
+      "kind": "tierlist",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary/50 h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(38.6592 -0.0000149012 0)",
+      "background": "lab(64.5223 53.9312 26.9975)",
+      "borderColor": "oklab(0.620903 0.176232 -0.0369989 / 0.5)",
+      "radius": "8px",
+      "fg": [
+        91,
+        91,
+        91
+      ],
+      "bg": [
+        249,
+        111,
+        112
+      ],
+      "border": [
+        228,
+        95,
+        133
+      ],
+      "contrast": 2.44,
+      "rect": {
+        "x": 788.1875,
+        "y": 426,
+        "width": 83.8125,
+        "height": 40
+      },
+      "clip": {
+        "x": 776,
+        "y": 414,
+        "width": 108,
+        "height": 64
+      }
+    },
+    {
+      "shot": "button-destructive__desktop__sorbet__dark",
+      "kind": "button",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-white hover:bg-destructive/90 shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive/50 h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+      "color": "rgb(255, 255, 255)",
+      "background": "lab(59.3147 57.7323 -10.7534)",
+      "borderColor": "oklab(0.670203 0.178027 -0.0302224 / 0.5)",
+      "radius": "8px",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        227,
+        94,
+        164
+      ],
+      "border": [
+        227,
+        94,
+        164
+      ],
+      "contrast": 3.28,
+      "rect": {
+        "x": 476.734375,
+        "y": 172,
+        "width": 113.0625,
+        "height": 40
+      },
+      "clip": {
+        "x": 464,
+        "y": 160,
+        "width": 138,
+        "height": 64
+      }
+    },
+    {
+      "shot": "button-destructive-sm__desktop__sorbet__dark",
+      "kind": "button",
+      "className": "group relative inline-flex items-center justify-center whitespace-nowrap font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-white hover:bg-destructive/90 shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive/50 h-8 rounded-md gap-1.5 px-3.5 text-xs has-[>svg]:px-2.5",
+      "color": "rgb(255, 255, 255)",
+      "background": "lab(59.3147 57.7323 -10.7534)",
+      "borderColor": "oklab(0.670203 0.178027 -0.0302224 / 0.5)",
+      "radius": "8px",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        227,
+        94,
+        164
+      ],
+      "border": [
+        227,
+        94,
+        164
+      ],
+      "contrast": 3.28,
+      "rect": {
+        "x": 476.59375,
+        "y": 228,
+        "width": 109.171875,
+        "height": 32
+      },
+      "clip": {
+        "x": 464,
+        "y": 216,
+        "width": 134,
+        "height": 56
+      }
+    },
+    {
+      "shot": "tierlist-delete__desktop__sorbet__dark",
+      "kind": "tierlist",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary/50 h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(91.6866 6.53416 -1.35535)",
+      "background": "lab(59.3147 57.7323 -10.7534)",
+      "borderColor": "oklab(0.9195 0.00325248 0.0800502 / 0.5)",
+      "radius": "8px",
+      "fg": [
+        243,
+        227,
+        234
+      ],
+      "bg": [
+        227,
+        94,
+        164
+      ],
+      "border": [
+        239,
+        160,
+        166
+      ],
+      "contrast": 2.65,
+      "rect": {
+        "x": 788.1875,
+        "y": 426,
+        "width": 83.8125,
+        "height": 40
+      },
+      "clip": {
+        "x": 776,
+        "y": 414,
+        "width": 108,
+        "height": 64
+      }
+    },
+    {
+      "shot": "button-destructive__desktop__singularity__light",
+      "kind": "button",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-white hover:bg-destructive/90 shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive/50 h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+      "color": "rgb(255, 255, 255)",
+      "background": "lab(55.7819 65.6007 40.7857)",
+      "borderColor": "oklab(0.636808 0.187795 0.0889196 / 0.5)",
+      "radius": "8px",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        239,
+        68,
+        68
+      ],
+      "border": [
+        239,
+        68,
+        68
+      ],
+      "contrast": 3.76,
+      "rect": {
+        "x": 476.734375,
+        "y": 172,
+        "width": 113.0625,
+        "height": 40
+      },
+      "clip": {
+        "x": 464,
+        "y": 160,
+        "width": 138,
+        "height": 64
+      }
+    },
+    {
+      "shot": "button-destructive-sm__desktop__singularity__light",
+      "kind": "button",
+      "className": "group relative inline-flex items-center justify-center whitespace-nowrap font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-white hover:bg-destructive/90 shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive/50 h-8 rounded-md gap-1.5 px-3.5 text-xs has-[>svg]:px-2.5",
+      "color": "rgb(255, 255, 255)",
+      "background": "lab(55.7819 65.6007 40.7857)",
+      "borderColor": "oklab(0.636808 0.187795 0.0889196 / 0.5)",
+      "radius": "8px",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        239,
+        68,
+        68
+      ],
+      "border": [
+        239,
+        68,
+        68
+      ],
+      "contrast": 3.76,
+      "rect": {
+        "x": 476.59375,
+        "y": 228,
+        "width": 109.171875,
+        "height": 32
+      },
+      "clip": {
+        "x": 464,
+        "y": 216,
+        "width": 134,
+        "height": 56
+      }
+    },
+    {
+      "shot": "tierlist-delete__desktop__singularity__light",
+      "kind": "tierlist",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary/50 h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(8.15285 0.645563 -11.4852)",
+      "background": "lab(55.7819 65.6007 40.7857)",
+      "borderColor": "oklab(0.671604 0.0906091 0.102488 / 0.5)",
+      "radius": "8px",
+      "fg": [
+        17,
+        24,
+        39
+      ],
+      "bg": [
+        239,
+        68,
+        68
+      ],
+      "border": [
+        227,
+        95,
+        68
+      ],
+      "contrast": 4.71,
+      "rect": {
+        "x": 788.1875,
+        "y": 426,
+        "width": 83.8125,
+        "height": 40
+      },
+      "clip": {
+        "x": 776,
+        "y": 414,
+        "width": 108,
+        "height": 64
+      }
+    },
+    {
+      "shot": "button-destructive__desktop__singularity__dark",
+      "kind": "button",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-white hover:bg-destructive/90 shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive/50 h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
+      "color": "rgb(255, 255, 255)",
+      "background": "lab(53.3698 -14.3715 -4.71399)",
+      "borderColor": "oklab(0.593997 -0.0425819 -0.0122142 / 0.5)",
+      "radius": "8px",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        95,
+        135,
+        135
+      ],
+      "border": [
+        95,
+        135,
+        135
+      ],
+      "contrast": 3.96,
+      "rect": {
+        "x": 476.734375,
+        "y": 172,
+        "width": 113.0625,
+        "height": 40
+      },
+      "clip": {
+        "x": 464,
+        "y": 160,
+        "width": 138,
+        "height": 64
+      }
+    },
+    {
+      "shot": "button-destructive-sm__desktop__singularity__dark",
+      "kind": "button",
+      "className": "group relative inline-flex items-center justify-center whitespace-nowrap font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case bg-destructive text-white hover:bg-destructive/90 shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive/50 h-8 rounded-md gap-1.5 px-3.5 text-xs has-[>svg]:px-2.5",
+      "color": "rgb(255, 255, 255)",
+      "background": "lab(53.3698 -14.3715 -4.71399)",
+      "borderColor": "oklab(0.593997 -0.0425819 -0.0122142 / 0.5)",
+      "radius": "8px",
+      "fg": [
+        255,
+        255,
+        255
+      ],
+      "bg": [
+        95,
+        135,
+        135
+      ],
+      "border": [
+        95,
+        135,
+        135
+      ],
+      "contrast": 3.96,
+      "rect": {
+        "x": 476.59375,
+        "y": 228,
+        "width": 109.171875,
+        "height": 32
+      },
+      "clip": {
+        "x": 464,
+        "y": 216,
+        "width": 134,
+        "height": 56
+      }
+    },
+    {
+      "shot": "tierlist-delete__desktop__singularity__dark",
+      "kind": "tierlist",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary/50 h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(78.0644 0 0)",
+      "background": "lab(53.3698 -14.3715 -4.71399)",
+      "borderColor": "oklab(0.721404 0.0859619 0.102401 / 0.5)",
+      "radius": "8px",
+      "fg": [
+        193,
+        193,
+        193
+      ],
+      "bg": [
+        95,
+        135,
+        135
+      ],
+      "border": [
+        163,
+        136,
+        109
+      ],
+      "contrast": 2.2,
+      "rect": {
+        "x": 788.1875,
+        "y": 426,
+        "width": 83.8125,
+        "height": 40
+      },
+      "clip": {
+        "x": 776,
+        "y": 414,
+        "width": 108,
+        "height": 64
+      }
+    },
+    {
+      "shot": "button__mobile__default__light",
+      "error": "TimeoutError: locator.waitFor: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:text-is(\"destructive\")').first() to be visible\u001b[22m\n\u001b[2m    116 × locator resolved to hidden <button data-slot=\"button\" class=\"group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([c"
+    },
+    {
+      "shot": "tierlist-delete__mobile__default__light",
+      "kind": "tierlist",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary/50 h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(9.38335 5.37004 4.96888)",
+      "background": "lab(48.4493 77.4328 61.5452)",
+      "borderColor": "oklab(0.32 0.0153167 0.0128628 / 0.5)",
+      "radius": "8px",
+      "fg": [
+        35,
+        24,
+        20
+      ],
+      "bg": [
+        231,
+        0,
+        11
+      ],
+      "border": [
+        145,
+        24,
+        27
+      ],
+      "contrast": 3.63,
+      "rect": {
+        "x": 16,
+        "y": 732,
+        "width": 358,
+        "height": 40
+      },
+      "clip": {
+        "x": 4,
+        "y": 720,
+        "width": 382,
+        "height": 64
+      }
+    },
+    {
+      "shot": "button__mobile__default__dark",
+      "error": "TimeoutError: locator.waitFor: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:text-is(\"destructive\")').first() to be visible\u001b[22m\n\u001b[2m    116 × locator resolved to hidden <button data-slot=\"button\" class=\"group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([c"
+    },
+    {
+      "shot": "tierlist-delete__mobile__default__dark",
+      "kind": "tierlist",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary/50 h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(95.3659 1.38789 4.33116)",
+      "background": "lab(53.6853 69.6775 43.7724)",
+      "borderColor": "oklab(0.780001 0.0344046 0.0491651 / 0.5)",
+      "radius": "8px",
+      "fg": [
+        247,
+        241,
+        233
+      ],
+      "bg": [
+        238,
+        52,
+        59
+      ],
+      "border": [
+        226,
+        113,
+        103
+      ],
+      "contrast": 3.61,
+      "rect": {
+        "x": 16,
+        "y": 732,
+        "width": 358,
+        "height": 40
+      },
+      "clip": {
+        "x": 4,
+        "y": 720,
+        "width": 382,
+        "height": 64
+      }
+    },
+    {
+      "shot": "button__mobile__calm-storm__light",
+      "error": "TimeoutError: locator.waitFor: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:text-is(\"destructive\")').first() to be visible\u001b[22m\n\u001b[2m    116 × locator resolved to hidden <button data-slot=\"button\" class=\"group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([c"
+    },
+    {
+      "shot": "tierlist-delete__mobile__calm-storm__light",
+      "kind": "tierlist",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary/50 h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(2.51107 0.242703 -0.886115)",
+      "background": "lab(55.4814 75.0732 48.8528)",
+      "borderColor": "oklab(0.745991 -0.0970495 -0.127188 / 0.5)",
+      "radius": "8px",
+      "fg": [
+        9,
+        9,
+        11
+      ],
+      "bg": [
+        251,
+        44,
+        54
+      ],
+      "border": [
+        126,
+        116,
+        155
+      ],
+      "contrast": 5.23,
+      "rect": {
+        "x": 16,
+        "y": 732,
+        "width": 358,
+        "height": 40
+      },
+      "clip": {
+        "x": 4,
+        "y": 720,
+        "width": 382,
+        "height": 64
+      }
+    },
+    {
+      "shot": "button__mobile__calm-storm__dark",
+      "error": "TimeoutError: locator.waitFor: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:text-is(\"destructive\")').first() to be visible\u001b[22m\n\u001b[2m    116 × locator resolved to hidden <button data-slot=\"button\" class=\"group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([c"
+    },
+    {
+      "shot": "tierlist-delete__mobile__calm-storm__dark",
+      "kind": "tierlist",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary/50 h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(97.3623 -2.33799 -4.13098)",
+      "background": "lab(55.4814 75.0732 48.8528)",
+      "borderColor": "oklab(0.684991 -0.0912492 -0.142231 / 0.5)",
+      "radius": "8px",
+      "fg": [
+        240,
+        249,
+        255
+      ],
+      "bg": [
+        251,
+        44,
+        54
+      ],
+      "border": [
+        125,
+        105,
+        149
+      ],
+      "contrast": 3.57,
+      "rect": {
+        "x": 16,
+        "y": 732,
+        "width": 358,
+        "height": 40
+      },
+      "clip": {
+        "x": 4,
+        "y": 720,
+        "width": 382,
+        "height": 64
+      }
+    },
+    {
+      "shot": "button__mobile__cyberpunk__light",
+      "error": "TimeoutError: locator.waitFor: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:text-is(\"destructive\")').first() to be visible\u001b[22m\n\u001b[2m    116 × locator resolved to hidden <button data-slot=\"button\" class=\"group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([c"
+    },
+    {
+      "shot": "tierlist-delete__mobile__cyberpunk__light",
+      "kind": "tierlist",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary/50 h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(3.79387 2.93769 -10.5157)",
+      "background": "lab(57.6471 71.5278 70.6416)",
+      "borderColor": "oklab(0.672604 0.275214 -0.0925595 / 0.5)",
+      "radius": "8px",
+      "fg": [
+        12,
+        12,
+        29
+      ],
+      "bg": [
+        255,
+        61,
+        0
+      ],
+      "border": [
+        255,
+        30,
+        100
+      ],
+      "contrast": 5.45,
+      "rect": {
+        "x": 16,
+        "y": 732,
+        "width": 358,
+        "height": 40
+      },
+      "clip": {
+        "x": 4,
+        "y": 720,
+        "width": 382,
+        "height": 64
+      }
+    },
+    {
+      "shot": "button__mobile__cyberpunk__dark",
+      "error": "TimeoutError: locator.waitFor: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:text-is(\"destructive\")').first() to be visible\u001b[22m\n\u001b[2m    111 × locator resolved to hidden <button data-slot=\"button\" class=\"group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([c"
+    },
+    {
+      "shot": "tierlist-delete__mobile__cyberpunk__dark",
+      "kind": "tierlist",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary/50 h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(94.3261 -0.358105 -2.77311)",
+      "background": "lab(57.6471 71.5278 70.6416)",
+      "borderColor": "oklab(0.672604 0.275214 -0.0925595 / 0.5)",
+      "radius": "8px",
+      "fg": [
+        236,
+        239,
+        244
+      ],
+      "bg": [
+        255,
+        61,
+        0
+      ],
+      "border": [
+        255,
+        30,
+        100
+      ],
+      "contrast": 3.08,
+      "rect": {
+        "x": 16,
+        "y": 732,
+        "width": 358,
+        "height": 40
+      },
+      "clip": {
+        "x": 4,
+        "y": 720,
+        "width": 382,
+        "height": 64
+      }
+    },
+    {
+      "shot": "button__mobile__cotton-candy__light",
+      "error": "TimeoutError: locator.waitFor: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:text-is(\"destructive\")').first() to be visible\u001b[22m\n\u001b[2m    115 × locator resolved to hidden <button data-slot=\"button\" class=\"group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([c"
+    },
+    {
+      "shot": "tierlist-delete__mobile__cotton-candy__light",
+      "kind": "tierlist",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary/50 h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(25.996 12.2909 -24.0776)",
+      "background": "lab(51.3806 69.5087 46.4972)",
+      "borderColor": "oklab(0.680001 0.16255 -0.0496815 / 0.5)",
+      "radius": "8px",
+      "fg": [
+        65,
+        56,
+        98
+      ],
+      "bg": [
+        230,
+        43,
+        48
+      ],
+      "border": [
+        226,
+        73,
+        114
+      ],
+      "contrast": 2.42,
+      "rect": {
+        "x": 16,
+        "y": 732,
+        "width": 358,
+        "height": 40
+      },
+      "clip": {
+        "x": 4,
+        "y": 720,
+        "width": 382,
+        "height": 64
+      }
+    },
+    {
+      "shot": "button__mobile__cotton-candy__dark",
+      "error": "TimeoutError: locator.waitFor: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:text-is(\"destructive\")').first() to be visible\u001b[22m\n\u001b[2m    116 × locator resolved to hidden <button data-slot=\"button\" class=\"group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([c"
+    },
+    {
+      "shot": "tierlist-delete__mobile__cotton-candy__dark",
+      "kind": "tierlist",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary/50 h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(93.8615 5.32234 -9.73096)",
+      "background": "lab(56.1657 63.7783 33.3305)",
+      "borderColor": "oklab(0.820001 0.114109 -0.0370587 / 0.5)",
+      "radius": "8px",
+      "fg": [
+        241,
+        234,
+        255
+      ],
+      "bg": [
+        237,
+        73,
+        82
+      ],
+      "border": [
+        243,
+        119,
+        150
+      ],
+      "contrast": 3.16,
+      "rect": {
+        "x": 16,
+        "y": 732,
+        "width": 358,
+        "height": 40
+      },
+      "clip": {
+        "x": 4,
+        "y": 720,
+        "width": 382,
+        "height": 64
+      }
+    },
+    {
+      "shot": "button__mobile__caffeine__light",
+      "error": "TimeoutError: locator.waitFor: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:text-is(\"destructive\")').first() to be visible\u001b[22m\n\u001b[2m    116 × locator resolved to hidden <button data-slot=\"button\" class=\"group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([c"
+    },
+    {
+      "shot": "tierlist-delete__mobile__caffeine__light",
+      "kind": "tierlist",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary/50 h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(12.246 0 0)",
+      "background": "lab(54.9915 58.7064 50.9473)",
+      "borderColor": "oklab(0.4341 0.0291276 0.0262357 / 0.5)",
+      "radius": "8px",
+      "fg": [
+        32,
+        32,
+        32
+      ],
+      "bg": [
+        229,
+        77,
+        46
+      ],
+      "border": [
+        164,
+        75,
+        55
+      ],
+      "contrast": 4.21,
+      "rect": {
+        "x": 16,
+        "y": 732,
+        "width": 358,
+        "height": 40
+      },
+      "clip": {
+        "x": 4,
+        "y": 720,
+        "width": 382,
+        "height": 64
+      }
+    },
+    {
+      "shot": "button__mobile__caffeine__dark",
+      "error": "TimeoutError: locator.waitFor: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:text-is(\"destructive\")').first() to be visible\u001b[22m\n\u001b[2m    116 × locator resolved to hidden <button data-slot=\"button\" class=\"group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([c"
+    },
+    {
+      "shot": "tierlist-delete__mobile__caffeine__dark",
+      "kind": "tierlist",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary/50 h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(94.0956 -0.0000298023 0.0000119209)",
+      "background": "lab(54.9915 58.7064 50.9473)",
+      "borderColor": "oklab(0.9247 0.0211577 0.0479531 / 0.5)",
+      "radius": "8px",
+      "fg": [
+        238,
+        238,
+        238
+      ],
+      "bg": [
+        229,
+        77,
+        46
+      ],
+      "border": [
+        242,
+        150,
+        120
+      ],
+      "contrast": 3.33,
+      "rect": {
+        "x": 16,
+        "y": 732,
+        "width": 358,
+        "height": 40
+      },
+      "clip": {
+        "x": 4,
+        "y": 720,
+        "width": 382,
+        "height": 64
+      }
+    },
+    {
+      "shot": "button__mobile__aurora__light",
+      "error": "TimeoutError: locator.waitFor: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:text-is(\"destructive\")').first() to be visible\u001b[22m\n\u001b[2m    116 × locator resolved to hidden <button data-slot=\"button\" class=\"group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([c"
+    },
+    {
+      "shot": "tierlist-delete__mobile__aurora__light",
+      "kind": "tierlist",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary/50 h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(7.16059 -0.970602 -7.04916)",
+      "background": "lab(48.8037 76.3079 51.5884)",
+      "borderColor": "oklab(0.549993 -0.19318 -0.0517513 / 0.5)",
+      "radius": "8px",
+      "fg": [
+        16,
+        23,
+        31
+      ],
+      "bg": [
+        230,
+        0,
+        35
+      ],
+      "border": [
+        115,
+        72,
+        92
+      ],
+      "contrast": 3.77,
+      "rect": {
+        "x": 16,
+        "y": 732,
+        "width": 358,
+        "height": 40
+      },
+      "clip": {
+        "x": 4,
+        "y": 720,
+        "width": 382,
+        "height": 64
+      }
+    },
+    {
+      "shot": "button__mobile__aurora__dark",
+      "error": "TimeoutError: locator.waitFor: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:text-is(\"destructive\")').first() to be visible\u001b[22m\n\u001b[2m    116 × locator resolved to hidden <button data-slot=\"button\" class=\"group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([c"
+    },
+    {
+      "shot": "tierlist-delete__mobile__aurora__dark",
+      "kind": "tierlist",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary/50 h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(90.8413 -5.07414 -4.90415)",
+      "background": "lab(53.3476 79.4347 52.8628)",
+      "borderColor": "oklab(0.779992 -0.173864 -0.0465695 / 0.5)",
+      "radius": "8px",
+      "fg": [
+        215,
+        232,
+        238
+      ],
+      "bg": [
+        249,
+        5,
+        43
+      ],
+      "border": [
+        124,
+        110,
+        130
+      ],
+      "contrast": 3.28,
+      "rect": {
+        "x": 16,
+        "y": 732,
+        "width": 358,
+        "height": 40
+      },
+      "clip": {
+        "x": 4,
+        "y": 720,
+        "width": 382,
+        "height": 64
+      }
+    },
+    {
+      "shot": "button__mobile__sorbet__light",
+      "error": "TimeoutError: locator.waitFor: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:text-is(\"destructive\")').first() to be visible\u001b[22m\n\u001b[2m    115 × locator resolved to hidden <button data-slot=\"button\" class=\"group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([c"
+    },
+    {
+      "shot": "tierlist-delete__mobile__sorbet__light",
+      "kind": "tierlist",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary/50 h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(38.6592 -0.0000149012 0)",
+      "background": "lab(64.5223 53.9312 26.9975)",
+      "borderColor": "oklab(0.620903 0.176232 -0.0369989 / 0.5)",
+      "radius": "8px",
+      "fg": [
+        91,
+        91,
+        91
+      ],
+      "bg": [
+        249,
+        111,
+        112
+      ],
+      "border": [
+        228,
+        95,
+        133
+      ],
+      "contrast": 2.44,
+      "rect": {
+        "x": 16,
+        "y": 732,
+        "width": 358,
+        "height": 40
+      },
+      "clip": {
+        "x": 4,
+        "y": 720,
+        "width": 382,
+        "height": 64
+      }
+    },
+    {
+      "shot": "button__mobile__sorbet__dark",
+      "error": "TimeoutError: locator.waitFor: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:text-is(\"destructive\")').first() to be visible\u001b[22m\n\u001b[2m    115 × locator resolved to hidden <button data-slot=\"button\" class=\"group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([c"
+    },
+    {
+      "shot": "tierlist-delete__mobile__sorbet__dark",
+      "kind": "tierlist",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary/50 h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(91.6866 6.53416 -1.35535)",
+      "background": "lab(59.3147 57.7323 -10.7534)",
+      "borderColor": "oklab(0.9195 0.00325248 0.0800502 / 0.5)",
+      "radius": "8px",
+      "fg": [
+        243,
+        227,
+        234
+      ],
+      "bg": [
+        227,
+        94,
+        164
+      ],
+      "border": [
+        239,
+        160,
+        166
+      ],
+      "contrast": 2.65,
+      "rect": {
+        "x": 16,
+        "y": 732,
+        "width": 358,
+        "height": 40
+      },
+      "clip": {
+        "x": 4,
+        "y": 720,
+        "width": 382,
+        "height": 64
+      }
+    },
+    {
+      "shot": "button__mobile__singularity__light",
+      "error": "TimeoutError: locator.waitFor: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:text-is(\"destructive\")').first() to be visible\u001b[22m\n\u001b[2m    116 × locator resolved to hidden <button data-slot=\"button\" class=\"group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([c"
+    },
+    {
+      "shot": "tierlist-delete__mobile__singularity__light",
+      "kind": "tierlist",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary/50 h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(8.15285 0.645563 -11.4852)",
+      "background": "lab(55.7819 65.6007 40.7857)",
+      "borderColor": "oklab(0.671604 0.0906091 0.102488 / 0.5)",
+      "radius": "8px",
+      "fg": [
+        17,
+        24,
+        39
+      ],
+      "bg": [
+        239,
+        68,
+        68
+      ],
+      "border": [
+        227,
+        95,
+        68
+      ],
+      "contrast": 4.71,
+      "rect": {
+        "x": 16,
+        "y": 732,
+        "width": 358,
+        "height": 40
+      },
+      "clip": {
+        "x": 4,
+        "y": 720,
+        "width": 382,
+        "height": 64
+      }
+    },
+    {
+      "shot": "button__mobile__singularity__dark",
+      "error": "TimeoutError: locator.waitFor: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:text-is(\"destructive\")').first() to be visible\u001b[22m\n\u001b[2m    116 × locator resolved to hidden <button data-slot=\"button\" class=\"group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([c"
+    },
+    {
+      "shot": "tierlist-delete__mobile__singularity__dark",
+      "kind": "tierlist",
+      "className": "group relative inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity] duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background chrome-label-case shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary/50 h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      "color": "lab(78.0644 0 0)",
+      "background": "lab(53.3698 -14.3715 -4.71399)",
+      "borderColor": "oklab(0.721404 0.0859619 0.102401 / 0.5)",
+      "radius": "8px",
+      "fg": [
+        193,
+        193,
+        193
+      ],
+      "bg": [
+        95,
+        135,
+        135
+      ],
+      "border": [
+        163,
+        136,
+        109
+      ],
+      "contrast": 2.2,
+      "rect": {
+        "x": 16,
+        "y": 732,
+        "width": 358,
+        "height": 40
+      },
+      "clip": {
+        "x": 4,
+        "y": 720,
+        "width": 382,
+        "height": 64
+      }
+    }
+  ]
+}
