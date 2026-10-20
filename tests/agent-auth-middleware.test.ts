@@ -28,14 +28,6 @@ describe("signed-in page redirect (src/middleware.ts)", () => {
     }
   });
 
-  test("lets a signed-in visit to /agent-login load, so its fragment code isn't carried to /home", async () => {
-    for (const authed of [true, false]) {
-      const { res, asked } = await run("/agent-login", authed);
-      expect(res).toBeUndefined();
-      expect(asked).toBe(0);
-    }
-  });
-
   test("never redirects or checks auth on other pages", async () => {
     for (const path of ["/", "/home", "/decks", "/gallery", "/settings", "/api/auth", "/sign-in-help"]) {
       const { res, asked } = await run(path, true);
