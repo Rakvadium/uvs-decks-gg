@@ -1,0 +1,23 @@
+{
+  "base": "owner-before",
+  "head": "owner-after",
+  "threshold": 0.1,
+  "results": [
+    {
+      "name": "owner-detail-rejected__desktop__default__dark",
+      "diffPercent": 0.192
+    },
+    {
+      "name": "owner-detail-rejected__mobile__default__dark",
+      "diffPercent": 0.553
+    },
+    {
+      "name": "owner-public-feed__desktop__default__dark",
+      "diffPercent": 2.592
+    },
+    {
+      "name": "owner-public-feed__mobile__default__dark",
+      "diffPercent": 0.018
+    }
+  ]
+}

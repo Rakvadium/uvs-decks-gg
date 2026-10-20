@@ -1,0 +1,23 @@
+{
+  "base": "before",
+  "head": "after",
+  "threshold": 0.1,
+  "results": [
+    {
+      "name": "guest-community-tier-lists-qs7b2s2cvb4vqkczfgwnq6z2tp0zj4tr__desktop__default__dark",
+      "diffPercent": 2.157
+    },
+    {
+      "name": "guest-community-tier-lists-qs7b2s2cvb4vqkczfgwnq6z2tp0zj4tr__mobile__default__dark",
+      "diffPercent": 4.419
+    },
+    {
+      "name": "guest-community-tier-lists__desktop__default__dark",
+      "diffPercent": 4.363
+    },
+    {
+      "name": "guest-community-tier-lists__mobile__default__dark",
+      "diffPercent": 0.006
+    }
+  ]
+}

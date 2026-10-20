@@ -1,0 +1,85 @@
+{
+  "issue": "245",
+  "label": "after",
+  "port": 8127,
+  "chrome": "calm",
+  "fullPage": false,
+  "strict": true,
+  "shots": [
+    {
+      "name": "guest-community-tier-lists__desktop__default__dark",
+      "route": "/community/tier-lists",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/community/tier-lists",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "guest-community-tier-lists__mobile__default__dark",
+      "route": "/community/tier-lists",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/community/tier-lists",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "guest-community-tier-lists-qs7b2s2cvb4vqkczfgwnq6z2tp0zj4tr__desktop__default__dark",
+      "route": "/community/tier-lists/qs7b2s2cvb4vqkczfgwnq6z2tp0zj4tr",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/community/tier-lists/qs7b2s2cvb4vqkczfgwnq6z2tp0zj4tr",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "guest-community-tier-lists-qs7b2s2cvb4vqkczfgwnq6z2tp0zj4tr__mobile__default__dark",
+      "route": "/community/tier-lists/qs7b2s2cvb4vqkczfgwnq6z2tp0zj4tr",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/community/tier-lists/qs7b2s2cvb4vqkczfgwnq6z2tp0zj4tr",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    }
+  ],
+  "gif": null,
+  "blockedConvexWrites": [
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus"
+  ],
+  "savedAppearance": [],
+  "pinFlagged": [],
+  "unstable": [],
+  "unproxiedSockets": []
+}

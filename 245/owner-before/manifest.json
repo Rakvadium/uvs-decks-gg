@@ -1,0 +1,11 @@
+{
+  "label": "before",
+  "blocked": {
+    "Action:communityLive:refreshLiveStatus": 8
+  },
+  "overrides": {
+    "tierLists:getDetail": 2,
+    "user:currentUser": 4,
+    "tierLists:listPublicFeed": 2
+  }
+}
