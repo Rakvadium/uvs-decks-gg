@@ -108,7 +108,8 @@ dashboard and never contact GitHub.
     exception is the wrapper's own `<backend dir>/.cache/convex` link.
   - It refuses every dir on another device than its parent (`st_dev`), which is a mount point.
   - On a Linux host, it also refuses every mount point in `/proc/self/mountinfo` at or below those
-    trees. That catches same-device bind mounts, including ones made inside `unshare -Urm`.
+    trees. That catches same-device bind mounts, including ones made inside `unshare -Urm`. If the
+    table can't be read, or lists no mount points (a real one always lists `/`), it refuses.
   - It refuses a dir whose real path can't be resolved, or isn't its parent's real path plus its
     name.
   - `owner-cache-untouched` reports the shared cache. It also needs `cache` and `cache/convex` to
