@@ -381,7 +381,14 @@ describe("pinned local backend version (#221)", () => {
       const inv = linuxInv(root, 8182);
       const legacy = path.join(inv.home, ".cache", "convex");
       fakePosixCache(legacy, { binary: true, dashboard: PINNED_LOCAL_BACKEND_VERSION });
+      // A crashed run's half-made link to the shared cache is unlinked, never deleted through.
+      const shared = path.join(sharedCacheDir(root), "convex");
+      fs.mkdirSync(path.join(shared, "binaries", "precompiled-2099-01-01-fffffff"), { recursive: true });
+      const partial = path.join(inv.home, ".cache", `.convex-link-${process.pid}`);
+      fs.symlinkSync(shared, partial, process.platform === "win32" ? "junction" : "dir");
       const message = linkSharedConvexCache(inv.home, root, "linux");
+      expect(fs.existsSync(partial)).toBe(false);
+      expect(fs.existsSync(path.join(shared, "binaries", "precompiled-2099-01-01-fffffff"))).toBe(true);
       expect(message).toContain("moved the backend binary and dashboard");
       expect(fs.lstatSync(legacy).isSymbolicLink() && real(legacy) === real(path.join(sharedCacheDir(root), "convex"))).toBe(true);
       expect(pinnedBackendCacheProblems({ childEnv: inv.childEnv, platform: "linux" })).toEqual([]);

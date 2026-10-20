@@ -532,7 +532,15 @@ export function linkSharedConvexCache(home: string, root: string, platform: Node
     throw new Error(`${link} is not a dir or a link; remove it and run again.`);
   }
   const partial = path.join(parent, `.convex-link-${process.pid}`);
-  fs.rmSync(partial, { recursive: true, force: true });
+  // Unlink only: a recursive delete through a leftover link could reach the shared cache.
+  const unlinkPartial = () => {
+    try {
+      fs.unlinkSync(partial);
+    } catch (err) {
+      if ((err as NodeJS.ErrnoException).code !== "ENOENT") throw err;
+    }
+  };
+  unlinkPartial();
   // Only reached on a Windows host in tests, which simulate other platforms; junctions need no privilege.
   fs.symlinkSync(target, partial, process.platform === "win32" ? "junction" : "dir");
   try {
@@ -541,7 +549,7 @@ export function linkSharedConvexCache(home: string, root: string, platform: Node
     // Another run linked it first.
     if (!resolvesToTarget()) throw err;
   } finally {
-    fs.rmSync(partial, { recursive: true, force: true });
+    unlinkPartial();
   }
   if (!resolvesToTarget()) throw new Error(`${link} does not resolve to the shared cache ${target}.`);
   return `[vconvex] linked ${link} to the shared cache ${target}${migrated.length ? ` (moved the ${migrated.join(" and ")} it held there)` : ""}`;
