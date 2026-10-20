@@ -1,0 +1,71 @@
+{
+  "issue": "211",
+  "label": "worker-service",
+  "port": 8132,
+  "chrome": "calm",
+  "fullPage": false,
+  "strict": true,
+  "shots": [
+    {
+      "name": "decks__desktop__default__dark",
+      "route": "/decks",
+      "auth": "agent",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/decks",
+      "loaded": true,
+      "stable": true,
+      "pin": {
+        "saved": "cyberpunk/dark/expressive",
+        "patched": true,
+        "problems": [],
+        "events": 2,
+        "unpinned": 1,
+        "pinned": "default/dark/calm",
+        "overridden": true,
+        "flagged": false
+      },
+      "unproxied": [
+        "during sign-in: a service worker started (http://localhost:8132/__probe/sw.js); WebSockets it opens bypass the capture proxy and can't be seen, so its writes would not be blocked",
+        "a service worker started (http://localhost:8132/__probe/sw.js); WebSockets it opens bypass the capture proxy and can't be seen, so its writes would not be blocked"
+      ]
+    },
+    {
+      "name": "guest-gallery__desktop__default__dark",
+      "route": "/gallery",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/gallery",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": [
+        "a service worker started (http://localhost:8132/__probe/sw.js); WebSockets it opens bypass the capture proxy and can't be seen, so its writes would not be blocked"
+      ]
+    }
+  ],
+  "gif": null,
+  "blockedConvexWrites": [
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus"
+  ],
+  "savedAppearance": [
+    "cyberpunk/dark/expressive"
+  ],
+  "pinFlagged": [],
+  "unstable": [],
+  "unproxiedSockets": [
+    "decks__desktop__default__dark",
+    "guest-gallery__desktop__default__dark"
+  ]
+}
