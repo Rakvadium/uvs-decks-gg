@@ -134,7 +134,7 @@ Checks
 - UI: before/after captures on your ports (§ PR visual embeds).
 
 Output
-- `gh pr create --base dev` with `Fixes #<n>`, evidence per Done when item, and the security checklist results.
+- `bun run gh-post -- pr create --base dev --title <title> --body-file <file>` with `Fixes #<n>`, evidence per Done when item, and the security checklist results. Post all PR and issue text through gh-post, never bare `gh`.
 - Final report (short): PR URL, Done when → evidence, anything uncertain.
 ```
 
@@ -162,7 +162,7 @@ Checks
 - Each Done when item, typecheck/test/lint/build, and every item in hardened-coding § Security & side effects (pr-issue-verify step 4).
 
 Output
-- One PR comment in the pr-issue-verify format (check table, evidence, must-fix, should-fix, nits). Verdict rules: pr-issue-verify § Verdict.
+- One PR comment in the pr-issue-verify format (check table, evidence, must-fix, should-fix, nits), posted with `bun run gh-post -- pr comment <pr> --body-file <file>`. Verdict rules: pr-issue-verify § Verdict.
 - Stop your dev servers and confirm your ports are free.
 - Final report (short): comment URL, verdict, must-fix list.
 ```
