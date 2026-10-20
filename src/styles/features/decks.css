@@ -1,0 +1,45 @@
+/*
+ * Deck surface chrome tokens (decks list, deck grid, deck details, deck state icons).
+ * Same layers and selectors as the chrome families in src/styles/base.css; import after it
+ * so the layer order is set there.
+ */
+
+@layer chrome-calm {
+  :root:is([data-chrome="calm"], [data-chrome="bubblegum"], [data-chrome="darkmatter"]) {
+    --chrome-decks-heading-dot-shadow: none;
+    --chrome-decks-heading-dot-animation: none;
+    --chrome-decks-heading-blur: none;
+
+    --chrome-deck-grid-border-hover: var(--border);
+    --chrome-deck-grid-shadow-hover: var(--chrome-elevation-mid);
+    --chrome-deck-grid-accent-line: 0;
+
+    --chrome-deck-state-icon-shadow: var(--chrome-elevation-low);
+
+    --chrome-deck-details-hero-border: var(--border);
+    --chrome-deck-details-hero-shadow: var(--chrome-elevation-low);
+    --chrome-deck-details-wash: none;
+    --chrome-deck-details-hover-preview-border: var(--border);
+    --chrome-deck-details-hover-preview-shadow: var(--chrome-elevation-mid);
+  }
+}
+
+@layer chrome-expressive {
+  :root:is([data-chrome="expressive"], [data-chrome="holoterminal"]) {
+    --chrome-decks-heading-dot-shadow: 0 0 8px var(--primary);
+    --chrome-decks-heading-dot-animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    --chrome-decks-heading-blur: blur(16px);
+
+    --chrome-deck-grid-border-hover: oklch(from var(--primary) l c h / 0.5);
+    --chrome-deck-grid-shadow-hover: 0 0 0 1px oklch(from var(--primary) l c h / 0.5), 0 0 8px oklch(from var(--primary) l c h / 0.8), 0 0 16px oklch(from var(--primary) l c h / 0.2);
+    --chrome-deck-grid-accent-line: 1;
+
+    --chrome-deck-state-icon-shadow: 0 0 30px -5px var(--primary);
+
+    --chrome-deck-details-hero-border: oklch(from var(--primary) l c h / 0.2);
+    --chrome-deck-details-hero-shadow: 0 0 0 1px oklch(from var(--primary) l c h / 0.15), 0 0 8px oklch(from var(--primary) l c h / 0.3);
+    --chrome-deck-details-wash: linear-gradient(to right, oklch(from var(--primary) l c h / 0.05), oklch(from var(--secondary) l c h / 0.05), oklch(from var(--accent) l c h / 0.05));
+    --chrome-deck-details-hover-preview-border: oklch(from var(--primary) l c h / 0.4);
+    --chrome-deck-details-hover-preview-shadow: 0 0 0 1px oklch(from var(--primary) l c h / 0.3), 0 0 6px oklch(from var(--primary) l c h / 0.7), 0 0 14px oklch(from var(--primary) l c h / 0.2);
+  }
+}

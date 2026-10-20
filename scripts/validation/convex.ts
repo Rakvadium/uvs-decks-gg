@@ -27,7 +27,10 @@ import {
   guardReport,
   parseDotenv,
   readCliEnvFiles,
+  backendHomeProblems,
+  plainTreeProblems,
   resolveCliTarget,
+  sharedCacheProblems,
   type Env,
   type GuardInput,
   type TargetClass,
@@ -365,6 +368,18 @@ export function prepareInvocation(opts: InvocationOptions): Invocation {
   };
 }
 
+/** Whether the CLI's saved config exists. Throws for anything but a regular file: reading a FIFO would hang. */
+function savedConfigExists(config: string): boolean {
+  let stat: fs.Stats;
+  try {
+    stat = fs.lstatSync(config);
+  } catch {
+    return false;
+  }
+  if (!stat.isFile()) throw new GuardError([`${config} is not a regular file.`]);
+  return true;
+}
+
 function savedDeploymentConfig(home: string): string {
   const name = ANONYMOUS_DEPLOYMENT.slice("anonymous:".length);
   return path.join(home, ".convex", "anonymous-convex-backend-state", name, "config.json");
@@ -373,7 +388,7 @@ function savedDeploymentConfig(home: string): string {
 /** The CLI saves the ports a deployment was created with; refuse if they drifted from ports.ts. */
 export function checkSavedDeploymentPorts(home: string, ports: BackendPorts): void {
   const config = savedDeploymentConfig(home);
-  if (!fs.existsSync(config)) return;
+  if (!savedConfigExists(config)) return;
   const saved = JSON.parse(fs.readFileSync(config, "utf8")) as { ports?: { cloud?: number; site?: number } };
   if (saved.ports && (saved.ports.cloud !== ports.cloud || saved.ports.site !== ports.site)) {
     throw new GuardError([
@@ -388,7 +403,7 @@ export function checkSavedDeploymentPorts(home: string, ports: BackendPorts): vo
  */
 export function checkSavedBackendVersion(home: string, appPort: number): void {
   const config = savedDeploymentConfig(home);
-  if (!fs.existsSync(config)) return;
+  if (!savedConfigExists(config)) return;
   const saved = JSON.parse(fs.readFileSync(config, "utf8")) as { backendVersion?: string };
   if (saved.backendVersion === undefined || saved.backendVersion === PINNED_LOCAL_BACKEND_VERSION) return;
   throw new Error(
@@ -488,6 +503,134 @@ export function seedBinaryCache(opts: {
   return seeded;
 }
 
+const realpathOrNull = (p: string) => {
+  try {
+    return fs.realpathSync(p);
+  } catch {
+    return null;
+  }
+};
+
+/**
+ * On macOS and Linux the CLI caches the backend binary and dashboard in `$HOME/.cache/convex`, and
+ * HOME is the backend dir, so every port would need its own 130MB download. Link that dir to
+ * `<shared cache>/convex`, the dir Windows reaches through LOCALAPPDATA, so one copy serves every
+ * port on the machine. A real dir an older wrapper left there hands its pinned assets to the shared
+ * cache first. Returns what it did, or null when the link was already in place.
+ */
+export function linkSharedConvexCache(home: string, root: string, platform: NodeJS.Platform = process.platform): string | null {
+  const parent = path.join(home, ".cache");
+  const link = path.join(parent, "convex");
+  const target = path.join(sharedCacheDir(root), "convex");
+  assertSharedCache(root, platform);
+  fs.mkdirSync(parent, { recursive: true });
+  fs.mkdirSync(target, { recursive: true });
+  assertSharedCache(root, platform);
+  // A `.cache` that is itself a link (say, to the owner's ~/.cache) would make `link` the owner's cache.
+  if (realpathOrNull(parent) !== path.join(realpathOrNull(home) ?? home, ".cache")) {
+    throw new Error(`${parent} must be a plain dir inside the backend home; remove it and run again.`);
+  }
+  // Built from the resolved root, not from where `target` resolves, so a swapped-in link under the
+  // root can't match itself.
+  const expected = path.join(sharedCacheDir(realpathOrNull(root) ?? path.resolve(root)), "convex");
+  const resolvesToTarget = () => realpathOrNull(link) === expected;
+  let stat: fs.Stats | null = null;
+  try {
+    stat = fs.lstatSync(link);
+  } catch {
+    // not there yet
+  }
+  let migrated: string[] = [];
+  if (stat?.isSymbolicLink()) {
+    if (resolvesToTarget()) return null;
+    throw new Error(`${link} links to ${fs.readlinkSync(link)}, not the shared cache ${target}. Remove it and run again.`);
+  }
+  if (stat?.isDirectory()) {
+    migrated = migrateLegacyCache(link, target, platform);
+    fs.rmSync(link, { recursive: true, force: true });
+  } else if (stat) {
+    throw new Error(`${link} is not a dir or a link; remove it and run again.`);
+  }
+  const partial = path.join(parent, `.convex-link-${process.pid}`);
+  // Unlink only: a recursive delete through a leftover link could reach the shared cache.
+  const unlinkPartial = () => {
+    try {
+      fs.unlinkSync(partial);
+    } catch (err) {
+      if ((err as NodeJS.ErrnoException).code !== "ENOENT") throw err;
+    }
+  };
+  unlinkPartial();
+  // Only reached on a Windows host in tests, which simulate other platforms; junctions need no privilege.
+  fs.symlinkSync(target, partial, process.platform === "win32" ? "junction" : "dir");
+  try {
+    fs.renameSync(partial, link);
+  } catch (err) {
+    // Another run linked it first.
+    if (!resolvesToTarget()) throw err;
+  } finally {
+    unlinkPartial();
+  }
+  if (!resolvesToTarget()) throw new Error(`${link} does not resolve to the shared cache ${target}.`);
+  return `[vconvex] linked ${link} to the shared cache ${target}${migrated.length ? ` (moved the ${migrated.join(" and ")} it held there)` : ""}`;
+}
+
+/** Throws when anything under `<root>/cache` is a link (see sharedCacheProblems). */
+function assertSharedCache(root: string, platform: NodeJS.Platform): void {
+  const problems = sharedCacheProblems(root, platform);
+  if (problems.length > 0) throw new GuardError(problems);
+}
+
+/** Throws when the backend home is a link, overlaps the owner's dirs, or holds a link (see backendHomeProblems). */
+function assertBackendHome(
+  inv: Pick<Invocation, "appPort" | "home">,
+  owner: { parentEnv: Env; realHome: string },
+  platform: NodeJS.Platform,
+): void {
+  const problems = backendHomeProblems({
+    root: path.dirname(path.dirname(inv.home)),
+    appPort: inv.appPort,
+    realHome: owner.realHome,
+    ownerLocalAppData: owner.parentEnv.LOCALAPPDATA,
+    platform,
+  });
+  if (problems.length > 0) throw new GuardError(problems);
+}
+
+/**
+ * Copies the pinned binary and dashboard from a per-port cache into the shared one when the shared
+ * cache lacks them. Throws, leaving the per-port cache in place, if one of them couldn't be copied
+ * or holds anything but regular files and dirs, so a planted link isn't promoted machine-wide.
+ */
+function migrateLegacyCache(legacy: string, shared: string, platform: NodeJS.Platform): string[] {
+  const exe = backendExe(platform);
+  const binary = path.join("binaries", PINNED_LOCAL_BACKEND_VERSION);
+  const out: string[] = [];
+  const assertPlain = (rel: string) => {
+    const problems = plainTreeProblems(legacy, rel, { platform });
+    if (problems.length > 0) {
+      throw new Error(`Refusing to move ${path.join(legacy, rel)} into the shared cache: ${problems.join("; ")}. Remove ${legacy} and run again.`);
+    }
+  };
+  const hasBinary = (dir: string) => fs.existsSync(path.join(dir, binary, exe));
+  if (hasBinary(legacy) && !hasBinary(shared)) {
+    assertPlain(binary);
+    if (!copyDirAtomically(path.join(legacy, binary), path.join(shared, binary))) {
+      throw new Error(`Could not copy ${path.join(legacy, binary)} into the shared cache ${shared}; run again.`);
+    }
+    out.push("backend binary");
+  }
+  const atPin = (dir: string) => dashboardVersion(dir) === PINNED_LOCAL_BACKEND_VERSION;
+  if (atPin(legacy) && !atPin(shared)) {
+    assertPlain("dashboard");
+    if (!copyDirAtomically(path.join(legacy, "dashboard"), path.join(shared, "dashboard"))) {
+      throw new Error(`Could not copy ${path.join(legacy, "dashboard")} into the shared cache ${shared}; run again.`);
+    }
+    out.push("dashboard");
+  }
+  return out;
+}
+
 /** The one-time fetch instruction, shared by `vconvex` and `start`. */
 export function pinnedBackendFetchHint(appPort: number, problems: string[]): string {
   return [
@@ -511,11 +654,26 @@ export function preparePinnedBackend(
 ): void {
   const platform = owner.platform ?? process.platform;
   checkSavedBackendVersion(inv.home, inv.appPort);
-  if (inv.childEnv.LOCALAPPDATA && platform === "win32") fs.mkdirSync(inv.childEnv.LOCALAPPDATA, { recursive: true });
+  // backendDir() is `<root>/backends/<P>`, and the guard holds HOME to it.
+  const root = path.dirname(path.dirname(inv.home));
+  // The guard checked these too; check again right before the wrapper writes anywhere, and once
+  // more after it has linked and seeded, just before the CLI runs.
+  assertBackendHome(inv, owner, platform);
+  assertSharedCache(root, platform);
+  if (inv.childEnv.LOCALAPPDATA && platform === "win32") {
+    fs.mkdirSync(inv.childEnv.LOCALAPPDATA, { recursive: true });
+    assertSharedCache(root, platform);
+  }
+  if (platform !== "win32") {
+    const linked = linkSharedConvexCache(inv.home, root, platform);
+    if (linked) say(linked);
+  }
   const seeded = seedBinaryCache({ ...owner, childEnv: inv.childEnv, platform });
   if (seeded.length > 0) {
     say(`[vconvex] seeded the ${seeded.join(" and ")} for ${PINNED_LOCAL_BACKEND_VERSION} from the owner's cache (read only)`);
   }
+  assertSharedCache(root, platform);
+  assertBackendHome(inv, owner, platform);
   const problems = pinnedBackendCacheProblems({ childEnv: inv.childEnv, platform });
   if (problems.length === 0) return;
   if (!inv.fetchPinnedBackend) throw new Error(pinnedBackendFetchHint(inv.appPort, problems));
@@ -541,9 +699,39 @@ export const CLI_GENERATED_DIR = "convex/_generated";
 
 /**
  * `exact` entries go back byte for byte. `eol` entries go back only when the CLI's rewrite
- * differs in line endings alone, so real codegen changes stay.
+ * differs in line endings alone, so real codegen changes stay. `head` is the file's git blob id at
+ * HEAD when the snapshot was taken (null: HEAD doesn't track it; absent: git couldn't tell).
  */
-export type CliSnapshotEntry = { rel: string; mode: "exact" | "eol"; content: string | null };
+export type CliSnapshotEntry = { rel: string; mode: "exact" | "eol"; content: string | null; head?: string | null };
+
+function runGit(repoRoot: string, args: string[]): string | null {
+  const r = spawnSync("git", args, { cwd: repoRoot, encoding: "utf8" });
+  return r.status === 0 && !r.error ? r.stdout : null;
+}
+
+/**
+ * Each path's blob id at HEAD, null for paths HEAD doesn't track. null overall when `repoRoot`
+ * isn't the top of a git checkout with a HEAD commit.
+ */
+export function headBlobs(repoRoot: string, rels: string[]): Map<string, string | null> | null {
+  if (runGit(repoRoot, ["rev-parse", "--show-prefix"])?.trim() !== "") return null;
+  const listed = runGit(repoRoot, ["ls-tree", "-z", "HEAD", "--", ...rels]);
+  if (listed === null) return null;
+  const out = new Map<string, string | null>(rels.map((rel) => [rel, null]));
+  for (const record of listed.split("\0")) {
+    const m = /^\d+ blob ([0-9a-f]+)\t([\s\S]+)$/.exec(record);
+    if (m && out.has(m[2])) out.set(m[2], m[1]);
+  }
+  return out;
+}
+
+/** Which of `rels` `git status` lists as changed, or null when git can't tell. */
+function gitChanged(repoRoot: string, rels: string[]): Set<string> | null {
+  if (rels.length === 0) return new Set();
+  const out = runGit(repoRoot, ["status", "--porcelain=v1", "-z", "--untracked-files=no", "--", ...rels]);
+  if (out === null) return null;
+  return new Set(out.split("\0").filter((r) => r.length > 3).map((r) => r.slice(3)));
+}
 
 export function takeCliSnapshot(repoRoot = REPO_ROOT): CliSnapshotEntry[] {
   const read = (rel: string) => {
@@ -557,24 +745,95 @@ export function takeCliSnapshot(repoRoot = REPO_ROOT): CliSnapshotEntry[] {
         .filter((d) => d.isFile())
         .map((d) => `${CLI_GENERATED_DIR}/${d.name}`)
     : [];
-  return [
+  const entries = [
     ...CLI_TOUCHED_FILES.map((rel) => ({ rel, mode: "exact" as const, content: read(rel) })),
     ...generated.map((rel) => ({ rel, mode: "eol" as const, content: read(rel) })),
   ];
+  const heads = headBlobs(repoRoot, entries.map((e) => e.rel));
+  return heads ? entries.map((e) => ({ ...e, head: heads.get(e.rel) ?? null })) : entries;
 }
 
-/** A file a restore put back. `backup` holds the bytes it replaced, when there were any to lose. */
-export type RevertedFile = { rel: string; backup?: string };
+/**
+ * A file a restore put back. `backup` holds the bytes it replaced, when there were any to lose.
+ * `stale`: the file changed in git since the snapshot was taken, so HEAD's version was kept, and
+ * `snapshotBackup` holds the snapshot's bytes when they differ from what was kept.
+ */
+export type RevertedFile = { rel: string; backup?: string; stale?: { snapshotBackup?: string } };
 
 /** A fresh dir per restore, under the backend dir, for the bytes that restore overwrites. */
 export function revertBackupDir(home: string, now = new Date()): string {
   return path.join(home, "reverted", now.toISOString().replace(/[:.]/g, "-"));
 }
 
+/** Backup dirs kept per port. Older ones are deleted after each restore that saves a backup. */
+export const REVERTED_KEEP = 20;
+const REVERTED_DIR_NAME = /^\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}-\d{3}Z$/;
+/** Inside a backup dir: the snapshot's own bytes for a file that changed in git since the snapshot. */
+export const STALE_SNAPSHOT_DIR = "stale-snapshot";
+
+function revertedDirs(parent: string): string[] {
+  if (!fs.existsSync(parent)) return [];
+  return fs
+    .readdirSync(parent, { withFileTypes: true })
+    .filter((d) => d.isDirectory() && REVERTED_DIR_NAME.test(d.name))
+    .map((d) => d.name)
+    .sort();
+}
+
+/** Removes `dir` and then its parents while they are empty, up to and including `top`. */
+function removeEmptyDirs(dir: string, top: string) {
+  for (let d = dir; ; d = path.dirname(d)) {
+    try {
+      if (fs.readdirSync(d).length > 0) return;
+      fs.rmdirSync(d);
+    } catch {
+      return;
+    }
+    if (path.resolve(d) === path.resolve(top)) return;
+  }
+}
+
+/**
+ * Writes `bytes` to `backupDir/rel`, then deletes identical copies of `rel` from older backup
+ * dirs. The CLI's repeated identical rewrites keep one copy, the latest, so a real edit's backup
+ * isn't buried under them.
+ */
+function writeBackup(backupDir: string, rel: string, bytes: Buffer): string {
+  const dest = path.join(backupDir, rel);
+  fs.mkdirSync(path.dirname(dest), { recursive: true });
+  fs.writeFileSync(dest, bytes);
+  const parent = path.dirname(backupDir);
+  for (const name of revertedDirs(parent)) {
+    const dir = path.join(parent, name);
+    if (path.resolve(dir) === path.resolve(backupDir)) continue;
+    const old = path.join(dir, rel);
+    if (fs.existsSync(old) && fs.readFileSync(old).equals(bytes)) {
+      fs.rmSync(old, { force: true });
+      removeEmptyDirs(path.dirname(old), dir);
+    }
+  }
+  return dest;
+}
+
+/** Deletes all but the newest `keep` backup dirs next to `backupDir`, and never `backupDir` itself. */
+function pruneRevertedDirs(backupDir: string, keep = REVERTED_KEEP) {
+  const parent = path.dirname(backupDir);
+  const others = revertedDirs(parent).filter((name) => path.resolve(parent, name) !== path.resolve(backupDir));
+  for (const name of others.slice(0, Math.max(0, others.length - (keep - 1)))) {
+    fs.rmSync(path.join(parent, name), { recursive: true, force: true });
+  }
+}
+
 /**
  * Puts a snapshot back and lists what it reverted. Before an `exact` file is overwritten or
  * deleted, its current bytes go to `backupDir/<rel>`, so an edit made during a session isn't lost.
  * `eol` files only change line endings, so they need no copy.
+ *
+ * When a file's blob at HEAD differs from the one the snapshot recorded, it changed in git since
+ * then (a branch switch or pull after a killed `start`), and the snapshot's bytes are out of date.
+ * HEAD's version is kept instead: the snapshot's bytes go to `backupDir/stale-snapshot/<rel>`, and
+ * a working copy that differs from HEAD is backed up and replaced with HEAD's version. Codegen
+ * (`eol`) files are left as they are.
  */
 export function restoreCliSnapshot(
   snapshot: CliSnapshotEntry[],
@@ -582,18 +841,44 @@ export function restoreCliSnapshot(
   opts: { backupDir?: string } = {},
 ): RevertedFile[] {
   const lf = (b: Buffer) => b.toString("utf8").replace(/\r\n/g, "\n");
+  let backedUp = false;
   const backUp = (rel: string, bytes: Buffer | null): string | undefined => {
     if (!opts.backupDir || bytes === null) return undefined;
-    const dest = path.join(opts.backupDir, rel);
-    fs.mkdirSync(path.dirname(dest), { recursive: true });
-    fs.writeFileSync(dest, bytes);
-    return dest;
+    backedUp = true;
+    return writeBackup(opts.backupDir, rel, bytes);
   };
-  return snapshot.flatMap(({ rel, mode, content }): RevertedFile[] => {
+  const readFile = (full: string) => (fs.existsSync(full) ? fs.readFileSync(full) : null);
+  const heads = snapshot.some((e) => e.head !== undefined) ? headBlobs(repoRoot, snapshot.map((e) => e.rel)) : null;
+  // A codegen file git already calls unchanged needs no line-ending fix. A `git checkout` since the
+  // snapshot may have rewritten it with LF, and putting the snapshot's CRLF bytes back would then
+  // make git list it as modified.
+  const eolChanged = heads ? gitChanged(repoRoot, snapshot.filter((e) => e.mode === "eol").map((e) => e.rel)) : null;
+  const reverted = snapshot.flatMap(({ rel, mode, content, head }): RevertedFile[] => {
     const full = path.join(repoRoot, rel);
-    const now = fs.existsSync(full) ? fs.readFileSync(full) : null;
+    const now = readFile(full);
     const before = content === null ? null : Buffer.from(content, "base64");
+    const headNow = heads?.get(rel);
+    if (head !== undefined && headNow !== undefined && headNow !== head) {
+      if (mode === "eol") return [];
+      // hash-object applies git's clean filters, so a CRLF checkout of HEAD's blob matches it.
+      const matchesHead =
+        headNow === null ? now === null : now !== null && runGit(repoRoot, ["hash-object", "--", rel])?.trim() === headNow;
+      let backup: string | undefined;
+      if (!matchesHead) {
+        backup = backUp(rel, now);
+        if (headNow === null) fs.rmSync(full, { force: true });
+        else if (runGit(repoRoot, ["restore", "--source=HEAD", "--worktree", "--", rel]) === null) {
+          throw new Error(`Could not put back HEAD's version of ${rel} (git restore --source=HEAD --worktree -- ${rel} failed).`);
+        }
+      }
+      const kept = readFile(full);
+      const snapshotLost = before !== null && !(kept?.equals(before) ?? false);
+      const snapshotBackup = snapshotLost ? backUp(path.join(STALE_SNAPSHOT_DIR, rel), before) : undefined;
+      if (matchesHead && !snapshotLost) return [];
+      return [{ rel, backup, stale: { snapshotBackup } }];
+    }
     if (mode === "eol") {
+      if (eolChanged !== null && !eolChanged.has(rel)) return [];
       if (before === null || now === null || now.equals(before) || lf(now) !== lf(before)) return [];
       fs.writeFileSync(full, before);
       return [{ rel }];
@@ -610,11 +895,30 @@ export function restoreCliSnapshot(
     }
     return [];
   });
+  if (backedUp && opts.backupDir) pruneRevertedDirs(opts.backupDir);
+  return reverted;
 }
 
-/** For the revert log line: each file, plus where the bytes it replaced were saved. */
+/** For the restore log lines: each file, plus where the bytes it replaced were saved. */
 export function formatReverted(reverted: RevertedFile[]): string {
-  return reverted.map((r) => (r.backup ? `${r.rel} (replaced bytes saved to ${r.backup})` : r.rel)).join(", ");
+  return reverted
+    .map((r) => {
+      const notes = [
+        ...(r.stale ? ["changed in git since the snapshot was taken, so HEAD's version was kept"] : []),
+        ...(r.backup ? [`replaced bytes saved to ${r.backup}`] : []),
+        ...(r.stale?.snapshotBackup ? [`the snapshot's bytes saved to ${r.stale.snapshotBackup}`] : []),
+      ];
+      return notes.length > 0 ? `${r.rel} (${notes.join("; ")})` : r.rel;
+    })
+    .join(", ");
+}
+
+/** Prints what a restore did: one line for reverted CLI edits, one for files kept at HEAD. */
+export function reportRestore(reverted: RevertedFile[], say: (message: string) => void, tag: string): void {
+  const rest = reverted.filter((r) => !r.stale);
+  const stale = reverted.filter((r) => r.stale);
+  if (rest.length > 0) say(`[${tag}] reverted CLI side-effect edits: ${formatReverted(rest)}`);
+  if (stale.length > 0) say(`[${tag}] did not restore an out-of-date snapshot: ${formatReverted(stale)}`);
 }
 
 /**
@@ -701,8 +1005,7 @@ export async function runConvexCapture(argv: string[], opts: RunOptions = {}): P
     clearTimeout(timer);
     const code = timedOut ? 124 : exitCode;
     if (timedOut) say(`[vconvex] killed \`convex ${inv.cliArgs.join(" ")}\` after ${opts.timeoutMs}ms`);
-    const reverted = restore();
-    if (reverted.length > 0) say(`[vconvex] reverted CLI side-effect edits: ${formatReverted(reverted)}`);
+    reportRestore(restore(), say, "vconvex");
     if (inv.cliArgs.find((a) => !a.startsWith("-")) === "dev") {
       const killed = killBackendExecutors(inv.home);
       if (killed.length > 0) say(`[vconvex] stopped orphaned backend node executor(s): ${killed.join(", ")}`);

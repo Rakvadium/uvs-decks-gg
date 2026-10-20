@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
 export const galleryToolbarControlClassName = cn(
-  "h-9 rounded-md border border-[color:var(--control-dual-border)] bg-background/50 text-base md:text-sm font-sans font-normal normal-case tracking-normal",
+  "h-9 rounded-md border border-[color:var(--control-dual-border)] bg-background-soft text-base md:text-sm font-sans font-normal normal-case tracking-normal",
   "shadow-[var(--chrome-search-field-shadow)] transition-[border-color,box-shadow,background-color,color] duration-200 outline-none",
   "hover:border-[color:var(--control-dual-border-strong)] hover:bg-[color-mix(in_oklch,var(--primary)_5%,var(--secondary)_4%,var(--background)_91%)]",
   "focus-visible:border-[color:var(--control-dual-border-strong)] focus-visible:shadow-[var(--chrome-search-field-shadow-focus)]",
@@ -79,9 +79,9 @@ export function GallerySearchField({
         value={value}
         onChange={onChange}
         className={cn(
-          "h-9 bg-background/50 text-base md:text-sm",
+          "h-9 bg-background-soft text-base md:text-sm",
           isQuiet
-            ? "border-border/50"
+            ? "border-surface"
             : "border-[color:var(--control-dual-border)] shadow-[var(--chrome-search-field-shadow)] focus-visible:border-[color:var(--control-dual-border-strong)] focus-visible:shadow-[var(--chrome-search-field-shadow-focus),0_0_0_3px_color-mix(in_oklch,var(--secondary)_18%,transparent)]",
           !leadingSlot && "pl-9",
           inputClassName,

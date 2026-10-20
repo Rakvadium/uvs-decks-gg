@@ -49,6 +49,7 @@
   --color-input: var(--input);
   --color-border: var(--border);
   --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
   --color-muted-foreground: var(--muted-foreground);
@@ -146,11 +147,6 @@
     --chrome-card-frame-halo: transparent;
     --chrome-card-frame-halo-hover-opacity: 0;
 
-    --chrome-filter-icon-well-shadow: var(--chrome-elevation-low);
-    --chrome-filter-icon-drop-shadow: none;
-    --chrome-filter-tile-shadow-selected: none;
-    --chrome-filter-tile-shadow-selected-inset: none;
-
     --chrome-shell-sidebar-wash: linear-gradient(
       to bottom,
       oklch(from var(--accent) l c h / 0.045) 0%,
@@ -178,27 +174,7 @@
     --chrome-page-nav-card-shadow-hover: var(--chrome-elevation-mid);
     --chrome-page-nav-card-icon-drop-shadow: none;
 
-    --chrome-decks-heading-dot-shadow: none;
-    --chrome-decks-heading-dot-animation: none;
-    --chrome-decks-heading-blur: none;
-
-    --chrome-deck-grid-border-hover: var(--border);
-    --chrome-deck-grid-shadow-hover: var(--chrome-elevation-mid);
-    --chrome-deck-grid-accent-line: 0;
-
-    --chrome-deck-state-icon-shadow: var(--chrome-elevation-low);
-
-    --chrome-deck-details-hero-border: var(--border);
-    --chrome-deck-details-hero-shadow: var(--chrome-elevation-low);
-    --chrome-deck-details-wash: none;
-    --chrome-deck-details-hover-preview-border: var(--border);
-    --chrome-deck-details-hover-preview-shadow: var(--chrome-elevation-mid);
-
-    --chrome-gallery-loading-shadow: var(--chrome-elevation-mid);
-    --chrome-gallery-progress-bar-glow: none;
-    --chrome-gallery-empty-icon-shadow: var(--chrome-elevation-low);
-    --chrome-gallery-empty-wash: none;
-    --chrome-gallery-stats-dot-shadow: none;
+    /* Feature-surface tokens (deck, decks, gallery, filter): src/styles/features/. */
 
     --chrome-dialog-nav-shadow-enabled: 0 1px 3px 0 oklch(0 0 0 / 0.08);
     --chrome-dialog-nav-border-enabled: var(--border);
@@ -371,11 +347,6 @@
     --chrome-card-frame-halo: linear-gradient(to right, var(--primary), var(--secondary), var(--primary));
     --chrome-card-frame-halo-hover-opacity: 0.7;
 
-    --chrome-filter-icon-well-shadow: 0 0 2px oklch(from var(--primary) l c h / 0.5), 0 0 6px oklch(from var(--primary) l c h / 0.4);
-    --chrome-filter-icon-drop-shadow: drop-shadow(0 0 3px var(--primary));
-    --chrome-filter-tile-shadow-selected: 0 0 10px -3px var(--primary);
-    --chrome-filter-tile-shadow-selected-inset: inset 0 0 8px -3px var(--primary);
-
     --chrome-shell-sidebar-wash: linear-gradient(
       to bottom,
       oklch(from var(--accent) l c h / 0.08) 0%,
@@ -399,27 +370,7 @@
     --chrome-page-nav-card-shadow-hover: 0 0 30px -5px var(--primary);
     --chrome-page-nav-card-icon-drop-shadow: drop-shadow(0 0 8px var(--primary));
 
-    --chrome-decks-heading-dot-shadow: 0 0 8px var(--primary);
-    --chrome-decks-heading-dot-animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-    --chrome-decks-heading-blur: blur(16px);
-
-    --chrome-deck-grid-border-hover: oklch(from var(--primary) l c h / 0.5);
-    --chrome-deck-grid-shadow-hover: 0 0 0 1px oklch(from var(--primary) l c h / 0.5), 0 0 8px oklch(from var(--primary) l c h / 0.8), 0 0 16px oklch(from var(--primary) l c h / 0.2);
-    --chrome-deck-grid-accent-line: 1;
-
-    --chrome-deck-state-icon-shadow: 0 0 30px -5px var(--primary);
-
-    --chrome-deck-details-hero-border: oklch(from var(--primary) l c h / 0.2);
-    --chrome-deck-details-hero-shadow: 0 0 0 1px oklch(from var(--primary) l c h / 0.15), 0 0 8px oklch(from var(--primary) l c h / 0.3);
-    --chrome-deck-details-wash: linear-gradient(to right, oklch(from var(--primary) l c h / 0.05), oklch(from var(--secondary) l c h / 0.05), oklch(from var(--accent) l c h / 0.05));
-    --chrome-deck-details-hover-preview-border: oklch(from var(--primary) l c h / 0.4);
-    --chrome-deck-details-hover-preview-shadow: 0 0 0 1px oklch(from var(--primary) l c h / 0.3), 0 0 6px oklch(from var(--primary) l c h / 0.7), 0 0 14px oklch(from var(--primary) l c h / 0.2);
-
-    --chrome-gallery-loading-shadow: 0 0 30px -5px var(--primary);
-    --chrome-gallery-progress-bar-glow: 0 0 10px var(--primary);
-    --chrome-gallery-empty-icon-shadow: 0 0 30px -5px var(--primary);
-    --chrome-gallery-empty-wash: linear-gradient(to right, oklch(from var(--primary) l c h / 0.1), oklch(from var(--secondary) l c h / 0.1), oklch(from var(--primary) l c h / 0.1));
-    --chrome-gallery-stats-dot-shadow: 0 0 8px var(--success);
+    /* Feature-surface tokens (deck, decks, gallery, filter): src/styles/features/. */
 
     --chrome-dialog-nav-shadow-enabled: 0 0 2px var(--primary), 0 0 8px oklch(from var(--primary) l c h / 0.7);
     --chrome-dialog-nav-border-enabled: oklch(from var(--primary) l c h / 0.3);

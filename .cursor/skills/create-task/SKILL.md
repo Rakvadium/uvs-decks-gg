@@ -50,7 +50,7 @@ If an open issue already covers it, comment on that issue instead of creating a 
 5. **Create with labels on the command**
 
 ```bash
-gh issue create \
+bun run gh-post -- issue create \
   --title "[agent] <short outcome>" \
   --body "$(cat <<'EOF'
 ## Goal
@@ -84,7 +84,7 @@ gh issue view <n> --json number,labels --jq '{number, labels: [.labels[].name]}'
 If `size/*` or `area/*` is missing:
 
 ```bash
-gh issue edit <n> --add-label "size/S" --add-label "area/ui"
+bun run gh-post -- issue edit <n> --add-label "size/S" --add-label "area/ui"
 ```
 
 Do not report the issue as done until that JSON shows the required labels.
