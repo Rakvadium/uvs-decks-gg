@@ -102,11 +102,19 @@ function withRegistryLock<T>(root: string, fn: () => T): T {
   }
 }
 
+/** `"auto"` only: search `min`-`max` (default the whole range) and pass over ports `skip` rejects. */
+export type ClaimOptions = { min?: number; max?: number; skip?: (port: number) => boolean };
+
 /**
  * Claim an app port for a worktree. `"auto"` reuses the worktree's existing claim or takes the
  * lowest free port. A specific port fails if another worktree already holds it.
  */
-export function claimPort(worktree: string, requested: number | "auto", root = defaultValidationRoot()): number {
+export function claimPort(
+  worktree: string,
+  requested: number | "auto",
+  root = defaultValidationRoot(),
+  opts: ClaimOptions = {},
+): number {
   return withRegistryLock(root, () => {
     const registry = readRegistry(root);
     const key = worktreeKey(worktree);
@@ -115,10 +123,12 @@ export function claimPort(worktree: string, requested: number | "auto", root = d
     if (requested === "auto") {
       if (registry[key] !== undefined) return registry[key];
       const taken = new Set(Object.values(registry));
-      const free = Array.from({ length: APP_PORT_MAX - APP_PORT_MIN + 1 }, (_, i) => APP_PORT_MIN + i).find(
-        (p) => !taken.has(p),
+      const min = parseAppPort(opts.min ?? APP_PORT_MIN);
+      const max = parseAppPort(opts.max ?? APP_PORT_MAX);
+      const free = Array.from({ length: Math.max(0, max - min + 1) }, (_, i) => min + i).find(
+        (p) => !taken.has(p) && !opts.skip?.(p),
       );
-      if (free === undefined) throw new Error("No free validation app ports left in the registry");
+      if (free === undefined) throw new Error(`No free validation app ports left in ${min}-${max}`);
       port = free;
     } else {
       port = parseAppPort(requested);
