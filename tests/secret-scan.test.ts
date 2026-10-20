@@ -193,6 +193,30 @@ describe("secret-scan CLI", () => {
     expect(output).not.toContain(FAKE);
   });
 
+  test("--diff uses the branch's own commits: removals on the base branch are not hits", () => {
+    const dir = tempDir();
+    const git = (...args: string[]) => execFileSync("git", args, { cwd: dir, stdio: "pipe" }).toString().trim();
+    git("init", "-q", "-b", "dev");
+    git("config", "user.email", "t@example.com");
+    git("config", "user.name", "t");
+    fs.writeFileSync(path.join(dir, "creds.md"), `old=${FAKE}\n`);
+    git("add", ".");
+    git("commit", "-qm", "base with an old leak");
+    git("checkout", "-qb", "feature");
+    fs.writeFileSync(path.join(dir, "feature.txt"), "clean work\n");
+    git("add", ".");
+    git("commit", "-qm", "feature work");
+    git("checkout", "-q", "dev");
+    fs.writeFileSync(path.join(dir, "creds.md"), "old=<placeholder>\n");
+    git("commit", "-qam", "dev removes the leak");
+
+    // A two-dot `git diff dev..feature` would show the removal reversed as an added line.
+    expect(git("diff", "dev..feature")).toContain(`+old=${FAKE}`);
+    const { code, output } = capture(["--diff", "dev..feature"], { SECRET_SCAN_CANARY: FAKE }, dir);
+    expect(output).not.toContain("creds.md");
+    expect(code).toBe(0);
+  });
+
   test("real process: stdout and stderr never contain the value", () => {
     const dir = tempDir();
     fs.writeFileSync(path.join(dir, "leak.txt"), FAKE);

@@ -34,7 +34,9 @@ For each value of 8 or more chars, the scan looks for:
 - its JSON-escaped form (multi-line keys)
 - base64 and base64url, including when the value sits inside a longer base64 string such as `Basic user:pass`
 
-`--diff` scans each commit in the range on its own. A value that was added and then removed later in the same PR still fails the scan, because PRs here merge with merge commits and the intermediate commit stays in history. To clean a branch, drop or rewrite the commit; a revert commit isn't enough.
+`--diff A..B` scans the commits in `A..B`, the commits reachable from `B` but not from `A`. That is the branch's own work since its merge-base with `A`. Each commit's added lines are diffed against that commit's parent, and its message is scanned too. This is not `git diff A..B`: changes made on `A` after the branch point, such as `dev` removing a credential, never show up reversed as additions. A merge commit contributes only what its conflict resolution added (`--remerge-diff`), not the branch it merged in.
+
+Each commit is scanned on its own. A value that was added and then removed later in the same PR still fails the scan, because PRs here merge with merge commits and the intermediate commit stays in history. To clean a branch, drop or rewrite the commit; a revert commit isn't enough.
 
 `--path` skips `.git` and `node_modules`. It can't see a secret drawn into image pixels, but it does catch the value in any text or metadata inside a file.
 
