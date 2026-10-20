@@ -15,13 +15,13 @@ import net from "node:net";
 import path from "node:path";
 import {
   REPO_ROOT,
-  formatReverted,
   formatTarget,
   killBackendExecutors,
   killBackendProcesses,
   killProcessTree,
   prepareInvocation,
   preparePinnedBackend,
+  reportRestore,
   revertBackupDir,
   runConvex,
   restoreCliSnapshot,
@@ -72,7 +72,7 @@ function restoreSavedSnapshot(appPort: number, opts: { discard: boolean; watcher
   const entries = opts.watcherRunning ? saved.entries.filter((e) => e.mode === "exact") : saved.entries;
   const reverted = restoreCliSnapshot(entries, saved.repoRoot, { backupDir: revertBackupDir(backendDir(appPort)) });
   if (opts.discard) fs.rmSync(file, { force: true });
-  if (reverted.length > 0) console.error(`[validation] reverted CLI side-effect edits: ${formatReverted(reverted)}`);
+  reportRestore(reverted, (m) => console.error(m), "validation");
 }
 
 function logSize(appPort: number): number {
