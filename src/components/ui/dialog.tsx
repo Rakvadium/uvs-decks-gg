@@ -153,7 +153,7 @@ function DialogContent({
         data-slot="dialog-content"
         className={cn(
           "fixed z-modal duration-200 overflow-x-hidden flex flex-col",
-          !isPlain && "shadow-lg",
+          !isPlain && "shadow-lg md:shadow-none",
           !isPlain && "bg-card-overlay backdrop-blur-lg border-primary-soft",
           isPlain &&
             "border-0 bg-transparent shadow-none backdrop-blur-none md:border-0 md:shadow-none",

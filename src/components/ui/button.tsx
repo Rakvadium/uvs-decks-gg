@@ -17,7 +17,7 @@ const buttonVariants = cva(
         outline:
           "border border-[color:var(--control-dual-border)] bg-transparent text-primary hover:bg-[color:var(--control-dual-surface-hover)] hover:border-[color:var(--control-dual-border-strong)] hover:text-primary hover:shadow-[var(--chrome-button-shadow-outline-hover)] [&_svg]:text-current",
         secondary:
-          "bg-secondary-dim text-secondary-foreground hover:bg-secondary border border-secondary-strong hover:shadow-[var(--chrome-button-shadow-secondary-hover)]",
+          "bg-secondary text-secondary-foreground hover:bg-secondary-dim border border-secondary-strong hover:shadow-[var(--chrome-button-shadow-secondary-hover)]",
         ghost:
           "hover:bg-accent-selected hover:text-foreground border border-transparent hover:border-accent-soft",
         link: "text-primary underline-offset-4 hover:underline",
