@@ -1,0 +1,391 @@
+{
+  "issue": "239",
+  "label": "verify-b",
+  "port": 8175,
+  "backend": "http://127.0.0.1:3450",
+  "seedVersion": 1,
+  "catalogVersion": 29,
+  "seed": {
+    "catalogVersion": 29,
+    "seedVersion": 1,
+    "sha256": "98df8df24f23fc50f64bb0bbc76a2ef596fd7735f9d4281a6d8a7174bf62bc23",
+    "reseeded": true
+  },
+  "catalog": {
+    "version": 29,
+    "url": "https://pub-53d81abf7a7f442a90c9383c1e7bdc60.r2.dev/catalog/uvs/v29.json.gz",
+    "sha256": "fc0dbddee10379b4833dfc0a1c7cfa469fc154e03b4de05a87de42112b4dfe36",
+    "served": 23,
+    "misses": []
+  },
+  "clock": 1792065600000,
+  "personas": [
+    {
+      "persona": "alice",
+      "email": "alice@validation.invalid",
+      "sessionCreated": true
+    }
+  ],
+  "allowWrites": false,
+  "chrome": "calm",
+  "fullPage": false,
+  "strict": true,
+  "shots": [
+    {
+      "name": "gallery__desktop__default__light",
+      "route": "/gallery",
+      "auth": "agent",
+      "persona": "alice@validation.invalid",
+      "appearance": {
+        "theme": "default",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/gallery",
+      "loaded": true,
+      "stable": true,
+      "pin": {
+        "saved": "default/system/calm",
+        "patched": true,
+        "problems": [],
+        "events": 2,
+        "unpinned": 1,
+        "pinned": "default/light/calm",
+        "overridden": true,
+        "flagged": false
+      },
+      "unproxied": []
+    },
+    {
+      "name": "gallery__desktop__default__dark",
+      "route": "/gallery",
+      "auth": "agent",
+      "persona": "alice@validation.invalid",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/gallery",
+      "loaded": true,
+      "stable": true,
+      "pin": {
+        "saved": "default/system/calm",
+        "patched": true,
+        "problems": [],
+        "events": 2,
+        "unpinned": 1,
+        "pinned": "default/dark/calm",
+        "overridden": true,
+        "flagged": false
+      },
+      "unproxied": []
+    },
+    {
+      "name": "gallery__mobile__default__light",
+      "route": "/gallery",
+      "auth": "agent",
+      "persona": "alice@validation.invalid",
+      "appearance": {
+        "theme": "default",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/gallery",
+      "loaded": true,
+      "stable": true,
+      "pin": {
+        "saved": "default/system/calm",
+        "patched": true,
+        "problems": [],
+        "events": 2,
+        "unpinned": 1,
+        "pinned": "default/light/calm",
+        "overridden": true,
+        "flagged": false
+      },
+      "unproxied": []
+    },
+    {
+      "name": "gallery__mobile__default__dark",
+      "route": "/gallery",
+      "auth": "agent",
+      "persona": "alice@validation.invalid",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/gallery",
+      "loaded": true,
+      "stable": true,
+      "pin": {
+        "saved": "default/system/calm",
+        "patched": true,
+        "problems": [],
+        "events": 2,
+        "unpinned": 1,
+        "pinned": "default/dark/calm",
+        "overridden": true,
+        "flagged": false
+      },
+      "unproxied": []
+    },
+    {
+      "name": "decks__desktop__default__light",
+      "route": "/decks",
+      "auth": "agent",
+      "persona": "alice@validation.invalid",
+      "appearance": {
+        "theme": "default",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/decks",
+      "loaded": true,
+      "stable": true,
+      "pin": {
+        "saved": "default/system/calm",
+        "patched": true,
+        "problems": [],
+        "events": 2,
+        "unpinned": 1,
+        "pinned": "default/light/calm",
+        "overridden": true,
+        "flagged": false
+      },
+      "unproxied": []
+    },
+    {
+      "name": "decks__desktop__default__dark",
+      "route": "/decks",
+      "auth": "agent",
+      "persona": "alice@validation.invalid",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/decks",
+      "loaded": true,
+      "stable": true,
+      "pin": {
+        "saved": "default/system/calm",
+        "patched": true,
+        "problems": [],
+        "events": 2,
+        "unpinned": 1,
+        "pinned": "default/dark/calm",
+        "overridden": true,
+        "flagged": false
+      },
+      "unproxied": []
+    },
+    {
+      "name": "decks__mobile__default__light",
+      "route": "/decks",
+      "auth": "agent",
+      "persona": "alice@validation.invalid",
+      "appearance": {
+        "theme": "default",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/decks",
+      "loaded": true,
+      "stable": true,
+      "pin": {
+        "saved": "default/system/calm",
+        "patched": true,
+        "problems": [],
+        "events": 2,
+        "unpinned": 1,
+        "pinned": "default/light/calm",
+        "overridden": true,
+        "flagged": false
+      },
+      "unproxied": []
+    },
+    {
+      "name": "decks__mobile__default__dark",
+      "route": "/decks",
+      "auth": "agent",
+      "persona": "alice@validation.invalid",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/decks",
+      "loaded": true,
+      "stable": true,
+      "pin": {
+        "saved": "default/system/calm",
+        "patched": true,
+        "problems": [],
+        "events": 2,
+        "unpinned": 1,
+        "pinned": "default/dark/calm",
+        "overridden": true,
+        "flagged": false
+      },
+      "unproxied": []
+    },
+    {
+      "name": "guest-gallery__desktop__default__light",
+      "route": "/gallery",
+      "auth": "guest",
+      "persona": null,
+      "appearance": {
+        "theme": "default",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/gallery",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "guest-gallery__desktop__default__dark",
+      "route": "/gallery",
+      "auth": "guest",
+      "persona": null,
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/gallery",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "guest-gallery__mobile__default__light",
+      "route": "/gallery",
+      "auth": "guest",
+      "persona": null,
+      "appearance": {
+        "theme": "default",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/gallery",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "guest-gallery__mobile__default__dark",
+      "route": "/gallery",
+      "auth": "guest",
+      "persona": null,
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/gallery",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    }
+  ],
+  "gif": {
+    "name": "decks-new-deck-dialog__desktop__default__dark",
+    "auth": "agent",
+    "persona": "alice@validation.invalid",
+    "appearance": {
+      "theme": "default",
+      "mode": "dark",
+      "chrome": "calm"
+    },
+    "frames": 38,
+    "pin": {
+      "saved": "default/system/calm",
+      "patched": true,
+      "problems": [],
+      "events": 2,
+      "unpinned": 1,
+      "pinned": "default/dark/calm",
+      "overridden": true,
+      "flagged": false
+    },
+    "unproxied": []
+  },
+  "blockedConvexWrites": [
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus"
+  ],
+  "savedAppearance": [
+    "default/system/calm"
+  ],
+  "pinFlagged": [],
+  "unstable": [],
+  "unproxiedSockets": []
+}

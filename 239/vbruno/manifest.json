@@ -1,0 +1,75 @@
+{
+  "issue": "239",
+  "label": "vbruno",
+  "port": 8175,
+  "backend": "http://127.0.0.1:3450",
+  "seedVersion": 1,
+  "catalogVersion": 29,
+  "seed": {
+    "catalogVersion": 29,
+    "seedVersion": 1,
+    "sha256": "98df8df24f23fc50f64bb0bbc76a2ef596fd7735f9d4281a6d8a7174bf62bc23",
+    "reseeded": false
+  },
+  "catalog": {
+    "version": 29,
+    "url": "https://pub-53d81abf7a7f442a90c9383c1e7bdc60.r2.dev/catalog/uvs/v29.json.gz",
+    "sha256": "fc0dbddee10379b4833dfc0a1c7cfa469fc154e03b4de05a87de42112b4dfe36",
+    "served": 3,
+    "misses": []
+  },
+  "clock": null,
+  "personas": [
+    {
+      "persona": "bruno",
+      "email": "bruno@validation.invalid",
+      "sessionCreated": true
+    }
+  ],
+  "allowWrites": false,
+  "chrome": "calm",
+  "fullPage": false,
+  "strict": true,
+  "shots": [
+    {
+      "name": "decks__desktop__default__dark",
+      "route": "/decks",
+      "auth": "agent",
+      "persona": "bruno@validation.invalid",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/decks",
+      "loaded": true,
+      "stable": true,
+      "pin": {
+        "saved": "default/system/calm",
+        "patched": true,
+        "problems": [],
+        "events": 2,
+        "unpinned": 1,
+        "pinned": "default/dark/calm",
+        "overridden": true,
+        "flagged": false
+      },
+      "unproxied": []
+    }
+  ],
+  "gif": null,
+  "blockedConvexWrites": [
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus"
+  ],
+  "savedAppearance": [
+    "default/system/calm"
+  ],
+  "pinFlagged": [],
+  "unstable": [],
+  "unproxiedSockets": []
+}
