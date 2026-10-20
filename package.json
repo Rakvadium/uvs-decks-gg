@@ -79,7 +79,10 @@
     "zod": "^4.1.13"
   },
   "devDependencies": {
+    "@happy-dom/global-registrator": "^21.0.3",
     "@tailwindcss/postcss": "^4",
+    "@testing-library/dom": "^10.4.2",
+    "@testing-library/react": "^16.3.3",
     "@types/bun": "latest",
     "@types/culori": "^4.0.1",
     "@types/node": "^20",

@@ -34,6 +34,7 @@ import {
   serializeLaneMap,
   tierListCardMatchesPool,
 } from "../utils";
+import { getTierListCatalogState, getTierListUnknownCardDisplay, syncTierListLaneMap } from "./lane-map-sync";
 
 type TierListDraftSnapshot = {
   title: string;
@@ -50,7 +51,15 @@ export function useCommunityTierListDetailModel(tierListId: string) {
   const detail = useQuery(api.tierLists.getDetail, { tierListId: tierListId as Id<"tierLists"> });
   const saveTierList = useMutation(api.tierLists.save);
   const deleteTierList = useMutation(api.tierLists.remove);
-  const { cards } = useCardCatalog();
+  const { cards, isCatalogDataLoading, isCheckingVersion, cachedVersion, serverVersion } = useCardCatalog();
+  const catalogState = getTierListCatalogState({
+    cards,
+    isCatalogDataLoading,
+    isCheckingVersion,
+    cachedVersion,
+    serverVersion,
+  });
+  const unknownCardDisplay = getTierListUnknownCardDisplay(catalogState, isCatalogDataLoading);
   const { sets } = useCardReferenceData();
 
   const [title, setTitle] = useState("Untitled Tier List");
@@ -70,13 +79,14 @@ export function useCommunityTierListDetailModel(tierListId: string) {
   const [isPoolDialogOpen, setIsPoolDialogOpen] = useState(false);
   const [isPresentationMode, setIsPresentationMode] = useState(false);
   const [pendingRankingScopeChange, setPendingRankingScopeChange] = useState<CommunityTierRankingScope | null>(null);
-  const hydratedTierListIdRef = useRef<string | null>(null);
+  const [hydratedTierListId, setHydratedTierListId] = useState<string | null>(null);
   const latestDraftRef = useRef<TierListDraftSnapshot | null>(null);
   const pendingAutoSaveDraftRef = useRef<TierListDraftSnapshot | null>(null);
   const isSavingRef = useRef(false);
 
   const cardMap = useMemo(() => buildCardMap(cards), [cards]);
   const canEdit = detail?.canEdit ?? false;
+  const detailTierListId = detail ? detail.tierList._id.toString() : null;
 
   const getDraftSnapshot = (overrides?: Partial<TierListDraftSnapshot>): TierListDraftSnapshot => {
     const base = latestDraftRef.current ?? {
@@ -106,7 +116,7 @@ export function useCommunityTierListDetailModel(tierListId: string) {
     }
 
     const currentId = detail.tierList._id.toString();
-    if (hydratedTierListIdRef.current === currentId) {
+    if (hydratedTierListId === currentId) {
       return;
     }
 
@@ -142,8 +152,8 @@ export function useCommunityTierListDetailModel(tierListId: string) {
     }
     setTiers(nextTiers);
     setLaneMap(reconcileLaneMap(detail.items.map((item) => item.cardId), nextTiers, nextLaneMap));
-    hydratedTierListIdRef.current = currentId;
-  }, [detail]);
+    setHydratedTierListId(currentId);
+  }, [detail, hydratedTierListId]);
 
   useEffect(() => {
     latestDraftRef.current = {
@@ -182,8 +192,26 @@ export function useCommunityTierListDetailModel(tierListId: string) {
   const tierSignature = useMemo(() => tiers.map((tier) => tier.id).join("|"), [tiers]);
 
   useEffect(() => {
-    setLaneMap((current) => reconcileLaneMap(sourceCardIds, tiers, current));
-  }, [sourceCardSignature, tierSignature, sourceCardIds, tiers]);
+    setLaneMap((current) =>
+      syncTierListLaneMap(current, {
+        catalogState,
+        hydratedTierListId,
+        tierListId: detailTierListId,
+        sourceCardIds,
+        tiers,
+        knownCardIds: cardMap,
+      })
+    );
+  }, [
+    cardMap,
+    catalogState,
+    detailTierListId,
+    hydratedTierListId,
+    sourceCardSignature,
+    tierSignature,
+    sourceCardIds,
+    tiers,
+  ]);
 
   const selectedCards = useMemo(
     () =>
@@ -319,24 +347,41 @@ export function useCommunityTierListDetailModel(tierListId: string) {
       return;
     }
 
-    let nextLaneMapSnapshot: BuilderLaneMap | null = null;
+    // Built from the latest draft, not inside a setLaneMap updater: React only runs an updater
+    // during the call when it can compute state eagerly, so the autosave could silently not fire.
+    const current = getDraftSnapshot().laneMap;
+    const nextLaneMap: BuilderLaneMap = Object.fromEntries(
+      Object.entries(current).map(([laneKey, laneCards]) => [laneKey, laneCards.filter((value) => value !== cardId)])
+    );
+    nextLaneMap[targetLaneKey] = [...(nextLaneMap[targetLaneKey] ?? []), cardId];
 
-    setLaneMap((current) => {
-      const nextLaneMap: BuilderLaneMap = Object.fromEntries(
-        Object.entries(current).map(([laneKey, laneCards]) => [laneKey, laneCards.filter((value) => value !== cardId)])
-      );
-      nextLaneMap[targetLaneKey] = [...(nextLaneMap[targetLaneKey] ?? []), cardId];
-      nextLaneMapSnapshot = nextLaneMap;
-      return nextLaneMap;
-    });
+    setLaneMap(nextLaneMap);
+    queueAutoSave(
+      getDraftSnapshot({
+        laneMap: nextLaneMap,
+      })
+    );
+  };
 
-    if (nextLaneMapSnapshot) {
-      queueAutoSave(
-        getDraftSnapshot({
-          laneMap: nextLaneMapSnapshot,
-        })
-      );
+  /** Takes a card out of every lane, e.g. an unavailable card the catalog no longer has. */
+  const removeCardFromLanes = (cardId: Id<"cards">) => {
+    if (!canEdit) {
+      return;
     }
+
+    const nextLaneMap: BuilderLaneMap = Object.fromEntries(
+      Object.entries(getDraftSnapshot().laneMap).map(([laneKey, laneCards]) => [
+        laneKey,
+        laneCards.filter((value) => value !== cardId),
+      ])
+    );
+
+    setLaneMap(nextLaneMap);
+    queueAutoSave(
+      getDraftSnapshot({
+        laneMap: nextLaneMap,
+      })
+    );
   };
 
   const setTierLabel = (tierId: string, value: string) => {
@@ -524,6 +569,7 @@ export function useCommunityTierListDetailModel(tierListId: string) {
     isPresentationMode,
     setIsPresentationMode,
     cardMap,
+    unknownCardDisplay,
     selectedCards,
     filteredPoolCardIds,
     poolCardIds,
@@ -531,6 +577,7 @@ export function useCommunityTierListDetailModel(tierListId: string) {
     visibleSets,
     sourceCards,
     moveCardToLane,
+    removeCardFromLanes,
     setTierLabel,
     setTierColor,
     addPoolScope,
