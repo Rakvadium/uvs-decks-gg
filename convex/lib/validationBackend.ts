@@ -3,6 +3,8 @@
  * (see scripts/validation/). Cloud deployments are `https://*.convex.cloud`, so a
  * loopback `CONVEX_CLOUD_URL` plus the explicit flag is required.
  */
+import { v } from "convex/values";
+import { internalQuery } from "../_generated/server";
 
 const LOOPBACK_HOSTS = new Set(["localhost", "127.0.0.1", "::1", "[::1]"]);
 const IPV4_LOOPBACK = /^127\.\d{1,3}\.\d{1,3}\.\d{1,3}$/;
@@ -33,3 +35,13 @@ export function assertValidationBackend(env: Env = process.env): void {
     );
   }
 }
+
+/**
+ * Readiness probe for scripts/validation/backend.ts (`vconvex run lib/validationBackend:status`).
+ * Internal, so it isn't callable from clients; on a cloud deployment it just returns false.
+ */
+export const status = internalQuery({
+  args: {},
+  returns: v.object({ validationBackend: v.boolean() }),
+  handler: async () => ({ validationBackend: isValidationBackend() }),
+});

@@ -1,24 +1,31 @@
 /**
  * Per-port validation backend lifecycle:
  *
- *   bun run validation:backend -- start  --app-port P [--no-env] [--timeout 300]
+ *   bun run validation:backend -- start  --app-port P [--timeout 60] [--repoint-env-local]
  *   bun run validation:backend -- stop   --app-port P
  *   bun run validation:backend -- status [--app-port P]
  *
- * `start` runs `vconvex dev` (guarded) in the background, which starts the local backend and
- * pushes this worktree's `convex/`. It records the PID, waits for `/version`, sets the generated
- * backend env (env.ts; the watcher retries a push that failed on missing env), then waits for a
- * successful push. `--no-env` skips the env step for a backend whose env is already set.
+ * `start` sets the generated backend env (env.ts), pushes this worktree's `convex/` with
+ * `vconvex dev --once`, then keeps a `vconvex dev` watcher running in the background (PID file)
+ * that pushes later changes. See `start` for the readiness checks.
  */
 import { spawn, spawnSync } from "node:child_process";
 import fs from "node:fs";
 import net from "node:net";
 import path from "node:path";
-import { REPO_ROOT, formatTarget, killBackendExecutors, prepareInvocation, snapshotCliTouchedFiles } from "./convex";
+import {
+  REPO_ROOT,
+  formatTarget,
+  killBackendExecutors,
+  killBackendProcesses,
+  killProcessTree,
+  prepareInvocation,
+  runConvex,
+  runConvexCapture,
+  snapshotCliTouchedFiles,
+} from "./convex";
 import { applyBackendEnv } from "./env";
 import { backendDir, defaultValidationRoot, loopbackUrl, parseAppPort, portsFor, type BackendPorts } from "./ports";
-
-const READY_MARKER = "Convex functions ready!";
 
 type PidRecord = { pid: number; startedAt: string; ports: BackendPorts };
 
@@ -41,6 +48,7 @@ function readPid(appPort: number): PidRecord | null {
 }
 
 export function isPidAlive(pid: number): boolean {
+  if (!Number.isInteger(pid) || pid <= 0) return false;
   try {
     process.kill(pid, 0);
     return true;
@@ -101,22 +109,6 @@ function logTail(appPort: number, lines = 30): string {
   return fs.readFileSync(file, "utf8").split(/\r?\n/).slice(-lines).join("\n");
 }
 
-function killTree(pid: number) {
-  if (process.platform === "win32") {
-    spawnSync("taskkill", ["/PID", String(pid), "/T", "/F"], { stdio: "ignore" });
-    return;
-  }
-  try {
-    process.kill(-pid, "SIGTERM");
-  } catch {
-    try {
-      process.kill(pid, "SIGTERM");
-    } catch {
-      // already gone
-    }
-  }
-}
-
 /**
  * Starts `bun convex.ts <args>` fully detached and returns its PID. On Windows, a child spawned
  * from bun inherits its inheritable handles, so the detached watcher kept the caller's stdout
@@ -151,7 +143,39 @@ async function waitFor(check: () => Promise<boolean> | boolean, timeoutMs: numbe
   return false;
 }
 
-export async function start(appPort: number, opts: { env?: boolean; timeoutSec?: number } = {}): Promise<BackendStatus> {
+/** Readiness probe pushed with convex/ (convex/lib/validationBackend.ts). */
+export const STATUS_FUNCTION = "lib/validationBackend:status";
+
+/** Parses `convex run lib/validationBackend:status` output. null = not answered (yet). */
+export function parseStatusOutput(stdout: string): boolean | null {
+  const m = /"?validationBackend"?\s*:\s*(true|false)/.exec(stdout);
+  return m ? m[1] === "true" : null;
+}
+
+async function stopWatcher(appPort: number, pid: number | null): Promise<void> {
+  const ports = portsFor(appPort);
+  if (pid !== null && isPidAlive(pid)) {
+    killProcessTree(pid);
+    await waitFor(() => !isPidAlive(pid), 10_000);
+  }
+  const strays = killBackendProcesses(backendDir(appPort));
+  if (strays.length > 0) console.error(`[validation] stopped leftover port ${appPort} backend processes: ${strays.join(", ")}`);
+  killBackendExecutors(backendDir(appPort));
+  const freed = await waitFor(async () => (await isPortFree(ports.cloud)) && (await isPortFree(ports.site)), 15_000);
+  if (!freed) throw new Error(`Ports ${ports.cloud}/${ports.site} are still in use after stopping the port ${appPort} backend`);
+}
+
+/**
+ * 1. Run a dev watcher just long enough to bring the backend up and set its env (a fresh
+ *    backend's first push fails until the R2 placeholders exist).
+ * 2. Stop it and push with `vconvex dev --once`, whose exit code decides whether convex/ pushed.
+ * 3. Start the long-running watcher; ready once `/version` answers and the pushed readiness query
+ *    says it is a validation backend. Every wait is bounded by `timeoutSec` (default 60).
+ */
+export async function start(
+  appPort: number,
+  opts: { timeoutSec?: number; repointEnvLocal?: boolean } = {},
+): Promise<BackendStatus> {
   const ports = portsFor(appPort);
   const existing = readPid(appPort);
   if (existing && isPidAlive(existing.pid)) {
@@ -166,56 +190,82 @@ export async function start(appPort: number, opts: { env?: boolean; timeoutSec?:
     if (!(await isPortFree(port))) throw new Error(`Port ${port} is already in use; the port ${appPort} backend cannot start`);
   }
 
+  const base = ["--app-port", String(appPort), ...(opts.repointEnvLocal ? ["--repoint-env-local"] : [])];
   // Run the guard here too, so a refusal fails `start` loudly instead of only in the log.
-  const args = ["--app-port", String(appPort), "dev", "--tail-logs", "disable"];
-  const inv = prepareInvocation({ argv: args });
+  const inv = prepareInvocation({ argv: [...base, "dev"] });
   console.error(formatTarget(inv));
 
   fs.mkdirSync(inv.home, { recursive: true });
   const restore = snapshotCliTouchedFiles();
   const log = logFile(appPort);
-  fs.appendFileSync(log, "");
-  const offset = fs.statSync(log).size;
-  const pid = spawnDetached([...args, "--log-file", log]);
-  const record: PidRecord = { pid, startedAt: new Date().toISOString(), ports };
-  fs.writeFileSync(pidFile(appPort), JSON.stringify(record, null, 2));
-  console.error(`[validation] started vconvex dev for port ${appPort} (pid ${pid}), log ${log}`);
-
-  const timeoutMs = (opts.timeoutSec ?? 300) * 1000;
-  const fail = (what: string): never => {
-    if (isPidAlive(pid)) killTree(pid);
-    killBackendExecutors(inv.home);
+  const timeoutMs = (opts.timeoutSec ?? 60) * 1000;
+  const watcherArgs = [...base, "dev", "--tail-logs", "disable", "--log-file", log];
+  let pid: number | null = null;
+  const fail = async (what: string): Promise<never> => {
+    if (pid !== null) await stopWatcher(appPort, pid).catch(() => {});
     fs.rmSync(pidFile(appPort), { force: true });
     restore();
-    throw new Error(`Port ${appPort} backend ${what}.\n--- log tail ---\n${logTail(appPort)}`);
+    throw new Error(`Port ${appPort} backend ${what}.\n--- log tail (${log}) ---\n${logTail(appPort)}`);
   };
-  const readSinceStart = () => fs.readFileSync(log).subarray(offset).toString("utf8");
+  const versionUp = async () => (await fetchText(`${inv.target.url}/version`)) !== null;
 
-  // 1. Backend process up. 2. Env set: on a fresh backend the first push fails on missing R2
-  // env, and the dev watcher retries on env changes. 3. A push succeeded.
-  const up = await waitFor(async () => !isPidAlive(pid) || (await fetchText(`${inv.target.url}/version`)) !== null, timeoutMs);
-  if (!up || !isPidAlive(pid)) fail(up ? "exited during startup" : "did not answer /version");
-  if (opts.env !== false) await applyBackendEnv(appPort);
-  const pushed = await waitFor(() => !isPidAlive(pid) || readSinceStart().includes(READY_MARKER), timeoutMs);
-  if (!pushed || !isPidAlive(pid)) fail(pushed ? "exited before the first push finished" : "did not finish a push in time");
+  const recordPid = (p: number) =>
+    fs.writeFileSync(pidFile(appPort), JSON.stringify({ pid: p, startedAt: new Date().toISOString(), ports } satisfies PidRecord, null, 2));
+
+  // 1. Backend up, env set. The PID is recorded at once, so `stop` works even if `start` is killed here.
+  pid = spawnDetached(watcherArgs);
+  recordPid(pid);
+  const up = await waitFor(async () => !isPidAlive(pid!) || (await versionUp()), timeoutMs);
+  if (!up || !isPidAlive(pid)) await fail(up ? "exited during startup" : `did not answer /version within ${timeoutMs / 1000}s`);
+  try {
+    await applyBackendEnv(appPort);
+  } catch (err) {
+    await fail(`could not set its env: ${(err as Error).message}`);
+  }
+  await stopWatcher(appPort, pid);
+  fs.rmSync(pidFile(appPort), { force: true });
+  pid = null;
+
+  // 2. Authoritative push.
+  console.error(`[validation] pushing convex/ to the port ${appPort} backend (vconvex dev --once)`);
+  const pushCode = await runConvex([...base, "dev", "--once", "--tail-logs", "disable", "--log-file", log], {
+    quiet: true,
+    timeoutMs,
+  });
+  if (pushCode !== 0) await fail(pushCode === 124 ? `push timed out after ${timeoutMs / 1000}s` : `push failed (vconvex dev --once exited ${pushCode})`);
+
+  // 3. Long-running watcher.
+  pid = spawnDetached(watcherArgs);
+  recordPid(pid);
+  console.error(`[validation] started vconvex dev watcher for port ${appPort} (pid ${pid}), log ${log}`);
+  let probe: boolean | null = null;
+  const ready = await waitFor(async () => {
+    if (!isPidAlive(pid!)) return true;
+    if (!(await versionUp())) return false;
+    const { code, stdout } = await runConvexCapture(["--app-port", String(appPort), "run", STATUS_FUNCTION], {
+      capture: true,
+      quiet: true,
+      timeoutMs: 20_000,
+    });
+    probe = code === 0 ? parseStatusOutput(stdout) : null;
+    return probe !== null;
+  }, timeoutMs);
+  if (!isPidAlive(pid)) await fail("watcher exited before the backend was ready");
+  if (!ready) await fail(`was not ready within ${timeoutMs / 1000}s (/version or \`run ${STATUS_FUNCTION}\` did not answer)`);
+  if (probe === false) {
+    await fail("answered, but isValidationBackend() is false there (UVS_VALIDATION_BACKEND or a loopback CONVEX_CLOUD_URL is missing)");
+  }
 
   const reverted = restore();
   if (reverted.length > 0) console.error(`[validation] reverted CLI side-effect edits: ${reverted.join(", ")}`);
-  console.error(`[validation] port ${appPort} backend is up and convex/ is pushed`);
+  console.error(`[validation] port ${appPort} backend is up, convex/ is pushed, and isValidationBackend() is true`);
   return status(appPort);
 }
 
 export async function stop(appPort: number): Promise<void> {
-  const ports = portsFor(appPort);
   const record = readPid(appPort);
-  if (record && isPidAlive(record.pid)) {
-    killTree(record.pid);
-    await waitFor(() => !isPidAlive(record.pid), 10_000);
-  }
-  killBackendExecutors(backendDir(appPort));
+  await stopWatcher(appPort, record?.pid ?? null);
   fs.rmSync(pidFile(appPort), { force: true });
-  const freed = await waitFor(async () => (await isPortFree(ports.cloud)) && (await isPortFree(ports.site)), 15_000);
-  if (!freed) throw new Error(`Ports ${ports.cloud}/${ports.site} are still in use after stopping the port ${appPort} backend`);
   console.error(`[validation] port ${appPort} backend stopped`);
 }
 
@@ -240,7 +290,7 @@ async function main(argv: string[]) {
   switch (command) {
     case "start": {
       const result = await start(parseAppPort(portRaw), {
-        env: !args.includes("--no-env"),
+        repointEnvLocal: args.includes("--repoint-env-local"),
         timeoutSec: flag("--timeout") ? Number(flag("--timeout")) : undefined,
       });
       console.log(JSON.stringify(result, null, 2));
