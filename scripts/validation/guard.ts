@@ -322,13 +322,19 @@ function realpathResult(p: string): { real: string } | { code: string } {
   }
 }
 
-/** `/proc/self/mountinfo` on a Linux host (per mount namespace, so it sees `unshare -m` mounts), else null. */
-function readMountinfo(): string | null {
+/**
+ * This process's mount table: its text, `{ unreadable }` with the error when reading it failed, or
+ * null when the host has no such table to check (not Linux).
+ */
+export type MountTable = string | { unreadable: string } | null;
+
+/** `/proc/self/mountinfo` on a Linux host (per mount namespace, so it sees `unshare -m` mounts). */
+function readMountinfo(): MountTable {
   if (process.platform !== "linux") return null;
   try {
     return fs.readFileSync("/proc/self/mountinfo", "utf8");
-  } catch {
-    return null;
+  } catch (err) {
+    return { unreadable: (err as NodeJS.ErrnoException).code ?? "unknown error" };
   }
 }
 
@@ -344,15 +350,21 @@ export function parseMountPoints(mountinfo: string): string[] {
 /**
  * Mount points at or below any of `under`, or equal to any of `exact`. A bind mount or volume is a
  * plain dir to lstat and realpath, so only the mount table shows it. `mountinfo` defaults to this
- * process's own table on Linux, and there is nothing to check elsewhere.
+ * process's own table on Linux; elsewhere there is none to check. It fails closed: a table that
+ * can't be read, or that lists no mount points at all (a real one always lists `/`), is a problem.
  */
 export function mountPointProblems(
   dirs: { under: string[]; exact?: string[] },
   platform: NodeJS.Platform,
-  mountinfo: string | null = readMountinfo(),
+  mountinfo: MountTable = readMountinfo(),
 ): string[] {
   if (mountinfo === null) return [];
-  return parseMountPoints(mountinfo)
+  if (typeof mountinfo !== "string") {
+    return [`/proc/self/mountinfo could not be read (${mountinfo.unreadable}), so mounts can't be ruled out`];
+  }
+  const points = parseMountPoints(mountinfo);
+  if (points.length === 0) return ["/proc/self/mountinfo lists no mount points (a real one always lists /), so mounts can't be ruled out"];
+  return points
     .filter((mp) => dirs.under.some((d) => isInside(mp, d, platform)) || (dirs.exact ?? []).some((d) => samePath(mp, d, platform)))
     .map((mp) => `${mp} is a mount point`);
 }
@@ -470,7 +482,7 @@ function plainDirChain(root: string, parts: string[], platform: NodeJS.Platform,
  * wrapper seeds there and the CLI runs the binary and writes the dashboard config there, so a link
  * or mount anywhere in it would reach wherever it points (the owner's Convex cache or login dir, say).
  */
-export function sharedCacheProblems(root: string, platform: NodeJS.Platform = process.platform, mountinfo?: string | null): string[] {
+export function sharedCacheProblems(root: string, platform: NodeJS.Platform = process.platform, mountinfo?: MountTable): string[] {
   const why = "nothing in the shared cache may be a link or a mount, so the owner's Convex cache stays untouched.";
   const cache = path.join(resolvedRoot(root), "cache");
   const mounts = mountPointProblems({ under: [cache] }, platform, mountinfo).map((p) => `${p}; ${why}`);
@@ -488,7 +500,7 @@ export type BackendHomeInput = {
   ownerLocalAppData?: string;
   platform?: NodeJS.Platform;
   /** For tests: a mountinfo text instead of this process's own. */
-  mountinfo?: string | null;
+  mountinfo?: MountTable;
 };
 
 /**

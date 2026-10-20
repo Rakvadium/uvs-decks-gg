@@ -654,7 +654,25 @@ describe("pinned local backend version (#221)", () => {
           "/r/backends is a mount point",
           "/r/backends/8182/.convex is a mount point",
         ]);
-        expect(mountPointProblems({ under: ["/r/cache"] }, "linux", null)).toEqual([]);
+        // null: a host with no mount table at all (not Linux), so there is nothing to check.
+        expect(mountPointProblems({ under: ["/r/cache"] }, "darwin", null)).toEqual([]);
+      });
+      test("an unreadable or empty mount table fails closed (#236 round 4)", () => {
+        const unreadable = mountPointProblems({ under: ["/r/cache"] }, "linux", { unreadable: "EACCES" });
+        expect(unreadable).toEqual(["/proc/self/mountinfo could not be read (EACCES), so mounts can't be ruled out"]);
+        for (const empty of ["", "\n", "garbage\n"]) {
+          expect(mountPointProblems({ under: ["/r/cache"] }, "linux", empty)[0]).toMatch(/lists no mount points/);
+        }
+        const owner = ownerSetup("linux");
+        const root = tmpDir("uvs-root-");
+        fs.mkdirSync(path.join(root, "cache", "convex"), { recursive: true });
+        fs.mkdirSync(backendDir(8182, root), { recursive: true });
+        expect(sharedCacheProblems(root, "linux", { unreadable: "EACCES" })[0]).toMatch(/could not be read \(EACCES\)/);
+        expect(sharedCacheProblems(root, "linux", "")[0]).toMatch(/lists no mount points/);
+        expect(backendHomeProblems({ root, appPort: 8182, realHome: owner.realHome, platform: "linux", mountinfo: { unreadable: "EACCES" } })[0]).toMatch(
+          /could not be read \(EACCES\)/,
+        );
+        expect(backendHomeProblems({ root, appPort: 8182, realHome: owner.realHome, platform: "linux", mountinfo: "" })[0]).toMatch(/lists no mount points/);
       });
       test("a mount in the shared cache or the backend home is refused (mountinfo fixture)", () => {
         const owner = ownerSetup("linux");
@@ -718,6 +736,33 @@ describe("pinned local backend version (#221)", () => {
         expect(problems.some((m) => /\.convex is a mount point/.test(m))).toBe(true);
         // Outside the namespace there is no mount, and nothing to refuse.
         expect(backendHomeProblems({ root, appPort: 8182, realHome: owner.realHome, platform: "linux" })).toEqual([]);
+      });
+      test.skipIf(!canUnshare)("linux: hiding the mount table inside `unshare -Urm` is refused, not read as no mounts (#236 round 4)", () => {
+        const owner = ownerSetup("linux");
+        const root = tmpDir("uvs-root-");
+        fs.mkdirSync(path.join(root, "cache", "convex"), { recursive: true });
+        fs.mkdirSync(backendDir(8182, root), { recursive: true });
+        const dir = tmpDir("uvs-probe-");
+        const probe = path.join(dir, "probe.ts");
+        fs.writeFileSync(
+          probe,
+          `import { sharedCacheProblems, backendHomeProblems } from ${JSON.stringify(path.resolve("scripts/validation/guard.ts"))};\n` +
+            `console.log(JSON.stringify([...sharedCacheProblems(${JSON.stringify(root)}, "linux"), ...backendHomeProblems({ root: ${JSON.stringify(root)}, appPort: 8182, realHome: ${JSON.stringify(owner.realHome)}, platform: "linux" })]));\n`,
+        );
+        const run = (over: string) => {
+          const r = sh(`unshare -Urm sh -c 'mount --bind ${over} /proc/$$/mountinfo && exec "${process.execPath}" "${probe}"'`);
+          expect(r.status).toBe(0);
+          return JSON.parse(r.stdout.trim().split("\n").at(-1)!) as string[];
+        };
+        // /dev/null over the table: it reads as empty.
+        expect(run("/dev/null").filter((m) => /lists no mount points/.test(m))).toHaveLength(2);
+        // A mode-000 file: EACCES for a non-root user (root reads it anyway, and then sees it empty).
+        const noread = path.join(dir, "noread");
+        fs.writeFileSync(noread, "");
+        fs.chmodSync(noread, 0o000);
+        expect(run(noread).some((m) => /could not be read \(EACCES\)|lists no mount points/.test(m))).toBe(true);
+        // With the real table, the same plain layout has no problems.
+        expect(sh(`"${process.execPath}" "${probe}"`).stdout.trim()).toBe("[]");
       });
       test.skipIf(process.platform !== "linux")("linux host: a FIFO in the backend home is refused, and so is an unreadable deep path", () => {
         const owner = ownerSetup("linux");
