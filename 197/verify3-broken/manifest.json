@@ -1,0 +1,44 @@
+{
+  "issue": "197",
+  "label": "verify3-broken",
+  "port": 8242,
+  "chrome": "calm",
+  "fullPage": false,
+  "strict": true,
+  "shots": [
+    {
+      "name": "decks__desktop__aurora__light",
+      "route": "/decks",
+      "auth": "agent",
+      "appearance": {
+        "theme": "aurora",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/decks",
+      "loaded": true,
+      "stable": true,
+      "pin": {
+        "saved": null,
+        "patched": false,
+        "problems": [
+          "no sessions:getSession subscription was seen (renamed, or the page isn't signed in)"
+        ],
+        "pinned": "aurora/light/calm",
+        "overridden": false,
+        "flagged": true
+      }
+    }
+  ],
+  "gif": null,
+  "blockedConvexWrites": [
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Mutation:sessions:ensureAppearanceMigrated",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus"
+  ],
+  "savedAppearance": [],
+  "pinFlagged": [
+    "decks__desktop__aurora__light"
+  ]
+}
