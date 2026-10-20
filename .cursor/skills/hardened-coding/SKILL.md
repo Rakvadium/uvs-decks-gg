@@ -56,7 +56,12 @@ If any UI file changed:
 
 Rules: `AGENTS.md` § Secrets and live data. This is the one checklist for both roles. Builders run every item before opening or updating a PR and put the results in the PR body. Verifiers rerun every item themselves through `pr-issue-verify`.
 
-- [ ] **Secret scan:** `bun run secret-scan --diff origin/<base>..HEAD` is clean. It scans the PR's own commits (merge-base to HEAD), not a two-way diff against the base. `bun run secret-scan --path <dir>` is clean for every capture or media folder before it is published. Until `secret-scan` is available (#202), run the fallback scan below.
+- [ ] **Secret scan:** the values come from the main checkout's live env backup (`.env.local.live-backup`) and its Convex env dump (`data/live-env-no-r2.txt`). A worktree has neither, so pass both by full path (`<main>` = the main checkout):
+  - `bun run secret-scan --diff origin/<base>..HEAD --env-file <main>/.env.local.live-backup --env-file <main>/data/live-env-no-r2.txt` scans the PR's own commits (merge-base to HEAD), not a two-way diff against the base.
+  - `bun run secret-scan --path <dir>` with the same two `--env-file` flags, for every capture or media folder before it is published.
+  - Optional before each commit: `bun run secret-scan --staged` with the same flags.
+  - A "nothing scanned" or "missing value" warning fails this item, even when the exit code is 0.
+  - Until `secret-scan` is available (#202), run the fallback scan below.
 - [ ] **Live data:** no writes, and no `convex` command that changes the cloud deployment without human approval. Say so in the PR body.
 - [ ] **Scope:** every path in `git diff --name-only origin/<base>...HEAD` is in the issue's allowed paths.
 - [ ] **New targets:** for each new branch, push target, upload or workflow, name the CI/CD it triggers (Vercel, GitHub Actions) and who can see it (this repo is public). Example: the orphan `pr-media` branch triggered failed Vercel builds until it got a `vercel.json` with deployments disabled.
@@ -65,8 +70,8 @@ Rules: `AGENTS.md` § Secrets and live data. This is the one checklist for both 
 
 **Fallback scan** (until `secret-scan` is available):
 
-- **Inputs:** the added lines of `git diff origin/<base>...HEAD` (three dots, so only the PR's changes), the commit messages from `git log origin/<base>..HEAD --format=%B`, the PR title and body, and each media folder.
-- **Values:** read them from this worktree's env file. Skip values shorter than 8 characters.
+- **Inputs:** the added lines of `git diff origin/<base>...HEAD` (three dots, so only the PR's changes), the added lines of each commit in `git log -p origin/<base>..HEAD` (catches a value added and later removed), the commit messages from `git log origin/<base>..HEAD --format=%B`, the PR title and body, and each media folder.
+- **Values:** read them from the same two files as the scan command, `<main>/.env.local.live-backup` and `<main>/data/live-env-no-r2.txt`, by full path. If either file is missing or yields no values, this item fails. Skip values shorter than 8 characters.
 - **Forms:** match each value raw, URL-encoded and base64-encoded.
 - **Output:** print each variable name with its hit count, never the value.
 

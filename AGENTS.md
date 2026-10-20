@@ -21,7 +21,13 @@ The cloud Convex deployment (the one Convex calls "dev") serves the live site. A
 - Write env var **names**, never values, in tracked files, commit messages, PR text, comments and published media. Docs and tests use `<placeholder>` values.
 - Keep secrets out of URLs and logs. The one exception is `/agent-login?token=` on `http://localhost:<port>` under `next dev` (the route only works when `NODE_ENV=development` and `VERCEL!=1`). Open it only in your own browser. `next dev` output logs that URL with the token, so redact `token=` before you share dev-server output.
 - Leave live data as you found it: read only. Signing in as the agent user (its own auth session) is the only write allowed.
-- Get explicit human approval for this task before any `convex` command that changes the cloud deployment: `dev`, `deploy`, `run`, `import`, `env set`, `env remove`, or a migration. The same commands against a local backend (`127.0.0.1`, e.g. `convex dev --local`) are allowed. Confirm which one `.env.local` targets first, without printing values.
+- Get explicit human approval for this task before any `convex` command that changes the cloud deployment: `dev`, `deploy`, `run`, `import`, `env set`, `env remove`, or a migration. The same commands against a local backend (`127.0.0.1`, e.g. `convex dev --local`) are allowed.
+- Before any `convex` command, prove the target is local, checking by name only and printing no values:
+  1. `CONVEX_DEPLOY_KEY` is unset in your shell (`env | cut -d= -f1 | grep '^CONVEX'`). An injected deploy key targets the cloud whatever `.env.local` says.
+  2. `CONVEX_DEPLOYMENT`, in the shell or `.env.local`, starts with `local:` or `anonymous:`.
+  3. The Convex URL host is `127.0.0.1` or `localhost`.
+
+  If any check fails or is unclear, the target is the live cloud deployment: get approval first. Once merged, the guarded `bun run vconvex` wrapper (#207) enforces these checks.
 
 Per-PR checklist: `hardened-coding` § Security & side effects. Verifiers rerun it through `pr-issue-verify`.
 
@@ -66,7 +72,7 @@ Two dev services (no combined script — run each in its own tmux session):
 Convex deployment + secrets (already provisioned; do not re-provision):
 - The Cloud env injects `CONVEX_DEPLOY_KEY`, `CONVEX_URL`, and `NEXT_PUBLIC_CONVEX_URL` as secrets, so Convex CLI targets a real cloud **dev** deployment and Next.js can reach it even before `.env.local` exists. `bunx convex dev` (re)writes `.env.local` with the matching `CONVEX_DEPLOYMENT`/`NEXT_PUBLIC_CONVEX_URL`.
 - That deployment already has its env vars set (`JWKS`, `JWT_PRIVATE_KEY` for Convex Auth, plus `R2_*`, `OPENAI_API_KEY`, `YOUTUBE_DATA_API_KEY`, `ADMIN_API_KEY`, `AUTH_RESEND_KEY`). `bunx convex env list` prints values, so keep its output out of logs, PRs and comments. Auth works out of the box — no `@convex-dev/auth` init needed.
-- This is a **shared** cloud dev deployment; `bunx convex dev` deploys your local function changes to it, so schema/function edits are visible to anyone else on it.
+- This is a **shared** cloud dev deployment, and it serves the live site (see Secrets and live data). `bunx convex dev` deploys your local function changes to it, so schema/function edits go live.
 
 Authenticated testing via agent login (dev only; see [docs/agent-onboarding.md](docs/agent-onboarding.md) §6):
 - `AGENT_AUTH_SECRET` / `AGENT_AUTH_EMAIL` / `AGENT_AUTH_PASSWORD` / `AGENT_AUTH_USERNAME` are injected as secrets, so the `/agent-login` flow works without extra setup. Visit `http://localhost:8090/agent-login?token=$AGENT_AUTH_SECRET&next=/decks` in a browser to auto sign in as the `agent` user (created on first use). The sign-in completes client-side via Convex Auth, so it must run in a real browser, not curl.
