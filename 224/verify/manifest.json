@@ -1,0 +1,166 @@
+{
+  "issue": "224",
+  "label": "verify",
+  "port": 8293,
+  "chrome": "calm",
+  "fullPage": false,
+  "strict": true,
+  "shots": [
+    {
+      "name": "guest-gallery__desktop__default__light",
+      "route": "/gallery",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/gallery",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "guest-gallery__desktop__default__dark",
+      "route": "/gallery",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/gallery",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "guest-gallery__desktop__cyberpunk__light",
+      "route": "/gallery",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/gallery",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "guest-gallery__desktop__cyberpunk__dark",
+      "route": "/gallery",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/gallery",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "guest-gallery__mobile__default__light",
+      "route": "/gallery",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/gallery",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "guest-gallery__mobile__default__dark",
+      "route": "/gallery",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/gallery",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "guest-gallery__mobile__cyberpunk__light",
+      "route": "/gallery",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/gallery",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "guest-gallery__mobile__cyberpunk__dark",
+      "route": "/gallery",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/gallery",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    }
+  ],
+  "gif": {
+    "name": "guest-gallery-scroll__desktop__default__dark",
+    "auth": "guest",
+    "appearance": {
+      "theme": "default",
+      "mode": "dark",
+      "chrome": "calm"
+    },
+    "frames": 31,
+    "pin": null,
+    "unproxied": []
+  },
+  "blockedConvexWrites": [
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus"
+  ],
+  "savedAppearance": [],
+  "pinFlagged": [],
+  "unstable": [],
+  "unproxiedSockets": []
+}
