@@ -688,4 +688,17 @@ export default defineSchema({
     isAnonymous: v.boolean(),
     userId: v.optional(v.id("users")),
   }),
+
+  // ---------------------------------------------------------------------------
+  // Validation backends only (convex/agentLogin.ts). Single-use agent login
+  // codes; only their SHA-256 is stored. Never written on a cloud deployment.
+  // ---------------------------------------------------------------------------
+  agentLoginCodes: defineTable({
+    codeHash: v.string(),
+    userId: v.id("users"),
+    email: v.string(),
+    expiresAt: v.number(),
+  })
+    .index("by_codeHash", ["codeHash"])
+    .index("by_expiresAt", ["expiresAt"]),
 });

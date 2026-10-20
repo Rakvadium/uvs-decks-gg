@@ -1,8 +1,12 @@
+import { ConvexCredentials } from "@convex-dev/auth/providers/ConvexCredentials";
 import { Password } from "@convex-dev/auth/providers/Password";
 import { convexAuth } from "@convex-dev/auth/server";
 import { ConvexError } from "convex/values";
 import { z } from "zod";
+import { internal } from "./_generated/api";
+import type { Id } from "./_generated/dataModel";
 import { isReservedAgentEmail } from "./lib/reservedIdentity";
+import { isValidationBackend } from "./lib/validationBackend";
 import { ResendOTPPasswordReset } from "./ResendOTPPasswordReset";
 
 const SignUpProfileSchema = z.object({
@@ -53,6 +57,21 @@ const passwordProvider = Password({
 
 export default passwordProvider;
 
+/**
+ * One-time agent login (convex/agentLogin.ts). Inert unless this is a local validation backend:
+ * `authorize` returns null before touching the database anywhere else.
+ */
+export const agentCodeProvider: ReturnType<typeof ConvexCredentials> = ConvexCredentials({
+  id: "agent-code",
+  authorize: async (params, ctx) => {
+    if (!isValidationBackend()) return null;
+    const { code } = params;
+    if (typeof code !== "string") return null;
+    const userId: Id<"users"> | null = await ctx.runMutation(internal.agentLogin.consume, { code });
+    return userId ? { userId } : null;
+  },
+});
+
 export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
-  providers: [passwordProvider],
+  providers: [passwordProvider, agentCodeProvider],
 });

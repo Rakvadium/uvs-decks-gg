@@ -1,14 +1,11 @@
+import { notFound } from "next/navigation";
+import { isAgentLoginPageEnabled } from "@/lib/agent-auth";
 import { AgentLoginClient } from "./agent-login-client";
-import { sanitizeAgentLoginNextPath } from "@/lib/agent-auth-shared";
 
-type AgentLoginPageProps = {
-  searchParams: Promise<{ token?: string; next?: string }>;
-};
+// Read the env per request, never at build time.
+export const dynamic = "force-dynamic";
 
-export default async function AgentLoginPage({ searchParams }: AgentLoginPageProps) {
-  const params = await searchParams;
-  const token = typeof params.token === "string" ? params.token.trim() : "";
-  const nextPath = sanitizeAgentLoginNextPath(params.next);
-
-  return <AgentLoginClient token={token} nextPath={nextPath} />;
+export default function AgentLoginPage() {
+  if (!isAgentLoginPageEnabled()) notFound();
+  return <AgentLoginClient />;
 }

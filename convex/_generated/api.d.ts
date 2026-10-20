@@ -13,6 +13,7 @@ import type * as accountStatusExpiry from "../accountStatusExpiry.js";
 import type * as admin from "../admin.js";
 import type * as adminHttp from "../adminHttp.js";
 import type * as adminUsers from "../adminUsers.js";
+import type * as agentLogin from "../agentLogin.js";
 import type * as auth from "../auth.js";
 import type * as cardDraftActions from "../cardDraftActions.js";
 import type * as cardDrafts from "../cardDrafts.js";
@@ -52,6 +53,7 @@ import type * as lib_moderation_localCommentHeuristic from "../lib/moderation/lo
 import type * as lib_moderation_providers from "../lib/moderation/providers.js";
 import type * as lib_moderation_textPublish from "../lib/moderation/textPublish.js";
 import type * as lib_r2Keys from "../lib/r2Keys.js";
+import type * as lib_reservedIdentity from "../lib/reservedIdentity.js";
 import type * as lib_username from "../lib/username.js";
 import type * as lib_validationBackend from "../lib/validationBackend.js";
 import type * as mediaAssetActions from "../mediaAssetActions.js";
@@ -103,6 +105,7 @@ declare const fullApi: ApiFromModules<{
   admin: typeof admin;
   adminHttp: typeof adminHttp;
   adminUsers: typeof adminUsers;
+  agentLogin: typeof agentLogin;
   auth: typeof auth;
   cardDraftActions: typeof cardDraftActions;
   cardDrafts: typeof cardDrafts;
@@ -142,6 +145,7 @@ declare const fullApi: ApiFromModules<{
   "lib/moderation/providers": typeof lib_moderation_providers;
   "lib/moderation/textPublish": typeof lib_moderation_textPublish;
   "lib/r2Keys": typeof lib_r2Keys;
+  "lib/reservedIdentity": typeof lib_reservedIdentity;
   "lib/username": typeof lib_username;
   "lib/validationBackend": typeof lib_validationBackend;
   mediaAssetActions: typeof mediaAssetActions;

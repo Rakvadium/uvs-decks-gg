@@ -25,7 +25,7 @@
     "validation:seed:build": "bun scripts/validation/not-implemented.ts validation:seed:build",
     "validation:seed:reset": "bun scripts/validation/not-implemented.ts validation:seed:reset",
     "agent:setup": "bun scripts/validation/not-implemented.ts agent:setup",
-    "agent:login-url": "bun scripts/validation/not-implemented.ts agent:login-url"
+    "agent:login-url": "bun scripts/validation/mint-login.ts"
   },
   "dependencies": {
     "@auth/core": "0.37.0",
