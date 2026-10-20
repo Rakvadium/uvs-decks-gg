@@ -1,0 +1,68 @@
+{
+  "desktop": {
+    "getByRoleDialog": 1,
+    "getByRoleDialogEditDeckDetails": 1,
+    "dom": {
+      "dialogs": [
+        {
+          "role": "dialog",
+          "slot": "dialog-content",
+          "title": "Edit deck details",
+          "state": "open",
+          "ariaHiddenBy": null,
+          "visible": true,
+          "containsFocus": true
+        }
+      ],
+      "editTitles": 1,
+      "activeElement": {
+        "tag": "input",
+        "id": "deck-edit-name",
+        "label": null
+      }
+    },
+    "focusTrapEscapesOnTab": [],
+    "afterEscape": {
+      "openDialogs": 0,
+      "ariaHiddenLeft": 0,
+      "active": "Edit"
+    },
+    "closeButtonInA11yTree": 1,
+    "focusReturnedToTrigger": true,
+    "focusReturnedAfterCloseButton": true,
+    "ariaSnapshot": "- region \"Notifications alt+T\"\n- dialog \"Edit deck details\":\n  - heading \"Edit deck details\" [level=2]\n  - paragraph: Change the name, description, play format, visibility, and who can view this deck.\n  - text: Deck name\n  - textbox \"Deck name\": Radiant Tempo\n  - text: Description\n  - textbox \"Description\":\n    - /placeholder: Add a short description\n    - text: Seeded public deck for validation captures.\n  - text: Format\n  - combobox \"Format\": Standard\n  - text: Visibility\n  - combobox \"Visibility\": Public\n  - button \"Delete deck\"\n  - button \"Cancel\"\n  - button \"Save\"\n  - button \"Close\""
+  },
+  "mobile": {
+    "getByRoleDialog": 1,
+    "getByRoleDialogEditDeckDetails": 1,
+    "dom": {
+      "dialogs": [
+        {
+          "role": "dialog",
+          "slot": "dialog-content",
+          "title": "Edit deck details",
+          "state": "open",
+          "ariaHiddenBy": null,
+          "visible": true,
+          "containsFocus": true
+        }
+      ],
+      "editTitles": 1,
+      "activeElement": {
+        "tag": "input",
+        "id": "deck-edit-name",
+        "label": null
+      }
+    },
+    "focusTrapEscapesOnTab": [],
+    "afterEscape": {
+      "openDialogs": 0,
+      "ariaHiddenLeft": 0,
+      "active": "Edit deck details"
+    },
+    "closeButtonInA11yTree": 1,
+    "focusReturnedToTrigger": true,
+    "focusReturnedAfterCloseButton": true,
+    "ariaSnapshot": "- region \"Notifications alt+T\"\n- dialog \"Edit deck details\":\n  - heading \"Edit deck details\" [level=2]\n  - paragraph: Change the name, description, play format, visibility, and who can view this deck.\n  - text: Deck name\n  - textbox \"Deck name\": Radiant Tempo\n  - text: Description\n  - textbox \"Description\":\n    - /placeholder: Add a short description\n    - text: Seeded public deck for validation captures.\n  - text: Format\n  - combobox \"Format\": Standard\n  - text: Visibility\n  - combobox \"Visibility\": Public\n  - button \"Delete deck\"\n  - button \"Cancel\"\n  - button \"Save\"\n  - button \"Close\""
+  }
+}

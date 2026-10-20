@@ -1,0 +1,39 @@
+{
+  "base": "before",
+  "head": "after",
+  "threshold": 0.1,
+  "results": [
+    {
+      "name": "edit-deck-dialog-open__desktop__cyberpunk__dark",
+      "diffPercent": 10.145
+    },
+    {
+      "name": "edit-deck-dialog-open__desktop__cyberpunk__light",
+      "diffPercent": 9.527
+    },
+    {
+      "name": "edit-deck-dialog-open__desktop__default__dark",
+      "diffPercent": 9.056
+    },
+    {
+      "name": "edit-deck-dialog-open__desktop__default__light",
+      "diffPercent": 8.574
+    },
+    {
+      "name": "edit-deck-dialog-open__mobile__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "edit-deck-dialog-open__mobile__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "edit-deck-dialog-open__mobile__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "edit-deck-dialog-open__mobile__default__light",
+      "diffPercent": 0
+    }
+  ]
+}

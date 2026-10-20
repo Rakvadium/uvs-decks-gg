@@ -1,0 +1,26 @@
+{
+  "label": "before",
+  "deck": "nh7f0kqdg3hwnpjpmga3tavb5sx4nzwf",
+  "override": "user:currentUser result rewritten to the seeded deck owner in the browser only",
+  "blockedConvexWrites": [
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus",
+    "Action:communityLive:refreshLiveStatus"
+  ],
+  "currentUserOverrides": 9
+}

@@ -1,0 +1,86 @@
+{
+  "desktop": {
+    "getByRoleDialog": 0,
+    "getByRoleDialogEditDeckDetails": 0,
+    "dom": {
+      "dialogs": [
+        {
+          "role": "dialog",
+          "slot": "dialog-content",
+          "title": "Edit deck details",
+          "state": "open",
+          "ariaHiddenBy": "div[data-slot=dialog-content]",
+          "visible": true,
+          "containsFocus": false
+        },
+        {
+          "role": "dialog",
+          "slot": "dialog-content",
+          "title": "Edit deck details",
+          "state": "open",
+          "ariaHiddenBy": "div[data-slot=dialog-content]",
+          "visible": true,
+          "containsFocus": true
+        }
+      ],
+      "editTitles": 2,
+      "activeElement": {
+        "tag": "input",
+        "id": "deck-edit-name",
+        "label": null
+      }
+    },
+    "focusTrapEscapesOnTab": [],
+    "afterEscape": {
+      "openDialogs": 0,
+      "ariaHiddenLeft": 0,
+      "active": "Skip to main contentUVSDECKS.GGCard Gall"
+    },
+    "closeButtonInA11yTree": 0,
+    "focusReturnedToTrigger": false,
+    "focusReturnedAfterCloseButton": false,
+    "ariaSnapshot": "- region \"Notifications alt+T\""
+  },
+  "mobile": {
+    "getByRoleDialog": 0,
+    "getByRoleDialogEditDeckDetails": 0,
+    "dom": {
+      "dialogs": [
+        {
+          "role": "dialog",
+          "slot": "dialog-content",
+          "title": "Edit deck details",
+          "state": "open",
+          "ariaHiddenBy": "div[data-slot=dialog-content]",
+          "visible": true,
+          "containsFocus": false
+        },
+        {
+          "role": "dialog",
+          "slot": "dialog-content",
+          "title": "Edit deck details",
+          "state": "open",
+          "ariaHiddenBy": "div[data-slot=dialog-content]",
+          "visible": true,
+          "containsFocus": true
+        }
+      ],
+      "editTitles": 2,
+      "activeElement": {
+        "tag": "input",
+        "id": "deck-edit-name",
+        "label": null
+      }
+    },
+    "focusTrapEscapesOnTab": [],
+    "afterEscape": {
+      "openDialogs": 0,
+      "ariaHiddenLeft": 0,
+      "active": "Skip to main contentUVSDECKS.GGCard Gall"
+    },
+    "closeButtonInA11yTree": 0,
+    "focusReturnedToTrigger": false,
+    "focusReturnedAfterCloseButton": false,
+    "ariaSnapshot": "- region \"Notifications alt+T\""
+  }
+}
