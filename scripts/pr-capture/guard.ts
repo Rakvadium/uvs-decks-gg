@@ -1,15 +1,35 @@
 /** The Convex sync WebSocket path the capture proxy routes. */
 export const CONVEX_SYNC_SOCKET = /\/api\/[^/]+\/sync$/;
 
-/** A sync-path socket, or any socket to the Convex deployment's host (so a renamed path still counts). */
-export function isConvexSocket(url: string, convexHost?: string) {
-  if (CONVEX_SYNC_SOCKET.test(url)) return true;
-  if (!convexHost) return false;
+/** Hosts of Convex's cloud (`*.convex.cloud`, `*.convex.site`): never a capture target. */
+const CLOUD_CONVEX_HOST = /(^|\.)convex\.(cloud|site)$/i;
+
+function hostOf(url: string): string | null {
   try {
-    return new URL(url).host === convexHost;
+    return new URL(url).host.toLowerCase();
   } catch {
-    return false;
+    return null;
   }
+}
+
+/** Whether `url` goes to a Convex cloud deployment (any port, any scheme). */
+export function isCloudConvexUrl(url: string) {
+  const host = hostOf(url);
+  return host !== null && CLOUD_CONVEX_HOST.test(host.replace(/:\d+$/, ""));
+}
+
+/**
+ * Whether `url` is this run's validation backend: one of `backendHosts` (`127.0.0.1:<port>`,
+ * `localhost:<port>`). Anything else, a cloud deployment above all, is refused by the proxy.
+ */
+export function isBackendUrl(url: string, backendHosts: readonly string[]) {
+  const host = hostOf(url);
+  return host !== null && backendHosts.includes(host);
+}
+
+/** A sync-path socket, any socket to the backend's hosts (so a renamed path still counts), or a cloud deployment. */
+export function isConvexSocket(url: string, backendHosts: readonly string[] = []) {
+  return CONVEX_SYNC_SOCKET.test(url) || isBackendUrl(url, backendHosts) || isCloudConvexUrl(url);
 }
 
 const frameKey = (frame: string | Buffer) => (typeof frame === "string" ? `s:${frame}` : `b:${frame.toString("base64")}`);
@@ -39,20 +59,26 @@ const frameType = (frame: string | Buffer) => {
  *
  * SharedWorkers and service workers get no WebSocket reporting from Playwright at all, so starting
  * one is a problem by itself: nothing it opens could be checked.
+ *
+ * `refused` is separate: a socket or request to anything but the validation backend that the
+ * capture stopped before it connected. Capture treats any refusal as fatal.
  */
-export function createSocketGuard(convexHost?: string) {
+export function createSocketGuard(backendHosts: readonly string[] = []) {
   let proxied = 0;
   let opened = 0;
   /** Client frames the proxy forwarded and the real connection hasn't reported sending yet. */
   const forwardedFrames = new Map<string, number>();
   const strayTypes = new Map<string, number>();
   const workers: string[] = [];
+  const refused: string[] = [];
   return {
-    isConvexSocket: (url: string) => isConvexSocket(url, convexHost),
+    isConvexSocket: (url: string) => isConvexSocket(url, backendHosts),
     /** The proxy routed a socket. Called before it connects, so before `opened` sees it. */
     proxied() {
       proxied++;
     },
+    /** How many sockets the proxy has connected so far. */
+    proxiedCount: () => proxied,
     /** The proxy is about to hand this client frame to the real connection. */
     forwarded(frame: string | Buffer) {
       const key = frameKey(frame);
@@ -74,6 +100,13 @@ export function createSocketGuard(convexHost?: string) {
       const text = `a ${kind} started (${url}); WebSockets it opens bypass the capture proxy and can't be seen, so its writes would not be blocked`;
       if (!workers.includes(text)) workers.push(text);
     },
+    /** The capture stopped a socket or request to `url` before it connected. Only the host is kept. */
+    refuse(kind: "WebSocket" | "request", url: string) {
+      const text = `a ${kind} to ${hostOf(url) ?? "an unparseable URL"} was refused: it is not this worktree's validation backend`;
+      if (!refused.includes(text)) refused.push(text);
+    },
+    /** Everything refused so far. Non-empty means the app tried to reach another deployment. */
+    refusals: (): string[] => [...refused],
     /** Empty when every Convex socket so far went through the proxy and no unobservable worker started. */
     problems(): string[] {
       const problems: string[] = [];
@@ -94,12 +127,3 @@ export function createSocketGuard(convexHost?: string) {
 }
 
 export type SocketGuard = ReturnType<typeof createSocketGuard>;
-
-/** The Convex deployment host from NEXT_PUBLIC_CONVEX_URL, if set. */
-export function convexHostFromEnv(env: Record<string, string | undefined> = process.env) {
-  try {
-    return env.NEXT_PUBLIC_CONVEX_URL ? new URL(env.NEXT_PUBLIC_CONVEX_URL).host : undefined;
-  } catch {
-    return undefined;
-  }
-}

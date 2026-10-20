@@ -30,7 +30,7 @@
     "validation:seed:build": "bun scripts/validation/seed/build.ts",
     "validation:seed:reset": "bun scripts/validation/seed/reset.ts",
     "agent:setup": "bun scripts/agent-setup/index.ts",
-    "agent:login-url": "bun scripts/validation/not-implemented.ts agent:login-url"
+    "agent:login-url": "bun scripts/validation/mint-login.ts"
   },
   "dependencies": {
     "@auth/core": "0.37.0",

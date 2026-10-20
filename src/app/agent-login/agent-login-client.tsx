@@ -1,132 +1,105 @@
 "use client";
 
 import { PageHeading } from "@/components/ui/typography-headings";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useConvexAuth } from "convex/react";
 import { clearAuthCookies, isRefreshTokenParseError } from "@/components/auth/auth-recovery";
-import { sanitizeAgentLoginNextPath } from "@/lib/agent-auth-shared";
+import { parseAgentLoginFragment, stripFragment } from "@/lib/agent-auth-shared";
 
-type AgentLoginClientProps = {
-  token: string;
-  nextPath: string;
-};
+type Fragment = ReturnType<typeof parseAgentLoginFragment>;
+type SignIn = ReturnType<typeof useAuthActions>["signIn"];
+type Router = ReturnType<typeof useRouter>;
 
-type AgentCredentials = {
-  email: string;
-  password: string;
-  username: string;
-};
+const FAILED = "Agent login failed";
 
-export function AgentLoginClient({ token, nextPath }: AgentLoginClientProps) {
+// Module scope, not component state: the page can remount while it loads, and the hash is gone
+// after the first read. Each code is redeemed at most once per page load.
+let captured: Fragment | null = null;
+let redemption: Promise<boolean> | null = null;
+
+/**
+ * Reads `#code=…&next=…` once and scrubs it from the address bar and the history entry. Next keeps
+ * the initial URL (fragment included) inside its router tree in `history.state`, so the stored
+ * state is rewritten without the fragment, and the router is moved to the clean URL so its
+ * in-memory state can't write the old one back.
+ */
+function captureFragment(router: Router): Fragment {
+  const { hash, pathname, search } = window.location;
+  if (captured === null || hash) {
+    captured = parseAgentLoginFragment(hash);
+    redemption = null;
+    if (hash) {
+      const cleanUrl = pathname + search;
+      window.history.replaceState(stripFragment(window.history.state, hash), "", cleanUrl);
+      router.replace(cleanUrl, { scroll: false });
+    }
+  }
+  return captured;
+}
+
+function redeemOnce(code: string, signIn: SignIn): Promise<boolean> {
+  redemption ??= (async () => {
+    try {
+      return (await signIn("agent-code", { code })).signingIn;
+    } catch (err) {
+      if (!isRefreshTokenParseError(err)) throw err;
+      await clearAuthCookies();
+      return (await signIn("agent-code", { code })).signingIn;
+    }
+  })();
+  return redemption;
+}
+
+/**
+ * Redeems the one-time code minted by `bun run agent:login-url`. The code only ever lives in the
+ * URL fragment, which is never sent to a server.
+ */
+export function AgentLoginClient() {
   const router = useRouter();
   const { signIn } = useAuthActions();
   const { isAuthenticated, isLoading } = useConvexAuth();
-  const [status, setStatus] = useState("Preparing agent session…");
+  const [status, setStatus] = useState("Signing in…");
   const [error, setError] = useState<string | null>(null);
-  const startedRef = useRef(false);
 
   useEffect(() => {
+    const { code, nextPath } = captureFragment(router);
     if (isLoading) return;
-    if (isAuthenticated) {
-      router.replace(sanitizeAgentLoginNextPath(nextPath));
-    }
-  }, [isAuthenticated, isLoading, nextPath, router]);
-
-  useEffect(() => {
-    if (startedRef.current || isLoading || isAuthenticated) return;
-    if (!token) {
-      setError("Missing token query parameter");
-      setStatus("Agent login failed");
-      return;
-    }
-
-    startedRef.current = true;
-    let cancelled = false;
-
-    async function establishSession(credentials: AgentCredentials) {
-      const signInArgs = {
-        email: credentials.email,
-        password: credentials.password,
-        flow: "signIn" as const,
-      };
-      const signUpArgs = {
-        email: credentials.email,
-        password: credentials.password,
-        username: credentials.username,
-        flow: "signUp" as const,
-      };
-
-      try {
-        const result = await signIn("password", signInArgs);
-        if (!result.signingIn) {
-          throw new Error("Sign-in requires an additional step");
-        }
-        return;
-      } catch (signInError) {
-        if (isRefreshTokenParseError(signInError)) {
-          await clearAuthCookies();
-          const retry = await signIn("password", signInArgs);
-          if (retry.signingIn) return;
-        }
-      }
-
-      setStatus("Creating agent account…");
-      const signedUp = await signIn("password", signUpArgs);
-      if (!signedUp.signingIn) {
-        throw new Error("Sign-up requires an additional step");
-      }
-    }
-
-    async function run() {
-      try {
-        setStatus("Validating agent secret…");
-        const response = await fetch("/api/agent-auth", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ secret: token }),
-        });
-        const payload = (await response.json().catch(() => null)) as
-          | (AgentCredentials & { error?: string })
-          | { error?: string }
-          | null;
-
-        if (
-          !response.ok ||
-          !payload ||
-          !("email" in payload) ||
-          !payload.email ||
-          !payload.password ||
-          !payload.username
-        ) {
-          throw new Error(payload?.error || "Agent auth rejected");
-        }
-
-        if (cancelled) return;
-        setStatus("Signing in…");
-        await establishSession({
-          email: payload.email,
-          password: payload.password,
-          username: payload.username,
-        });
-
-        if (cancelled) return;
-        setStatus("Redirecting…");
-        router.replace(sanitizeAgentLoginNextPath(nextPath));
-      } catch (err) {
-        if (cancelled) return;
-        console.error(err);
-        setError(err instanceof Error ? err.message : "Agent login failed");
-        setStatus("Agent login failed");
-      }
-    }
-
-    void run();
-    return () => {
-      cancelled = true;
+    let active = true;
+    const fail = (message: string) => {
+      if (!active) return;
+      setStatus(FAILED);
+      setError(message);
     };
-  }, [isAuthenticated, isLoading, nextPath, router, signIn, token]);
+
+    if (!code) {
+      if (isAuthenticated) router.replace(nextPath);
+      else queueMicrotask(() => fail("Missing or malformed code. Mint a new URL with `bun run agent:login-url`."));
+      return () => {
+        active = false;
+      };
+    }
+
+    redeemOnce(code, signIn).then(
+      (signedIn) => {
+        if (!active) return;
+        if (!signedIn) {
+          fail("Code rejected: it is invalid, expired or already used. Mint a new one.");
+          return;
+        }
+        setStatus("Redirecting…");
+        router.replace(nextPath);
+      },
+      (err: unknown) => {
+        console.error(err);
+        fail(err instanceof Error ? err.message : FAILED);
+      },
+    );
+    return () => {
+      active = false;
+    };
+  }, [isAuthenticated, isLoading, router, signIn]);
 
   return (
     <main className="flex min-h-[100dvh] items-center justify-center bg-background px-6">

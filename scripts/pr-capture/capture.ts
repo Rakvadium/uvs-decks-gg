@@ -8,9 +8,11 @@ import {
   HIDE_DEV_OVERLAY_CSS,
   agentLogin,
   newCaptureContext,
+  probeServerTarget,
   runSteps,
   settle,
   stableScreenshot,
+  type CaptureTarget,
 } from "./browser.ts";
 import { recordFrames, writeGif } from "./gif.ts";
 import { BREAK_PIN_ENV, shotPin, stillPin, type Appearance, type PinReport, type ShotPin } from "./pin.ts";
@@ -27,14 +29,26 @@ import {
   type Mode,
   type RouteSpec,
 } from "./shared.ts";
-
-if (fs.existsSync(".env.local")) process.loadEnvFile(".env.local");
+import {
+  backendHosts,
+  ensureSession,
+  loadPinnedCatalog,
+  mintLoginUrl,
+  parseClock,
+  validationPreflight,
+  type Preflight,
+} from "./target.ts";
 
 const args = parseArgs(process.argv.slice(2));
 const issue = requireIssue(args);
 const label = requireLabel(args.label, "--label");
 const port = Number(args.port);
-if (!Number.isInteger(port) || port <= 0) throw new Error("--port <number> is required");
+if (!Number.isInteger(port) || port <= 0) throw new Error("--port <app port of this worktree's validation backend> is required");
+/** Signed-in routes sign in as `<persona>@validation.invalid`. `alice` owns seeded decks. */
+const defaultPersona = typeof args.persona === "string" ? args.persona : "alice";
+const reseed = args.reseed === true;
+const allowWrites = args["allow-writes"] === true;
+const clock = parseClock(args.clock);
 
 const spec: CaptureSpec =
   typeof args.spec === "string"
@@ -74,26 +88,32 @@ function portOpen(): Promise<boolean> {
   });
 }
 
-/** Reuses whatever already listens on --port, otherwise starts `next dev -p <port>` (never Convex). */
-async function ensureServer(): Promise<ChildProcess | null> {
+/**
+ * Reuses whatever already listens on --port (the probe then checks which backend it talks to),
+ * otherwise starts `next dev -p <port>` with NEXT_PUBLIC_CONVEX_URL set to the validation backend.
+ * Never starts Convex. Only runs after the preflight passed.
+ */
+async function ensureServer(convexUrl: string): Promise<ChildProcess | null> {
   if (await portOpen()) {
-    console.log(`Reusing server on ${baseUrl}`);
+    console.log(`Reusing server on ${baseUrl} (its Convex target is checked before the first sign-in)`);
     return null;
   }
   const logFile = path.join(outDir, "next-dev.log");
-  console.log(`Starting next dev on ${baseUrl} (log: ${logFile})`);
+  console.log(`Starting next dev on ${baseUrl} against ${convexUrl} (log: ${logFile})`);
   const log = fs.createWriteStream(logFile);
   const next = path.join(process.cwd(), "node_modules", "next", "dist", "bin", "next");
   const child = spawn(process.execPath, [next, "dev", "-p", String(port)], {
     stdio: ["ignore", "pipe", "pipe"],
     detached: process.platform !== "win32",
+    // A set variable beats every env file, so this server can only point at the validation backend.
+    env: { ...process.env, NEXT_PUBLIC_CONVEX_URL: convexUrl },
   });
   let ready = false;
   let lockBusy = false;
   for (const stream of [child.stdout, child.stderr]) {
     readline.createInterface({ input: stream }).on("line", (line) => {
-      // Next logs request URLs, and /agent-login carries AGENT_AUTH_SECRET.
-      log.write(`${line.replace(/token=[^&\s]+/g, "token=<redacted>")}\n`);
+      // Login codes travel in a URL fragment, which never reaches the server; redact anyway.
+      log.write(`${line.replace(/\b(token|code)=[^&\s]+/g, "$1=<redacted>")}\n`);
       if (/Ready in/.test(line)) ready = true;
       if (/Unable to acquire lock/.test(line)) lockBusy = true;
     });
@@ -129,11 +149,32 @@ function warnUnproxied(unproxied: string[]) {
   if (unproxied.length) console.warn(`    WARNING: Convex socket outside the capture proxy: ${unproxied.join("; ")}`);
 }
 
-/** Signed-in shots sign in on their own (see `agentLogin`); guests don't. */
-async function loginFor(browser: Browser, auth: RouteSpec["auth"], blocked: string[]) {
-  if (auth !== "agent") return { storageState: undefined, unproxied: [] };
-  const login = await agentLogin(browser, baseUrl, blocked);
-  return { storageState: login.storageState, unproxied: login.unproxied.map((problem) => `during sign-in: ${problem}`) };
+/** Set by main() once the preflight passed. */
+let target: CaptureTarget;
+/** Each persona signed in this run, with whether ensureSession had to store a session row. */
+const personas = new Map<string, { persona: string; email: string; sessionCreated: boolean }>();
+
+/**
+ * Signed-in shots sign in on their own, each with a freshly minted one-time code (see
+ * `agentLogin`); guests don't. A persona's first sign-in also makes sure it has a session row.
+ */
+async function loginFor(browser: Browser, route: RouteSpec, blocked: string[]) {
+  if (route.auth !== "agent") return { storageState: undefined, persona: null, unproxied: [], refused: [] };
+  const persona = route.persona ?? defaultPersona;
+  const minted = await mintLoginUrl(port, persona, baseUrl);
+  const login = await agentLogin(browser, minted.url, target, blocked);
+  if (!personas.has(persona)) personas.set(persona, await ensureSession(port, persona));
+  return {
+    storageState: login.storageState,
+    persona: minted.email,
+    unproxied: login.unproxied.map((problem) => `during sign-in: ${problem}`),
+    refused: login.refused.map((problem) => `during sign-in: ${problem}`),
+  };
+}
+
+/** Any refused target ends the run at once: the app tried to reach something other than the validation backend. */
+function assertNotRefused(name: string, refused: string[]) {
+  if (refused.length) throw new Error(`capture refused: ${name}: ${refused.join("; ")}. Nothing more was captured.`);
 }
 
 function stopServer(child: ChildProcess | null) {
@@ -150,10 +191,12 @@ async function captureStill(
   blocked: string[],
 ) {
   const name = shotName(route, viewport, appearance.theme, appearance.mode);
-  const login = await loginFor(browser, route.auth, blocked);
+  const login = await loginFor(browser, route, blocked);
+  assertNotRefused(name, login.refused);
   const { context, page, pin, guard } = await newCaptureContext(browser, {
     viewport,
     appearance,
+    target,
     storageState: login.storageState,
     blocked,
     still: true,
@@ -176,7 +219,8 @@ async function captureStill(
     warnPin(report);
     const unproxied = [...login.unproxied, ...guard.problems()];
     warnUnproxied(unproxied);
-    return { name, route: route.path, auth: route.auth, appearance, finalPath, loaded, stable, pin: report, unproxied };
+    assertNotRefused(name, guard.refusals());
+    return { name, route: route.path, auth: route.auth, persona: login.persona, appearance, finalPath, loaded, stable, pin: report, unproxied };
   } finally {
     await context.close();
   }
@@ -188,10 +232,12 @@ async function captureGif(browser: Browser, blocked: string[]) {
   const appearance = { theme: gif.theme ?? themes[0], mode: gif.mode ?? modes[0], chrome };
   const name = shotName(gif, viewport, appearance.theme, appearance.mode);
   const videoDir = path.join(outDir, ".video-tmp");
-  const login = await loginFor(browser, gif.auth, blocked);
+  const login = await loginFor(browser, gif, blocked);
+  assertNotRefused(name, login.refused);
   const { context, page, pin, guard } = await newCaptureContext(browser, {
     viewport,
     appearance,
+    target,
     storageState: login.storageState,
     blocked,
     still: false,
@@ -200,6 +246,7 @@ async function captureGif(browser: Browser, blocked: string[]) {
   let frames: Awaited<ReturnType<typeof recordFrames<PinReport>>> = [];
   let afterRecording: PinReport | undefined;
   const unproxied = [...login.unproxied];
+  const refused: string[] = [];
   try {
     await page.goto(baseUrl + gif.path, { timeout: 180_000 });
     await settle(page);
@@ -210,8 +257,10 @@ async function captureGif(browser: Browser, blocked: string[]) {
     afterRecording = pin.report();
   } finally {
     unproxied.push(...guard.problems());
+    refused.push(...guard.refusals());
     await context.close();
   }
+  assertNotRefused(name, refused);
   const gifPin = shotPinFor([...(frames.length ? frames.map((frame) => frame.snapshot) : [undefined]), afterRecording], gif.auth, appearance);
   await page.video()?.saveAs(path.join(outDir, `${name}.webm`));
   fs.rmSync(videoDir, { recursive: true, force: true });
@@ -219,13 +268,29 @@ async function captureGif(browser: Browser, blocked: string[]) {
   console.log(`  ${name}.gif (${frames.length} frames) + ${name}.webm`);
   warnPin(gifPin);
   warnUnproxied(unproxied);
-  return { name, auth: gif.auth, appearance, frames: frames.length, pin: gifPin, unproxied };
+  return { name, auth: gif.auth, persona: login.persona, appearance, frames: frames.length, pin: gifPin, unproxied };
 }
 
 async function main() {
+  // Before anything else (no server, no browser, no output folder): the env files, the shell, the
+  // vconvex guard, the backend, its seed and the pinned catalog. Any refusal ends the run here.
+  const preflight: Preflight = await validationPreflight(port, reseed);
+  target = {
+    backendHosts: backendHosts(preflight.convexPort),
+    catalog: { ...loadPinnedCatalog(preflight.catalog), served: 0, misses: [] },
+    allowWrites,
+    writes: [],
+    clock,
+  };
+  console.log(
+    `Target: validation backend ${preflight.convexUrl} (seed v${preflight.seed.seedVersion}${preflight.seed.reseeded ? ", reseeded" : ""}, ` +
+      `catalog v${preflight.catalog.version} from the pinned file)`,
+  );
+  if (allowWrites) console.warn("WARNING: --allow-writes: Convex writes from the capture browser reach this worktree's validation backend.");
+
   fs.rmSync(outDir, { recursive: true, force: true });
   fs.mkdirSync(outDir, { recursive: true });
-  const server = await ensureServer();
+  const server = await ensureServer(preflight.convexUrl);
   process.once("SIGINT", () => {
     stopServer(server);
     process.exit(130);
@@ -237,12 +302,7 @@ async function main() {
   let browser: Browser | undefined;
   try {
     browser = await chromium.launch();
-    const needsAgent = [...(stills ? spec.routes : []), ...(spec.gif && args.gif ? [spec.gif] : [])].some(
-      (route) => route.auth === "agent",
-    );
-    if (needsAgent && !process.env.AGENT_AUTH_SECRET) {
-      throw new Error("AGENT_AUTH_SECRET is missing (copy .env.local into this checkout)");
-    }
+    await probeServerTarget(browser, baseUrl, target, blocked);
 
     if (stills) {
       console.log(`Capturing #${issue} "${label}" → ${outDir}`);
@@ -265,6 +325,7 @@ async function main() {
   const unstable = shots.filter((shot) => !shot.stable).map((shot) => shot.name);
   // Every shot, guests included: an unproxied socket skips the write blocking as well as the pin.
   const unproxied = [...shots, ...(gifShot ? [gifShot] : [])].filter((shot) => shot.unproxied.length).map((shot) => shot.name);
+  const catalogMisses = target.catalog.misses;
 
   fs.writeFileSync(
     path.join(outDir, "manifest.json"),
@@ -273,12 +334,27 @@ async function main() {
         issue,
         label,
         port,
+        backend: preflight.convexUrl,
+        seedVersion: preflight.seed.seedVersion,
+        catalogVersion: preflight.catalog.version,
+        seed: preflight.seed,
+        catalog: {
+          version: target.catalog.version,
+          url: target.catalog.url,
+          sha256: target.catalog.sha256,
+          served: target.catalog.served,
+          misses: catalogMisses,
+        },
+        clock,
+        personas: [...personas.values()],
+        allowWrites,
         chrome,
         fullPage,
         strict,
         shots,
         gif: gifShot ?? null,
         blockedConvexWrites: blocked,
+        ...(allowWrites ? { forwardedConvexWrites: target.writes } : {}),
         savedAppearance,
         pinFlagged: flagged,
         unstable,
@@ -296,13 +372,22 @@ async function main() {
     const patched = signedIn.filter((shot) => shot.pin.patched).length;
     const overridden = signedIn.filter((shot) => shot.pin.overridden).length;
     console.log(
-      `Agent's saved appearance (preset/mode/chrome): ${savedAppearance.join(", ") || "unknown"}. ` +
+      `Personas: ${[...personas.values()].map((p) => p.email).join(", ")}. ` +
+        `Saved appearance (preset/mode/chrome): ${savedAppearance.join(", ") || "unknown"}. ` +
         `Session result rewritten in ${patched}/${signedIn.length} signed-in shots (${overridden} differ from saved).`,
+    );
+  }
+  console.log(`Catalog v${target.catalog.version} served from the pinned file ${target.catalog.served} time(s).`);
+  if (allowWrites) console.warn(`WARNING: --allow-writes forwarded ${target.writes.length} Convex write(s) to the validation backend.`);
+  if (catalogMisses.length) {
+    console.warn(
+      `WARNING: ${catalogMisses.length} catalog URL(s) other than the pinned one were requested and aborted; ` +
+        "those pages fell back to Convex sync. See `catalog.misses` in manifest.json.",
     );
   }
   if (flagged.length) {
     console.warn(
-      `WARNING: ${flagged.length} signed-in shot(s) may show the agent's saved theme or the app defaults in JS-driven UI ` +
+      `WARNING: ${flagged.length} signed-in shot(s) may show the persona's saved theme or the app defaults in JS-driven UI ` +
         `(menus, toasts, neon forks) instead of the pin: ${flagged.join(", ")}. See \`pin.problems\` in manifest.json.`,
     );
   }
@@ -315,13 +400,14 @@ async function main() {
         `so its writes were not blocked: ${unproxied.join(", ")}. See \`unproxied\` in manifest.json.`,
     );
   }
-  if (strict && (flagged.length || unstable.length || unproxied.length)) {
+  if (strict && (flagged.length || unstable.length || unproxied.length || catalogMisses.length)) {
     throw new Error(
       "--strict: failing because " +
         [
           flagged.length && "the JS theme pin did not apply to every signed-in shot",
           unstable.length && "some shots never settled",
           unproxied.length && "a Convex socket bypassed the capture proxy",
+          catalogMisses.length && "a catalog other than the pinned one was requested",
         ]
           .filter(Boolean)
           .join(" and ") +
