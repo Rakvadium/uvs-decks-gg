@@ -38,7 +38,7 @@ function ProgressSegments({
             className="group relative h-1.5 flex-1 overflow-hidden rounded-full bg-foreground/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <span
-              className="absolute inset-y-0 left-0 w-full origin-left rounded-full bg-primary motion-safe:transition-transform motion-safe:duration-100 motion-safe:ease-linear group-hover:bg-primary/90"
+              className="absolute inset-y-0 left-0 w-full origin-left rounded-full bg-primary motion-safe:transition-transform motion-safe:duration-100 motion-safe:ease-linear group-hover:bg-primary-dim"
               style={{ transform: `scaleX(${Math.min(Math.max(fill, 0), 1)})` }}
             />
           </button>
@@ -144,7 +144,7 @@ export function SizzleReelContent() {
 
           <div
             className={cn(
-              "relative min-h-[300px] overflow-hidden rounded-3xl border border-border/50 bg-card/30 shadow-[var(--chrome-elevation-mid)] backdrop-blur-sm md:min-h-[480px]",
+              "relative min-h-[300px] overflow-hidden rounded-3xl border border-surface bg-card-tint shadow-[var(--chrome-elevation-mid)] backdrop-blur-sm md:min-h-[480px]",
               "before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:z-10 before:h-px before:bg-gradient-to-r before:from-transparent before:via-primary/40 before:to-transparent"
             )}
           >
@@ -152,7 +152,7 @@ export function SizzleReelContent() {
           </div>
         </div>
 
-        <footer className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-3 border-t border-border/30 pt-4">
+        <footer className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-3 border-t border-hairline pt-4">
           <p className="chrome-label-case text-[10px] text-muted-foreground">
             Space play/pause · Arrows seek
           </p>
