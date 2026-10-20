@@ -1,0 +1,583 @@
+{
+  "base": "verify2",
+  "head": "verify2-rerun",
+  "threshold": 0,
+  "results": [
+    {
+      "name": "community__desktop__aurora__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "community__desktop__aurora__light",
+      "diffPercent": 15.938
+    },
+    {
+      "name": "community__desktop__cyberpunk__dark",
+      "diffPercent": 15.815
+    },
+    {
+      "name": "community__desktop__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "community__desktop__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "community__desktop__default__light",
+      "diffPercent": 15.84
+    },
+    {
+      "name": "community__mobile__aurora__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "community__mobile__aurora__light",
+      "diffPercent": 15.507
+    },
+    {
+      "name": "community__mobile__cyberpunk__dark",
+      "diffPercent": 15.491
+    },
+    {
+      "name": "community__mobile__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "community__mobile__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "community__mobile__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "deck-card-dialog-open__desktop__aurora__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "deck-card-dialog-open__desktop__aurora__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "deck-card-dialog-open__desktop__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "deck-card-dialog-open__desktop__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "deck-card-dialog-open__desktop__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "deck-card-dialog-open__desktop__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "deck-detail__desktop__aurora__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "deck-detail__desktop__aurora__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "deck-detail__desktop__cyberpunk__dark",
+      "diffPercent": 0.001
+    },
+    {
+      "name": "deck-detail__desktop__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "deck-detail__desktop__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "deck-detail__desktop__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "deck-detail__mobile__aurora__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "deck-detail__mobile__aurora__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "deck-detail__mobile__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "deck-detail__mobile__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "deck-detail__mobile__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "deck-detail__mobile__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "decks__desktop__aurora__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "decks__desktop__aurora__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "decks__desktop__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "decks__desktop__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "decks__desktop__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "decks__desktop__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "decks__mobile__aurora__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "decks__mobile__aurora__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "decks__mobile__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "decks__mobile__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "decks__mobile__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "decks__mobile__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "filter-panel-open__desktop__aurora__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "filter-panel-open__desktop__aurora__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "filter-panel-open__desktop__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "filter-panel-open__desktop__cyberpunk__light",
+      "diffPercent": 0.001
+    },
+    {
+      "name": "filter-panel-open__desktop__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "filter-panel-open__desktop__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "filter-panel-sets__desktop__aurora__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "filter-panel-sets__desktop__aurora__light",
+      "diffPercent": 0.001
+    },
+    {
+      "name": "filter-panel-sets__desktop__cyberpunk__dark",
+      "diffPercent": 0.001
+    },
+    {
+      "name": "filter-panel-sets__desktop__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "filter-panel-sets__desktop__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "filter-panel-sets__desktop__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "gallery__desktop__aurora__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "gallery__desktop__aurora__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "gallery__desktop__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "gallery__desktop__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "gallery__desktop__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "gallery__desktop__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "gallery__mobile__aurora__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "gallery__mobile__aurora__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "gallery__mobile__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "gallery__mobile__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "gallery__mobile__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "gallery__mobile__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-gallery__desktop__aurora__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-gallery__desktop__aurora__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-gallery__desktop__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-gallery__desktop__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-gallery__desktop__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-gallery__desktop__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-gallery__mobile__aurora__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-gallery__mobile__aurora__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-gallery__mobile__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-gallery__mobile__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-gallery__mobile__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-gallery__mobile__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-ghost-hover__desktop__aurora__dark",
+      "diffPercent": 0.001
+    },
+    {
+      "name": "guest-ghost-hover__desktop__aurora__light",
+      "diffPercent": 0.001
+    },
+    {
+      "name": "guest-ghost-hover__desktop__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-ghost-hover__desktop__cyberpunk__light",
+      "diffPercent": 0.001
+    },
+    {
+      "name": "guest-ghost-hover__desktop__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-ghost-hover__desktop__default__light",
+      "diffPercent": 0.001
+    },
+    {
+      "name": "guest-secondary-hover__desktop__aurora__dark",
+      "diffPercent": 0.001
+    },
+    {
+      "name": "guest-secondary-hover__desktop__aurora__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-secondary-hover__desktop__cyberpunk__dark",
+      "diffPercent": 0.001
+    },
+    {
+      "name": "guest-secondary-hover__desktop__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-secondary-hover__desktop__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "guest-secondary-hover__desktop__default__light",
+      "diffPercent": 0.001
+    },
+    {
+      "name": "mobile-profile-sheet-open__mobile__aurora__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "mobile-profile-sheet-open__mobile__aurora__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "mobile-profile-sheet-open__mobile__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "mobile-profile-sheet-open__mobile__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "mobile-profile-sheet-open__mobile__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "mobile-profile-sheet-open__mobile__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "new-deck-dialog-open__desktop__aurora__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "new-deck-dialog-open__desktop__aurora__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "new-deck-dialog-open__desktop__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "new-deck-dialog-open__desktop__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "new-deck-dialog-open__desktop__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "new-deck-dialog-open__desktop__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "new-deck-dialog-open__mobile__aurora__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "new-deck-dialog-open__mobile__aurora__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "new-deck-dialog-open__mobile__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "new-deck-dialog-open__mobile__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "new-deck-dialog-open__mobile__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "new-deck-dialog-open__mobile__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "select-open__desktop__aurora__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "select-open__desktop__aurora__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "select-open__desktop__cyberpunk__dark",
+      "diffPercent": 0.034
+    },
+    {
+      "name": "select-open__desktop__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "select-open__desktop__default__dark",
+      "diffPercent": 0.034
+    },
+    {
+      "name": "select-open__desktop__default__light",
+      "diffPercent": 0.042
+    },
+    {
+      "name": "select-open__mobile__aurora__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "select-open__mobile__aurora__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "select-open__mobile__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "select-open__mobile__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "select-open__mobile__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "select-open__mobile__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "settings__desktop__aurora__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "settings__desktop__aurora__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "settings__desktop__cyberpunk__dark",
+      "diffPercent": 0.001
+    },
+    {
+      "name": "settings__desktop__cyberpunk__light",
+      "diffPercent": 0.041
+    },
+    {
+      "name": "settings__desktop__default__dark",
+      "diffPercent": 0.034
+    },
+    {
+      "name": "settings__desktop__default__light",
+      "diffPercent": 0.001
+    },
+    {
+      "name": "settings__mobile__aurora__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "settings__mobile__aurora__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "settings__mobile__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "settings__mobile__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "settings__mobile__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "settings__mobile__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "tooltip-open__desktop__aurora__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "tooltip-open__desktop__aurora__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "tooltip-open__desktop__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "tooltip-open__desktop__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "tooltip-open__desktop__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "tooltip-open__desktop__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "user-menu-open__desktop__aurora__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "user-menu-open__desktop__aurora__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "user-menu-open__desktop__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "user-menu-open__desktop__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "user-menu-open__desktop__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "user-menu-open__desktop__default__light",
+      "diffPercent": 0
+    }
+  ]
+}
