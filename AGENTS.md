@@ -14,6 +14,17 @@ Supporting detail:
 
 For any non-trivial change to `src/` or `convex/`, start with **`project-context-gate`**. Do not edit until a Context Brief exists.
 
+## Secrets and live data
+
+The live site runs on the same Convex deployment agents can reach. Treat it as production.
+
+- Write env var **names**, never values, in tracked files, commit messages, PR text, comments and published media. Docs and tests use `<placeholder>` values.
+- Keep secrets out of URLs and logs. The one exception is the local `/agent-login?token=` link: open it only in your own browser, and redact `token=` in anything you paste or save.
+- Leave live data as you found it: read only. Signing in as the agent user (its own auth session) is the only write allowed.
+- Run `convex dev`, `convex deploy`, `convex run` and migrations only after a human explicitly approves that command for this task.
+
+Per-PR checks: `hardened-coding` and `pr-issue-verify` § Security & side effects.
+
 ## Workflow skills
 
 | Skill | Purpose |
@@ -49,12 +60,12 @@ Use ShadCN and MagicUI for styling/components when possible.
 Stack: Next.js 16 (App Router, React 19) + Convex backend, **Bun** as package manager/runner. The update script runs `bun install`; the notes below are for starting/running services (not covered by the update script).
 
 Two dev services (no combined script — run each in its own tmux session):
-- Convex backend: `bunx convex dev` (keeps functions/codegen synced with the cloud dev deployment). Standard command per Convex; started manually, not in `package.json` scripts.
+- Convex backend: `bunx convex dev` (keeps functions/codegen synced with the cloud dev deployment). Standard command per Convex; started manually, not in `package.json` scripts. Needs human approval first (see Secrets and live data).
 - Next.js frontend: `bun run dev` → serves on **http://localhost:8090** (port is hardcoded).
 
 Convex deployment + secrets (already provisioned; do not re-provision):
 - The Cloud env injects `CONVEX_DEPLOY_KEY`, `CONVEX_URL`, and `NEXT_PUBLIC_CONVEX_URL` as secrets, so Convex CLI targets a real cloud **dev** deployment and Next.js can reach it even before `.env.local` exists. `bunx convex dev` (re)writes `.env.local` with the matching `CONVEX_DEPLOYMENT`/`NEXT_PUBLIC_CONVEX_URL`.
-- That deployment already has its env vars set (`JWKS`, `JWT_PRIVATE_KEY` for Convex Auth, plus `R2_*`, `OPENAI_API_KEY`, `YOUTUBE_DATA_API_KEY`, `ADMIN_API_KEY`, `AUTH_RESEND_KEY`). Inspect with `bunx convex env list`. Auth works out of the box — no `@convex-dev/auth` init needed.
+- That deployment already has its env vars set (`JWKS`, `JWT_PRIVATE_KEY` for Convex Auth, plus `R2_*`, `OPENAI_API_KEY`, `YOUTUBE_DATA_API_KEY`, `ADMIN_API_KEY`, `AUTH_RESEND_KEY`). `bunx convex env list` prints values, so keep its output out of logs, PRs and comments. Auth works out of the box — no `@convex-dev/auth` init needed.
 - This is a **shared** cloud dev deployment; `bunx convex dev` deploys your local function changes to it, so schema/function edits are visible to anyone else on it.
 
 Authenticated testing via agent login (dev only; see [docs/agent-onboarding.md](docs/agent-onboarding.md) §6):

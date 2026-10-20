@@ -52,12 +52,23 @@ If any UI file changed:
 4. Confirm placement still matches Context Brief / floating-header inventory.
 5. If opening a PR: run `capture:compare` + `capture:publish` (`scripts/pr-capture/README.md`) and embed the generated `summary.md` (Before **and** After, raw `pr-media` URLs). Never use `cursor.com/artifacts` in the PR body (they expire; GitHub usually shows only Before). See `docs/agent-workflow-playbook.md` § PR visual embeds.  
 
+## Security & side effects
+
+Rules: `AGENTS.md` § Secrets and live data. Before opening or updating a PR, run every item and put the results in the PR body:
+
+- [ ] **Secret scan:** `bun run secret-scan --diff origin/<base>..HEAD` is clean, and `bun run secret-scan --path <dir>` is clean for every capture or media folder before you publish it. Until `secret-scan` is available (#202), search the diff and the media for each `.env.local` value instead (raw and URL-encoded), printing match counts only.
+- [ ] **Live data:** no writes, and no `convex dev`/deploy/run/migrations without human approval. Say so in the PR body.
+- [ ] **Scope:** every path in `git diff --name-only origin/<base>...HEAD` is in the issue's allowed paths.
+- [ ] **New targets:** for each new branch, push target, upload or workflow, name the CI/CD it triggers (Vercel, GitHub Actions) and who can see it (this repo is public). Example: the orphan `pr-media` branch triggered failed Vercel builds until it got a `vercel.json` with deployments disabled.
+- [ ] **Preview:** the PR's own Vercel check passes (`gh pr checks <pr>`).
+- [ ] **Validation tooling** (capture, scan, verify scripts): env var name patterns accept digits (`[A-Z0-9_]`, so `R2_*` matches), and every failure path is loud (non-zero exit or a flagged result).
+
 ## Forbidden
 
 Editing before Context Brief; inventing placement; destructive git; skipping/weakening tests or CI; stubbing to pass; unrelated refactors; committing unless asked.
 
 ## Stop / escalate
 
-Stop when Done-When true, verifier green, UI adversary clean of must-fix (if UI), visual compare done (if UI).
+Stop when Done-When true, verifier green, Security & side effects all checked, UI adversary clean of must-fix (if UI), visual compare done (if UI).
 
 Escalate when blocked twice on the same failure, placement ambiguous, or product/auth decision required.

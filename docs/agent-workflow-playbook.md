@@ -99,6 +99,72 @@ Captures never write to Convex, and they set theme and mode in the browser only.
 
 ---
 
+## Coordinator brief templates
+
+A coordinator hands one issue to a builder agent, then the PR to a different verifier agent, and repeats verify rounds until one passes. Fill every `<placeholder>` and delete lines that don't apply. Reference runs: #196 and #198 (capture tooling, two verification rounds each), #201 (design foundation).
+
+Both briefs rely on these setup rules:
+
+- **One agent, one worktree, one port range.** Concurrent dev servers never share a checkout: Next allows one `next dev` per checkout (`.next/dev/lock`). Builder and verifier get different ranges, and both stay off the default port 8090.
+- **Choose the worktree's env on purpose.** A new worktree has no `.env.local`, and the main checkout's copy may point at a local Convex instead of the cloud deployment. The brief names the target (`cloud` or `local`). Copy the main `.env.local` only after checking that its `NEXT_PUBLIC_CONVEX_URL` host matches that target, without printing the value (for example, `grep -c` for the local host).
+
+### Builder brief
+
+```text
+You are the BUILDER for issue #<n> (`gh issue view <n>`). A separate agent will verify your PR.
+
+Setup
+1. `git fetch origin && git checkout -B agent/<n>-<slug> origin/dev` in your own worktree.
+2. Ports <first>–<last> only. Convex target: <cloud | local | none>; set up env per docs/agent-workflow-playbook.md § Coordinator brief templates.
+3. Allowed files: <globs>. Other agents are editing <globs>.
+
+Bans
+- AGENTS.md § Secrets and live data. Approved exceptions: <none | command + reason>.
+- Push only to your PR branch<, and to pr-media for captures>. Don't merge.
+
+Process
+- Read the issue, AGENTS.md and every file you'll edit. project-context-gate, then hardened-coding.
+- Implement each Done when item. <Issue-specific constraints or lessons.>
+
+Checks
+- `bun run typecheck`, `bun test`, `bun run lint`, `bun run build`.
+- Every item in hardened-coding § Security & side effects.
+- UI: before/after captures on your ports (§ PR visual embeds).
+
+Output
+- `gh pr create --base dev` with `Fixes #<n>`, evidence per Done when item, and the security checklist results.
+- Final report (short): PR URL, Done when → evidence, anything uncertain.
+```
+
+### Verifier brief
+
+```text
+You are the VERIFIER for PR #<pr> (issue #<n>), round <k>. You did not build it.
+
+Setup
+1. Your own worktree at the PR head (`gh pr checkout <pr>`). Record the head SHA.
+2. Ports <first>–<last>, different from the builder's. Convex target: <same as builder>; same env rule.
+
+Bans
+- AGENTS.md § Secrets and live data. Approved exceptions: <none | command + reason>.
+- No pushes to the PR branch. Publish your media only under `<n>/verify*` labels. Don't merge.
+
+Process
+- Use pr-issue-verify. Reproduce every PR-body claim with your own runs and captures.
+- <Round 2+: re-check each prior must-fix and should-fix by number, then rerun the full check table.>
+- <Issue-specific probes, e.g. break the tool and confirm it fails loudly.>
+
+Checks
+- Each Done when item, typecheck/test/lint/build, and every item in pr-issue-verify § Security & side effects.
+
+Output
+- One PR comment in the pr-issue-verify format (check table, evidence, must-fix, should-fix, nits). Verdict rules: pr-issue-verify § Verdict.
+- Stop your dev servers and confirm your ports are free.
+- Final report (short): comment URL, verdict, must-fix list.
+```
+
+---
+
 ## Paste prompts for testing
 
 ### A) Full coding loop (recommended first test)
