@@ -6,10 +6,11 @@ import { useRouter } from "next/navigation";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useConvexAuth } from "convex/react";
 import { clearAuthCookies, isRefreshTokenParseError } from "@/components/auth/auth-recovery";
-import { parseAgentLoginFragment } from "@/lib/agent-auth-shared";
+import { parseAgentLoginFragment, stripFragment } from "@/lib/agent-auth-shared";
 
 type Fragment = ReturnType<typeof parseAgentLoginFragment>;
 type SignIn = ReturnType<typeof useAuthActions>["signIn"];
+type Router = ReturnType<typeof useRouter>;
 
 const FAILED = "Agent login failed";
 
@@ -18,13 +19,21 @@ const FAILED = "Agent login failed";
 let captured: Fragment | null = null;
 let redemption: Promise<boolean> | null = null;
 
-/** Reads `#code=…&next=…` once and removes it from the address bar and history entry. */
-function captureFragment(): Fragment {
-  if (captured === null || window.location.hash) {
-    captured = parseAgentLoginFragment(window.location.hash);
+/**
+ * Reads `#code=…&next=…` once and scrubs it from the address bar and the history entry. Next keeps
+ * the initial URL (fragment included) inside its router tree in `history.state`, so the stored
+ * state is rewritten without the fragment, and the router is moved to the clean URL so its
+ * in-memory state can't write the old one back.
+ */
+function captureFragment(router: Router): Fragment {
+  const { hash, pathname, search } = window.location;
+  if (captured === null || hash) {
+    captured = parseAgentLoginFragment(hash);
     redemption = null;
-    if (window.location.hash) {
-      window.history.replaceState(window.history.state, "", window.location.pathname + window.location.search);
+    if (hash) {
+      const cleanUrl = pathname + search;
+      window.history.replaceState(stripFragment(window.history.state, hash), "", cleanUrl);
+      router.replace(cleanUrl, { scroll: false });
     }
   }
   return captured;
@@ -55,7 +64,7 @@ export function AgentLoginClient() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const { code, nextPath } = captureFragment();
+    const { code, nextPath } = captureFragment(router);
     if (isLoading) return;
     let active = true;
     const fail = (message: string) => {

@@ -10,7 +10,7 @@ import {
 import { agentCodeProvider } from "../convex/auth";
 import AgentLoginPage from "../src/app/agent-login/page";
 import { isAgentLoginPageEnabled } from "../src/lib/agent-auth";
-import { parseAgentLoginFragment, sanitizeAgentLoginNextPath } from "../src/lib/agent-auth-shared";
+import { parseAgentLoginFragment, sanitizeAgentLoginNextPath, stripFragment } from "../src/lib/agent-auth-shared";
 import {
   buildLoginUrl,
   parseMintLoginArgs,
@@ -344,6 +344,29 @@ describe("agent login URL", () => {
     expect(parseAgentLoginFragment(`#code=${code}`)).toEqual({ code, nextPath: "/home" });
     expect(parseAgentLoginFragment("#code=bad&next=//evil.com")).toEqual({ code: null, nextPath: "/home" });
     expect(parseAgentLoginFragment("")).toEqual({ code: null, nextPath: "/home" });
+  });
+
+  test("stripFragment removes the fragment from every string in a history state", () => {
+    const hash = `#code=${"C".repeat(43)}&next=/decks`;
+    const state = {
+      __NA: true,
+      __PRIVATE_NEXTJS_INTERNALS_TREE: {
+        tree: ["", { children: ["agent-login", { children: ["__PAGE__", {}, `/agent-login${hash}`, "refetch"] }] }],
+        url: `http://localhost:8152/agent-login${hash}`,
+      },
+    };
+    const clean = stripFragment(state, hash);
+    expect(JSON.stringify(clean)).not.toContain("C".repeat(43));
+    expect(clean).toEqual({
+      __NA: true,
+      __PRIVATE_NEXTJS_INTERNALS_TREE: {
+        tree: ["", { children: ["agent-login", { children: ["__PAGE__", {}, "/agent-login", "refetch"] }] }],
+        url: "http://localhost:8152/agent-login",
+      },
+    });
+    expect(JSON.stringify(state)).toContain("C".repeat(43));
+    expect(stripFragment(null, hash)).toBeNull();
+    expect(stripFragment(state, "")).toBe(state);
   });
 
   test("sanitizeAgentLoginNextPath blocks open redirects", () => {
