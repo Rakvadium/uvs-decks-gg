@@ -1,0 +1,391 @@
+{
+  "base": "verify-before",
+  "head": "verify-after",
+  "threshold": 0.1,
+  "results": [
+    {
+      "name": "tour-1-open__desktop__aurora__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-1-open__desktop__aurora__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-1-open__desktop__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-1-open__desktop__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-1-open__desktop__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-1-open__desktop__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-1-open__mobile__aurora__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-1-open__mobile__aurora__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-1-open__mobile__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-1-open__mobile__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-1-open__mobile__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-1-open__mobile__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-2-gallery__desktop__aurora__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-2-gallery__desktop__aurora__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-2-gallery__desktop__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-2-gallery__desktop__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-2-gallery__desktop__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-2-gallery__desktop__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-2-gallery__mobile__aurora__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-2-gallery__mobile__aurora__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-2-gallery__mobile__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-2-gallery__mobile__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-2-gallery__mobile__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-2-gallery__mobile__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-3-decks__desktop__aurora__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-3-decks__desktop__aurora__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-3-decks__desktop__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-3-decks__desktop__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-3-decks__desktop__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-3-decks__desktop__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-3-decks__mobile__aurora__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-3-decks__mobile__aurora__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-3-decks__mobile__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-3-decks__mobile__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-3-decks__mobile__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-3-decks__mobile__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-4-collection__desktop__aurora__dark",
+      "diffPercent": 0.452
+    },
+    {
+      "name": "tour-4-collection__desktop__aurora__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-4-collection__desktop__cyberpunk__dark",
+      "diffPercent": 0.452
+    },
+    {
+      "name": "tour-4-collection__desktop__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-4-collection__desktop__default__dark",
+      "diffPercent": 0.452
+    },
+    {
+      "name": "tour-4-collection__desktop__default__light",
+      "diffPercent": 0.452
+    },
+    {
+      "name": "tour-4-collection__mobile__aurora__dark",
+      "diffPercent": 0.769
+    },
+    {
+      "name": "tour-4-collection__mobile__aurora__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-4-collection__mobile__cyberpunk__dark",
+      "diffPercent": 0.769
+    },
+    {
+      "name": "tour-4-collection__mobile__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-4-collection__mobile__default__dark",
+      "diffPercent": 0.769
+    },
+    {
+      "name": "tour-4-collection__mobile__default__light",
+      "diffPercent": 0.769
+    },
+    {
+      "name": "tour-5-community__desktop__aurora__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-5-community__desktop__aurora__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-5-community__desktop__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-5-community__desktop__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-5-community__desktop__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-5-community__desktop__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-5-community__mobile__aurora__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-5-community__mobile__aurora__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-5-community__mobile__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-5-community__mobile__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-5-community__mobile__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-5-community__mobile__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-6-teams__desktop__aurora__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-6-teams__desktop__aurora__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-6-teams__desktop__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-6-teams__desktop__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-6-teams__desktop__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-6-teams__desktop__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-6-teams__mobile__aurora__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-6-teams__mobile__aurora__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-6-teams__mobile__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-6-teams__mobile__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-6-teams__mobile__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-6-teams__mobile__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-7-close__desktop__aurora__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-7-close__desktop__aurora__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-7-close__desktop__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-7-close__desktop__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-7-close__desktop__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-7-close__desktop__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-7-close__mobile__aurora__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-7-close__mobile__aurora__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-7-close__mobile__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-7-close__mobile__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-7-close__mobile__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-7-close__mobile__default__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-focus-visible__desktop__aurora__dark",
+      "diffPercent": 0.452
+    },
+    {
+      "name": "tour-focus-visible__desktop__aurora__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-focus-visible__desktop__cyberpunk__dark",
+      "diffPercent": 0.452
+    },
+    {
+      "name": "tour-focus-visible__desktop__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-focus-visible__desktop__default__dark",
+      "diffPercent": 0.452
+    },
+    {
+      "name": "tour-focus-visible__desktop__default__light",
+      "diffPercent": 0.452
+    },
+    {
+      "name": "tour-segment-hover__desktop__aurora__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-segment-hover__desktop__aurora__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-segment-hover__desktop__cyberpunk__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-segment-hover__desktop__cyberpunk__light",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-segment-hover__desktop__default__dark",
+      "diffPercent": 0
+    },
+    {
+      "name": "tour-segment-hover__desktop__default__light",
+      "diffPercent": 0
+    }
+  ]
+}
