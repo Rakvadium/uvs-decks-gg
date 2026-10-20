@@ -1,0 +1,110 @@
+[
+  {
+    "name": "default-custom__light__default",
+    "ring": 11,
+    "ringMax": 1,
+    "corner": 12,
+    "cornerMax": 1,
+    "interior": 0,
+    "outside": 0
+  },
+  {
+    "name": "default-custom__light__sm",
+    "ring": 14,
+    "ringMax": 1,
+    "corner": 13,
+    "cornerMax": 1,
+    "interior": 0,
+    "outside": 0
+  },
+  {
+    "name": "default-custom__light__disabled",
+    "ring": 8,
+    "ringMax": 1,
+    "corner": 8,
+    "cornerMax": 1,
+    "interior": 0,
+    "outside": 0
+  },
+  {
+    "name": "default-custom__dark__default",
+    "ring": 296,
+    "ringMax": 2,
+    "corner": 14,
+    "cornerMax": 1,
+    "interior": 0,
+    "outside": 0
+  },
+  {
+    "name": "default-custom__dark__sm",
+    "ring": 280,
+    "ringMax": 2,
+    "corner": 15,
+    "cornerMax": 1,
+    "interior": 0,
+    "outside": 0
+  },
+  {
+    "name": "default-custom__dark__disabled",
+    "ring": 180,
+    "ringMax": 1,
+    "corner": 4,
+    "cornerMax": 1,
+    "interior": 0,
+    "outside": 0
+  },
+  {
+    "name": "blue-custom__light__default",
+    "ring": 11,
+    "ringMax": 1,
+    "corner": 12,
+    "cornerMax": 1,
+    "interior": 0,
+    "outside": 0
+  },
+  {
+    "name": "blue-custom__light__sm",
+    "ring": 14,
+    "ringMax": 1,
+    "corner": 13,
+    "cornerMax": 1,
+    "interior": 0,
+    "outside": 0
+  },
+  {
+    "name": "blue-custom__light__disabled",
+    "ring": 0,
+    "ringMax": 0,
+    "corner": 1,
+    "cornerMax": 1,
+    "interior": 0,
+    "outside": 0
+  },
+  {
+    "name": "blue-custom__dark__default",
+    "ring": 300,
+    "ringMax": 2,
+    "corner": 14,
+    "cornerMax": 1,
+    "interior": 0,
+    "outside": 0
+  },
+  {
+    "name": "blue-custom__dark__sm",
+    "ring": 283,
+    "ringMax": 2,
+    "corner": 15,
+    "cornerMax": 1,
+    "interior": 0,
+    "outside": 0
+  },
+  {
+    "name": "blue-custom__dark__disabled",
+    "ring": 166,
+    "ringMax": 1,
+    "corner": 9,
+    "cornerMax": 1,
+    "interior": 0,
+    "outside": 0
+  }
+]
