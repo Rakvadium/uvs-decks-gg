@@ -1,0 +1,207 @@
+{
+  "listId": "qs79cym6q521fdqc7c9qjf7dcqc27a3k",
+  "missingCard": {
+    "lane": "A",
+    "order": 1
+  },
+  "shots": [
+    {
+      "name": "unknown-card-loading__desktop__default__light",
+      "state": "catalog loading (guest)",
+      "laneA": {
+        "badge": "4 cards",
+        "images": 0,
+        "skeletons": 4,
+        "unavailable": 0,
+        "removeButtons": 0
+      },
+      "laneS": {
+        "badge": "1 cards",
+        "images": 0,
+        "skeletons": 1,
+        "unavailable": 0,
+        "removeButtons": 0
+      },
+      "writes": [
+        "communityLive:refreshLiveStatus",
+        "communityLive:refreshLiveStatus"
+      ]
+    },
+    {
+      "name": "unknown-card-current-guest__desktop__default__light",
+      "state": "catalog current, card missing (guest)",
+      "laneA": {
+        "badge": "4 cards",
+        "images": 3,
+        "skeletons": 0,
+        "unavailable": 1,
+        "removeButtons": 0
+      },
+      "laneS": {
+        "badge": "1 cards",
+        "images": 1,
+        "skeletons": 0,
+        "unavailable": 0,
+        "removeButtons": 0
+      }
+    },
+    {
+      "name": "unknown-card-current-owner__desktop__default__light",
+      "state": "catalog current, card missing (owner)",
+      "laneA": {
+        "badge": "4 cards",
+        "images": 3,
+        "skeletons": 0,
+        "unavailable": 1,
+        "removeButtons": 1
+      },
+      "laneS": {
+        "badge": "1 cards",
+        "images": 1,
+        "skeletons": 0,
+        "unavailable": 0,
+        "removeButtons": 0
+      }
+    },
+    {
+      "name": "unknown-card-loading__desktop__default__dark",
+      "state": "catalog loading (guest)",
+      "laneA": {
+        "badge": "4 cards",
+        "images": 0,
+        "skeletons": 4,
+        "unavailable": 0,
+        "removeButtons": 0
+      },
+      "laneS": {
+        "badge": "1 cards",
+        "images": 0,
+        "skeletons": 1,
+        "unavailable": 0,
+        "removeButtons": 0
+      },
+      "writes": [
+        "communityLive:refreshLiveStatus",
+        "communityLive:refreshLiveStatus"
+      ]
+    },
+    {
+      "name": "unknown-card-current-guest__desktop__default__dark",
+      "state": "catalog current, card missing (guest)",
+      "laneA": {
+        "badge": "4 cards",
+        "images": 3,
+        "skeletons": 0,
+        "unavailable": 1,
+        "removeButtons": 0
+      },
+      "laneS": {
+        "badge": "1 cards",
+        "images": 1,
+        "skeletons": 0,
+        "unavailable": 0,
+        "removeButtons": 0
+      }
+    },
+    {
+      "name": "unknown-card-current-owner__desktop__default__dark",
+      "state": "catalog current, card missing (owner)",
+      "laneA": {
+        "badge": "4 cards",
+        "images": 3,
+        "skeletons": 0,
+        "unavailable": 1,
+        "removeButtons": 1
+      },
+      "laneS": {
+        "badge": "1 cards",
+        "images": 1,
+        "skeletons": 0,
+        "unavailable": 0,
+        "removeButtons": 0
+      }
+    }
+  ],
+  "owner": {
+    "afterDrag": {
+      "laneS": {
+        "badge": "2 cards",
+        "images": 1,
+        "skeletons": 0,
+        "unavailable": 1,
+        "removeButtons": 1
+      },
+      "laneA": {
+        "badge": "3 cards",
+        "images": 3,
+        "skeletons": 0,
+        "unavailable": 0,
+        "removeButtons": 0
+      }
+    },
+    "dragSave": {
+      "udfPath": "tierLists:save",
+      "tierListIdMatches": true,
+      "laneCounts": {
+        "S": 2,
+        "A": 3,
+        "B": 2,
+        "C": 1,
+        "D": 2,
+        "F": 2
+      },
+      "poolItems": 449,
+      "savedPlacements": 12,
+      "preservedPlacements": 11,
+      "changedPlacements": 1,
+      "newPlacements": [
+        {
+          "lane": "S",
+          "cardInSavedList": true,
+          "isExtra": false
+        }
+      ],
+      "missingCardLane": "S"
+    },
+    "afterRemove": {
+      "laneS": {
+        "badge": "1 cards",
+        "images": 1,
+        "skeletons": 0,
+        "unavailable": 0,
+        "removeButtons": 0
+      },
+      "laneA": {
+        "badge": "3 cards",
+        "images": 3,
+        "skeletons": 0,
+        "unavailable": 0,
+        "removeButtons": 0
+      }
+    },
+    "removeSave": {
+      "udfPath": "tierLists:save",
+      "tierListIdMatches": true,
+      "laneCounts": {
+        "S": 1,
+        "A": 3,
+        "B": 2,
+        "C": 1,
+        "D": 2,
+        "F": 2
+      },
+      "poolItems": 449,
+      "savedPlacements": 12,
+      "preservedPlacements": 11,
+      "changedPlacements": 1,
+      "newPlacements": [],
+      "containsMissingCard": false
+    },
+    "writes": [
+      "communityLive:refreshLiveStatus",
+      "communityLive:refreshLiveStatus",
+      "tierLists:save",
+      "tierLists:save"
+    ]
+  }
+}
