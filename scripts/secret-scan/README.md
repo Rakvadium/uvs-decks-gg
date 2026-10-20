@@ -9,7 +9,7 @@ The secrets it checks are listed **by name** in [`secrets.json`](secrets.json). 
 ```bash
 E="--env-file /c/Projects/uvs-decks-gg/.env.local.live-backup --env-file /c/Projects/uvs-decks-gg/data/live-env-no-r2.txt"
 
-# Your branch's commits: changed files and commit messages
+# Your branch's commits: changed files and commit objects (message, author, committer)
 bun run secret-scan --strict --diff origin/dev..HEAD $E
 
 # The staged files (works as a pre-commit check)
@@ -19,7 +19,7 @@ bun run secret-scan --strict --staged $E
 bun run secret-scan --strict --path .pr-captures $E
 ```
 
-Flags can be combined, and `--env-file` can be repeated. Production Convex values (`JWT_PRIVATE_KEY`, `JWKS`, `YOUTUBE_DATA_API_KEY`, and others) live in `data/live-env-no-r2.txt`, so pass it too. If a name has several distinct values across sources, every value is checked. In a worktree, the env files live in the main checkout, so pass their full paths.
+Flags can be combined, and `--diff` and `--env-file` can be repeated. Production Convex values (`JWT_PRIVATE_KEY`, `JWKS`, `YOUTUBE_DATA_API_KEY`, and others) live in `data/live-env-no-r2.txt`, so pass it too. If a name has several distinct values across sources, every value is checked. In a worktree, the env files live in the main checkout, so pass their full paths.
 
 | Exit | Meaning |
 | --- | --- |
@@ -33,7 +33,7 @@ Flags can be combined, and `--env-file` can be repeated. Production Convex value
 
 - `names` — every secret to scan for.
 - `optional` (`CONVEX_DEPLOY_KEY`) — may be missing even under `--strict`.
-- `ciOnly` (`SECRET_SCAN_CANARY`) — required only with `--ci`, and ignored otherwise.
+- `ciOnly` (`SECRET_SCAN_CANARY`) — required only with `--ci`. Without `--ci`, these names are ignored: they aren't scanned for, and they aren't counted.
 
 Every other name is **required**.
 
@@ -47,7 +47,7 @@ Every other name is **required**.
   Values under 8 chars can't be checked, so they count as missing.
 - **Zero values loaded:** exit 2 even without `--strict`. This catches a forgotten `--env-file`.
 
-With both env files, a correct local setup passes `--strict`. CI runs `--strict --ci`, so a deleted or renamed Actions secret, or a missing canary, fails the job instead of passing on nothing.
+With both env files, a correct local setup passes `--strict`. `--ci` implies `--strict`. CI runs `--strict --ci`, so a deleted or renamed Actions secret, or a missing canary, fails the job instead of passing on nothing.
 
 ## What is detected
 
@@ -65,15 +65,15 @@ Each file is scanned in several decoded forms:
 
 - the raw bytes
 - a UTF-16 decoding, when the file has a UTF-16 BOM or the NUL pattern of UTF-16 text. Windows PowerShell 5.1 `>` writes UTF-16LE.
-- for text files (no NUL in the first 8000 bytes): a copy with all whitespace removed (hard-wrapped base64, values broken across lines), and a copy that also joins split strings: `"abc" +\n "def"`, `'abc' 'def'`, `"abc" . "def"`, `"abc","def"`, and `\` line continuations
+- for text files (no NUL in the first 8000 bytes): a copy with all whitespace and zero-width chars (U+200B–U+200D, U+2060, U+FEFF) removed (hard-wrapped base64, values broken across lines or salted with invisible chars), and a copy that also joins split strings: `"abc" +\n "def"`, `'abc' 'def'`, `"abc" . "def"`, `"abc","def"`, and `\` line continuations
 
 On the current tree, all of this gives zero false positives. Across the repo's whole history, it flags only the real old leaks.
 
 ### `--diff` and `--staged`
 
-`--diff A..B` scans the commits in `A..B`. Those are the commits reachable from `B` but not from `A`: the branch's own work since its merge-base with `A`. It is **not** `git diff A..B`, so changes made on `A` after the branch point, such as `dev` removing a credential, never show up reversed. For each commit, the scan reads the **full new blob of every changed file** with `git cat-file`. It also scans the commit message. Patch text isn't used, so binary files and `.gitattributes` (`binary`, `-diff`, textconv) can't hide anything.
+`--diff A..B` scans the commits in `A..B`. Those are the commits reachable from `B` but not from `A`: the branch's own work since its merge-base with `A`. It is **not** `git diff A..B`, so changes made on `A` after the branch point, such as `dev` removing a credential, never show up reversed. For each commit, the scan reads the **full new blob of every changed file** with `git cat-file`. It also scans the **whole raw commit object**: author and committer names and emails, the message, trailers, and any signature block. A hit there is reported as `VAR_NAME commit:<line> @<sha>`, with lines counted from the object's `tree` header. Patch text isn't used, so binary files and `.gitattributes` (`binary`, `-diff`, textconv) can't hide anything.
 
-A value counts as added when it occurs more often in the new blob than in the parent blob. An old occurrence elsewhere in an edited file isn't reported again. A merge commit contributes only paths that differ from every parent, which means its conflict resolutions. Each commit is scanned on its own, so a value added and removed later in the same PR still fails. PRs here merge with merge commits, so that intermediate commit would land in history. To clean a branch, drop or rewrite the commit; a revert isn't enough.
+A value counts as added when it occurs more often in the new blob than in the parent blob, so an old occurrence elsewhere in an edited file isn't reported again. Renames are an exception, and fail safe: diffs run with `--no-renames`, so a renamed file is a new path. Any value already inside it is reported again under the new name. A merge commit contributes only paths that differ from every parent, which means its conflict resolutions. Each commit is scanned on its own, so a value added and removed later in the same PR still fails. PRs here merge with merge commits, so that intermediate commit would land in history. To clean a branch, drop or rewrite the commit; a revert isn't enough.
 
 `--staged` does the same for each staged file: the index blob compared with `HEAD`'s.
 
@@ -91,15 +91,30 @@ A value counts as added when it occurs more often in the new blob than in the pa
 
 ## CI
 
-The `secret-scan` job in `.github/workflows/ci.yml` runs `--strict --ci --diff <range>`. Values come from Actions secrets with the same names. The job's env list must match `secrets.json`, and `tests/secret-scan.test.ts` checks that it does.
+The `secret-scan` job in `.github/workflows/ci.yml` runs `--strict --ci` with one `--diff` per range. Values come from Actions secrets with the same names. The job's env list must match `secrets.json`, and `tests/secret-scan.test.ts` checks that it does.
 
-- **Pull requests** (`opened`, `synchronize`, `reopened`, `edited`; `edited` re-runs on a base-branch change): the range is `base.sha..head.sha`.
-- **Pushes to `dev` and `master`:** the range is `before..after`. If `before` isn't available, or is all zeros on a new branch, it's the merge-base with the default branch. After a force-push, it's the merge-base of `before` and `after`. If that leaves nothing, only the pushed commit is scanned. This alerts after the push; it can't block it.
+The ranges come from [`ci-range.sh`](ci-range.sh), which the tests run against temp repos. When it can't determine a range, it **fails the job** rather than guessing.
+
+- **Pull requests** (`opened`, `synchronize`, `reopened`, `edited`; `edited` re-runs on a base-branch change): `base.sha..head.sha`.
+- **Pushes to `dev` and `master`:** `merge-base(before, after)..after`. That is `before..after` for a normal push, and also covers older commits a force-push rewrote.
+  - After a force-push, `actions/checkout` doesn't have the old tip, because it's no longer on any branch. The script fetches it by SHA; GitHub serves it until garbage collection. If it still can't be read, the job fails.
+  - For a new branch (`before` all zeros), the range is everything not already on the default branch.
+  - Push scans alert after the push; they can't block it.
+- **Nightly (`schedule`):** every commit that landed on `dev` and `master` in the last 3 days, meaning commits reachable from the tip but not from the newest first-parent commit older than the window. Older history, including known historical leaks, is reachable from that base, so it never turns this run red. The overlapping windows cover runs that were skipped, cancelled or missed.
 - **Fork PRs fail** with an error saying a maintainer must run the scan locally. Forks get no Actions secrets, so CI can't scan them.
 
-The `gitleaks` job adds pattern-based detection for well-known token formats. On PRs, it scans only the PR's own commits, so the old leak in history doesn't fail every run.
+**Concurrency:** a newer PR run cancels an older one for the same PR, because it scans a superset. Push and scheduled runs each get their own concurrency group (`run_id`), so a later push can never cancel an earlier push's scan, or drop it while it's pending.
 
-These jobs only block merges if they are **required status checks** on `dev` and `master`. That is a repo setting, separate from this code.
+The `gitleaks` job adds pattern-based detection for well-known token formats. On PRs, it scans only the PR's own commits, so the old leak in history doesn't fail every run. It misses binary, UTF-16, wrapped and split values, so it supplements the value scan rather than replacing it.
+
+### Deliberate bypasses
+
+These skip or weaken the scan. They are known and accepted; the gate can't prevent them on its own.
+
+- **Skip markers:** `[skip ci]`, `[ci skip]`, `[no ci]`, `[skip actions]`, `[actions skip]`, or a `skip-checks: true` trailer in the head commit. These skip the push run, with no record, and the PR run too. For PRs, required checks then block the merge. For direct pushes, the nightly run is the backstop.
+- **Editing the gate itself:** a PR runs its own version of `ci.yml`, `secrets.json` and `scripts/secret-scan/`, so it can weaken or remove the scan for itself. Review changes to these files with care. Once merged, the weakened version also runs nightly.
+- **Disabled or missing workflows:** a disabled workflow, a deleted secret (which fails `--strict --ci`), and GitHub pausing scheduled workflows after 60 days without repo activity.
+- **Not required:** these jobs only block merges if they are **required status checks** on `dev` and `master`. That is a repo setting, separate from this code.
 
 ## Syncing Actions secrets
 

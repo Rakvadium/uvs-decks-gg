@@ -2,13 +2,15 @@ import fs from "node:fs";
 import path from "node:path";
 import { buildMatcher, formatHit, scanTarget, type Hit, type Target } from "./match.ts";
 import { flagValues, loadManifest, loadSecrets, parseArgs, parseEnvFile } from "./shared.ts";
-import { pathTargets, rangeTargets, stagedTargets } from "./sources.ts";
+import { COMMIT_LOCATION, pathTargets, rangeTargets, stagedTargets } from "./sources.ts";
 
-const USAGE = `Usage: bun run secret-scan [--diff <base>..<head>] [--staged] [--path <dir>]
+const USAGE = `Usage: bun run secret-scan [--diff <base>..<head>]... [--staged] [--path <dir>]
                            [--env-file <file>]... [--strict] [--ci]
 
 Scans for the values of the env vars in scripts/secret-scan/secrets.json.
 Prints VAR_NAME file:line for each hit, never the value.
+--strict fails when a required value is missing. --ci also requires ciOnly names, and
+implies --strict.
 Exit 0 clean, 1 hits, 2 the scan could not run completely (bad usage, no values loaded,
 or --strict with a required value missing).`;
 
@@ -63,18 +65,22 @@ export function run(argv: string[], options: RunOptions = {}): number {
     }
   }
 
+  // --ci implies --strict: CI must never pass on missing values.
+  const strict = Boolean(args.strict || args.ci);
   const manifest = loadManifest(options.manifest);
-  const { secrets, missing, short } = loadSecrets(manifest.names, envs);
-  const ignored = new Set([...(args.ci ? [] : manifest.ciOnly)]);
-  const unavailable = [...missing, ...short].filter((name) => !ignored.has(name));
+  const loaded = loadSecrets(manifest.names, envs);
+  const ignored = new Set(args.ci ? [] : manifest.ciOnly);
+  const secrets = loaded.secrets.filter((s) => !ignored.has(s.name));
+  const short = loaded.short.filter((name) => !ignored.has(name));
+  const unavailable = [...loaded.missing, ...short].filter((name) => !ignored.has(name));
   const required = unavailable.filter((name) => !manifest.optional.includes(name));
   if (short.length > 0) warn(`value shorter than 8 chars, not checked: ${short.join(", ")}`);
-  if (secrets.filter((s) => !ignored.has(s.name)).length === 0) {
+  if (secrets.length === 0) {
     fail("no secret values loaded, nothing to scan. Pass --env-file, or set the values in the environment.");
     return 2;
   }
-  if (args.strict && required.length > 0) fail(`missing required value(s): ${required.join(", ")}`);
-  const notChecked = args.strict ? unavailable.filter((n) => !required.includes(n)) : unavailable;
+  if (strict && required.length > 0) fail(`missing required value(s): ${required.join(", ")}`);
+  const notChecked = strict ? unavailable.filter((n) => !required.includes(n)) : unavailable;
   if (notChecked.length > 0) warn(`no value, not checked: ${notChecked.join(", ")}`);
 
   const matcher = buildMatcher(secrets);
@@ -87,7 +93,7 @@ export function run(argv: string[], options: RunOptions = {}): number {
     }
   };
   try {
-    if (typeof args.diff === "string") scan(rangeTargets(args.diff, cwd));
+    for (const range of flagValues(argv, "diff")) scan(rangeTargets(range, cwd));
     if (args.staged) scan(stagedTargets(cwd));
     if (typeof args.path === "string") scan(pathTargets(args.path, cwd));
   } catch (error) {
@@ -97,7 +103,7 @@ export function run(argv: string[], options: RunOptions = {}): number {
 
   for (const hit of hits) {
     out(formatHit(hit));
-    if (actions && hit.location !== "commit-message") {
+    if (actions && hit.location !== COMMIT_LOCATION) {
       out(`::error file=${hit.location},line=${hit.line},title=secret-scan::${hit.name} value found`);
     }
   }
@@ -105,8 +111,8 @@ export function run(argv: string[], options: RunOptions = {}): number {
     err(`secret-scan: ${hits.length} hit(s). Remove the value, and rotate the secret if it was pushed.`);
     return 1;
   }
-  if (args.strict && required.length > 0) return 2;
-  out(`secret-scan: clean (${secrets.length} values checked across ${scanned} files and messages)`);
+  if (strict && required.length > 0) return 2;
+  out(`secret-scan: clean (${secrets.length} values checked across ${scanned} files and commits)`);
   return 0;
 }
 

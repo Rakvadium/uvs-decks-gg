@@ -6,13 +6,21 @@ on:
   pull_request:
     # edited: re-run when the PR's base branch changes.
     types: [opened, synchronize, reopened, edited]
+  # Nightly backstop for the secret scan: rescans the last 3 days of dev and master.
+  # Scheduled runs ignore [skip ci], and the overlapping windows cover cancelled or missed runs.
+  schedule:
+    - cron: "23 4 * * *"
 
+# A newer PR run replaces an older one for the same PR (it scans a superset). Push and
+# scheduled runs each get their own group (run_id), so a later push can never cancel, or drop
+# as pending, an earlier push's scan.
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  group: ci-${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.ref || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   check:
+    if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -38,7 +46,8 @@ jobs:
 
   # Value-based scan for the real values of the secrets named in scripts/secret-scan/secrets.json.
   # Fails closed: --strict --ci fails if any required Actions secret (including the canary) is
-  # missing. Runs on PRs (the PR's commits) and on pushes to dev/master (the pushed commits).
+  # missing. Runs on PRs (the PR's commits), on pushes to dev/master (the pushed commits), and
+  # nightly (the last 3 days of dev and master). The range logic is scripts/secret-scan/ci-range.sh.
   secret-scan:
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -61,9 +70,9 @@ jobs:
         with:
           bun-version: latest
 
-      # PR: base.sha..head.sha. Push: before..after; on a new branch or a force-push
-      # (before isn't an ancestor, or isn't fetchable), from the merge-base instead.
-      - name: Pick the commit range
+      # Fails the job when the range can't be determined (e.g. a force-pushed-over tip that
+      # can't be fetched) instead of guessing.
+      - name: Pick the commit ranges
         id: range
         env:
           EVENT: ${{ github.event_name }}
@@ -72,27 +81,19 @@ jobs:
           BEFORE: ${{ github.event.before }}
           AFTER: ${{ github.sha }}
           DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+          WINDOW: 3 days ago
+          SCHEDULE_BRANCHES: dev master
         run: |
           set -euo pipefail
-          if [ "$EVENT" = pull_request ]; then
-            range="$BASE_SHA..$HEAD_SHA"
-          else
-            base=""
-            if [ -n "$BEFORE" ] && [ "$BEFORE" != 0000000000000000000000000000000000000000 ] && git cat-file -e "$BEFORE^{commit}" 2>/dev/null; then
-              base=$(git merge-base "$BEFORE" "$AFTER" || true)
-            fi
-            if [ -z "$base" ]; then
-              base=$(git merge-base "$AFTER" "origin/$DEFAULT_BRANCH" || true)
-            fi
-            if [ -z "$base" ] || [ "$base" = "$AFTER" ]; then range="$AFTER^!"; else range="$base..$AFTER"; fi
-          fi
-          echo "Scanning $range"
-          echo "range=$range" >> "$GITHUB_OUTPUT"
+          ranges=$(bash scripts/secret-scan/ci-range.sh)
+          echo "Scanning:"
+          echo "$ranges"
+          { echo "ranges<<RANGES_EOF"; echo "$ranges"; echo "RANGES_EOF"; } >> "$GITHUB_OUTPUT"
 
       # Keep this env list in sync with scripts/secret-scan/secrets.json (a test checks it).
       - name: Scan commits for secret values
         env:
-          RANGE: ${{ steps.range.outputs.range }}
+          RANGES: ${{ steps.range.outputs.ranges }}
           AGENT_AUTH_SECRET: ${{ secrets.AGENT_AUTH_SECRET }}
           AGENT_AUTH_EMAIL: ${{ secrets.AGENT_AUTH_EMAIL }}
           AGENT_AUTH_PASSWORD: ${{ secrets.AGENT_AUTH_PASSWORD }}
@@ -106,7 +107,14 @@ jobs:
           JWT_PRIVATE_KEY: ${{ secrets.JWT_PRIVATE_KEY }}
           JWKS: ${{ secrets.JWKS }}
           SECRET_SCAN_CANARY: ${{ secrets.SECRET_SCAN_CANARY }}
-        run: bun run secret-scan --strict --ci --diff "$RANGE"
+        run: |
+          set -euo pipefail
+          args=()
+          while IFS= read -r range; do
+            if [ -n "$range" ]; then args+=(--diff "$range"); fi
+          done <<< "$RANGES"
+          if [ ${#args[@]} -eq 0 ]; then echo "::error title=secret-scan::no commit range to scan"; exit 1; fi
+          bun run secret-scan --strict --ci "${args[@]}"
 
   # Pattern-based scan for well-known token formats. On pull_request events the
   # action scans only the PR's commits, so the old leak in history doesn't fail it.

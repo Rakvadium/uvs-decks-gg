@@ -75,7 +75,7 @@ function matchBytes(bytes: Buffer, matcher: Matcher): Matches {
 
 /**
  * The raw bytes, the UTF-16 decoding when the file looks like UTF-16, and for text: a copy with
- * all whitespace removed (wrapped base64, line-split values) and one that also removes string
+ * all whitespace and zero-width chars removed (wrapped base64, line-split values) and one that also removes string
  * joins like `"abc" +\n "def"`. Offsets in derived views map back to lines of their source.
  */
 export function viewsOf(bytes: Buffer): View[] {
@@ -133,6 +133,11 @@ function derive(base: View, joinStrings: boolean): View {
   for (let i = 0; i < src.length; i++) {
     const byte = src[i];
     if (WHITESPACE.has(byte)) continue;
+    const zeroWidth = zeroWidthLength(src, i);
+    if (zeroWidth > 0) {
+      i += zeroWidth - 1;
+      continue;
+    }
     if (joinStrings && byte === 0x5c && (src[i + 1] === 0x0a || (src[i + 1] === 0x0d && src[i + 2] === 0x0a))) continue;
     if (joinStrings && QUOTES.has(byte)) {
       let j = skipWhitespace(src, i + 1);
@@ -147,6 +152,14 @@ function derive(base: View, joinStrings: boolean): View {
     n++;
   }
   return { bytes: out.subarray(0, n), lineAt: (offset) => base.lineAt(origin[offset]) };
+}
+
+/** UTF-8 length of a zero-width char at `i` (U+200B-U+200D, U+2060, U+FEFF), else 0. */
+function zeroWidthLength(bytes: Buffer, i: number): number {
+  if (bytes[i] === 0xe2 && bytes[i + 1] === 0x80 && bytes[i + 2] >= 0x8b && bytes[i + 2] <= 0x8d) return 3;
+  if (bytes[i] === 0xe2 && bytes[i + 1] === 0x81 && bytes[i + 2] === 0xa0) return 3;
+  if (bytes[i] === 0xef && bytes[i + 1] === 0xbb && bytes[i + 2] === 0xbf) return 3;
+  return 0;
 }
 
 function skipWhitespace(bytes: Buffer, from: number): number {

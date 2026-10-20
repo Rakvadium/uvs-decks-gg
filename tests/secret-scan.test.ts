@@ -4,6 +4,7 @@ import crypto from "node:crypto";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
+import { pathToFileURL } from "node:url";
 import { run } from "../scripts/secret-scan/index";
 import { buildMatcher, scanTarget, utf16Encoding, type Hit } from "../scripts/secret-scan/match";
 import {
@@ -65,9 +66,11 @@ function repo() {
     fs.mkdirSync(path.dirname(path.join(dir, file)), { recursive: true });
     fs.writeFileSync(path.join(dir, file), content);
   };
-  const commit = (message: string) => {
+  const commit = (message: string, options: { email?: string; date?: string } = {}) => {
     git("add", "-A");
-    git("commit", "-qm", message, "--allow-empty");
+    const identity = options.email ? ["-c", `user.email=${options.email}`] : [];
+    const env = options.date ? { ...process.env, GIT_AUTHOR_DATE: options.date, GIT_COMMITTER_DATE: options.date } : process.env;
+    execFileSync("git", [...identity, "commit", "-qm", message, "--allow-empty"], { cwd: dir, stdio: "pipe", env });
     return git("rev-parse", "HEAD");
   };
   return { dir, git, write, commit };
@@ -106,6 +109,14 @@ describe("secret-scan matching", () => {
     expect(found(`const key = "${FAKE.slice(0, half)}" +\n  "${FAKE.slice(half)}";`)).toEqual(["FAKE_TOKEN:1"]);
     expect(found(`key = ('${FAKE.slice(0, half)}'\n       '${FAKE.slice(half)}')`)).toEqual(["FAKE_TOKEN:1"]);
     expect(found(`$k = "${FAKE.slice(0, half)}" . "${FAKE.slice(half)}";`)).toEqual(["FAKE_TOKEN:1"]);
+  });
+
+  test("zero-width characters inside a value (U+200B-U+200D, U+2060, U+FEFF)", () => {
+    for (const zw of ["​", "‌", "‍", "⁠", "﻿"]) {
+      const hidden = FAKE.match(/.{1,5}/g)!.join(zw);
+      expect(hidden).not.toContain(FAKE);
+      expect(found(`token: ${hidden}\n`)).toEqual(["FAKE_TOKEN:1"]);
+    }
   });
 
   test("any 24-char slice of a long value, e.g. one piece of a split string", () => {
@@ -218,10 +229,27 @@ describe("secret-scan env file and manifest", () => {
     expect(manifest.ciOnly).toEqual(["SECRET_SCAN_CANARY"]);
   });
 
-  test("CI passes every manifest secret and runs --strict --ci", () => {
-    const ci = fs.readFileSync(path.join(import.meta.dir, "../.github/workflows/ci.yml"), "utf8");
-    for (const name of loadManifest().names) expect(ci).toContain(`${name}: \${{ secrets.${name} }}`);
-    expect(ci).toContain("bun run secret-scan --strict --ci --diff");
+  const ci = () => fs.readFileSync(path.join(import.meta.dir, "../.github/workflows/ci.yml"), "utf8").replace(/\r\n/g, "\n");
+
+  test("CI passes every manifest secret and runs --strict --ci on the ci-range.sh ranges", () => {
+    for (const name of loadManifest().names) expect(ci()).toContain(`${name}: \${{ secrets.${name} }}`);
+    expect(ci()).toContain('bun run secret-scan --strict --ci "${args[@]}"');
+    expect(ci()).toContain("ranges=$(bash scripts/secret-scan/ci-range.sh)");
+  });
+
+  test("CI concurrency: only PR runs cancel each other; push and schedule runs never do", () => {
+    expect(ci()).toContain(
+      "group: ci-${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.ref || github.run_id }}",
+    );
+    expect(ci()).toContain("cancel-in-progress: ${{ github.event_name == 'pull_request' }}");
+    expect(ci()).not.toContain("cancel-in-progress: true");
+  });
+
+  test("CI has a nightly schedule, and the secret-scan job has no job-level skip", () => {
+    expect(ci()).toMatch(/schedule:\s*\n\s*- cron: "[^"]+"/);
+    const job = ci().split("\n  secret-scan:\n")[1].split("\n  gitleaks:\n")[0];
+    expect(job).not.toMatch(/^ {4}if:/m);
+    expect(job).not.toContain("continue-on-error");
   });
 });
 
@@ -260,6 +288,20 @@ describe("secret-scan fail closed", () => {
     expect(capture(["--strict", "--ci", "--path", "."], { ...env, CANARY: "canary-value-1" }, tempDir()).code).toBe(0);
   });
 
+  test("--ci implies --strict", () => {
+    const ci = capture(["--ci", "--path", "."], { FAKE_TOKEN: FAKE, OTHER_TOKEN: "other-value-1" }, tempDir());
+    expect(ci.code).toBe(2);
+    expect(ci.output).toContain("secret-scan: missing required value(s): CANARY");
+  });
+
+  test("ignored CI-only values are not scanned or counted locally", () => {
+    const dir = tempDir();
+    fs.writeFileSync(path.join(dir, "a.txt"), "canary-value-1");
+    const { code, output } = capture(["--path", "."], { FAKE_TOKEN: FAKE, CANARY: "canary-value-1" }, dir);
+    expect(code).toBe(0);
+    expect(output).toContain("clean (1 values checked");
+  });
+
   test("a hit still exits 1 under --strict with values missing", () => {
     const dir = tempDir();
     fs.writeFileSync(path.join(dir, "a.txt"), FAKE);
@@ -287,8 +329,34 @@ describe("secret-scan --diff and --staged", () => {
     const { code, output } = capture(["--diff", `${base}..HEAD`], env, r.dir);
     expect(code).toBe(1);
     expect(output).toMatch(/FAKE_TOKEN a\.txt:2 @[0-9a-f]{7}/);
-    expect(output).toMatch(/FAKE_TOKEN commit-message:3 @[0-9a-f]{7}/);
+    // Line 8 of the raw commit object: tree, parent, author, committer, blank, subject, blank, body.
+    expect(output).toMatch(/FAKE_TOKEN commit:8 @[0-9a-f]{7}/);
     expect(output).not.toContain(FAKE);
+  });
+
+  test("author and committer identity in the commit object", () => {
+    const email = `agent-${crypto.randomBytes(6).toString("hex")}@example.com`;
+    const r = repo();
+    const base = r.commit("base");
+    r.write("clean.txt", "clean\n");
+    r.commit("clean change", { email });
+    const { code, output } = capture(["--diff", `${base}..HEAD`], { FAKE_TOKEN: FAKE, OTHER_TOKEN: email }, r.dir);
+    expect(code).toBe(1);
+    expect(output).toMatch(/OTHER_TOKEN commit:3 @[0-9a-f]{7}/);
+    expect(output).toMatch(/OTHER_TOKEN commit:4 @[0-9a-f]{7}/);
+    expect(output).not.toContain(email);
+  });
+
+  test("repeated --diff ranges are all scanned", () => {
+    const r = repo();
+    const base = r.commit("base");
+    r.write("one.txt", `${FAKE}\n`);
+    const one = r.commit("one");
+    r.write("two.txt", `${FAKE}\n`);
+    r.commit("two");
+    const { output } = capture(["--diff", `${base}..${one}`, "--diff", `${one}..HEAD`], env, r.dir);
+    expect(output).toContain("FAKE_TOKEN one.txt:1");
+    expect(output).toContain("FAKE_TOKEN two.txt:1");
   });
 
   test("binary files and .gitattributes binary/-diff don't hide values", () => {
@@ -382,6 +450,105 @@ describe("secret-scan --diff and --staged", () => {
     const { code, output } = capture(["--diff", `${base}..HEAD`, "--env-file", ".env.one", "--env-file", ".env.two"], {}, r.dir);
     expect(code).toBe(1);
     expect(output).toContain("FAKE_TOKEN a.txt:1");
+  });
+});
+
+/** Git's bash on Windows (not WSL's), plain bash elsewhere. */
+function findBash(): string | null {
+  if (process.platform !== "win32") return "bash";
+  const root = path.resolve(execFileSync("git", ["--exec-path"]).toString().trim(), "../../..");
+  const bash = path.join(root, "bin", "bash.exe");
+  return fs.existsSync(bash) ? bash : null;
+}
+const BASH = findBash();
+const CI_RANGE = path.join(import.meta.dir, "../scripts/secret-scan/ci-range.sh").split(path.sep).join("/");
+
+function ciRange(cwd: string, env: Record<string, string>) {
+  const result = spawnSync(BASH!, [CI_RANGE], { cwd, env: { ...process.env, ...env } });
+  return { code: result.status, out: result.stdout.toString().trim(), err: result.stderr.toString() };
+}
+
+/**
+ * dev on a bare origin: an old commit holding a known historical leak (10 days old), then b, c.
+ * Then a force-push rewrites b to add a fake secret (b2, c2). The "CI" clone fetches only
+ * refs/heads/*, like actions/checkout, so the old tip c is not in it.
+ */
+function forcePushScenario() {
+  const root = tempDir();
+  const origin = path.join(root, "origin.git");
+  execFileSync("git", ["init", "-q", "--bare", "-b", "dev", origin]);
+  // GitHub serves unreferenced commits by SHA; a local bare repo needs this to do the same.
+  execFileSync("git", ["-C", origin, "config", "uploadpack.allowAnySHA1InWant", "true"]);
+  const url = pathToFileURL(origin).href;
+  const daysAgo = (days: number) => new Date(Date.now() - days * 86_400_000).toISOString();
+
+  const r = repo();
+  r.write("old-leak.txt", `old=${FAKE}\n`);
+  const old = r.commit("old leak", { date: daysAgo(10) });
+  r.write("b.txt", "clean\n");
+  r.commit("b", { date: daysAgo(5) });
+  r.write("c.txt", "clean\n");
+  const c = r.commit("c");
+  r.git("remote", "add", "origin", url);
+  r.git("push", "-q", "origin", "HEAD:refs/heads/dev");
+  r.git("reset", "-q", "--hard", old);
+  r.write("b.txt", `rewritten=${FAKE}\n`);
+  const b2 = r.commit("b rewritten");
+  r.write("c.txt", "clean\n");
+  const c2 = r.commit("c again");
+  r.git("push", "-qf", "origin", "HEAD:refs/heads/dev");
+
+  const ci = tempDir();
+  const git = (...args: string[]) => execFileSync("git", args, { cwd: ci, stdio: "pipe" }).toString().trim();
+  git("init", "-q");
+  git("remote", "add", "origin", url);
+  git("fetch", "-q", "--no-tags", "origin", "+refs/heads/*:refs/remotes/origin/*");
+  git("checkout", "-q", c2);
+  return { ci, git, old, c, b2, c2 };
+}
+
+(BASH ? describe : describe.skip)("secret-scan ci-range.sh (the CI range logic)", () => {
+  const s = forcePushScenario();
+  const env = { FAKE_TOKEN: FAKE };
+
+  test("force-push to the default branch: fetches the old tip by SHA and scans the rewritten commit", () => {
+    expect(() => s.git("cat-file", "-e", `${s.c}^{commit}`)).toThrow();
+    const range = ciRange(s.ci, { EVENT: "push", BEFORE: s.c, AFTER: s.c2, DEFAULT_BRANCH: "dev" });
+    expect(range.code).toBe(0);
+    expect(range.out).toBe(`${s.old}..${s.c2}`);
+    const { code, output } = capture(["--diff", range.out], env, s.ci);
+    expect(code).toBe(1);
+    expect(output).toMatch(/FAKE_TOKEN b\.txt:1 @/);
+    expect(output).not.toContain("old-leak.txt");
+  });
+
+  test("an old tip that can't be fetched fails the job instead of scanning only the tip", () => {
+    const range = ciRange(s.ci, { EVENT: "push", BEFORE: "1".repeat(40), AFTER: s.c2, DEFAULT_BRANCH: "dev" });
+    expect(range.code).toBe(1);
+    expect(range.out).toBe("");
+    expect(range.err).toContain("could not determine the commit range");
+    expect(range.err).toContain("can't be fetched");
+  });
+
+  test("normal push scans before..after; a new branch at the default tip scans that commit", () => {
+    expect(ciRange(s.ci, { EVENT: "push", BEFORE: s.b2, AFTER: s.c2, DEFAULT_BRANCH: "dev" }).out).toBe(`${s.b2}..${s.c2}`);
+    expect(ciRange(s.ci, { EVENT: "push", BEFORE: "0".repeat(40), AFTER: s.c2, DEFAULT_BRANCH: "dev" }).out).toBe(`${s.c2}^!`);
+  });
+
+  test("pull_request scans base..head; an unknown event fails", () => {
+    expect(ciRange(s.ci, { EVENT: "pull_request", BASE_SHA: s.old, HEAD_SHA: s.c2 }).out).toBe(`${s.old}..${s.c2}`);
+    expect(ciRange(s.ci, { EVENT: "workflow_dispatch" }).code).toBe(1);
+  });
+
+  test("schedule: the window's commits are scanned, older history (the old leak) is not", () => {
+    const range = ciRange(s.ci, { EVENT: "schedule", WINDOW: "3 days ago", SCHEDULE_BRANCHES: "dev" });
+    expect(range.code).toBe(0);
+    expect(range.out).toBe(`${s.old}..origin/dev`);
+    const { code, output } = capture(["--diff", range.out], env, s.ci);
+    expect(code).toBe(1);
+    expect(output).toContain("FAKE_TOKEN b.txt:1");
+    expect(output).not.toContain("old-leak.txt");
+    expect(ciRange(s.ci, { EVENT: "schedule", WINDOW: "30 days ago", SCHEDULE_BRANCHES: "dev" }).code).toBe(1);
   });
 });
 

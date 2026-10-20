@@ -6,6 +6,12 @@ import type { Target } from "./match.ts";
 const SKIP_DIRS = new Set([".git", "node_modules"]);
 const EMPTY_TREE = "4b825dc642cb6eb9a060e54bf8d69288fbee4904";
 const SUBMODULE_MODE = "160000";
+/**
+ * Location reported for hits in a commit object: the whole raw object (`git cat-file commit`),
+ * so author, committer, message, trailers and signatures are all scanned. Lines count from the
+ * `tree` header.
+ */
+export const COMMIT_LOCATION = "commit";
 
 function git(args: string[], cwd: string, input?: string): Buffer {
   return execFileSync("git", args, {
@@ -51,7 +57,7 @@ function readObjects(shas: Iterable<string>, cwd: string): Map<string, Buffer> {
 }
 
 /**
- * The full new blob of every file a commit changes, plus its message. Blobs are read raw, so
+ * The full new blob of every file a commit changes, plus the raw commit object. Blobs are read raw, so
  * binary files and `.gitattributes` (`binary`, `-diff`) don't hide anything. A merge commit
  * contributes only paths that differ from every parent (its conflict resolutions).
  */
@@ -84,8 +90,7 @@ export function rangeTargets(range: string, cwd = process.cwd()): Target[] {
   for (const { commit, changes } of perCommit) {
     const raw = objects.get(commit);
     if (!raw) throw new Error(`cannot read commit ${commit}`);
-    const split = raw.indexOf("\n\n");
-    targets.push({ location: "commit-message", commit, bytes: split === -1 ? Buffer.alloc(0) : raw.subarray(split + 2) });
+    targets.push({ location: COMMIT_LOCATION, commit, bytes: raw });
     for (const change of changes) {
       targets.push({ location: change.path, commit, bytes: blob(objects, change.newSha), before: change.oldShas.map((sha) => blob(objects, sha)) });
     }
