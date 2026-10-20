@@ -23,7 +23,7 @@ Structural borders use only these steps. Write the named utility ([Named utiliti
 | Default surface | `/50` | `border-surface` |
 | Dashed empty / placeholder | `/80` | `border-placeholder` |
 
-Interactive form and toolbar controls use `--control-dual-border` / `--control-dual-border-strong` (see `src/app/globals.css`), not structural opacities. Keep semantic borders (`border-primary/*`, destructive) and `--chrome-*-border*` theme tokens as-is.
+Interactive form and toolbar controls use `--control-dual-border` / `--control-dual-border-strong` (see `src/app/globals.css`), not structural opacities. Semantic borders (primary, destructive, …) stay on the [tone ladder](#tone-ladder) (`border-primary-soft` / `-strong`), not this structural one, and `--chrome-*-border*` theme tokens stay as-is.
 
 ## Surface opacity ladder
 
@@ -63,7 +63,7 @@ State is expressed with semantic tokens, never Tailwind palette hues:
 | Success / ready / online | `success`, `success-foreground` | `Badge tone="success"`, `Alert variant="success"` |
 | Warning / building / pending | `warning`, `warning-foreground` | `Badge tone="warning"`, `Alert variant="warning"` |
 | Informational | `info`, `info-foreground` | `Badge tone="info"`, `Alert variant="info"` |
-| Error / destructive | `destructive` | `Badge tone="destructive"`, `Alert variant="destructive"`, `Button variant="destructive"` |
+| Error / destructive | `destructive`, `destructive-foreground` | `Badge tone="destructive"`, `Alert variant="destructive"`, `Button variant="destructive"` |
 
 Inline usage follows the tone ladder: `bg-warning-wash`, `border-warning-soft`, `text-warning`. Domain colors (card symbols, stat tints) live in `src/config/universus.ts` and are not status colors.
 
