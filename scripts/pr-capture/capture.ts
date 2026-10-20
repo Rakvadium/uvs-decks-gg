@@ -7,14 +7,13 @@ import { chromium, type Browser } from "playwright";
 import {
   HIDE_DEV_OVERLAY_CSS,
   agentStorageState,
-  savedAppearances,
   newCaptureContext,
   runSteps,
   settle,
   stableScreenshot,
-  type Appearance,
 } from "./browser.ts";
 import { recordFrames, writeGif } from "./gif.ts";
+import { BREAK_PIN_ENV, appearanceKey, pinFlagged, type Appearance, type PinReport, type SessionPin } from "./pin.ts";
 import {
   OUTPUT_ROOT,
   VIEWPORTS,
@@ -48,6 +47,8 @@ const chrome = typeof args.chrome === "string" ? args.chrome : "calm";
 const fullPage = args["full-page"] === true;
 const stills = args["skip-stills"] !== true;
 const gifWidth = Number(args["gif-width"] ?? 960);
+const strict = args.strict === true;
+if (process.env[BREAK_PIN_ENV] === "1") console.warn(`${BREAK_PIN_ENV}=1: the session rewrite is deliberately broken (test only).`);
 
 if ((chrome !== "calm" || themes.some((t) => t !== "default")) && spec.routes.some((r) => r.auth === "guest")) {
   console.warn(
@@ -112,6 +113,20 @@ async function ensureServer(): Promise<ChildProcess | null> {
   throw new Error(`next dev was not ready on port ${port} within 180s`);
 }
 
+type ShotPin = PinReport & { pinned: string; overridden: boolean; flagged: boolean };
+
+/** Signed-in shots only: what the session rewrite did in this shot's context. `flagged` is set when the run ends. */
+function readPin(pin: SessionPin, auth: RouteSpec["auth"], appearance: Appearance): ShotPin | null {
+  if (auth !== "agent") return null;
+  const report = pin.report();
+  const pinned = appearanceKey(appearance);
+  return { ...report, pinned, overridden: report.patched && report.saved !== pinned, flagged: false };
+}
+
+function warnPin(pin: ShotPin | null) {
+  if (pin?.problems.length) console.warn(`    WARNING: JS theme pin may not apply: ${pin.problems.join("; ")}`);
+}
+
 function stopServer(child: ChildProcess | null) {
   if (!child?.pid || child.exitCode !== null) return;
   if (process.platform === "win32") spawnSync("taskkill", ["/pid", String(child.pid), "/T", "/F"]);
@@ -127,7 +142,7 @@ async function captureStill(
   blocked: string[],
 ) {
   const name = shotName(route, viewport, appearance.theme, appearance.mode);
-  const context = await newCaptureContext(browser, {
+  const { context, pin } = await newCaptureContext(browser, {
     viewport,
     appearance,
     storageState: route.auth === "agent" ? storageState : undefined,
@@ -149,7 +164,9 @@ async function captureStill(
       finalPath !== route.path && `landed on ${finalPath}`,
     ].filter(Boolean);
     console.log(`  ${name}.png${notes.length ? `  (${notes.join("; ")})` : ""}`);
-    return { name, route: route.path, auth: route.auth, finalPath, loaded, stable };
+    const shotPin = readPin(pin, route.auth, appearance);
+    warnPin(shotPin);
+    return { name, route: route.path, auth: route.auth, appearance, finalPath, loaded, stable, pin: shotPin };
   } finally {
     await context.close();
   }
@@ -165,7 +182,7 @@ async function captureGif(
   const appearance = { theme: gif.theme ?? themes[0], mode: gif.mode ?? modes[0], chrome };
   const name = shotName(gif, viewport, appearance.theme, appearance.mode);
   const videoDir = path.join(outDir, ".video-tmp");
-  const context = await newCaptureContext(browser, {
+  const { context, pin } = await newCaptureContext(browser, {
     viewport,
     appearance,
     storageState: gif.auth === "agent" ? storageState : undefined,
@@ -183,10 +200,13 @@ async function captureGif(
   } finally {
     await context.close();
   }
+  const gifPin = readPin(pin, gif.auth, appearance);
   await page.video()?.saveAs(path.join(outDir, `${name}.webm`));
   fs.rmSync(videoDir, { recursive: true, force: true });
   await writeGif(frames, path.join(outDir, `${name}.gif`), gifWidth);
   console.log(`  ${name}.gif (${frames.length} frames) + ${name}.webm`);
+  warnPin(gifPin);
+  return { name, auth: gif.auth, appearance, frames: frames.length, pin: gifPin };
 }
 
 async function main() {
@@ -200,6 +220,7 @@ async function main() {
 
   const blocked: string[] = [];
   const shots: Awaited<ReturnType<typeof captureStill>>[] = [];
+  let gifShot: Awaited<ReturnType<typeof captureGif>> | undefined;
   let browser: Browser | undefined;
   try {
     browser = await chromium.launch();
@@ -216,16 +237,33 @@ async function main() {
             for (const mode of modes)
               shots.push(await captureStill(browser, route, viewport, { theme, mode, chrome }, storageState, blocked));
     }
-    if (args.gif === true) await captureGif(browser, storageState, blocked);
+    if (args.gif === true) gifShot = await captureGif(browser, storageState, blocked);
   } finally {
     await browser?.close();
     stopServer(server);
   }
 
+  const signedIn = [...shots, ...(gifShot ? [gifShot] : [])].flatMap((shot) => (shot.pin ? [{ ...shot, pin: shot.pin }] : []));
+  const savedAppearance = [...new Set(signedIn.flatMap((shot) => (shot.pin.saved ? [shot.pin.saved] : [])))];
+  for (const { pin, appearance } of signedIn) pin.flagged = pinFlagged(pin, appearance, savedAppearance[0] ?? null);
+  const flagged = signedIn.filter((shot) => shot.pin.flagged).map((shot) => shot.name);
+
   fs.writeFileSync(
     path.join(outDir, "manifest.json"),
     JSON.stringify(
-      { issue, label, port, chrome, fullPage, shots, blockedConvexWrites: blocked, savedAppearance: [...savedAppearances] },
+      {
+        issue,
+        label,
+        port,
+        chrome,
+        fullPage,
+        strict,
+        shots,
+        gif: gifShot ?? null,
+        blockedConvexWrites: blocked,
+        savedAppearance,
+        pinFlagged: flagged,
+      },
       null,
       2,
     ),
@@ -234,9 +272,20 @@ async function main() {
   for (const write of blocked) counts.set(write, (counts.get(write) ?? 0) + 1);
   const summary = [...counts].map(([write, n]) => `${write} ×${n}`).join(", ");
   console.log(`Done: ${shots.length} stills. Blocked Convex writes: ${summary || "none"}`);
-  if (savedAppearances.size) {
-    const saved = [...savedAppearances].join(", ");
-    console.log(`Agent's saved appearance (preset/mode/chrome): ${saved}. Overridden in the browser for every shot.`);
+  if (signedIn.length) {
+    const patched = signedIn.filter((shot) => shot.pin.patched).length;
+    const overridden = signedIn.filter((shot) => shot.pin.overridden).length;
+    console.log(
+      `Agent's saved appearance (preset/mode/chrome): ${savedAppearance.join(", ") || "unknown"}. ` +
+        `Session result rewritten in ${patched}/${signedIn.length} signed-in shots (${overridden} differ from saved).`,
+    );
+  }
+  if (flagged.length) {
+    console.warn(
+      `WARNING: ${flagged.length} signed-in shot(s) may show the agent's saved theme in JS-driven UI (menus, toasts, ` +
+        `neon forks) instead of the pin: ${flagged.join(", ")}. See \`pin.problems\` in manifest.json.`,
+    );
+    if (strict) throw new Error("--strict: failing because the JS theme pin did not apply to every signed-in shot.");
   }
 }
 
