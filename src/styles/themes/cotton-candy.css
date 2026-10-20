@@ -15,6 +15,7 @@
   --accent-foreground: oklch(0.99 0.01 310);
   --destructive: oklch(0.6 0.22 26);
   --destructive-foreground: #fff;
+  --destructive-fill: oklch(0.57 0.22 26);
   --border: oklch(0.87 0.06 255);
   --input: oklch(0.915 0.055 238);
   --ring: oklch(0.76 0.11 232);
@@ -38,6 +39,8 @@
 }
 
 [data-color-theme="cotton-candy"]:not(.dark) {
+  --checkbox-border: oklch(from var(--control-dual-border) calc(l - 0.04) c h);
+  --checkbox-border-hover: oklch(from var(--control-dual-border-strong) calc(l - 0.055) c h);
   --secondary: oklch(0.62 0.11 232);
   --secondary-foreground: oklch(0.99 0.012 305);
   --border: oklch(0.73 0.078 252);
@@ -63,6 +66,7 @@
   --accent-foreground: oklch(0.17 0.045 255);
   --destructive: oklch(0.64 0.2 22);
   --destructive-foreground: #fff;
+  --destructive-fill: oklch(0.59 0.2 22);
   --border: oklch(0.38 0.07 258);
   --input: oklch(0.33 0.065 252);
   --ring: oklch(0.82 0.12 225);

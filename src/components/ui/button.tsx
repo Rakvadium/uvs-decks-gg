@@ -11,7 +11,7 @@ const buttonVariants = cva(
       variant: {
         default: "bg-primary text-primary-foreground hover:bg-primary-dim shadow-[var(--chrome-button-shadow-default)] hover:shadow-[var(--chrome-button-shadow-default-hover)] border border-primary-strong",
         destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive-dim shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive-strong",
+          "[--destructive:var(--destructive-fill)] bg-destructive text-destructive-foreground hover:bg-destructive-dim shadow-[var(--chrome-button-shadow-destructive)] hover:shadow-[var(--chrome-button-shadow-destructive-hover)] border border-destructive-strong",
         destructiveOutline:
           "border border-destructive-strong bg-transparent text-destructive shadow-none hover:bg-destructive-wash hover:border-destructive hover:text-destructive [&_svg]:text-current focus-visible:border-destructive focus-visible:ring-destructive-soft",
         outline:

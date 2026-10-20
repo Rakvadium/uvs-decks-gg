@@ -12,7 +12,7 @@ const badgeVariants = cva(
         default:
           "rounded-md bg-primary-selected text-primary border-primary-soft shadow-[var(--chrome-badge-default-shadow)] hover:shadow-[var(--chrome-badge-default-shadow-hover)] hover:border-primary-strong",
         secondary:
-          "rounded-md bg-secondary-selected text-secondary border-secondary-soft shadow-[var(--chrome-badge-secondary-shadow)] hover:shadow-[var(--chrome-badge-secondary-shadow-hover)] hover:border-secondary-strong",
+          "rounded-md bg-secondary-selected text-[color:var(--badge-secondary,var(--secondary))] border-[color:color-mix(in_oklab,var(--badge-secondary,var(--secondary))_40%,transparent)] shadow-[var(--chrome-badge-secondary-shadow)] hover:shadow-[var(--chrome-badge-secondary-shadow-hover)] hover:border-[color:color-mix(in_oklab,var(--badge-secondary,var(--secondary))_60%,transparent)]",
         destructive:
           "rounded-md bg-destructive-selected text-destructive border-destructive-soft shadow-[var(--chrome-badge-destructive-shadow)] hover:shadow-[var(--chrome-badge-destructive-shadow-hover)]",
         outline:
