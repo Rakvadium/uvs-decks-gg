@@ -3,7 +3,12 @@ import { getAuthUserId } from "@convex-dev/auth/server";
 import { v } from "convex/values";
 import { buildAdminSearchText } from "./lib/accountStatus";
 import { assertValidUsername, normalizeUsernameInput } from "./lib/username";
-import { publicUserFromDocument, userValidator, currentUserSelfValidator } from "./validators";
+import {
+  currentUserSelfValidator,
+  publicUserProfileFromDocument,
+  publicUserProfileValidator,
+  selfUserFromDocument,
+} from "./validators";
 import { requireUserCanUpdateProfile } from "./utils/validation";
 
 export const currentUser = query({
@@ -16,7 +21,7 @@ export const currentUser = query({
     }
     const user = await ctx.db.get(userId);
     if (!user) return null;
-    const base = publicUserFromDocument(user);
+    const base = selfUserFromDocument(user);
     return {
       ...base,
       accountStatus: (user.accountStatus ?? "active") as
@@ -32,10 +37,10 @@ export const currentUser = query({
 
 export const getById = query({
   args: { userId: v.id("users") },
-  returns: v.union(userValidator, v.null()),
+  returns: v.union(publicUserProfileValidator, v.null()),
   handler: async (ctx, args) => {
     const user = await ctx.db.get(args.userId);
-    return user ? publicUserFromDocument(user) : null;
+    return user ? publicUserProfileFromDocument(user) : null;
   },
 });
 
