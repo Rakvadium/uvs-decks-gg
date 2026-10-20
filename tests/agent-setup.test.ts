@@ -1,5 +1,5 @@
 import { afterAll, describe, expect, test } from "bun:test";
-import { spawn, spawnSync } from "node:child_process";
+import { spawnSync } from "node:child_process";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -220,30 +220,81 @@ describe("port allocation", () => {
 });
 
 describe("registry lock", () => {
-  type Result = { code: number | null; stdout: string; stderr: string };
-  /** A bun child process; its output is collected as it arrives. */
-  const runBun = (args: string[]): Promise<Result> =>
-    new Promise((resolve) => {
-      const child = spawn(process.execPath, args, { stdio: ["ignore", "pipe", "pipe"] });
-      let stdout = "";
-      let stderr = "";
-      child.stdout.on("data", (c: Buffer) => (stdout += c.toString("utf8")));
-      child.stderr.on("data", (c: Buffer) => (stderr += c.toString("utf8")));
-      child.on("close", (code) => resolve({ code, stdout: stdout.trim(), stderr: stderr.trim() }));
-    });
-  const claimScript = (dir: string) => {
-    const file = path.join(dir, "claim.ts");
+  /**
+   * The concurrent claims run in child processes started by one driver process, which the test
+   * runs with spawnSync. Spawning many async children from the test process itself left Bun 1.3 on
+   * Windows unable to spawn again ("Out of memory") in later test files.
+   */
+  const scripts = () => {
+    const dir = tmpDir("agent-setup-script-");
+    const worker = path.join(dir, "worker.ts");
+    const driver = path.join(dir, "driver.ts");
     fs.writeFileSync(
-      file,
-      `import { claimPort } from ${JSON.stringify(PORTS_MODULE)};\n` +
-        `console.log(claimPort(process.argv[2], "auto", process.argv[3], { min: 8170, max: 8179 }));\n`,
+      worker,
+      `import { claimPort, lookupRegisteredPort } from ${JSON.stringify(PORTS_MODULE)};
+const [mode, a, b] = process.argv.slice(2);
+if (mode === "claim") {
+  console.log(claimPort(a, "auto", b, { min: 8170, max: 8179 }));
+} else {
+  // Alternate between two ports so every claim rewrites the registry; read it unlocked in between.
+  const n = Number(b);
+  let errors = 0;
+  for (let i = 0; i < 100; i++) {
+    try {
+      claimPort("/wt/churn-" + b, i % 2 ? 8100 + n : 8150 + n, a);
+      lookupRegisteredPort("/wt/churn-" + ((n + 1) % 6), a);
+    } catch (e) {
+      errors++;
+      console.error(String(e));
+    }
+  }
+  console.log(errors);
+}
+`,
     );
-    return file;
+    fs.writeFileSync(
+      driver,
+      `import { spawn } from "node:child_process";
+import fs from "node:fs";
+const [scenario, root, worker, lock, registry] = process.argv.slice(2);
+const run = (args) =>
+  new Promise((resolve) => {
+    const child = spawn(process.execPath, [worker, ...args], { stdio: ["ignore", "pipe", "pipe"] });
+    let stdout = "";
+    let stderr = "";
+    child.stdout.on("data", (c) => (stdout += c));
+    child.stderr.on("data", (c) => (stderr += c));
+    child.on("close", (code) => resolve({ code, stdout: stdout.trim(), stderr: stderr.trim() }));
+  });
+const six = (args) => Promise.all(Array.from({ length: 6 }, (_, i) => run(args(i))));
+let out;
+if (scenario === "parallel") out = await six((i) => ["claim", "/wt/parallel-" + i, root]);
+else if (scenario === "churn") out = await six((i) => ["churn", root, String(i)]);
+else {
+  fs.writeFileSync(lock, "");
+  const claim = run(["claim", "/wt/waiting", root]);
+  const early = await Promise.race([claim, new Promise((r) => setTimeout(() => r("waiting"), 1500))]);
+  const registryWritten = fs.existsSync(registry);
+  fs.rmSync(lock);
+  out = { early, registryWritten, result: await claim };
+}
+console.log(JSON.stringify(out));
+`,
+    );
+    return { driver, worker };
   };
-  test("concurrent claims from separate processes get distinct ports", async () => {
+  const drive = (scenario: string, root: string) => {
+    const { driver, worker } = scripts();
+    const lock = `${registryPath(root)}.lock`;
+    const r = spawnSync(process.execPath, [driver, scenario, root, worker, lock, registryPath(root)], { encoding: "utf8", timeout: 60_000 });
+    if (r.status !== 0) throw new Error(`driver ${scenario} exited ${r.status}: ${r.stderr}`);
+    return JSON.parse(r.stdout) as unknown;
+  };
+  type Result = { code: number | null; stdout: string; stderr: string };
+
+  test("concurrent claims from separate processes get distinct ports", () => {
     const root = tmpDir("agent-setup-root-");
-    const script = claimScript(tmpDir("agent-setup-script-"));
-    const results = await Promise.all(Array.from({ length: 6 }, (_, i) => runBun([script, `/wt/parallel-${i}`, root])));
+    const results = drive("parallel", root) as Result[];
     for (const r of results) expect(r.code).toBe(0);
     const ports = results.map((r) => Number(r.stdout));
     expect(new Set(ports).size).toBe(6);
@@ -251,33 +302,20 @@ describe("registry lock", () => {
     expect(Object.keys(readRegistry(root))).toHaveLength(6);
   });
 
-  test("heavy contention: every claim rewrites the registry while others read it unlocked, with no failures", async () => {
+  test("heavy contention: every claim rewrites the registry while others read it unlocked, with no failures", () => {
     const root = tmpDir("agent-setup-root-");
-    const dir = tmpDir("agent-setup-script-");
-    const script = path.join(dir, "churn.ts");
-    fs.writeFileSync(
-      script,
-      `import { claimPort, lookupRegisteredPort } from ${JSON.stringify(PORTS_MODULE)};\n` +
-        `const [root, id] = process.argv.slice(2); const n = Number(id); let errors = 0;\n` +
-        `for (let i = 0; i < 40; i++) { try { claimPort("/wt/churn-" + id, i % 2 ? 8100 + n : 8150 + n, root); lookupRegisteredPort("/wt/churn-" + ((n + 1) % 6), root); } catch (e) { errors++; console.error(String(e)); } }\n` +
-        `console.log(errors);\n`,
-    );
-    const results = await Promise.all(Array.from({ length: 6 }, (_, i) => runBun([script, root, String(i)])));
+    const results = drive("churn", root) as Result[];
     for (const r of results) expect(r).toEqual({ code: 0, stdout: "0", stderr: "" });
-    // The last claim (i = 39) is 8100 + n.
+    // The last claim (i = 99) is 8100 + n.
     expect(Object.values(readRegistry(root)).sort()).toEqual([8100, 8101, 8102, 8103, 8104, 8105]);
   }, 60_000);
 
-  test("a claim waits while another process holds the lock, then proceeds", async () => {
+  test("a claim waits while another process holds the lock, then proceeds", () => {
     const root = tmpDir("agent-setup-root-");
-    const script = claimScript(tmpDir("agent-setup-script-"));
-    const lock = `${registryPath(root)}.lock`;
-    fs.writeFileSync(lock, "");
-    const run = runBun([script, "/wt/waiting", root]);
-    const early = await Promise.race([run, new Promise((r) => setTimeout(() => r("waiting"), 1500))]);
-    expect(early).toBe("waiting");
-    expect(fs.existsSync(registryPath(root))).toBe(false);
-    fs.rmSync(lock);
-    expect(await run).toEqual({ code: 0, stdout: "8170", stderr: "" });
+    expect(drive("wait", root)).toEqual({
+      early: "waiting",
+      registryWritten: false,
+      result: { code: 0, stdout: "8170", stderr: "" },
+    });
   });
 });
