@@ -85,25 +85,17 @@ Use browser preview snapshots (and short recordings only for interaction-heavy w
 
 ### PR visual embeds (GitHub)
 
-GitHub PR bodies cannot show Cursor chat attachments. `https://cursor.com/artifacts/...` links 302 to signed S3 URLs that expire in ~15 minutes, so Camo usually keeps the first fetch (Before) and drops After.
+Use the repo tool in [`scripts/pr-capture/`](../scripts/pr-capture/README.md). It writes stills, GIFs and diffs locally, then publishes them to the orphan `pr-media` branch. The PR body embeds them with raw GitHub URLs (the repo is public). Do not commit captures to the PR branch, and do not link `cursor.com/artifacts` or chat attachments. Those links expire, and GitHub usually keeps only the first image.
 
-For UI PRs:
+For UI PRs, use your own `--port` so you never collide with other agents:
 
-1. Write captures to `.github/pr-captures/<issue>/` on the PR branch (`before-desktop.png`, `before-mobile.png`, `after-desktop.png`, `after-mobile.png`).
-2. Commit and push those files **before** writing image URLs into the PR body.
-3. Embed **both** Before and After with raw GitHub URLs (public repo). Do not use `cursor.com/artifacts` or chat attachment links.
-4. Create or update the PR body only after After shots exist. A Before-only description is incomplete.
+1. Before editing: `bun run capture --issue <n> --label before --port <port> --routes <routes>`. Add `--themes` if theme matters, and `--spec` plus `--gif` for an interaction.
+2. After the change: the same command with `--label after`.
+3. `bun run capture:compare --issue <n> --base before --head after`
+4. `bun run capture:publish --issue <n>`
+5. Paste `.pr-captures/<n>/compare-before-vs-after/summary.md` into the PR body. It holds Before, After, side-by-side, diff and diff % for every shot, plus any GIFs. A Before-only description is incomplete.
 
-```markdown
-## Visual
-
-| | Desktop | Mobile |
-| --- | --- | --- |
-| Before | ![Before desktop](https://raw.githubusercontent.com/Rakvadium/uvs-decks-gg/<head-branch>/.github/pr-captures/<issue>/before-desktop.png) | ![Before mobile](https://raw.githubusercontent.com/Rakvadium/uvs-decks-gg/<head-branch>/.github/pr-captures/<issue>/before-mobile.png) |
-| After | ![After desktop](https://raw.githubusercontent.com/Rakvadium/uvs-decks-gg/<head-branch>/.github/pr-captures/<issue>/after-desktop.png) | ![After mobile](https://raw.githubusercontent.com/Rakvadium/uvs-decks-gg/<head-branch>/.github/pr-captures/<issue>/after-mobile.png) |
-```
-
-Replace `<head-branch>` with the PR head (e.g. `agent/101-gallery-active-deck-empty`) and `<issue>` with the issue number.
+Captures never write to Convex, and they set theme and mode in the browser only. See the README for how, and for how a verifier re-captures and diffs someone else's PR.
 
 ---
 

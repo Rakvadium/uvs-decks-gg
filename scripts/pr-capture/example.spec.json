@@ -1,0 +1,24 @@
+{
+  "routes": [
+    { "path": "/gallery", "auth": "agent" },
+    { "path": "/decks", "auth": "agent" },
+    { "path": "/gallery", "auth": "guest" }
+  ],
+  "gif": {
+    "path": "/decks",
+    "auth": "agent",
+    "name": "decks-new-deck-dialog",
+    "viewport": "desktop",
+    "theme": "default",
+    "mode": "dark",
+    "steps": [
+      { "hover": "role=button[name=\"New Deck\"]" },
+      { "wait": 400 },
+      { "click": "role=button[name=\"New Deck\"]" },
+      { "waitFor": "[role=\"dialog\"]" },
+      { "wait": 1200 },
+      { "press": "Escape" },
+      { "wait": 600 }
+    ]
+  }
+}
