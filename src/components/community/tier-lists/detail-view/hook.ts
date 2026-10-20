@@ -34,7 +34,7 @@ import {
   serializeLaneMap,
   tierListCardMatchesPool,
 } from "../utils";
-import { isTierListCardCatalogReady, syncTierListLaneMap } from "./lane-map-sync";
+import { getTierListCatalogState, syncTierListLaneMap } from "./lane-map-sync";
 
 type TierListDraftSnapshot = {
   title: string;
@@ -51,8 +51,14 @@ export function useCommunityTierListDetailModel(tierListId: string) {
   const detail = useQuery(api.tierLists.getDetail, { tierListId: tierListId as Id<"tierLists"> });
   const saveTierList = useMutation(api.tierLists.save);
   const deleteTierList = useMutation(api.tierLists.remove);
-  const { cards, isCatalogDataLoading } = useCardCatalog();
-  const isCatalogReady = isTierListCardCatalogReady({ cards, isCatalogDataLoading });
+  const { cards, isCatalogDataLoading, isCheckingVersion, cachedVersion, serverVersion } = useCardCatalog();
+  const catalogState = getTierListCatalogState({
+    cards,
+    isCatalogDataLoading,
+    isCheckingVersion,
+    cachedVersion,
+    serverVersion,
+  });
   const { sets } = useCardReferenceData();
 
   const [title, setTitle] = useState("Untitled Tier List");
@@ -187,14 +193,24 @@ export function useCommunityTierListDetailModel(tierListId: string) {
   useEffect(() => {
     setLaneMap((current) =>
       syncTierListLaneMap(current, {
-        isCatalogReady,
+        catalogState,
         hydratedTierListId,
         tierListId: detailTierListId,
         sourceCardIds,
         tiers,
+        knownCardIds: cardMap,
       })
     );
-  }, [detailTierListId, hydratedTierListId, isCatalogReady, sourceCardSignature, tierSignature, sourceCardIds, tiers]);
+  }, [
+    cardMap,
+    catalogState,
+    detailTierListId,
+    hydratedTierListId,
+    sourceCardSignature,
+    tierSignature,
+    sourceCardIds,
+    tiers,
+  ]);
 
   const selectedCards = useMemo(
     () =>
@@ -330,24 +346,20 @@ export function useCommunityTierListDetailModel(tierListId: string) {
       return;
     }
 
-    let nextLaneMapSnapshot: BuilderLaneMap | null = null;
+    // Built from the latest draft, not inside a setLaneMap updater: React only runs an updater
+    // during the call when it can compute state eagerly, so the autosave could silently not fire.
+    const current = getDraftSnapshot().laneMap;
+    const nextLaneMap: BuilderLaneMap = Object.fromEntries(
+      Object.entries(current).map(([laneKey, laneCards]) => [laneKey, laneCards.filter((value) => value !== cardId)])
+    );
+    nextLaneMap[targetLaneKey] = [...(nextLaneMap[targetLaneKey] ?? []), cardId];
 
-    setLaneMap((current) => {
-      const nextLaneMap: BuilderLaneMap = Object.fromEntries(
-        Object.entries(current).map(([laneKey, laneCards]) => [laneKey, laneCards.filter((value) => value !== cardId)])
-      );
-      nextLaneMap[targetLaneKey] = [...(nextLaneMap[targetLaneKey] ?? []), cardId];
-      nextLaneMapSnapshot = nextLaneMap;
-      return nextLaneMap;
-    });
-
-    if (nextLaneMapSnapshot) {
-      queueAutoSave(
-        getDraftSnapshot({
-          laneMap: nextLaneMapSnapshot,
-        })
-      );
-    }
+    setLaneMap(nextLaneMap);
+    queueAutoSave(
+      getDraftSnapshot({
+        laneMap: nextLaneMap,
+      })
+    );
   };
 
   const setTierLabel = (tierId: string, value: string) => {
