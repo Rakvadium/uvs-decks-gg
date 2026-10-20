@@ -1,7 +1,7 @@
 import { query, mutation, internalQuery } from "./_generated/server";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { v } from "convex/values";
-import { buildAdminSearchText } from "./lib/accountStatus";
+import { buildAdminSearchText, isEffectiveAdmin } from "./lib/accountStatus";
 import { assertValidUsername, normalizeUsernameInput } from "./lib/username";
 import { publicUserFromDocument, userValidator, currentUserSelfValidator } from "./validators";
 import { requireUserCanUpdateProfile } from "./utils/validation";
@@ -44,7 +44,7 @@ export const isAdminForUserId = internalQuery({
   returns: v.boolean(),
   handler: async (ctx, args) => {
     const user = await ctx.db.get(args.userId);
-    return user !== null && user.role === "Admin";
+    return isEffectiveAdmin(user);
   },
 });
 
