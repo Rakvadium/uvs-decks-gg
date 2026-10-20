@@ -26,7 +26,7 @@
     "validation:backend": "bun scripts/validation/backend.ts",
     "validation:seed:build": "bun scripts/validation/seed/build.ts",
     "validation:seed:reset": "bun scripts/validation/seed/reset.ts",
-    "agent:setup": "bun scripts/validation/not-implemented.ts agent:setup",
+    "agent:setup": "bun scripts/agent-setup/index.ts",
     "agent:login-url": "bun scripts/validation/not-implemented.ts agent:login-url"
   },
   "dependencies": {
