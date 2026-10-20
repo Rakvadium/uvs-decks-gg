@@ -21,8 +21,10 @@ import {
   killProcessTree,
   prepareInvocation,
   runConvex,
+  restoreCliSnapshot,
   runConvexCapture,
-  snapshotCliTouchedFiles,
+  takeCliSnapshot,
+  type CliSnapshotEntry,
 } from "./convex";
 import { applyBackendEnv } from "./env";
 import { backendDir, defaultValidationRoot, loopbackUrl, parseAppPort, portsFor, type BackendPorts } from "./ports";
@@ -41,6 +43,48 @@ export type BackendStatus = {
 
 const pidFile = (appPort: number, root?: string) => path.join(backendDir(appPort, root), "backend.pid");
 const logFile = (appPort: number, root?: string) => path.join(backendDir(appPort, root), "backend.log");
+const snapshotFile = (appPort: number, root?: string) => path.join(backendDir(appPort, root), "cli-touched-files.json");
+
+type SavedSnapshot = { repoRoot: string; entries: CliSnapshotEntry[] };
+
+/**
+ * `start` saves the CLI-touched files before its first CLI run. The watcher rewrites the Cursor
+ * rules after `start` has restored them, and `stop` kills it before its own restore can run, so
+ * `stop` restores from this copy.
+ */
+function saveSnapshot(appPort: number): void {
+  const saved: SavedSnapshot = { repoRoot: REPO_ROOT, entries: takeCliSnapshot() };
+  fs.writeFileSync(snapshotFile(appPort), JSON.stringify(saved));
+}
+
+/**
+ * `watcherRunning` skips `convex/_generated/*`: the watcher sees the rewrite, pushes again and
+ * writes its own copy back, so those go back only once it is stopped.
+ */
+function restoreSavedSnapshot(appPort: number, opts: { discard: boolean; watcherRunning?: boolean }): void {
+  const file = snapshotFile(appPort);
+  if (!fs.existsSync(file)) return;
+  const saved = JSON.parse(fs.readFileSync(file, "utf8")) as SavedSnapshot;
+  const entries = opts.watcherRunning ? saved.entries.filter((e) => e.mode === "exact") : saved.entries;
+  const reverted = restoreCliSnapshot(entries, saved.repoRoot);
+  if (opts.discard) fs.rmSync(file, { force: true });
+  if (reverted.length > 0) console.error(`[validation] reverted CLI side-effect edits: ${reverted.join(", ")}`);
+}
+
+function logSize(appPort: number): number {
+  const file = logFile(appPort);
+  return fs.existsSync(file) ? fs.statSync(file).size : 0;
+}
+
+function logSince(appPort: number, offset: number): string {
+  const file = logFile(appPort);
+  if (!fs.existsSync(file)) return "";
+  return fs.readFileSync(file).subarray(offset).toString("utf8");
+}
+
+/** The watcher's first push is done; its one Cursor rules check runs alongside that push. */
+const WATCHER_PUSHED = "Convex functions ready!";
+const WATCHER_SETTLE_MS = 20_000;
 
 function readPid(appPort: number): PidRecord | null {
   const file = pidFile(appPort);
@@ -196,7 +240,7 @@ export async function start(
   console.error(formatTarget(inv));
 
   fs.mkdirSync(inv.home, { recursive: true });
-  const restore = snapshotCliTouchedFiles();
+  saveSnapshot(appPort);
   const log = logFile(appPort);
   const timeoutMs = (opts.timeoutSec ?? 60) * 1000;
   const watcherArgs = [...base, "dev", "--tail-logs", "disable", "--log-file", log];
@@ -204,7 +248,7 @@ export async function start(
   const fail = async (what: string): Promise<never> => {
     if (pid !== null) await stopWatcher(appPort, pid).catch(() => {});
     fs.rmSync(pidFile(appPort), { force: true });
-    restore();
+    restoreSavedSnapshot(appPort, { discard: true });
     throw new Error(`Port ${appPort} backend ${what}.\n--- log tail (${log}) ---\n${logTail(appPort)}`);
   };
   const versionUp = async () => (await fetchText(`${inv.target.url}/version`)) !== null;
@@ -235,6 +279,7 @@ export async function start(
   if (pushCode !== 0) await fail(pushCode === 124 ? `push timed out after ${timeoutMs / 1000}s` : `push failed (vconvex dev --once exited ${pushCode})`);
 
   // 3. Long-running watcher.
+  const watcherLogStart = logSize(appPort);
   pid = spawnDetached(watcherArgs);
   recordPid(pid);
   console.error(`[validation] started vconvex dev watcher for port ${appPort} (pid ${pid}), log ${log}`);
@@ -256,8 +301,11 @@ export async function start(
     await fail("answered, but isValidationBackend() is false there (UVS_VALIDATION_BACKEND or a loopback CONVEX_CLOUD_URL is missing)");
   }
 
-  const reverted = restore();
-  if (reverted.length > 0) console.error(`[validation] reverted CLI side-effect edits: ${reverted.join(", ")}`);
+  // Restore once the watcher's own push (and the Cursor rules update beside it) has run; `stop`
+  // restores again in case anything lands later.
+  const settled = await waitFor(() => logSince(appPort, watcherLogStart).includes(WATCHER_PUSHED), Math.min(timeoutMs, WATCHER_SETTLE_MS));
+  if (!settled) console.error(`[validation] the watcher has not logged "${WATCHER_PUSHED}" yet; restoring CLI side-effect edits anyway`);
+  restoreSavedSnapshot(appPort, { discard: false, watcherRunning: true });
   console.error(`[validation] port ${appPort} backend is up, convex/ is pushed, and isValidationBackend() is true`);
   return status(appPort);
 }
@@ -266,6 +314,7 @@ export async function stop(appPort: number): Promise<void> {
   const record = readPid(appPort);
   await stopWatcher(appPort, record?.pid ?? null);
   fs.rmSync(pidFile(appPort), { force: true });
+  restoreSavedSnapshot(appPort, { discard: true });
   console.error(`[validation] port ${appPort} backend stopped`);
 }
 
