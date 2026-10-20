@@ -1,0 +1,1467 @@
+{
+  "issue": "257",
+  "label": "after",
+  "port": 8100,
+  "chrome": "calm",
+  "fullPage": false,
+  "strict": true,
+  "shots": [
+    {
+      "name": "tour-1-open__desktop__default__light",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-1-open__desktop__default__dark",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-1-open__desktop__cyberpunk__light",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-1-open__desktop__cyberpunk__dark",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-1-open__desktop__aurora__light",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "aurora",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-1-open__desktop__aurora__dark",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "aurora",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-1-open__mobile__default__light",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-1-open__mobile__default__dark",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-1-open__mobile__cyberpunk__light",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-1-open__mobile__cyberpunk__dark",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-1-open__mobile__aurora__light",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "aurora",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-1-open__mobile__aurora__dark",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "aurora",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-2-gallery__desktop__default__light",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-2-gallery__desktop__default__dark",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-2-gallery__desktop__cyberpunk__light",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-2-gallery__desktop__cyberpunk__dark",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-2-gallery__desktop__aurora__light",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "aurora",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-2-gallery__desktop__aurora__dark",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "aurora",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-2-gallery__mobile__default__light",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-2-gallery__mobile__default__dark",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-2-gallery__mobile__cyberpunk__light",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-2-gallery__mobile__cyberpunk__dark",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-2-gallery__mobile__aurora__light",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "aurora",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-2-gallery__mobile__aurora__dark",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "aurora",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-3-decks__desktop__default__light",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-3-decks__desktop__default__dark",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-3-decks__desktop__cyberpunk__light",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-3-decks__desktop__cyberpunk__dark",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-3-decks__desktop__aurora__light",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "aurora",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-3-decks__desktop__aurora__dark",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "aurora",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-3-decks__mobile__default__light",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-3-decks__mobile__default__dark",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-3-decks__mobile__cyberpunk__light",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-3-decks__mobile__cyberpunk__dark",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-3-decks__mobile__aurora__light",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "aurora",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-3-decks__mobile__aurora__dark",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "aurora",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-4-collection__desktop__default__light",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-4-collection__desktop__default__dark",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-4-collection__desktop__cyberpunk__light",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-4-collection__desktop__cyberpunk__dark",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-4-collection__desktop__aurora__light",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "aurora",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-4-collection__desktop__aurora__dark",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "aurora",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-4-collection__mobile__default__light",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-4-collection__mobile__default__dark",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-4-collection__mobile__cyberpunk__light",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-4-collection__mobile__cyberpunk__dark",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-4-collection__mobile__aurora__light",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "aurora",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-4-collection__mobile__aurora__dark",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "aurora",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-5-community__desktop__default__light",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-5-community__desktop__default__dark",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-5-community__desktop__cyberpunk__light",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-5-community__desktop__cyberpunk__dark",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-5-community__desktop__aurora__light",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "aurora",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-5-community__desktop__aurora__dark",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "aurora",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-5-community__mobile__default__light",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-5-community__mobile__default__dark",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-5-community__mobile__cyberpunk__light",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-5-community__mobile__cyberpunk__dark",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-5-community__mobile__aurora__light",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "aurora",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-5-community__mobile__aurora__dark",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "aurora",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-6-teams__desktop__default__light",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-6-teams__desktop__default__dark",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-6-teams__desktop__cyberpunk__light",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-6-teams__desktop__cyberpunk__dark",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-6-teams__desktop__aurora__light",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "aurora",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-6-teams__desktop__aurora__dark",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "aurora",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-6-teams__mobile__default__light",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-6-teams__mobile__default__dark",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-6-teams__mobile__cyberpunk__light",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-6-teams__mobile__cyberpunk__dark",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-6-teams__mobile__aurora__light",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "aurora",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-6-teams__mobile__aurora__dark",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "aurora",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-7-close__desktop__default__light",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-7-close__desktop__default__dark",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-7-close__desktop__cyberpunk__light",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-7-close__desktop__cyberpunk__dark",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-7-close__desktop__aurora__light",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "aurora",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-7-close__desktop__aurora__dark",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "aurora",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-7-close__mobile__default__light",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-7-close__mobile__default__dark",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-7-close__mobile__cyberpunk__light",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-7-close__mobile__cyberpunk__dark",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-7-close__mobile__aurora__light",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "aurora",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-7-close__mobile__aurora__dark",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "aurora",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-segment-hover__desktop__default__light",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-segment-hover__desktop__default__dark",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-segment-hover__desktop__cyberpunk__light",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-segment-hover__desktop__cyberpunk__dark",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-segment-hover__desktop__aurora__light",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "aurora",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-segment-hover__desktop__aurora__dark",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "aurora",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-focus-visible__desktop__default__light",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-focus-visible__desktop__default__dark",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "default",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-focus-visible__desktop__cyberpunk__light",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-focus-visible__desktop__cyberpunk__dark",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "cyberpunk",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-focus-visible__desktop__aurora__light",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "aurora",
+        "mode": "light",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    },
+    {
+      "name": "tour-focus-visible__desktop__aurora__dark",
+      "route": "/tour",
+      "auth": "guest",
+      "appearance": {
+        "theme": "aurora",
+        "mode": "dark",
+        "chrome": "calm"
+      },
+      "finalPath": "/tour",
+      "loaded": true,
+      "stable": true,
+      "pin": null,
+      "unproxied": []
+    }
+  ],
+  "gif": {
+    "name": "tour-reel__desktop__default__dark",
+    "auth": "guest",
+    "appearance": {
+      "theme": "default",
+      "mode": "dark",
+      "chrome": "calm"
+    },
+    "frames": 97,
+    "pin": null,
+    "unproxied": []
+  },
+  "blockedConvexWrites": [],
+  "savedAppearance": [],
+  "pinFlagged": [],
+  "unstable": [],
+  "unproxiedSockets": []
+}
