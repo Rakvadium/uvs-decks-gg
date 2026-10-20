@@ -462,7 +462,7 @@ export default function SetAdminCards({
           <AlertDialogFooter>
             <AlertDialogCancel disabled={formBusy}>Cancel</AlertDialogCancel>
             <AlertDialogAction
-              className="bg-destructive text-foreground hover:bg-destructive/90"
+              variant="destructive"
               disabled={formBusy}
               onClick={(e) => {
                 e.preventDefault();
