@@ -1,0 +1,304 @@
+{
+  "desktop": {
+    "open": {
+      "facts": {
+        "dialogs": [
+          {
+            "role": "dialog",
+            "title": "Edit deck details",
+            "state": "open",
+            "ariaHiddenBy": "div[data-slot=dialog-content]",
+            "containsFocus": false
+          },
+          {
+            "role": "dialog",
+            "title": "Edit deck details",
+            "state": "open",
+            "ariaHiddenBy": "div[data-slot=dialog-content]",
+            "containsFocus": true
+          }
+        ],
+        "overlays": 2,
+        "activeElement": {
+          "tag": "input",
+          "label": null
+        }
+      },
+      "roleDialogs": 0,
+      "roleEdit": 0,
+      "domOpenEditTitles": 2
+    },
+    "focusInsideOnOpen": true,
+    "ariaSnapshot": "- region \"Notifications alt+T\"",
+    "trapEscapes": [],
+    "afterEscape": {
+      "openDialogs": 0,
+      "focusOnTrigger": false,
+      "active": "body:Skip to main contentUVSDECKS.G"
+    },
+    "closeButtonsByRole": 0,
+    "afterClose": {
+      "openDialogs": 0,
+      "focusOnTrigger": false,
+      "active": "body:Skip to main contentUVSDECKS.G"
+    },
+    "afterCancel": {
+      "openDialogs": 0,
+      "focusOnTrigger": false,
+      "active": "body:Skip to main contentUVSDECKS.G"
+    },
+    "initialName": "Radiant Tempo",
+    "save": {
+      "mutations": [
+        {
+          "type": "Mutation",
+          "udfPath": "decks:update",
+          "args": [
+            {
+              "deckId": "nh7f0kqdg3hwnpjpmga3tavb5sx4nzwf",
+              "description": "Seeded public deck for validation captures.",
+              "format": "standard",
+              "name": "Radiant Tempo verify-248",
+              "subFormat": null,
+              "visibility": "public"
+            }
+          ]
+        }
+      ],
+      "updateCount": 1,
+      "openDialogsAfter": 0,
+      "focusOnTrigger": false,
+      "active": "body:Skip to main contentUVSDECKS.G"
+    },
+    "consoleErrors": [],
+    "blocked": [
+      "Action:communityLive:refreshLiveStatus",
+      "Mutation:decks:update"
+    ],
+    "overrides": 1,
+    "faked": 1
+  },
+  "mobile": {
+    "open": {
+      "facts": {
+        "dialogs": [
+          {
+            "role": "dialog",
+            "title": "Edit deck details",
+            "state": "open",
+            "ariaHiddenBy": "div[data-slot=dialog-content]",
+            "containsFocus": false
+          },
+          {
+            "role": "dialog",
+            "title": "Edit deck details",
+            "state": "open",
+            "ariaHiddenBy": "div[data-slot=dialog-content]",
+            "containsFocus": true
+          }
+        ],
+        "overlays": 2,
+        "activeElement": {
+          "tag": "input",
+          "label": null
+        }
+      },
+      "roleDialogs": 0,
+      "roleEdit": 0,
+      "domOpenEditTitles": 2
+    },
+    "focusInsideOnOpen": true,
+    "ariaSnapshot": "- region \"Notifications alt+T\"",
+    "trapEscapes": [],
+    "afterEscape": {
+      "openDialogs": 0,
+      "focusOnTrigger": false,
+      "active": "body:Skip to main contentUVSDECKS.G"
+    },
+    "closeButtonsByRole": 0,
+    "afterClose": {
+      "openDialogs": 0,
+      "focusOnTrigger": false,
+      "active": "body:Skip to main contentUVSDECKS.G"
+    },
+    "afterCancel": {
+      "openDialogs": 0,
+      "focusOnTrigger": false,
+      "active": "body:Skip to main contentUVSDECKS.G"
+    },
+    "initialName": "Radiant Tempo",
+    "save": {
+      "mutations": [
+        {
+          "type": "Mutation",
+          "udfPath": "decks:update",
+          "args": [
+            {
+              "deckId": "nh7f0kqdg3hwnpjpmga3tavb5sx4nzwf",
+              "description": "Seeded public deck for validation captures.",
+              "format": "standard",
+              "name": "Radiant Tempo verify-248",
+              "subFormat": null,
+              "visibility": "public"
+            }
+          ]
+        }
+      ],
+      "updateCount": 1,
+      "openDialogsAfter": 0,
+      "focusOnTrigger": false,
+      "active": "body:Skip to main contentUVSDECKS.G"
+    },
+    "consoleErrors": [],
+    "blocked": [
+      "Action:communityLive:refreshLiveStatus",
+      "Mutation:decks:update"
+    ],
+    "overrides": 1,
+    "faked": 1
+  },
+  "resize_desktop_to_mobile": {
+    "beforeResize": {
+      "facts": {
+        "dialogs": [
+          {
+            "role": "dialog",
+            "title": "Edit deck details",
+            "state": "open",
+            "ariaHiddenBy": "div[data-slot=dialog-content]",
+            "containsFocus": false
+          },
+          {
+            "role": "dialog",
+            "title": "Edit deck details",
+            "state": "open",
+            "ariaHiddenBy": "div[data-slot=dialog-content]",
+            "containsFocus": true
+          }
+        ],
+        "overlays": 2,
+        "activeElement": {
+          "tag": "input",
+          "label": null
+        }
+      },
+      "roleDialogs": 0,
+      "roleEdit": 0,
+      "domOpenEditTitles": 2
+    },
+    "afterResize": {
+      "facts": {
+        "dialogs": [
+          {
+            "role": "dialog",
+            "title": "Edit deck details",
+            "state": "open",
+            "ariaHiddenBy": "div[data-slot=dialog-content]",
+            "containsFocus": false
+          },
+          {
+            "role": "dialog",
+            "title": "Edit deck details",
+            "state": "open",
+            "ariaHiddenBy": "div[data-slot=dialog-content]",
+            "containsFocus": true
+          }
+        ],
+        "overlays": 2,
+        "activeElement": {
+          "tag": "input",
+          "label": null
+        }
+      },
+      "roleDialogs": 0,
+      "roleEdit": 0,
+      "domOpenEditTitles": 2
+    },
+    "draftValue": "draft-survives-resize",
+    "focusInsideAfterResize": true,
+    "activeAfterResize": "input:",
+    "trapEscapes": [],
+    "afterEscape": {
+      "openDialogs": 0,
+      "focusOnVisibleTrigger": false,
+      "focusOnOriginalTrigger": false,
+      "active": "body:Skip to main contentUVSDECKS.G"
+    },
+    "consoleErrors": [],
+    "blocked": [
+      "Action:communityLive:refreshLiveStatus"
+    ]
+  },
+  "resize_mobile_to_desktop": {
+    "beforeResize": {
+      "facts": {
+        "dialogs": [
+          {
+            "role": "dialog",
+            "title": "Edit deck details",
+            "state": "open",
+            "ariaHiddenBy": "div[data-slot=dialog-content]",
+            "containsFocus": false
+          },
+          {
+            "role": "dialog",
+            "title": "Edit deck details",
+            "state": "open",
+            "ariaHiddenBy": "div[data-slot=dialog-content]",
+            "containsFocus": true
+          }
+        ],
+        "overlays": 2,
+        "activeElement": {
+          "tag": "input",
+          "label": null
+        }
+      },
+      "roleDialogs": 0,
+      "roleEdit": 0,
+      "domOpenEditTitles": 2
+    },
+    "afterResize": {
+      "facts": {
+        "dialogs": [
+          {
+            "role": "dialog",
+            "title": "Edit deck details",
+            "state": "open",
+            "ariaHiddenBy": "div[data-slot=dialog-content]",
+            "containsFocus": false
+          },
+          {
+            "role": "dialog",
+            "title": "Edit deck details",
+            "state": "open",
+            "ariaHiddenBy": "div[data-slot=dialog-content]",
+            "containsFocus": true
+          }
+        ],
+        "overlays": 2,
+        "activeElement": {
+          "tag": "input",
+          "label": null
+        }
+      },
+      "roleDialogs": 0,
+      "roleEdit": 0,
+      "domOpenEditTitles": 2
+    },
+    "draftValue": "draft-survives-resize",
+    "focusInsideAfterResize": true,
+    "activeAfterResize": "input:",
+    "trapEscapes": [],
+    "afterEscape": {
+      "openDialogs": 0,
+      "focusOnVisibleTrigger": false,
+      "focusOnOriginalTrigger": false,
+      "active": "body:Skip to main contentUVSDECKS.G"
+    },
+    "consoleErrors": [],
+    "blocked": [
+      "Action:communityLive:refreshLiveStatus"
+    ]
+  }
+}

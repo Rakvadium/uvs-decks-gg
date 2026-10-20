@@ -1,0 +1,262 @@
+{
+  "desktop": {
+    "open": {
+      "facts": {
+        "dialogs": [
+          {
+            "role": "dialog",
+            "title": "Edit deck details",
+            "state": "open",
+            "ariaHiddenBy": null,
+            "containsFocus": true
+          }
+        ],
+        "overlays": 1,
+        "activeElement": {
+          "tag": "input",
+          "label": null
+        }
+      },
+      "roleDialogs": 1,
+      "roleEdit": 1,
+      "domOpenEditTitles": 1
+    },
+    "focusInsideOnOpen": true,
+    "ariaSnapshot": "- region \"Notifications alt+T\"\n- dialog \"Edit deck details\":\n  - heading \"Edit deck details\" [level=2]\n  - paragraph: Change the name, description, play format, visibility, and who can view this deck.\n  - text: Deck name\n  - textbox \"Deck name\": Radiant Tempo\n  - text: Description\n  - textbox \"Description\":\n    - /placeholder: Add a short description\n    - text: Seeded public deck for validation captures.\n  - text: Format\n  - combobox \"Format\": Standard\n  - text: Visibility\n  - combobox \"Visibility\": Public\n  - button \"Delete deck\"\n  - button \"Cancel\"\n  - button \"Save\"\n  - button \"Close\"",
+    "trapEscapes": [],
+    "afterEscape": {
+      "openDialogs": 0,
+      "focusOnTrigger": true,
+      "active": "button:Edit"
+    },
+    "closeButtonsByRole": 1,
+    "afterClose": {
+      "openDialogs": 0,
+      "focusOnTrigger": true,
+      "active": "button:Edit"
+    },
+    "afterCancel": {
+      "openDialogs": 0,
+      "focusOnTrigger": true,
+      "active": "button:Edit"
+    },
+    "initialName": "Radiant Tempo",
+    "save": {
+      "mutations": [
+        {
+          "type": "Mutation",
+          "udfPath": "decks:update",
+          "args": [
+            {
+              "deckId": "nh7f0kqdg3hwnpjpmga3tavb5sx4nzwf",
+              "description": "Seeded public deck for validation captures.",
+              "format": "standard",
+              "name": "Radiant Tempo verify-248",
+              "subFormat": null,
+              "visibility": "public"
+            }
+          ]
+        }
+      ],
+      "updateCount": 1,
+      "openDialogsAfter": 0,
+      "focusOnTrigger": true,
+      "active": "button:Edit"
+    },
+    "consoleErrors": [],
+    "blocked": [
+      "Action:communityLive:refreshLiveStatus",
+      "Mutation:decks:update"
+    ],
+    "overrides": 1,
+    "faked": 1
+  },
+  "mobile": {
+    "open": {
+      "facts": {
+        "dialogs": [
+          {
+            "role": "dialog",
+            "title": "Edit deck details",
+            "state": "open",
+            "ariaHiddenBy": null,
+            "containsFocus": true
+          }
+        ],
+        "overlays": 1,
+        "activeElement": {
+          "tag": "input",
+          "label": null
+        }
+      },
+      "roleDialogs": 1,
+      "roleEdit": 1,
+      "domOpenEditTitles": 1
+    },
+    "focusInsideOnOpen": true,
+    "ariaSnapshot": "- region \"Notifications alt+T\"\n- dialog \"Edit deck details\":\n  - heading \"Edit deck details\" [level=2]\n  - paragraph: Change the name, description, play format, visibility, and who can view this deck.\n  - text: Deck name\n  - textbox \"Deck name\": Radiant Tempo\n  - text: Description\n  - textbox \"Description\":\n    - /placeholder: Add a short description\n    - text: Seeded public deck for validation captures.\n  - text: Format\n  - combobox \"Format\": Standard\n  - text: Visibility\n  - combobox \"Visibility\": Public\n  - button \"Delete deck\"\n  - button \"Cancel\"\n  - button \"Save\"\n  - button \"Close\"",
+    "trapEscapes": [],
+    "afterEscape": {
+      "openDialogs": 0,
+      "focusOnTrigger": true,
+      "active": "button:Edit deck details"
+    },
+    "closeButtonsByRole": 1,
+    "afterClose": {
+      "openDialogs": 0,
+      "focusOnTrigger": true,
+      "active": "button:Edit deck details"
+    },
+    "afterCancel": {
+      "openDialogs": 0,
+      "focusOnTrigger": true,
+      "active": "button:Edit deck details"
+    },
+    "initialName": "Radiant Tempo",
+    "save": {
+      "mutations": [
+        {
+          "type": "Mutation",
+          "udfPath": "decks:update",
+          "args": [
+            {
+              "deckId": "nh7f0kqdg3hwnpjpmga3tavb5sx4nzwf",
+              "description": "Seeded public deck for validation captures.",
+              "format": "standard",
+              "name": "Radiant Tempo verify-248",
+              "subFormat": null,
+              "visibility": "public"
+            }
+          ]
+        }
+      ],
+      "updateCount": 1,
+      "openDialogsAfter": 0,
+      "focusOnTrigger": true,
+      "active": "button:Edit deck details"
+    },
+    "consoleErrors": [],
+    "blocked": [
+      "Action:communityLive:refreshLiveStatus",
+      "Mutation:decks:update"
+    ],
+    "overrides": 1,
+    "faked": 1
+  },
+  "resize_desktop_to_mobile": {
+    "beforeResize": {
+      "facts": {
+        "dialogs": [
+          {
+            "role": "dialog",
+            "title": "Edit deck details",
+            "state": "open",
+            "ariaHiddenBy": null,
+            "containsFocus": true
+          }
+        ],
+        "overlays": 1,
+        "activeElement": {
+          "tag": "input",
+          "label": null
+        }
+      },
+      "roleDialogs": 1,
+      "roleEdit": 1,
+      "domOpenEditTitles": 1
+    },
+    "afterResize": {
+      "facts": {
+        "dialogs": [
+          {
+            "role": "dialog",
+            "title": "Edit deck details",
+            "state": "open",
+            "ariaHiddenBy": null,
+            "containsFocus": true
+          }
+        ],
+        "overlays": 1,
+        "activeElement": {
+          "tag": "input",
+          "label": null
+        }
+      },
+      "roleDialogs": 1,
+      "roleEdit": 1,
+      "domOpenEditTitles": 1
+    },
+    "draftValue": "draft-survives-resize",
+    "focusInsideAfterResize": true,
+    "activeAfterResize": "input:",
+    "trapEscapes": [],
+    "afterEscape": {
+      "openDialogs": 0,
+      "focusOnVisibleTrigger": false,
+      "focusOnOriginalTrigger": false,
+      "active": "body:Skip to main contentUVSDECKS.G"
+    },
+    "consoleErrors": [],
+    "blocked": [
+      "Action:communityLive:refreshLiveStatus"
+    ]
+  },
+  "resize_mobile_to_desktop": {
+    "beforeResize": {
+      "facts": {
+        "dialogs": [
+          {
+            "role": "dialog",
+            "title": "Edit deck details",
+            "state": "open",
+            "ariaHiddenBy": null,
+            "containsFocus": true
+          }
+        ],
+        "overlays": 1,
+        "activeElement": {
+          "tag": "input",
+          "label": null
+        }
+      },
+      "roleDialogs": 1,
+      "roleEdit": 1,
+      "domOpenEditTitles": 1
+    },
+    "afterResize": {
+      "facts": {
+        "dialogs": [
+          {
+            "role": "dialog",
+            "title": "Edit deck details",
+            "state": "open",
+            "ariaHiddenBy": null,
+            "containsFocus": true
+          }
+        ],
+        "overlays": 1,
+        "activeElement": {
+          "tag": "input",
+          "label": null
+        }
+      },
+      "roleDialogs": 1,
+      "roleEdit": 1,
+      "domOpenEditTitles": 1
+    },
+    "draftValue": "draft-survives-resize",
+    "focusInsideAfterResize": true,
+    "activeAfterResize": "input:",
+    "trapEscapes": [],
+    "afterEscape": {
+      "openDialogs": 0,
+      "focusOnVisibleTrigger": false,
+      "focusOnOriginalTrigger": false,
+      "active": "body:Skip to main contentUVSDECKS.G"
+    },
+    "consoleErrors": [],
+    "blocked": [
+      "Action:communityLive:refreshLiveStatus"
+    ]
+  }
+}
