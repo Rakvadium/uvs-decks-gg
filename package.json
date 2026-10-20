@@ -19,7 +19,13 @@
     "watch:uvs-releases": "bun scripts/watch-uvs-releases.ts",
     "capture": "node --disable-warning=ExperimentalWarning scripts/pr-capture/capture.ts",
     "capture:compare": "bun scripts/pr-capture/compare.ts",
-    "capture:publish": "bun scripts/pr-capture/publish.ts"
+    "capture:publish": "bun scripts/pr-capture/publish.ts",
+    "vconvex": "bun scripts/validation/convex.ts",
+    "validation:backend": "bun scripts/validation/backend.ts",
+    "validation:seed:build": "bun scripts/validation/not-implemented.ts validation:seed:build",
+    "validation:seed:reset": "bun scripts/validation/not-implemented.ts validation:seed:reset",
+    "agent:setup": "bun scripts/validation/not-implemented.ts agent:setup",
+    "agent:login-url": "bun scripts/validation/not-implemented.ts agent:login-url"
   },
   "dependencies": {
     "@auth/core": "0.37.0",

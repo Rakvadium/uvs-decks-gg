@@ -47,6 +47,8 @@ next-env.d.ts
 !/scripts/seed-card-drafts.ts
 !/scripts/ocr-calibration/
 !/scripts/pr-capture/
+!/scripts/validation/
+!/scripts/agent-setup/
 /scripts/ocr-calibration/*
 !/scripts/ocr-calibration/fixtures.json
 /scripts/ocr-calibration/output/
