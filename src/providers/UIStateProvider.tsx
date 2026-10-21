@@ -36,6 +36,7 @@ export interface CardFilters {
   attuned?: string[];
   symbolMatchAll?: boolean;
   includeInfinity?: boolean;
+  includeBanned?: boolean;
   keywords?: string[];
   keywordMatchAll?: boolean;
   difficultyMin?: number;

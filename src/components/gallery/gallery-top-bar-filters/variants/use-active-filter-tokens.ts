@@ -55,6 +55,7 @@ export interface ActiveFilterToken {
   label: string;
   values: string[];
   count: number;
+  active: boolean;
   clear: () => void;
 }
 
@@ -63,79 +64,97 @@ export function useActiveFilterTokens(): ActiveFilterToken[] {
 
   return useMemo(() => {
     const tokens: ActiveFilterToken[] = [];
+    const activeFormat = filters.format ?? meta.defaultFormatKey;
+    const formatName =
+      meta.formats.find((format) => format.key === activeFormat)?.name ?? activeFormat ?? "Any";
+    const formatChanged = Boolean(filters.format && filters.format !== meta.defaultFormatKey);
 
-    if (filters.format && filters.format !== meta.defaultFormatKey) {
-      const formatName =
-        meta.formats.find((format) => format.key === filters.format)?.name ?? filters.format;
+    tokens.push({
+      id: "format",
+      label: "Format",
+      values: [formatName],
+      count: formatChanged ? 1 : 0,
+      active: formatChanged,
+      clear: () => actions.removeFilterKeys(["format"]),
+    });
+
+    if (filters.includeBanned === true) {
       tokens.push({
-        id: "format",
-        label: "Format",
-        values: [formatName],
+        id: "includeBanned",
+        label: "Banned",
+        values: ["included"],
         count: 1,
-        clear: () => actions.removeFilterKeys(["format"]),
+        active: true,
+        clear: () => actions.removeFilterKeys(["includeBanned"]),
       });
     }
 
     const setCodes = filters.set ?? [];
-    if (setCodes.length > 0) {
-      tokens.push({
-        id: "set",
-        label: "Set",
-        values: setCodes.map(
-          (code) => setOptions.find((option) => option.code === code)?.name ?? code
-        ),
-        count: setCodes.length,
-        clear: () => actions.removeFilterKeys(["set"]),
-      });
-    }
+    const setNames = setCodes.map(
+      (code) => setOptions.find((option) => option.code === code)?.name ?? code
+    );
+    tokens.push({
+      id: "sets",
+      label: "Sets",
+      values: setNames.length > 0 ? setNames : ["Any"],
+      count: setCodes.length,
+      active: setCodes.length > 0,
+      clear: () => actions.removeFilterKeys(["set"]),
+    });
 
     const types = filters.type ?? [];
-    if (types.length > 0) {
-      tokens.push({
-        id: "type",
-        label: "Type",
-        values: types,
-        count: types.length,
-        clear: () => actions.removeFilterKeys(["type"]),
-      });
-    }
+    tokens.push({
+      id: "type",
+      label: "Type",
+      values: types.length > 0 ? types : ["Any"],
+      count: types.length,
+      active: types.length > 0,
+      clear: () => actions.removeFilterKeys(["type"]),
+    });
 
     const symbols = filters.symbols ?? [];
     const excludesInfinity = filters.includeInfinity === false;
-    if (symbols.length > 0 || excludesInfinity) {
-      const values = symbols.map(formatSymbolLabel);
-      if (excludesInfinity) values.push("no ∞");
-      tokens.push({
-        id: "symbols",
-        label: "Symbols",
-        values,
-        count: symbols.length + (excludesInfinity ? 1 : 0),
-        clear: () =>
-          actions.removeFilterKeys(["symbols", "symbolMatchAll", "includeInfinity"]),
-      });
-    }
+    const symbolValues = symbols.map(formatSymbolLabel);
+    if (excludesInfinity) symbolValues.push("no ∞");
+    const symbolsActive = symbols.length > 0 || excludesInfinity;
+    tokens.push({
+      id: "symbols",
+      label: "Symbols",
+      values: symbolsActive ? symbolValues : ["Any"],
+      count: symbols.length + (excludesInfinity ? 1 : 0),
+      active: symbolsActive,
+      clear: () => actions.removeFilterKeys(["symbols", "symbolMatchAll", "includeInfinity"]),
+    });
 
     const keywords = filters.keywords ?? [];
-    if (keywords.length > 0) {
-      tokens.push({
-        id: "keywords",
-        label: "Keywords",
-        values: keywords,
-        count: keywords.length,
-        clear: () => actions.removeFilterKeys(["keywords", "keywordMatchAll"]),
-      });
-    }
+    tokens.push({
+      id: "keywords",
+      label: "Keywords",
+      values: keywords.length > 0 ? keywords : ["Any"],
+      count: keywords.length,
+      active: keywords.length > 0,
+      clear: () => actions.removeFilterKeys(["keywords", "keywordMatchAll"]),
+    });
 
     const statCount = statsFilterCount(filters);
-    if (statCount > 0) {
-      tokens.push({
-        id: "stats",
-        label: "Stats",
-        values: [`${statCount} active`],
-        count: statCount,
-        clear: () => actions.removeFilterKeys([...STATS_FILTER_KEYS]),
-      });
-    }
+    tokens.push({
+      id: "stats",
+      label: "Stats",
+      values: statCount > 0 ? [`${statCount} selected`] : ["Any"],
+      count: statCount,
+      active: statCount > 0,
+      clear: () => actions.removeFilterKeys([...STATS_FILTER_KEYS]),
+    });
+
+    const rarities = filters.rarity ?? [];
+    tokens.push({
+      id: "rarity",
+      label: "Rarity",
+      values: rarities.length > 0 ? rarities : ["Any"],
+      count: rarities.length,
+      active: rarities.length > 0,
+      clear: () => actions.removeFilterKeys(["rarity"]),
+    });
 
     return tokens;
   }, [filters, meta.defaultFormatKey, meta.formats, actions, setOptions]);

@@ -20,6 +20,9 @@ All notable changes to this project are recorded here.
 
 ### Changed
 
+- **Desktop gallery filters** — The gallery search-island filter dropdown now uses the same inset groups, pill chips, Reset/Done header, Show-cards footer, and Sets/Keywords/Stats drill-in as the mobile filter sheet. Search scope and view mode stay on the island.
+  - **Files:** `src/components/gallery/gallery-top-bar-filters/variants/anchored-filter-panel.tsx`, `src/components/gallery/mobile-filter-sheet/root-page.tsx`.
+
 - **Design system consistency** — Theme, chrome, and primitives now own color, casing, radius, and overlay styling so pages stop one-offing buttons, headings, and status chips.
   - **Decisions:** Casing comes from chrome tokens (`chrome-heading-case` / `chrome-label-case`), not inline `uppercase`. Status uses `--success` / `--warning` / `--info`. Dialogs share one scrim and content-size scale.
   - **Files:** `src/styles/base.css`, `src/components/ui/*`, `docs/UI_UX_DESIGN.md`, `docs/theme-and-chrome.md`.
@@ -28,6 +31,9 @@ All notable changes to this project are recorded here.
   - **Files:** `src/components/community/community-destination-tabs.tsx`, `src/components/community/community-view/floating-top-bar.tsx`, `src/components/community/tier-lists/page-view/floating-top-bar.tsx`, `src/app/(app)/community/creators/page.tsx`, `docs/floating-header-islands.md`.
 
 ### Fixed
+
+- **Ability reminder text and double colons** — OCR no longer stores parenthetical keyword/Mill/Drive reminders as extra abilities, and a timing word no longer adds a second `:` when the printed cost already has one (`Enhance Mill 1: …`, not `Enhance: Mill 1: …`). Bulleted “choose one” lists keep their extra colons. Display, import, and Vision Autofill share `normalizeAbilityText`.
+  - **Files:** `convex/lib/normalizeAbilityText.ts`, `convex/cardOcr.ts`, `convex/lib/cardTextParser.ts`, `convex/lib/cardCreate.ts`, `convex/admin.ts`, `src/components/universus/card-details/ability-text.tsx`, `docs/universus/ability-text.md`.
 
 - **Create deck from list** — Creating a deck on `/decks` now sets it as the session Active deck and navigates into `/decks/[id]` instead of closing the dialog onto the list.
   - **Files:** `src/components/decks/decks-view/create-dialog/hook.ts`.

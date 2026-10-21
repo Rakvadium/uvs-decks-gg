@@ -3,6 +3,7 @@ import type { MutationCtx } from "../_generated/server";
 import type { Id } from "../_generated/dataModel";
 import { cardInputValidator } from "../validators";
 import { syncSetCardCountByCode } from "../setCardCountSync";
+import { normalizeAbilityText } from "./normalizeAbilityText";
 
 export type CardInput = Infer<typeof cardInputValidator>;
 
@@ -61,6 +62,11 @@ export function sanitizeCardImportInput(raw: unknown): CardInput | null {
       out[key] = value;
     }
   }
+  if (typeof out.text === "string") {
+    const normalized = normalizeAbilityText(out.text);
+    if (normalized) out.text = normalized;
+    else delete out.text;
+  }
   return out as CardInput;
 }
 
@@ -96,18 +102,20 @@ export async function createCardWithDerivedFields(
   card: CardInput,
   now = Date.now()
 ): Promise<Id<"cards">> {
+  const text = typeof card.text === "string" ? normalizeAbilityText(card.text) || undefined : card.text;
+  const normalizedCard = { ...card, text };
   const { searchName, searchText, searchAll } = deriveCardSearchFields({
-    name: card.name,
-    searchName: card.searchName,
-    keywords: card.keywords,
-    text: card.text,
-    setName: card.setName,
-    type: card.type,
-    rarity: card.rarity,
+    name: normalizedCard.name,
+    searchName: normalizedCard.searchName,
+    keywords: normalizedCard.keywords,
+    text: normalizedCard.text,
+    setName: normalizedCard.setName,
+    type: normalizedCard.type,
+    rarity: normalizedCard.rarity,
   });
 
   const id = await ctx.db.insert("cards", {
-    ...card,
+    ...normalizedCard,
     searchName,
     searchText,
     searchAll,

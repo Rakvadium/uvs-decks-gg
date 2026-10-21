@@ -2,12 +2,15 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
   type ReactNode,
 } from "react";
+import { useCardReferenceData } from "@/lib/universus/card-data-provider";
 import { useGalleryFiltersOptional } from "@/providers/GalleryFiltersProvider";
 import type { CardFilters, StatFilterValue } from "@/providers/UIStateProvider";
+import { filterSetOptionsForFormat, legalSelectedSetCodes } from "./set-options";
 import type { SetFilterOption, StatFilterKey, StringArrayFilterKey } from "./types";
 
 type GalleryFiltersContextValue = NonNullable<ReturnType<typeof useGalleryFiltersOptional>>;
@@ -28,6 +31,7 @@ interface GalleryFilterDialogContextValue {
   setStatFilter: (key: StatFilterKey, value: StatFilterValue | undefined) => void;
   setBooleanFilter: (key: "symbolMatchAll" | "keywordMatchAll", checked: boolean) => void;
   setIncludeInfinityResults: (include: boolean) => void;
+  setIncludeBanned: (include: boolean) => void;
 }
 
 const GalleryFilterDialogContext = createContext<GalleryFilterDialogContextValue | null>(
@@ -46,16 +50,27 @@ export function GalleryFilterDialogProvider({
   const { state, actions, meta } = filtersContext;
   const filters = state.filters;
   const uniqueValues = meta.uniqueValues;
+  const { isSetLegalInFormat, setsLoading } = useCardReferenceData();
+  const formatKey = filters.format ?? meta.defaultFormatKey;
   const [setSearch, setSetSearch] = useState("");
   const setOptions = useMemo(() => {
     if (!uniqueValues?.setNames) return [];
 
-    return uniqueValues.setNames.map((name, index) => ({
+    const options = uniqueValues.setNames.map((name, index) => ({
       name,
-      code: uniqueValues.setCodes[index],
+      code: uniqueValues.setCodes[index] ?? "",
       number: uniqueValues.setNumbers?.[index] ?? 0,
     }));
-  }, [uniqueValues]);
+    if (setsLoading) return options;
+    return filterSetOptionsForFormat(options, formatKey, isSetLegalInFormat);
+  }, [formatKey, isSetLegalInFormat, setsLoading, uniqueValues]);
+
+  useEffect(() => {
+    if (setsLoading) return;
+    const next = legalSelectedSetCodes(filters.set, formatKey, isSetLegalInFormat);
+    if (next === filters.set) return;
+    actions.updateFilter("set", next);
+  }, [actions, filters.set, formatKey, isSetLegalInFormat, setsLoading]);
   const filteredSets = useMemo(() => {
     if (!setSearch.trim()) return setOptions;
 
@@ -115,6 +130,13 @@ export function GalleryFilterDialogProvider({
     [actions]
   );
 
+  const setIncludeBanned = useCallback(
+    (include: boolean) => {
+      actions.updateFilter("includeBanned", include ? true : undefined);
+    },
+    [actions]
+  );
+
   const value = useMemo(
     () => ({
       state,
@@ -132,6 +154,7 @@ export function GalleryFilterDialogProvider({
       setStatFilter,
       setBooleanFilter,
       setIncludeInfinityResults,
+      setIncludeBanned,
     }),
     [
       state,
@@ -146,6 +169,7 @@ export function GalleryFilterDialogProvider({
       setStatFilter,
       setBooleanFilter,
       setIncludeInfinityResults,
+      setIncludeBanned,
     ]
   );
 

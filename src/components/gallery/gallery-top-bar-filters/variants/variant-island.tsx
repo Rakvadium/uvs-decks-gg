@@ -30,7 +30,7 @@ export function GalleryTopBarIslandVariant() {
   return (
     <FloatingIsland
       anchored={<AnchoredFilterPanel className="rounded-xl" />}
-      below={<FilterTokens centered className="pointer-events-auto max-w-3xl" />}
+      below={<FilterTokens centered className="pointer-events-auto" />}
     >
       <Search className="size-4 shrink-0 text-[color:var(--control-dual-mix)]" />
       <input

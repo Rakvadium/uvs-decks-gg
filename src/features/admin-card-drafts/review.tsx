@@ -390,21 +390,29 @@ export default function AdminCardDraftReview({
       if (!draft.imageUrl) return;
       setVisionBusy(true);
       try {
-        const [symbolReferenceImageUrl, regions] = await Promise.all([
-          createSymbolReferenceImageUrl(),
-          analyzeCardRegions(draft.imageUrl).catch((): CardRegionAnalysis => ({})),
-        ]);
+        const regions = await analyzeCardRegions(draft.imageUrl).catch(
+          (): CardRegionAnalysis => ({})
+        );
         const extracted = await extractCardFromImage({
           imageUrl: draft.imageUrl,
-          symbolReferenceImageUrl,
-          symbolStripImageUrl: regions.symbolStripImageUrl,
           attackZone: regions.attackZone,
           blockZone: regions.blockZone,
+          ...(regions.symbols
+            ? { symbols: regions.symbols }
+            : {
+                symbolReferenceImageUrl: await createSymbolReferenceImageUrl(),
+                symbolStripImageUrl: regions.symbolStripImageUrl,
+              }),
         });
         const nextDraft = {
           ...draft.draft,
           ...extracted,
-          symbols: existingSymbols.trim() || extracted.symbols || draft.draft.symbols || "",
+          symbols:
+            existingSymbols.trim() ||
+            regions.symbols ||
+            extracted.symbols ||
+            draft.draft.symbols ||
+            "",
         };
         await applyDraftOcrFromAdmin({
           draftId: draft._id,
@@ -422,7 +430,12 @@ export default function AdminCardDraftReview({
               },
               setNumber
             ),
-            symbols: existingSymbols.trim() || extracted.symbols || draft.draft.symbols || "",
+            symbols:
+              existingSymbols.trim() ||
+              regions.symbols ||
+              extracted.symbols ||
+              draft.draft.symbols ||
+              "",
           });
         }
         if (showToast) {
@@ -546,15 +559,19 @@ export default function AdminCardDraftReview({
         }
         const extracted = await extractCardFromImage({
           imageUrl: item.imageUrl,
-          symbolReferenceImageUrl,
-          symbolStripImageUrl: regions.symbolStripImageUrl,
           attackZone: regions.attackZone,
           blockZone: regions.blockZone,
+          ...(regions.symbols
+            ? { symbols: regions.symbols }
+            : {
+                symbolReferenceImageUrl,
+                symbolStripImageUrl: regions.symbolStripImageUrl,
+              }),
         });
         const nextDraft = {
           ...item.draft,
           ...extracted,
-          symbols: extracted.symbols || item.draft.symbols || "",
+          symbols: regions.symbols || extracted.symbols || item.draft.symbols || "",
         };
         await applyDraftOcrFromAdmin({
           draftId: item.draftId,

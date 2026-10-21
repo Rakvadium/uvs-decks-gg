@@ -33,6 +33,7 @@
 | [features/community/TierListSystem.md](./features/community/TierListSystem.md)               | Tier lists, ranked scopes, rankings  |
 | [teams-feature-implementation.md](./teams-feature-implementation.md)                         | Teams permissions and flows          |
 | [implementation/notes/legality-dates.md](./implementation/notes/legality-dates.md)           | Format legality date semantics       |
+| [universus/ability-text.md](./universus/ability-text.md)                                     | Card `text`: reminders vs abilities, colon rules |
 
 Missing / planned feature docs: `card-data-hooks.md`, `content-moderation-and-language-filter.md`.
 

@@ -3,6 +3,9 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
+export const floatingIslandRingClassName =
+  "bg-[linear-gradient(115deg,color-mix(in_oklch,var(--primary)_40%,transparent),color-mix(in_oklch,var(--border)_65%,transparent)_28%,color-mix(in_oklch,var(--border)_65%,transparent)_72%,color-mix(in_oklch,var(--secondary)_40%,transparent))]";
+
 interface FloatingIslandCapsuleProps {
   children: ReactNode;
   className?: string;
@@ -26,9 +29,9 @@ export function FloatingIslandCapsule({
       ) : null}
       <div
         className={cn(
-          "relative rounded-full p-px transition-shadow duration-300",
-          "bg-[linear-gradient(115deg,color-mix(in_oklch,var(--primary)_40%,transparent),color-mix(in_oklch,var(--border)_65%,transparent)_28%,color-mix(in_oklch,var(--border)_65%,transparent)_72%,color-mix(in_oklch,var(--secondary)_40%,transparent))]",
-          "shadow-[var(--chrome-floating-shadow)] focus-within:shadow-[var(--chrome-floating-shadow-focus)]"
+          "relative rounded-full p-px shadow-[var(--chrome-floating-shadow)] transition-shadow duration-300",
+          floatingIslandRingClassName,
+          "focus-within:shadow-[var(--chrome-floating-shadow-focus)]"
         )}
       >
         <div
@@ -68,13 +71,20 @@ export function FloatingIsland({
         className
       )}
     >
-      <div className={cn("pointer-events-auto relative w-full max-w-3xl", capsuleClassName)}>
-        <FloatingIslandCapsule bodyClassName={bodyClassName}>{children}</FloatingIslandCapsule>
+      <FloatingIslandCapsule
+        className={cn("pointer-events-auto w-full max-w-3xl", capsuleClassName)}
+        bodyClassName={bodyClassName}
+      >
+        {children}
+      </FloatingIslandCapsule>
 
-        {anchored}
-      </div>
+      {below ? <div className="pointer-events-auto relative z-[150] w-full">{below}</div> : null}
 
-      {below}
+      {anchored ? (
+        <div className="pointer-events-none absolute inset-x-0 top-full z-[140] mt-2 flex justify-center">
+          {anchored}
+        </div>
+      ) : null}
     </div>
   );
 }

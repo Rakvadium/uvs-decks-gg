@@ -2,6 +2,9 @@ import { action } from "./_generated/server";
 import { internal } from "./_generated/api";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { v, type Infer } from "convex/values";
+import { normalizeAbilityText } from "./lib/normalizeAbilityText";
+import { printedRarityLabel } from "./lib/printedRarity";
+import { applyRegionZones } from "./lib/visionZones";
 
 const OCR_MODEL = "gpt-4o";
 
@@ -49,9 +52,9 @@ Keys and formats:
 - name: string, the card title.
 - type: one of "Character", "Attack", "Action", "Asset", "Foundation", "Arena", "Backup", "Token".
 - Arena cards are printed rotated 90 degrees and appear sideways in the image. Read all text, stats, and symbols relative to the card's printed orientation, not as if the card were upright portrait.
-- rarity: string if visible: C = Common, U = Uncommon, R = Rare, SR = Secret Rare, UR = Ultra Rare, PR = Promo, CH = Character. If a Character has a rarity after it, ignore the rarity.
+- rarity: the rarity code exactly as printed on the bottom line after the card type, e.g. "C", "UC", "R", "UR", "SR", "PR". Characters print "CH" alone or "CH" followed by a code (e.g. "CH-R"); return it as printed.
 - difficulty: number (top-left check value / difficulty).
-- control: number (foundation control value, bottom-right area).
+- control: number. The large number at the bottom-right of the text box. Every non-Character card prints one: Attacks, Foundations, Actions, Assets, Backups, and Arenas.
 - speed: number (attack speed, only for Attack cards). This number is inside the attack-zone circle on the right edge.
 - damage: number (attack damage, only for Attack cards). This number is inside the yellow explosion/starburst below speed.
 - blockModifier: number (block modifier, e.g. +1 -> 1, -2 -> -2). This number is printed on the block shield at top-right.
@@ -60,6 +63,9 @@ Keys and formats:
 - stamina: number. This number is inside of a green heart on backup type cards.
 - keywords: pipe-delimited keywords/traits including ratings. Example: "Ranged|EX 2|Powerful 1".
 - text: pipe-delimited rules abilities. Separate each distinct ability with " | ". Keep timing prefixes. If an ability has a bracketed restriction, put the bracket before the colon, e.g. "Form [Once per turn]: Do something" and never "Form: [Once per turn]: Do something".
+- Do NOT transcribe parenthetical reminder text. Reminder boxes are printed in parentheses after keywords or costs (Mill, Drive, Powerful, EX, Stun, Breaker, Echo, etc.). Omit "(Mill 1—Add the top card of your deck to your discard pile.)" and omit Powerful/EX/Stun/Breaker/Echo reminder paragraphs. Those keywords belong in the keywords field, not as extra abilities in text.
+- Each ability has exactly one colon, between the timing+cost header and the effect. Printed "ENHANCE Mill 1: Your rival mills 1." becomes "Enhance Mill 1: Your rival mills 1." — never "Enhance: Mill 1: Your rival mills 1.".
+- The only exception to a second colon is a bulleted choice list, e.g. "Enhance: Choose one:" followed by "•" options (those options may contain colons).
 - In rules text, transcribe printed symbol icons inline using curly-brace tokens:
   - commit icon: {commit}
   - block zone icons: {blockhigh}, {blockmid}, {blocklow}
@@ -93,6 +99,7 @@ export const extractCardFromImage = action({
     imageUrl: v.string(),
     symbolReferenceImageUrl: v.optional(v.string()),
     symbolStripImageUrl: v.optional(v.string()),
+    symbols: v.optional(v.string()),
     attackZone: v.optional(zoneValidator),
     blockZone: v.optional(zoneValidator),
   },
@@ -117,17 +124,21 @@ export const extractCardFromImage = action({
       throw new Error("OpenAI returned invalid JSON");
     }
 
-    const result = coerceExtractedCard(parsed);
-    if (args.attackZone) result.attackZone = args.attackZone;
-    if (args.blockZone) result.blockZone = args.blockZone;
+    const result = applyRegionZones(coerceExtractedCard(parsed), args);
 
-    const symbols = await extractResourceSymbols(
-      args.symbolStripImageUrl ?? args.imageUrl,
-      args.symbolReferenceImageUrl,
-      Boolean(args.symbolStripImageUrl)
-    );
-    if (symbols) {
-      result.symbols = symbols;
+    const providedSymbols = args.symbols?.trim();
+    if (providedSymbols) {
+      const normalized = normalizeSymbolList(providedSymbols);
+      if (normalized) result.symbols = normalized;
+    } else if (args.symbolStripImageUrl) {
+      const symbols = await extractResourceSymbols(
+        args.symbolStripImageUrl,
+        args.symbolReferenceImageUrl,
+        true
+      );
+      if (symbols) {
+        result.symbols = symbols;
+      }
     }
 
     return result;
@@ -349,7 +360,7 @@ function coerceExtractedCard(parsed: Record<string, unknown>): ExtractedCard {
   if (name) result.name = name;
   const type = asTrimmedString(parsed.type);
   if (type) result.type = type;
-  const rarity = asTrimmedString(parsed.rarity);
+  const rarity = printedRarityLabel(asTrimmedString(parsed.rarity));
   if (rarity) result.rarity = rarity;
 
   const numericFields = [
@@ -370,16 +381,12 @@ function coerceExtractedCard(parsed: Record<string, unknown>): ExtractedCard {
   const keywords = asPipeList(parsed.keywords);
   if (keywords) result.keywords = keywords;
   const text = asPipeList(parsed.text);
-  if (text) result.text = normalizeAbilityTimingText(text);
+  if (text) {
+    const normalized = normalizeAbilityText(text);
+    if (normalized) result.text = normalized;
+  }
 
   return result;
-}
-
-function normalizeAbilityTimingText(text: string): string {
-  return text.replace(
-    /\b(Enhance|Response|Form|Blitz|Static)\s*:\s*(\[[^\]]+\])\s*:/gi,
-    (_match, timing: string, restriction: string) => `${timing} ${restriction}:`
-  );
 }
 
 function normalizeSymbolList(symbols: string): string {

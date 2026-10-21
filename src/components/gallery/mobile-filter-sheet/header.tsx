@@ -8,9 +8,13 @@ import { useGalleryMobileFilterNav, type GalleryMobileFilterPage } from "./conte
 
 const PAGE_TITLES: Record<GalleryMobileFilterPage, string> = {
   root: "Filters",
+  format: "Format",
   sets: "Sets",
+  type: "Type",
+  symbols: "Symbols",
   keywords: "Keywords",
   stats: "Stats",
+  rarity: "Rarity",
 };
 
 const headerButtonClassName =
@@ -45,7 +49,7 @@ export function GalleryMobileFilterHeader({ onClose }: { onClose: () => void }) 
           {PAGE_TITLES[page]}
         </SheetTitle>
         <span className="text-[11px] tabular-nums text-muted-foreground">
-          {meta.filteredCount.toLocaleString()} of {meta.totalCards.toLocaleString()}
+          {meta.filteredCount.toLocaleString()} of {meta.formatCardCount.toLocaleString()}
         </span>
       </div>
       <div className="flex items-center justify-end">

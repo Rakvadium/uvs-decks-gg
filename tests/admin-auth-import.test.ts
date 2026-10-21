@@ -69,4 +69,12 @@ describe("sanitizeCardImportInput", () => {
     expect(sanitizeCardImportInput({ setCode: "ABC" })).toBe(null);
     expect(sanitizeCardImportList([{ name: "A" }, { name: "" }, null])).toHaveLength(1);
   });
+
+  test("strips reminder text and extra timing colons from imported abilities", () => {
+    const card = sanitizeCardImportInput({
+      name: "Following in Bison's Footsteps",
+      text: "Enhance: Mill 1: Your rival mills 1. | (Mill 1—Add the top card of your deck to your discard pile.)",
+    });
+    expect(card?.text).toBe("Enhance Mill 1: Your rival mills 1.");
+  });
 });

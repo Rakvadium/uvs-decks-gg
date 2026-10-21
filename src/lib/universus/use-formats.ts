@@ -18,6 +18,7 @@ export interface UseFormatsResult {
   getFormatByKey: (key: string) => CachedFormat | undefined;
   isSetLegalInFormat: (setCode: string, formatKey: string) => boolean;
   isCardBannedInFormat: (formatKey: string, cardId: string) => boolean;
+  getBannedFormatNames: (cardId: string) => string[];
   isHydrated: boolean;
 }
 
@@ -98,6 +99,16 @@ export function useFormats(): UseFormatsResult {
     return true;
   }, [cardLegalities]);
 
+  const getBannedFormatNames = useCallback((cardId: string): string[] => {
+    const names: string[] = [];
+    for (const format of formats) {
+      if (isCardBannedInFormat(format.key, cardId)) {
+        names.push(format.name);
+      }
+    }
+    return names;
+  }, [formats, isCardBannedInFormat]);
+
   useEffect(() => {
     if (!isHydrated) return;
     fetchFormats();
@@ -112,6 +123,7 @@ export function useFormats(): UseFormatsResult {
     getFormatByKey,
     isSetLegalInFormat,
     isCardBannedInFormat,
+    getBannedFormatNames,
     isHydrated,
   };
 }
