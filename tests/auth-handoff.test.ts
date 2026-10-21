@@ -23,7 +23,6 @@ import {
 } from "@shared/auth-handoff";
 import { DEFAULT_ROOT_DOMAINS } from "@shared/hosts";
 import { apexOriginFor } from "@/lib/auth/handoff-client";
-import { sanitizeAgentLoginNextPath } from "@/lib/agent-auth-shared";
 
 const ROOTS = DEFAULT_ROOT_DOMAINS;
 
@@ -59,13 +58,6 @@ describe("sanitizeSameOriginPath", () => {
     expect(sanitizeSameOriginPath(["/a"], "/x")).toBe("/x");
   });
 
-  test("agent login next sanitizer allows handoff paths and blocks open redirects", () => {
-    expect(sanitizeAgentLoginNextPath("/auth/handoff?return=x&state=y")).toBe(
-      "/auth/handoff?return=x&state=y",
-    );
-    expect(sanitizeAgentLoginNextPath("/\\evil.com")).toBe("/home");
-    expect(sanitizeAgentLoginNextPath("//evil.com")).toBe("/home");
-  });
 });
 
 describe("parseHandoffReturnUrl", () => {
@@ -310,7 +302,7 @@ describe("pending handoff states", () => {
 
 describe("isAuthFlowPath", () => {
   test("auth pages", () => {
-    for (const path of ["/auth/callback", "/auth/handoff", "/sign-in", "/sign-up", "/agent-login"]) {
+    for (const path of ["/auth/callback", "/auth/handoff", "/sign-in", "/sign-up"]) {
       expect(isAuthFlowPath(path)).toBe(true);
     }
     for (const path of ["/", "/decks", "/sign-install", "/authors", "/settings"]) {

@@ -51,6 +51,7 @@ export function CommunityTierListsPageView() {
                 authorLabel={entry.author?.username ?? "Unknown duelist"}
                 cardMap={cardMap}
                 href={`/community/tier-lists/${entry.tierList._id}`}
+                moderationStatus={entry.listModerationStatus}
               />
             ))}
           </div>
@@ -63,6 +64,7 @@ export function CommunityTierListsPageView() {
                 authorLabel="Your list"
                 cardMap={cardMap}
                 href={`/community/tier-lists/${tierList._id}`}
+                moderationStatus={tierList.listModerationStatus}
               />
             ))}
           </div>

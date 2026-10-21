@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import { useCommunityTierListDetailContext } from "./context";
 import { CommunityTierListPresentationCard } from "./presentation-card";
 import { useGameModule } from "@/games/game-context";
+import { CommunityTierListUnknownCardTile } from "./unknown-card-tile";
 
 export function CommunityTierListDetailPoolPanel() {
   const { CardGridItem } = useGameModule().ui;
@@ -22,6 +23,8 @@ export function CommunityTierListDetailPoolPanel() {
     setIsPoolDialogOpen,
     filteredPoolCardIds,
     cardMap,
+    unknownCardDisplay,
+    removeCardFromLanes,
     getBackCard,
     poolScopes,
     isPresentationMode,
@@ -101,18 +104,25 @@ export function CommunityTierListDetailPoolPanel() {
                   <div className="grid grid-cols-2 gap-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-10">
                     {filteredPoolCardIds.map((cardId) => {
                       const card = cardMap.get(cardId.toString());
-                      if (!card) {
-                        return null;
-                      }
 
                       return (
-                        <div key={card._id} className="content-visibility-auto">
-                          <CardGridItem
-                            card={card}
-                            backCard={getBackCard(card)}
-                            dragSourceId="tier-list:pool"
-                            showDeckActions={false}
-                          />
+                        <div key={cardId} className="content-visibility-auto">
+                          {card ? (
+                            <CardGridItem
+                              card={card}
+                              backCard={getBackCard(card)}
+                              dragSourceId="tier-list:pool"
+                              showDeckActions={false}
+                            />
+                          ) : (
+                            <CommunityTierListUnknownCardTile
+                              cardId={cardId}
+                              display={unknownCardDisplay}
+                              dragSourceId="tier-list:pool"
+                              canEdit={canEdit}
+                              onRemove={() => removeCardFromLanes(cardId)}
+                            />
+                          )}
                         </div>
                       );
                     })}

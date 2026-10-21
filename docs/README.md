@@ -8,7 +8,7 @@
 
 **UI structure:** [component-architecture-playbook.md](./component-architecture-playbook.md)
 
-**Agents:** [agent-os.md](./agent-os.md) (start here) · [agent-workflow-playbook.md](./agent-workflow-playbook.md) · [agent-issue-queue.md](./agent-issue-queue.md) · [agent-onboarding.md](./agent-onboarding.md) · [`AGENTS.md`](../AGENTS.md)
+**Agents:** [`AGENTS.md`](../AGENTS.md)
 
 ---
 
@@ -20,6 +20,7 @@
 | [PRODUCT_VISION.md](./PRODUCT_VISION.md)                             | Outcomes, scope, principles               |
 | [SYSTEM_ANALYSIS.md](./SYSTEM_ANALYSIS.md)                           | Clients, Convex, data, integrations       |
 | [multi-game.md](./multi-game.md)                                     | Game modules, hosts/routing, game-scoped data, auth handoff, rollout |
+| [local-convex.md](./local-convex.md)                                 | Local Convex deployment for branch work (cloud dev = production) |
 | [component-architecture-playbook.md](./component-architecture-playbook.md) | Feature folders and UI module shape |
 | [UI_UX_DESIGN.md](./UI_UX_DESIGN.md)                                 | Interface patterns and constraints        |
 | [theme-chrome-guidelines.md](./theme-chrome-guidelines.md)           | Portable theme / chrome / styling law     |
@@ -38,7 +39,7 @@
 | [implementation/notes/legality-dates.md](./implementation/notes/legality-dates.md)           | Format legality date semantics       |
 | [universus/ability-text.md](./universus/ability-text.md)                                     | Card `text`: reminders vs abilities, colon rules |
 
-Missing / planned feature docs (see [agent-workflow-playbook.md](./agent-workflow-playbook.md) § Documentation gaps): `card-data-hooks.md`, `content-moderation-and-language-filter.md`.
+Missing / planned feature docs: `card-data-hooks.md`, `content-moderation-and-language-filter.md`.
 
 
 ## Process
@@ -48,10 +49,6 @@ Missing / planned feature docs (see [agent-workflow-playbook.md](./agent-workflo
 | -------------------------------------------------------- | ----------------------------------------- |
 | [BACKLOG.md](./BACKLOG.md)                               | Queued work                               |
 | [CHANGELOG.md](./CHANGELOG.md)                           | Release-facing history                    |
-| [agent-os.md](./agent-os.md)                             | Tasks, routing, workflows, triggers (start here) |
-| [agent-workflow-playbook.md](./agent-workflow-playbook.md) | Hardened loops, visual verify, test prompts, doc gaps |
-| [agent-issue-queue.md](./agent-issue-queue.md)           | GitHub issue labels, template, claim filter |
-| [agent-onboarding.md](./agent-onboarding.md)             | Coding-agent setup and local browser login |
 
 
 ## Historical material

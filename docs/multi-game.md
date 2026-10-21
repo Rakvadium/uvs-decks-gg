@@ -343,7 +343,7 @@ Implementation notes (Phase 1 foundation):
 - **Game host** (`uvs.tcgdecks.gg`, dev `uvs.tcgdecks.localhost:8090`): game routes; sign-in
   goes through the auth host.
 - **Apex** (`tcgdecks.gg`, dev `tcgdecks.localhost:8090`): `/` game picker, `/sign-in`,
-  `/sign-up`, `/auth/*`, `/agent-login`, `/api/*`. Any other path redirects to
+  `/sign-up`, `/auth/*`, `/api/*`. Any other path redirects to
   `{DEFAULT_GAME}.{root}` with the same path.
 - **Legacy** `uvsdecks.gg/*` → 301 `https://uvs.tcgdecks.gg/*`.
 
@@ -363,7 +363,7 @@ Implementation (Phase 2 routing step):
 - **Decision logic** is the pure `routeRequest({ host, pathname, search, protocol })` in
   `src/lib/routing/route-request.ts` → `{ type: "next" | "rewrite" | "redirect" | "notFound" }`
   (tests: `tests/route-request.test.ts`). Order: legacy host → 301; apex unknown subdomain → 307
-  to `{apex}/`; apex allowed path (`/`, `/sign-in`, `/sign-up`, `/agent-login`, `/auth[/…]`,
+  to `{apex}/`; apex allowed path (`/`, `/sign-in`, `/sign-up`, `/auth[/…]`,
   `/api[/…]`) → next, anything else (incl. `/tour`) → 307 to `{DEFAULT_GAME}.{root}` + path +
   query; game/standalone: first segment is a GameId → notFound, `isGameScopedPath` → rewrite to
   `/{game}{path}{query}`, else next. Apex requests carry `x-tcg-game: {DEFAULT_GAME_ID}` +
@@ -373,7 +373,7 @@ Implementation (Phase 2 routing step):
   (Node runtime) is a separate, low-value change, so it was deferred. The handler runs *inside*
   `convexAuthNextjsMiddleware`, so `/api/auth` POSTs are still proxied to Convex before routing
   runs and token refresh cookies still propagate. Redirect decisions return first; then the
-  existing "authenticated on /sign-in|/sign-up|/agent-login → /home" rule; then rewrite/next with
+  existing "authenticated on /sign-in|/sign-up → /home" rule; then rewrite/next with
   `NextResponse.rewrite|next(…, { request: { headers } })` (headers copied from the request so
   refreshed auth cookies survive; our `x-tcg-*` values overwrite client-supplied ones).
   `notFound` rewrites to `/__tcg-not-found`, which matches no page → root not-found UI, 404.
@@ -439,7 +439,7 @@ builders, `sanitizeSameOriginPath`, code checks, hint cookie) live in `shared/au
    in → `authHandoff.create({ returnUrl, state })` → sets the hint cookie →
    `location.replace({returnOrigin}/auth/callback?handoff_code&state&next={path})` — the param is not `code` because Convex Auth consumes `?code=` itself.
    After apex sign-in, `AuthRouteEntry` and the middleware "authenticated on
-   `/sign-in|/sign-up|/agent-login`" redirect honor a sanitized same-origin `next`
+   `/sign-in|/sign-up`" redirect honor a sanitized same-origin `next`
    (`authenticatedAuthEntryRedirect`), else `/home`.
 3. `authHandoff.create` (auth required, rate-limited per user) validates the `returnUrl`
    origin with `isAllowedHandoffOrigin`, stores `sha256(code)` of a 32-byte random code in
@@ -482,15 +482,12 @@ builders, `sanitizeSameOriginPath`, code checks, hint cookie) live in `shared/au
    re-implements it (in-flight Convex requests) and, in the capture phase, swallows
    `beforeunload` for navigations started via `leavePage` (all auth redirects) and on auth-flow
    pages, which also silences `@convex-dev/auth`'s "token refresh in progress" prompt.
-   The middleware's "authenticated on `/sign-in|/sign-up|/agent-login`" redirect only applies
+   The middleware's "authenticated on `/sign-in|/sign-up`" redirect only applies
    to GET/HEAD page loads, not Convex Auth's post-sign-in `invalidateCache` server action (a
    redirected action POST to `/home` → game host failed cross-origin and broke apex sign-in).
 8. Sign-up and password reset UIs only render on apex/standalone; game-host `/sign-in` and
    `/sign-up` hand off to the apex (which lands on its own `/sign-in|/sign-up?next=/auth/handoff?...`).
-9. `/agent-login` on a game host generates `state`, then redirects to the apex `/agent-login`
-   with `next=/auth/handoff?return=...&state=...` (only when `isAgentAuthEnabled()`);
-   standalone behaves as today.
-10. `@convex-dev/auth` treats only exact `localhost` as local; the postinstall patch and
+9. `@convex-dev/auth` treats only exact `localhost` as local; the postinstall patch and
     `src/lib/auth-local-host.ts` also accept `*.localhost`. The patch marker is a versioned
     comment (`tcgdecks-local-host-vN`); bump it whenever the replacement body changes.
 

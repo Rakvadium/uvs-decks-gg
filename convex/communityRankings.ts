@@ -2,7 +2,7 @@ import { v } from "convex/values";
 import { internal } from "./_generated/api";
 import type { Doc, Id } from "./_generated/dataModel";
 import { internalMutation, query, type MutationCtx } from "./_generated/server";
-import { communityCardRankingValidator, gameIdValidator } from "./validators";
+import { communityCardRankingValidator, gameIdValidator, isTierListHiddenByModeration } from "./validators";
 import type { GameId } from "../shared/games/types";
 import { gameValuesWithLegacy, withResolvedGame } from "./lib/gameScope";
 import {
@@ -69,7 +69,11 @@ function getEligibleScopeFromTierList(tierList: Doc<"tierLists">): EligibleScope
   const rankingScope = tierList.rankingScope ?? COMMUNITY_TIER_RANKING.scopes.unranked;
   const rankingScopeKey = tierList.rankingScopeKey ?? "";
 
-  if (!tierList.isPublic || !isCanonicalRankedTierDefinitions(tierList.tiers)) {
+  if (
+    !tierList.isPublic ||
+    isTierListHiddenByModeration(tierList.listModerationStatus) ||
+    !isCanonicalRankedTierDefinitions(tierList.tiers)
+  ) {
     return null;
   }
 

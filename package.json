@@ -7,6 +7,8 @@
     "build": "next build --webpack",
     "start": "next start -p 8090",
     "lint": "eslint",
+    "lint:design": "bun scripts/design-codemod/lint.ts",
+    "design:codemod": "bun scripts/design-codemod/index.ts",
     "typecheck": "tsc --noEmit",
     "test": "bun test tests",
     "postinstall": "node scripts/patch-convex-auth-lan-host.mjs",
@@ -65,7 +67,10 @@
     "zod": "^4.1.13"
   },
   "devDependencies": {
+    "@happy-dom/global-registrator": "^21.0.3",
     "@tailwindcss/postcss": "^4",
+    "@testing-library/dom": "^10.4.2",
+    "@testing-library/react": "^16.3.3",
     "@types/bun": "latest",
     "@types/culori": "^4.0.1",
     "@types/node": "^20",

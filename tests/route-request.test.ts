@@ -41,7 +41,7 @@ describe("routeRequest: legacy hosts", () => {
 
   test("legacy redirect applies to every path, including settings and api", () => {
     expect(route({ host: "uvsdecks.gg", pathname: "/settings" })).toMatchObject({ status: 301 });
-    expect(route({ host: "uvsdecks.gg", pathname: "/api/agent-auth" })).toMatchObject({
+    expect(route({ host: "uvsdecks.gg", pathname: "/api/auth" })).toMatchObject({
       status: 301,
     });
   });
@@ -58,12 +58,10 @@ describe("routeRequest: apex", () => {
     "/",
     "/sign-in",
     "/sign-up",
-    "/agent-login",
     "/auth",
     "/auth/handoff",
     "/auth/callback",
     "/api/auth",
-    "/api/agent-auth",
   ])("allows %s", (pathname) => {
     expect(route({ host: "tcgdecks.gg", pathname })).toEqual({
       type: "next",

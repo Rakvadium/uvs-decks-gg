@@ -6,7 +6,7 @@
  * - `@convex-dev/auth`'s provider while a token refresh is running (not configurable).
  * Our listener is registered first, in the capture phase, and swallows the event for auth
  * redirects started via `leavePage` and for any unload from an auth-flow page (`/auth/*`,
- * `/sign-in`, `/sign-up`, `/agent-login`), so no later listener can prompt.
+ * `/sign-in`, `/sign-up`), so no later listener can prompt.
  */
 import { isAuthFlowPath } from "@shared/auth-handoff";
 

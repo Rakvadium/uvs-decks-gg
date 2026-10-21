@@ -25,6 +25,7 @@ import { PageHeading } from "@/components/ui/typography-headings";
 import { COMMUNITY_TIER_RANKING, getRankingScopeLabel } from "../../../../../shared/app-config";
 import { ArrowLeft, ChevronDown, Edit3, Globe, Loader2, Lock, Save, Trash2, X } from "lucide-react";
 import { useProfanityDisplayText } from "@/lib/moderation/use-profanity-display-text";
+import { TierListModerationBadge } from "../moderation-badge";
 import { useOptionalCommunityTierListDetailContext } from "./context";
 
 export function CommunityTierListDetailTopBar() {
@@ -182,7 +183,7 @@ export function CommunityTierListDetailTopBar() {
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction
-            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            variant="destructive"
             onClick={() => void handleDelete()}
           >
             {isDeleting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
@@ -235,6 +236,7 @@ export function CommunityTierListDetailTopBar() {
         </div>
 
         <div className="ml-auto flex shrink-0 items-center gap-2">
+          <TierListModerationBadge status={detail.listModerationStatus} className="h-8 px-2.5 text-[10px]" />
           {!isEditingMeta ? publicityControl : null}
           {!isEditingMeta ? rankingScopeControl : null}
           {canEdit ? (isEditingMeta ? saveMetaButton : (

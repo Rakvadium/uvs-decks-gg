@@ -1,12 +1,10 @@
 # Backlog — tcg-decks (legacy scratch)
 
-**Live queue = GitHub Issues.** See [agent-os.md](./agent-os.md) and [agent-issue-queue.md](./agent-issue-queue.md).
-
-Do not auto-claim work from this file. Promote Open rows to **Agent task** issues (`create-task` or the GitHub template), then mark the row Done with `#<issue>`.
+**Live queue = GitHub Issues.** Promote Open rows to issues, then mark the row Done with `#<issue>`.
 
 Historical workflow (human scratch only): Open → In progress → Done; archive noise to [_noLongerNeeded/docs/archive/backlog-completed.md](../_noLongerNeeded/docs/archive/backlog-completed.md).
 
-**Coding agents:** [agent-os.md](./agent-os.md) · [agent-onboarding.md](./agent-onboarding.md) · [component-architecture-playbook.md](./component-architecture-playbook.md).
+**Coding agents:** [`AGENTS.md`](../AGENTS.md) · [component-architecture-playbook.md](./component-architecture-playbook.md).
 
 ---
 

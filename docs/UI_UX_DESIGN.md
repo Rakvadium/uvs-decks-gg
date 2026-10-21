@@ -14,42 +14,45 @@
 
 ## Border ladder
 
-Use structural `border-border/*` only at these steps:
+Structural borders use only these steps. Write the named utility ([Named utilities](#named-utilities)):
 
-| Role | Class |
-|------|--------|
-| Hairline divider | `border-border/30` |
-| Mid divider / inset split | `border-border/40` |
-| Default surface | `border-border/50` |
-| Dashed empty / placeholder | `border-border/80` |
+| Role | Step | Class |
+|------|------|-------|
+| Hairline divider | `/30` | `border-hairline` |
+| Mid divider / inset split | `/40` | `border-divider` |
+| Default surface | `/50` | `border-surface` |
+| Dashed empty / placeholder | `/80` | `border-placeholder` |
 
-Interactive form and toolbar controls use `--control-dual-border` / `--control-dual-border-strong` (see `src/app/globals.css`), not structural opacities. Keep semantic borders (`border-primary/*`, destructive) and `--chrome-*-border*` theme tokens as-is.
+Interactive form and toolbar controls use `--control-dual-border` / `--control-dual-border-strong` (see `src/app/globals.css`), not structural opacities. Semantic borders (primary, destructive, …) stay on the [tone ladder](#tone-ladder) (`border-primary-soft` / `-strong`), not this structural one, and `--chrome-*-border*` theme tokens stay as-is.
 
 ## Surface opacity ladder
 
-Prefer these steps for translucent fills:
+Translucent fills use only these steps. Write the named utility, `bg-{base}-{step}`:
 
-| Role | `bg-card` | `bg-background` | `bg-muted` |
-|------|-----------|-----------------|------------|
-| Tint / inset | `/30` | `/30` | `/20` |
-| Soft panel | `/50` | `/50` | `/50` |
-| Elevated panel | `/80` | `/80` | `/60` |
-| Near-opaque overlay | `/95` | `/95` | `/80` |
+| Role | Class | `card` | `background` | `popover` | `muted` |
+|------|-------|--------|--------------|-----------|---------|
+| Tint / inset | `bg-{base}-tint` | `/30` | `/30` | `/30` | `/20` |
+| Soft panel | `bg-{base}-soft` | `/50` | `/50` | `/50` | `/50` |
+| Elevated panel | `bg-{base}-elevated` | `/80` | `/80` | `/80` | `/60` |
+| Near-opaque overlay | `bg-{base}-overlay` | `/95` | `/95` | `/95` | `/80` |
 
-Solid tokens (`bg-card`, `bg-background`, `bg-muted`) remain valid when no translucency is needed.
+Solid tokens (`bg-card`, `bg-background`, `bg-popover`, `bg-muted`) remain valid when no translucency is needed.
 
-## Primary opacity ladder
+## Tone ladder
 
-Semantic tints of `primary` (and `secondary` / `accent`) use four steps only:
+Semantic tints of `{tone}` = `primary` | `secondary` | `accent` | `success` | `warning` | `info` | `destructive` use these steps only:
 
-| Role | Class |
-|------|--------|
-| Wash / hover fill | `bg-primary/10` |
-| Selected fill / badge fill | `bg-primary/20` |
-| Soft border | `border-primary/40` |
-| Strong border / active ring | `border-primary/60` |
+| Role | Step | Class |
+|------|------|-------|
+| Wash / hover fill | `/10` | `bg-{tone}-wash` |
+| Selected fill / badge fill | `/20` | `bg-{tone}-selected` |
+| Hover of a solid fill (filled buttons: rest `bg-{tone}`, hover `bg-{tone}-dim`) | `/90` | `bg-{tone}-dim` |
+| Soft border | `/40` | `border-{tone}-soft` |
+| Strong border / active | `/60` | `border-{tone}-strong` |
+| Invalid / quiet ring | `/40` | `ring-{tone}-soft` |
+| Active / focus ring | `/60` | `ring-{tone}-strong` |
 
-Off-ladder values (`/5`, `/8`, `/15`, `/25`, `/30`, `/35`, `/50`, `/70`, `/90`) are legacy and should be snapped to the nearest step when a file is touched. Hover states move one step up (`/10 → /20`, `/40 → /60`).
+Any other tone opacity (`/5`, `/8`, `/15`, `/25`, `/30`, `/35`, `/50`, `/70`, `/80`) is legacy; snap it when a file is touched (rules under [Named utilities](#named-utilities)). Hover states move one step up (`-wash → -selected`, `-soft → -strong`, solid → `-dim`).
 
 ## Status colors
 
@@ -60,9 +63,9 @@ State is expressed with semantic tokens, never Tailwind palette hues:
 | Success / ready / online | `success`, `success-foreground` | `Badge tone="success"`, `Alert variant="success"` |
 | Warning / building / pending | `warning`, `warning-foreground` | `Badge tone="warning"`, `Alert variant="warning"` |
 | Informational | `info`, `info-foreground` | `Badge tone="info"`, `Alert variant="info"` |
-| Error / destructive | `destructive` | `Badge tone="destructive"`, `Alert variant="destructive"`, `Button variant="destructive"` |
+| Error / destructive | `destructive`, `destructive-foreground` | `Badge tone="destructive"`, `Alert variant="destructive"`, `Button variant="destructive"` |
 
-Inline usage follows the primary ladder: `bg-warning/10`, `border-warning/40`, `text-warning`. Domain colors (card symbols, stat tints) live in `src/games/uvs/config.ts` and are not status colors.
+Inline usage follows the tone ladder: `bg-warning-wash`, `border-warning-soft`, `text-warning`. Domain colors (card symbols, stat tints) live in `src/games/uvs/config.ts` and are not status colors.
 
 ## Elevation
 
@@ -91,19 +94,62 @@ Bare `rounded` and `rounded-sm` are off-ladder: `rounded` is a static 4px that i
 
 ## Z-index stack
 
-| Layer | Class |
-|-------|--------|
-| Local stacking | `z-10` / `z-20` |
-| Sticky headers | `z-30` |
-| Shell chrome | `z-40` |
-| Modal / sheet baseline | `z-50` |
-| In-dialog floating controls | `z-[60]` |
-| Skip link / dialog chrome / hover preview | `z-[100]` |
-| Popovers | `z-[200]` |
-| Select menus | `z-[300]` |
-| Nested dialog overlay / content | `z-[400]` / `z-[410]` |
-| Media dock | `z-[500]` |
-| Drag preview | `z-[600]` |
+| Layer | Value | Class |
+|-------|-------|-------|
+| Local stacking | `10` / `20` | `z-10` / `z-20` |
+| Sticky headers | `30` | `z-sticky` |
+| Shell chrome | `40` | `z-shell` |
+| Modal / sheet baseline | `50` | `z-modal` |
+| In-dialog floating controls | `60` | `z-dialog-float` |
+| Skip link / dialog chrome / hover preview | `100` | `z-chrome` |
+| Popovers, tooltips | `200` | `z-popover` |
+| Select menus, dropdown menus | `300` | `z-select` |
+| Nested dialog overlay / content | `400` / `410` | `z-nested-overlay` / `z-nested-dialog` |
+| Media dock | `500` | `z-dock` |
+| Drag preview | `600` | `z-drag` |
+
+## Named utilities
+
+The border, surface, tone and z-index ladders above ship as named Tailwind utilities in `src/styles/system/ladders.css` (imported from `src/app/globals.css`). This table maps each legacy class to its name; it lists the same steps as the ladder tables. Each name aliases one step, so it emits the same CSS as the class it replaces and works with any variant (`hover:`, `focus-visible:`, `dark:`, `group-hover:`, `data-[…]:`, `md:`). Write the name, not the opacity class.
+
+`{tone}` = `primary` | `secondary` | `accent` | `success` | `warning` | `info` | `destructive`.
+
+| Old class | Named utility | Role |
+|-----------|---------------|------|
+| `bg-{tone}/10` | `bg-{tone}-wash` | Wash / hover fill |
+| `bg-{tone}/20` | `bg-{tone}-selected` | Selected fill / badge fill |
+| `bg-{tone}/90` | `bg-{tone}-dim` | Hover of a solid fill (filled buttons) |
+| `border-{tone}/40` | `border-{tone}-soft` | Soft border |
+| `border-{tone}/60` | `border-{tone}-strong` | Strong border / active |
+| `ring-{tone}/40` | `ring-{tone}-soft` | Invalid / quiet ring |
+| `ring-{tone}/60` | `ring-{tone}-strong` | Active / focus ring |
+| `border-border/30` | `border-hairline` | Hairline divider |
+| `border-border/40` | `border-divider` | Mid divider / inset split |
+| `border-border/50` | `border-surface` | Default surface |
+| `border-border/80` | `border-placeholder` | Dashed empty / placeholder |
+| `bg-card/30` · `bg-background/30` · `bg-popover/30` · `bg-muted/20` | `bg-{base}-tint` | Tint / inset |
+| `bg-card/50` · `bg-background/50` · `bg-popover/50` · `bg-muted/50` | `bg-{base}-soft` | Soft panel |
+| `bg-card/80` · `bg-background/80` · `bg-popover/80` · `bg-muted/60` | `bg-{base}-elevated` | Elevated panel |
+| `bg-card/95` · `bg-background/95` · `bg-popover/95` · `bg-muted/80` | `bg-{base}-overlay` | Near-opaque overlay |
+| `z-30` | `z-sticky` | Sticky headers |
+| `z-40` | `z-shell` | Shell chrome |
+| `z-50` | `z-modal` | Modal / sheet baseline |
+| `z-[60]` | `z-dialog-float` | In-dialog floating controls |
+| `z-[100]` | `z-chrome` | Skip link / dialog chrome / hover preview |
+| `z-[200]` | `z-popover` | Popovers, tooltips |
+| `z-[300]` | `z-select` | Select menus, dropdown menus |
+| `z-[400]` | `z-nested-overlay` | Nested dialog overlay |
+| `z-[410]` | `z-nested-dialog` | Nested dialog content |
+| `z-[500]` | `z-dock` | Media dock |
+| `z-[600]` | `z-drag` | Drag preview |
+
+`{base}` = `card` | `background` | `muted` | `popover`. Local stacking inside a component stays `z-10` / `z-20`.
+
+**Snapping legacy values.** Use the nearest step for the same role, and round ties up. Fills: `/5`, `/8` → `-wash`; `/15`, `/25`, `/30`, `/50` → `-selected`; `/70`, `/80` → `-dim`. Borders and rings: `/20`, `/25`, `/30`, `/35` → `-soft`; `/50` → `-strong`. A hover moves one step up (`-wash` → `-selected`, `-soft` → `-strong`). A fill already at `-selected` has no step above it, so its hover moves the border instead.
+
+**No named form.** Keep the raw class for gradient stops (`from-primary/10`), side-only border colors (`border-y-border/50`), and bases outside the ladders (`muted-foreground`, `foreground`, `ring`, `bg-border`). Use a ladder number (`/10` `/20` `/30` `/40` `/50` `/60` `/80` `/90` `/95`), and when snapping a border or control edge, pick the step that keeps or improves its contrast (for example the dark checkbox border went `/55` → `/60`, not `/50`).
+
+**Overriding.** `tailwind-merge` (`cn`) treats the color names as colors, so a call-site `bg-*` or `border-*` still replaces a primitive's. It does not know the `z-*` names. Do not override a primitive's z-index from a call site until `cn` is extended to know them.
 
 ## Motion
 

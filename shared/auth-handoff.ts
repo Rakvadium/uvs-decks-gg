@@ -327,7 +327,7 @@ export function takePendingState(
 export function isAuthFlowPath(pathname: string): boolean {
   return (
     pathname.startsWith("/auth/") ||
-    ["/sign-in", "/sign-up", "/agent-login"].some(
+    ["/sign-in", "/sign-up"].some(
       (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
     )
   );

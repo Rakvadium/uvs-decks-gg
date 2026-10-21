@@ -255,6 +255,12 @@ export const tierListPoolScopeValidator = v.object({
   cardType: v.string(),
 });
 
+export const tierListModerationStatusValidator = v.union(
+  v.literal("pending"),
+  v.literal("approved"),
+  v.literal("rejected")
+);
+
 export const tierListValidator = v.object({
   _id: v.id("tierLists"),
   _creationTime: v.number(),
@@ -274,15 +280,36 @@ export const tierListValidator = v.object({
   commentCount: v.number(),
   featuredCardId: v.optional(v.id("cards")),
   updatedAt: v.number(),
-  listModerationStatus: v.optional(
-    v.union(
-      v.literal("pending"),
-      v.literal("approved"),
-      v.literal("rejected")
-    )
-  ),
+  listModerationStatus: v.optional(tierListModerationStatusValidator),
   game: v.optional(gameIdValidator),
 });
+
+export type TierListModerationStatus = Infer<typeof tierListModerationStatusValidator>;
+
+/**
+ * `pending` and `rejected` lists are hidden from everyone except their owner and admins, and don't
+ * count toward community rankings. A list with no status predates list moderation and counts as
+ * approved.
+ */
+export function isTierListHiddenByModeration(status: TierListModerationStatus | undefined): boolean {
+  return status === "pending" || status === "rejected";
+}
+
+/**
+ * Tier list fields any viewer may see: everything except `listModerationStatus`. Readers that show
+ * a list to people other than its owner return this shape, and send the status separately, only to
+ * the owner and admins. Convex rejects return values with extra fields, so a raw document can't be
+ * returned by accident.
+ */
+export const publicTierListValidator = tierListValidator.omit("listModerationStatus");
+
+export type PublicTierList = Infer<typeof publicTierListValidator>;
+
+export function publicTierListFromDocument(doc: Doc<"tierLists">): PublicTierList {
+  const { listModerationStatus: _omit, ...publicFields } = doc;
+  void _omit;
+  return publicFields;
+}
 
 export const tierListItemValidator = v.object({
   _id: v.id("tierListItems"),

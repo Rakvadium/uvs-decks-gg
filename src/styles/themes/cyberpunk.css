@@ -14,7 +14,8 @@
   --accent: oklch(0.62 0.16 171.269);
   --accent-foreground: oklch(0.99 0.01 171);
   --destructive: oklch(0.6535 0.2348 34.037);
-  --destructive-foreground: oklch(1 0 0);
+  --destructive-foreground: #fff;
+  --destructive-fill: oklch(0.556 0.1997 34.037);
   --border: oklch(0.9205 0.0086 225.0878);
   --input: oklch(0.9205 0.0086 225.0878);
   --ring: oklch(0.6726 0.2904 341.4084);
@@ -33,7 +34,14 @@
   --sidebar-ring: oklch(0.6726 0.2904 341.4084);
 }
 
+[data-color-theme="cyberpunk"]:not(.dark) {
+  --checkbox-border: oklch(from var(--control-dual-border) calc(l - 0.2) c h);
+  --checkbox-border-hover: oklch(from var(--control-dual-border-strong) calc(l - 0.205) c h);
+}
+
 [data-color-theme="cyberpunk"].dark {
+  --checkbox-border: color-mix(in oklab, var(--muted-foreground) 80%, transparent);
+  --checkbox-border-hover: var(--muted-foreground);
   --background: oklch(0.1649 0.0352 281.8285);
   --foreground: oklch(0.9513 0.0074 260.7315);
   --card: oklch(0.2542 0.0611 281.1423);
@@ -49,7 +57,8 @@
   --accent: oklch(0.8903 0.1739 171.269);
   --accent-foreground: oklch(0.1649 0.0352 281.8285);
   --destructive: oklch(0.6535 0.2348 34.037);
-  --destructive-foreground: oklch(1 0 0);
+  --destructive-foreground: #fff;
+  --destructive-fill: oklch(0.5885 0.2114 34.037);
   --border: oklch(0.3279 0.0832 280.789);
   --input: oklch(0.3279 0.0832 280.789);
   --ring: oklch(0.6726 0.2904 341.4084);

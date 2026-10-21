@@ -6,6 +6,7 @@ import { ArrowLeft, Search, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useSlashToFocus } from "@/hooks/use-slash-to-focus";
+import { useIsMobile } from "@/hooks/useIsMobile";
 import { FloatingIslandCapsule } from "./floating-island";
 
 export const FLOATING_ACTION_PILL_CLASS =
@@ -45,11 +46,17 @@ export function FloatingPageLayout({
   children: ReactNode;
   contentClassName?: string;
 }) {
+  // Desktop-only chrome: on mobile the nav bar and its slots own these controls, and a mounted
+  // copy here would open a second instance of every bar dialog.
+  const isMobile = useIsMobile();
+
   return (
     <div className="relative flex min-h-0 flex-1 flex-col md:h-full">
-      <div className="pointer-events-none absolute inset-x-0 top-0 z-30 hidden px-4 pt-3 md:block md:px-6">
-        {bar}
-      </div>
+      {isMobile ? null : (
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-30 hidden px-4 pt-3 md:block md:px-6">
+          {bar}
+        </div>
+      )}
       <div
         className={cn(
           "min-h-0 flex-1 overflow-y-auto overflow-x-hidden overscroll-y-contain [-webkit-overflow-scrolling:touch] p-4 md:p-6 md:pt-[4.75rem]",

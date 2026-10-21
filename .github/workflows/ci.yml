@@ -4,10 +4,16 @@ on:
   push:
     branches: [master, main, dev]
   pull_request:
+    # edited: re-run when the PR's base branch changes.
+    types: [opened, synchronize, reopened, edited]
 
+permissions:
+  contents: read
+
+# A newer PR run replaces an older one for the same PR. Push runs each get their own group.
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  group: ci-${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.ref || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   check:
@@ -33,3 +39,24 @@ jobs:
 
       - name: Lint
         run: bun run lint
+
+  # Pattern-based scan for well-known token formats. On pull_request events the
+  # action scans only the PR's commits, so the old leak in history doesn't fail it.
+  gitleaks:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_ENABLE_COMMENTS: false

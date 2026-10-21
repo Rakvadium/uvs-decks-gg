@@ -1,0 +1,35 @@
+/*
+ * Card gallery chrome tokens (gallery states, stats, and the card filter dialog / sheet).
+ * Same layers and selectors as the chrome families in src/styles/base.css; import after it
+ * so the layer order is set there.
+ */
+
+@layer chrome-calm {
+  :root:is([data-chrome="calm"], [data-chrome="bubblegum"], [data-chrome="darkmatter"]) {
+    --chrome-filter-icon-well-shadow: var(--chrome-elevation-low);
+    --chrome-filter-icon-drop-shadow: none;
+    --chrome-filter-tile-shadow-selected: none;
+    --chrome-filter-tile-shadow-selected-inset: none;
+
+    --chrome-gallery-loading-shadow: var(--chrome-elevation-mid);
+    --chrome-gallery-progress-bar-glow: none;
+    --chrome-gallery-empty-icon-shadow: var(--chrome-elevation-low);
+    --chrome-gallery-empty-wash: none;
+    --chrome-gallery-stats-dot-shadow: none;
+  }
+}
+
+@layer chrome-expressive {
+  :root:is([data-chrome="expressive"], [data-chrome="holoterminal"]) {
+    --chrome-filter-icon-well-shadow: 0 0 2px oklch(from var(--primary) l c h / 0.5), 0 0 6px oklch(from var(--primary) l c h / 0.4);
+    --chrome-filter-icon-drop-shadow: drop-shadow(0 0 3px var(--primary));
+    --chrome-filter-tile-shadow-selected: 0 0 10px -3px var(--primary);
+    --chrome-filter-tile-shadow-selected-inset: inset 0 0 8px -3px var(--primary);
+
+    --chrome-gallery-loading-shadow: 0 0 30px -5px var(--primary);
+    --chrome-gallery-progress-bar-glow: 0 0 10px var(--primary);
+    --chrome-gallery-empty-icon-shadow: 0 0 30px -5px var(--primary);
+    --chrome-gallery-empty-wash: linear-gradient(to right, oklch(from var(--primary) l c h / 0.1), oklch(from var(--secondary) l c h / 0.1), oklch(from var(--primary) l c h / 0.1));
+    --chrome-gallery-stats-dot-shadow: 0 0 8px var(--success);
+  }
+}

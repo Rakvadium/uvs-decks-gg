@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useProfanityDisplayText } from "@/lib/moderation/use-profanity-display-text";
 import { useCommunityTierListDetailContext } from "./context";
+import { CommunityTierListUnknownCardTile } from "./unknown-card-tile";
 import { Check, Pencil, Trash2 } from "lucide-react";
 import { SectionHeading } from "@/components/ui/typography-headings";
 import { useGameModule } from "@/games/game-context";
@@ -28,9 +29,11 @@ export function CommunityTierListLaneRow({ tier }: { tier: BuilderTier }) {
   const {
     laneMap,
     cardMap,
+    unknownCardDisplay,
     canEdit,
     isRankedScope,
     moveCardToLane,
+    removeCardFromLanes,
     setTierLabel,
     setTierColor,
     removeTier,
@@ -123,18 +126,25 @@ export function CommunityTierListLaneRow({ tier }: { tier: BuilderTier }) {
           <div className="flex min-w-max gap-4">
             {cardIds.map((cardId) => {
               const card = cardMap.get(cardId.toString());
-              if (!card) {
-                return null;
-              }
 
               return (
-                <div key={card._id} className="w-32 shrink-0 md:w-36">
-                  <CardGridItem
-                    card={card}
-                    backCard={getBackCard(card)}
-                    dragSourceId={`tier-list:${tier.id}`}
-                    showDeckActions={false}
-                  />
+                <div key={cardId} className="w-32 shrink-0 md:w-36">
+                  {card ? (
+                    <CardGridItem
+                      card={card}
+                      backCard={getBackCard(card)}
+                      dragSourceId={`tier-list:${tier.id}`}
+                      showDeckActions={false}
+                    />
+                  ) : (
+                    <CommunityTierListUnknownCardTile
+                      cardId={cardId}
+                      display={unknownCardDisplay}
+                      dragSourceId={`tier-list:${tier.id}`}
+                      canEdit={canEdit}
+                      onRemove={() => removeCardFromLanes(cardId)}
+                    />
+                  )}
                 </div>
               );
             })}

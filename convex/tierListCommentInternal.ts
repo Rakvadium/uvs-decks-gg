@@ -2,6 +2,7 @@ import { v } from "convex/values";
 import { internalMutation, internalQuery } from "./_generated/server";
 import { tierListCommentStatusValidator } from "./validators";
 import { requireUserCanPostContent } from "./utils/validation";
+import { canViewTierList, getTierListViewer } from "./tierLists";
 
 export const assertPublicTierListCommentActor = internalQuery({
   args: {
@@ -13,7 +14,8 @@ export const assertPublicTierListCommentActor = internalQuery({
     if (!tierList) {
       throw new Error("Tier list not found");
     }
-    if (!tierList.isPublic) {
+    // A pending or rejected list is hidden like a private one, except from its owner and admins.
+    if (!tierList.isPublic || !canViewTierList(await getTierListViewer(ctx), tierList)) {
       throw new Error("Not a public tier list");
     }
     return null;

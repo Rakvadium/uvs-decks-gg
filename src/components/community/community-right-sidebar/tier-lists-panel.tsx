@@ -9,6 +9,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  isHiddenByModeration,
+  TierListModerationBadge,
+} from "@/components/community/tier-lists/moderation-badge";
 import { getTierListScopeLabel } from "@/components/community/tier-lists/utils";
 import { useGameId } from "@/games/game-context";
 
@@ -51,7 +55,7 @@ export function CommunityTierListsSidebarPanel() {
               <p className="text-center text-xs text-muted-foreground">No public tier lists yet.</p>
             ) : (
               <ul className="space-y-2">
-                {publicFeed.map(({ tierList, author }) => (
+                {publicFeed.map(({ tierList, author, listModerationStatus }) => (
                   <li key={tierList._id}>
                     <Link
                       href={`/community/tier-lists/${tierList._id}`}
@@ -62,6 +66,7 @@ export function CommunityTierListsSidebarPanel() {
                         <span className="text-[10px] text-muted-foreground">
                           {author?.username ?? "Community"}
                         </span>
+                        <TierListModerationBadge status={listModerationStatus} className="h-5 px-1.5 text-[10px]" />
                         <Badge variant="outline" className="h-5 px-1.5 text-[10px] font-normal">
                           {getTierListScopeLabel(tierList.rankingScope)}
                         </Badge>
@@ -101,9 +106,16 @@ export function CommunityTierListsSidebarPanel() {
                     >
                       <div className="line-clamp-2 text-sm font-medium leading-snug">{tierList.title}</div>
                       <div className="mt-1 flex flex-wrap items-center gap-1.5">
-                        <Badge variant={tierList.isPublic ? "default" : "outline"} className="h-5 px-1.5 text-[10px]">
-                          {tierList.isPublic ? "Public" : "Private"}
-                        </Badge>
+                        {tierList.isPublic && isHiddenByModeration(tierList.listModerationStatus) ? (
+                          <TierListModerationBadge
+                            status={tierList.listModerationStatus}
+                            className="h-5 px-1.5 text-[10px]"
+                          />
+                        ) : (
+                          <Badge variant={tierList.isPublic ? "default" : "outline"} className="h-5 px-1.5 text-[10px]">
+                            {tierList.isPublic ? "Public" : "Private"}
+                          </Badge>
+                        )}
                         <Badge variant="outline" className="h-5 px-1.5 text-[10px] font-normal">
                           {getTierListScopeLabel(tierList.rankingScope)}
                         </Badge>

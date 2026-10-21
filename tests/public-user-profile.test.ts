@@ -100,6 +100,9 @@ function fakeCtx(signedInAs: Id<"users"> | null) {
       take: async () => rows,
       collect: async () => rows,
       unique: async () => null,
+      async *[Symbol.asyncIterator]() {
+        yield* rows;
+      },
     };
     return c;
   };

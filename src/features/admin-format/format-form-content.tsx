@@ -513,7 +513,7 @@ export function FormatDeleteSection({ format }: FormatDeleteSectionProps) {
             <AlertDialogAction
               onClick={() => void onConfirm()}
               disabled={busy}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              variant="destructive"
             >
               {busy ? "Deleting…" : "Delete"}
             </AlertDialogAction>

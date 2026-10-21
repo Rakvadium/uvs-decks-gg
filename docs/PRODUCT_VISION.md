@@ -52,7 +52,7 @@ Design and implementation contract: [multi-game.md](./multi-game.md).
 2. **Reliability** — Search, deck validation, and edge cases around card faces and variants.
 3. **Community trust** — Moderation, abuse resistance, and transparent ranking methodology.
 4. **Performance** — Keep list and gallery interactions snappy; cache or snapshot where aggregation is heavy.
-5. **Contributor experience** — Documentation and issue queue that make agent and human contributors productive ([agent-os.md](./agent-os.md), [agent-onboarding.md](./agent-onboarding.md)).
+5. **Contributor experience** — Documentation and issue queue that make agent and human contributors productive ([`AGENTS.md`](../AGENTS.md)).
 
 
 

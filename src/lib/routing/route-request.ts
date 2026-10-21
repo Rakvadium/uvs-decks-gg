@@ -61,7 +61,7 @@ export type RouteDecision =
     };
 
 /** Paths served on the apex host; everything else redirects to the default game host. */
-const APEX_EXACT_PATHS = new Set(["/", "/sign-in", "/sign-up", "/agent-login"]);
+const APEX_EXACT_PATHS = new Set(["/", "/sign-in", "/sign-up"]);
 const APEX_PREFIXES = ["/auth", "/api"];
 
 export function isApexPath(pathname: string): boolean {
@@ -74,7 +74,7 @@ export function isApexPath(pathname: string): boolean {
 }
 
 /** Pages that bounce already-authenticated users onward (middleware). */
-export const AUTH_ENTRY_PATHS: readonly string[] = ["/sign-in", "/sign-up", "/agent-login"];
+export const AUTH_ENTRY_PATHS: readonly string[] = ["/sign-in", "/sign-up"];
 
 /**
  * Where an authenticated request to an auth entry page goes: the `next` query param when it is
