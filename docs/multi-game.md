@@ -493,24 +493,57 @@ builders, `sanitizeSameOriginPath`, code checks, hint cookie) live in `shared/au
 
 ## Rollout / ops (human)
 
-1. Deploy with optional fields.
-2. Run migrations in prod: `migrations/migrateDeckSetup:run` and
-   `migrations/backfillGameField:runAll` (check each table with
-   `migrations/backfillGameField:status '{"table":"cards"}'`, and `migrations/migrateDeckSetup:status`,
-   looping on `continueCursor` until `pending` sums to 0). Game-indexed `uvs` lists are empty until
-   the backfill finishes, so run it right after the deploy.
-3. Publish a catalog **after** the backfill (publishing reads cards `by_game`; writes
-   `catalog/{game}/v{n}.json.gz` and the per-game `cardDataVersion` row).
-4. **R2 bucket CORS** must allow the new origins: `https://tcgdecks.gg`, `https://*.tcgdecks.gg`,
-   and dev `http://*.tcgdecks.localhost:8090` (keep the existing origins). Until then the static
-   catalog fetch from R2 fails CORS on the new hosts and the client falls back to the (slower)
-   paginated Convex sync.
-5. **Vercel domains:** add `tcgdecks.gg` and `*.tcgdecks.gg` (wildcard needs Vercel DNS /
-   nameservers); keep `uvsdecks.gg` (+ `www`) attached so middleware can 301 it.
-6. **`NEXT_PUBLIC_ROOT_DOMAINS`:** leave unset for the defaults, or set the **same** comma list in
-   both Vercel (Next inlines it at build time) and the Convex deployment env
-   (`isAllowedHandoffOrigin` reads it server-side). A mismatch breaks the auth handoff.
-7. Verify the Resend sender domain.
-8. Follow-up change: make `game`/`setup` required (schema fields **and** the public function
-   `game` args, which are optional only for rolling-deploy compatibility), drop legacy deck fields,
-   old indexes and the legacy-aware lookup fallbacks.
+Done before cutover (checked 2026-10-21): production Convex already runs the multi-game functions,
+the `migrateDeckSetup` and `backfillGameField` migrations ran, and catalogs are published for both
+games (`catalog/uvs/v31`, `catalog/cyberpunk/v2`). The merged branch exports the same Convex
+functions as production, with no schema change, and the live `master` frontend doesn't read the
+fields it changes, so its Convex deploy is backward compatible.
+
+### Prep (no user-visible change)
+
+1. **DNS.** Both domains are registered outside Vercel, with zones in Route 53.
+   - `tcgdecks.gg`: add `CNAME cname.vercel-dns.com` for `uvs`, `cyberpunk`, `www.uvs` and
+     `www.cyberpunk` (the apex and `www` already point at Vercel). Or move the domain's
+     nameservers to Vercel (`ns1`/`ns2.vercel-dns.com`); the zone has no mail records to carry over.
+   - `uvsdecks.gg`: the registrar lists AWS **and** Vercel nameservers, and the Route 53 zone has no
+     apex record, so the bare domain fails for resolvers that reach AWS. Keep one set. Moving to
+     Vercel-only means re-adding the Proton verification TXT record in Vercel DNS.
+2. **R2 CORS** (optional): the bucket has no CORS rules, so the browser's direct catalog fetch fails
+   on every host and falls back to the same-origin `/catalog-proxy` rewrite (`next.config.ts`).
+   Allowing `https://tcgdecks.gg` and `https://*.tcgdecks.gg` (plus dev
+   `http://*.tcgdecks.localhost:8090`) skips the failed first request.
+3. **`NEXT_PUBLIC_ROOT_DOMAINS`:** unset in both Vercel and Convex, so both use the defaults. If you
+   set it, set the **same** comma list in both: Next inlines it at build time and
+   `isAllowedHandoffOrigin` reads it in Convex. A mismatch breaks the auth handoff.
+4. **Password reset email** is broken today, unrelated to cutover: production Convex has no
+   `AUTH_RESEND_KEY`, and the sender `no-reply@tcg-decks.gg` (hyphenated) is not a registered domain.
+   Fix the sender to a verified Resend domain and set the key.
+5. PR #271 (`multi-game-platform` → `dev`) green and tested on its Vercel preview.
+
+### Cutover (in this order)
+
+Production frontend deploys from `master`; the Vercel build does not deploy Convex. Once the
+multi-game frontend is live, its middleware 301s `uvsdecks.gg` → `uvs.tcgdecks.gg`, so the
+`tcgdecks.gg` domains must be serving **before** `master` moves.
+
+1. **Convex:** deploy from `multi-game-platform` with owner approval. Diff
+   `convex function-spec` before and after.
+2. **Vercel domains:** detach `tcgdecks.gg` and `www.tcgdecks.gg` from the old `tcg-decks` project
+   (detach from the project; `vercel domains rm` removes the domain from the account). On
+   `uvs-decks-gg` add `tcgdecks.gg`, `uvs.tcgdecks.gg` and `cyberpunk.tcgdecks.gg` (production), and
+   `www.tcgdecks.gg`, `www.uvs.tcgdecks.gg`, `www.cyberpunk.tcgdecks.gg` as 308 redirects to their
+   bare host (the app would send `www.uvs…` to the apex picker). Keep `uvsdecks.gg` and
+   `www.uvsdecks.gg` attached with no redirect; the middleware handles them. Wait for the
+   certificates. Until step 3 these hosts serve the old app.
+3. **Ship:** merge #271 into `dev`, fast-forward `master` to `dev`, push.
+4. **Smoke test:** the `tcgdecks.gg` picker, sign-in on the apex handing off to `uvs.tcgdecks.gg`,
+   `cyberpunk.tcgdecks.gg`, `uvsdecks.gg/decks/<id>` landing on the same deck, every `www` host.
+
+Rollback: Vercel Instant Rollback to the previous production deployment. The Convex deploy can
+stay. Users are signed out once on the move (sessions are per host).
+
+### Follow-up
+
+Make `game`/`setup` required (schema fields **and** the public function `game` args, which are
+optional only for rolling-deploy compatibility), drop legacy deck fields, old indexes and the
+legacy-aware lookup fallbacks.
