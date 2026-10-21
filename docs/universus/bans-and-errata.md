@@ -1,10 +1,11 @@
 # UniVersus Formats — Ban Lists & Card Errata
 
-**Last fetched:** 2026-09-17 (America/Boise / America/Denver)  
+**Last fetched:** 2026-09-17 (America/Boise / America/Denver); ban lists and errata updated 2026-10-19 from the 10/06/2026 changelog  
 **Official page last updated:** 2026-09-07  
 **Primary source:** [Formats and Ban Lists](https://uvsgames.com/news/formats-and-ban-lists/) (living hub)  
 **Related official hubs:**
 - [Rules and Documents](https://uvsgames.com/universus/organized-play/rules-and-documents/)
+- [Ban and Errata Update 10/06/2026](https://uvsgames.com/news/ban-and-errata-update-10-06-2026/) (Standard: Violent Past, Genkai’s Guidance; Hero Too: those plus Channel Chaos; Retro: Channel Chaos; functional errata to Unlimited Psycho Crusher; effective 10/12/26)
 - [Ban and Errata Update 09/01/2026](https://uvsgames.com/news/ban-and-errata-update-09-01-2026/) (no changes; effective 09/07/26)
 - UVS Games site: [https://uvsgames.com/](https://uvsgames.com/)
 
@@ -124,7 +125,7 @@ Counts below are from the living Formats page as of the fetch date. Set codes in
 
 ### Standard Format — Banned Cards
 
-**Count: 10**
+**Count: 12**
 
 - YYHDT-27 Immortal Shapeshifter
 - YYHDTR-11 Mop Strike
@@ -136,12 +137,14 @@ Counts below are from the living Formats page as of the fetch date. Set codes in
 - AOT03-179 Unyielding Destruction
 - TMNT01-77 Equipment Heist
 - GDZ02-159 Battra Arrives
+- YYHDT-155 Genkai’s Guidance (effective 10/12/26)
+- TK802-29 Violent Past (effective 10/12/26)
 
 ### Hero Too Format — Banned Cards
 
 Hero Too uses the Standard ban list **plus** additional format-specific bans (and currently also lists Gravity-Beam Volley). Combined published list:
 
-**Count: 25**
+**Count: 28**
 
 - MHA01-024 Coordinated Effort
 - MHA01-045 Stronger In Darkness
@@ -168,6 +171,9 @@ Hero Too uses the Standard ban list **plus** additional format-specific bans (an
 - TMNT01-77 Equipment Heist
 - GDZ02-128 Gravity-Beam Volley
 - GDZ02-159 Battra Arrives
+- YYHDT-155 Genkai’s Guidance (effective 10/12/26)
+- TK802-29 Violent Past (effective 10/12/26)
+- TK802-25 Channel Chaos (effective 10/12/26)
 
 ### Spotlight Format (My Hero Academia) — Banned Cards
 
@@ -187,7 +193,7 @@ Hero Too uses the Standard ban list **plus** additional format-specific bans (an
 
 ### Retro Format — Banned Cards
 
-**Count: 84** (names as published; dots · / ·· indicate version markers on character names)
+**Count: 85** (names as published; dots · / ·· indicate version markers on character names)
 
 - A World Lost to Time
 - Amphibious
@@ -197,6 +203,7 @@ Hero Too uses the Standard ban list **plus** additional format-specific bans (an
 - Big Shot: Judy
 - Big Shot: Punch
 - · Cassandra ·
+- Channel Chaos (effective 10/12/26)
 - · Chin ·
 - Clandestine Research
 - Colossus’s Thermal Blast
@@ -352,6 +359,9 @@ First Form: Try to play a card with printed difficulty 5 from your discard pile 
 ### Standard Format – Functional Errata
 
 **Count: 39**
+
+#### Unlimited Psycho Crusher — SF621 #12
+Response [Card Pool]: After you mill 1 or more attack cards, your attack gets +1 speed and +1 damage. (Effective 10/12/26; was "this attack".)
 
 #### Absorbed Energy Spirit Strike — YYHDT #29
 Enhance: Your rival discards 1 momentum. If they did, this attack gets +X damage. X equals the difficulty of the top card of your rival’s discard pile.
@@ -1085,5 +1095,6 @@ With Character Traits (from MHA06: JetBurn), UVS retroactively assigns traits to
 5. Hero Too list includes **GDZ02-128 Gravity-Beam Volley** and **GDZ02-159 Battra Arrives** (set code GDZ02 as published), while Standard legal product list currently shows **GDZ01** Godzilla: Reign of Kaiju — codes copied as published.
 6. Full FAQ spreadsheet / complete rules PDFs may contain additional rulings that are **not** errata; this file covers bans + printed errata from the Formats hub only.
 7. Character Traits section is included because it lives on the same official Formats page under errata-adjacent living updates.
+8. **App data (synced 2026-10-19):** production `cardLegality` rows cover every list above except Spotlight. A ban applies to each printing, so reprints such as Mop Strike (YYH #4), One With Nature (Platinum #210) and Big Cyclone get their own rows. The official Retro list gives names only. For characters, the banned version was matched using [uvsultra.online](https://uvsultra.online/)'s per-printing format tags. Some banned entries have no matching printing in the catalog, so they have no row: Clandestine Research, Combat Ash, Meddling With Higher Powers, Slay Ride Stowaway, and the banned versions of · Liu Kang ·, · Twinkle Murdock · and ·· Zoey ··, which share a card number with a legal version.
 
 *Do not treat community wikis as primary over this document’s official sources.*
