@@ -41,7 +41,7 @@ function CardTile({ className }: { className?: string; delay?: number; animate?:
   return (
     <div
       className={cn(
-        "aspect-[5/7] rounded-lg border border-border/50 bg-card shadow-[var(--chrome-elevation-low)]",
+        "aspect-[5/7] rounded-lg border border-surface bg-card shadow-[var(--chrome-elevation-low)]",
         className
       )}
     >
@@ -58,8 +58,8 @@ function OpenStage({ active, animate }: StageProps) {
   return (
     <StageShell active={active} animate={animate}>
       <div className="relative w-full max-w-4xl">
-        <div className="absolute -left-8 top-8 h-40 w-40 rounded-full bg-primary/20 blur-3xl" />
-        <div className="absolute -right-4 bottom-0 h-48 w-48 rounded-full bg-secondary/20 blur-3xl" />
+        <div className="absolute -left-8 top-8 h-40 w-40 rounded-full bg-primary-selected blur-3xl" />
+        <div className="absolute -right-4 bottom-0 h-48 w-48 rounded-full bg-secondary-selected blur-3xl" />
         <div className="relative grid grid-cols-3 gap-3 md:gap-4">
           {[0, 1, 2, 3, 4, 5].map((i) => (
             <CardTile
@@ -78,11 +78,11 @@ function OpenStage({ active, animate }: StageProps) {
 function GalleryStage({ active, animate }: StageProps) {
   return (
     <StageShell active={active} animate={animate}>
-      <div className="w-full max-w-5xl overflow-hidden rounded-3xl border border-border/50 bg-background/80 shadow-[var(--chrome-elevation-mid)] backdrop-blur-md">
-        <div className="flex items-center gap-3 border-b border-border/40 px-4 py-3">
-          <div className="h-8 flex-1 rounded-full border border-[color:var(--control-dual-border)] bg-muted/30" />
-          <div className="hidden h-8 w-24 rounded-md border border-border/50 bg-card/80 sm:block" />
-          <div className="h-8 w-8 rounded-md border border-border/50 bg-card/80" />
+      <div className="w-full max-w-5xl overflow-hidden rounded-3xl border border-surface bg-background-elevated shadow-[var(--chrome-elevation-mid)] backdrop-blur-md">
+        <div className="flex items-center gap-3 border-b border-divider px-4 py-3">
+          <div className="h-8 flex-1 rounded-full border border-[color:var(--control-dual-border)] bg-muted-tint" />
+          <div className="hidden h-8 w-24 rounded-md border border-surface bg-card-elevated sm:block" />
+          <div className="h-8 w-8 rounded-md border border-surface bg-card-elevated" />
         </div>
         <div className="grid grid-cols-3 gap-3 p-4 sm:grid-cols-4 md:grid-cols-5 md:gap-4 md:p-6">
           {Array.from({ length: 10 }).map((_, i) => (
@@ -98,7 +98,7 @@ function DecksStage({ active, animate }: StageProps) {
   return (
     <StageShell active={active} animate={animate}>
       <div className="grid w-full max-w-5xl gap-3 md:grid-cols-[1.1fr_0.9fr] md:gap-4">
-        <div className="overflow-hidden rounded-3xl border border-border/50 bg-card/80 p-4 shadow-[var(--chrome-elevation-mid)] backdrop-blur-md md:p-6">
+        <div className="overflow-hidden rounded-3xl border border-surface bg-card-elevated p-4 shadow-[var(--chrome-elevation-mid)] backdrop-blur-md md:p-6">
           <p className="chrome-label-case mb-3 text-[10px] text-muted-foreground">Main</p>
           <div className="grid grid-cols-4 gap-2 md:grid-cols-5">
             {Array.from({ length: 10 }).map((_, i) => (
@@ -110,7 +110,7 @@ function DecksStage({ active, animate }: StageProps) {
           {["Side", "Reference"].map((label, lane) => (
             <div
               key={label}
-              className="rounded-2xl border border-border/50 bg-background/80 p-4 shadow-[var(--chrome-elevation-low)] backdrop-blur-md"
+              className="rounded-2xl border border-surface bg-background-elevated p-4 shadow-[var(--chrome-elevation-low)] backdrop-blur-md"
             >
               <p className="chrome-label-case mb-3 text-[10px] text-muted-foreground">{label}</p>
               <div className="grid grid-cols-3 gap-2">
@@ -129,27 +129,27 @@ function DecksStage({ active, animate }: StageProps) {
 function CollectionStage({ active, animate }: StageProps) {
   return (
     <StageShell active={active} animate={animate}>
-      <div className="w-full max-w-3xl space-y-3 rounded-3xl border border-border/50 bg-card/80 p-4 shadow-[var(--chrome-elevation-mid)] backdrop-blur-md md:p-6">
+      <div className="w-full max-w-3xl space-y-3 rounded-3xl border border-surface bg-card-elevated p-4 shadow-[var(--chrome-elevation-mid)] backdrop-blur-md md:p-6">
         {["Character", "Attack", "Foundation"].map((row, i) => (
           <m.div
             key={row}
             initial={animate && active ? { opacity: 0, x: -16 } : false}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.4, delay: 0.08 * i }}
-            className="flex items-center gap-3 rounded-xl border border-border/40 bg-background/60 p-3"
+            className="flex items-center gap-3 rounded-xl border border-divider bg-background-soft p-3"
           >
-            <div className="h-12 w-9 shrink-0 rounded-md border border-border/50 bg-gradient-to-br from-primary/30 to-muted/40" />
+            <div className="h-12 w-9 shrink-0 rounded-md border border-surface bg-gradient-to-br from-primary/30 to-muted/40" />
             <div className="min-w-0 flex-1 space-y-1.5">
               <div className="flex items-center justify-between gap-3">
                 <p className="chrome-label-case truncate text-sm font-semibold">{row}</p>
                 <span className="text-xs tabular-nums text-primary">×{4 + i * 3}</span>
               </div>
-              <div className="h-1.5 overflow-hidden rounded-full bg-muted/50">
+              <div className="h-1.5 overflow-hidden rounded-full bg-muted-soft">
                 <m.div
                   initial={animate && active ? { scaleX: 0 } : false}
                   animate={{ scaleX: (48 + i * 18) / 100 }}
                   transition={{ duration: 0.8, delay: 0.15 * i }}
-                  className="h-full w-full origin-left rounded-full bg-primary/70"
+                  className="h-full w-full origin-left rounded-full bg-primary-dim"
                 />
               </div>
             </div>
@@ -169,7 +169,7 @@ function CommunityStage({ active, animate }: StageProps) {
 
   return (
     <StageShell active={active} animate={animate}>
-      <div className="w-full max-w-4xl space-y-3 rounded-3xl border border-border/50 bg-background/80 p-4 shadow-[var(--chrome-elevation-mid)] backdrop-blur-md md:p-6">
+      <div className="w-full max-w-4xl space-y-3 rounded-3xl border border-surface bg-background-elevated p-4 shadow-[var(--chrome-elevation-mid)] backdrop-blur-md md:p-6">
         {lanes.map((lane, i) => (
           <m.div
             key={lane.label}
@@ -180,17 +180,17 @@ function CommunityStage({ active, animate }: StageProps) {
           >
             <div
               className={cn(
-                "flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-border/50 bg-gradient-to-br to-transparent text-lg font-bold",
+                "flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-surface bg-gradient-to-br to-transparent text-lg font-bold",
                 lane.tone
               )}
             >
               {lane.label}
             </div>
-            <div className="flex min-w-0 flex-1 gap-2 overflow-hidden rounded-xl border border-border/40 bg-card/60 p-2">
+            <div className="flex min-w-0 flex-1 gap-2 overflow-hidden rounded-xl border border-divider bg-card-soft p-2">
               {Array.from({ length: 5 - i }).map((_, card) => (
                 <div
                   key={card}
-                  className="aspect-[5/7] w-12 shrink-0 rounded-md border border-border/50 bg-card md:w-14"
+                  className="aspect-[5/7] w-12 shrink-0 rounded-md border border-surface bg-card md:w-14"
                 />
               ))}
             </div>
@@ -205,9 +205,9 @@ function TeamsStage({ active, animate }: StageProps) {
   return (
     <StageShell active={active} animate={animate}>
       <div className="grid w-full max-w-4xl gap-3 md:grid-cols-[0.9fr_1.1fr]">
-        <div className="rounded-3xl border border-border/50 bg-card/80 p-5 shadow-[var(--chrome-elevation-mid)] backdrop-blur-md">
+        <div className="rounded-3xl border border-surface bg-card-elevated p-5 shadow-[var(--chrome-elevation-mid)] backdrop-blur-md">
           <div className="mb-4 flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full border border-primary/40 bg-primary/15 text-lg font-bold text-primary">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full border border-primary-soft bg-primary-selected text-lg font-bold text-primary">
               T
             </div>
             <div>
@@ -222,14 +222,14 @@ function TeamsStage({ active, animate }: StageProps) {
                 initial={animate && active ? { opacity: 0, x: -10 } : false}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.35, delay: 0.08 * i }}
-                className="chrome-label-case rounded-lg border border-border/40 bg-background/60 px-3 py-2 text-xs text-muted-foreground"
+                className="chrome-label-case rounded-lg border border-divider bg-background-soft px-3 py-2 text-xs text-muted-foreground"
               >
                 {item}
               </m.div>
             ))}
           </div>
         </div>
-        <div className="rounded-3xl border border-border/50 bg-background/80 p-5 shadow-[var(--chrome-elevation-low)] backdrop-blur-md">
+        <div className="rounded-3xl border border-surface bg-background-elevated p-5 shadow-[var(--chrome-elevation-low)] backdrop-blur-md">
           <p className="chrome-label-case mb-3 text-[10px] text-muted-foreground">Shared Decks</p>
           <div className="grid grid-cols-2 gap-3">
             {Array.from({ length: 4 }).map((_, i) => (
@@ -238,7 +238,7 @@ function TeamsStage({ active, animate }: StageProps) {
                 initial={animate && active ? { opacity: 0, scale: 0.95 } : false}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.4, delay: 0.1 * i }}
-                className="rounded-xl border border-border/50 bg-card/70 p-3"
+                className="rounded-xl border border-surface bg-card-elevated p-3"
               >
                 <div className="mb-3 aspect-video rounded-lg bg-gradient-to-br from-primary/20 via-transparent to-secondary/20" />
                 <div className="h-1.5 w-2/3 rounded-full bg-foreground/20" />
@@ -255,7 +255,7 @@ function CloseStage({ active, animate }: StageProps) {
   return (
     <StageShell active={active} animate={animate}>
       <div className="relative flex w-full max-w-3xl flex-col items-center">
-        <div className="absolute inset-x-10 top-1/2 h-40 -translate-y-1/2 rounded-full bg-primary/15 blur-3xl" />
+        <div className="absolute inset-x-10 top-1/2 h-40 -translate-y-1/2 rounded-full bg-primary-selected blur-3xl" />
         <div className="relative grid w-full grid-cols-3 gap-3 md:gap-5">
           {[0, 1, 2].map((i) => (
             <CardTile

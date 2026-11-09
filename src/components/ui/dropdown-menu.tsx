@@ -42,8 +42,8 @@ function DropdownMenuContent({
         data-slot="dropdown-menu-content"
         sideOffset={sideOffset}
         className={cn(
-          "z-[300] max-h-(--radix-dropdown-menu-content-available-height) min-w-[8rem] origin-(--radix-dropdown-menu-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-lg border border-[color:var(--control-dual-border)] p-1.5",
-          "bg-popover/95 text-popover-foreground backdrop-blur-lg",
+          "z-select max-h-(--radix-dropdown-menu-content-available-height) min-w-[8rem] origin-(--radix-dropdown-menu-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-lg border border-[color:var(--control-dual-border)] p-1.5",
+          "bg-popover-overlay text-popover-foreground backdrop-blur-lg",
           "shadow-[var(--chrome-popover-shadow),var(--popover-dual-glow)]",
           "data-[state=open]:animate-in data-[state=closed]:animate-out",
           "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
@@ -82,7 +82,7 @@ function DropdownMenuItem({
       className={cn(
         "relative flex cursor-default items-center gap-2 rounded-md px-3 py-2 text-sm outline-hidden select-none transition-colors",
         "hover:bg-[color:var(--control-option-hover-bg)] hover:text-foreground focus:bg-[color:var(--control-option-hover-bg)] focus:text-foreground",
-        "data-[variant=destructive]:text-destructive data-[variant=destructive]:hover:bg-destructive/10 data-[variant=destructive]:focus:bg-destructive/10",
+        "data-[variant=destructive]:text-destructive data-[variant=destructive]:hover:bg-destructive-wash data-[variant=destructive]:focus:bg-destructive-wash",
         "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
         "data-[inset]:pl-8",
         "[&_svg:not([class*='text-'])]:text-muted-foreground",
@@ -254,7 +254,7 @@ function DropdownMenuSubContent({
       <DropdownMenuPrimitive.SubContent
         data-slot="dropdown-menu-sub-content"
         className={cn(
-          "z-[300] min-w-[8rem] origin-(--radix-dropdown-menu-content-transform-origin) overflow-hidden rounded-lg border border-[color:var(--control-dual-border)] p-1.5",
+          "z-select min-w-[8rem] origin-(--radix-dropdown-menu-content-transform-origin) overflow-hidden rounded-lg border border-[color:var(--control-dual-border)] p-1.5",
           "bg-popover text-popover-foreground",
           "shadow-[var(--chrome-popover-shadow),var(--popover-dual-glow)]",
           "data-[state=open]:animate-in data-[state=closed]:animate-out",

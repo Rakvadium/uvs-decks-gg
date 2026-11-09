@@ -1,6 +1,5 @@
 {
     "setup-worktree": [
-        "bun install",
-        "Copy-Item \"$env:ROOT_WORKTREE_PATH\\.env.local\" .env.local"
+        "bun run agent:setup --port auto"
     ]
 }

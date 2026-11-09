@@ -1,6 +1,9 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "../styles/base.css";
+@import "../styles/features/decks.css";
+@import "../styles/features/gallery.css";
+@import "../styles/system/ladders.css";
 @import "../styles/themes/default.css";
 @import "../styles/themes/calm-storm.css";
 @import "../styles/themes/cyberpunk.css";

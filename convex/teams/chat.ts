@@ -1,13 +1,17 @@
 import { paginationOptsValidator } from "convex/server";
 import { mutation, query } from "../_generated/server";
 import { v } from "convex/values";
-import { teamChatMessageValidator } from "../validators";
+import {
+  memberTeamChatMessageFromDocument,
+  memberTeamChatMessageValidator,
+  type MemberTeamChatMessage,
+} from "../validators";
 import { isPublishTextModerationEnabled } from "../lib/moderation/textPublish";
 import { getTeamViewerOrNull, hasCapability, requireCapability } from "./permissions";
 import { requireUserCanPostContent } from "../utils/validation";
 
 const messageWithAuthorValidator = v.object({
-  message: teamChatMessageValidator,
+  message: memberTeamChatMessageValidator,
   authorUsername: v.optional(v.string()),
 });
 
@@ -33,13 +37,13 @@ export const listPage = query({
       .order("desc")
       .paginate({ numItems, cursor: args.paginationOpts.cursor });
     const page: Array<{
-      message: (typeof result.page)[0];
+      message: MemberTeamChatMessage;
       authorUsername?: string;
     }> = [];
     for (const message of result.page) {
       const u = await ctx.db.get(message.authorUserId);
       page.push({
-        message,
+        message: memberTeamChatMessageFromDocument(message),
         authorUsername: u?.username ?? undefined,
       });
     }

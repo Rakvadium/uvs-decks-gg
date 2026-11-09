@@ -8,11 +8,11 @@ const cardVariantStyles: Record<CardVariant, string> = {
   fx: cn(
     "shadow-[var(--chrome-card-shadow)] hover:shadow-[var(--chrome-card-shadow-hover)]",
     "hover:border-[var(--chrome-card-border-hover)] transition-[border-color,box-shadow,background-color,opacity] duration-150",
-    "before:absolute before:inset-0 before:rounded-lg before:bg-gradient-to-br before:from-primary/5 before:to-transparent before:opacity-0 before:transition-opacity before:duration-150 hover:before:opacity-100",
+    "before:absolute before:inset-0 before:rounded-lg before:bg-gradient-to-br before:from-primary/10 before:to-transparent before:opacity-0 before:transition-opacity before:duration-150 hover:before:opacity-100",
   ),
   quiet: cn(
     "shadow-[var(--chrome-elevation-low)] hover:shadow-[var(--chrome-elevation-mid)]",
-    "hover:border-border/50 transition-[border-color,box-shadow,background-color,opacity] duration-150",
+    "hover:border-surface transition-[border-color,box-shadow,background-color,opacity] duration-150",
   ),
 }
 
@@ -25,8 +25,8 @@ function Card({ className, variant = "fx", ...props }: CardProps) {
     <div
       data-slot="card"
       className={cn(
-        "group relative bg-card/80 text-card-foreground flex flex-col gap-6 py-6 backdrop-blur-sm",
-        "border border-border/50 rounded-lg",
+        "group relative bg-card-elevated text-card-foreground flex flex-col gap-6 py-6 backdrop-blur-sm",
+        "border border-surface rounded-lg",
         "overflow-hidden",
         cardVariantStyles[variant],
         className
@@ -113,7 +113,7 @@ function CardFooter({ className, ...props }: React.ComponentProps<"div">) {
       data-slot="card-footer"
       className={cn(
         "relative z-10 flex items-center px-6 [.border-t]:pt-6",
-        "border-t border-border/30 pt-4",
+        "border-t border-hairline pt-4",
         className
       )}
       {...props}

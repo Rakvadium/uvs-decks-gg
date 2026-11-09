@@ -1,4 +1,5 @@
 import type { Doc } from "../_generated/dataModel";
+import { isReservedAgentUser } from "./reservedIdentity";
 
 export const ACCOUNT_STATUSES = [
   "active",
@@ -37,6 +38,14 @@ export function userCanUpdateProfile(status: AccountStatusValue): boolean {
 
 export function isAdminRole(role: string | undefined): boolean {
   return role === "Admin";
+}
+
+/** Admin role on a non-reserved account. Use this for every admin gate. */
+export function isEffectiveAdmin(
+  user: Pick<Doc<"users">, "role" | "email"> | null | undefined
+): boolean {
+  if (!user) return false;
+  return isAdminRole(user.role) && !isReservedAgentUser(user);
 }
 
 export function buildAdminSearchText(

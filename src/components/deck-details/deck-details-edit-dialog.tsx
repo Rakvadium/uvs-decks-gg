@@ -1,7 +1,7 @@
 "use client";
 
 import { Loader2 } from "lucide-react";
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useRef } from "react";
 import { useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import {
@@ -97,6 +97,8 @@ export function DeckDetailsEditDialog() {
   } = useDeckDetailsTopBarContext();
 
   const formats = useQuery(api.formats.list);
+  // Opened from provider state, not a DialogTrigger, so Radix has no trigger to refocus on close.
+  const returnFocusRef = useRef<HTMLElement | null>(null);
 
   const dialogOpen = Boolean(isOwner && isEditing);
 
@@ -172,6 +174,17 @@ export function DeckDetailsEditDialog() {
             </div>
           </div>
         }
+        onOpenAutoFocus={() => {
+          returnFocusRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+        }}
+        onCloseAutoFocus={(event) => {
+          const target = returnFocusRef.current;
+          returnFocusRef.current = null;
+          if (target?.isConnected) {
+            event.preventDefault();
+            target.focus();
+          }
+        }}
         onPointerDownOutside={(event) => {
           if (isSaving) event.preventDefault();
         }}

@@ -3,6 +3,7 @@ import { convexAuth } from "@convex-dev/auth/server";
 import { ConvexError } from "convex/values";
 import { z } from "zod";
 import { passwordRequirementError } from "./lib/password";
+import { isReservedAgentEmail } from "./lib/reservedIdentity";
 import { ResendOTPPasswordReset } from "./ResendOTPPasswordReset";
 
 const SignUpProfileSchema = z.object({
@@ -25,6 +26,10 @@ function normalizeAuthEmail(email: unknown): string {
 const passwordProvider = Password({
   profile(params): { email: string } | { email: string; username: string } {
     const email = normalizeAuthEmail(params.email);
+    // Runs for every password flow (signUp, signIn, reset, ...).
+    if (isReservedAgentEmail(email)) {
+      throw new ConvexError("This account cannot use password sign-in.");
+    }
     if (params.flow === "signUp") {
       const username =
         typeof params.username === "string" ? params.username.trim() : params.username;

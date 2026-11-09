@@ -29,6 +29,7 @@ import { Input } from "@/components/ui/input";
 import { COMMUNITY_TIER_RANKING, getRankingScopeLabel } from "../../../../../shared/app-config";
 import { ChevronDown, Edit3, Globe, Loader2, Lock, Save, Trash2, X } from "lucide-react";
 import { useProfanityDisplayText } from "@/lib/moderation/use-profanity-display-text";
+import { TierListModerationBadge } from "../moderation-badge";
 import { useCommunityTierListDetailContext } from "./context";
 
 export function CommunityTierListDetailFloatingTopBar() {
@@ -147,6 +148,10 @@ export function CommunityTierListDetailFloatingTopBar() {
             </FloatingCapsuleCluster>
             <FloatingCapsuleCluster>
               {publicityControl}
+              <TierListModerationBadge
+                status={detail.listModerationStatus}
+                className="h-8 shrink-0 items-center gap-1.5 rounded-full px-2.5 text-[10px]"
+              />
               {rankingScopeControl}
             </FloatingCapsuleCluster>
           </>
@@ -192,7 +197,7 @@ export function CommunityTierListDetailFloatingTopBar() {
                     <AlertDialogFooter>
                       <AlertDialogCancel>Cancel</AlertDialogCancel>
                       <AlertDialogAction
-                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        variant="destructive"
                         onClick={() => void handleDelete()}
                       >
                         {isDeleting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}

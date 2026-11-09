@@ -1,12 +1,10 @@
-import { convexAuthNextjsMiddleware, createRouteMatcher, nextjsMiddlewareRedirect } from "@convex-dev/auth/nextjs/server";
+import { convexAuthNextjsMiddleware } from "@convex-dev/auth/nextjs/server";
+import { signedInPageRedirect } from "@/lib/agent-auth-middleware";
 
-const isPublicPage = createRouteMatcher(["/sign-in", "/sign-up", "/agent-login"]);
 const AUTH_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 30;
 
 export default convexAuthNextjsMiddleware(async (request, { convexAuth }) => {
-  if (isPublicPage(request) && await convexAuth.isAuthenticated()) {
-    return nextjsMiddlewareRedirect(request, "/home");
-  }
+  return signedInPageRedirect(request, () => convexAuth.isAuthenticated());
 }, {
   cookieConfig: {
     maxAge: AUTH_COOKIE_MAX_AGE_SECONDS,

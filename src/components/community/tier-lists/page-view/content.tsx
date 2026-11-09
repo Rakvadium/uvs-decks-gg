@@ -48,9 +48,10 @@ export function CommunityTierListsPageView() {
               <TierListBrowserCard
                 key={entry.tierList._id}
                 tierList={entry.tierList}
-                authorLabel={entry.author?.username ?? entry.author?.email ?? "Unknown duelist"}
+                authorLabel={entry.author?.username ?? "Unknown duelist"}
                 cardMap={cardMap}
                 href={`/community/tier-lists/${entry.tierList._id}`}
+                moderationStatus={entry.listModerationStatus}
               />
             ))}
           </div>
@@ -63,6 +64,7 @@ export function CommunityTierListsPageView() {
                 authorLabel="Your list"
                 cardMap={cardMap}
                 href={`/community/tier-lists/${tierList._id}`}
+                moderationStatus={tierList.listModerationStatus}
               />
             ))}
           </div>

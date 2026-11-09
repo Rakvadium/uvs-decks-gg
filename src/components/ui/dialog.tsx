@@ -97,7 +97,7 @@ const dialogSizeStyles = {
   "content-xl": "md:w-full md:min-w-0 md:max-w-3xl",
 }
 
-export const overlayScrimClassName = "fixed inset-0 z-50 bg-background/50 backdrop-blur-[2px]"
+export const overlayScrimClassName = "fixed inset-0 z-modal bg-background-soft backdrop-blur-[2px]"
 
 type DialogSize = keyof typeof dialogSizeStyles
 
@@ -152,10 +152,9 @@ function DialogContent({
       <DialogPrimitive.Content
         data-slot="dialog-content"
         className={cn(
-          "fixed z-50 duration-200 overflow-x-hidden flex flex-col",
-          !isPlain &&
-            "shadow-lg md:shadow-[0_0_2px_var(--primary)/40,0_0_12px_var(--primary)/50,0_0_28px_var(--primary)/12]",
-          !isPlain && "bg-card/95 backdrop-blur-lg border-primary/20",
+          "fixed z-modal duration-200 overflow-x-hidden flex flex-col",
+          !isPlain && "shadow-lg md:shadow-none",
+          !isPlain && "bg-card-overlay backdrop-blur-lg border-primary-soft",
           isPlain &&
             "border-0 bg-transparent shadow-none backdrop-blur-none md:border-0 md:shadow-none",
           "data-[state=open]:animate-in data-[state=closed]:animate-out",
@@ -174,8 +173,8 @@ function DialogContent({
       >
         {!isPlain ? (
           <>
-            <div className="pointer-events-none absolute inset-0 rounded-lg bg-gradient-to-br from-primary/5 via-transparent to-secondary/5" />
-            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+            <div className="pointer-events-none absolute inset-0 rounded-lg bg-gradient-to-br from-primary/10 via-transparent to-secondary/10" />
+            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
           </>
         ) : null}
         <div
@@ -202,8 +201,8 @@ function DialogContent({
                 footerMobileOnly
                   ? "pointer-events-none fixed inset-x-0 bottom-0 z-20 flex justify-end bg-transparent p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] md:hidden"
                   : cn(
-                      "flex-col-reverse gap-2 border-t border-border/30 px-4 pt-5 sm:flex-row sm:justify-end md:px-6 md:pt-5 md:pb-6",
-                      "max-md:fixed max-md:bottom-0 max-md:left-0 max-md:right-0 max-md:z-20 max-md:bg-card/95 max-md:backdrop-blur-lg max-md:p-4 max-md:pb-[max(1rem,env(safe-area-inset-bottom))]",
+                      "flex-col-reverse gap-2 border-t border-hairline px-4 pt-5 sm:flex-row sm:justify-end md:px-6 md:pt-5 md:pb-6",
+                      "max-md:fixed max-md:bottom-0 max-md:left-0 max-md:right-0 max-md:z-20 max-md:bg-card-overlay max-md:backdrop-blur-lg max-md:p-4 max-md:pb-[max(1rem,env(safe-area-inset-bottom))]",
                       "md:relative md:z-10"
                     )
               )}
@@ -215,7 +214,7 @@ function DialogContent({
         {showCloseButton && (
           <DialogPrimitive.Close
             data-slot="dialog-close"
-            className="pointer-events-auto flex absolute top-4 right-4 z-[100] h-8 w-8 rounded-md items-center justify-center opacity-70 transition-colors hover:opacity-100 hover:bg-primary/10 hover:text-primary focus:ring-2 focus:ring-primary/30 focus:outline-hidden disabled:pointer-events-none border border-transparent hover:border-primary/30"
+            className="pointer-events-auto flex absolute top-4 right-4 z-chrome h-8 w-8 rounded-md items-center justify-center opacity-70 transition-colors hover:opacity-100 hover:bg-primary-wash hover:text-primary focus:ring-2 focus:ring-primary-soft focus:outline-hidden disabled:pointer-events-none border border-transparent hover:border-primary-soft"
           >
             <XIcon className="h-4 w-4" />
             <span className="sr-only">Close</span>
@@ -231,7 +230,7 @@ function DialogHeader({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="dialog-header"
       className={cn(
-        "flex flex-col gap-2 text-center sm:text-left pb-4 border-b border-border/30",
+        "flex flex-col gap-2 text-center sm:text-left pb-4 border-b border-hairline",
         className
       )}
       {...props}
@@ -257,8 +256,8 @@ function DialogFooter({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="dialog-footer"
       className={cn(
-        "flex w-full shrink-0 flex-col-reverse gap-2 border-t border-border/30 pt-5 sm:flex-row sm:justify-end md:pb-5",
-        "max-md:fixed max-md:bottom-0 max-md:left-0 max-md:right-0 max-md:z-20 max-md:border-0 max-md:bg-card/95 max-md:backdrop-blur-lg max-md:px-4 max-md:pt-4 max-md:pb-[max(1rem,env(safe-area-inset-bottom))]",
+        "flex w-full shrink-0 flex-col-reverse gap-2 border-t border-hairline pt-5 sm:flex-row sm:justify-end md:pb-5",
+        "max-md:fixed max-md:bottom-0 max-md:left-0 max-md:right-0 max-md:z-20 max-md:border-0 max-md:bg-card-overlay max-md:backdrop-blur-lg max-md:px-4 max-md:pt-4 max-md:pb-[max(1rem,env(safe-area-inset-bottom))]",
         "md:relative md:z-10",
         className
       )}

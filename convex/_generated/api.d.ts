@@ -54,6 +54,7 @@ import type * as lib_moderation_providers from "../lib/moderation/providers.js";
 import type * as lib_moderation_textPublish from "../lib/moderation/textPublish.js";
 import type * as lib_normalizeAbilityText from "../lib/normalizeAbilityText.js";
 import type * as lib_r2Keys from "../lib/r2Keys.js";
+import type * as lib_reservedIdentity from "../lib/reservedIdentity.js";
 import type * as lib_username from "../lib/username.js";
 import type * as mediaAssetActions from "../mediaAssetActions.js";
 import type * as mediaAssets from "../mediaAssets.js";
@@ -145,6 +146,7 @@ declare const fullApi: ApiFromModules<{
   "lib/moderation/textPublish": typeof lib_moderation_textPublish;
   "lib/normalizeAbilityText": typeof lib_normalizeAbilityText;
   "lib/r2Keys": typeof lib_r2Keys;
+  "lib/reservedIdentity": typeof lib_reservedIdentity;
   "lib/username": typeof lib_username;
   mediaAssetActions: typeof mediaAssetActions;
   mediaAssets: typeof mediaAssets;

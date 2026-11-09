@@ -94,7 +94,7 @@ export function useCommunityTierListsPageModel() {
         matchesTierListSearch({
           search: normalizedSearch,
           tierList: entry.tierList,
-          authorLabel: entry.author?.username ?? entry.author?.email ?? null,
+          authorLabel: entry.author?.username ?? null,
         })
       ),
     [normalizedSearch, publicLists]
