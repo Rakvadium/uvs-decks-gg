@@ -16,7 +16,8 @@ import { api } from "../../../convex/_generated/api";
 import { Id, Doc } from "../../../convex/_generated/dataModel";
 import type { DeckSetupPatch } from "@shared/games/deck";
 import { useCardIndex } from "@/lib/universus/card-data-provider";
-import { canAddCardToSection, canMoveCardToSection } from "./card-eligibility";
+import { canAddCardToSection, canMoveCardToSection, type DeckSectionCounts } from "./card-eligibility";
+import { useDeckEditorCounts } from "./use-deck-editor-counts";
 import {
   type DeckTeamSharing,
   type DeckVisibility,
@@ -50,6 +51,8 @@ interface SiloedDeckContextValue {
   sideCounts: Record<string, number>;
   referenceCounts: Record<string, number>;
   allCounts: Record<string, number>;
+  /** Section counts for `canAddCardToSection` / `canMoveCardToSection` (copy limits across printings). */
+  sectionCounts: DeckSectionCounts;
   addCard: (cardId: Id<"cards">, section?: DeckSection) => Promise<void>;
   removeCard: (cardId: Id<"cards">, section: DeckSection) => Promise<void>;
   moveCard: (cardId: Id<"cards">, fromSection: DeckSection, toSection: DeckSection, quantity?: number) => Promise<void>;
@@ -114,10 +117,7 @@ export function SiloedDeckProvider({ children, deckId }: SiloedDeckProviderProps
     return counts;
   }, [mainCounts, sideCounts, referenceCounts]);
 
-  const sectionCounts = useMemo(
-    () => ({ mainCounts, sideCounts, referenceCounts }),
-    [mainCounts, sideCounts, referenceCounts]
-  );
+  const sectionCounts = useDeckEditorCounts(deck, { mainCounts, sideCounts, referenceCounts }, cardIndex);
 
   const canAddToSection = useCallback(
     (cardId: Id<"cards">, section: DeckSection, quantity?: number) => {
@@ -283,6 +283,7 @@ export function SiloedDeckProvider({ children, deckId }: SiloedDeckProviderProps
       sideCounts,
       referenceCounts,
       allCounts,
+      sectionCounts,
       addCard,
       removeCard,
       moveCard,
@@ -301,6 +302,7 @@ export function SiloedDeckProvider({ children, deckId }: SiloedDeckProviderProps
       sideCounts,
       referenceCounts,
       allCounts,
+      sectionCounts,
       addCard,
       removeCard,
       moveCard,

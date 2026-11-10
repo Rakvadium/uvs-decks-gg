@@ -17,7 +17,8 @@ import { Id, Doc } from "../../convex/_generated/dataModel";
 import type { DeckSetupPatch } from "@shared/games/deck";
 import { useUIState } from "./UIStateProvider";
 import { useCardIndex } from "@/lib/universus/card-data-provider";
-import { canAddCardToSection, canMoveCardToSection } from "@/lib/deck";
+import { canAddCardToSection, canMoveCardToSection, type DeckSectionCounts } from "@/lib/deck";
+import { useDeckEditorCounts } from "@/lib/deck/use-deck-editor-counts";
 import {
   type DeckVisibility,
   deckRevisionNumber,
@@ -48,6 +49,8 @@ interface ActiveDeckContextValue {
   sideCounts: Record<string, number>;
   referenceCounts: Record<string, number>;
   allCounts: Record<string, number>;
+  /** Section counts for `canAddCardToSection` / `canMoveCardToSection` (copy limits across printings). */
+  sectionCounts: DeckSectionCounts;
   getCardCount: (cardId: string) => number;
   getCardSection: (cardId: string) => DeckSection | null;
   getTotalCardCount: () => number;
@@ -70,6 +73,7 @@ const ActiveDeckContext = createContext<ActiveDeckContextValue>({
   sideCounts: {},
   referenceCounts: {},
   allCounts: {},
+  sectionCounts: { mainCounts: {}, sideCounts: {}, referenceCounts: {} },
   getCardCount: () => 0,
   getCardSection: () => null,
   getTotalCardCount: () => 0,
@@ -136,10 +140,7 @@ export function ActiveDeckProvider({ children }: ActiveDeckProviderProps) {
     return counts;
   }, [mainCounts, sideCounts, referenceCounts]);
 
-  const sectionCounts = useMemo(
-    () => ({ mainCounts, sideCounts, referenceCounts }),
-    [mainCounts, sideCounts, referenceCounts]
-  );
+  const sectionCounts = useDeckEditorCounts(activeDeck, { mainCounts, sideCounts, referenceCounts }, cardIndex);
 
   const canAddToSection = useCallback(
     (cardId: Id<"cards">, section: DeckSection, quantity?: number) => {
@@ -323,6 +324,7 @@ export function ActiveDeckProvider({ children }: ActiveDeckProviderProps) {
       sideCounts,
       referenceCounts,
       allCounts,
+      sectionCounts,
       getCardCount,
       getCardSection,
       getTotalCardCount,
@@ -344,6 +346,7 @@ export function ActiveDeckProvider({ children }: ActiveDeckProviderProps) {
       sideCounts,
       referenceCounts,
       allCounts,
+      sectionCounts,
       getCardCount,
       getCardSection,
       getTotalCardCount,

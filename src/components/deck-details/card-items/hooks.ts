@@ -1,13 +1,8 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { useDeckEditor } from "@/lib/deck";
 
 export function useDeckSectionCounts() {
-  const { mainCounts, sideCounts, referenceCounts } = useDeckEditor();
-
-  return useMemo(
-    () => ({ mainCounts, sideCounts, referenceCounts }),
-    [mainCounts, sideCounts, referenceCounts]
-  );
+  return useDeckEditor().sectionCounts;
 }
 
 export function useCardDetailsDialogTrigger() {

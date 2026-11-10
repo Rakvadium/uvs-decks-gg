@@ -56,6 +56,7 @@ export function ActiveDeckSectionsProvider({
     removeCard,
     moveCard,
     getSectionCardCount,
+    sectionCounts,
   } = useActiveDeck();
   const { cards: allCards } = useCardData();
   const cardMap = useCardIdMap(allCards);
@@ -80,18 +81,6 @@ export function ActiveDeckSectionsProvider({
     ]
   );
 
-  const sectionCounts = useMemo<DeckSectionCounts>(
-    () => ({
-      mainCounts: activeDeck?.mainQuantities ?? {},
-      sideCounts: activeDeck?.sideQuantities ?? {},
-      referenceCounts: activeDeck?.referenceQuantities ?? {},
-    }),
-    [
-      activeDeck?.mainQuantities,
-      activeDeck?.referenceQuantities,
-      activeDeck?.sideQuantities,
-    ]
-  );
 
   const getBackCard = useCallback(
     (card: CachedCard): CachedCard | null => {

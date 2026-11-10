@@ -5,6 +5,7 @@ import { Doc, Id } from "../../../convex/_generated/dataModel";
 import type { DeckSetupPatch } from "@shared/games/deck";
 import { useActiveDeck } from "@/providers/ActiveDeckProvider";
 import type { DeckVisibility } from "@/lib/deck/visibility";
+import type { DeckSectionCounts } from "./card-eligibility";
 import { useSiloedDeckOptional } from "./siloed-deck-context";
 
 type Deck = Doc<"decks">;
@@ -28,6 +29,8 @@ interface DeckEditorContextValue {
   sideCounts: Record<string, number>;
   referenceCounts: Record<string, number>;
   allCounts: Record<string, number>;
+  /** Pass as `counts` to `canAddCardToSection` / `canMoveCardToSection`; counts copies across printings. */
+  sectionCounts: DeckSectionCounts;
   getCardCount: (cardId: string) => number;
   getCardSection: (cardId: string) => DeckSection | null;
   getTotalCardCount: () => number;
@@ -40,6 +43,8 @@ interface DeckEditorContextValue {
   teamEditableWriteConflict: boolean;
   dismissTeamEditableWriteConflict: () => void;
 }
+
+const EMPTY_SECTION_COUNTS: DeckSectionCounts = { mainCounts: {}, sideCounts: {}, referenceCounts: {} };
 
 function repeat(times: number, action: () => void) {
   if (times <= 0) return;
@@ -65,6 +70,7 @@ export function useDeckEditor(): DeckEditorContextValue {
     sideCounts: active.sideCounts,
     referenceCounts: active.referenceCounts,
     allCounts: active.allCounts,
+    sectionCounts: active.sectionCounts,
     getCardCount: active.getCardCount,
     getCardSection: active.getCardSection,
     getTotalCardCount: active.getTotalCardCount,
@@ -85,6 +91,7 @@ export function useDeckEditor(): DeckEditorContextValue {
     active.sideCounts,
     active.referenceCounts,
     active.allCounts,
+    active.sectionCounts,
     active.getCardCount,
     active.getCardSection,
     active.getTotalCardCount,
@@ -151,6 +158,7 @@ export function useDeckEditor(): DeckEditorContextValue {
     sideCounts: siloed?.sideCounts ?? {},
     referenceCounts: siloed?.referenceCounts ?? {},
     allCounts: siloed?.allCounts ?? {},
+    sectionCounts: siloed?.sectionCounts ?? EMPTY_SECTION_COUNTS,
     getCardCount: getSiloedCardCount,
     getCardSection: (cardId: string) => siloed?.getCardSection(cardId as Id<"cards">) ?? null,
     getTotalCardCount: () => siloed?.getTotalCardCount() ?? 0,

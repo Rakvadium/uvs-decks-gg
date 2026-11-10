@@ -3,6 +3,7 @@ export {
   canAddCardToDeck,
   canAddCardToSection,
   canMoveCardToSection,
+  buildCopiesTowardLimit,
   getCardCopyLimit,
   getCardSectionCounts,
 } from "@shared/games/uvs/card-eligibility";
