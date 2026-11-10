@@ -493,6 +493,9 @@ builders, `sanitizeSameOriginPath`, code checks, hint cookie) live in `shared/au
 
 ## Rollout / ops (human)
 
+**Cutover completed 2026-11-10.** PR #271 is merged, `master` matches `dev`, and production Convex
+is deployed from `dev`. The steps below are kept as a record; don't deploy from `multi-game-platform`.
+
 Done before cutover (checked 2026-10-21): production Convex already runs the multi-game functions,
 the `migrateDeckSetup` and `backfillGameField` migrations ran, and catalogs are published for both
 games (`catalog/uvs/v31`, `catalog/cyberpunk/v2`). The merged branch exports the same Convex
