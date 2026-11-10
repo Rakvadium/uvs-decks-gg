@@ -2,7 +2,7 @@ import { useCallback, useState, type FormEvent } from "react";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { ConvexError } from "convex/values";
 import { toast } from "sonner";
-import { INVALID_PASSWORD } from "../../../../convex/errors";
+import { passwordRequirementError } from "../../../../convex/lib/password";
 import { clearAuthCookies, isRefreshTokenParseError } from "../auth-recovery";
 
 export function useSignUpDialogModel(onSuccess: () => void) {
@@ -18,6 +18,13 @@ export function useSignUpDialogModel(onSuccess: () => void) {
       const formData = new FormData(form);
       if (formData.get("password") !== formData.get("confirmPassword")) {
         toast.error("Passwords do not match");
+        setSubmitting(false);
+        return;
+      }
+      const password = formData.get("password");
+      const passwordError = passwordRequirementError(typeof password === "string" ? password : "");
+      if (passwordError) {
+        toast.error(passwordError);
         setSubmitting(false);
         return;
       }
@@ -67,11 +74,7 @@ export function useSignUpDialogModel(onSuccess: () => void) {
           }
         }
         console.error(error);
-        const toastTitle =
-          error instanceof ConvexError && error.data === INVALID_PASSWORD
-            ? "Invalid password - check the requirements and try again."
-            : "Could not create account";
-        toast.error(toastTitle);
+        toast.error(signUpErrorMessage(error));
       } finally {
         setSubmitting(false);
       }
@@ -83,4 +86,11 @@ export function useSignUpDialogModel(onSuccess: () => void) {
     submitting,
     handleSubmit,
   };
+}
+
+function signUpErrorMessage(error: unknown): string {
+  if (error instanceof ConvexError && typeof error.data === "string") {
+    return error.data;
+  }
+  return "Could not create account. If this email is already registered, try signing in.";
 }

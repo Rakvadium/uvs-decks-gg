@@ -4,6 +4,7 @@ import { PageHeading } from "@/components/ui/typography-headings";
 import { ArrowLeft, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PASSWORD_REQUIREMENTS } from "../../../../convex/lib/password";
 import type { AuthDialogFlow } from "../dialog-flow";
 import { useSignUpDialogModel } from "./hook";
 
@@ -41,7 +42,16 @@ export function SignUpFormDialog({
         <div className="mt-4 flex items-center justify-between py-1">
           <label htmlFor="dialog-signup-password">Password</label>
         </div>
-        <Input type="password" name="password" id="dialog-signup-password" autoComplete="new-password" />
+        <Input
+          type="password"
+          name="password"
+          id="dialog-signup-password"
+          autoComplete="new-password"
+          aria-describedby="dialog-signup-password-hint"
+        />
+        <p id="dialog-signup-password-hint" className="mt-1 text-sm text-muted-foreground">
+          {PASSWORD_REQUIREMENTS}
+        </p>
         <div className="mt-4 flex items-center justify-between py-1">
           <label htmlFor="dialog-confirmPassword">Confirm password</label>
         </div>

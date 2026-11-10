@@ -4,6 +4,7 @@ import { convexAuth } from "@convex-dev/auth/server";
 import { ConvexError } from "convex/values";
 import { z } from "zod";
 import { internal } from "./_generated/api";
+import { passwordRequirementError } from "./lib/password";
 import { isReservedAgentEmail } from "./lib/reservedIdentity";
 import { ResendOTPPasswordReset } from "./ResendOTPPasswordReset";
 import {
@@ -42,7 +43,7 @@ const passwordProvider = Password({
         typeof params.username === "string" ? params.username.trim() : params.username;
       const parsed = SignUpProfileSchema.safeParse({ email, username });
       if (!parsed.success) {
-        throw new ConvexError(parsed.error.format());
+        throw new ConvexError(parsed.error.issues[0]?.message ?? "Invalid sign-up details");
       }
       return {
         email: parsed.data.email,
@@ -52,8 +53,9 @@ const passwordProvider = Password({
     return { email };
   },
   validatePasswordRequirements: (password: string) => {
-    if (password.length < 8 || !/\d/.test(password)) {
-      throw new ConvexError("Password must be at least 8 characters with a number");
+    const message = passwordRequirementError(password);
+    if (message) {
+      throw new ConvexError(message);
     }
   },
   reset: ResendOTPPasswordReset,
