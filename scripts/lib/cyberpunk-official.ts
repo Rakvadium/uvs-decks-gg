@@ -74,6 +74,7 @@ export const OFFICIAL_SET_CODE_MAP: Record<string, SetInfo> = {
   edgerunneropens1: { code: "EO-S1", name: "Edgerunner Open S1", setNumber: 8 },
   nightcitybrawls1: { code: "NCB-S1", name: "Night City Brawl S1", setNumber: 8.1 },
   nightcityshowdowns1: { code: "NCS-S1", name: "Night City Showdown S1", setNumber: 8.2 },
+  judgepromos: { code: "JUDGE", name: "Judge Promos", setNumber: 9 },
 };
 
 /** Fallback for sets missing from the map: a sanitized upper-case official code (with a warning). */
