@@ -3,9 +3,11 @@
 import { useQuery, useAction } from "convex/react";
 import { useEffect, useRef } from "react";
 import { api } from "../../../../../convex/_generated/api";
+import { useGameId } from "@/games/game-context";
 
 export function useCommunityMediaFeedModel() {
-  const feed = useQuery(api.communityYoutube.getFeed, {});
+  const game = useGameId();
+  const feed = useQuery(api.communityYoutube.getFeed, { game });
   const bootstrap = useAction(api.communityYoutube.bootstrapYoutubeCurationIds);
   const refresh = useAction(api.communityYoutube.requestClientRefresh);
 

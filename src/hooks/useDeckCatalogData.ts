@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { useConvexAuth, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import type { DeckListItem } from "@/components/decks/deck-grid-item/types";
+import { useGameId } from "@/games/game-context";
 
 export type DeckTab = "my-decks" | "public" | "tournament";
 
@@ -12,22 +13,27 @@ export function useDeckCatalogData(searchQuery: string, activeTab: DeckTab) {
   const user = useQuery(api.user.currentUser, isAuthenticated ? {} : "skip");
   const deckSearch = searchQuery.trim();
 
-  const myDecksAll = useQuery(api.decks.listByUser, user ? { userId: user._id } : "skip");
-  const publicDecksAll = useQuery(api.decks.listPublic, {});
-  const tournamentDecksAll = useQuery(api.decks.listTournament, {});
+  const game = useGameId();
+  const myDecksAll = useQuery(api.decks.listByUser, user ? { game, userId: user._id } : "skip");
+  const publicDecksAll = useQuery(api.decks.listPublic, { game });
+  const tournamentDecksAll = useQuery(api.decks.listTournament, { game });
 
   const myDecks = useQuery(
     api.decks.listByUser,
     user
       ? {
+          game,
           userId: user._id,
           ...(deckSearch ? { search: deckSearch } : {}),
         }
       : "skip"
   );
 
-  const publicDecks = useQuery(api.decks.listPublic, deckSearch ? { search: deckSearch } : {});
-  const tournamentDecks = useQuery(api.decks.listTournament, deckSearch ? { search: deckSearch } : {});
+  const publicDecks = useQuery(api.decks.listPublic, deckSearch ? { game, search: deckSearch } : { game });
+  const tournamentDecks = useQuery(
+    api.decks.listTournament,
+    deckSearch ? { game, search: deckSearch } : { game }
+  );
 
   const deckCounts = useMemo(
     () => ({

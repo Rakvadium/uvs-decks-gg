@@ -12,6 +12,7 @@ import { useCardData } from "@/lib/universus/card-data-provider";
 import * as m from "framer-motion/m";
 import { usePrefersReducedMotion } from "@/lib/reduced-motion";
 import { useAuthDialog } from "@/components/auth/auth-dialog";
+import { useGameId } from "@/games/game-context";
 
 function StatCard({ label, value, icon: Icon, delay = 0, animate = true }: { label: string; value: string | number; icon: typeof Database; delay?: number; animate?: boolean }) {
   const prefersReducedMotion = usePrefersReducedMotion();
@@ -98,7 +99,8 @@ function HomePage() {
   const { isAuthenticated, isLoading } = useConvexAuth();
   const user = useQuery(api.user.currentUser, isAuthenticated ? {} : "skip");
   const { isLoading: cardsLoading, totalCards: catalogTotalCards } = useCardData();
-  const decks = useQuery(api.decks.listByUser, user ? { userId: user._id } : "skip");
+  const game = useGameId();
+  const decks = useQuery(api.decks.listByUser, user ? { game, userId: user._id } : "skip");
   const prefersReducedMotion = usePrefersReducedMotion();
   const { openAuthDialog } = useAuthDialog();
   const [isFirstPaint, setIsFirstPaint] = useState(true);

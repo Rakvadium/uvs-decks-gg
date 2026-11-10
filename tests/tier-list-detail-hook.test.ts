@@ -112,6 +112,21 @@ const noSets = { sets: [] };
 const realConvexReact = await import("convex/react");
 const realNavigation = await import("next/navigation");
 const realCardDataProvider = await import("../src/lib/universus/card-data-provider");
+const realGameRegistry = await import("../src/games/registry");
+// Captured before mocking: bun live-updates the namespace above to the mock.
+const realGetClientGameModule = realGameRegistry.getClientGameModule;
+// Known cards render as a labelled stub, so the DOM tests can count tiles without the gallery's
+// image pipeline. Lanes read `CardGridItem` from the game module, which `GameProvider` (see
+// `mountView`) looks up through this registry when it renders.
+const StubCardGridItem = ({ card }: { card: CachedCard }) =>
+    createElement("div", { role: "img", "aria-label": `Card ${String(card._id)}` });
+mock.module("../src/games/registry", () => ({
+  ...realGameRegistry,
+  getClientGameModule: (id: Parameters<typeof realGetClientGameModule>[0]) => {
+    const real = realGetClientGameModule(id);
+    return { ...real, ui: { ...real.ui, CardGridItem: StubCardGridItem } };
+  },
+}));
 
 mock.module("convex/react", () => ({
   ...realConvexReact,
@@ -133,12 +148,6 @@ mock.module("../src/lib/universus/card-data-provider", () => ({
   },
   useCardReferenceData: () => noSets,
 }));
-// Known cards render as a labelled stub, so the DOM tests can count tiles without the gallery's
-// image pipeline.
-mock.module("../src/components/universus/card-grid-item", () => ({
-  CardGridItem: ({ card }: { card: CachedCard }) =>
-    createElement("div", { role: "img", "aria-label": `Card ${String(card._id)}` }),
-}));
 
 // The DOM globals must exist before React Testing Library and react-dom load. RTL registers its
 // own act-environment hooks on import, so it is imported at the top level, not in a hook.
@@ -149,6 +158,7 @@ const { useCommunityTierListDetailModel: useModel } = await import(
 );
 type Model = ReturnType<typeof useModel>;
 const { TcgDndProvider } = await import("../src/lib/dnd");
+const { GameProvider } = await import("../src/games/game-context");
 const { CommunityTierListDetailProvider, useCommunityTierListDetailContext } = await import(
   "../src/components/community/tier-lists/detail-view/context"
 );
@@ -369,17 +379,22 @@ function mountView(listId = LIST_A) {
   view.model = null;
   // The providers type `children` as a required prop; createElement passes it as an argument.
   const Dnd = TcgDndProvider as ComponentType<{ children?: ReactNode }>;
+  const Game = GameProvider as ComponentType<{ game: "uvs"; hostKind: "standalone"; children?: ReactNode }>;
   const Detail = CommunityTierListDetailProvider as ComponentType<{ tierListId: string; children?: ReactNode }>;
   return rtl.render(
     createElement(
-      Dnd,
-      null,
+      Game,
+      { game: "uvs", hostKind: "standalone" },
       createElement(
-        Detail,
-        { tierListId: listId },
-        createElement(ViewProbe),
-        createElement(CommunityTierListDetailBoard),
-        createElement(CommunityTierListDetailPoolPanel)
+        Dnd,
+        null,
+        createElement(
+          Detail,
+          { tierListId: listId },
+          createElement(ViewProbe),
+          createElement(CommunityTierListDetailBoard),
+          createElement(CommunityTierListDetailPoolPanel)
+        )
       )
     )
   );

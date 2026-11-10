@@ -23,6 +23,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { useGameId } from "@/games/game-context";
 
 type FormatDoc = Doc<"formats">;
 
@@ -79,6 +80,7 @@ function validateKey(key: string) {
 
 export function FormatFormContent({ mode, format }: FormatFormContentProps) {
   const router = useRouter();
+  const game = useGameId();
   const createFormat = useMutation(api.admin.createFormat);
   const updateFormat = useMutation(api.admin.updateFormat);
   const [submitting, setSubmitting] = useState(false);
@@ -209,6 +211,7 @@ export function FormatFormContent({ mode, format }: FormatFormContentProps) {
     try {
       if (mode === "create") {
         await createFormat({
+          game,
           key: parsed.data.key,
           name: parsed.data.name,
           description: parsed.data.description || undefined,

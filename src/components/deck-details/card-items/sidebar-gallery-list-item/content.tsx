@@ -1,7 +1,6 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { CardDetailsDialog } from "@/components/universus/card-details/dialog";
 import { SidebarGalleryListItemActions } from "./actions";
 import {
   SidebarGalleryListItemProvider,
@@ -10,8 +9,10 @@ import {
 import { SidebarGalleryListItemDetails } from "./details";
 import { SidebarGalleryListItemThumbnail } from "./thumbnail";
 import type { SidebarGalleryListItemProps } from "./types";
+import { useGameModule } from "@/games/game-context";
 
 function SidebarGalleryListItemContent() {
+  const { CardDetailsDialog } = useGameModule().ui;
   const {
     backCard,
     canOpenDialog,

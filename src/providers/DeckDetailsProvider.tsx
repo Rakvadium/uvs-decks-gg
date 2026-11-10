@@ -5,12 +5,14 @@ import { useConvexAuth, useQuery, useMutation } from "convex/react";
 import { toast } from "sonner";
 import { api } from "../../convex/_generated/api";
 import { Id } from "../../convex/_generated/dataModel";
+import type { DeckSetupPatch } from "@shared/games/deck";
 import { useRouter } from "next/navigation";
 import { useAuthDialog } from "@/components/auth/auth-dialog";
 import { useSiloedDeckOptional } from "@/lib/deck";
 import type { DeckTeamSharing, DeckVisibility } from "@/lib/deck/visibility";
 import { deckTeamSharingFromDeck, normalizeDeckVisibility } from "@/lib/deck/visibility";
 import { useActiveDeck } from "./ActiveDeckProvider";
+import { useGameId } from "@/games/game-context";
 
 type DeckSection = "main" | "side" | "reference";
 type DeckDetailsUpdate = {
@@ -20,8 +22,8 @@ type DeckDetailsUpdate = {
   teamId?: Id<"teams"> | null;
   teamCollaboration?: DeckTeamSharing;
   imageCardId?: Id<"cards"> | null;
-  startingCharacterId?: Id<"cards"> | null;
-  selectedIdentity?: string | null;
+  /** Partial setup: omitted fields keep, `null` fields clear; `null` clears the whole setup. */
+  setup?: DeckSetupPatch<Id<"cards">> | null;
   format?: string | null;
   subFormat?: string | null;
 };
@@ -99,7 +101,8 @@ export function DeckDetailsProvider({ children, deckId }: DeckDetailsProviderPro
   const typedDeckId = deckId as Id<"decks">;
   const currentUser = useQuery(api.user.currentUser);
   const myTeam = useQuery(api.teams.permissions.getMyTeam, isAuthenticated ? {} : "skip");
-  const queriedDeck = useQuery(api.decks.getById, siloedDeck ? "skip" : { deckId: typedDeckId });
+  const game = useGameId();
+  const queriedDeck = useQuery(api.decks.getById, siloedDeck ? "skip" : { game, deckId: typedDeckId });
   const deck = siloedDeck?.deck ?? queriedDeck;
   const isDeckLoading = siloedDeck ? siloedDeck.isLoading : queriedDeck === undefined;
   const isOwner = Boolean(deck && currentUser && deck.userId === currentUser._id);
@@ -240,7 +243,7 @@ export function DeckDetailsProvider({ children, deckId }: DeckDetailsProviderPro
     setDuplicateConfirmOpen(false);
     setIsDuplicating(true);
     try {
-      const newDeckId = await duplicateDeckMutation({ deckId: typedDeckId });
+      const newDeckId = await duplicateDeckMutation({ game, deckId: typedDeckId });
       setActiveDeck(newDeckId);
       router.push(`/decks/${newDeckId}`);
     } catch (error) {
@@ -249,6 +252,7 @@ export function DeckDetailsProvider({ children, deckId }: DeckDetailsProviderPro
     }
   }, [
     duplicateDeckMutation,
+    game,
     isAuthenticated,
     openAuthDialog,
     router,

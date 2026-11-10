@@ -1,5 +1,9 @@
 import { v, type Infer } from "convex/values";
 import type { Doc } from "./_generated/dataModel";
+import { GAME_IDS } from "../shared/games/types";
+
+/** Built from the shared `GAME_IDS` so adding a game only touches `shared/games/types.ts`. */
+export const gameIdValidator = v.union(...GAME_IDS.map((id) => v.literal(id)));
 
 export const deckVisibilityValidator = v.union(
   v.literal("private"),
@@ -70,6 +74,17 @@ export const cardValidator = v.object({
   text: v.optional(v.string()),
   keywords: v.optional(v.string()),
   symbols: v.optional(v.string()),
+  /** Cyberpunk TCG columns (docs/games/cyberpunk.md "Card data model"); UVS never sets them. */
+  color: v.optional(v.string()),
+  cost: v.optional(v.number()),
+  power: v.optional(v.number()),
+  ram: v.optional(v.number()),
+  sellable: v.optional(v.boolean()),
+  /** Pipe-delimited, e.g. `Corpo|Netrunner`. */
+  tags: v.optional(v.string()),
+  /** Card subtitle (e.g. a Legend's epithet) and illustrator; used by Cyberpunk TCG. */
+  subname: v.optional(v.string()),
+  artist: v.optional(v.string()),
   searchName: v.optional(v.string()),
   searchText: v.optional(v.string()),
   searchAll: v.optional(v.string()),
@@ -78,6 +93,7 @@ export const cardValidator = v.object({
   contentRevisionAt: v.optional(v.number()),
   revealedAt: v.optional(v.number()),
   isRevealHidden: v.optional(v.boolean()),
+  game: v.optional(gameIdValidator),
 });
 
 /**
@@ -153,6 +169,37 @@ export const cardLayoutValidator = v.object({
   unassignedCardIds: v.array(v.string()),
 });
 
+/** UVS deck setup (see docs/multi-game.md "Deck setup"; shape mirrors `shared/games/uvs/setup.ts`). */
+export const uvsDeckSetupValidator = v.object({
+  game: v.literal("uvs"),
+  startingCharacterId: v.optional(v.id("cards")),
+  selectedIdentity: v.optional(v.string()),
+});
+
+/** Cyberpunk TCG deck setup (shape mirrors `shared/games/cyberpunk/setup.ts`): ordered Legends, max 3. */
+export const cyberpunkDeckSetupValidator = v.object({
+  game: v.literal("cyberpunk"),
+  legendIds: v.array(v.id("cards")),
+});
+
+/** Union over games, discriminated by `game` (always equal to the deck's `game`). */
+export const deckSetupValidator = v.union(uvsDeckSetupValidator, cyberpunkDeckSetupValidator);
+
+/** Partial setup update for `decks.update`: omitted keeps, `null` clears, value sets. */
+export const uvsDeckSetupPatchValidator = v.object({
+  game: v.literal("uvs"),
+  startingCharacterId: v.optional(v.union(v.id("cards"), v.null())),
+  selectedIdentity: v.optional(v.union(v.string(), v.null())),
+});
+
+/** Cyberpunk patch: omitted keeps the Legends, `null` clears them, an array replaces them. */
+export const cyberpunkDeckSetupPatchValidator = v.object({
+  game: v.literal("cyberpunk"),
+  legendIds: v.optional(v.union(v.array(v.id("cards")), v.null())),
+});
+
+export const deckSetupPatchValidator = v.union(uvsDeckSetupPatchValidator, cyberpunkDeckSetupPatchValidator);
+
 export const deckValidator = v.object({
   _id: v.id("decks"),
   _creationTime: v.number(),
@@ -163,7 +210,10 @@ export const deckValidator = v.object({
   isPublic: v.boolean(),
   format: v.optional(v.string()),
   subFormat: v.optional(v.string()),
+  setup: v.optional(deckSetupValidator),
+  /** @deprecated read via `normalizeDeckSetup`; kept until the setup backfill has run. */
   startingCharacterId: v.optional(v.id("cards")),
+  /** @deprecated read via `normalizeDeckSetup`; kept until the setup backfill has run. */
   selectedIdentity: v.optional(v.string()),
   imageCardId: v.optional(v.id("cards")),
   mainCardIds: v.array(v.id("cards")),
@@ -176,6 +226,7 @@ export const deckValidator = v.object({
   teamId: v.optional(v.id("teams")),
   teamCollaboration: v.optional(deckTeamCollaborationValidator),
   revision: v.optional(v.number()),
+  game: v.optional(gameIdValidator),
   ownerUsername: v.optional(v.string()),
 });
 
@@ -230,6 +281,7 @@ export const tierListValidator = v.object({
   featuredCardId: v.optional(v.id("cards")),
   updatedAt: v.number(),
   listModerationStatus: v.optional(tierListModerationStatusValidator),
+  game: v.optional(gameIdValidator),
 });
 
 export type TierListModerationStatus = Infer<typeof tierListModerationStatusValidator>;
@@ -281,6 +333,7 @@ export const communityCardRankingValidator = v.object({
   topLaneRate: v.number(),
   bottomLaneRate: v.number(),
   lastComputedAt: v.number(),
+  game: v.optional(gameIdValidator),
 });
 
 export const communityTierSnapshotValidator = v.object({
@@ -301,6 +354,7 @@ export const communityTierSnapshotValidator = v.object({
   })),
   insufficientDataCardIds: v.array(v.id("cards")),
   lastComputedAt: v.number(),
+  game: v.optional(gameIdValidator),
 });
 
 export const tierListLikeValidator = v.object({
@@ -355,6 +409,7 @@ export const collectionEntryValidator = v.object({
   quantity: v.number(),
   condition: v.optional(v.string()),
   isFoil: v.optional(v.boolean()),
+  game: v.optional(gameIdValidator),
 });
 
 export const deckSectionValidator = v.union(
@@ -464,6 +519,13 @@ export const sessionValidator = v.object({
   lastActiveAt: v.number(),
 });
 
+/** Per-game session UI state (`sessions.gameState[game]`). */
+export const sessionGameStateEntryValidator = v.object({
+  activeDeckId: v.optional(v.id("decks")),
+  galleryFilters: v.optional(v.any()),
+  rightSidebarAction: v.optional(v.string()),
+});
+
 export const subFormatValidator = v.object({
   key: v.string(),
   name: v.string(),
@@ -483,6 +545,7 @@ export const formatValidator = v.object({
   requiresStartingCharacter: v.boolean(),
   requiresIdentity: v.boolean(),
   subFormats: v.optional(v.array(subFormatValidator)),
+  game: v.optional(gameIdValidator),
 });
 
 export const cardLegalityValidator = v.object({
@@ -497,6 +560,7 @@ export const cardLegalityValidator = v.object({
   ),
   copyLimitOverride: v.optional(v.number()),
   effectiveDate: v.optional(v.number()),
+  game: v.optional(gameIdValidator),
 });
 
 export const setLegalityValidator = v.object({
@@ -506,6 +570,7 @@ export const setLegalityValidator = v.object({
   setCode: v.string(),
   isLegal: v.boolean(),
   rotatesOutAt: v.optional(v.number()),
+  game: v.optional(gameIdValidator),
 });
 
 export const formatErrataValidator = v.object({
@@ -516,6 +581,7 @@ export const formatErrataValidator = v.object({
   body: v.string(),
   url: v.optional(v.string()),
   sortOrder: v.number(),
+  game: v.optional(gameIdValidator),
 });
 
 export const cardTextHistoryValidator = v.object({
@@ -527,6 +593,7 @@ export const cardTextHistoryValidator = v.object({
   source: v.optional(
     v.union(v.literal("admin_edit"), v.literal("import"), v.literal("printed"))
   ),
+  game: v.optional(gameIdValidator),
 });
 
 export const setDocValidator = v.object({
@@ -544,6 +611,7 @@ export const setDocValidator = v.object({
   spotlightIP: v.optional(v.string()),
   updatedAt: v.optional(v.number()),
   updatedBy: v.optional(v.id("users")),
+  game: v.optional(gameIdValidator),
 });
 
 export const cardInputValidator = v.object({
@@ -573,6 +641,17 @@ export const cardInputValidator = v.object({
   text: v.optional(v.string()),
   keywords: v.optional(v.string()),
   symbols: v.optional(v.string()),
+  /** Cyberpunk TCG columns (docs/games/cyberpunk.md "Card data model"); UVS never sets them. */
+  color: v.optional(v.string()),
+  cost: v.optional(v.number()),
+  power: v.optional(v.number()),
+  ram: v.optional(v.number()),
+  sellable: v.optional(v.boolean()),
+  /** Pipe-delimited, e.g. `Corpo|Netrunner`. */
+  tags: v.optional(v.string()),
+  /** Card subtitle (e.g. a Legend's epithet) and illustrator; used by Cyberpunk TCG. */
+  subname: v.optional(v.string()),
+  artist: v.optional(v.string()),
   searchName: v.optional(v.string()),
   searchText: v.optional(v.string()),
   searchAll: v.optional(v.string()),
@@ -615,6 +694,17 @@ export const cardDraftEditableValidator = v.object({
   text: v.optional(v.string()),
   keywords: v.optional(v.string()),
   symbols: v.optional(v.string()),
+  /** Cyberpunk TCG columns (docs/games/cyberpunk.md "Card data model"); UVS never sets them. */
+  color: v.optional(v.string()),
+  cost: v.optional(v.number()),
+  power: v.optional(v.number()),
+  ram: v.optional(v.number()),
+  sellable: v.optional(v.boolean()),
+  /** Pipe-delimited, e.g. `Corpo|Netrunner`. */
+  tags: v.optional(v.string()),
+  /** Card subtitle (e.g. a Legend's epithet) and illustrator; used by Cyberpunk TCG. */
+  subname: v.optional(v.string()),
+  artist: v.optional(v.string()),
   searchName: v.optional(v.string()),
   searchText: v.optional(v.string()),
   searchAll: v.optional(v.string()),
@@ -642,6 +732,7 @@ export const cardDraftValidator = v.object({
   updatedAt: v.number(),
   reviewedBy: v.optional(v.id("users")),
   approvalError: v.optional(v.string()),
+  game: v.optional(gameIdValidator),
 });
 
 export const cardDraftReviewRowValidator = v.object({
@@ -664,6 +755,7 @@ export const cardDraftReviewRowValidator = v.object({
   updatedAt: v.number(),
   reviewedBy: v.optional(v.id("users")),
   approvalError: v.optional(v.string()),
+  game: v.optional(gameIdValidator),
 });
 
 export const ingestionJobValidator = v.object({
@@ -682,6 +774,7 @@ export const ingestionJobValidator = v.object({
   errorMessages: v.optional(v.array(v.string())),
   startedAt: v.number(),
   completedAt: v.optional(v.number()),
+  game: v.optional(gameIdValidator),
 });
 
 export const cardDataVersionValidator = v.object({
@@ -694,6 +787,7 @@ export const cardDataVersionValidator = v.object({
   catalogSha256: v.optional(v.string()),
   catalogSchemaVersion: v.optional(v.number()),
   catalogObjectKey: v.optional(v.string()),
+  game: v.optional(gameIdValidator),
 });
 
 export const teamRoleValidator = v.union(

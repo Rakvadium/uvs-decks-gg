@@ -51,6 +51,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useGameId } from "@/games/game-context";
 
 type SetAdminCardsProps = {
   setCode: string;
@@ -101,7 +102,8 @@ export default function SetAdminCards({
   const deleteCard = useMutation(api.admin.deleteCard);
   const revealCard = useMutation(api.admin.revealCard);
   const hideCardReveal = useMutation(api.admin.hideCardReveal);
-  const formats = useQuery(api.formats.list);
+  const game = useGameId();
+  const formats = useQuery(api.formats.list, { game });
   const [sheetOpen, setSheetOpen] = useState(false);
   const [editing, setEditing] = useState<Doc<"cards"> | null>(null);
   const [createBackParent, setCreateBackParent] = useState<Doc<"cards"> | null>(

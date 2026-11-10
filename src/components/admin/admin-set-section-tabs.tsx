@@ -2,6 +2,7 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useGameFeatures } from "@/games/game-context";
 
 type AdminSetSectionTabsProps = {
   setCode: string;
@@ -14,6 +15,7 @@ export function AdminSetSectionTabs({
 }: AdminSetSectionTabsProps) {
   const pathname = usePathname();
   const router = useRouter();
+  const { cardOcrDrafts } = useGameFeatures();
   const enc = encodeURIComponent(setCode);
   const base = `/admin/sets/${enc}`;
   const tab = pathname.includes("/import")
@@ -48,7 +50,7 @@ export function AdminSetSectionTabs({
       <TabsList className="h-auto w-full min-w-0 flex-wrap justify-start gap-0 sm:w-fit">
         <TabsTrigger value="overview">Overview</TabsTrigger>
         <TabsTrigger value="cards">Cards</TabsTrigger>
-        <TabsTrigger value="review">Review</TabsTrigger>
+        {cardOcrDrafts ? <TabsTrigger value="review">Review</TabsTrigger> : null}
         <TabsTrigger value="import">Import</TabsTrigger>
       </TabsList>
     </Tabs>

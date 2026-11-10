@@ -18,7 +18,7 @@ import {
   UNIVERSUS_KEYWORDS,
   UNIVERSUS_SYMBOLS,
   UNIVERSUS_ZONES,
-} from "@/config/universus";
+} from "@/games/uvs/config";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -47,13 +47,14 @@ import {
 } from "@/components/ui/popover";
 import { toast } from "sonner";
 import { toastConvexError } from "@/lib/convex-error-toast";
-import { parseZoneDisplay } from "@/components/universus/card-details/parsers";
+import { parseZoneDisplay } from "@/games/uvs/components/card-details/parsers";
 import { createSymbolReferenceImageUrl } from "@/lib/universus/vision-reference-images";
 import {
   analyzeCardRegions,
   type CardRegionAnalysis,
 } from "@/lib/universus/vision-card-regions";
 import { Sparkles, Upload, X } from "lucide-react";
+import { useGameId } from "@/games/game-context";
 
 const RARITY_SUGGESTIONS = [
   "Common",
@@ -488,6 +489,7 @@ export function CardFormDialog({
   onSaved,
   onRequestCreateBackFace,
 }: CardFormDialogProps) {
+  const game = useGameId();
   const createCard = useMutation(api.admin.createCard);
   const updateCard = useMutation(api.admin.updateCard);
   const linkCardFaces = useMutation(api.admin.linkCardFacesById);
@@ -680,6 +682,7 @@ export function CardFormDialog({
         toast.success("Card updated");
       } else {
         const newId = await createCard({
+          game,
           card: {
             name: values.name.trim(),
             setCode,
@@ -726,6 +729,7 @@ export function CardFormDialog({
   }, [
     values,
     editing,
+    game,
     setCode,
     setName,
     linkAsBackOf,

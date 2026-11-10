@@ -3,23 +3,14 @@ import { useMutation } from "convex/react";
 import { toast } from "sonner";
 import { api } from "../../../../convex/_generated/api";
 import type { Id } from "../../../../convex/_generated/dataModel";
-import { formatUniversusCardType } from "@/config/universus";
+import type { DeckTextLine } from "@shared/games/deck";
 import { useCardIdMap } from "@/hooks/useCardIdMap";
 import { useCardData } from "@/lib/universus/card-data-provider";
 import { useDeckDetailsOptional } from "@/providers/DeckDetailsProvider";
+import { useGameModule } from "@/games/game-context";
 import { deckRevisionNumber, isDeckWriteConflictError, isTeamEditableDeck } from "@/lib/deck/visibility";
-import {
-  SIDEBAR_SIDEBOARD_LIMIT,
-  UVS_MAIN_TYPE_ORDER,
-  buildCardNameIndex,
-  findCardByName,
-  formatUvsUltraDeckExport,
-  incrementCount,
-  parseUvsUltraDeck,
-  sumLineEntries,
-  sumQuantities,
-  type UvsUltraDeckLine,
-} from "../uvs-import-export";
+import { buildCardNameIndex, incrementCount, sumQuantities } from "../uvs-import-export";
+import { findCardsByName, setupExportCards, sumDeckLines } from "./setup-text";
 
 export function useImportExportSidebarModel() {
   const context = useDeckDetailsOptional();
@@ -33,13 +24,19 @@ export function useImportExportSidebarModel() {
   const [lastImportMessage, setLastImportMessage] = useState<string | null>(null);
 
   const deck = context?.deck ?? null;
+  const gameModule = useGameModule();
+  const gameDeck = gameModule.deck;
+  const { formatCardType } = gameModule.ui;
+  const deckText = gameDeck.text;
+  const setupHelpers = gameModule.ui.deckSetup;
+  const setup = gameDeck.normalizeSetup(deck);
   const cardMap = useCardIdMap(cards);
   const cardNameIndex = useMemo(() => buildCardNameIndex(cards), [cards]);
 
   const exportMainEntries = useMemo(() => {
-    if (!deck) return [] as UvsUltraDeckLine[];
+    if (!deck) return [] as DeckTextLine[];
 
-    const entries: UvsUltraDeckLine[] = [];
+    const entries: DeckTextLine[] = [];
 
     for (const [cardId, quantity] of Object.entries(deck.mainQuantities)) {
       if (quantity <= 0) continue;
@@ -47,23 +44,18 @@ export function useImportExportSidebarModel() {
       const card = cardMap.get(cardId);
       if (!card) continue;
 
-      const type = formatUniversusCardType(card.type) ?? card.type ?? "Other";
-      if (!UVS_MAIN_TYPE_ORDER.includes(type as (typeof UVS_MAIN_TYPE_ORDER)[number])) continue;
-
-      entries.push({
-        name: card.name,
-        quantity,
-        type: type as (typeof UVS_MAIN_TYPE_ORDER)[number],
-      });
+      // Each format decides which types it lists (UVS drops types outside `mainTypeOrder`).
+      const type = formatCardType(card.type) ?? card.type ?? "Other";
+      entries.push({ name: card.name, quantity, type });
     }
 
     return entries;
-  }, [deck, cardMap]);
+  }, [deck, cardMap, formatCardType]);
 
   const exportSideEntries = useMemo(() => {
-    if (!deck) return [] as UvsUltraDeckLine[];
+    if (!deck) return [] as DeckTextLine[];
 
-    const entries: UvsUltraDeckLine[] = [];
+    const entries: DeckTextLine[] = [];
 
     for (const [cardId, quantity] of Object.entries(deck.sideQuantities)) {
       if (quantity <= 0) continue;
@@ -77,19 +69,21 @@ export function useImportExportSidebarModel() {
     return entries;
   }, [deck, cardMap]);
 
-  const exportCharacter = useMemo(() => {
-    if (!deck?.startingCharacterId) return null;
-    return cardMap.get(deck.startingCharacterId) ?? null;
-  }, [deck?.startingCharacterId, cardMap]);
+  const setupCardIdsKey = gameDeck.setupCardIds(setup).join("|");
+  const exportSetup = useMemo(
+    () => setupExportCards(setupCardIdsKey ? setupCardIdsKey.split("|") : [], (id) => cardMap.get(id)),
+    [setupCardIdsKey, cardMap]
+  );
 
   const exportText = useMemo(
     () =>
-      formatUvsUltraDeckExport({
-        character: exportCharacter,
+      deckText.format({
+        character: exportSetup.character,
+        setupCards: exportSetup.setupCards,
         main: exportMainEntries,
         side: exportSideEntries,
       }),
-    [exportCharacter, exportMainEntries, exportSideEntries]
+    [deckText, exportSetup, exportMainEntries, exportSideEntries]
   );
 
   const handleCopyExport = useCallback(async () => {
@@ -108,16 +102,16 @@ export function useImportExportSidebarModel() {
     setLastImportMessage(null);
 
     try {
-      const parsed = parseUvsUltraDeck(importText);
+      const parsed = deckText.parse(importText);
       const targetMain: Record<string, number> = {};
       const targetSide: Record<string, number> = {};
       const unresolvedNames = new Set<string>();
 
-      const parsedMainCounts = sumLineEntries(parsed.main);
-      const parsedSideCounts = sumLineEntries(parsed.side);
+      const parsedMainCounts = sumDeckLines(parsed.main);
+      const parsedSideCounts = sumDeckLines(parsed.side);
 
       for (const [name, quantity] of Object.entries(parsedMainCounts)) {
-        const card = findCardByName(name, cardNameIndex);
+        const card = findCardsByName(name, cardNameIndex)[0];
         if (!card) {
           unresolvedNames.add(name);
           continue;
@@ -126,7 +120,7 @@ export function useImportExportSidebarModel() {
       }
 
       for (const [name, quantity] of Object.entries(parsedSideCounts)) {
-        const card = findCardByName(name, cardNameIndex);
+        const card = findCardsByName(name, cardNameIndex)[0];
         if (!card) {
           unresolvedNames.add(name);
           continue;
@@ -134,18 +128,12 @@ export function useImportExportSidebarModel() {
         incrementCount(targetSide, card._id, quantity);
       }
 
-      let importedCharacterId: Id<"cards"> | undefined;
-      if (parsed.character) {
-        const character = findCardByName(parsed.character.name, cardNameIndex);
-        if (character) {
-          importedCharacterId = character._id as Id<"cards">;
-        } else {
-          unresolvedNames.add(parsed.character.name);
-        }
-      }
+      // Setup cards (UVS: starting character; Cyberpunk: Legends) become a setup patch.
+      const setupImport = setupHelpers.importPatch(parsed, (name) => findCardsByName(name, cardNameIndex));
+      for (const name of setupImport.unresolved) unresolvedNames.add(name);
 
       const matchedCardCount = sumQuantities(targetMain) + sumQuantities(targetSide);
-      if (matchedCardCount === 0 && !importedCharacterId) {
+      if (matchedCardCount === 0 && !setupImport.patch) {
         toast.error("No recognizable cards were found in the import text.");
         return;
       }
@@ -192,11 +180,8 @@ export function useImportExportSidebarModel() {
       await applyDiff("side", deck.sideQuantities, targetSide);
       await applyDiff("reference", deck.referenceQuantities, {});
 
-      if (importedCharacterId) {
-        await updateDeckMutation({
-          deckId,
-          startingCharacterId: importedCharacterId,
-        });
+      if (setupImport.patch) {
+        await updateDeckMutation({ deckId, setup: setupImport.patch });
       }
 
       const importedMainCount = sumQuantities(targetMain);
@@ -209,8 +194,12 @@ export function useImportExportSidebarModel() {
       setLastImportMessage(summary);
       toast.success(summary);
 
-      if (importedSideCount > SIDEBAR_SIDEBOARD_LIMIT) {
-        toast.warning("Sideboard has more than 10 cards. A validation warning is shown on deck details.");
+      if (importedSideCount > gameDeck.sideboardLimit) {
+        toast.warning(
+          gameDeck.sideboardLimit > 0
+            ? `Sideboard has more than ${gameDeck.sideboardLimit} cards. A validation warning is shown on deck details.`
+            : "This game has no sideboard. A validation warning is shown on deck details."
+        );
       }
     } catch (e) {
       if (isDeckWriteConflictError(e)) {
@@ -221,7 +210,7 @@ export function useImportExportSidebarModel() {
     } finally {
       setIsImporting(false);
     }
-  }, [deck, importText, cardNameIndex, addCardMutation, removeCardMutation, updateDeckMutation]);
+  }, [deck, gameDeck, deckText, setupHelpers, importText, cardNameIndex, addCardMutation, removeCardMutation, updateDeckMutation]);
 
   return {
     deck,

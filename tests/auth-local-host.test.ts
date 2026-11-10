@@ -10,6 +10,12 @@ describe("isAuthLocalHost", () => {
     expect(isAuthLocalHost("localhost")).toBe(true);
   });
 
+  test("treats *.localhost subdomains as local", () => {
+    expect(isAuthLocalHost("tcgdecks.localhost:8090")).toBe(true);
+    expect(isAuthLocalHost("uvs.tcgdecks.localhost:8090")).toBe(true);
+    expect(isAuthLocalHost("UVS.TCGDecks.Localhost")).toBe(true);
+  });
+
   test("treats private LAN IPs as local", () => {
     expect(isAuthLocalHost("192.168.1.24:8090")).toBe(true);
     expect(isAuthLocalHost("10.0.0.8:8090")).toBe(true);
@@ -22,6 +28,9 @@ describe("isAuthLocalHost", () => {
     expect(isAuthLocalHost("uvsdecks.gg:443")).toBe(false);
     expect(isAuthLocalHost("8.8.8.8:8090")).toBe(false);
     expect(isAuthLocalHost("172.32.0.1:8090")).toBe(false);
+    expect(isAuthLocalHost("uvs.tcgdecks.gg")).toBe(false);
+    expect(isAuthLocalHost("localhost.evil.com")).toBe(false);
+    expect(isAuthLocalHost("evil-localhost:8090")).toBe(false);
     expect(isAuthLocalHost("")).toBe(false);
   });
 
@@ -29,5 +38,8 @@ describe("isAuthLocalHost", () => {
     expect(convexAuthIsLocalHost("192.168.1.24:8090")).toBe(true);
     expect(convexAuthIsLocalHost("localhost:8090")).toBe(true);
     expect(convexAuthIsLocalHost("uvsdecks.gg")).toBe(false);
+    expect(convexAuthIsLocalHost("uvs.tcgdecks.localhost:8090")).toBe(true);
+    expect(convexAuthIsLocalHost("tcgdecks.localhost:8090")).toBe(true);
+    expect(convexAuthIsLocalHost("localhost.evil.com")).toBe(false);
   });
 });

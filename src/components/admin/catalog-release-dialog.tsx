@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import type { ComponentProps } from "react";
+import { useGameId } from "@/games/game-context";
 
 type CatalogReleaseDialogProps = {
   triggerLabel?: string;
@@ -30,7 +31,8 @@ export function CatalogReleaseDialog({
   buttonSize = "default",
   buttonClassName,
 }: CatalogReleaseDialogProps) {
-  const versionDoc = useQuery(api.admin.getCardDataVersion, {});
+  const game = useGameId();
+  const versionDoc = useQuery(api.admin.getCardDataVersion, { game });
   const releaseCards = useAction(api.admin.releaseCards);
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -39,7 +41,7 @@ export function CatalogReleaseDialog({
   const onConfirm = async () => {
     setBusy(true);
     try {
-      const r = await releaseCards({});
+      const r = await releaseCards({ game });
       const line = `Published catalog version ${r.version} (${r.cardCount.toLocaleString()} gallery-eligible cards).`;
       setPublishAnnounce(line);
       window.setTimeout(() => setPublishAnnounce(""), 8000);

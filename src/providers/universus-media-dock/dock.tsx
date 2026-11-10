@@ -5,6 +5,7 @@ import type { CSSProperties, PointerEvent as ReactPointerEvent } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
 import { useAction, useQuery } from "convex/react";
+import { useGameId } from "@/games/game-context";
 import {
   ArrowDownRight,
   ChevronDown,
@@ -185,8 +186,9 @@ export function UniversusMediaDock() {
     dockPosRef.current = dockPosition;
   }, [dockPosition]);
   const panelDrag = useDockDrag(panelRef, dockPosition, setDockPosition);
-  const feed = useQuery(api.communityYoutube.getFeed, {});
-  const liveStatus = useQuery(api.communityLive.getLiveStatus, {});
+  const game = useGameId();
+  const feed = useQuery(api.communityYoutube.getFeed, { game });
+  const liveStatus = useQuery(api.communityLive.getLiveStatus, { game });
   const refreshLive = useAction(api.communityLive.refreshLiveStatus);
 
   useEffect(() => {

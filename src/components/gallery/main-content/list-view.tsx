@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { CardNavigationProvider } from "@/components/universus/card-details/navigation-context";
+import { CardNavigationProvider } from "@/components/card/navigation-context";
 import type { CachedCard } from "@/lib/universus/card-store";
 import { useGalleryCardMap } from "./card-map-context";
 import { CardListItem } from "./card-list-item";

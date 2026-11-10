@@ -7,6 +7,7 @@ import { buildAdminSearchText, isEffectiveAdmin } from "./lib/accountStatus";
 import { isReservedAgentUser } from "./lib/reservedIdentity";
 import { requireAdmin } from "./utils/validation";
 import { isTierListHiddenByModeration } from "./validators";
+import { docGame } from "./lib/gameScope";
 import {
   getEligibleRankingScopeRefs,
   recomputeAffectedRankingScopes,
@@ -502,8 +503,12 @@ export const bulkSetTierListListModeration = mutation({
           isTierListHiddenByModeration(args.listModerationStatus)
         ) {
           affectedScopes.push(
-            ...getEligibleRankingScopeRefs(tl),
-            ...getEligibleRankingScopeRefs({ ...tl, listModerationStatus: args.listModerationStatus })
+            ...getEligibleRankingScopeRefs({ ...tl, game: docGame(tl) }),
+            ...getEligibleRankingScopeRefs({
+              ...tl,
+              game: docGame(tl),
+              listModerationStatus: args.listModerationStatus,
+            })
           );
         }
       }

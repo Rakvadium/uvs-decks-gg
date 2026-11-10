@@ -1,24 +1,33 @@
 "use client";
 
+import { useMemo } from "react";
 import { Minus, Plus, X } from "lucide-react";
+import {
+  getFilterGroupLayout,
+  statStandaloneLabel,
+  type GameStatFilterDescriptor,
+  type GameZoneFilterDescriptor,
+} from "@shared/games/filters";
+import { useGameModule } from "@/games/game-context";
 import type { StatOperator } from "@/providers/UIStateProvider";
 import { cn } from "@/lib/utils";
-import { OPERATOR_OPTIONS, ZONE_OPTIONS } from "../filter-dialog/constants";
+import { OPERATOR_OPTIONS } from "../filter-dialog/constants";
 import { useGalleryFilterDialogContext } from "../filter-dialog/context";
-import type { StatFilterKey } from "../filter-dialog/types";
+import type { StatFilterKey, StringArrayFilterKey } from "../filter-dialog/types";
 import { FilterChip, FilterChipRow, FilterGroup, FilterRow } from "./primitives";
-import { OPERATOR_GLYPHS, STAT_LABELS } from "./use-active-chips";
+import { OPERATOR_GLYPHS } from "./use-active-chips";
 
 const stepperButtonClassName =
   "flex size-10 shrink-0 items-center justify-center text-foreground transition-colors duration-150 hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-40 motion-safe:active:scale-90 motion-safe:transition-[color,background-color,transform]";
 
-function StatRule({ filterKey }: { filterKey: StatFilterKey }) {
+function StatRule({ stat }: { stat: GameStatFilterDescriptor }) {
   const { filters, setStatFilter } = useGalleryFilterDialogContext();
+  const filterKey = stat.key as StatFilterKey;
   const value = filters[filterKey];
   const isActive = value?.value !== undefined;
   const operator = value?.operator ?? "eq";
   const amount = value?.value ?? 0;
-  const label = STAT_LABELS[filterKey];
+  const label = statStandaloneLabel(stat);
 
   const setOperator = (next: StatOperator) => {
     setStatFilter(filterKey, { operator: next, value: amount });
@@ -116,15 +125,17 @@ function StatRule({ filterKey }: { filterKey: StatFilterKey }) {
   );
 }
 
-function ZoneRule({ filterKey, label }: { filterKey: "blockZone" | "attackZone"; label: string }) {
+function ZoneRule({ zone: descriptor }: { zone: GameZoneFilterDescriptor }) {
   const { filters, toggleStringFilter } = useGalleryFilterDialogContext();
+  const filterKey = descriptor.key as StringArrayFilterKey;
+  const label = descriptor.label;
   const selected = filters[filterKey] ?? [];
 
   return (
     <FilterRow>
       <p className="mb-2 text-xs text-muted-foreground">{label}</p>
       <FilterChipRow>
-        {ZONE_OPTIONS.map((zone) => (
+        {descriptor.options.map((zone) => (
           <FilterChip
             key={zone}
             label={zone}
@@ -138,24 +149,21 @@ function ZoneRule({ filterKey, label }: { filterKey: "blockZone" | "attackZone";
 }
 
 export function GalleryMobileFilterStatsPage() {
+  const { filters: filterDefinition } = useGameModule();
+  const groups = useMemo(() => getFilterGroupLayout(filterDefinition), [filterDefinition]);
+
   return (
     <div className="space-y-5 px-4 pb-4 pt-3">
-      <FilterGroup label="General">
-        <StatRule filterKey="difficulty" />
-        <StatRule filterKey="control" />
-        <StatRule filterKey="health" />
-        <StatRule filterKey="handSize" />
-        <StatRule filterKey="stamina" />
-      </FilterGroup>
-      <FilterGroup label="Block">
-        <ZoneRule filterKey="blockZone" label="Zone" />
-        <StatRule filterKey="blockModifier" />
-      </FilterGroup>
-      <FilterGroup label="Attack">
-        <ZoneRule filterKey="attackZone" label="Zone" />
-        <StatRule filterKey="speed" />
-        <StatRule filterKey="damage" />
-      </FilterGroup>
+      {groups.map((group) => (
+        <FilterGroup key={group.id} label={group.label}>
+          {group.zones.map((zone) => (
+            <ZoneRule key={zone.key} zone={zone} />
+          ))}
+          {group.stats.map((stat) => (
+            <StatRule key={stat.key} stat={stat} />
+          ))}
+        </FilterGroup>
+      ))}
     </div>
   );
 }

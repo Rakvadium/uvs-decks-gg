@@ -24,4 +24,11 @@ crons.interval(
   { cursor: null }
 );
 
+crons.interval(
+  "delete expired auth handoff codes",
+  { minutes: 10 },
+  internal.authHandoff.cleanupExpired,
+  {}
+);
+
 export default crons;

@@ -1,6 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import { Outfit } from "next/font/google";
 import { ConvexAuthNextjsServerProvider } from "@convex-dev/auth/nextjs/server";
+import { getHostBrand } from "@shared/games/registry";
+import { GameProvider } from "@/games/game-context";
+import { getRequestGame } from "@/lib/routing/request-game";
 import { Providers } from "./providers";
 import "./globals.css";
 
@@ -20,21 +23,25 @@ const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL ??
   (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined);
 
-export const metadata: Metadata = {
-  ...(siteUrl ? { metadataBase: new URL(siteUrl) } : {}),
-  title: {
-    default: "UVSDECKS.GG",
-    template: "%s | UVSDECKS.GG",
-  },
-  description:
-    "Build UniVersus decks, browse the card gallery, and explore community tier lists on UVSDECKS.GG.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { game, hostKind } = await getRequestGame();
+  const brand = getHostBrand(hostKind, game);
+  return {
+    ...(siteUrl ? { metadataBase: new URL(siteUrl) } : {}),
+    title: {
+      default: brand.title,
+      template: `%s | ${brand.title}`,
+    },
+    description: brand.description,
+  };
+}
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const { game, hostKind, host, protocol } = await getRequestGame();
   return (
     <ConvexAuthNextjsServerProvider>
     <html
@@ -45,7 +52,9 @@ export default function RootLayout({
       className={outfit.variable}
     >
       <body className={`${outfit.className} subpixel-antialiased`}>
-        <Providers>{children}</Providers>
+        <GameProvider game={game} hostKind={hostKind} host={host} protocol={protocol}>
+          <Providers>{children}</Providers>
+        </GameProvider>
       </body>
     </html>
     </ConvexAuthNextjsServerProvider>

@@ -1,1 +1,1 @@
-export const SIMULATOR_REDRAW_EVENT = "uvs:deck-details-simulator-redraw";
+export const SIMULATOR_REDRAW_EVENT = "tcgdecks:deck-details-simulator-redraw";

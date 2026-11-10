@@ -2,9 +2,11 @@ import { useMemo } from "react";
 import { normalizeDeckVisibility } from "@/lib/deck/visibility";
 import { useProfanityDisplayText } from "@/lib/moderation/use-profanity-display-text";
 import { useCardData } from "@/lib/universus/card-data-provider";
+import { useGameModule } from "@/games/game-context";
+import { mainDeckTarget } from "@/games/main-deck-target";
+import type { CachedCard } from "@/lib/universus/card-store";
 import type { DeckGridItemProps } from "./types";
-
-export const MAIN_DECK_TARGET = 60;
+import { uvsSetupFields } from "@shared/games/uvs/setup";
 
 function countSectionCards(quantities: Record<string, number>) {
   return Object.values(quantities).reduce((sum, quantity) => sum + quantity, 0);
@@ -27,6 +29,10 @@ export function useDeckGridItemModel({
 }: DeckGridItemProps) {
   const { cards } = useCardData();
   const { display, viewerUserId } = useProfanityDisplayText();
+  const gameModule = useGameModule();
+  const gameDeck = gameModule.deck;
+  const setup = gameDeck.normalizeSetup(deck);
+  const mainTarget = mainDeckTarget(gameModule);
 
   const imageCard = useMemo(() => {
     if (!deck.imageCardId) return null;
@@ -34,9 +40,18 @@ export function useDeckGridItemModel({
   }, [deck.imageCardId, cards]);
 
   const startingCharacter = useMemo(() => {
-    if (!deck.startingCharacterId) return null;
-    return cards.find((card) => card._id === deck.startingCharacterId) ?? null;
-  }, [deck.startingCharacterId, cards]);
+    const startingCharacterId = gameDeck.setupPreviewCardId(gameDeck.normalizeSetup(deck));
+    if (!startingCharacterId) return null;
+    return cards.find((card) => card._id === startingCharacterId) ?? null;
+  }, [gameDeck, deck, cards]);
+
+  // Every setup card (UVS: the starting character; Cyberpunk: the Legends), in setup order.
+  const setupCards = useMemo(() => {
+    const ids = gameDeck.setupCardIds(gameDeck.normalizeSetup(deck));
+    return ids
+      .map((id) => cards.find((card) => card._id === id))
+      .filter((card): card is CachedCard => Boolean(card));
+  }, [gameDeck, deck, cards]);
 
   const counts = useMemo(
     () => ({
@@ -51,7 +66,7 @@ export function useDeckGridItemModel({
     [startingCharacter?.symbols],
   );
 
-  const selectedSymbol = deck.selectedIdentity?.toLowerCase();
+  const selectedSymbol = uvsSetupFields(setup).selectedIdentity?.toLowerCase();
   const accentSymbol =
     selectedSymbol && characterSymbols.includes(selectedSymbol)
       ? selectedSymbol
@@ -70,7 +85,11 @@ export function useDeckGridItemModel({
     selected,
     trailingAction,
     displayImage: imageCard?.imageUrl || startingCharacter?.imageUrl,
-    startingCharacterName: startingCharacter?.name,
+    setup,
+    /** Setup card names ("A · B · C"); UVS: the starting character's name. */
+    startingCharacterName: setupCards.length > 0 ? setupCards.map((card) => card.name).join(" · ") : undefined,
+    emptySetupLabel: gameModule.ui.deckSetup.emptySetupLabel,
+    getSetupCard: (id: string) => setupCards.find((card) => card._id === id),
     characterHandSize: startingCharacter?.handSize ?? null,
     characterHealth: startingCharacter?.health ?? null,
     characterSymbols,
@@ -80,8 +99,9 @@ export function useDeckGridItemModel({
     displayName,
     displayDescription,
     counts,
-    progress: Math.min(1, counts.main / MAIN_DECK_TARGET),
-    isReady: counts.main >= MAIN_DECK_TARGET,
+    mainTarget,
+    progress: Math.min(1, counts.main / mainTarget),
+    isReady: counts.main >= mainTarget,
   };
 }
 

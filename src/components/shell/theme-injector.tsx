@@ -1,12 +1,13 @@
 "use client";
 
 import { useEffect } from "react";
-import { UNIVERSUS_CONFIG } from "@/config/universus";
+import { useGameModule } from "@/games/game-context";
 
 export function ThemeInjector() {
+  const theme = useGameModule().theme;
+
   useEffect(() => {
     const root = document.documentElement;
-    const theme = UNIVERSUS_CONFIG.theme;
 
     root.style.setProperty("--game-primary", theme.primary);
     root.style.setProperty("--game-secondary", theme.secondary);
@@ -17,7 +18,7 @@ export function ThemeInjector() {
       root.style.removeProperty("--game-secondary");
       root.style.removeProperty("--game-accent");
     };
-  }, []);
+  }, [theme]);
 
   return null;
 }

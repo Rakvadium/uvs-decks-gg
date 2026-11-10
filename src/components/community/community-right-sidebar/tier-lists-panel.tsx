@@ -14,6 +14,7 @@ import {
   TierListModerationBadge,
 } from "@/components/community/tier-lists/moderation-badge";
 import { getTierListScopeLabel } from "@/components/community/tier-lists/utils";
+import { useGameId } from "@/games/game-context";
 
 function formatUpdatedAt(timestamp: number) {
   return new Intl.DateTimeFormat(undefined, {
@@ -25,8 +26,9 @@ function formatUpdatedAt(timestamp: number) {
 export function CommunityTierListsSidebarPanel() {
   const { isAuthenticated } = useConvexAuth();
   const { openAuthDialog } = useAuthDialog();
-  const publicFeed = useQuery(api.tierLists.listPublicFeed, { limit: 32 });
-  const myLists = useQuery(api.tierLists.listMine, isAuthenticated ? { limit: 32 } : "skip");
+  const game = useGameId();
+  const publicFeed = useQuery(api.tierLists.listPublicFeed, { game, limit: 32 });
+  const myLists = useQuery(api.tierLists.listMine, isAuthenticated ? { game, limit: 32 } : "skip");
 
   return (
     <div className="flex h-full min-h-0 flex-col">

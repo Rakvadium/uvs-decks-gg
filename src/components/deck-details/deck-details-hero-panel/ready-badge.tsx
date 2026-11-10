@@ -1,11 +1,8 @@
 import { Check } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { useDeckDetailsHeroPanelContext } from "./context";
 
-export function DeckDetailsHeroReadyBadge() {
-  const { mainCount } = useDeckDetailsHeroPanelContext();
-
-  if (mainCount < 60) return null;
+export function DeckDetailsHeroReadyBadge({ mainCount, target }: { mainCount: number; target: number }) {
+  if (mainCount < target) return null;
 
   return (
     <div className="absolute right-2 top-2 z-20">

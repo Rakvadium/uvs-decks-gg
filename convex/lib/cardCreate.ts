@@ -4,6 +4,7 @@ import type { Id } from "../_generated/dataModel";
 import { cardInputValidator } from "../validators";
 import { syncSetCardCountByCode } from "../setCardCountSync";
 import { normalizeAbilityText } from "./normalizeAbilityText";
+import type { GameId } from "../../shared/games/types";
 
 export type CardInput = Infer<typeof cardInputValidator>;
 
@@ -34,6 +35,14 @@ const CARD_INPUT_KEYS = [
   "text",
   "keywords",
   "symbols",
+  "color",
+  "cost",
+  "power",
+  "ram",
+  "sellable",
+  "tags",
+  "subname",
+  "artist",
   "searchName",
   "searchText",
   "searchAll",
@@ -76,6 +85,11 @@ export function sanitizeCardImportList(raw: unknown[]): CardInput[] {
     .filter((card): card is CardInput => card !== null);
 }
 
+/**
+ * Search index strings. `subname` (after the name) and `tags` (pipe-delimited, next to keywords)
+ * join `searchText`; `color` joins `searchAll`. Each is only added when present, so UVS strings are
+ * unchanged.
+ */
 export function deriveCardSearchFields(card: {
   name: string;
   searchName?: string;
@@ -84,21 +98,37 @@ export function deriveCardSearchFields(card: {
   setName?: string;
   type?: string;
   rarity?: string;
+  tags?: string;
+  color?: string;
+  subname?: string;
 }) {
   const searchName = card.searchName ?? card.name;
-  const searchText = [card.name, card.keywords ?? "", card.text ?? ""].join(" ");
+  const tags = card.tags
+    ?.split("|")
+    .map((tag) => tag.trim())
+    .filter(Boolean)
+    .join(" ");
+  const searchText = [
+    card.name,
+    ...(card.subname ? [card.subname] : []),
+    card.keywords ?? "",
+    ...(tags ? [tags] : []),
+    card.text ?? "",
+  ].join(" ");
   const searchAll = [
     searchName,
     searchText,
     card.setName ?? "",
     card.type ?? "",
     card.rarity ?? "",
+    ...(card.color ? [card.color] : []),
   ].join(" ");
   return { searchName, searchText, searchAll };
 }
 
 export async function createCardWithDerivedFields(
   ctx: MutationCtx,
+  game: GameId,
   card: CardInput,
   now = Date.now()
 ): Promise<Id<"cards">> {
@@ -112,6 +142,9 @@ export async function createCardWithDerivedFields(
     setName: normalizedCard.setName,
     type: normalizedCard.type,
     rarity: normalizedCard.rarity,
+    tags: normalizedCard.tags,
+    color: normalizedCard.color,
+    subname: normalizedCard.subname,
   });
 
   const id = await ctx.db.insert("cards", {
@@ -120,7 +153,8 @@ export async function createCardWithDerivedFields(
     searchText,
     searchAll,
     contentRevisionAt: now,
+    game,
   });
-  await syncSetCardCountByCode(ctx, card.setCode);
+  await syncSetCardCountByCode(ctx, game, card.setCode);
   return id;
 }

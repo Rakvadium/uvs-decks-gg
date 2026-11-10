@@ -9,7 +9,6 @@ import {
   FloatingTabsPill,
 } from "@/components/shell/floating-page-bar";
 import { useOptionalCommunityTierListsPageContext } from "./context";
-import { BROWSER_TABS } from "./hook";
 
 export function CommunityTierListsFloatingTopBar() {
   const context = useOptionalCommunityTierListsPageContext();
@@ -23,6 +22,7 @@ export function CommunityTierListsFloatingTopBar() {
     publicLists,
     myLists,
     handleOpenCreateDialog,
+    browserTabs,
   } = context;
 
   const showListBrowser = activeTab !== "rankings";
@@ -35,7 +35,7 @@ export function CommunityTierListsFloatingTopBar() {
           <FloatingTabsPill
             value={activeTab}
             onValueChange={(value) => setActiveTab(value as typeof activeTab)}
-            items={BROWSER_TABS.map((tab) => ({
+            items={browserTabs.map((tab) => ({
               value: tab.id,
               label: tab.label,
               icon: tab.icon,

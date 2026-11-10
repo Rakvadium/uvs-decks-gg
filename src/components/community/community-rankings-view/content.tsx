@@ -13,14 +13,15 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
-import { CardImageDisplay } from "@/components/universus/card-grid-item/image-display";
 import type { Id } from "../../../../convex/_generated/dataModel";
 import { useCommunityRankingsModel } from "./hook";
 import type { CommunityRankingsViewProps } from "./types";
+import { useGameModule } from "@/games/game-context";
 
 const TIER_PREVIEW_CARD_LIMIT = 10;
 
 export function CommunityRankingsView({ embedded = false }: CommunityRankingsViewProps) {
+  const { CardImageDisplay } = useGameModule().ui;
   const {
     scopeType,
     leaderboard,

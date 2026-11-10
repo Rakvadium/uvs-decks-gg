@@ -2,48 +2,20 @@
 
 import { useMemo } from "react";
 import { useGalleryFilterDialogContext } from "@/components/gallery/filter-dialog/context";
+import { useGameModule } from "@/games/game-context";
 import type { CardFilters } from "@/providers/UIStateProvider";
+import { colorFacetLabel } from "@/components/gallery/mobile-filter-sheet/color-facet-chips";
+import {
+  countActiveStatPageFilters,
+  statPageFilterKeys,
+  type GameFilterDefinition,
+} from "@shared/games/filters";
 
-export const STATS_FILTER_KEYS = [
-  "difficulty",
-  "control",
-  "speed",
-  "damage",
-  "blockModifier",
-  "handSize",
-  "health",
-  "stamina",
-  "blockZone",
-  "attackZone",
-] as const satisfies readonly (keyof CardFilters)[];
-
-const STAT_VALUE_KEYS = [
-  "difficulty",
-  "control",
-  "speed",
-  "damage",
-  "blockModifier",
-  "handSize",
-  "health",
-  "stamina",
-] as const;
-
-export function statsFilterCount(filters: CardFilters): number {
-  let count = 0;
-  for (const key of STAT_VALUE_KEYS) {
-    const statValue = filters[key];
-    if (
-      statValue &&
-      typeof statValue === "object" &&
-      "value" in statValue &&
-      statValue.value !== undefined
-    ) {
-      count += 1;
-    }
-  }
-  count += filters.blockZone?.length ?? 0;
-  count += filters.attackZone?.length ?? 0;
-  return count;
+export function statsFilterCount(
+  filters: CardFilters,
+  definition: GameFilterDefinition
+): number {
+  return countActiveStatPageFilters(definition, filters);
 }
 
 export function formatSymbolLabel(symbol: string): string {
@@ -61,6 +33,7 @@ export interface ActiveFilterToken {
 
 export function useActiveFilterTokens(): ActiveFilterToken[] {
   const { filters, meta, actions, setOptions } = useGalleryFilterDialogContext();
+  const { filters: filterDefinition } = useGameModule();
 
   return useMemo(() => {
     const tokens: ActiveFilterToken[] = [];
@@ -112,38 +85,68 @@ export function useActiveFilterTokens(): ActiveFilterToken[] {
       clear: () => actions.removeFilterKeys(["type"]),
     });
 
-    const symbols = filters.symbols ?? [];
-    const excludesInfinity = filters.includeInfinity === false;
-    const symbolValues = symbols.map(formatSymbolLabel);
-    if (excludesInfinity) symbolValues.push("no ∞");
-    const symbolsActive = symbols.length > 0 || excludesInfinity;
-    tokens.push({
-      id: "symbols",
-      label: "Symbols",
-      values: symbolsActive ? symbolValues : ["Any"],
-      count: symbols.length + (excludesInfinity ? 1 : 0),
-      active: symbolsActive,
-      clear: () => actions.removeFilterKeys(["symbols", "symbolMatchAll", "includeInfinity"]),
-    });
+    const { facets } = filterDefinition;
 
-    const keywords = filters.keywords ?? [];
-    tokens.push({
-      id: "keywords",
-      label: "Keywords",
-      values: keywords.length > 0 ? keywords : ["Any"],
-      count: keywords.length,
-      active: keywords.length > 0,
-      clear: () => actions.removeFilterKeys(["keywords", "keywordMatchAll"]),
-    });
+    if (facets.colors) {
+      const colors = filters.colors ?? [];
+      tokens.push({
+        id: "colors",
+        label: "Colors",
+        values: colors.length > 0 ? colors.map((value) => colorFacetLabel(facets.colors, value)) : ["Any"],
+        count: colors.length,
+        active: colors.length > 0,
+        clear: () => actions.removeFilterKeys(["colors"]),
+      });
+    }
 
-    const statCount = statsFilterCount(filters);
+    if (facets.symbols) {
+      const symbols = filters.symbols ?? [];
+      const excludesInfinity = filters.includeInfinity === false;
+      const symbolValues = symbols.map(formatSymbolLabel);
+      if (excludesInfinity) symbolValues.push("no ∞");
+      const symbolsActive = symbols.length > 0 || excludesInfinity;
+      tokens.push({
+        id: "symbols",
+        label: "Symbols",
+        values: symbolsActive ? symbolValues : ["Any"],
+        count: symbols.length + (excludesInfinity ? 1 : 0),
+        active: symbolsActive,
+        clear: () => actions.removeFilterKeys(["symbols", "symbolMatchAll", "includeInfinity"]),
+      });
+    }
+
+    if (facets.keywords) {
+      const keywords = filters.keywords ?? [];
+      tokens.push({
+        id: "keywords",
+        label: "Keywords",
+        values: keywords.length > 0 ? keywords : ["Any"],
+        count: keywords.length,
+        active: keywords.length > 0,
+        clear: () => actions.removeFilterKeys(["keywords", "keywordMatchAll"]),
+      });
+    }
+
+    if (facets.tags) {
+      const tags = filters.tags ?? [];
+      tokens.push({
+        id: "tags",
+        label: "Tags",
+        values: tags.length > 0 ? tags : ["Any"],
+        count: tags.length,
+        active: tags.length > 0,
+        clear: () => actions.removeFilterKeys(["tags"]),
+      });
+    }
+
+    const statCount = statsFilterCount(filters, filterDefinition);
     tokens.push({
       id: "stats",
       label: "Stats",
       values: statCount > 0 ? [`${statCount} selected`] : ["Any"],
       count: statCount,
       active: statCount > 0,
-      clear: () => actions.removeFilterKeys([...STATS_FILTER_KEYS]),
+      clear: () => actions.removeFilterKeys(statPageFilterKeys(filterDefinition) as (keyof CardFilters)[]),
     });
 
     const rarities = filters.rarity ?? [];
@@ -157,7 +160,7 @@ export function useActiveFilterTokens(): ActiveFilterToken[] {
     });
 
     return tokens;
-  }, [filters, meta.defaultFormatKey, meta.formats, actions, setOptions]);
+  }, [filters, filterDefinition, meta.defaultFormatKey, meta.formats, actions, setOptions]);
 }
 
 export function summarizeTokenValues(values: string[], maxVisible = 2): string {

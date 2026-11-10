@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test";
+import { UVS_FILTER_DEFINITION } from "../shared/games/uvs/filters";
 import { filterCards } from "../src/lib/universus/use-universus-cards";
 import type { CachedCard } from "../src/lib/universus/card-store";
 import type { Id } from "../convex/_generated/dataModel";
@@ -21,7 +22,7 @@ describe("filterCards format bans", () => {
   const isCardBannedInFormat = (cardId: string) => cardId === banned._id;
 
   test("hides banned cards for a format by default", () => {
-    const filtered = filterCards(cards, { format: "standard" }, { isCardBannedInFormat });
+    const filtered = filterCards(cards, { format: "standard" }, { isCardBannedInFormat }, UVS_FILTER_DEFINITION);
     expect(filtered.map((entry) => entry._id)).toEqual([legal._id]);
   });
 
@@ -29,7 +30,8 @@ describe("filterCards format bans", () => {
     const filtered = filterCards(
       cards,
       { format: "standard", includeBanned: true },
-      { isCardBannedInFormat }
+      { isCardBannedInFormat },
+      UVS_FILTER_DEFINITION
     );
     expect(filtered.map((entry) => entry._id)).toEqual([legal._id, banned._id]);
   });

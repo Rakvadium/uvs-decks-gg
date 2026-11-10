@@ -1,9 +1,10 @@
 "use client";
 
-import { CardGridItem } from "@/components/universus/card-grid-item";
 import { useCommunityTierListDetailContext } from "./context";
+import { useGameModule } from "@/games/game-context";
 
 export function CommunityTierListPresentationCard() {
+  const { CardGridItem } = useGameModule().ui;
   const { presentationCard, filteredPoolCardIds, getBackCard } = useCommunityTierListDetailContext();
 
   if (!presentationCard) {

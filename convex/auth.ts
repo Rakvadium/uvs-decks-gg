@@ -1,9 +1,17 @@
+import { ConvexCredentials } from "@convex-dev/auth/providers/ConvexCredentials";
 import { Password } from "@convex-dev/auth/providers/Password";
 import { convexAuth } from "@convex-dev/auth/server";
 import { ConvexError } from "convex/values";
 import { z } from "zod";
+import { internal } from "./_generated/api";
 import { isReservedAgentEmail } from "./lib/reservedIdentity";
 import { ResendOTPPasswordReset } from "./ResendOTPPasswordReset";
+import {
+  HANDOFF_PROVIDER_ID,
+  isValidHandoffCode,
+  isValidHandoffState,
+} from "../shared/auth-handoff";
+import { isAllowedHandoffOrigin } from "../shared/hosts";
 
 const SignUpProfileSchema = z.object({
   email: z.string().email("Invalid email format"),
@@ -53,6 +61,22 @@ const passwordProvider = Password({
 
 export default passwordProvider;
 
+/** Redeems a one-time code minted on the apex (convex/authHandoff.ts). */
+const handoffProvider = ConvexCredentials({
+  id: HANDOFF_PROVIDER_ID,
+  authorize: async (params, ctx) => {
+    const { code, origin, state } = params;
+    if (!isValidHandoffCode(code) || typeof origin !== "string" || !isAllowedHandoffOrigin(origin)) {
+      return null;
+    }
+    if (state !== undefined && !isValidHandoffState(state)) {
+      return null;
+    }
+    const userId = await ctx.runMutation(internal.authHandoff.consume, { code, origin, state });
+    return userId ? { userId } : null;
+  },
+});
+
 export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
-  providers: [passwordProvider],
+  providers: [passwordProvider, handoffProvider],
 });

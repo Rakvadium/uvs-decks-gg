@@ -158,7 +158,7 @@ export function classifyUtility(utility) {
       : "a semantic token (primary, secondary, accent, success, warning, info, destructive)";
     return {
       rule: RULES.palette,
-      message: `Raw palette hue \`${utility}\`. Use ${hint} (UI_UX_DESIGN.md § Status colors); domain colors live in src/config/universus.ts.`,
+      message: `Raw palette hue \`${utility}\`. Use ${hint} (UI_UX_DESIGN.md § Status colors); domain colors live in src/games/uvs/config.ts.`,
     };
   }
 

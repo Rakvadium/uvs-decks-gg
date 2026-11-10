@@ -45,6 +45,7 @@ function tierList(id: Id<"tierLists">, userId: Id<"users">, updatedAt: number, s
     _id: id,
     _creationTime: 1,
     userId,
+    game: "uvs",
     title: id,
     isPublic,
     rankingScope: "global",
@@ -336,7 +337,7 @@ describe("likes and comments on hidden lists", () => {
 describe("community rankings", () => {
   test("pending and rejected lists don't count; approved and legacy lists do", async () => {
     const { ctx, inserted } = fakeCtx(null);
-    await handlerOf(recomputeScope)(ctx, { scopeType: "global", scopeKey: "global" });
+    await handlerOf(recomputeScope)(ctx, { game: "uvs", scopeType: "global", scopeKey: "global" });
     const snapshot = inserted.find((i) => i.table === "communityTierSnapshots")?.doc;
     expect(snapshot?.contributorCount).toBe(2);
     const votedCards = inserted.filter((i) => i.table === "communityCardRankings").map((i) => i.doc.cardId);
@@ -345,7 +346,7 @@ describe("community rankings", () => {
 
   test("a hidden list has no ranking scope", () => {
     const base = tierList(approvedId, memberId, 1) as never as Parameters<typeof getEligibleRankingScopeRefs>[0];
-    expect(getEligibleRankingScopeRefs(base)).toEqual([{ scopeType: "global", scopeKey: "global" }]);
+    expect(getEligibleRankingScopeRefs(base)).toEqual([{ game: "uvs", scopeType: "global", scopeKey: "global" }]);
     expect(getEligibleRankingScopeRefs({ ...base, listModerationStatus: "approved" })).toHaveLength(1);
     expect(getEligibleRankingScopeRefs({ ...base, listModerationStatus: "pending" })).toEqual([]);
     expect(getEligibleRankingScopeRefs({ ...base, listModerationStatus: "rejected" })).toEqual([]);
@@ -358,7 +359,7 @@ describe("community rankings", () => {
     ] as const) {
       const { ctx, runMutationCalls } = fakeCtx(adminId);
       await handlerOf(bulkSetTierListListModeration)(ctx, { tierListIds: [id], listModerationStatus: next });
-      expect(runMutationCalls).toEqual([{ scopeType: "global", scopeKey: "global" }]);
+      expect(runMutationCalls).toEqual([{ game: "uvs", scopeType: "global", scopeKey: "global" }]);
       expect((await ctx.db.get(id))?.listModerationStatus).toBe(next);
     }
     // Visibility doesn't change, so no ranking work: rejected -> pending (hidden both sides),
