@@ -3,6 +3,7 @@ import Image from "next/image";
 import { FileText, Hexagon, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCardNavigation } from "@/components/card/navigation-context";
+import { OraclePrintingsCarousel } from "@/components/card/oracle-printings-carousel";
 import { usePrefersReducedMotion } from "@/lib/reduced-motion";
 import { useTcgDraggable } from "@/lib/dnd";
 import { cn } from "@/lib/utils";
@@ -21,12 +22,18 @@ export function CardDetailsListItem({ card, onOpenCardDetails, imagePriority = f
   const { CardDetailsContent, CardDetailsDialog } = useGameModule().ui;
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isFlipped, setIsFlipped] = useState(false);
+  // Another printing of this card picked in the carousel; deck controls and drag keep using `card`.
+  const [picked, setPicked] = useState<{ baseId: string; card: CachedCard } | null>(null);
+  const printing = picked?.baseId === card._id ? picked.card : null;
   const prefersReducedMotion = usePrefersReducedMotion();
   const { getBackCard } = useGalleryCardMap();
   const nav = useCardNavigation();
   const backCard = getBackCard(card);
-  const hasBack = Boolean(backCard);
-  const displayCard = useMemo(() => (isFlipped && backCard ? backCard : card), [isFlipped, backCard, card]);
+  const hasBack = Boolean(backCard) && !printing;
+  const displayCard = useMemo(
+    () => printing ?? (isFlipped && backCard ? backCard : card),
+    [printing, isFlipped, backCard, card]
+  );
   const dragPreviewImageRef = useRef<HTMLImageElement | null>(null);
   const { isDragging, dragHandleProps } = useTcgDraggable({
     card,
@@ -81,6 +88,13 @@ export function CardDetailsListItem({ card, onOpenCardDetails, imagePriority = f
                 <div className="absolute -inset-3 -z-10 rounded-2xl bg-gradient-to-r from-primary/10 via-secondary/10 to-primary/10 blur-2xl" />
               ) : null}
             </div>
+
+            <OraclePrintingsCarousel
+              oracleId={card.oracleId}
+              selectedCardId={displayCard._id}
+              onSelectPrinting={(next) => setPicked(next._id === card._id ? null : { baseId: card._id, card: next })}
+              className="mx-auto max-w-[260px] lg:mx-0"
+            />
 
             <div className="flex flex-wrap items-center justify-center gap-2 lg:justify-start">
               {hasBack ? (
