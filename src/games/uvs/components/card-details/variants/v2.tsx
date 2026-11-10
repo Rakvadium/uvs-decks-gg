@@ -17,7 +17,7 @@ import {
 } from "../content-context";
 import { CardDetailsAdminJsonControls } from "../card-details-admin-json-controls";
 import { CardVariantSaveDialog, CardVariantSaveTrigger } from "../card-variant-save-dialog";
-import { OraclePrintingsCarousel } from "../oracle-printings-carousel";
+import { OraclePrintingsCarousel } from "@/components/card/oracle-printings-carousel";
 import { DeckSectionControls } from "../deck-section-controls";
 import {
   CardDetailsReadoutPanel,
