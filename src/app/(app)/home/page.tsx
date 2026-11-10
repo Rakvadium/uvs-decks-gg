@@ -12,7 +12,7 @@ import { useCardData } from "@/lib/universus/card-data-provider";
 import * as m from "framer-motion/m";
 import { usePrefersReducedMotion } from "@/lib/reduced-motion";
 import { useAuthDialog } from "@/components/auth/auth-dialog";
-import { useGameId } from "@/games/game-context";
+import { useBrand, useGameId, useGameModule } from "@/games/game-context";
 
 function StatCard({ label, value, icon: Icon, delay = 0, animate = true }: { label: string; value: string | number; icon: typeof Database; delay?: number; animate?: boolean }) {
   const prefersReducedMotion = usePrefersReducedMotion();
@@ -100,6 +100,8 @@ function HomePage() {
   const user = useQuery(api.user.currentUser, isAuthenticated ? {} : "skip");
   const { isLoading: cardsLoading, totalCards: catalogTotalCards } = useCardData();
   const game = useGameId();
+  const { displayName } = useGameModule();
+  const brandLabel = useBrand().wordmark.join("");
   const decks = useQuery(api.decks.listByUser, user ? { game, userId: user._id } : "skip");
   const prefersReducedMotion = usePrefersReducedMotion();
   const { openAuthDialog } = useAuthDialog();
@@ -117,7 +119,7 @@ function HomePage() {
   const showPersonalStats = !isLoading && isAuthenticated;
   const cardsLabel = new Intl.NumberFormat().format(totalCards);
   const greetingLead = isAuthenticated ? "Welcome back," : "Build Better Decks";
-  const greetingName = isAuthenticated ? username : "UniVersus";
+  const greetingName = isAuthenticated ? username : displayName;
 
   return (
     <div className="relative flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-y-contain [-webkit-overflow-scrolling:touch] md:h-full" style={{ transform: "translateZ(0)" }}>
@@ -136,7 +138,7 @@ function HomePage() {
         >
           <div className="flex flex-wrap items-center gap-3">
             <div className="flex h-3 w-3 rounded-full bg-success" style={{ boxShadow: "var(--chrome-page-status-dot-shadow)", animation: "var(--chrome-decks-heading-dot-animation)" }} />
-            <span className="chrome-label-case text-xs text-muted-foreground">UVSDECKS.GG</span>
+            <span className="chrome-label-case text-xs text-muted-foreground">{brandLabel}</span>
             <span className="chrome-label-case text-xs text-muted-foreground/60">
               {isLoading ? "Checking session…" : isAuthenticated ? "Signed in" : "Browsing as guest"}
             </span>
@@ -204,7 +206,7 @@ function HomePage() {
             href="/gallery"
             icon={LayoutGrid}
             title="Card Gallery"
-            description="Browse the complete UniVersus card database. Search, filter, and explore."
+            description={`Browse the complete ${displayName} card database. Search, filter, and explore.`}
             accentColor="primary"
             delay={0.2}
             animate={introAnimations}
@@ -282,7 +284,7 @@ function HomePage() {
           className="flex items-center justify-center gap-4 py-8 text-xs text-muted-foreground"
         >
           <Hexagon className="h-4 w-4" />
-          <span className="chrome-label-case">UVSDECKS.GG</span>
+          <span className="chrome-label-case">{brandLabel}</span>
           <Hexagon className="h-4 w-4" />
         </m.div>
       </div>

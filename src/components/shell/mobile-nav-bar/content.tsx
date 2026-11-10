@@ -3,6 +3,7 @@
 import { useLayoutEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { AppBrandLink } from "@/components/brand/app-brand-link";
+import { useBrand } from "@/games/game-context";
 import { CommunityTierListsPageMobileNavAction } from "@/components/community/tier-lists/page-view/top-bar";
 import { cn } from "@/lib/utils";
 import { MOBILE_GLASS_BAR, MOBILE_GLASS_HAIRLINE_BOTTOM } from "../mobile-glass";
@@ -23,6 +24,7 @@ function PageAction({ pathname }: { pathname: string }) {
 }
 
 function NavRow({ config, pathname }: { config: MobileNavPageConfig; pathname: string }) {
+  const brand = useBrand();
   if (config.kind === "deck-details") {
     return <DeckDetailsMobileNav />;
   }
@@ -51,7 +53,7 @@ function NavRow({ config, pathname }: { config: MobileNavPageConfig; pathname: s
       <div className="flex min-w-0 items-center justify-start">{leading}</div>
       <div className="flex min-w-0 items-center justify-center">
         {config.kind === "brand" ? (
-          <span className="sr-only">{config.title}</span>
+          <span className="sr-only">{brand.title}</span>
         ) : (
           <MobileNavTitle collapsible={config.kind === "section"}>{config.title}</MobileNavTitle>
         )}
