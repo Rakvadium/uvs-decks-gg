@@ -22,7 +22,7 @@ export function CardDetailsListItem({ card, onOpenCardDetails, imagePriority = f
   const { CardDetailsContent, CardDetailsDialog } = useGameModule().ui;
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isFlipped, setIsFlipped] = useState(false);
-  // Another printing of this card picked in the carousel; deck controls and drag keep using `card`.
+  // Another printing of this card picked in the carousel; deck controls and drag use it.
   const [picked, setPicked] = useState<{ baseId: string; card: CachedCard } | null>(null);
   const printing = picked?.baseId === card._id ? picked.card : null;
   const prefersReducedMotion = usePrefersReducedMotion();
@@ -36,7 +36,7 @@ export function CardDetailsListItem({ card, onOpenCardDetails, imagePriority = f
   );
   const dragPreviewImageRef = useRef<HTMLImageElement | null>(null);
   const { isDragging, dragHandleProps } = useTcgDraggable({
-    card,
+    card: printing ?? card,
     sourceId: "gallery-details",
     previewImageRef: dragPreviewImageRef,
   });
@@ -110,7 +110,7 @@ export function CardDetailsListItem({ card, onOpenCardDetails, imagePriority = f
                 </Button>
               ) : null}
 
-              <CardDeckControlsStandard card={card} />
+              <CardDeckControlsStandard card={printing ?? card} />
 
               <Button
                 variant="outline"

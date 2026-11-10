@@ -1,4 +1,3 @@
-import { useMemo } from "react";
 import { canAddCardToSection, useDeckEditor } from "@/lib/deck";
 import { useGameModule } from "@/games/game-context";
 import type { CachedCard } from "@/lib/universus/card-store";
@@ -9,16 +8,9 @@ export function useCardMainDeckControls(card: CachedCard) {
     getCardCount,
     addCard,
     removeCard,
-    mainCounts,
-    sideCounts,
-    referenceCounts,
+    sectionCounts,
   } = useDeckEditor();
   const gameDeck = useGameModule().deck;
-
-  const sectionCounts = useMemo(
-    () => ({ mainCounts, sideCounts, referenceCounts }),
-    [mainCounts, sideCounts, referenceCounts]
-  );
 
   const deckCount = getCardCount(card._id);
   const canAddToDeck = canAddCardToSection({

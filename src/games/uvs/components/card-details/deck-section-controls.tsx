@@ -20,14 +20,9 @@ interface DeckSectionControlsProps {
 }
 
 export function DeckSectionControls({ card, layout = "vertical" }: DeckSectionControlsProps) {
-  const { hasDeck, addCard, removeCard, mainCounts, sideCounts, referenceCounts } = useDeckEditor();
+  const { hasDeck, addCard, removeCard, sectionCounts } = useDeckEditor();
   const deckDetails = useDeckDetailsOptional();
   const canEditViewedDeck = deckDetails?.isOwner ?? true;
-
-  const sectionCounts = useMemo(
-    () => ({ mainCounts, sideCounts, referenceCounts }),
-    [mainCounts, sideCounts, referenceCounts]
-  );
 
   const counts = useMemo(
     () =>

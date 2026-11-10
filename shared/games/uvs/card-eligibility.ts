@@ -20,6 +20,11 @@ export type DeckSectionCounts = {
   mainCounts: Record<string, number>;
   sideCounts: Record<string, number>;
   referenceCounts: Record<string, number>;
+  /**
+   * Main + side copies counted toward `cardId`'s copy limit. Deck providers set it to sum every
+   * printing of the same card (shared `oracleId`); without it, only `cardId` itself counts.
+   */
+  copiesTowardLimit?: (cardId: string) => number;
 };
 
 export type CardSectionCountSummary = {
@@ -64,7 +69,7 @@ export function canAddCardToSection(params: {
   if (section === "reference") return true;
 
   const limit = rules.getCardCopyLimit(card);
-  const { mainSide } = getCardSectionCounts(cardId, counts);
+  const mainSide = counts.copiesTowardLimit?.(cardId) ?? getCardSectionCounts(cardId, counts).mainSide;
   const addQuantity = Math.max(1, quantity ?? 1);
   return mainSide + addQuantity <= limit;
 }
@@ -85,7 +90,29 @@ export function canMoveCardToSection(params: {
   if (fromSection !== "reference") return true;
 
   const limit = rules.getCardCopyLimit(card);
-  const { mainSide } = getCardSectionCounts(cardId, counts);
+  const mainSide = counts.copiesTowardLimit?.(cardId) ?? getCardSectionCounts(cardId, counts).mainSide;
   const moveQuantity = Math.max(1, quantity ?? 1);
   return mainSide + moveQuantity <= limit;
+}
+
+/**
+ * `copiesTowardLimit` for `DeckSectionCounts`: main + side copies across every printing that shares
+ * the card's `oracleId` (the grouping deck validation uses). Unknown cards count only themselves.
+ */
+export function buildCopiesTowardLimit(
+  counts: Pick<DeckSectionCounts, "mainCounts" | "sideCounts">,
+  getCard: (cardId: string) => { oracleId?: string } | null | undefined,
+): (cardId: string) => number {
+  const groupKey = (cardId: string) => {
+    const oracleId = getCard(cardId)?.oracleId;
+    return oracleId ? `oracle:${oracleId}` : `id:${cardId}`;
+  };
+  const totals = new Map<string, number>();
+  for (const record of [counts.mainCounts, counts.sideCounts]) {
+    for (const [cardId, quantity] of Object.entries(record)) {
+      const key = groupKey(cardId);
+      totals.set(key, (totals.get(key) ?? 0) + quantity);
+    }
+  }
+  return (cardId) => totals.get(groupKey(cardId)) ?? 0;
 }

@@ -1,12 +1,13 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import Image from "next/image";
 import { useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import type { CachedCard } from "@/lib/universus/card-store";
 import { cn } from "@/lib/utils";
 import { useGameId } from "@/games/game-context";
+import { useCardCatalog } from "@/lib/universus/card-data-provider";
 
 interface OraclePrintingsCarouselProps {
   oracleId: string | undefined;
@@ -28,6 +29,11 @@ export function OraclePrintingsCarousel({
   );
 
   const items = useMemo(() => printings ?? [], [printings]);
+  // Variant printings aren't in the catalog; register them so deck controls can resolve the pick.
+  const { registerCards } = useCardCatalog();
+  useEffect(() => {
+    if (printings && printings.length > 1) registerCards(printings);
+  }, [printings, registerCards]);
 
   if (!oracleId || items.length <= 1) {
     return null;

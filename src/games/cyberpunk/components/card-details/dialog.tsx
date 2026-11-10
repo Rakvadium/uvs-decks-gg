@@ -86,6 +86,8 @@ export function CardDetailsDialog({
   const selectedPrinting = printing?.baseId === currentCard._id ? printing.card : null;
   const isFlipped = flippedCardId === currentCard._id;
   const displayCard = selectedPrinting ?? (isFlipped && currentBack ? currentBack : currentCard);
+  // Deck controls add the printing being viewed.
+  const deckCard = selectedPrinting ?? currentCard;
   const showGuestPrompt = canEditViewedDeck && !isAuthLoading && !isAuthenticated;
 
   const prevButton = hasNavigation ? (
@@ -166,7 +168,7 @@ export function CardDetailsDialog({
               </div>
               {showGuestPrompt ? null : (
                 <div className="flex shrink-0 justify-start border-t border-border/30 px-3 py-2 empty:hidden">
-                  <CyberpunkCardDeckBar key={currentCard._id} card={currentCard} />
+                  <CyberpunkCardDeckBar key={deckCard._id} card={deckCard} />
                 </div>
               )}
             </div>

@@ -27,7 +27,7 @@ const EMPTY_QUANTITIES: Record<string, number> = {};
 export function useDeckCardsSectionModel() {
   const isMobile = useIsMobile();
   const { cards: allCards } = useCardData();
-  const { addCard } = useDeckEditor();
+  const { addCard, sectionCounts: sectionCountsForDrop } = useDeckEditor();
   const { deck, activeSection, isOwner, setActiveSection } = useDeckDetails();
   const gameModule = useGameModule();
   const gameDeck = gameModule.deck;
@@ -69,15 +69,6 @@ export function useDeckCardsSectionModel() {
 
   const sideboardLimit = gameDeck.sideboardLimit;
   const isSideboardOverflow = counts.side > sideboardLimit;
-
-  const sectionCountsForDrop = useMemo(
-    () => ({
-      mainCounts: deck?.mainQuantities ?? {},
-      sideCounts: deck?.sideQuantities ?? {},
-      referenceCounts: deck?.referenceQuantities ?? {},
-    }),
-    [deck]
-  );
 
   const currentCards = activeSection === "main" ? mainCards : activeSection === "side" ? sideCards : referenceCards;
   const currentQuantities = useMemo(() => {

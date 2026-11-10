@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { normalizeDeckVisibility } from "@/lib/deck/visibility";
 import { useProfanityDisplayText } from "@/lib/moderation/use-profanity-display-text";
-import { useCardData } from "@/lib/universus/card-data-provider";
+import { useCardIndex, useEnsureCards } from "@/lib/universus/card-data-provider";
 import { useGameModule } from "@/games/game-context";
 import { mainDeckTarget } from "@/games/main-deck-target";
 import type { CachedCard } from "@/lib/universus/card-store";
@@ -27,31 +27,33 @@ export function useDeckGridItemModel({
   selected = false,
   trailingAction,
 }: DeckGridItemProps) {
-  const { cards } = useCardData();
+  const cardIndex = useCardIndex();
   const { display, viewerUserId } = useProfanityDisplayText();
   const gameModule = useGameModule();
   const gameDeck = gameModule.deck;
   const setup = gameDeck.normalizeSetup(deck);
   const mainTarget = mainDeckTarget(gameModule);
+  const setupCardIds = useMemo(() => gameDeck.setupCardIds(gameDeck.normalizeSetup(deck)), [gameDeck, deck]);
+  // Cover and setup cards can be variant printings, which aren't in the catalog.
+  useEnsureCards(deck.imageCardId ? [deck.imageCardId, ...setupCardIds] : setupCardIds);
 
   const imageCard = useMemo(() => {
     if (!deck.imageCardId) return null;
-    return cards.find((card) => card._id === deck.imageCardId) ?? null;
-  }, [deck.imageCardId, cards]);
+    return cardIndex?.byId.get(deck.imageCardId) ?? null;
+  }, [deck.imageCardId, cardIndex]);
 
   const startingCharacter = useMemo(() => {
     const startingCharacterId = gameDeck.setupPreviewCardId(gameDeck.normalizeSetup(deck));
     if (!startingCharacterId) return null;
-    return cards.find((card) => card._id === startingCharacterId) ?? null;
-  }, [gameDeck, deck, cards]);
+    return cardIndex?.byId.get(startingCharacterId) ?? null;
+  }, [gameDeck, deck, cardIndex]);
 
   // Every setup card (UVS: the starting character; Cyberpunk: the Legends), in setup order.
   const setupCards = useMemo(() => {
-    const ids = gameDeck.setupCardIds(gameDeck.normalizeSetup(deck));
-    return ids
-      .map((id) => cards.find((card) => card._id === id))
+    return setupCardIds
+      .map((id) => cardIndex?.byId.get(id))
       .filter((card): card is CachedCard => Boolean(card));
-  }, [gameDeck, deck, cards]);
+  }, [setupCardIds, cardIndex]);
 
   const counts = useMemo(
     () => ({
