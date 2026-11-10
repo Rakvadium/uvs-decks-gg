@@ -4,10 +4,12 @@ import { useCallback, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useConvexAuth } from "convex/react";
 import { ChevronLeft, ChevronRight, RotateCcw, X } from "lucide-react";
+import { OraclePrintingsCarousel } from "@/components/card/oracle-printings-carousel";
 import { GalleryGuestDeckAuthPrompt } from "@/components/gallery/gallery-guest-deck-auth-prompt";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import type { GameCardDetailsDialogProps } from "@/games/types";
+import type { CachedCard } from "@/lib/universus/card-store";
 import { useDeckDetailsOptional } from "@/providers/DeckDetailsProvider";
 import { cn } from "@/lib/utils";
 import { CardImageDisplay } from "../card-image-display";
@@ -44,6 +46,8 @@ export function CardDetailsDialog({
   const anchorIndex = anchorId && cards ? cards.findIndex((c) => c._id === anchorId) : -1;
   const currentIndex = paging.anchorId === anchorId && paging.index !== null ? paging.index : anchorIndex;
   const [flippedCardId, setFlippedCardId] = useState<string | null>(null);
+  // A printing picked in the carousel applies only to the gallery card it was picked on.
+  const [printing, setPrinting] = useState<{ baseId: string; card: CachedCard } | null>(null);
   const { isAuthenticated, isLoading: isAuthLoading } = useConvexAuth();
   const deckDetails = useDeckDetailsOptional();
   const canEditViewedDeck = deckDetails?.isOwner ?? true;
@@ -79,8 +83,9 @@ export function CardDetailsDialog({
 
   const currentBack =
     cards && currentIndex >= 0 && getBackCard ? (getBackCard(cards[currentIndex]) ?? null) : (backCard ?? null);
+  const selectedPrinting = printing?.baseId === currentCard._id ? printing.card : null;
   const isFlipped = flippedCardId === currentCard._id;
-  const displayCard = isFlipped && currentBack ? currentBack : currentCard;
+  const displayCard = selectedPrinting ?? (isFlipped && currentBack ? currentBack : currentCard);
   const showGuestPrompt = canEditViewedDeck && !isAuthLoading && !isAuthenticated;
 
   const prevButton = hasNavigation ? (
@@ -115,7 +120,7 @@ export function CardDetailsDialog({
               <div className={cn("shrink-0 justify-center md:hidden", prevButton ? "flex w-10" : "hidden")}>{prevButton}</div>
               <div className="relative aspect-[2.5/3.5] w-full max-w-[260px] overflow-hidden rounded-2xl md:max-w-[340px]" style={{ boxShadow: "var(--chrome-card-image-glow-rest)" }}>
                 <CardImageDisplay imageUrl={displayCard.imageUrl} name={displayCard.name} card={displayCard} sizes={HERO_SIZES} priority />
-                {currentBack ? (
+                {currentBack && !selectedPrinting ? (
                   <button
                     type="button"
                     onClick={() => setFlippedCardId(isFlipped ? null : currentCard._id)}
@@ -128,6 +133,14 @@ export function CardDetailsDialog({
               </div>
               <div className={cn("shrink-0 justify-center md:hidden", nextButton ? "flex w-10" : "hidden")}>{nextButton}</div>
             </div>
+            <OraclePrintingsCarousel
+              oracleId={currentCard.oracleId}
+              selectedCardId={displayCard._id}
+              onSelectPrinting={(picked) =>
+                setPrinting(picked._id === currentCard._id ? null : { baseId: currentCard._id, card: picked })
+              }
+              className="mt-3"
+            />
           </div>
 
           <div className="relative flex min-w-0 flex-col max-md:flex-none md:min-h-0 md:flex-1">
