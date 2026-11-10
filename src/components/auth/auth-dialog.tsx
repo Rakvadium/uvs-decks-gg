@@ -111,7 +111,7 @@ function AuthFormWithClose({
     <>
       {flow === "signIn" && <SignInFormDialog setFlow={setFlow} onSuccess={onSuccess} />}
       {flow === "signUp" && <SignUpFormDialog setFlow={setFlow} onSuccess={onSuccess} />}
-      {flow === "reset" && <ResetPasswordFormDialog setFlow={setFlow} />}
+      {flow === "reset" && <ResetPasswordFormDialog setFlow={setFlow} onSuccess={onSuccess} />}
     </>
   );
 }
