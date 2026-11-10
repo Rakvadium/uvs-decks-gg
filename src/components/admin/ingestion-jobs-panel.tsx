@@ -10,6 +10,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useGameId } from "@/games/game-context";
 
 type IngestionJobsPanelProps = {
   activeJobId: Id<"ingestionJobs"> | null;
@@ -27,7 +28,8 @@ export function IngestionJobsPanel({
   setCode,
   variant = "default",
 }: IngestionJobsPanelProps) {
-  const recent = useQuery(api.admin.listMyRecentIngestionJobs, { limit: 12 });
+  const game = useGameId();
+  const recent = useQuery(api.admin.listMyRecentIngestionJobs, { game, limit: 12 });
   const activeJob = useQuery(
     api.admin.getIngestionJob,
     activeJobId ? { jobId: activeJobId } : "skip"

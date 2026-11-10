@@ -1,11 +1,20 @@
 import { query } from "./_generated/server";
 import { v } from "convex/values";
 import {
-  runDeckValidation,
+  deckValidationRules,
+  runGameDeckValidation,
   type ValidationResult,
   type ValidationError,
   type ValidationWarning,
 } from "./lib/deckFormatRules";
+import { docGame, findFormatByKey } from "./lib/gameScope";
+import type { QueryCtx } from "./_generated/server";
+import type { GameId } from "../shared/games/types";
+
+/** The deck's format within the deck's game. */
+async function getDeckFormat(ctx: QueryCtx, formatKey: string, game: GameId) {
+  return await findFormatByKey(ctx, game, formatKey);
+}
 
 export type { ValidationResult, ValidationError, ValidationWarning };
 
@@ -51,10 +60,7 @@ export const validateDeck = query({
       };
     }
 
-    const format = await ctx.db
-      .query("formats")
-      .withIndex("by_key", (q) => q.eq("key", deck.format!))
-      .unique();
+    const format = await getDeckFormat(ctx, deck.format, docGame(deck));
 
     if (!format) {
       return {
@@ -64,7 +70,7 @@ export const validateDeck = query({
       };
     }
 
-    const { errors, warnings } = await runDeckValidation(ctx, deck, format);
+    const { errors, warnings } = await runGameDeckValidation(ctx, deckValidationRules(deck), deck, format);
 
     return {
       isValid: errors.length === 0,
@@ -89,16 +95,13 @@ export const getDeckValidationSummary = query({
       return { isValid: true, errorCount: 0, warningCount: 0 };
     }
 
-    const format = await ctx.db
-      .query("formats")
-      .withIndex("by_key", (q) => q.eq("key", deck.format!))
-      .unique();
+    const format = await getDeckFormat(ctx, deck.format, docGame(deck));
 
     if (!format) {
       return { isValid: false, errorCount: 1, warningCount: 0 };
     }
 
-    const { errors, warnings } = await runDeckValidation(ctx, deck, format);
+    const { errors, warnings } = await runGameDeckValidation(ctx, deckValidationRules(deck), deck, format);
 
     return {
       isValid: errors.length === 0,

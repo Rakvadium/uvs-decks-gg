@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useSyncExternalStore } from "react";
 import { useConvex } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import type { Doc } from "../../../convex/_generated/dataModel";
+import { useGameId } from "@/games/game-context";
 
 export type CachedFormat = Doc<"formats">;
 export type SetLegality = Doc<"setLegality">;
@@ -38,11 +39,12 @@ export function useFormats(): UseFormatsResult {
   const [error, setError] = useState<Error | null>(null);
   
   const convex = useConvex();
+  const game = useGameId();
   const isHydrated = useIsClient();
 
   const fetchFormats = useCallback(async () => {
     try {
-      const result = await convex.query(api.formats.list, {});
+      const result = await convex.query(api.formats.list, { game });
       setFormats(result);
       
       const legalitiesMap = new Map<string, SetLegality[]>();
@@ -50,9 +52,11 @@ export function useFormats(): UseFormatsResult {
       for (const format of result) {
         const [legalities, cardLegRows] = await Promise.all([
           convex.query(api.formats.getSetLegalityByFormat, {
+            game,
             formatKey: format.key,
           }),
           convex.query(api.formats.getCardLegalityByFormat, {
+            game,
             formatKey: format.key,
           }),
         ]);
@@ -69,7 +73,7 @@ export function useFormats(): UseFormatsResult {
       }
       setIsLoading(false);
     }
-  }, [convex]);
+  }, [convex, game]);
 
   const getFormatByKey = useCallback((key: string): CachedFormat | undefined => {
     return formats.find((f) => f.key === key);

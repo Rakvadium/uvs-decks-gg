@@ -15,6 +15,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { toast } from "sonner";
+import { useGameId } from "@/games/game-context";
 
 function effectiveSetLegal(
   entry: Doc<"setLegality"> | undefined,
@@ -38,8 +39,9 @@ type SetLegalityMatrixProps = {
 };
 
 export function SetLegalityMatrix({ formatKey }: SetLegalityMatrixProps) {
-  const sets = useQuery(api.sets.list);
-  const rows = useQuery(api.admin.listSetLegalityByFormat, { formatKey });
+  const game = useGameId();
+  const sets = useQuery(api.sets.list, { game });
+  const rows = useQuery(api.admin.listSetLegalityByFormat, { game, formatKey });
   const upsert = useMutation(api.admin.upsertSetLegality);
   const [busyCode, setBusyCode] = useState<string | null>(null);
 
@@ -72,6 +74,7 @@ export function SetLegalityMatrix({ formatKey }: SetLegalityMatrixProps) {
     setBusyCode(setCode);
     try {
       await upsert({
+        game,
         formatKey,
         setCode,
         isLegal: nextLegal,

@@ -8,6 +8,7 @@ import {
   upsertCardsBatch,
   upsertSet,
 } from "./adminHttp";
+import { uploadCardImage } from "./adminCardImagesHttp";
 
 const http = httpRouter();
 
@@ -38,6 +39,11 @@ http.route({
   path: "/admin/rebuild-catalog-aggregates",
   method: "POST",
   handler: rebuildCatalogAggregates,
+});
+http.route({
+  path: "/admin/upload-card-image",
+  method: "POST",
+  handler: uploadCardImage,
 });
 
 export default http;

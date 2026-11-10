@@ -1,9 +1,11 @@
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
-const MARKER = "192 && second === 168";
+// Bump when REPLACEMENT changes: older patched installs lack the new marker and get re-patched.
+const MARKER = "tcgdecks-local-host-v2";
 
 const REPLACEMENT = `export function isLocalHost(host) {
+    // ${MARKER}
     const raw = (host ?? "").trim().toLowerCase();
     if (!raw) {
         return false;
@@ -22,6 +24,9 @@ const REPLACEMENT = `export function isLocalHost(host) {
         }
     }
     if (hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1") {
+        return true;
+    }
+    if (hostname.endsWith(".localhost")) {
         return true;
     }
     const match = /^(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})$/.exec(hostname);

@@ -6,9 +6,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { SectionHeading } from "@/components/ui/typography-headings";
+import { useGameId } from "@/games/game-context";
 
 export function CommunityDeckSpotlightsSection() {
-  const publicDecks = useQuery(api.decks.listPublic, {});
+  const game = useGameId();
+  const publicDecks = useQuery(api.decks.listPublic, { game });
   const isLoadingDecks = publicDecks === undefined;
   const deckSpotlights = (publicDecks ?? []).slice(0, 6);
 

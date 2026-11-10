@@ -4,15 +4,16 @@ import { AnimatePresence } from "framer-motion";
 import * as m from "framer-motion/m";
 import { usePrefersReducedMotion } from "@/lib/reduced-motion";
 import { Layers3, Presentation } from "lucide-react";
-import { CardGridItem } from "@/components/universus/card-grid-item";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useCommunityTierListDetailContext } from "./context";
 import { CommunityTierListPresentationCard } from "./presentation-card";
+import { useGameModule } from "@/games/game-context";
 import { CommunityTierListUnknownCardTile } from "./unknown-card-tile";
 
 export function CommunityTierListDetailPoolPanel() {
+  const { CardGridItem } = useGameModule().ui;
   const prefersReducedMotion = usePrefersReducedMotion();
   const {
     canEdit,

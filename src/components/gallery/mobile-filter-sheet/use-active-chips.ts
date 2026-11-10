@@ -2,31 +2,16 @@
 
 import { useMemo } from "react";
 import { toggleCanonicalRarityFilter } from "@/lib/universus/rarity";
+import { STAT_OPERATOR_OPTIONS, statStandaloneLabel } from "@shared/games/filters";
+import { useGameModule } from "@/games/game-context";
 import type { StatOperator } from "@/providers/UIStateProvider";
 import { useGalleryFilterDialogContext } from "../filter-dialog/context";
-import type { StatFilterKey } from "../filter-dialog/types";
+import type { StatFilterKey, StringArrayFilterKey } from "../filter-dialog/types";
+import { colorFacetLabel } from "./color-facet-chips";
 
-export const OPERATOR_GLYPHS: Record<StatOperator, string> = {
-  eq: "=",
-  neq: "≠",
-  gt: ">",
-  lt: "<",
-  gte: "≥",
-  lte: "≤",
-};
-
-export const STAT_LABELS: Record<StatFilterKey, string> = {
-  difficulty: "Difficulty",
-  control: "Control",
-  health: "Health",
-  handSize: "Hand Size",
-  stamina: "Stamina",
-  blockModifier: "Block Mod",
-  speed: "Speed",
-  damage: "Damage",
-};
-
-export const STAT_KEYS = Object.keys(STAT_LABELS) as StatFilterKey[];
+export const OPERATOR_GLYPHS = Object.fromEntries(
+  STAT_OPERATOR_OPTIONS.map((option) => [option.value, option.glyph])
+) as Record<StatOperator, string>;
 
 export interface ActiveChip {
   id: string;
@@ -50,6 +35,7 @@ export function useActiveChips(): ActiveChip[] {
     setIncludeInfinityResults,
     toggleFormat,
   } = useGalleryFilterDialogContext();
+  const { filters: filterDefinition } = useGameModule();
 
   return useMemo(() => {
     const chips: ActiveChip[] = [];
@@ -77,6 +63,14 @@ export function useActiveChips(): ActiveChip[] {
       chips.push({ id: `set:${code}`, label: name, remove: () => toggleStringFilter("set", code) });
     }
 
+    for (const color of filters.colors ?? []) {
+      chips.push({
+        id: `color:${color}`,
+        label: colorFacetLabel(filterDefinition.facets.colors, color),
+        remove: () => toggleStringFilter("colors", color),
+      });
+    }
+
     for (const symbol of filters.symbols ?? []) {
       chips.push({ id: `symbol:${symbol}`, label: symbolLabel(symbol), remove: () => toggleStringFilter("symbols", symbol) });
     }
@@ -97,25 +91,33 @@ export function useActiveChips(): ActiveChip[] {
       chips.push({ id: `keyword:${keyword}`, label: keyword, remove: () => toggleStringFilter("keywords", keyword) });
     }
 
-    for (const zone of filters.blockZone ?? []) {
-      chips.push({ id: `blockZone:${zone}`, label: `Block ${zone}`, remove: () => toggleStringFilter("blockZone", zone) });
+    for (const tag of filters.tags ?? []) {
+      chips.push({ id: `tag:${tag}`, label: tag, remove: () => toggleStringFilter("tags", tag) });
     }
 
-    for (const zone of filters.attackZone ?? []) {
-      chips.push({ id: `attackZone:${zone}`, label: `Attack ${zone}`, remove: () => toggleStringFilter("attackZone", zone) });
+    for (const descriptor of filterDefinition.zones) {
+      const key = descriptor.key as StringArrayFilterKey;
+      for (const zone of filters[key] ?? []) {
+        chips.push({
+          id: `${key}:${zone}`,
+          label: `${descriptor.standaloneLabel} ${zone}`,
+          remove: () => toggleStringFilter(key, zone),
+        });
+      }
     }
 
-    for (const key of STAT_KEYS) {
+    for (const descriptor of filterDefinition.stats) {
+      const key = descriptor.key as StatFilterKey;
       const value = filters[key];
       if (!value || value.value === undefined) continue;
       const operator = OPERATOR_GLYPHS[value.operator] ?? "=";
       chips.push({
         id: `stat:${key}`,
-        label: `${STAT_LABELS[key]} ${operator} ${value.value}`,
+        label: `${statStandaloneLabel(descriptor)} ${operator} ${value.value}`,
         remove: () => setStatFilter(key, undefined),
       });
     }
 
     return chips;
-  }, [actions, filters, meta.formats, setIncludeInfinityResults, setOptions, setStatFilter, toggleFormat, toggleStringFilter]);
+  }, [actions, filterDefinition, filters, meta.formats, setIncludeInfinityResults, setOptions, setStatFilter, toggleFormat, toggleStringFilter]);
 }

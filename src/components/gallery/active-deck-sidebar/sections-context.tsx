@@ -14,6 +14,7 @@ import {
   DECK_SECTION_KEYS,
   type DeckSection,
 } from "@/lib/deck/display-config";
+import { useGameModule } from "@/games/game-context";
 import { buildSectionGroups } from "./build-section-groups";
 import type { SectionGroup } from "./types";
 
@@ -58,18 +59,24 @@ export function ActiveDeckSectionsProvider({
   } = useActiveDeck();
   const { cards: allCards } = useCardData();
   const cardMap = useCardIdMap(allCards);
+  const gameModule = useGameModule();
+  const { formatCardType } = gameModule.ui;
+  const { cardTypeOrder, cardTypeLabels } = gameModule.deck;
 
   const groupsBySection = useMemo<SectionsByKey>(
     () => ({
-      main: buildSectionGroups(activeDeck?.mainQuantities ?? {}, cardMap),
-      side: buildSectionGroups(activeDeck?.sideQuantities ?? {}, cardMap),
-      reference: buildSectionGroups(activeDeck?.referenceQuantities ?? {}, cardMap),
+      main: buildSectionGroups(activeDeck?.mainQuantities ?? {}, cardMap, formatCardType, cardTypeOrder, cardTypeLabels),
+      side: buildSectionGroups(activeDeck?.sideQuantities ?? {}, cardMap, formatCardType, cardTypeOrder, cardTypeLabels),
+      reference: buildSectionGroups(activeDeck?.referenceQuantities ?? {}, cardMap, formatCardType, cardTypeOrder, cardTypeLabels),
     }),
     [
       activeDeck?.mainQuantities,
       activeDeck?.referenceQuantities,
       activeDeck?.sideQuantities,
       cardMap,
+      formatCardType,
+      cardTypeOrder,
+      cardTypeLabels,
     ]
   );
 

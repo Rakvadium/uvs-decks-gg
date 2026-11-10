@@ -5,8 +5,11 @@ import {
   cardLayoutValidator,
   deckCardMutationResultValidator,
   deckSectionValidator,
+  deckSetupPatchValidator,
+  deckSetupValidator,
   deckTeamCollaborationValidator,
   deckVisibilityValidator,
+  gameIdValidator,
 } from "./validators";
 import { requireAdmin, requireAuth, requireNotBackFace, requireUserCanPostContent } from "./utils/validation";
 import {
@@ -21,21 +24,50 @@ import { requireCapability } from "./teams/permissions";
 import { attachOwnerUsernames } from "./lib/deckList";
 import { buildDuplicatedDeckFields } from "./lib/duplicateDeck";
 import { getAuthUserId } from "@convex-dev/auth/server";
+import type { Id } from "./_generated/dataModel";
+import type { QueryCtx } from "./_generated/server";
 import { requirePositiveIntegerQuantity } from "./lib/deckQuantity";
+import { deckGameModule } from "./lib/deckGame";
+import type { GameId } from "../shared/games/types";
+import { getSharedGameModule } from "../shared/games/registry";
+import { resolveDeckSetupPatchArgs } from "../shared/games/deck-setup";
+import { legacyUvsSetupFields } from "../shared/games/uvs/setup";
+import { docGame, findDefaultFormat, isDocInGame, withResolvedGame } from "./lib/gameScope";
+
+/** Rejects cards from another game (decks only reference cards of their own game). */
+async function requireCardInGame(ctx: Pick<QueryCtx, "db">, cardId: Id<"cards">, game: GameId) {
+  const card = await ctx.db.get(cardId);
+  if (!card) throw new Error("Card not found");
+  if (!isDocInGame(card, game)) {
+    throw new Error("Card belongs to a different game than the deck");
+  }
+}
+
+/** Rejects a setup tagged for a different game than the deck. */
+function requireSetupGame(setup: { game: GameId } | null | undefined, game: GameId) {
+  if (setup && setup.game !== game) {
+    throw new Error(`Deck setup is for "${setup.game}" but the deck is a "${game}" deck`);
+  }
+}
 
 export const listByUser = query({
   args: {
+    game: v.optional(gameIdValidator),
     userId: v.id("users"),
     search: v.optional(v.string()),
     visibility: v.optional(deckVisibilityValidator),
   },
   returns: v.array(deckValidator),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     const viewer = await getAuthUserId(ctx);
-    let decks = await ctx.db
-      .query("decks")
-      .withIndex("by_user", (q) => q.eq("userId", args.userId))
-      .collect();
+    // Per-user lists are small; filtering (instead of a game index) keeps pre-backfill decks visible.
+    let decks = (
+      await ctx.db
+        .query("decks")
+        .withIndex("by_user", (q) => q.eq("userId", args.userId))
+        .collect()
+    ).filter((deck) => isDocInGame(deck, args.game));
 
     if (viewer !== args.userId) {
       decks = decks.filter((deck) => {
@@ -67,13 +99,15 @@ export const listByUser = query({
 
 export const listPublic = query({
   args: {
+    game: v.optional(gameIdValidator),
     search: v.optional(v.string()),
   },
   returns: v.array(deckValidator),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     let decks = await ctx.db
       .query("decks")
-      .withIndex("by_isPublic", (q) => q.eq("isPublic", true))
+      .withIndex("by_game_and_isPublic", (q) => q.eq("game", args.game).eq("isPublic", true))
       .collect();
 
     if (args.search) {
@@ -95,13 +129,17 @@ export const listPublic = query({
 
 export const listTournament = query({
   args: {
+    game: v.optional(gameIdValidator),
     search: v.optional(v.string()),
   },
   returns: v.array(deckValidator),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     let decks = await ctx.db
       .query("decks")
-      .withIndex("by_visibility", (q) => q.eq("visibility", "tournament"))
+      .withIndex("by_game_and_visibility", (q) =>
+        q.eq("game", args.game).eq("visibility", "tournament")
+      )
       .collect();
 
     if (args.search) {
@@ -119,12 +157,15 @@ export const listTournament = query({
 
 export const getById = query({
   args: {
+    game: v.optional(gameIdValidator),
     deckId: v.id("decks"),
   },
   returns: v.union(deckValidator, v.null()),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     const deck = await ctx.db.get(args.deckId);
-    if (!deck) return null;
+    // A deck is only visible on its own game's host.
+    if (!isDocInGame(deck, args.game)) return null;
     const allowed = await canViewDeck(ctx, deck, args.deckId);
     if (!allowed) return null;
     return deck;
@@ -133,22 +174,40 @@ export const getById = query({
 
 export const create = mutation({
   args: {
+    game: v.optional(gameIdValidator),
     name: v.string(),
     description: v.optional(v.string()),
     visibility: v.optional(deckVisibilityValidator),
     teamId: v.optional(v.id("teams")),
     teamCollaboration: v.optional(deckTeamCollaborationValidator),
     format: v.optional(v.string()),
+    setup: v.optional(deckSetupValidator),
+    /** @deprecated send `setup` (accepted for one release; mapped into `setup`). */
     startingCharacterId: v.optional(v.id("cards")),
+    /** @deprecated send `setup` (accepted for one release; mapped into `setup`). */
     selectedIdentity: v.optional(v.string()),
   },
   returns: v.id("decks"),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     const userId = await requireAuth(ctx);
     await requireUserCanPostContent(ctx, userId);
 
-    if (args.startingCharacterId) {
-      await requireNotBackFace(ctx, args.startingCharacterId);
+    const deckModule = getSharedGameModule(args.game).deck;
+    // Rejects a setup for another game; legacy UVS args only fold in for UVS decks.
+    const setupPatch = resolveDeckSetupPatchArgs(args.game, args.setup, {
+      startingCharacterId: args.startingCharacterId,
+      selectedIdentity: args.selectedIdentity,
+    });
+    // `setup.game` always matches the deck's `game` (normalizeSetup starts from the game's empty setup).
+    const setup = deckModule.applySetupPatch(
+      deckModule.normalizeSetup<Id<"cards">>(undefined),
+      setupPatch,
+    );
+    requireSetupGame(setup, args.game);
+    for (const cardId of deckModule.setupCardIds(setup)) {
+      await requireNotBackFace(ctx, cardId);
+      await requireCardInGame(ctx, cardId, args.game);
     }
 
     const visibility = args.visibility ?? "private";
@@ -174,7 +233,11 @@ export const create = mutation({
       }
     }
 
+    // New decks start in the game's default format (Standard) unless one was chosen.
+    const format = args.format ?? (await findDefaultFormat(ctx, args.game))?.key;
+
     return await ctx.db.insert("decks", {
+      game: args.game,
       userId,
       name: args.name,
       description: args.description,
@@ -183,9 +246,10 @@ export const create = mutation({
       teamCollaboration:
         visibility === "team" ? (args.teamCollaboration ?? "team_viewable") : "none",
       isPublic: syncListingIsPublic(visibility),
-      format: args.format,
-      startingCharacterId: args.startingCharacterId,
-      selectedIdentity: args.selectedIdentity,
+      format,
+      setup,
+      // Keep legacy fields for the live frontend (see legacyUvsSetupFields).
+      ...legacyUvsSetupFields(setup),
       mainCardIds: [],
       mainQuantities: {},
       sideCardIds: [],
@@ -206,7 +270,11 @@ export const update = mutation({
     teamId: v.optional(v.union(v.id("teams"), v.null())),
     teamCollaboration: v.optional(deckTeamCollaborationValidator),
     imageCardId: v.optional(v.union(v.id("cards"), v.null())),
+    /** Partial setup: omitted fields keep, `null` fields clear; `setup: null` clears the whole setup. */
+    setup: v.optional(v.union(deckSetupPatchValidator, v.null())),
+    /** @deprecated send `setup` (accepted for one release; mapped into a setup patch). */
     startingCharacterId: v.optional(v.union(v.id("cards"), v.null())),
+    /** @deprecated send `setup` (accepted for one release; mapped into a setup patch). */
     selectedIdentity: v.optional(v.union(v.string(), v.null())),
     format: v.optional(v.union(v.string(), v.null())),
     subFormat: v.optional(v.union(v.string(), v.null())),
@@ -217,8 +285,19 @@ export const update = mutation({
     if (!deck) throw new Error("Deck not found");
     await requireDeckWriteAccess(ctx, deck);
 
-    if (args.startingCharacterId !== undefined && args.startingCharacterId !== null) {
-      await requireNotBackFace(ctx, args.startingCharacterId);
+    const deckModule = deckGameModule(deck).deck;
+    const game = docGame(deck);
+    // Rejects a setup patch for another game than the deck's; legacy UVS args only for UVS decks.
+    const setupPatch = resolveDeckSetupPatchArgs(game, args.setup, {
+      startingCharacterId: args.startingCharacterId,
+      selectedIdentity: args.selectedIdentity,
+    });
+    for (const cardId of deckModule.setupCardIds(setupPatch)) {
+      await requireNotBackFace(ctx, cardId);
+      await requireCardInGame(ctx, cardId, game);
+    }
+    if (args.imageCardId) {
+      await requireCardInGame(ctx, args.imageCardId, game);
     }
 
     const nextVisibility =
@@ -271,23 +350,29 @@ export const update = mutation({
     const { deckId, ...updates } = args;
     const filteredUpdates: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(updates)) {
+      // Setup args are folded into `setupPatch` above.
+      if (key === "setup" || key === "startingCharacterId" || key === "selectedIdentity") continue;
       if (value !== undefined) {
         if (key === "teamId" && value === null) {
           filteredUpdates.teamId = undefined;
         } else if (
-          (key === "format" ||
-            key === "subFormat" ||
-            key === "description" ||
-            key === "selectedIdentity") &&
+          (key === "format" || key === "subFormat" || key === "description") &&
           value === null
         ) {
           filteredUpdates[key] = undefined;
-        } else if ((key === "imageCardId" || key === "startingCharacterId") && value === null) {
+        } else if (key === "imageCardId" && value === null) {
           filteredUpdates[key] = undefined;
         } else {
           filteredUpdates[key] = value;
         }
       }
+    }
+    if (setupPatch !== undefined) {
+      // Write `setup` and keep the legacy fields mirrored for the live frontend
+      // (see legacyUvsSetupFields).
+      const nextSetup = deckModule.applySetupPatch(deckModule.normalizeSetup(deck), setupPatch);
+      filteredUpdates.setup = nextSetup;
+      Object.assign(filteredUpdates, legacyUvsSetupFields(nextSetup));
     }
     if (args.visibility !== undefined) {
       filteredUpdates.isPublic = syncListingIsPublic(args.visibility);
@@ -341,6 +426,7 @@ export const addCard = mutation({
     assertTeamEditableCardWriteRevision(deck, args.expectedRevision);
 
     await requireNotBackFace(ctx, args.cardId);
+    await requireCardInGame(ctx, args.cardId, docGame(deck));
 
     const cardIdStr = args.cardId.toString();
     const addQuantity = requirePositiveIntegerQuantity(args.quantity);
@@ -512,15 +598,17 @@ export const deleteDeck = mutation({
 
 export const duplicate = mutation({
   args: {
+    game: v.optional(gameIdValidator),
     deckId: v.id("decks"),
   },
   returns: v.id("decks"),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     const userId = await requireAuth(ctx);
     await requireUserCanPostContent(ctx, userId);
 
     const source = await ctx.db.get(args.deckId);
-    if (!source) throw new Error("Deck not found");
+    if (!isDocInGame(source, args.game)) throw new Error("Deck not found");
     const allowed = await canViewDeck(ctx, source, args.deckId);
     if (!allowed) throw new Error("Deck not found");
 

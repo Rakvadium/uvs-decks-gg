@@ -8,11 +8,7 @@ import { useCardData } from "@/lib/universus/card-data-provider";
 import type { CachedCard } from "@/lib/universus/card-store";
 import { canAddCardToSection, useDeckEditor } from "@/lib/deck";
 import { useCardIdMap } from "@/hooks/useCardIdMap";
-import {
-  CARD_TYPE_LABELS,
-  CARD_TYPE_ORDER,
-} from "@/lib/deck/display-config";
-import { formatUniversusCardType } from "@/config/universus";
+import { useGameModule } from "@/games/game-context";
 import { TCG_DND_ACCEPTS_CARD_ONLY, useTcgDroppable } from "@/lib/dnd";
 import {
   LIST_SORT_SELECT_OPTIONS,
@@ -25,7 +21,6 @@ import {
   type DeckViewMode,
   type ListSortDirection,
 } from "./deck-list-utils";
-import { SIDEBAR_SIDEBOARD_LIMIT } from "./uvs-import-export";
 
 const EMPTY_QUANTITIES: Record<string, number> = {};
 
@@ -34,6 +29,9 @@ export function useDeckCardsSectionModel() {
   const { cards: allCards } = useCardData();
   const { addCard } = useDeckEditor();
   const { deck, activeSection, isOwner, setActiveSection } = useDeckDetails();
+  const gameModule = useGameModule();
+  const gameDeck = gameModule.deck;
+  const { formatCardType } = gameModule.ui;
 
   const [manualViewMode, setManualViewMode] = useState<DeckViewMode | null>(null);
   const [listSortKey, setListSortKey] = useState<DeckListSortKey>("difficulty");
@@ -69,7 +67,8 @@ export function useDeckCardsSectionModel() {
     [deck]
   );
 
-  const isSideboardOverflow = counts.side > SIDEBAR_SIDEBOARD_LIMIT;
+  const sideboardLimit = gameDeck.sideboardLimit;
+  const isSideboardOverflow = counts.side > sideboardLimit;
 
   const sectionCountsForDrop = useMemo(
     () => ({
@@ -106,16 +105,17 @@ export function useDeckCardsSectionModel() {
   const groupedCards = useMemo(() => {
     const groups = new Map<string, CachedCard[]>();
     for (const card of sortedCards) {
-      const normalizedType = formatUniversusCardType(card.type) ?? card.type ?? "Other";
+      const normalizedType = formatCardType(card.type) ?? card.type ?? "Other";
       const list = groups.get(normalizedType) ?? [];
       list.push(card);
       groups.set(normalizedType, list);
     }
 
+    const typeOrder = gameDeck.cardTypeOrder;
     const orderedTypes = [
-      ...CARD_TYPE_ORDER,
+      ...typeOrder,
       ...Array.from(groups.keys())
-        .filter((type) => !CARD_TYPE_ORDER.includes(type as (typeof CARD_TYPE_ORDER)[number]))
+        .filter((type) => !typeOrder.includes(type))
         .sort(),
     ];
 
@@ -123,10 +123,10 @@ export function useDeckCardsSectionModel() {
       .filter((type) => groups.has(type))
       .map((type) => ({
         type,
-        label: CARD_TYPE_LABELS[type] ?? type,
+        label: gameDeck.cardTypeLabels[type] ?? type,
         cards: groups.get(type) ?? [],
       }));
-  }, [sortedCards]);
+  }, [sortedCards, gameDeck, formatCardType]);
 
   const listGroups = useMemo(() => {
     const groupMap = new Map<string, DeckListEntry[]>();
@@ -135,7 +135,7 @@ export function useDeckCardsSectionModel() {
     }
 
     for (const card of visibleCards) {
-      const normalizedType = formatUniversusCardType(card.type) ?? card.type ?? "Other";
+      const normalizedType = formatCardType(card.type) ?? card.type ?? "Other";
       const typeKey = groupMap.has(normalizedType) ? normalizedType : "Other";
       const quantity = currentQuantities[card._id.toString()] ?? 0;
       const backCard = card.backCardId ? cardIdMap.get(card.backCardId) : undefined;
@@ -162,24 +162,27 @@ export function useDeckCardsSectionModel() {
       left: buildGroups("left"),
       right: buildGroups("right"),
     };
-  }, [visibleCards, currentQuantities, cardIdMap, listSortKey, listSortDirection]);
+  }, [visibleCards, currentQuantities, cardIdMap, listSortKey, listSortDirection, formatCardType]);
 
   const handleDropToActiveSection = useCallback(
     (item: { card: CachedCard }) => {
       if (!deck) return;
       if (
+        gameModule.deck.isMainDeckEligible(item.card) &&
         !canAddCardToSection({
           card: item.card,
           cardId: item.card._id,
           section: activeSection,
           counts: sectionCountsForDrop,
+          rules: gameModule.deck,
         })
       ) {
         return;
       }
+      // Ineligible cards still go to `addCard`, which offers the deck setup instead (Legends).
       addCard(item.card._id as Id<"cards">, activeSection);
     },
-    [activeSection, addCard, deck, sectionCountsForDrop]
+    [activeSection, addCard, deck, sectionCountsForDrop, gameModule]
   );
 
   const { isOver: isDeckDropOver, canDrop: canDropToActiveSection, droppableProps: deckDropProps } = useTcgDroppable({
@@ -234,6 +237,7 @@ export function useDeckCardsSectionModel() {
     onClearListCardHover,
     counts,
     isSideboardOverflow,
+    sideboardLimit,
     visibleCards,
     groupedCards,
     listGroups,

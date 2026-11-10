@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useConvexAuth } from "convex/react";
@@ -8,12 +8,16 @@ import { Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuthDialog } from "@/components/auth/auth-dialog";
 import type { AuthDialogFlow } from "@/components/auth/dialog-flow";
+import { useHostKind } from "@/games/game-context";
+import { startHandoff } from "@/lib/auth/handoff-client";
 
 type AuthRouteEntryProps = {
   flow: Extract<AuthDialogFlow, "signIn" | "signUp">;
   heading: string;
   description: string;
   actionLabel: string;
+  /** Sanitized same-origin path to continue to after auth (e.g. `/auth/handoff?…`). */
+  nextPath?: string | null;
 };
 
 export function AuthRouteEntry({
@@ -21,23 +25,32 @@ export function AuthRouteEntry({
   heading,
   description,
   actionLabel,
+  nextPath = null,
 }: AuthRouteEntryProps) {
   const router = useRouter();
   const { isAuthenticated, isLoading } = useConvexAuth();
   const { openAuthDialog } = useAuthDialog();
+  const hostKind = useHostKind();
   const openedRef = useRef(false);
+  const destination = nextPath ?? "/home";
 
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
-      router.replace("/home");
+      router.replace(destination);
     }
-  }, [isAuthenticated, isLoading, router]);
+  }, [destination, isAuthenticated, isLoading, router]);
+
+  const start = useCallback(() => {
+    // Game hosts sign in on the apex and come back to `destination`.
+    if (hostKind === "game" && startHandoff(destination, { flow })) return;
+    openAuthDialog(flow);
+  }, [destination, flow, hostKind, openAuthDialog]);
 
   useEffect(() => {
     if (isLoading || isAuthenticated || openedRef.current) return;
     openedRef.current = true;
-    openAuthDialog(flow);
-  }, [flow, isAuthenticated, isLoading, openAuthDialog]);
+    start();
+  }, [isAuthenticated, isLoading, start]);
 
   if (isLoading || isAuthenticated) {
     return <div className="min-h-screen bg-background" aria-busy="true" />;
@@ -62,7 +75,7 @@ export function AuthRouteEntry({
           <Button
             type="button"
             variant="default"
-            onClick={() => openAuthDialog(flow)}
+            onClick={start}
           >
             {actionLabel}
           </Button>

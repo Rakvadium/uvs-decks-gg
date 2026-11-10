@@ -1,7 +1,10 @@
 import { v } from "convex/values";
+import { internal } from "./_generated/api";
 import type { Doc, Id } from "./_generated/dataModel";
 import { internalMutation, query, type MutationCtx } from "./_generated/server";
-import { communityCardRankingValidator, isTierListHiddenByModeration } from "./validators";
+import { communityCardRankingValidator, gameIdValidator, isTierListHiddenByModeration } from "./validators";
+import type { GameId } from "../shared/games/types";
+import { gameValuesWithLegacy, withResolvedGame } from "./lib/gameScope";
 import {
   COMMUNITY_TIER_RANKING,
   buildCanonicalRankedTiers,
@@ -104,36 +107,61 @@ function getEligibleScopeFromTierList(tierList: Doc<"tierLists">): EligibleScope
   return null;
 }
 
-async function clearScopeCache(ctx: MutationCtx, scopeType: RankedScopeType, scopeKey: string) {
-  for await (const stat of ctx.db.query("communityCardRankings").withIndex("by_scope", (q) => q.eq("scopeType", scopeType).eq("scopeKey", scopeKey))) {
-    await ctx.db.delete(stat._id);
-  }
+async function clearScopeCache(
+  ctx: MutationCtx,
+  game: GameId,
+  scopeType: RankedScopeType,
+  scopeKey: string
+) {
+  // Default game also clears untagged (pre-backfill) rows so a recompute never leaves duplicates.
+  for (const value of gameValuesWithLegacy(game)) {
+    for await (const stat of ctx.db.query("communityCardRankings").withIndex("by_game_and_scope", (q) => q.eq("game", value).eq("scopeType", scopeType).eq("scopeKey", scopeKey))) {
+      await ctx.db.delete(stat._id);
+    }
 
-  for await (const snapshot of ctx.db.query("communityTierSnapshots").withIndex("by_scope", (q) => q.eq("scopeType", scopeType).eq("scopeKey", scopeKey))) {
-    await ctx.db.delete(snapshot._id);
+    for await (const snapshot of ctx.db.query("communityTierSnapshots").withIndex("by_game_and_scope", (q) => q.eq("game", value).eq("scopeType", scopeType).eq("scopeKey", scopeKey))) {
+      await ctx.db.delete(snapshot._id);
+    }
   }
 }
 
-async function getEligibleTierListsForScope(ctx: MutationCtx, scopeType: RankedScopeType, scopeKey: string) {
-  const tierLists =
-    scopeType === "global"
-      ? await ctx.db
-          .query("tierLists")
-          .withIndex("by_isPublic_and_rankingScope_and_updatedAt", (q) =>
-            q.eq("isPublic", true).eq("rankingScope", COMMUNITY_TIER_RANKING.scopes.global)
-          )
-          .order("desc")
-          .collect()
-      : await ctx.db
-          .query("tierLists")
-          .withIndex("by_isPublic_and_rankingScope_and_scopeKey_and_updatedAt", (q) =>
-            q
-              .eq("isPublic", true)
-              .eq("rankingScope", COMMUNITY_TIER_RANKING.scopes.setScope)
-              .eq("rankingScopeKey", scopeKey)
-          )
-          .order("desc")
-          .collect();
+async function getEligibleTierListsForScope(
+  ctx: MutationCtx,
+  game: GameId,
+  scopeType: RankedScopeType,
+  scopeKey: string
+) {
+  // Default game also reads untagged (pre-backfill) tier lists: clearScopeCache deletes the
+  // untagged cache rows, so the rebuild must see the same legacy data or a save would wipe rankings.
+  const tierLists: Doc<"tierLists">[] = [];
+  for (const value of gameValuesWithLegacy(game)) {
+    const rows =
+      scopeType === "global"
+        ? await ctx.db
+            .query("tierLists")
+            .withIndex("by_game_and_isPublic_and_rankingScope_and_updatedAt", (q) =>
+              q
+                .eq("game", value)
+                .eq("isPublic", true)
+                .eq("rankingScope", COMMUNITY_TIER_RANKING.scopes.global)
+            )
+            .order("desc")
+            .collect()
+        : await ctx.db
+            .query("tierLists")
+            .withIndex("by_game_and_isPublic_and_rankingScope_and_scopeKey_and_updatedAt", (q) =>
+              q
+                .eq("game", value)
+                .eq("isPublic", true)
+                .eq("rankingScope", COMMUNITY_TIER_RANKING.scopes.setScope)
+                .eq("rankingScopeKey", scopeKey)
+            )
+            .order("desc")
+            .collect();
+    tierLists.push(...rows);
+  }
+  // Newest first across both index ranges so "latest per user" stays correct.
+  tierLists.sort((left, right) => right.updatedAt - left.updatedAt);
 
   const latestByUser = new Map<string, Doc<"tierLists">>();
   for (const tierList of tierLists) {
@@ -213,6 +241,7 @@ function buildCommunitySnapshot({
 
 export const recomputeScope = internalMutation({
   args: {
+    game: gameIdValidator,
     scopeType: communityScopeTypeValidator,
     scopeKey: v.string(),
   },
@@ -234,9 +263,14 @@ export const recomputeScope = internalMutation({
             setCodes: args.scopeKey.split("__").filter(Boolean),
           };
 
-    await clearScopeCache(ctx, args.scopeType, args.scopeKey);
+    await clearScopeCache(ctx, args.game, args.scopeType, args.scopeKey);
 
-    const tierLists = await getEligibleTierListsForScope(ctx, args.scopeType, args.scopeKey);
+    const tierLists = await getEligibleTierListsForScope(
+      ctx,
+      args.game,
+      args.scopeType,
+      args.scopeKey
+    );
     if (tierLists.length === 0) {
       return null;
     }
@@ -296,6 +330,7 @@ export const recomputeScope = internalMutation({
           COMMUNITY_TIER_RANKING.smoothingPriorMean;
 
       return {
+        game: args.game,
         scopeType: targetScope.scopeType,
         scopeKey: targetScope.scopeKey,
         scopeLabel: targetScope.scopeLabel,
@@ -314,27 +349,74 @@ export const recomputeScope = internalMutation({
       await ctx.db.insert("communityCardRankings", entry);
     }
 
-    await ctx.db.insert(
-      "communityTierSnapshots",
-      buildCommunitySnapshot({
+    await ctx.db.insert("communityTierSnapshots", {
+      ...buildCommunitySnapshot({
         now,
         scope: targetScope,
         contributorCount: tierLists.length,
         stats: sortedStats,
-      })
-    );
+      }),
+      game: args.game,
+    });
 
     return null;
   },
 });
 
+/**
+ * Schedules `recomputeScope` for every ranked scope of `game` (global + each set scope that has a
+ * public ranked tier list or an existing snapshot, legacy untagged rows included for the default
+ * game). Scheduled by `migrations/backfillGameField` once the `tierLists` backfill finishes so
+ * the cache is rebuilt from tagged data; safe to run manually at any time.
+ */
+export const recomputeAllScopes = internalMutation({
+  args: { game: gameIdValidator },
+  returns: v.number(),
+  handler: async (ctx, args) => {
+    const setScopeKeys = new Set<string>();
+    for (const value of gameValuesWithLegacy(args.game)) {
+      for await (const tierList of ctx.db
+        .query("tierLists")
+        .withIndex("by_game_and_isPublic_and_rankingScope_and_updatedAt", (q) =>
+          q.eq("game", value).eq("isPublic", true).eq("rankingScope", COMMUNITY_TIER_RANKING.scopes.setScope)
+        )) {
+        if (tierList.rankingScopeKey) setScopeKeys.add(tierList.rankingScopeKey);
+      }
+      for await (const snapshot of ctx.db
+        .query("communityTierSnapshots")
+        .withIndex("by_game_and_scopeType_and_lastComputedAt", (q) =>
+          q.eq("game", value).eq("scopeType", "set_scope")
+        )) {
+        setScopeKeys.add(snapshot.scopeKey);
+      }
+    }
+
+    await ctx.scheduler.runAfter(0, internal.communityRankings.recomputeScope, {
+      game: args.game,
+      scopeType: "global",
+      scopeKey: COMMUNITY_TIER_RANKING.globalScopeKey,
+    });
+    for (const scopeKey of setScopeKeys) {
+      await ctx.scheduler.runAfter(0, internal.communityRankings.recomputeScope, {
+        game: args.game,
+        scopeType: "set_scope",
+        scopeKey,
+      });
+    }
+    return setScopeKeys.size + 1;
+  },
+});
+
 export const listSetScopes = query({
-  args: {},
+  args: { game: v.optional(gameIdValidator) },
   returns: v.array(communityScopeSummaryValidator),
-  handler: async (ctx) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     const snapshots = await ctx.db
       .query("communityTierSnapshots")
-      .withIndex("by_scopeType_and_lastComputedAt", (q) => q.eq("scopeType", "set_scope"))
+      .withIndex("by_game_and_scopeType_and_lastComputedAt", (q) =>
+        q.eq("game", args.game).eq("scopeType", "set_scope")
+      )
       .order("desc")
       .collect();
 
@@ -353,14 +435,18 @@ export const listSetScopes = query({
 
 export const getScopeLeaderboard = query({
   args: {
+    game: v.optional(gameIdValidator),
     scopeType: communityScopeTypeValidator,
     scopeKey: v.string(),
   },
   returns: v.union(communityScopeLeaderboardValidator, v.null()),
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
+    const args = withResolvedGame(rawArgs);
     const snapshot = await ctx.db
       .query("communityTierSnapshots")
-      .withIndex("by_scope", (q) => q.eq("scopeType", args.scopeType).eq("scopeKey", args.scopeKey))
+      .withIndex("by_game_and_scope", (q) =>
+        q.eq("game", args.game).eq("scopeType", args.scopeType).eq("scopeKey", args.scopeKey)
+      )
       .unique();
 
     if (!snapshot) {
@@ -369,7 +455,9 @@ export const getScopeLeaderboard = query({
 
     const stats = await ctx.db
       .query("communityCardRankings")
-      .withIndex("by_scope_and_adjustedScore", (q) => q.eq("scopeType", args.scopeType).eq("scopeKey", args.scopeKey))
+      .withIndex("by_game_and_scope_and_adjustedScore", (q) =>
+        q.eq("game", args.game).eq("scopeType", args.scopeType).eq("scopeKey", args.scopeKey)
+      )
       .order("desc")
       .collect();
 

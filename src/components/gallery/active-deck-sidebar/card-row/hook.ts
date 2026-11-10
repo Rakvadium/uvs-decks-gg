@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { canAddCardToSection, canMoveCardToSection } from "@/lib/deck";
 import { useIsMobile } from "@/hooks/useIsMobile";
+import { useGameModule } from "@/games/game-context";
 import {
-  DECK_SECTION_KEYS,
   type DeckSection,
 } from "@/lib/deck/display-config";
 import { useTcgDraggable } from "@/lib/dnd";
+import { useEnabledDeckSections } from "@/lib/deck/use-deck-sections";
 import { useActiveDeckSectionsContext } from "../sections-context";
 import type { ActiveDeckCardRowProps } from "./types";
 
@@ -21,6 +22,7 @@ export function useActiveDeckCardRowModel({ card, count, sectionKey }: ActiveDec
     removeCard,
     sectionCounts,
   } = useActiveDeckSectionsContext();
+  const gameDeck = useGameModule().deck;
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const dragBlockRef = useRef(false);
@@ -30,11 +32,13 @@ export function useActiveDeckCardRowModel({ card, count, sectionKey }: ActiveDec
     cardId: card._id,
     section: sectionKey,
     counts: sectionCounts,
+    rules: gameDeck,
   });
 
+  const enabledSections = useEnabledDeckSections();
   const moveTargets = useMemo(
-    () => DECK_SECTION_KEYS.filter((key) => key !== sectionKey),
-    [sectionKey]
+    () => enabledSections.filter((key) => key !== sectionKey),
+    [enabledSections, sectionKey]
   );
 
   const dragPreviewImageRef = useRef<HTMLImageElement | null>(null);
@@ -74,6 +78,7 @@ export function useActiveDeckCardRowModel({ card, count, sectionKey }: ActiveDec
       fromSection: sectionKey,
       toSection: target,
       counts: sectionCounts,
+      rules: gameDeck,
     });
   };
 

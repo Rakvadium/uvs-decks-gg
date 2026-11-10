@@ -68,29 +68,51 @@ function parseStaticCatalog(jsonText: string): CachedCard[] {
   return cards;
 }
 
-export async function fetchStaticCatalog(args: {
-  catalogUrl: string;
-  catalogSha256: string;
-}): Promise<CachedCard[]> {
+/** Same-origin path for a catalog URL (`next.config.ts` rewrites `/catalog-proxy/*` to R2). */
+export function catalogProxyPath(catalogUrl: string): string | null {
+  try {
+    const { pathname } = new URL(catalogUrl);
+    return pathname.startsWith("/catalog/") ? `/catalog-proxy/${pathname.slice("/catalog/".length)}` : null;
+  } catch {
+    return null;
+  }
+}
+
+async function fetchCatalogBytes(url: string): Promise<ArrayBuffer> {
   const controller = new AbortController();
   const timeout = window.setTimeout(() => controller.abort(), R2_FETCH_TIMEOUT_MS);
   try {
-    const response = await fetch(args.catalogUrl, {
+    const response = await fetch(url, {
       signal: controller.signal,
       headers: { Accept: "application/json, application/gzip" },
     });
     if (!response.ok) {
       throw new Error(`Static catalog HTTP ${response.status}`);
     }
-    const compressed = await response.arrayBuffer();
-    const digest = await sha256Hex(compressed);
-    if (digest !== args.catalogSha256.toLowerCase()) {
-      throw new Error("Static catalog digest mismatch");
-    }
-
-    const jsonText = await decompressGzip(compressed);
-    return parseStaticCatalog(jsonText);
+    return await response.arrayBuffer();
   } finally {
     window.clearTimeout(timeout);
   }
+}
+
+export async function fetchStaticCatalog(args: {
+  catalogUrl: string;
+  catalogSha256: string;
+}): Promise<CachedCard[]> {
+  let compressed: ArrayBuffer;
+  try {
+    compressed = await fetchCatalogBytes(args.catalogUrl);
+  } catch (directError) {
+    // Hosts missing from the bucket's CORS rules fail here; retry through the same-origin proxy.
+    const proxyPath = catalogProxyPath(args.catalogUrl);
+    if (!proxyPath) throw directError;
+    compressed = await fetchCatalogBytes(proxyPath);
+  }
+  const digest = await sha256Hex(compressed);
+  if (digest !== args.catalogSha256.toLowerCase()) {
+    throw new Error("Static catalog digest mismatch");
+  }
+
+  const jsonText = await decompressGzip(compressed);
+  return parseStaticCatalog(jsonText);
 }

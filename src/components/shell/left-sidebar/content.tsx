@@ -1,5 +1,6 @@
 "use client";
 
+import { SidebarGameSwitcher } from "../game-switcher/sidebar";
 import { LeftSidebarBrand } from "./brand";
 import { LeftSidebarProvider } from "./context";
 import { LeftSidebarDivider } from "./divider";
@@ -17,6 +18,7 @@ export function LeftSidebar({ collapsed, onToggle }: LeftSidebarProps) {
     <LeftSidebarProvider collapsed={collapsed} onToggle={onToggle}>
       <LeftSidebarFrame>
         <LeftSidebarBrand />
+        <SidebarGameSwitcher />
         <LeftSidebarDivider />
         <LeftSidebarNav />
         <LeftSidebarDivider />

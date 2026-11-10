@@ -10,6 +10,7 @@ import {
   DeckDetailsProvider,
 } from "@/providers";
 import { UniversusMediaDockProvider } from "@/providers/UniversusMediaDockProvider";
+import { useGameFeatures } from "@/games/game-context";
 import {
   ShellSlotProvider,
   useShellSlotSlots,
@@ -39,6 +40,7 @@ import Link from "next/link";
 import { TcgDndProvider } from "@/lib/dnd";
 import { SiloedDeckProvider } from "@/lib/deck";
 import { cn } from "@/lib/utils";
+import { globalStorageKey, readStorageWithLegacy } from "@/lib/storage-keys";
 import { GalleryFiltersProvider } from "@/providers/GalleryFiltersProvider";
 import { DecksProvider } from "@/providers/DecksProvider";
 import { CommunityTierListsPageProvider } from "@/components/community/tier-lists/page-view/context";
@@ -57,7 +59,8 @@ function loadRightSidebarShell() {
 
 const RightSidebar = dynamic(() => loadRightSidebarShell(), { ssr: false });
 
-const LEFT_SIDEBAR_KEY = "uvs-decks-left-sidebar-collapsed";
+const LEFT_SIDEBAR_KEY = globalStorageKey("left-sidebar-collapsed");
+const LEGACY_LEFT_SIDEBAR_KEY = "uvs-decks-left-sidebar-collapsed";
 
 const SHOW_DESKTOP_RIGHT_SIDEBAR = true;
 const SHOW_DESKTOP_LEFT_SIDEBAR = true;
@@ -87,9 +90,11 @@ function AdminSidebarContent() {
   const setCardsHref = setCode
     ? `/admin/sets/${encodeURIComponent(setCode)}/cards`
     : null;
-  const setReviewHref = setCode
-    ? `/admin/sets/${encodeURIComponent(setCode)}/review`
-    : null;
+  const { cardOcrDrafts } = useGameFeatures();
+  const setReviewHref =
+    setCode && cardOcrDrafts
+      ? `/admin/sets/${encodeURIComponent(setCode)}/review`
+      : null;
   const setImportHref = setCode
     ? `/admin/sets/${encodeURIComponent(setCode)}/import`
     : null;
@@ -119,7 +124,7 @@ function AdminSidebarContent() {
         </Link>
       </div>
 
-      {showSetNav && setOverviewHref && setCardsHref && setReviewHref && setImportHref ? (
+      {showSetNav && setOverviewHref && setCardsHref && setImportHref ? (
         <div className="rounded-md border bg-muted/20 p-2 space-y-1">
           <Link
             href="/admin/sets"
@@ -143,13 +148,15 @@ function AdminSidebarContent() {
             <CreditCard className="h-4 w-4" />
             Cards
           </Link>
-          <Link
-            href={setReviewHref}
-            className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm hover:bg-muted ${pathname === setReviewHref ? "bg-muted font-medium" : ""}`}
-          >
-            <ClipboardCheck className="h-4 w-4" />
-            Review
-          </Link>
+          {setReviewHref ? (
+            <Link
+              href={setReviewHref}
+              className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm hover:bg-muted ${pathname === setReviewHref ? "bg-muted font-medium" : ""}`}
+            >
+              <ClipboardCheck className="h-4 w-4" />
+              Review
+            </Link>
+          ) : null}
           <Link
             href={setImportHref}
             className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm hover:bg-muted ${pathname === setImportHref ? "bg-muted font-medium" : ""}`}
@@ -287,7 +294,7 @@ function ShellLayoutInner({ children }: { children: ReactNode }) {
   const frame = useShellFrame();
   const [leftSidebarCollapsed, setLeftSidebarCollapsed] = useState(() => {
     if (typeof window === "undefined") return false;
-    const stored = window.localStorage.getItem(LEFT_SIDEBAR_KEY);
+    const stored = readStorageWithLegacy(LEFT_SIDEBAR_KEY, LEGACY_LEFT_SIDEBAR_KEY);
     return stored === "true";
   });
   const shellSlots = useShellSlotSlots();

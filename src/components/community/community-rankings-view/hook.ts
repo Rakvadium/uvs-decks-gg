@@ -5,10 +5,12 @@ import { useQuery } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import { useCardData } from "@/lib/universus/card-data-provider";
 import type { ScopeType } from "./types";
+import { useGameId } from "@/games/game-context";
 
 export function useCommunityRankingsModel() {
   const { cards } = useCardData();
-  const setScopes = useQuery(api.communityRankings.listSetScopes, {});
+  const game = useGameId();
+  const setScopes = useQuery(api.communityRankings.listSetScopes, { game });
   const [scopeType, setScopeType] = useState<ScopeType>("global");
   const [selectedSetScopeKey, setSelectedSetScopeKey] = useState("");
 
@@ -23,6 +25,7 @@ export function useCommunityRankingsModel() {
   }, [scopeType, selectedSetScopeKey, setScopes]);
 
   const leaderboard = useQuery(api.communityRankings.getScopeLeaderboard, {
+    game,
     scopeType,
     scopeKey: scopeType === "global" ? "global" : effectiveSetScopeKey || "__missing__",
   });

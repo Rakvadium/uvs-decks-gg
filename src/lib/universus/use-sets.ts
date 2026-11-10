@@ -14,6 +14,8 @@ import {
 } from "./set-store";
 import type { CachedSet } from "./set-store";
 
+import { useGameId } from "@/games/game-context";
+
 export type { CachedSet } from "./set-store";
 export { isSetLegalInFormat, getFormatsForSet, getSetByCode, parseSetLegality } from "./set-store";
 
@@ -54,13 +56,14 @@ export function useSets(options: UseSetsOptions = {}): UseSetsResult {
   const syncInProgress = useRef(false);
   const initialLoadDone = useRef(false);
   const convex = useConvex();
+  const game = useGameId();
   const isHydrated = useIsClient();
 
   const loadFromCache = useCallback(async (): Promise<{ hasCache: boolean; version: number | null }> => {
     try {
       const [cachedSets, metadata] = await Promise.all([
-        getCachedSets(),
-        getSetCacheMetadata(),
+        getCachedSets(game),
+        getSetCacheMetadata(game),
       ]);
       
       if (cachedSets.length > 0 && metadata) {
@@ -76,12 +79,12 @@ export function useSets(options: UseSetsOptions = {}): UseSetsResult {
       console.error("Failed to load sets from cache:", err);
       return { hasCache: false, version: null };
     }
-  }, []);
+  }, [game]);
 
   const fetchFromConvex = useCallback(async (): Promise<CachedSet[]> => {
-    const result = await convex.query(api.sets.list, {});
+    const result = await convex.query(api.sets.list, { game });
     return result;
-  }, [convex]);
+  }, [convex, game]);
 
   const syncFromConvex = useCallback(async (serverSets: CachedSet[], version: number) => {
     if (syncInProgress.current) return;
@@ -91,8 +94,8 @@ export function useSets(options: UseSetsOptions = {}): UseSetsResult {
     try {
       const now = Date.now();
       
-      await setCachedSets(serverSets);
-      await setSetCacheMetadata({
+      await setCachedSets(game, serverSets);
+      await setSetCacheMetadata(game, {
         version,
         updatedAt: now,
         setCount: serverSets.length,
@@ -112,7 +115,7 @@ export function useSets(options: UseSetsOptions = {}): UseSetsResult {
       setIsSyncing(false);
       syncInProgress.current = false;
     }
-  }, []);
+  }, [game]);
 
   const refreshSets = useCallback(async () => {
     if (serverVersion === null || serverVersion === undefined) return;

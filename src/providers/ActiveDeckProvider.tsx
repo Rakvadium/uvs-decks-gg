@@ -14,6 +14,7 @@ import { useQuery, useMutation } from "convex/react";
 import { toast } from "sonner";
 import { api } from "../../convex/_generated/api";
 import { Id, Doc } from "../../convex/_generated/dataModel";
+import type { DeckSetupPatch } from "@shared/games/deck";
 import { useUIState } from "./UIStateProvider";
 import { useCardIndex } from "@/lib/universus/card-data-provider";
 import { canAddCardToSection, canMoveCardToSection } from "@/lib/deck";
@@ -23,6 +24,8 @@ import {
   isDeckWriteConflictError,
   isTeamEditableDeck,
 } from "@/lib/deck/visibility";
+import { useGameId, useGameModule } from "@/games/game-context";
+import { offerSetupAdd } from "@/lib/deck/setup-add-fallback";
 
 type Deck = Doc<"decks">;
 type DeckSection = "main" | "side" | "reference";
@@ -32,8 +35,8 @@ type DeckUpdate = {
   description?: string;
   visibility?: DeckVisibility;
   imageCardId?: Id<"cards"> | null;
-  startingCharacterId?: Id<"cards"> | null;
-  selectedIdentity?: string | null;
+  /** Partial setup: omitted fields keep, `null` fields clear; `null` clears the whole setup. */
+  setup?: DeckSetupPatch<Id<"cards">> | null;
 };
 
 interface ActiveDeckContextValue {
@@ -89,9 +92,11 @@ export function ActiveDeckProvider({ children }: ActiveDeckProviderProps) {
   const activeDeckId = uiState.activeDeckId;
   const cardIndex = useCardIndex();
 
+  const game = useGameId();
+  const gameModule = useGameModule();
   const activeDeck = useQuery(
     api.decks.getById,
-    activeDeckId ? { deckId: activeDeckId as Id<"decks"> } : "skip"
+    activeDeckId ? { game, deckId: activeDeckId as Id<"decks"> } : "skip"
   );
 
   const addCardMutation = useMutation(api.decks.addCard);
@@ -145,9 +150,10 @@ export function ActiveDeckProvider({ children }: ActiveDeckProviderProps) {
         section,
         counts: sectionCounts,
         quantity,
+        rules: gameModule.deck,
       });
     },
-    [cardIndex, sectionCounts]
+    [cardIndex, sectionCounts, gameModule]
   );
 
   const canMoveToSection = useCallback(
@@ -160,9 +166,10 @@ export function ActiveDeckProvider({ children }: ActiveDeckProviderProps) {
         toSection,
         counts: sectionCounts,
         quantity,
+        rules: gameModule.deck,
       });
     },
-    [cardIndex, sectionCounts]
+    [cardIndex, sectionCounts, gameModule]
   );
 
   const setActiveDeck = useCallback(
@@ -210,7 +217,16 @@ export function ActiveDeckProvider({ children }: ActiveDeckProviderProps) {
     (cardId: Id<"cards">, section: DeckSection = "main", quantity?: number) => {
       if (!activeDeckId) return;
       if (!activeDeck) return;
-      if (!canAddToSection(cardId, section, quantity)) return;
+      if (!canAddToSection(cardId, section, quantity)) {
+        offerSetupAdd({
+          card: cardIndex?.byId.get(cardId.toString()),
+          module: gameModule,
+          deck: activeDeck,
+          getCard: (id) => cardIndex?.byId.get(id),
+          applySetup: (setup) => updateDeckMutation({ deckId: activeDeckId as Id<"decks">, setup }),
+        });
+        return;
+      }
       const payload: Parameters<typeof addCardMutation>[0] = {
         deckId: activeDeckId as Id<"decks">,
         cardId,
@@ -229,7 +245,7 @@ export function ActiveDeckProvider({ children }: ActiveDeckProviderProps) {
           }
         });
     },
-    [activeDeckId, activeDeck, addCardMutation, canAddToSection]
+    [activeDeckId, activeDeck, addCardMutation, canAddToSection, cardIndex, gameModule, updateDeckMutation]
   );
 
   const removeCard = useCallback(

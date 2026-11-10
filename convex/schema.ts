@@ -10,14 +10,28 @@ import {
   colorSourceValidator,
   userFeedbackKindValidator,
   deckBuilderUiStateV1Validator,
+  deckSetupValidator,
   deckTeamCollaborationValidator,
   deckVisibilityValidator,
+  gameIdValidator,
   teamMemberStatusValidator,
   teamRoleValidator,
 } from "./validators";
 
 export default defineSchema({
   ...authTables,
+
+  // One-time cross-host sign-in codes (convex/authHandoff.ts). Stores sha256(code) only.
+  authHandoffCodes: defineTable({
+    codeHash: v.string(),
+    userId: v.id("users"),
+    origin: v.string(),
+    state: v.optional(v.string()),
+    expiresAt: v.number(),
+    usedAt: v.optional(v.number()),
+  })
+    .index("by_codeHash", ["codeHash"])
+    .index("by_expiresAt", ["expiresAt"]),
 
   cardDataVersion: defineTable({
     version: v.number(),
@@ -27,7 +41,8 @@ export default defineSchema({
     catalogSha256: v.optional(v.string()),
     catalogSchemaVersion: v.optional(v.number()),
     catalogObjectKey: v.optional(v.string()),
-  }),
+    game: v.optional(gameIdValidator),
+  }).index("by_game", ["game"]),
 
   cardFacetSnapshot: defineTable({
     key: v.literal("default"),
@@ -35,7 +50,10 @@ export default defineSchema({
     types: v.array(v.string()),
     setCodes: v.array(v.string()),
     updatedAt: v.number(),
-  }).index("by_key", ["key"]),
+    game: v.optional(gameIdValidator),
+  })
+    .index("by_key", ["key"])
+    .index("by_game_and_key", ["game", "key"]),
 
   users: defineTable({
     username: v.optional(v.string()),
@@ -84,9 +102,12 @@ export default defineSchema({
     spotlightIP: v.optional(v.string()),
     updatedAt: v.optional(v.number()),
     updatedBy: v.optional(v.id("users")),
+    game: v.optional(gameIdValidator),
   })
     .index("by_code", ["code"])
+    .index("by_game_and_code", ["game", "code"])
     .index("by_setNumber", ["setNumber"])
+    .index("by_game_and_setNumber", ["game", "setNumber"])
     .index("by_isRotating", ["isRotating"])
     .index("by_isFuture", ["isFuture"]),
 
@@ -115,6 +136,17 @@ export default defineSchema({
     text: v.optional(v.string()),
     keywords: v.optional(v.string()),
     symbols: v.optional(v.string()),
+    /** Cyberpunk TCG columns (docs/games/cyberpunk.md "Card data model"); UVS never sets them. */
+    color: v.optional(v.string()),
+    cost: v.optional(v.number()),
+    power: v.optional(v.number()),
+    ram: v.optional(v.number()),
+    sellable: v.optional(v.boolean()),
+    /** Pipe-delimited, e.g. `Corpo|Netrunner`. */
+    tags: v.optional(v.string()),
+    /** Card subtitle (e.g. a Legend's epithet) and illustrator; used by Cyberpunk TCG. */
+    subname: v.optional(v.string()),
+    artist: v.optional(v.string()),
     searchName: v.optional(v.string()),
     searchText: v.optional(v.string()),
     searchAll: v.optional(v.string()),
@@ -126,7 +158,14 @@ export default defineSchema({
     setName: v.optional(v.string()),
     setNumber: v.optional(v.number()),
     legality: v.optional(v.string()),
+    game: v.optional(gameIdValidator),
   })
+    .index("by_game", ["game"])
+    .index("by_game_and_setCode_and_collectorNumber", ["game", "setCode", "collectorNumber"])
+    .index("by_game_and_setCode_and_name", ["game", "setCode", "name"])
+    .index("by_game_and_type_and_name", ["game", "type", "name"])
+    .index("by_game_and_oracleId", ["game", "oracleId"])
+    .index("by_game_and_setName", ["game", "setName"])
     .index("by_setCode_and_collectorNumber", ["setCode", "collectorNumber"])
     .index("by_setCode_and_name", ["setCode", "name"])
     .index("by_setName", ["setName"])
@@ -144,19 +183,19 @@ export default defineSchema({
     .index("by_speed", ["speed"])
     .searchIndex("search_tier1_name", {
       searchField: "searchName",
-      filterFields: [],
+      filterFields: ["game"],
     })
     .searchIndex("search_tier2_keywords", {
       searchField: "searchText",
-      filterFields: ["type", "rarity"],
+      filterFields: ["game", "type", "rarity"],
     })
     .searchIndex("search_tier3_all", {
       searchField: "searchAll",
-      filterFields: ["type", "rarity"],
+      filterFields: ["game", "type", "rarity"],
     })
     .searchIndex("search_gallery_name", {
       searchField: "searchName",
-      filterFields: ["setCode", "type", "rarity"],
+      filterFields: ["game", "setCode", "type", "rarity"],
     }),
 
   cardDrafts: defineTable({
@@ -176,7 +215,9 @@ export default defineSchema({
     updatedAt: v.number(),
     reviewedBy: v.optional(v.id("users")),
     approvalError: v.optional(v.string()),
+    game: v.optional(gameIdValidator),
   })
+    .index("by_game_and_setCode_and_status_and_sortIndex", ["game", "setCode", "status", "sortIndex"])
     .index("by_setCode_and_status_and_sortIndex", ["setCode", "status", "sortIndex"])
     .index("by_setCode_and_status", ["setCode", "status"])
     .index("by_status_and_updatedAt", ["status", "updatedAt"]),
@@ -191,7 +232,10 @@ export default defineSchema({
     isPublic: v.boolean(),
     format: v.optional(v.string()),
     subFormat: v.optional(v.string()),
+    setup: v.optional(deckSetupValidator),
+    /** @deprecated moved to `setup` (migrations/migrateDeckSetup); drop after the prod backfill. */
     startingCharacterId: v.optional(v.id("cards")),
+    /** @deprecated moved to `setup` (migrations/migrateDeckSetup); drop after the prod backfill. */
     selectedIdentity: v.optional(v.string()),
     imageCardId: v.optional(v.id("cards")),
     mainCardIds: v.array(v.id("cards")),
@@ -210,10 +254,13 @@ export default defineSchema({
       unassignedCardIds: v.array(v.string()),
     }))),
     revision: v.optional(v.number()),
+    game: v.optional(gameIdValidator),
   })
     .index("by_user", ["userId"])
     .index("by_isPublic", ["isPublic"])
+    .index("by_game_and_isPublic", ["game", "isPublic"])
     .index("by_visibility", ["visibility"])
+    .index("by_game_and_visibility", ["game", "visibility"])
     .index("by_teamId", ["teamId"])
     .index("by_format", ["format"]),
 
@@ -389,11 +436,16 @@ export default defineSchema({
         v.literal("rejected")
       )
     ),
+    game: v.optional(gameIdValidator),
   })
     .index("by_user_and_updatedAt", ["userId", "updatedAt"])
+    .index("by_user_and_game_and_updatedAt", ["userId", "game", "updatedAt"])
     .index("by_isPublic_and_updatedAt", ["isPublic", "updatedAt"])
+    .index("by_game_and_isPublic_and_updatedAt", ["game", "isPublic", "updatedAt"])
     .index("by_isPublic_and_rankingScope_and_updatedAt", ["isPublic", "rankingScope", "updatedAt"])
+    .index("by_game_and_isPublic_and_rankingScope_and_updatedAt", ["game", "isPublic", "rankingScope", "updatedAt"])
     .index("by_isPublic_and_rankingScope_and_scopeKey_and_updatedAt", ["isPublic", "rankingScope", "rankingScopeKey", "updatedAt"])
+    .index("by_game_and_isPublic_and_rankingScope_and_scopeKey_and_updatedAt", ["game", "isPublic", "rankingScope", "rankingScopeKey", "updatedAt"])
     .index("by_userId_and_listModerationStatus", ["userId", "listModerationStatus"]),
 
   tierListItems: defineTable({
@@ -416,9 +468,12 @@ export default defineSchema({
     topLaneRate: v.number(),
     bottomLaneRate: v.number(),
     lastComputedAt: v.number(),
+    game: v.optional(gameIdValidator),
   })
     .index("by_scope", ["scopeType", "scopeKey"])
-    .index("by_scope_and_adjustedScore", ["scopeType", "scopeKey", "adjustedScore"]),
+    .index("by_game_and_scope", ["game", "scopeType", "scopeKey"])
+    .index("by_scope_and_adjustedScore", ["scopeType", "scopeKey", "adjustedScore"])
+    .index("by_game_and_scope_and_adjustedScore", ["game", "scopeType", "scopeKey", "adjustedScore"]),
 
   communityTierSnapshots: defineTable({
     scopeType: v.union(v.literal("global"), v.literal("set_scope")),
@@ -436,9 +491,12 @@ export default defineSchema({
     })),
     insufficientDataCardIds: v.array(v.id("cards")),
     lastComputedAt: v.number(),
+    game: v.optional(gameIdValidator),
   })
     .index("by_scope", ["scopeType", "scopeKey"])
-    .index("by_scopeType_and_lastComputedAt", ["scopeType", "lastComputedAt"]),
+    .index("by_game_and_scope", ["game", "scopeType", "scopeKey"])
+    .index("by_scopeType_and_lastComputedAt", ["scopeType", "lastComputedAt"])
+    .index("by_game_and_scopeType_and_lastComputedAt", ["game", "scopeType", "lastComputedAt"]),
 
   collections: defineTable({
     userId: v.id("users"),
@@ -446,20 +504,36 @@ export default defineSchema({
     quantity: v.number(),
     condition: v.optional(v.string()),
     isFoil: v.optional(v.boolean()),
+    game: v.optional(gameIdValidator),
   })
     .index("by_user", ["userId"])
+    .index("by_user_and_game", ["userId", "game"])
     .index("by_user_and_card", ["userId", "cardId"]),
 
   sessions: defineTable({
     userId: v.id("users"),
+    /** @deprecated legacy uvs-only value; read/write `gameState[game]` (sessions.ts). */
     activeDeckId: v.optional(v.id("decks")),
     theme: v.optional(v.union(v.literal("light"), v.literal("dark"), v.literal("system"))),
     chrome: v.optional(chromeVariantValidator),
     colorSource: v.optional(colorSourceValidator),
     colorScheme: colorSchemeValidator,
     chromePreference: chromePreferenceValidator,
+    /** @deprecated legacy uvs-only value; read/write `gameState[game]` (sessions.ts). */
     galleryFilters: v.optional(v.any()),
+    /** @deprecated legacy uvs-only value; read/write `gameState[game]` (sessions.ts). */
     rightSidebarAction: v.optional(v.string()),
+    /** Per-game UI state keyed by GameId (docs/multi-game.md). */
+    gameState: v.optional(
+      v.record(
+        v.string(),
+        v.object({
+          activeDeckId: v.optional(v.id("decks")),
+          galleryFilters: v.optional(v.any()),
+          rightSidebarAction: v.optional(v.string()),
+        }),
+      ),
+    ),
     lastActiveAt: v.number(),
   })
     .index("by_user", ["userId"]),
@@ -538,6 +612,7 @@ export default defineSchema({
     errorMessages: v.optional(v.array(v.string())),
     startedAt: v.number(),
     completedAt: v.optional(v.number()),
+    game: v.optional(gameIdValidator),
   })
     .index("by_user", ["userId"])
     .index("by_status", ["status"]),
@@ -573,8 +648,10 @@ export default defineSchema({
       key: v.string(),
       name: v.string(),
     }))),
+    game: v.optional(gameIdValidator),
   })
-    .index("by_key", ["key"]),
+    .index("by_key", ["key"])
+    .index("by_game_and_key", ["game", "key"]),
 
   cardLegality: defineTable({
     formatKey: v.string(),
@@ -586,8 +663,10 @@ export default defineSchema({
     ),
     copyLimitOverride: v.optional(v.number()),
     effectiveDate: v.optional(v.number()),
+    game: v.optional(gameIdValidator),
   })
     .index("by_format", ["formatKey"])
+    .index("by_game_and_format", ["game", "formatKey"])
     .index("by_card", ["cardId"])
     .index("by_format_card", ["formatKey", "cardId"]),
 
@@ -596,9 +675,12 @@ export default defineSchema({
     setCode: v.string(),
     isLegal: v.boolean(),
     rotatesOutAt: v.optional(v.number()),
+    game: v.optional(gameIdValidator),
   })
     .index("by_format", ["formatKey"])
-    .index("by_format_set", ["formatKey", "setCode"]),
+    .index("by_game_and_format", ["game", "formatKey"])
+    .index("by_format_set", ["formatKey", "setCode"])
+    .index("by_game_and_format_set", ["game", "formatKey", "setCode"]),
 
   formatErrata: defineTable({
     formatKey: v.string(),
@@ -606,7 +688,10 @@ export default defineSchema({
     body: v.string(),
     url: v.optional(v.string()),
     sortOrder: v.number(),
-  }).index("by_format_and_sortOrder", ["formatKey", "sortOrder"]),
+    game: v.optional(gameIdValidator),
+  })
+    .index("by_format_and_sortOrder", ["formatKey", "sortOrder"])
+    .index("by_game_and_format_and_sortOrder", ["game", "formatKey", "sortOrder"]),
 
   cardTextHistory: defineTable({
     cardId: v.id("cards"),
@@ -615,6 +700,7 @@ export default defineSchema({
     source: v.optional(
       v.union(v.literal("admin_edit"), v.literal("import"), v.literal("printed"))
     ),
+    game: v.optional(gameIdValidator),
   }).index("by_cardId_and_recordedAt", ["cardId", "recordedAt"]),
 
   communityYoutubeCurations: defineTable({

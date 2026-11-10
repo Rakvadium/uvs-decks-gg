@@ -1,16 +1,16 @@
 "use client";
 
 import type { KeyboardEvent } from "react";
-import { CardDetailsDialog } from "@/components/universus/card-details/dialog";
-import { CardFlipButton } from "@/components/universus/card-item/flip-button";
-import { CARD_GLOW_REST, CARD_GLOW_HOVER } from "@/components/universus/card-item/glow";
-import { CardImageDisplay } from "@/components/universus/card-grid-item/image-display";
+import { CardFlipButton } from "@/components/card/flip-button";
+import { CARD_GLOW_REST, CARD_GLOW_HOVER } from "@/components/card/glow";
 import { cn } from "@/lib/utils";
 import { DeckCardStackItemActions } from "./actions";
 import { useDeckCardStackItemModel } from "./hook";
 import type { DeckCardStackItemProps } from "./types";
+import { useGameModule } from "@/games/game-context";
 
 export function DeckCardStackItem(props: DeckCardStackItemProps) {
+  const { CardDetailsDialog, CardImageDisplay } = useGameModule().ui;
   const {
     backCard,
     card,

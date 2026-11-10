@@ -1,4 +1,5 @@
 "use client";
 
-export { CardDetailsContent } from "./card-details/content";
-export { CardDetailsDialog } from "./card-details/dialog";
+// Compatibility wrapper: implementation moved to src/games/uvs/components/card-details.
+export { CardDetailsContent } from "@/games/uvs/components/card-details/content";
+export { CardDetailsDialog } from "@/games/uvs/components/card-details/dialog";

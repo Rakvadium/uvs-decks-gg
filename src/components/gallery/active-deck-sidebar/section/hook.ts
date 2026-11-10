@@ -1,4 +1,5 @@
 import { useCallback } from "react";
+import { useGameModule } from "@/games/game-context";
 import { canAddCardToSection, canMoveCardToSection } from "@/lib/deck";
 import { TCG_DND_ACCEPTS_CARD_ONLY, useTcgDroppable } from "@/lib/dnd";
 import {
@@ -17,6 +18,7 @@ export function useActiveDeckSectionModel({ sectionKey }: ActiveDeckSectionProps
     sectionCount,
     sectionCounts,
   } = useActiveDeckSectionsContext();
+  const gameDeck = useGameModule().deck;
 
   const groups = groupsBySection[sectionKey];
   const currentSectionCount = sectionCount(sectionKey);
@@ -40,6 +42,7 @@ export function useActiveDeckSectionModel({ sectionKey }: ActiveDeckSectionProps
             fromSection: sourceSection,
             toSection: sectionKey,
             counts: sectionCounts,
+            rules: gameDeck,
           })
         ) {
           return;
@@ -50,19 +53,22 @@ export function useActiveDeckSectionModel({ sectionKey }: ActiveDeckSectionProps
       }
 
       if (
+        gameDeck.isMainDeckEligible(item.card) &&
         !canAddCardToSection({
           card: item.card,
           cardId: item.card._id,
           section: sectionKey,
           counts: sectionCounts,
+          rules: gameDeck,
         })
       ) {
         return;
       }
+      // Ineligible cards still go to `addCard`, which offers the deck setup instead (Legends).
 
       addCard(item.card._id, sectionKey);
     },
-    [addCard, moveCard, sectionCounts, sectionKey]
+    [addCard, moveCard, sectionCounts, sectionKey, gameDeck]
   );
 
   const { isOver, canDrop, droppableProps } = useTcgDroppable({

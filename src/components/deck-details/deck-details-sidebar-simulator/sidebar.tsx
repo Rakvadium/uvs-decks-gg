@@ -1,11 +1,13 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { useGameModule } from "@/games/game-context";
 import { SimulatorHandImageCard } from "./hand-image-card";
 import { useDrawnHand } from "./use-drawn-hand";
 import { useSimulatorDeckState } from "./use-simulator-deck-state";
 
 export function HandSimulatorSidebar() {
+  const { simulatorSetupHint, simulatorNoHandSizeHint } = useGameModule().ui.deckSetup;
   const { cardMap, startingCharacter, handSize, mainDeckPool, canDraw } = useSimulatorDeckState();
   const { drawnCards, drawHand } = useDrawnHand({
     canDraw,
@@ -17,15 +19,15 @@ export function HandSimulatorSidebar() {
   return (
     <div className="flex h-full flex-col space-y-3 p-4">
       <div className="min-h-0 flex-1 space-y-2 overflow-y-auto">
-        {!startingCharacter ? (
+        {simulatorSetupHint && !startingCharacter ? (
           <div className="rounded-lg border border-dashed border-border/50 p-4 text-xs text-muted-foreground">
-            Select a starting character to enable simulator draws.
+            {simulatorSetupHint}
           </div>
         ) : null}
 
-        {startingCharacter && handSize <= 0 ? (
+        {simulatorNoHandSizeHint && startingCharacter && handSize <= 0 ? (
           <div className="rounded-lg border border-dashed border-border/50 p-4 text-xs text-muted-foreground">
-            Starting character has no hand size available.
+            {simulatorNoHandSizeHint}
           </div>
         ) : null}
 

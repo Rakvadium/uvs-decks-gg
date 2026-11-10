@@ -12,11 +12,13 @@ import {
   toPublicCatalogUrl,
 } from "./publicCardUrls";
 import type { Doc } from "./_generated/dataModel";
+import { gameIdValidator } from "./validators";
 
 const PUBLISH_PAGE_SIZE = 500;
 
 export const uploadCatalogBlob = internalAction({
   args: {
+    game: gameIdValidator,
     version: v.number(),
     releaseAt: v.number(),
   },
@@ -38,6 +40,7 @@ export const uploadCatalogBlob = internalAction({
         cursor: string | null;
         isDone: boolean;
       } = await ctx.runQuery(internal.cards.listGalleryCatalogPageForPublish, {
+        game: args.game,
         cursor,
         limit: PUBLISH_PAGE_SIZE,
         cutoff: args.releaseAt,
@@ -55,8 +58,8 @@ export const uploadCatalogBlob = internalAction({
     });
     const compressed = gzipSync(Buffer.from(payload, "utf8"));
     const catalogSha256 = createHash("sha256").update(compressed).digest("hex");
-    const catalogObjectKey = catalogObjectKeyForVersion(args.version);
-    const catalogUrl = toPublicCatalogUrl(args.version);
+    const catalogObjectKey = catalogObjectKeyForVersion(args.game, args.version);
+    const catalogUrl = toPublicCatalogUrl(args.game, args.version);
 
     const existing = await r2.getMetadata(ctx, catalogObjectKey);
     if (existing) {

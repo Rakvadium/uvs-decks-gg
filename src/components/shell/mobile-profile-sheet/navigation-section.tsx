@@ -2,13 +2,14 @@ import { ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ShellTeamNav } from "@/components/shell/shell-team-nav";
 import { MOBILE_INSET_DIVIDER, MOBILE_INSET_GROUP, MOBILE_INSET_ROW } from "../mobile-glass";
+import { useGameFeatures } from "@/games/game-context";
 import { buildMainNavItemsMobileOrder } from "../main-nav-build";
 import { MobileProfileSectionLabel } from "./section-label";
 import { useMobileProfileSheetContext } from "./context";
 
 export function MobileProfileNavigationSection() {
   const { pathname, handleNavClick, closeSheet } = useMobileProfileSheetContext();
-  const navItems = buildMainNavItemsMobileOrder();
+  const navItems = buildMainNavItemsMobileOrder(useGameFeatures());
 
   return (
     <section>

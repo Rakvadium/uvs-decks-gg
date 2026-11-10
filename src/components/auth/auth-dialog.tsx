@@ -10,6 +10,8 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import { useHostKind } from "@/games/game-context";
+import { currentPathWithSearch, startHandoff } from "@/lib/auth/handoff-client";
 import type { AuthDialogFlow } from "./dialog-flow";
 import { SignInFormDialog } from "./sign-in-dialog";
 import { SignUpFormDialog } from "./sign-up-dialog";
@@ -42,16 +44,26 @@ export function AuthDialogProvider({ children }: AuthDialogProviderProps) {
   const router = useRouter();
   const pathname = usePathname();
 
+  const hostKind = useHostKind();
+
   const openAuthDialog = useCallback((flow: AuthDialogFlow = "signIn") => {
+    // Game hosts have no local credentials UI: sign in on the apex and hand the session back.
+    if (
+      hostKind === "game" &&
+      startHandoff(currentPathWithSearch(), { flow: flow === "signUp" ? "signUp" : "signIn" })
+    ) {
+      return;
+    }
     setEntryFlow(flow);
     setAuthFormKey((k) => k + 1);
     setIsOpen(true);
-  }, []);
+  }, [hostKind]);
   const closeAuthDialog = useCallback(() => setIsOpen(false), []);
 
   const handleSuccess = useCallback(() => {
     setIsOpen(false);
-    if (pathname === "/" || pathname === "/sign-in" || pathname === "/sign-up") {
+    // `/sign-in` and `/sign-up` navigate themselves (honoring `next`) via AuthRouteEntry.
+    if (pathname === "/") {
       router.push("/home");
     }
   }, [pathname, router]);

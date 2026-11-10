@@ -17,6 +17,7 @@ This repo uses oddstack (user-level install). Use `/odd-mode` for non-trivial wo
 ## Hard rules
 
 - The `.env.local` in the main checkout points at the live production Convex deployment. Never run a Convex CLI command, migration or deploy against it without the owner's explicit approval of the exact command.
+- Branch work uses a local Convex deployment: [docs/local-convex.md](docs/local-convex.md). The deployed Convex functions come from `multi-game-platform`, so deploying from another branch can delete live functions.
 - Write env var names, never values, in tracked files, commits, PR text and logs.
 - Ask before starting new infra or side fixes.
 - PRs target `dev`.
