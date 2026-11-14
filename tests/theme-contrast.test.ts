@@ -7,7 +7,7 @@ import { clampRgb, converter, parse, wcagContrast, type Oklch, type Rgb } from "
 // color-mix(in oklch) for --control-dual-*, relative oklch() for --checkbox-border, alpha
 // composited in sRGB, out-of-gamut channels clipped.
 
-const THEMES = ["default", "calm-storm", "cyberpunk", "cotton-candy", "caffeine", "aurora", "sorbet", "singularity"];
+const THEMES = ["universus", "cyberpunk", "calm-storm", "cotton-candy", "caffeine", "aurora", "sorbet", "singularity"];
 const MODES = ["light", "dark"] as const;
 type Mode = (typeof MODES)[number];
 
@@ -123,8 +123,8 @@ describe("unchecked checkbox border (WCAG 1.4.11)", () => {
   }
 });
 
-test("default light: the secondary Badge text reaches 4.5:1 on its own tint", () => {
-  const p = palette("default", "light");
+test("universus light: the secondary Badge text reaches 4.5:1 on its own tint", () => {
+  const p = palette("universus", "light");
   const ink = p.resolve(p.get("--badge-secondary"));
   const tint = p.resolve(p.get("--secondary"));
   for (const surface of p.surfaces) {

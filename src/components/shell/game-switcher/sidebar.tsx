@@ -34,7 +34,7 @@ export function SidebarGameSwitcher() {
           collapsed ? SHELL_RAIL_ITEM_COLLAPSED_CLASS : "w-full py-2"
         )}
       >
-        <GameBadge shortName={gameModule.shortName} theme={gameModule.theme} />
+        <GameBadge game={gameModule.id} />
         {!collapsed ? (
           <>
             <span className="chrome-label-case min-w-0 flex-1 truncate text-left text-xs">{gameModule.displayName}</span>

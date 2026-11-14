@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import { COLOR_PRESET_VALUES, type ColorPresetChoice } from "@/lib/theme/appearance-types";
+import { COLOR_THEME_VALUES, type ColorTheme } from "@/lib/theme/appearance-types";
 import { parseBlockPropertyNames, parseCustomPropertyNames, parseLadders, type LadderSource } from "./parse";
 
 /** Server-only: reads the real CSS sources so the catalog tables come from them. */
@@ -8,7 +8,7 @@ import { parseBlockPropertyNames, parseCustomPropertyNames, parseLadders, type L
 export interface ColorTokenSource {
   name: string;
   /** Presets that declare it. Empty for tokens defined once in `base.css` (status colors). */
-  themes: ColorPresetChoice[];
+  themes: ColorTheme[];
   origin: "theme" | "base";
 }
 
@@ -27,7 +27,7 @@ export function readCatalogSource(): CatalogSource {
   const ladders = parseLadders(readStyle("system", "ladders.css"));
 
   const byName = new Map<string, ColorTokenSource>();
-  for (const theme of COLOR_PRESET_VALUES) {
+  for (const theme of COLOR_THEME_VALUES) {
     for (const name of parseCustomPropertyNames(readStyle("themes", `${theme}.css`))) {
       const row = byName.get(name) ?? { name, themes: [], origin: "theme" as const };
       row.themes.push(theme);

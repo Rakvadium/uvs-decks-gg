@@ -1,8 +1,8 @@
 import {
   CHROME_VARIANT_VALUES,
-  COLOR_PRESET_VALUES,
+  COLOR_THEME_VALUES,
   type ChromeVariant,
-  type ColorPresetChoice,
+  type ColorTheme,
 } from "@/lib/theme/appearance-types";
 
 /**
@@ -13,7 +13,7 @@ import {
 export type CatalogMode = "light" | "dark";
 
 export interface CatalogAppearance {
-  theme: ColorPresetChoice;
+  theme: ColorTheme;
   mode: CatalogMode;
   chrome: ChromeVariant;
 }
@@ -40,7 +40,7 @@ function pick<T extends string>(allowed: readonly T[], value: string | undefined
 /** Only allow-listed values survive, so the result is safe to write into an inline script. */
 export function parseCatalogOverride(source: ParamSource): CatalogOverride {
   const override: CatalogOverride = {};
-  const theme = pick(COLOR_PRESET_VALUES, readParam(source, "theme"));
+  const theme = pick(COLOR_THEME_VALUES, readParam(source, "theme"));
   const mode = pick(CATALOG_MODES, readParam(source, "mode"));
   const chrome = pick(CHROME_VARIANT_VALUES, readParam(source, "chrome"));
   if (theme) override.theme = theme;

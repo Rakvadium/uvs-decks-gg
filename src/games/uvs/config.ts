@@ -545,9 +545,9 @@ export const UNIVERSUS_CONFIG = {
   description: "The UniVersus Trading Card Game",
   imageBaseUrl: IMAGE_BASE_URL,
   theme: {
-    primary: "220 90% 56%",
-    secondary: "262 83% 58%",
-    accent: "142 76% 36%",
+    primary: "19 100% 50%",
+    secondary: "266 98% 46%",
+    accent: "266 98% 46%",
   },
   terminology: {
     card: "Card",

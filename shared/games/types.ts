@@ -32,6 +32,9 @@ export interface GameThemeColors {
   accent: string;
 }
 
+/** Built-in color theme a game's hosts use until the user picks another (`src/styles/themes/<id>.css`). */
+export type GameColorTheme = "universus" | "cyberpunk";
+
 /** Product brand shown in the wordmark and page titles. */
 export interface Brand {
   /** Wordmark parts: lead, accented middle, suffix (e.g. `["UVS", "DECKS", ".GG"]`). */
@@ -74,6 +77,10 @@ export interface SharedGameModule {
   /** Short label for compact UI, e.g. "UVS". */
   shortName: string;
   theme: GameThemeColors;
+  /** Color theme shown while the user's saved preset is `default`. */
+  colorTheme: GameColorTheme;
+  /** Monochrome game logo, painted as a CSS mask in `theme.primary`. */
+  markSrc: string;
   /** Brand on this game's hosts (game subdomain + standalone). */
   brand: Brand;
   /** Gallery stat/zone filter descriptors (see `shared/games/filters.ts`). */

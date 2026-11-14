@@ -9,7 +9,6 @@ import { useColorScheme, COLOR_SCHEMES, CHROME_OPTIONS } from "@/lib/theme";
 import type {
   AppearanceModePair,
   ChromeVariant,
-  ColorPresetChoice,
   ThemePreference,
 } from "@/lib/theme/appearance-types";
 import { DEFAULT_CUSTOM_BRAND } from "@/lib/theme/appearance-types";
@@ -214,6 +213,7 @@ export default function SettingsPageClient() {
     setTheme,
     resolvedTheme,
     colorSource,
+    colorPreset,
     isCustomAppearance,
     setAppearancePreset,
     setAppearanceCustom,
@@ -587,15 +587,13 @@ export default function SettingsPageClient() {
                   </p>
                   <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
                     {COLOR_SCHEMES.map((scheme) => {
-                      const active =
-                        colorSource.kind === "preset" &&
-                        colorSource.preset === (scheme.value as ColorPresetChoice);
+                      const active = colorPreset === scheme.value;
                       return (
                         <button
                           key={scheme.value}
                           type="button"
                           onClick={() =>
-                            void setAppearancePreset(scheme.value as ColorPresetChoice)
+                            void setAppearancePreset(scheme.value)
                           }
                           className={cn(
                             "group relative rounded-xl border-2 p-3 text-left transition-colors hover:border-primary/50",

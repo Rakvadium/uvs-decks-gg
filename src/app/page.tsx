@@ -66,7 +66,7 @@ async function GamePicker() {
                     }}
                   />
                   <div className="flex items-center gap-4">
-                    <GameBadge shortName={gameModule.shortName} theme={theme} size="lg" />
+                    <GameBadge game={id} size="lg" />
                     <div className="min-w-0">
                       <SectionHeading size="lg" className="truncate">
                         {gameModule.displayName}

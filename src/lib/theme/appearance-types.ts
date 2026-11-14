@@ -1,7 +1,10 @@
-export const COLOR_PRESET_VALUES = [
-  "default",
-  "calm-storm",
+import type { GameColorTheme } from "@shared/games/types";
+
+/** Built-in palettes. Each has `src/styles/themes/<id>.css` and is a `data-color-theme` value. */
+export const COLOR_THEME_VALUES = [
+  "universus",
   "cyberpunk",
+  "calm-storm",
   "cotton-candy",
   "caffeine",
   "aurora",
@@ -9,7 +12,16 @@ export const COLOR_PRESET_VALUES = [
   "singularity",
 ] as const;
 
+export type ColorTheme = (typeof COLOR_THEME_VALUES)[number];
+
+/** Saved presets. `default` follows the current game's `colorTheme`. */
+export const COLOR_PRESET_VALUES = ["default", ...COLOR_THEME_VALUES] as const;
+
 export type ColorPresetChoice = (typeof COLOR_PRESET_VALUES)[number];
+
+export function resolveColorTheme(preset: ColorPresetChoice, gameTheme: GameColorTheme): ColorTheme {
+  return preset === "default" ? gameTheme : preset;
+}
 
 export const CHROME_VARIANT_VALUES = [
   "calm",

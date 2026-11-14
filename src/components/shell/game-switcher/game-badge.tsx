@@ -1,40 +1,45 @@
 import type { CSSProperties } from "react";
-import type { GameThemeColors } from "@shared/games/types";
+import { getSharedGameModule } from "@shared/games/registry";
+import type { GameId } from "@shared/games/types";
 import { cn } from "@/lib/utils";
 
 const SIZE_CLASS = {
-  sm: "h-5 min-w-5 rounded-md px-1 text-[10px]",
-  lg: "size-12 rounded-lg text-sm",
+  sm: "h-6 w-8 rounded-md p-1",
+  lg: "h-12 w-16 rounded-lg p-2",
 } as const;
 
-/** Game short name on the game's own theme color (`/20` fill, `/40` border ladder steps). */
+/** Ink-dark tile: keeps light brand marks (Cyberpunk yellow) legible on light themes too. */
+const TILE_BACKGROUND = "oklch(0.17 0.025 268)";
+
+/** The game's logo in its theme color on a dark tile. Decorative: pair it with the game name. */
 export function GameBadge({
-  shortName,
-  theme,
+  game,
   size = "sm",
   className,
 }: {
-  shortName: string;
-  theme: GameThemeColors;
+  game: GameId;
   size?: keyof typeof SIZE_CLASS;
   className?: string;
 }) {
-  const style: CSSProperties = {
-    backgroundColor: `hsl(${theme.primary} / 0.2)`,
+  const { theme, markSrc } = getSharedGameModule(game);
+  const tile: CSSProperties = {
+    backgroundColor: TILE_BACKGROUND,
     borderColor: `hsl(${theme.primary} / 0.4)`,
-    color: `hsl(${theme.primary})`,
+  };
+  const logo: CSSProperties = {
+    backgroundColor: `hsl(${theme.primary})`,
+    maskImage: `url(${markSrc})`,
+    maskSize: "contain",
+    maskRepeat: "no-repeat",
+    maskPosition: "center",
   };
   return (
     <span
       aria-hidden
-      style={style}
-      className={cn(
-        "inline-flex shrink-0 items-center justify-center border font-bold leading-none normal-case tracking-normal",
-        SIZE_CLASS[size],
-        className,
-      )}
+      style={tile}
+      className={cn("inline-flex shrink-0 items-center justify-center border", SIZE_CLASS[size], className)}
     >
-      {shortName}
+      <span style={logo} className="size-full" />
     </span>
   );
 }

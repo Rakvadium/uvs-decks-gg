@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { Check, LayoutGrid } from "lucide-react";
-import { getSharedGameModule } from "@shared/games/registry";
 import {
   DropdownMenuContent,
   DropdownMenuItem,
@@ -20,7 +19,7 @@ export function GameSwitcherMenuContent({ model }: { model: GameSwitcherModel })
       {model.games.map((game) => {
         const content = (
           <>
-            <GameBadge shortName={game.shortName} theme={getSharedGameModule(game.id).theme} />
+            <GameBadge game={game.id} />
             <span className="flex-1">{game.displayName}</span>
             {game.current ? <Check className="text-primary" aria-hidden /> : null}
           </>

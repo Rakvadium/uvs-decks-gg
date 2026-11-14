@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Outfit } from "next/font/google";
 import { ConvexAuthNextjsServerProvider } from "@convex-dev/auth/nextjs/server";
-import { getHostBrand } from "@shared/games/registry";
+import { getHostBrand, getSharedGameModule } from "@shared/games/registry";
 import { GameProvider } from "@/games/game-context";
 import { getRequestGame } from "@/lib/routing/request-game";
 import { Providers } from "./providers";
@@ -47,7 +47,7 @@ export default async function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      data-color-theme="default"
+      data-color-theme={getSharedGameModule(game).colorTheme}
       data-chrome="calm"
       className={outfit.variable}
     >
