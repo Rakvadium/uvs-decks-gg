@@ -7,7 +7,7 @@ import { BarChart3, FolderOpen, Globe } from "lucide-react";
 import { toast } from "sonner";
 import type { Doc } from "../../../../../convex/_generated/dataModel";
 import { api } from "../../../../../convex/_generated/api";
-import { useAuthDialog } from "@/components/auth/auth-dialog";
+import { useStartAuth } from "@/components/auth/use-start-auth";
 import { useCardData } from "@/lib/universus/card-data-provider";
 import {
   COMMUNITY_TIER_RANKING,
@@ -66,7 +66,7 @@ export function useCommunityTierListsPageModel() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const { isAuthenticated } = useConvexAuth();
-  const { openAuthDialog } = useAuthDialog();
+  const startAuth = useStartAuth();
   const game = useGameId();
   const publicLists = useQuery(api.tierLists.listPublicFeed, { game, limit: 48 });
   const myLists = useQuery(api.tierLists.listMine, isAuthenticated ? { game, limit: 48 } : "skip");
@@ -147,7 +147,7 @@ export function useCommunityTierListsPageModel() {
 
   const handleOpenCreateDialog = () => {
     if (!isAuthenticated) {
-      openAuthDialog();
+      startAuth();
       return;
     }
 
@@ -163,7 +163,7 @@ export function useCommunityTierListsPageModel() {
     if (openCreateIntentRef.current) return;
     openCreateIntentRef.current = true;
     if (!isAuthenticated) {
-      openAuthDialog();
+      startAuth();
     } else {
       setIsCreateOpen(true);
     }
@@ -174,11 +174,11 @@ export function useCommunityTierListsPageModel() {
     startTransition(() => {
       router.replace(nextHref, { scroll: false });
     });
-  }, [isAuthenticated, openAuthDialog, pathname, router, searchParams]);
+  }, [isAuthenticated, startAuth, pathname, router, searchParams]);
 
   const handleCreate = async () => {
     if (!isAuthenticated) {
-      openAuthDialog();
+      startAuth();
       return;
     }
 
@@ -234,7 +234,7 @@ export function useCommunityTierListsPageModel() {
     setNewRankingScope,
     isCreating,
     isAuthenticated,
-    openAuthDialog,
+    startAuth,
     handleOpenCreateDialog,
     handleCreate,
     publicLists,

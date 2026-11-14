@@ -2,14 +2,14 @@
 
 import { Eye } from "lucide-react";
 import { useConvexAuth } from "convex/react";
-import { useAuthDialog } from "@/components/auth/auth-dialog";
+import { useStartAuth } from "@/components/auth/use-start-auth";
 import { Button } from "@/components/ui/button";
 import { useDeckDetails } from "@/providers/DeckDetailsProvider";
 
 export function DeckDetailsReadOnlyBanner() {
   const { deck, isOwner } = useDeckDetails();
   const { isAuthenticated } = useConvexAuth();
-  const { openAuthDialog } = useAuthDialog();
+  const startAuth = useStartAuth();
 
   if (!deck || isOwner) return null;
 
@@ -24,7 +24,7 @@ export function DeckDetailsReadOnlyBanner() {
           type="button"
           size="sm"
           className="h-7 shrink-0 px-2.5 text-xs"
-          onClick={() => openAuthDialog()}
+          onClick={() => startAuth()}
         >
           Sign in to edit
         </Button>

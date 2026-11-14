@@ -41,7 +41,7 @@ export function TeamIdentityPill({ teamId, name, presentation, loading }: TeamId
   const notice = noticeText(presentation);
 
   const avatar = (
-    <span className="flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border/50 bg-muted/50">
+    <span className="flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-full border border-surface bg-muted-soft">
       {displayUrl ? (
         <img src={displayUrl} alt="" className="size-full object-cover" />
       ) : (

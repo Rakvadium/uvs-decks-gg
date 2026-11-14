@@ -18,7 +18,7 @@ export function TeamHubStatsContent({ teamId }: TeamHubStatsContentProps) {
     return (
       <div className="space-y-3">
         <div className="h-6 w-32 animate-pulse rounded-md bg-muted" />
-        <div className="h-24 w-full animate-pulse rounded-md bg-muted/80" />
+        <div className="h-24 w-full animate-pulse rounded-md bg-muted-overlay" />
       </div>
     );
   }
@@ -27,7 +27,7 @@ export function TeamHubStatsContent({ teamId }: TeamHubStatsContentProps) {
     <div className="space-y-4">
       <PageHeading size="sm" className="md:hidden">Stats</PageHeading>
       <div
-        className="rounded-lg border border-dashed border-border/80 bg-muted/20 px-4 py-12 text-center"
+        className="rounded-lg border border-dashed border-placeholder bg-muted-tint px-4 py-12 text-center"
         role="status"
       >
         <p className="text-sm text-muted-foreground">No statistics available yet.</p>

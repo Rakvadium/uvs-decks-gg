@@ -1,15 +1,15 @@
 "use client";
 
-import { PageHeading } from "@/components/ui/typography-headings";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { ConvexError } from "convex/values";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useState, type FormEvent } from "react";
 import { toast } from "sonner";
 import { ArrowLeft, KeyRound, Send } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { SectionHeading } from "@/components/ui/typography-headings";
 import { PASSWORD_REQUIREMENTS, passwordRequirementError } from "../../../convex/lib/password";
-import type { AuthDialogFlow } from "./dialog-flow";
+import { AuthField } from "./auth-field";
+import type { AuthFlow } from "./flow";
 import { clearAuthCookies, isRefreshTokenParseError } from "./auth-recovery";
 
 type SignIn = ReturnType<typeof useAuthActions>["signIn"];
@@ -31,11 +31,40 @@ function errorMessage(error: unknown, fallback: string): string {
   return fallback;
 }
 
-export function ResetPasswordFormDialog({
+function ResetHeader({
+  title,
+  description,
+  onBack,
+}: {
+  title: string;
+  description: string;
+  onBack: () => void;
+}) {
+  return (
+    <div className="mb-6 flex flex-col gap-3">
+      <Button
+        variant="ghost"
+        size="sm"
+        type="button"
+        className="-ml-2 self-start text-muted-foreground"
+        onClick={onBack}
+      >
+        <ArrowLeft className="size-4" />
+        Back
+      </Button>
+      <div className="space-y-1">
+        <SectionHeading size="lg">{title}</SectionHeading>
+        <p className="text-sm text-muted-foreground">{description}</p>
+      </div>
+    </div>
+  );
+}
+
+export function ResetPasswordForm({
   setFlow,
   onSuccess,
 }: {
-  setFlow: (flow: AuthDialogFlow) => void;
+  setFlow: (flow: AuthFlow) => void;
   onSuccess: () => void;
 }) {
   const { signIn } = useAuthActions();
@@ -93,60 +122,44 @@ export function ResetPasswordFormDialog({
   if (email !== null) {
     return (
       <>
-        <div className="mb-6 text-center">
-          <PageHeading size="lg">Check your email</PageHeading>
-          <p className="mt-2 text-muted-foreground">
-            Enter the 8-digit code we sent to {email} and choose a new password.
-          </p>
-        </div>
-        <form className="flex flex-col" onSubmit={verifyCode}>
+        <ResetHeader
+          title="Check your email"
+          description={`Enter the 8-digit code we sent to ${email} and choose a new password.`}
+          onBack={() => setEmail(null)}
+        />
+        <form className="flex flex-col gap-5" onSubmit={verifyCode}>
           <input name="email" value={email} type="hidden" />
           <input name="flow" value="reset-verification" type="hidden" />
-          <div className="mt-4 flex items-center justify-between py-1">
-            <label htmlFor="dialog-reset-code">Code</label>
-          </div>
-          <Input
+          <AuthField
+            id="reset-code"
             name="code"
-            id="dialog-reset-code"
+            label="Code"
             inputMode="numeric"
             autoComplete="one-time-code"
             required
+            autoFocus
           />
-          <div className="mt-4 flex items-center justify-between py-1">
-            <label htmlFor="dialog-reset-password">New password</label>
-          </div>
-          <Input
-            type="password"
+          <AuthField
+            id="reset-new-password"
             name="newPassword"
-            id="dialog-reset-password"
-            autoComplete="new-password"
-            aria-describedby="dialog-reset-password-hint"
-            required
-          />
-          <p id="dialog-reset-password-hint" className="mt-1 text-sm text-muted-foreground">
-            {PASSWORD_REQUIREMENTS}
-          </p>
-          <div className="mt-4 flex items-center justify-between py-1">
-            <label htmlFor="dialog-reset-confirm">Confirm new password</label>
-          </div>
-          <Input
             type="password"
+            label="New password"
+            autoComplete="new-password"
+            required
+            hint={PASSWORD_REQUIREMENTS}
+          />
+          <AuthField
+            id="reset-confirm-password"
             name="confirmPassword"
-            id="dialog-reset-confirm"
+            type="password"
+            label="Confirm new password"
             autoComplete="new-password"
             required
           />
-
-          <div className="mt-8 flex items-center justify-between">
-            <Button variant="outline" type="button" onClick={() => setEmail(null)}>
-              <ArrowLeft className="size-4" />
-              Back
-            </Button>
-            <Button type="submit" disabled={submitting}>
-              Reset Password
-              <KeyRound className="size-4" />
-            </Button>
-          </div>
+          <Button type="submit" className="mt-2 w-full" disabled={submitting}>
+            {submitting ? "Resetting…" : "Reset password"}
+            <KeyRound className="size-4" />
+          </Button>
         </form>
       </>
     );
@@ -154,33 +167,26 @@ export function ResetPasswordFormDialog({
 
   return (
     <>
-      <div className="mb-6 text-center">
-        <PageHeading size="lg">Reset password</PageHeading>
-        <p className="mt-2 text-muted-foreground">
-          Enter your email and we&apos;ll send you a reset code
-        </p>
-      </div>
-      <form className="flex flex-col" onSubmit={requestCode}>
-        <div className="flex items-center justify-between mt-4 py-1">
-          <label htmlFor="dialog-reset-email">Email</label>
-        </div>
-        <Input name="email" id="dialog-reset-email" autoComplete="email" required />
+      <ResetHeader
+        title="Reset your password"
+        description="Enter your email and we'll send you a reset code."
+        onBack={() => setFlow("signIn")}
+      />
+      <form className="flex flex-col gap-5" onSubmit={requestCode}>
+        <AuthField
+          id="reset-email"
+          name="email"
+          type="email"
+          label="Email"
+          autoComplete="email"
+          required
+          autoFocus
+        />
         <input name="flow" value="reset" type="hidden" />
-
-        <div className="flex items-center justify-between mt-8">
-          <Button
-            variant="outline"
-            type="button"
-            onClick={() => setFlow("signIn")}
-          >
-            <ArrowLeft className="size-4" />
-            Back
-          </Button>
-          <Button type="submit" disabled={submitting}>
-            Send Reset Code
-            <Send className="size-4" />
-          </Button>
-        </div>
+        <Button type="submit" className="mt-2 w-full" disabled={submitting}>
+          {submitting ? "Sending…" : "Send reset code"}
+          <Send className="size-4" />
+        </Button>
       </form>
     </>
   );

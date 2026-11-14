@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useConvexAuth, useQuery } from "convex/react";
 import { Calendar, Layers, Loader2, Megaphone, MessageSquare, Plus, Users } from "lucide-react";
 import { api } from "../../../convex/_generated/api";
-import { useAuthDialog } from "@/components/auth/auth-dialog";
+import { useStartAuth } from "@/components/auth/use-start-auth";
 import {
   FLOATING_ACTION_PILL_CLASS,
   FloatingActionPill,
@@ -18,7 +18,7 @@ import { CreateTeamButton } from "@/components/teams/create-team-dialog";
 import { Surface } from "@/components/ui/card";
 
 function TeamsLandingFloatingBar({ isAuthenticated }: { isAuthenticated: boolean }) {
-  const { openAuthDialog } = useAuthDialog();
+  const startAuth = useStartAuth();
 
   return (
     <FloatingPageBar
@@ -29,7 +29,7 @@ function TeamsLandingFloatingBar({ isAuthenticated }: { isAuthenticated: boolean
         isAuthenticated ? (
           <CreateTeamButton className={FLOATING_ACTION_PILL_CLASS} />
         ) : (
-          <FloatingActionPill onClick={() => openAuthDialog()}>
+          <FloatingActionPill onClick={() => startAuth()}>
             <Plus className="h-3.5 w-3.5" />
             <span className="text-xs">Sign in</span>
           </FloatingActionPill>
@@ -41,7 +41,7 @@ function TeamsLandingFloatingBar({ isAuthenticated }: { isAuthenticated: boolean
 
 export function TeamsLandingView() {
   const router = useRouter();
-  const { openAuthDialog } = useAuthDialog();
+  const startAuth = useStartAuth();
   const { isAuthenticated, isLoading: authLoading } = useConvexAuth();
   const myTeam = useQuery(api.teams.permissions.getMyTeam, isAuthenticated ? {} : "skip");
 
@@ -77,7 +77,7 @@ export function TeamsLandingView() {
   }
 
   const featureClass =
-    "flex gap-3 rounded-xl border border-border/50 bg-card/50 p-4 backdrop-blur-sm md:p-5";
+    "flex gap-3 rounded-xl border border-surface bg-card-soft p-4 backdrop-blur-sm md:p-5";
 
   return (
     <FloatingPageLayout bar={<TeamsLandingFloatingBar isAuthenticated={isAuthenticated} />}>
@@ -91,14 +91,14 @@ export function TeamsLandingView() {
             {isAuthenticated ? (
               <CreateTeamButton className="w-full justify-center" />
             ) : (
-              <FloatingActionPill className="w-full" onClick={() => openAuthDialog()}>
+              <FloatingActionPill className="w-full" onClick={() => startAuth()}>
                 <Plus className="h-3.5 w-3.5" />
                 <span className="text-xs">Sign in</span>
               </FloatingActionPill>
             )}
           </div>
 
-          <Surface className="rounded-3xl border-border/50 bg-card/80 p-5 backdrop-blur-sm md:p-7">
+          <Surface className="rounded-3xl border-surface bg-card-elevated p-5 backdrop-blur-sm md:p-7">
             <SectionHeading size="md">What you get</SectionHeading>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
               {isAuthenticated

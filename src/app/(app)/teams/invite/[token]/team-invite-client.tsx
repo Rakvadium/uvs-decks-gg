@@ -15,7 +15,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useAuthDialog } from "@/components/auth/auth-dialog";
+import { useStartAuth } from "@/components/auth/use-start-auth";
 
 type InviteModalStep = "choose" | "leaveWarning";
 
@@ -25,7 +25,7 @@ export function TeamInviteClient() {
   const raw = params?.token;
   const token = typeof raw === "string" ? raw : Array.isArray(raw) ? raw[0] : "";
   const { isAuthenticated, isLoading: authLoading } = useConvexAuth();
-  const { openAuthDialog } = useAuthDialog();
+  const startAuth = useStartAuth();
   const accept = useMutation(api.teams.invites.acceptInvite);
   const decline = useMutation(api.teams.invites.declineInvite);
   const details = useQuery(api.teams.invites.getInviteDetails, token ? { token } : "skip");
@@ -148,7 +148,7 @@ export function TeamInviteClient() {
     body = (
       <div className="flex flex-col gap-3">
         <p className="text-sm text-muted-foreground">Sign in to respond to this invite.</p>
-        <Button type="button" onClick={() => openAuthDialog()}>
+        <Button type="button" onClick={() => startAuth()}>
           Sign in
         </Button>
       </div>

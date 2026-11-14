@@ -6,7 +6,7 @@ import { useConvexAuth, useMutation } from "convex/react";
 import { Link2, Loader2, PenLine, Plus, UsersRound } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "../../../convex/_generated/api";
-import { useAuthDialog } from "@/components/auth/auth-dialog";
+import { useStartAuth } from "@/components/auth/use-start-auth";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -30,15 +30,15 @@ type CreateTeamButtonProps = {
 export function CreateTeamButton({ className, size = "sm", variant = "default" }: CreateTeamButtonProps) {
   const [open, setOpen] = useState(false);
   const { isAuthenticated } = useConvexAuth();
-  const { openAuthDialog } = useAuthDialog();
+  const startAuth = useStartAuth();
 
   const onOpen = useCallback(() => {
     if (!isAuthenticated) {
-      openAuthDialog();
+      startAuth();
       return;
     }
     setOpen(true);
-  }, [isAuthenticated, openAuthDialog]);
+  }, [isAuthenticated, startAuth]);
 
   return (
     <>
@@ -131,15 +131,15 @@ function CreateTeamFormDialog({ open, onOpenChange }: CreateTeamFormDialogProps)
       >
         <div className="relative flex h-full min-h-0 max-h-[85vh] flex-col">
           <div className="pointer-events-none absolute inset-0">
-            <div className="absolute -top-16 left-10 h-24 w-24 rounded-full bg-primary/20 blur-3xl" />
-            <div className="absolute -bottom-16 right-10 h-24 w-24 rounded-full bg-secondary/20 blur-3xl" />
+            <div className="absolute -top-16 left-10 h-24 w-24 rounded-full bg-primary-selected blur-3xl" />
+            <div className="absolute -bottom-16 right-10 h-24 w-24 rounded-full bg-secondary-selected blur-3xl" />
             <div className="absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
           </div>
 
           <div className="relative min-h-0 flex-1 overflow-y-auto px-6">
-            <DialogHeader className="border-border/30 pb-4 pt-6">
+            <DialogHeader className="border-hairline pb-4 pt-6">
               <div className="flex items-start gap-3">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-primary/30 bg-primary/10 shadow-[0_0_2px_var(--primary)/40,0_0_6px_var(--primary)/40]">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-primary-soft bg-primary-wash shadow-[0_0_2px_var(--primary)/40,0_0_6px_var(--primary)/40]">
                   <UsersRound className="h-5 w-5 text-primary" />
                 </div>
                 <div className="min-w-0">
@@ -163,7 +163,7 @@ function CreateTeamFormDialog({ open, onOpenChange }: CreateTeamFormDialogProps)
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Team name…"
-                    className="h-12 bg-background/50 pl-10 text-base focus-visible:ring-primary/25"
+                    className="h-12 bg-background-soft pl-10 text-base focus-visible:ring-primary-soft"
                     autoComplete="off"
                     onKeyDown={(e) => {
                       if (e.key === "Enter") {
@@ -184,7 +184,7 @@ function CreateTeamFormDialog({ open, onOpenChange }: CreateTeamFormDialogProps)
                     value={slug}
                     onChange={(e) => setSlug(e.target.value)}
                     placeholder="my-team"
-                    className="h-12 bg-background/50 pl-10 text-sm focus-visible:ring-primary/25"
+                    className="h-12 bg-background-soft pl-10 text-sm focus-visible:ring-primary-soft"
                     autoComplete="off"
                   />
                 </div>
@@ -198,7 +198,7 @@ function CreateTeamFormDialog({ open, onOpenChange }: CreateTeamFormDialogProps)
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="What is this team for?"
                   rows={3}
-                  className="mt-2 min-h-[4.5rem] resize-y bg-background/50 focus-visible:ring-primary/25"
+                  className="mt-2 min-h-[4.5rem] resize-y bg-background-soft focus-visible:ring-primary-soft"
                 />
                 <p className="mt-2 text-xs text-muted-foreground/70">
                   Tip: A short blurb helps members know what the team is for. You can change this later in the

@@ -25,7 +25,7 @@ export function TeamsDecksHeading({ title, description }: TeamsDecksHeadingProps
           />
           <PageHeading>{title}</PageHeading>
         </div>
-        <div className="pl-5 text-sm tracking-wide text-muted-foreground">{description}</div>
+        <div className="pl-5 text-sm text-muted-foreground">{description}</div>
       </div>
     </div>
   );

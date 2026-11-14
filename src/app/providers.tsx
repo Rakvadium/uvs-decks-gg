@@ -6,7 +6,6 @@ import { ConvexAuthNextjsProvider } from "@convex-dev/auth/nextjs";
 import { ConvexReactClient } from "convex/react";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
-import { AuthDialogProvider } from "@/components/auth/auth-dialog";
 import { SilentSso } from "@/components/auth/silent-sso";
 import { CardDataProvider } from "@/lib/universus/card-data-provider";
 import { ColorSchemeProvider } from "@/providers/ColorSchemeProvider";
@@ -25,11 +24,9 @@ export function Providers({ children }: { children: ReactNode }) {
       <SilentSso />
       <LazyMotion features={domAnimation} strict>
         <ColorSchemeProvider>
-          <AuthDialogProvider>
-            <CardDataProvider>
-              <TooltipProvider delayDuration={0}>{children}</TooltipProvider>
-            </CardDataProvider>
-          </AuthDialogProvider>
+          <CardDataProvider>
+            <TooltipProvider delayDuration={0}>{children}</TooltipProvider>
+          </CardDataProvider>
           <Toaster />
         </ColorSchemeProvider>
       </LazyMotion>
