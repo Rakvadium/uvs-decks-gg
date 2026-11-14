@@ -30,6 +30,7 @@ const eslintConfig = defineConfig([
     "data/**",
     "convex/_generated/**",
     "scripts/**",
+    ".claude/**",
   ]),
 ]);
 
