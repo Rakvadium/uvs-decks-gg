@@ -1,11 +1,11 @@
 "use client";
 
 import { Layers } from "lucide-react";
-import { useAuthDialog } from "@/components/auth/auth-dialog";
+import { useStartAuth } from "@/components/auth/use-start-auth";
 import { Button } from "@/components/ui/button";
 
 export function DecksGuestBrowseBanner() {
-  const { openAuthDialog } = useAuthDialog();
+  const startAuth = useStartAuth();
 
   return (
     <div className="flex flex-wrap items-center gap-2 rounded-lg border border-border/50 bg-muted/60 px-3 py-2 text-xs text-foreground/80">
@@ -17,7 +17,7 @@ export function DecksGuestBrowseBanner() {
         type="button"
         size="sm"
         className="h-7 shrink-0 px-2.5 text-xs"
-        onClick={() => openAuthDialog()}
+        onClick={() => startAuth()}
       >
         Sign in to build
       </Button>

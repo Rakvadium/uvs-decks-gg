@@ -429,16 +429,16 @@ subdomains get their own sessions via a one-time handoff from the apex. Pure pie
 builders, `sanitizeSameOriginPath`, code checks, hint cookie) live in `shared/auth-handoff.ts`
 (tested in `tests/auth-handoff.test.ts`); browser helpers in `src/lib/auth/handoff-client.ts`.
 
-1. Game host, signed out, any "Sign in"/"Sign up" (`openAuthDialog` in `AuthDialogProvider`,
-   `/sign-in`, `/sign-up`) → `startHandoff(path, { flow })`: random `state` added to the tab's pending set
+1. Game host, signed out, any "Sign in"/"Sign up" (`useStartAuth` in
+   `src/components/auth/use-start-auth.ts`, `/sign-in`, `/sign-up`) → `startHandoff(path, { flow })`: random `state` added to the tab's pending set
    `sessionStorage["tcgd:handoff-state"]` (JSON `state → createdAt`, TTL 15 min, max 8, so a
    concurrent silent/explicit handoff can't invalidate another) → `{apex}/auth/handoff?return={origin}{path}&state=…[&flow=signUp]`.
-   Apex/standalone keep the local dialog.
+   Apex/standalone navigate to their own full-page `/sign-in|/sign-up?next={path}` (`AuthPage`).
 2. Apex `/auth/handoff` (`src/app/auth/handoff`): validates `return` (`parseHandoffReturnUrl`)
    and `state` client-side. Signed out → `/sign-in?next=/auth/handoff?…` (or `/sign-up`). Signed
    in → `authHandoff.create({ returnUrl, state })` → sets the hint cookie →
    `location.replace({returnOrigin}/auth/callback?handoff_code&state&next={path})` — the param is not `code` because Convex Auth consumes `?code=` itself.
-   After apex sign-in, `AuthRouteEntry` and the middleware "authenticated on
+   After apex sign-in, `AuthPage` and the middleware "authenticated on
    `/sign-in|/sign-up`" redirect honor a sanitized same-origin `next`
    (`authenticatedAuthEntryRedirect`), else `/home`.
 3. `authHandoff.create` (auth required, rate-limited per user) validates the `returnUrl`
@@ -463,7 +463,7 @@ builders, `sanitizeSameOriginPath`, code checks, hint cookie) live in `shared/au
 6. Silent SSO (`src/components/auth/silent-sso.tsx`, mounted in `Providers`): the hint
    `tcgd_signed_in=<random>; Domain=.{root}; Path=/; SameSite=Lax; Max-Age=30d[; Secure]`
    (informational only) is set by `/auth/handoff` and by `SilentSso` whenever the apex is signed
-   in (any page but `/auth/*`, so dialog sign-ins on the apex count), and backfilled by a signed-in
+   in (any page but `/auth/*`, so sign-ins on the apex auth pages count), and backfilled by a signed-in
    game host when no hint was ever written (older sessions). Sign-out and `login_required`
    write the marker value `0` instead of deleting it, so a game host with a still-valid JWT for a
    revoked session doesn't re-create it. A signed-out game host (not on an auth page, no handoff

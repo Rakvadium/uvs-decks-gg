@@ -6,14 +6,14 @@ import { SHELL_RAIL_ITEM_SIZE_CLASS } from "../../shell-chrome";
 import { useLeftSidebarContext } from "../context";
 
 export function LeftSidebarGuestSignInButton() {
-  const { collapsed, openAuthDialog } = useLeftSidebarContext();
+  const { collapsed, startAuth } = useLeftSidebarContext();
 
   return (
     <Tooltip>
       <TooltipTrigger asChild>
         <Button
           variant="outline"
-          onClick={() => openAuthDialog()}
+          onClick={() => startAuth()}
           className={cn(
             "border-accent/35 text-sidebar-foreground hover:border-accent/60 hover:bg-accent/10 hover:text-accent [&_svg]:text-sidebar-foreground hover:[&_svg]:text-accent",
             collapsed ? cn(SHELL_RAIL_ITEM_SIZE_CLASS, "p-0") : "h-12 w-full justify-start gap-3 px-3"

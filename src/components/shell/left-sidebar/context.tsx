@@ -3,7 +3,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useConvexAuth, useQuery } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
-import { useAuthDialog } from "@/components/auth/auth-dialog";
+import { useStartAuth } from "@/components/auth/use-start-auth";
 import { useAppSignOut } from "@/lib/auth/use-app-sign-out";
 import { usePrefersReducedMotion } from "@/lib/reduced-motion";
 import { useColorScheme, useTheme } from "@/lib/theme";
@@ -24,7 +24,7 @@ interface LeftSidebarContextValue {
   colorPreset: ReturnType<typeof useColorScheme>["colorPreset"];
   isCustomAppearance: boolean;
   applyColorPreset: ReturnType<typeof useColorScheme>["setAppearancePreset"];
-  openAuthDialog: () => void;
+  startAuth: () => void;
   user: ReturnType<typeof useQuery<typeof api.user.currentUser>>;
   isAdmin: boolean;
   navigateTo: (path: string) => void;
@@ -53,7 +53,7 @@ export function LeftSidebarProvider({ collapsed, onToggle, children }: LeftSideb
     isCustomAppearance,
     setAppearancePreset,
   } = useColorScheme();
-  const { openAuthDialog } = useAuthDialog();
+  const startAuth = useStartAuth();
   const prefersReducedMotion = usePrefersReducedMotion();
   const user = useQuery(api.user.currentUser, isAuthenticated ? {} : "skip");
   const isAdmin = user?.role === "Admin";
@@ -89,7 +89,7 @@ export function LeftSidebarProvider({ collapsed, onToggle, children }: LeftSideb
       colorPreset,
       isCustomAppearance,
       applyColorPreset: setAppearancePreset,
-      openAuthDialog,
+      startAuth,
       user,
       isAdmin,
       navigateTo,
@@ -109,7 +109,7 @@ export function LeftSidebarProvider({ collapsed, onToggle, children }: LeftSideb
       colorPreset,
       isCustomAppearance,
       setAppearancePreset,
-      openAuthDialog,
+      startAuth,
       user,
       isAdmin,
       navigateTo,

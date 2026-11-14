@@ -3,7 +3,7 @@
 import { useConvexAuth, useQuery } from "convex/react";
 import { LogIn } from "lucide-react";
 import { api } from "../../../../convex/_generated/api";
-import { useAuthDialog } from "@/components/auth/auth-dialog";
+import { useStartAuth } from "@/components/auth/use-start-auth";
 import { UserAvatar } from "@/components/user-avatar";
 import { cn } from "@/lib/utils";
 import { useMobileShell } from "../mobile-shell-context";
@@ -17,7 +17,7 @@ export function MobileProfileTab({ className }: MobileProfileTabProps) {
   const { isAuthenticated } = useConvexAuth();
   const user = useQuery(api.user.currentUser, isAuthenticated ? {} : "skip");
   const { isProfileSheetOpen, setProfileSheetOpen } = useMobileShell();
-  const { openAuthDialog } = useAuthDialog();
+  const startAuth = useStartAuth();
 
   return (
     <button
@@ -30,7 +30,7 @@ export function MobileProfileTab({ className }: MobileProfileTabProps) {
           setProfileSheetOpen(true);
           return;
         }
-        openAuthDialog();
+        startAuth();
       }}
       className={cn(
         className,

@@ -6,7 +6,7 @@ import { useAuthActions } from "@convex-dev/auth/react";
 import { useConvexAuth, useQuery } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import type { Doc } from "../../../../convex/_generated/dataModel";
-import { useAuthDialog } from "@/components/auth/auth-dialog";
+import { useStartAuth } from "@/components/auth/use-start-auth";
 import { useAppSignOut } from "@/lib/auth/use-app-sign-out";
 import { suppressSubsequentPointerEvents } from "@/lib/suppress-subsequent-pointer";
 import { useColorScheme, useTheme } from "@/lib/theme";
@@ -48,7 +48,7 @@ export function MobileProfileSheetProvider({ children }: { children: ReactNode }
     isCustomAppearance,
     setAppearancePreset,
   } = useColorScheme();
-  const { openAuthDialog } = useAuthDialog();
+  const startAuth = useStartAuth();
   const { isProfileSheetOpen, setProfileSheetOpen } = useMobileShell();
 
   const user = useQuery(api.user.currentUser, isAuthenticated ? {} : "skip");
@@ -83,8 +83,8 @@ export function MobileProfileSheetProvider({ children }: { children: ReactNode }
   const handleAuthClick = useCallback(() => {
     suppressSubsequentPointerEvents();
     closeSheet();
-    openAuthDialog();
-  }, [openAuthDialog, closeSheet]);
+    startAuth();
+  }, [startAuth, closeSheet]);
 
   const handleAdminToggle = useCallback(() => {
     router.push(isOnAdminPage ? "/" : "/admin");

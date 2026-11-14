@@ -6,7 +6,7 @@ import { useConvexAuth, useMutation } from "convex/react";
 import { Link2, Loader2, PenLine, Plus, UsersRound } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "../../../convex/_generated/api";
-import { useAuthDialog } from "@/components/auth/auth-dialog";
+import { useStartAuth } from "@/components/auth/use-start-auth";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -30,15 +30,15 @@ type CreateTeamButtonProps = {
 export function CreateTeamButton({ className, size = "sm", variant = "default" }: CreateTeamButtonProps) {
   const [open, setOpen] = useState(false);
   const { isAuthenticated } = useConvexAuth();
-  const { openAuthDialog } = useAuthDialog();
+  const startAuth = useStartAuth();
 
   const onOpen = useCallback(() => {
     if (!isAuthenticated) {
-      openAuthDialog();
+      startAuth();
       return;
     }
     setOpen(true);
-  }, [isAuthenticated, openAuthDialog]);
+  }, [isAuthenticated, startAuth]);
 
   return (
     <>

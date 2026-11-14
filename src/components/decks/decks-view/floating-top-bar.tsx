@@ -1,7 +1,7 @@
 "use client";
 
 import { Plus } from "lucide-react";
-import { useAuthDialog } from "@/components/auth/auth-dialog";
+import { useStartAuth } from "@/components/auth/use-start-auth";
 import {
   FloatingActionPill,
   FloatingPageBar,
@@ -14,7 +14,7 @@ import { TABS } from "./constants";
 
 export function DecksFloatingTopBar() {
   const context = useDecksOptional();
-  const { openAuthDialog } = useAuthDialog();
+  const startAuth = useStartAuth();
   if (!context) return null;
 
   const {
@@ -27,7 +27,7 @@ export function DecksFloatingTopBar() {
 
   const handleNewDeck = () => {
     if (!isAuthenticated) {
-      openAuthDialog();
+      startAuth();
       return;
     }
     actions.openCreateDialog();
