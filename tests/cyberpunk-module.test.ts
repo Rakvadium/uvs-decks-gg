@@ -25,7 +25,8 @@ describe("cyberpunk module identity", () => {
     expect(cp.id).toBe("cyberpunk");
     expect(cp.displayName).toBe("Cyberpunk TCG");
     expect(cp.shortName).toBe("CPK");
-    expect(cp.theme).toEqual({ primary: "55 98% 51%", secondary: "184 100% 50%", accent: "350 90% 55%" });
+    expect(cp.theme).toEqual({ primary: "57 98% 51%", secondary: "184 100% 50%", accent: "3 92% 63%" });
+    expect(cp.colorTheme).toBe("cyberpunk");
     expect(cp.brand.wordmark).toEqual(["TCG", "DECKS", ".GG"]);
     expect(cp.brand.title).toBe("Cyberpunk TCG · TCGDECKS.GG");
     expect(cp.deck.sideboardLimit).toBe(0);

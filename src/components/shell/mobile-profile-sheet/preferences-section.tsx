@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { COLOR_SCHEMES } from "@/lib/theme";
-import type { ColorPresetChoice } from "@/lib/theme/appearance-types";
 import { Check, ChevronRight, Moon, Palette, Settings, Sun } from "lucide-react";
 import {
   DropdownMenu,
@@ -31,7 +30,7 @@ export function MobileProfilePreferencesSection() {
 
   const selectedLabel = isCustomAppearance
     ? "Custom"
-    : (COLOR_SCHEMES.find((scheme) => scheme.value === colorPreset)?.label ?? "Default");
+    : (COLOR_SCHEMES.find((scheme) => scheme.value === colorPreset)?.label ?? "Universus");
 
   return (
     <section>
@@ -62,7 +61,7 @@ export function MobileProfilePreferencesSection() {
               return (
                 <DropdownMenuItem
                   key={scheme.value}
-                  onClick={() => applyColorPreset(scheme.value as ColorPresetChoice)}
+                  onClick={() => applyColorPreset(scheme.value)}
                 >
                   <span className="flex-1">{scheme.label}</span>
                   {picked ? (

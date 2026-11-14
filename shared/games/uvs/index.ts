@@ -8,12 +8,14 @@ export const UVS_SHARED_GAME_MODULE = {
   id: "uvs",
   displayName: "UniVersus",
   shortName: "UVS",
-  // Mirrors UNIVERSUS_CONFIG.theme in src/config/universus.ts (shared code must not import src/).
+  // UniVersus orange with Boss Stage purple (the publisher since 2026-11).
   theme: {
-    primary: "220 90% 56%",
-    secondary: "262 83% 58%",
-    accent: "142 76% 36%",
+    primary: "19 100% 50%",
+    secondary: "266 98% 46%",
+    accent: "266 98% 46%",
   },
+  colorTheme: "universus",
+  markSrc: "/games/uvs/mark.svg",
   brand: {
     wordmark: ["UVS", "DECKS", ".GG"],
     title: "UVSDECKS.GG",

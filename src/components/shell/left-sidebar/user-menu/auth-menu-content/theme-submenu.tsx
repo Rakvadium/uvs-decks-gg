@@ -10,7 +10,6 @@ import {
   DropdownMenuSubTrigger,
 } from "@/components/ui/dropdown-menu";
 import { COLOR_SCHEMES } from "@/lib/theme";
-import type { ColorPresetChoice } from "@/lib/theme/appearance-types";
 import { useLeftSidebarContext } from "../../context";
 
 export function LeftSidebarThemeControls() {
@@ -38,7 +37,7 @@ export function LeftSidebarThemeControls() {
             return (
               <DropdownMenuItem
                 key={scheme.value}
-                onClick={() => applyColorPreset(scheme.value as ColorPresetChoice)}
+                onClick={() => applyColorPreset(scheme.value)}
               >
                 <span>{scheme.label}</span>
                 {picked ? (

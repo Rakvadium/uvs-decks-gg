@@ -14,6 +14,7 @@ export const LEGACY_COLOR_SCHEME_CHROME_MAP: Record<
 
 const COLOR_PRESET_IDS = [
   "default",
+  "universus",
   "calm-storm",
   "cyberpunk",
   "cotton-candy",

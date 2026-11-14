@@ -46,5 +46,6 @@ describe("game registries", () => {
     const uvs = getSharedGameModule("uvs");
     expect(uvs.displayName).toBe(UNIVERSUS_CONFIG.name);
     expect(uvs.theme).toEqual({ ...UNIVERSUS_CONFIG.theme });
+    expect(uvs.colorTheme).toBe("universus");
   });
 });

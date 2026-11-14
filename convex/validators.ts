@@ -461,6 +461,7 @@ export const chromeVariantValidator = v.union(
 
 export const colorPresetValidator = v.union(
   v.literal("default"),
+  v.literal("universus"),
   v.literal("calm-storm"),
   v.literal("cyberpunk"),
   v.literal("cotton-candy"),
