@@ -52,7 +52,7 @@ export function TeamHubDecksContent({ teamId }: TeamHubDecksContentProps) {
     return (
       <div className="space-y-3">
         <div className="h-6 w-48 animate-pulse rounded-md bg-muted" />
-        <div className="h-32 w-full animate-pulse rounded-md bg-muted/80" />
+        <div className="h-32 w-full animate-pulse rounded-md bg-muted-overlay" />
       </div>
     );
   }
@@ -81,7 +81,7 @@ export function TeamHubDecksContent({ teamId }: TeamHubDecksContentProps) {
       </div>
       {isEmpty ? (
         <div
-          className="rounded-lg border border-dashed border-border/80 bg-muted/20 px-4 py-10 text-center"
+          className="rounded-lg border border-dashed border-placeholder bg-muted-tint px-4 py-10 text-center"
           role="status"
         >
           <p className="text-sm text-muted-foreground">
@@ -100,7 +100,7 @@ export function TeamHubDecksContent({ teamId }: TeamHubDecksContentProps) {
           ) : null}
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-lg border border-border/50">
+        <div className="overflow-x-auto rounded-lg border border-surface">
           <Table>
             <TableHeader>
               <TableRow className="hover:bg-transparent">

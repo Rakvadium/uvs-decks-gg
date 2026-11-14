@@ -118,7 +118,7 @@ export function TeamHubEventsContent({ teamId }: TeamHubEventsContentProps) {
     return (
       <div className="space-y-3">
         <div className="h-6 w-28 animate-pulse rounded-md bg-muted" />
-        <div className="h-40 w-full animate-pulse rounded-md bg-muted/80" />
+        <div className="h-40 w-full animate-pulse rounded-md bg-muted-overlay" />
       </div>
     );
   }
@@ -220,7 +220,7 @@ export function TeamHubEventsContent({ teamId }: TeamHubEventsContentProps) {
               return (
                 <li
                   key={e._id}
-                  className="flex flex-col gap-1 rounded-lg border border-border/50 bg-background/50 px-4 py-3 sm:flex-row sm:items-start sm:justify-between"
+                  className="flex flex-col gap-1 rounded-lg border border-surface bg-background-soft px-4 py-3 sm:flex-row sm:items-start sm:justify-between"
                 >
                   <div className="min-w-0">
                     <p className="font-medium text-foreground">{e.title}</p>

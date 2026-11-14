@@ -33,7 +33,7 @@ export function TeamLogoSection({ teamId, presentation }: TeamLogoSectionProps) 
       />
       <div
         className={cn(
-          "relative flex h-24 w-24 items-center justify-center overflow-hidden rounded-2xl border border-border/50 bg-muted/50",
+          "relative flex h-24 w-24 items-center justify-center overflow-hidden rounded-2xl border border-surface bg-muted-soft",
           "shadow-[var(--chrome-shell-nav-active-shadow)]",
         )}
       >
@@ -70,21 +70,21 @@ export function TeamLogoSection({ teamId, presentation }: TeamLogoSectionProps) 
         </>
       ) : null}
       {canManage && editorNotice?.kind === "pending" ? (
-        <Alert className="max-w-xs border-border/50 bg-muted/20 py-2">
+        <Alert className="max-w-xs border-surface bg-muted-tint py-2">
           <AlertDescription className="text-xs text-muted-foreground">
             Your logo is being reviewed. It will appear for everyone once approved.
           </AlertDescription>
         </Alert>
       ) : null}
       {canManage && editorNotice?.kind === "needs_review" ? (
-        <Alert className="max-w-xs border-border/50 bg-muted/20 py-2">
+        <Alert className="max-w-xs border-surface bg-muted-tint py-2">
           <AlertDescription className="text-xs text-muted-foreground">
             Your logo is awaiting manual review.
           </AlertDescription>
         </Alert>
       ) : null}
       {canManage && editorNotice?.kind === "rejected" ? (
-        <Alert className="max-w-xs border-destructive/30 bg-destructive/5 py-2">
+        <Alert className="max-w-xs border-destructive-soft bg-destructive-wash py-2">
           <AlertDescription className="text-xs text-muted-foreground">
             Logo didn&apos;t pass content guidelines. Try a different image.
           </AlertDescription>
