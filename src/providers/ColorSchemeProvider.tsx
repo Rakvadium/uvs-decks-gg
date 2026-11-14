@@ -16,15 +16,17 @@ import {
   CHROME_VARIANT_VALUES,
   COLOR_PRESET_VALUES,
   DEFAULT_CUSTOM_BRAND,
+  resolveColorTheme,
   type ChromeVariant,
   type ColorPresetChoice,
+  type ColorTheme,
   type ThemePreference,
   type AppearanceCustom,
   type AppearanceModePair,
 } from "@/lib/theme/appearance-types";
 import { buildSemanticCssVars } from "@/lib/theme/generateSemanticCssVars";
 import { resolveAppearanceCustomPair } from "@/lib/theme/resolve-appearance-custom";
-import { useGameId } from "@/games/game-context";
+import { useGameId, useGameModule } from "@/games/game-context";
 
 type ResolvedTheme = "light" | "dark";
 
@@ -34,10 +36,10 @@ const DEFAULT_COLOR_SOURCE: PersistedColorSource = { kind: "preset", preset: "de
 
 const CUSTOM_STYLE_EL_ID = "appearance-custom-vars";
 
-export const COLOR_PRESET_OPTIONS: { id: ColorPresetChoice; label: string }[] = [
-  { id: "default", label: "Default" },
-  { id: "calm-storm", label: "Calm Storm" },
+export const COLOR_PRESET_OPTIONS: { id: ColorTheme; label: string }[] = [
+  { id: "universus", label: "Universus" },
   { id: "cyberpunk", label: "Cyberpunk" },
+  { id: "calm-storm", label: "Calm Storm" },
   { id: "cotton-candy", label: "Cotton Candy" },
   { id: "caffeine", label: "Caffeine" },
   { id: "aurora", label: "Aurora" },
@@ -127,10 +129,11 @@ function clearCustomAppearanceStyle() {
 }
 
 interface ColorSchemeContextValue {
-  colorPreset: ColorPresetChoice | null;
+  /** The palette on screen (`default` resolved for this game), or null for a custom palette. */
+  colorPreset: ColorTheme | null;
   isCustomAppearance: boolean;
   colorSource: PersistedColorSource;
-  setAppearancePreset: (preset: ColorPresetChoice) => void;
+  setAppearancePreset: (preset: ColorTheme) => void;
   setAppearanceCustom: (custom: AppearanceCustom) => void;
   touchAppearanceCustom: (target: AppearanceCustom | ((draft: AppearanceCustom) => AppearanceCustom)) => void;
   chrome: ChromeVariant;
@@ -144,10 +147,6 @@ interface ColorSchemeContextValue {
 }
 
 const ColorSchemeContext = createContext<ColorSchemeContextValue | null>(null);
-
-function themeAttributeValue(source: PersistedColorSource): string {
-  return source.kind === "custom" ? "custom" : source.preset;
-}
 
 function resolveCustomCss(custom: AppearanceCustom, chrome: ChromeVariant): string {
   const resolved = resolveAppearanceCustomPair(custom, chrome);
@@ -221,6 +220,7 @@ function mergeDraftCustom(
 export function ColorSchemeProvider({ children }: { children: ReactNode }) {
   const { isAuthenticated, isLoading: authLoading } = useConvexAuth();
   const game = useGameId();
+  const gameColorTheme = useGameModule().colorTheme;
   const session = useQuery(api.sessions.getSession, isAuthenticated ? { game } : "skip");
   const updateSession = useMutation(api.sessions.updateSession);
   const ensureMigrated = useMutation(api.sessions.ensureAppearanceMigrated);
@@ -241,12 +241,13 @@ export function ColorSchemeProvider({ children }: { children: ReactNode }) {
   const chrome = normalizeChrome(session?.chrome);
   const colorSource = normalizePersistedColorSource(session?.colorSource);
 
-  const presetFromSource = colorSource.kind === "preset" ? colorSource.preset : null;
+  const presetFromSource =
+    colorSource.kind === "preset" ? resolveColorTheme(colorSource.preset, gameColorTheme) : null;
 
   const [systemTheme, setSystemTheme] = useState<ResolvedTheme>(() => getSystemTheme());
   const resolvedTheme: ResolvedTheme = theme === "system" ? systemTheme : theme;
   const isDark = resolvedTheme === "dark";
-  const effectivePresetAttr = themeAttributeValue(colorSource);
+  const effectivePresetAttr = presetFromSource ?? "custom";
 
   useEffect(() => {
     if (typeof document === "undefined") return;
@@ -289,7 +290,7 @@ export function ColorSchemeProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const setAppearancePreset = useCallback(
-    async (preset: ColorPresetChoice) => {
+    async (preset: ColorTheme) => {
       if (!isAuthenticated || authLoading) return;
       await updateSession({
         colorSource: { kind: "preset", preset },

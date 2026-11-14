@@ -86,11 +86,11 @@ export function CatalogAppearanceProvider({
   const app = useColorScheme();
   const appValues = useMemo<AppValues>(
     () => ({
-      themeAttr: app.colorSource.kind === "custom" ? "custom" : app.colorSource.preset,
+      themeAttr: app.colorPreset ?? "custom",
       chrome: app.chrome,
       dark: app.resolvedTheme === "dark",
     }),
-    [app.colorSource, app.chrome, app.resolvedTheme],
+    [app.colorPreset, app.chrome, app.resolvedTheme],
   );
   const [override, setOverride] = useState<CatalogOverride>(initialOverride);
   const [focus, setFocusState] = useState<string | null>(initialFocus);

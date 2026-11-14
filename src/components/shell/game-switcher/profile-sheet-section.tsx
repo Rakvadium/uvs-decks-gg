@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { Check, ChevronRight, LayoutGrid } from "lucide-react";
-import { getSharedGameModule } from "@shared/games/registry";
 import { useGameSwitcher } from "@/games/game-context";
 import { cn } from "@/lib/utils";
 import { MOBILE_INSET_DIVIDER, MOBILE_INSET_GROUP, MOBILE_INSET_ROW } from "../mobile-glass";
@@ -21,7 +20,7 @@ export function ProfileSheetGameSection({ onNavigate }: { onNavigate: () => void
         {model.games.map((game) => {
           const content = (
             <>
-              <GameBadge shortName={game.shortName} theme={getSharedGameModule(game.id).theme} />
+              <GameBadge game={game.id} />
               <span className="flex-1 font-medium">{game.displayName}</span>
               {game.current ? (
                 <Check className="size-4 text-primary" aria-hidden />

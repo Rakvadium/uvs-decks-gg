@@ -6,7 +6,7 @@ import { SegmentedControl } from "@/components/ui/segmented-control";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { CHROME_OPTIONS, COLOR_PRESET_OPTIONS } from "@/providers/ColorSchemeProvider";
-import type { ChromeVariant, ColorPresetChoice } from "@/lib/theme/appearance-types";
+import type { ChromeVariant, ColorTheme } from "@/lib/theme/appearance-types";
 import { cn } from "@/lib/utils";
 import { CopyButton } from "../specimen/code-block";
 import { useCatalogAppearance } from "./context";
@@ -36,7 +36,7 @@ export function AppearanceSwitcher({ className }: { className?: string }) {
 
   return (
     <div className={cn("flex min-w-0 items-center gap-2", className)} role="group" aria-label="Catalog appearance (this page only)">
-      <Select value={themeValue} onValueChange={(value) => set({ theme: value as ColorPresetChoice })}>
+      <Select value={themeValue} onValueChange={(value) => set({ theme: value as ColorTheme })}>
         <SelectTrigger size="sm" aria-label="Color preset" className="min-w-0 flex-[3] sm:w-44 sm:flex-none">
           <SelectValue />
         </SelectTrigger>

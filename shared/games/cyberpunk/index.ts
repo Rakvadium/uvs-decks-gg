@@ -8,11 +8,14 @@ export const CYBERPUNK_SHARED_GAME_MODULE = {
   id: "cyberpunk",
   displayName: "Cyberpunk TCG",
   shortName: "CPK",
+  // Cyberpunk TCG brand: --cp-yellow #FCEE0A, --cp-turquoise #00F0FF, --cp-red #F75049.
   theme: {
-    primary: "55 98% 51%",
+    primary: "57 98% 51%",
     secondary: "184 100% 50%",
-    accent: "350 90% 55%",
+    accent: "3 92% 63%",
   },
+  colorTheme: "cyberpunk",
+  markSrc: "/games/cyberpunk/mark.png",
   brand: {
     wordmark: ["TCG", "DECKS", ".GG"],
     title: "Cyberpunk TCG · TCGDECKS.GG",

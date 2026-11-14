@@ -3,9 +3,9 @@
 import { useMemo, useSyncExternalStore } from "react";
 import {
   CHROME_VARIANT_VALUES,
-  COLOR_PRESET_VALUES,
+  COLOR_THEME_VALUES,
   type ChromeVariant,
-  type ColorPresetChoice,
+  type ColorTheme,
 } from "@/lib/theme/appearance-types";
 import type { CatalogAppearance, CatalogOverride } from "./params";
 
@@ -42,7 +42,7 @@ export function subscribeRoot(listener: () => void): () => void {
   };
 }
 
-export const SERVER_APPEARANCE: CatalogAppearance = { theme: "default", mode: "light", chrome: "calm" };
+export const SERVER_APPEARANCE: CatalogAppearance = { theme: "universus", mode: "light", chrome: "calm" };
 
 function readRootKey(): string {
   const root = document.documentElement;
@@ -55,8 +55,8 @@ function toAppearance(key: string): CatalogAppearance & { rawTheme: string } {
   const [theme, mode, chrome] = key.split("|");
   return {
     rawTheme: theme,
-    theme: (COLOR_PRESET_VALUES as readonly string[]).includes(theme)
-      ? (theme as ColorPresetChoice)
+    theme: (COLOR_THEME_VALUES as readonly string[]).includes(theme)
+      ? (theme as ColorTheme)
       : SERVER_APPEARANCE.theme,
     mode: mode === "dark" ? "dark" : "light",
     chrome: (CHROME_VARIANT_VALUES as readonly string[]).includes(chrome)
