@@ -49,6 +49,9 @@ next-env.d.ts
 !/scripts/seed-card-drafts.ts
 !/scripts/ocr-calibration/
 !/scripts/design-codemod/
+!/scripts/dev.ts
+!/scripts/local-seed.ts
+!/scripts/worktree-setup/
 /scripts/ocr-calibration/*
 !/scripts/ocr-calibration/fixtures.json
 /scripts/ocr-calibration/output/

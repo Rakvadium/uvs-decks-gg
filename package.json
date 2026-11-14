@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 8090",
+    "dev": "bun scripts/dev.ts",
     "build": "next build --webpack",
     "start": "next start -p 8090",
     "lint": "eslint",
@@ -12,6 +12,9 @@
     "typecheck": "tsc --noEmit",
     "test": "bun test tests",
     "postinstall": "node scripts/patch-convex-auth-lan-host.mjs",
+    "worktree:setup": "bun scripts/worktree-setup/index.ts",
+    "worktree:audit": "bun scripts/worktree-setup/index.ts --audit",
+    "local:seed": "bun scripts/local-seed.ts",
     "import:universus": "bun scripts/import-universus.ts",
     "import:universus:all": "bun scripts/import-universus.ts --all",
     "bulk-upload": "bun scripts/bulk-upload.ts",

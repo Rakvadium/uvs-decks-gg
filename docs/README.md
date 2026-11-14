@@ -20,7 +20,7 @@
 | [PRODUCT_VISION.md](./PRODUCT_VISION.md)                             | Outcomes, scope, principles               |
 | [SYSTEM_ANALYSIS.md](./SYSTEM_ANALYSIS.md)                           | Clients, Convex, data, integrations       |
 | [multi-game.md](./multi-game.md)                                     | Game modules, hosts/routing, game-scoped data, auth handoff, rollout |
-| [local-convex.md](./local-convex.md)                                 | Local Convex deployment for branch work (cloud dev = production) |
+| [local-convex.md](./local-convex.md)                                 | Local dev: multi-game hosts, local Convex, data refresh, worktrees (cloud dev = production) |
 | [component-architecture-playbook.md](./component-architecture-playbook.md) | Feature folders and UI module shape |
 | [UI_UX_DESIGN.md](./UI_UX_DESIGN.md)                                 | Interface patterns and constraints        |
 | [theme-chrome-guidelines.md](./theme-chrome-guidelines.md)           | Portable theme / chrome / styling law     |

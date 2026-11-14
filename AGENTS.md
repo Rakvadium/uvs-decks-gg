@@ -6,7 +6,8 @@ Next.js 16 (App Router, React 19) with a Convex backend. Bun is the package mana
 
 ## Commands
 
-- `bun run dev` serves http://localhost:8090. The port is hardcoded.
+- `bunx convex dev` (local backend) plus `bun run dev` (port 8090, or `PORT` in `.env.local`). Test multi-game work on http://tcgdecks.localhost:8090, http://uvs.tcgdecks.localhost:8090 and http://cyberpunk.tcgdecks.localhost:8090. Plain `localhost:8090` is single-game UVS. Sign in with the `LOCAL_TEST_*` account from `.env.local`; `bun run local:seed --admin` (re)creates it. Details, smoke test and data refresh: [docs/local-convex.md](docs/local-convex.md).
+- In a new worktree, run `bun install` then `bun run worktree:setup` before anything else.
 - `bun run typecheck`, `bun test` and `bun run lint` are the CI gates. `bun run lint` reports pre-existing errors in `src/providers/universus-media-dock/dock.tsx`.
 - `bun run lint:design` checks design-system usage. `bun run design:codemod` applies its fixes.
 
