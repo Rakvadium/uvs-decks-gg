@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { Link2, Moon, RotateCcw, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SegmentedControl } from "@/components/ui/segmented-control";
@@ -11,13 +12,24 @@ import { cn } from "@/lib/utils";
 import { CopyButton } from "../specimen/code-block";
 import { useCatalogAppearance } from "./context";
 import type { CatalogMode } from "./params";
+import { NEUTRAL_SEGMENT } from "../chrome-tone";
 
-function PresetDot({ id, dark }: { id: string; dark: boolean }) {
+export const CUSTOM_PALETTE_LABEL = "Custom palette (from your account)";
+
+/**
+ * Half primary, half secondary. With an `id` it paints in that preset (the theme CSS scopes to
+ * `data-color-theme`); without one it inherits `<html>`, which is how a custom palette shows.
+ */
+export function PresetDot({ id, dark, className }: { id?: string; dark: boolean; className?: string }) {
   return (
     <span
       data-color-theme={id}
       aria-hidden
-      className={cn(dark && "dark", "inline-flex size-3.5 shrink-0 overflow-hidden rounded-full border border-hairline")}
+      className={cn(
+        id && dark && "dark",
+        "inline-flex size-3.5 shrink-0 overflow-hidden rounded-full border border-hairline",
+        className,
+      )}
     >
       <span className="h-full w-1/2 bg-primary" />
       <span className="h-full w-1/2 bg-secondary" />
@@ -26,24 +38,61 @@ function PresetDot({ id, dark }: { id: string; dark: boolean }) {
 }
 
 /**
- * Theme × mode × chrome for this page only. Every control writes the URL and `<html>` through
- * `useCatalogAppearance`; none of them touches the saved session.
+ * Sizes a select trigger to its longest option, in the current chrome's casing and tracking, so a
+ * label never truncates and the header doesn't shift when the value changes. The hidden copies
+ * share one grid cell with the live value.
+ */
+function WidestValue({ options, children }: { options: ReactNode[]; children: ReactNode }) {
+  return (
+    <span className="grid min-w-0 items-center">
+      {options.map((option, index) => (
+        <span key={index} aria-hidden className="invisible col-start-1 row-start-1 flex items-center gap-2 whitespace-nowrap">
+          {option}
+        </span>
+      ))}
+      <span className="col-start-1 row-start-1 flex min-w-0 items-center whitespace-nowrap *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-2">
+        {children}
+      </span>
+    </span>
+  );
+}
+
+const MODE_ITEMS = [
+  { value: "light", label: "Light", icon: Sun },
+  { value: "dark", label: "Dark", icon: Moon },
+];
+
+/**
+ * Theme × mode × chrome for this page only, inline in the desktop header (phones use
+ * `AppearanceSheet`). Every control writes the URL and `<html>` through `useCatalogAppearance`;
+ * none of them touches the saved session.
  */
 export function AppearanceSwitcher({ className }: { className?: string }) {
   const { current, set } = useCatalogAppearance();
   const dark = current.mode === "dark";
-  const themeValue = current.rawTheme === "custom" ? "custom" : current.theme;
+  const custom = current.rawTheme === "custom";
+  const themeValue = custom ? "custom" : current.theme;
+  const presetLabels = [...(custom ? [CUSTOM_PALETTE_LABEL] : []), ...COLOR_PRESET_OPTIONS.map((preset) => preset.label)];
 
   return (
-    <div className={cn("flex min-w-0 items-center gap-2", className)} role="group" aria-label="Catalog appearance (this page only)">
+    <div className={cn("flex items-center gap-2", className)} role="group" aria-label="Catalog appearance (this page only)">
       <Select value={themeValue} onValueChange={(value) => set({ theme: value as ColorTheme })}>
-        <SelectTrigger size="sm" aria-label="Color preset" className="min-w-0 flex-[3] sm:w-44 sm:flex-none">
-          <SelectValue />
+        <SelectTrigger size="sm" aria-label="Color preset">
+          <WidestValue
+            options={presetLabels.map((label) => (
+              <>
+                <PresetDot dark={dark} />
+                {label}
+              </>
+            ))}
+          >
+            <SelectValue />
+          </WidestValue>
         </SelectTrigger>
         <SelectContent position="popper" align="start">
-          {current.rawTheme === "custom" ? (
+          {custom ? (
             <SelectItem value="custom" disabled>
-              Custom palette (from your account)
+              {CUSTOM_PALETTE_LABEL}
             </SelectItem>
           ) : null}
           {COLOR_PRESET_OPTIONS.map((preset) => (
@@ -60,15 +109,15 @@ export function AppearanceSwitcher({ className }: { className?: string }) {
         value={current.mode}
         onValueChange={(value) => set({ mode: value as CatalogMode })}
         className="shrink-0"
-        items={[
-          { value: "light", label: <span className="sr-only sm:not-sr-only">Light</span>, icon: Sun },
-          { value: "dark", label: <span className="sr-only sm:not-sr-only">Dark</span>, icon: Moon },
-        ]}
+        itemClassName={NEUTRAL_SEGMENT}
+        items={MODE_ITEMS}
       />
 
       <Select value={current.chrome} onValueChange={(value) => set({ chrome: value as ChromeVariant })}>
-        <SelectTrigger size="sm" aria-label="Chrome" className="min-w-0 flex-[2] sm:w-36 sm:flex-none">
-          <SelectValue />
+        <SelectTrigger size="sm" aria-label="Chrome">
+          <WidestValue options={CHROME_OPTIONS.map((chrome) => chrome.label)}>
+            <SelectValue />
+          </WidestValue>
         </SelectTrigger>
         <SelectContent position="popper" align="end">
           {CHROME_OPTIONS.map((chrome) => (
@@ -78,12 +127,11 @@ export function AppearanceSwitcher({ className }: { className?: string }) {
           ))}
         </SelectContent>
       </Select>
-
     </div>
   );
 }
 
-/** Copy-a-link and reset, kept apart from the selects so phones can give the selects the full row. */
+/** Copy-a-link and reset, icon-only beside the desktop switcher. */
 export function AppearanceLinkActions({ className }: { className?: string }) {
   const { current, pinned, reset, hrefWith } = useCatalogAppearance();
   return (

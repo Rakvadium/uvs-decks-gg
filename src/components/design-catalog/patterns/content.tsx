@@ -23,7 +23,7 @@ import {
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import { REPO_BLOB_URL } from "../registry";
-import { CatalogEntrySection, Preview, SpecimenLabel } from "../specimen/entry";
+import { CatalogEntrySection, Preview, ScrollRow, SpecimenLabel } from "../specimen/entry";
 import { Code, CodeBlock } from "../specimen/code-block";
 
 function DocLink({ path, children }: { path: string; children: React.ReactNode }) {
@@ -32,9 +32,9 @@ function DocLink({ path, children }: { path: string; children: React.ReactNode }
       href={`${REPO_BLOB_URL}/${path}`}
       target="_blank"
       rel="noreferrer"
-      className="inline-flex items-center gap-1.5 font-medium text-primary underline-offset-4 hover:underline"
+      className="inline-flex items-center gap-1.5 rounded-md font-medium text-foreground underline decoration-primary underline-offset-4 outline-none hover:decoration-2 focus-visible:ring-2 focus-visible:ring-ring"
     >
-      <BookOpen className="size-4" aria-hidden />
+      <BookOpen className="size-4 text-primary" aria-hidden />
       {children}
       <span className="sr-only">(opens GitHub)</span>
     </a>
@@ -184,41 +184,44 @@ export function MobileShellEntry() {
             ["Bottom · Act", "Act", "Search, page actions (≤ 1 primary), then Peek"],
           ]}
         />
-        <Preview label={`Bottom stack · peek placement "${MOBILE_PEEK_PLACEMENT}"`} className="flex flex-col items-center justify-end gap-6">
-          <div style={MOBILE_TAB_METRIC_VARS} className="flex items-center justify-center gap-[var(--mobile-tab-row-gap)]">
-            <MobileGlassCapsule bodyClassName={cn(MOBILE_TAB_ROW_HEIGHT_CLASS, "items-stretch gap-0.5 p-0.5")}>
-              {GO_TABS.map((tab) => (
-                <span
-                  key={tab.label}
-                  aria-label={tab.label}
-                  role="img"
-                  className={cn(
-                    "flex items-center justify-center rounded-full",
-                    MOBILE_TAB_ITEM_WIDTH_CLASS,
-                    tab.current ? "bg-primary-selected text-primary" : "text-muted-foreground",
-                  )}
-                >
-                  <tab.icon className={MOBILE_TAB_ICON_CLASS} />
-                </span>
-              ))}
-            </MobileGlassCapsule>
-            <MobileGlassCapsule bodyClassName={cn(MOBILE_TAB_ROW_HEIGHT_CLASS, "items-center gap-0.5 p-0.5")}>
-              <MobileActButton label="Search">
-                <Search className={MOBILE_TAB_ICON_CLASS} />
-              </MobileActButton>
-              <MobileActButton label="Filters" badge={2}>
-                <Filter className={MOBILE_TAB_ICON_CLASS} />
-              </MobileActButton>
-              <MobileActButton label="New deck" tone="primary">
-                <Plus className={MOBILE_TAB_ICON_CLASS} />
-              </MobileActButton>
-              <span aria-hidden className="w-px shrink-0 self-center bg-border [height:calc(var(--mobile-tab-icon)+4px)]" />
-              <MobileActButton label="Deck panels">
-                <PanelBottomOpen className={MOBILE_TAB_ICON_CLASS} />
-              </MobileActButton>
-            </MobileGlassCapsule>
-          </div>
-          <SpecimenLabel>Go capsule (left) · Act capsule with Search, Filters, a primary and Peek (right)</SpecimenLabel>
+        <Preview label={`Bottom stack · peek placement "${MOBILE_PEEK_PLACEMENT}"`} className="flex flex-col justify-end gap-6">
+          {/* Real metrics: on the narrowest phones the row scrolls instead of shrinking. */}
+          <ScrollRow label="Mobile bottom stack" className="flex justify-center">
+            <div style={MOBILE_TAB_METRIC_VARS} className="flex items-center justify-center gap-[var(--mobile-tab-row-gap)]">
+              <MobileGlassCapsule bodyClassName={cn(MOBILE_TAB_ROW_HEIGHT_CLASS, "items-stretch gap-0.5 p-0.5")}>
+                {GO_TABS.map((tab) => (
+                  <span
+                    key={tab.label}
+                    aria-label={tab.label}
+                    role="img"
+                    className={cn(
+                      "flex items-center justify-center rounded-full",
+                      MOBILE_TAB_ITEM_WIDTH_CLASS,
+                      tab.current ? "bg-primary-selected text-primary" : "text-muted-foreground",
+                    )}
+                  >
+                    <tab.icon className={MOBILE_TAB_ICON_CLASS} />
+                  </span>
+                ))}
+              </MobileGlassCapsule>
+              <MobileGlassCapsule bodyClassName={cn(MOBILE_TAB_ROW_HEIGHT_CLASS, "items-center gap-0.5 p-0.5")}>
+                <MobileActButton label="Search">
+                  <Search className={MOBILE_TAB_ICON_CLASS} />
+                </MobileActButton>
+                <MobileActButton label="Filters" badge={2}>
+                  <Filter className={MOBILE_TAB_ICON_CLASS} />
+                </MobileActButton>
+                <MobileActButton label="New deck" tone="primary">
+                  <Plus className={MOBILE_TAB_ICON_CLASS} />
+                </MobileActButton>
+                <span aria-hidden className="w-px shrink-0 self-center bg-border [height:calc(var(--mobile-tab-icon)+4px)]" />
+                <MobileActButton label="Deck panels">
+                  <PanelBottomOpen className={MOBILE_TAB_ICON_CLASS} />
+                </MobileActButton>
+              </MobileGlassCapsule>
+            </div>
+          </ScrollRow>
+          <SpecimenLabel className="text-center">Go capsule (left) · Act capsule with Search, Filters, a primary and Peek (right)</SpecimenLabel>
         </Preview>
       </div>
       <div className="overflow-hidden rounded-lg border border-hairline">

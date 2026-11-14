@@ -27,7 +27,7 @@ export function CatalogEntrySection({
       id={id}
       aria-labelledby={headingId}
       data-catalog-entry={id}
-      className="scroll-mt-36 space-y-5 border-t border-hairline pt-10 first:border-t-0 first:pt-2 lg:scroll-mt-24"
+      className="scroll-mt-24 space-y-5 border-t border-hairline pt-10 first:border-t-0 first:pt-2"
     >
       <header className="space-y-3">
         <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2">
@@ -47,7 +47,7 @@ export function CatalogEntrySection({
                     href={`${REPO_BLOB_URL}/${file}`}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center gap-1 rounded-md text-xs text-muted-foreground outline-none transition-colors duration-150 hover:text-primary focus-visible:ring-2 focus-visible:ring-ring"
+                    className="inline-flex items-center gap-1 rounded-md text-xs text-muted-foreground outline-none transition-colors duration-150 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
                   >
                     <span className="normal-case tracking-normal">{file}</span>
                     <ExternalLink className="size-3" aria-hidden />
@@ -135,6 +135,24 @@ export function SpecimenLabel({ children, className }: { children: ReactNode; cl
 }
 
 /**
+ * One specimen that can be wider than a phone (a long SegmentedControl, the mobile tab row). It
+ * scrolls sideways inside its own focusable region instead of widening the page. The 4px inset
+ * keeps the controls' focus rings inside the clip.
+ */
+export function ScrollRow({ label, children, className }: { label: string; children: ReactNode; className?: string }) {
+  return (
+    <div
+      role="region"
+      aria-label={label}
+      tabIndex={0}
+      className="-m-1 overflow-x-auto rounded-md p-1 outline-none focus-visible:ring-2 focus-visible:ring-ring"
+    >
+      <div className={cn("w-max min-w-full", className)}>{children}</div>
+    </div>
+  );
+}
+
+/**
  * Rows × columns of live specimens. On narrow screens the grid scrolls sideways inside a focusable
  * region instead of squashing the components.
  */
@@ -145,8 +163,8 @@ export function SpecimenGrid({
   rowHeader = "",
   cellClassName,
 }: {
-  /** A string, or a title (shown as code) with a role note under it. */
-  columns: (string | { title: string; note?: string })[];
+  /** A string, or a title (shown as code) with the alias it stands for and a role note under it. */
+  columns: (string | { title: string; alias?: string; note?: string })[];
   rows: { label: ReactNode; cells: ReactNode[] }[];
   label: string;
   rowHeader?: string;
@@ -161,12 +179,17 @@ export function SpecimenGrid({
               <Kicker size="meta">{rowHeader}</Kicker>
             </th>
             {columns.map((column) => {
-              const { title, note } = typeof column === "string" ? { title: column, note: undefined } : column;
+              const { title, alias, note } = typeof column === "string" ? { title: column, alias: undefined, note: undefined } : column;
               return (
                 <th key={title} scope="col" className="px-3 pb-3 text-left align-bottom">
                   <span className="block whitespace-nowrap text-[11px] font-semibold normal-case tracking-normal text-foreground">
                     {title}
                   </span>
+                  {alias ? (
+                    <span className="block whitespace-nowrap text-[11px] font-normal normal-case tracking-normal text-foreground/80">
+                      = {alias}
+                    </span>
+                  ) : null}
                   {note ? <span className="block text-[11px] font-normal leading-tight text-muted-foreground">{note}</span> : null}
                 </th>
               );

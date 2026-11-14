@@ -10,11 +10,14 @@ export function CopyButton({
   label = "Copy code",
   icon,
   className,
+  children,
 }: {
   value: string | (() => string);
   label?: string;
   icon?: React.ReactNode;
   className?: string;
+  /** Visible text. Without it the button is icon-only, named by `label`. */
+  children?: React.ReactNode;
 }) {
   const [copied, setCopied] = useState(false);
   const timer = useRef<number | undefined>(undefined);
@@ -23,10 +26,10 @@ export function CopyButton({
   return (
     <Button
       type="button"
-      variant="ghost"
-      size="icon-sm"
-      aria-label={copied ? "Copied" : label}
-      className={cn("text-muted-foreground hover:text-foreground", className)}
+      variant={children ? "outline" : "ghost"}
+      size={children ? "sm" : "icon-sm"}
+      aria-label={children ? undefined : copied ? "Copied" : label}
+      className={cn(!children && "text-muted-foreground hover:text-foreground", className)}
       onClick={() => {
         void navigator.clipboard?.writeText(typeof value === "function" ? value() : value).then(() => {
           setCopied(true);
@@ -36,6 +39,7 @@ export function CopyButton({
       }}
     >
       {copied ? <Check className="text-success" /> : (icon ?? <Copy />)}
+      {children ? <span>{copied ? "Copied" : children}</span> : null}
       <span className="sr-only" aria-live="polite">
         {copied ? "Copied to clipboard" : ""}
       </span>
