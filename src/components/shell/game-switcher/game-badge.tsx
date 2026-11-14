@@ -4,8 +4,8 @@ import type { GameId } from "@shared/games/types";
 import { cn } from "@/lib/utils";
 
 const SIZE_CLASS = {
-  sm: "h-6 w-8 rounded-md p-1",
-  lg: "h-12 w-16 rounded-lg p-2",
+  sm: "size-7 rounded-md p-1",
+  lg: "size-14 rounded-lg p-2",
 } as const;
 
 /** Ink-dark tile: keeps light brand marks (Cyberpunk yellow) legible on light themes too. */
@@ -26,12 +26,17 @@ export function GameBadge({
     backgroundColor: TILE_BACKGROUND,
     borderColor: `hsl(${theme.primary} / 0.4)`,
   };
+  // Prefixed copies: Safari scales an unprefixed-only mask to the box, distorting the mark.
   const logo: CSSProperties = {
     backgroundColor: `hsl(${theme.primary})`,
     maskImage: `url(${markSrc})`,
     maskSize: "contain",
     maskRepeat: "no-repeat",
     maskPosition: "center",
+    WebkitMaskImage: `url(${markSrc})`,
+    WebkitMaskSize: "contain",
+    WebkitMaskRepeat: "no-repeat",
+    WebkitMaskPosition: "center",
   };
   return (
     <span
