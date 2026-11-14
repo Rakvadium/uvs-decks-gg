@@ -2,10 +2,10 @@
 
 import { Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useAuthDialog } from "@/components/auth/auth-dialog";
+import { useStartAuth } from "@/components/auth/use-start-auth";
 
 export function SettingsAuthRequiredState() {
-  const { openAuthDialog } = useAuthDialog();
+  const startAuth = useStartAuth();
 
   return (
     <div className="flex min-h-[40vh] items-center justify-center px-4">
@@ -22,7 +22,7 @@ export function SettingsAuthRequiredState() {
         <p className="mx-auto max-w-sm text-sm text-muted-foreground">
           Profile, community preferences, and custom appearance live here after you sign in.
         </p>
-        <Button variant="default" className="mt-4" onClick={() => openAuthDialog()}>
+        <Button variant="default" className="mt-4" onClick={() => startAuth()}>
           Sign In
         </Button>
       </div>

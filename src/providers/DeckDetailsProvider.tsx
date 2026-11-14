@@ -7,7 +7,7 @@ import { api } from "../../convex/_generated/api";
 import { Id } from "../../convex/_generated/dataModel";
 import type { DeckSetupPatch } from "@shared/games/deck";
 import { useRouter } from "next/navigation";
-import { useAuthDialog } from "@/components/auth/auth-dialog";
+import { useStartAuth } from "@/components/auth/use-start-auth";
 import { useSiloedDeckOptional } from "@/lib/deck";
 import type { DeckTeamSharing, DeckVisibility } from "@/lib/deck/visibility";
 import { deckTeamSharingFromDeck, normalizeDeckVisibility } from "@/lib/deck/visibility";
@@ -95,7 +95,7 @@ export function DeckDetailsProvider({ children, deckId }: DeckDetailsProviderPro
   const router = useRouter();
 
   const { isAuthenticated } = useConvexAuth();
-  const { openAuthDialog } = useAuthDialog();
+  const startAuth = useStartAuth();
   const { activeDeckId, setActiveDeck } = useActiveDeck();
   const siloedDeck = useSiloedDeckOptional();
   const typedDeckId = deckId as Id<"decks">;
@@ -229,15 +229,15 @@ export function DeckDetailsProvider({ children, deckId }: DeckDetailsProviderPro
 
   const requestDuplicate = useCallback(() => {
     if (!isAuthenticated) {
-      openAuthDialog();
+      startAuth();
       return;
     }
     setDuplicateConfirmOpen(true);
-  }, [isAuthenticated, openAuthDialog]);
+  }, [isAuthenticated, startAuth]);
 
   const confirmDuplicate = useCallback(async () => {
     if (!isAuthenticated) {
-      openAuthDialog();
+      startAuth();
       return;
     }
     setDuplicateConfirmOpen(false);
@@ -254,7 +254,7 @@ export function DeckDetailsProvider({ children, deckId }: DeckDetailsProviderPro
     duplicateDeckMutation,
     game,
     isAuthenticated,
-    openAuthDialog,
+    startAuth,
     router,
     setActiveDeck,
     typedDeckId,

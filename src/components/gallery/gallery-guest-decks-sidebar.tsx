@@ -1,7 +1,7 @@
 "use client";
 
 import { FolderKanban } from "lucide-react";
-import { useAuthDialog } from "@/components/auth/auth-dialog";
+import { useStartAuth } from "@/components/auth/use-start-auth";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/useIsMobile";
 
@@ -10,7 +10,7 @@ export function GalleryGuestDecksIcon({ className }: { className?: string }) {
 }
 
 export function GalleryGuestDecksSidebar() {
-  const { openAuthDialog } = useAuthDialog();
+  const startAuth = useStartAuth();
   const isMobile = useIsMobile();
   const intro = isMobile
     ? "Sign in to use deck tools from the gallery: pick an active deck, add cards from the catalog, and keep everything synced while you browse."
@@ -29,14 +29,14 @@ export function GalleryGuestDecksSidebar() {
         </ul>
       </div>
       <div className="mt-auto flex shrink-0 flex-col gap-2 border-t border-border/40 pt-6">
-        <Button type="button" onClick={() => openAuthDialog("signIn")}>
+        <Button type="button" onClick={() => startAuth("signIn")}>
           Sign in
         </Button>
         <Button
           variant="outline"
           type="button"
           className="border-primary/30 hover:border-primary/60 hover:bg-primary/10 hover:text-primary"
-          onClick={() => openAuthDialog("signUp")}
+          onClick={() => startAuth("signUp")}
         >
           Create account
         </Button>

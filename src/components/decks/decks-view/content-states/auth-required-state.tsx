@@ -1,9 +1,9 @@
 import { Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useAuthDialog } from "@/components/auth/auth-dialog";
+import { useStartAuth } from "@/components/auth/use-start-auth";
 
 export function DecksAuthRequiredState() {
-  const { openAuthDialog } = useAuthDialog();
+  const startAuth = useStartAuth();
 
   return (
     <div className="flex h-full items-center justify-center">
@@ -12,7 +12,7 @@ export function DecksAuthRequiredState() {
           <Lock className="h-10 w-10 text-primary/50" />
         </div>
         <p className="chrome-label-case text-muted-foreground">Sign in to view your decks</p>
-        <Button variant="default" className="mt-4" onClick={() => openAuthDialog()}>
+        <Button variant="default" className="mt-4" onClick={() => startAuth()}>
           Sign In
         </Button>
       </div>

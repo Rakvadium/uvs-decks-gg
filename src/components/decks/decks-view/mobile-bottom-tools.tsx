@@ -1,7 +1,7 @@
 "use client";
 
 import { Plus } from "lucide-react";
-import { useAuthDialog } from "@/components/auth/auth-dialog";
+import { useStartAuth } from "@/components/auth/use-start-auth";
 import { MobileActButton } from "@/components/shell/mobile-tab-bar/act-button";
 import { MOBILE_TAB_ICON_CLASS } from "@/components/shell/mobile-tab-bar/metrics";
 import { MobileSearchField } from "@/components/shell/mobile-tab-bar/search-field";
@@ -11,7 +11,7 @@ import { DECK_VISIBILITY_MOBILE_TAB_LABELS, TABS } from "./constants";
 
 export function DecksMobileActions() {
   const context = useDecksOptional();
-  const { openAuthDialog } = useAuthDialog();
+  const startAuth = useStartAuth();
   if (!context) return null;
 
   const {
@@ -21,7 +21,7 @@ export function DecksMobileActions() {
 
   const handleClick = () => {
     if (!isAuthenticated) {
-      openAuthDialog();
+      startAuth();
       return;
     }
     actions.openCreateDialog();

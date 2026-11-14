@@ -1,7 +1,7 @@
 "use client";
 
 import { FolderKanban } from "lucide-react";
-import { useAuthDialog } from "@/components/auth/auth-dialog";
+import { useStartAuth } from "@/components/auth/use-start-auth";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -12,7 +12,7 @@ export function GalleryGuestDeckAuthPrompt({
   className?: string;
   compact?: boolean;
 }) {
-  const { openAuthDialog } = useAuthDialog();
+  const startAuth = useStartAuth();
 
   return (
     <div
@@ -30,7 +30,7 @@ export function GalleryGuestDeckAuthPrompt({
         </p>
       </div>
       <div className="flex flex-wrap items-center gap-2">
-        <Button type="button" size="sm" className="h-8 px-3 text-xs" onClick={() => openAuthDialog("signIn")}>
+        <Button type="button" size="sm" className="h-8 px-3 text-xs" onClick={() => startAuth("signIn")}>
           Sign in
         </Button>
         <Button
@@ -38,7 +38,7 @@ export function GalleryGuestDeckAuthPrompt({
           size="sm"
           variant="outline"
           className="h-8 px-3 text-xs border-primary/30 hover:border-primary/60 hover:bg-primary/10 hover:text-primary"
-          onClick={() => openAuthDialog("signUp")}
+          onClick={() => startAuth("signUp")}
         >
           Create account
         </Button>

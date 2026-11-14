@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useConvexAuth, useQuery } from "convex/react";
 import { Loader2 } from "lucide-react";
 import { api } from "../../../../convex/_generated/api";
-import { useAuthDialog } from "@/components/auth/auth-dialog";
+import { useStartAuth } from "@/components/auth/use-start-auth";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -25,7 +25,7 @@ function formatUpdatedAt(timestamp: number) {
 
 export function CommunityTierListsSidebarPanel() {
   const { isAuthenticated } = useConvexAuth();
-  const { openAuthDialog } = useAuthDialog();
+  const startAuth = useStartAuth();
   const game = useGameId();
   const publicFeed = useQuery(api.tierLists.listPublicFeed, { game, limit: 32 });
   const myLists = useQuery(api.tierLists.listMine, isAuthenticated ? { game, limit: 32 } : "skip");
@@ -86,7 +86,7 @@ export function CommunityTierListsSidebarPanel() {
             {!isAuthenticated ? (
               <div className="flex flex-col items-center gap-3 py-6 text-center">
                 <p className="text-xs text-muted-foreground">Sign in to see your tier lists here.</p>
-                <Button size="sm" type="button" onClick={() => openAuthDialog()}>
+                <Button size="sm" type="button" onClick={() => startAuth()}>
                   Sign in
                 </Button>
               </div>

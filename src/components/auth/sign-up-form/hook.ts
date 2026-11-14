@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { passwordRequirementError } from "../../../../convex/lib/password";
 import { clearAuthCookies, isRefreshTokenParseError } from "../auth-recovery";
 
-export function useSignUpDialogModel(onSuccess: () => void) {
+export function useSignUpFormModel(onSuccess: () => void) {
   const { signIn } = useAuthActions();
   const [submitting, setSubmitting] = useState(false);
 

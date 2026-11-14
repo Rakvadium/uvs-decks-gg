@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useConvexAuth, useQuery } from "convex/react";
 import { Calendar, Layers, Loader2, Megaphone, MessageSquare, Plus, Users } from "lucide-react";
 import { api } from "../../../convex/_generated/api";
-import { useAuthDialog } from "@/components/auth/auth-dialog";
+import { useStartAuth } from "@/components/auth/use-start-auth";
 import {
   FLOATING_ACTION_PILL_CLASS,
   FloatingActionPill,
@@ -18,7 +18,7 @@ import { CreateTeamButton } from "@/components/teams/create-team-dialog";
 import { Surface } from "@/components/ui/card";
 
 function TeamsLandingFloatingBar({ isAuthenticated }: { isAuthenticated: boolean }) {
-  const { openAuthDialog } = useAuthDialog();
+  const startAuth = useStartAuth();
 
   return (
     <FloatingPageBar
@@ -29,7 +29,7 @@ function TeamsLandingFloatingBar({ isAuthenticated }: { isAuthenticated: boolean
         isAuthenticated ? (
           <CreateTeamButton className={FLOATING_ACTION_PILL_CLASS} />
         ) : (
-          <FloatingActionPill onClick={() => openAuthDialog()}>
+          <FloatingActionPill onClick={() => startAuth()}>
             <Plus className="h-3.5 w-3.5" />
             <span className="text-xs">Sign in</span>
           </FloatingActionPill>
@@ -41,7 +41,7 @@ function TeamsLandingFloatingBar({ isAuthenticated }: { isAuthenticated: boolean
 
 export function TeamsLandingView() {
   const router = useRouter();
-  const { openAuthDialog } = useAuthDialog();
+  const startAuth = useStartAuth();
   const { isAuthenticated, isLoading: authLoading } = useConvexAuth();
   const myTeam = useQuery(api.teams.permissions.getMyTeam, isAuthenticated ? {} : "skip");
 
@@ -91,7 +91,7 @@ export function TeamsLandingView() {
             {isAuthenticated ? (
               <CreateTeamButton className="w-full justify-center" />
             ) : (
-              <FloatingActionPill className="w-full" onClick={() => openAuthDialog()}>
+              <FloatingActionPill className="w-full" onClick={() => startAuth()}>
                 <Plus className="h-3.5 w-3.5" />
                 <span className="text-xs">Sign in</span>
               </FloatingActionPill>

@@ -11,7 +11,7 @@ import { useConvexAuth } from "convex/react";
 import { useCardData } from "@/lib/universus/card-data-provider";
 import * as m from "framer-motion/m";
 import { usePrefersReducedMotion } from "@/lib/reduced-motion";
-import { useAuthDialog } from "@/components/auth/auth-dialog";
+import { useStartAuth } from "@/components/auth/use-start-auth";
 import { useBrand, useGameId, useGameModule } from "@/games/game-context";
 
 function StatCard({ label, value, icon: Icon, delay = 0, animate = true }: { label: string; value: string | number; icon: typeof Database; delay?: number; animate?: boolean }) {
@@ -104,7 +104,7 @@ function HomePage() {
   const brandLabel = useBrand().wordmark.join("");
   const decks = useQuery(api.decks.listByUser, user ? { game, userId: user._id } : "skip");
   const prefersReducedMotion = usePrefersReducedMotion();
-  const { openAuthDialog } = useAuthDialog();
+  const startAuth = useStartAuth();
   const [isFirstPaint, setIsFirstPaint] = useState(true);
 
   useEffect(() => {
@@ -174,7 +174,7 @@ function HomePage() {
             {showAuthCta ? (
               <>
                 <div className="h-4 w-px bg-border" />
-                <Button variant="outline" size="sm" onClick={() => openAuthDialog()}>
+                <Button variant="outline" size="sm" onClick={() => startAuth()}>
                   Sign In
                 </Button>
               </>
@@ -269,7 +269,7 @@ function HomePage() {
                 </Link>
               </Button>
               {showAuthCta ? (
-                <Button variant="outline" onClick={() => openAuthDialog()}>
+                <Button variant="outline" onClick={() => startAuth()}>
                   Sign In
                 </Button>
               ) : null}

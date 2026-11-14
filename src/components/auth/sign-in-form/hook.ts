@@ -3,7 +3,7 @@ import { useAuthActions } from "@convex-dev/auth/react";
 import { toast } from "sonner";
 import { clearAuthCookies, isRefreshTokenParseError } from "../auth-recovery";
 
-export function useSignInDialogModel(onSuccess: () => void) {
+export function useSignInFormModel(onSuccess: () => void) {
   const { signIn } = useAuthActions();
   const [submitting, setSubmitting] = useState(false);
 
