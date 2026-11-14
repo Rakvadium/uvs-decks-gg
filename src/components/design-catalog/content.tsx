@@ -7,6 +7,7 @@ import { X } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Kicker, PageHeading } from "@/components/ui/typography-headings";
+import { useBrand } from "@/games/game-context";
 import { CHROME_OPTIONS, COLOR_PRESET_OPTIONS } from "@/providers/ColorSchemeProvider";
 import { CatalogAppearanceProvider, useCatalogAppearance } from "./appearance/context";
 import type { CatalogOverride } from "./appearance/params";
@@ -125,6 +126,7 @@ function CatalogLayout({ source }: { source: CatalogSource }) {
   const chapters = focus ? ALL_CHAPTERS.filter((chapter) => chapter.id === focus) : ALL_CHAPTERS;
   const active = useActiveEntry(focus);
   const focused = focus ? ALL_CHAPTERS.find((chapter) => chapter.id === focus) : null;
+  const brand = useBrand();
 
   return (
     <div id="top" className="min-h-dvh bg-background text-foreground">
@@ -140,7 +142,7 @@ function CatalogLayout({ source }: { source: CatalogSource }) {
           <div className="mr-auto flex items-center gap-2 sm:gap-2.5">
             <Link
               href="/"
-              aria-label="Back to UVSDECKS.GG"
+              aria-label={`Back to ${brand.title}`}
               title="Back to the app"
               className="shrink-0 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
@@ -148,7 +150,7 @@ function CatalogLayout({ source }: { source: CatalogSource }) {
             </Link>
             <div>
               <Kicker size="meta" className="block leading-tight">
-                UVSDECKS.GG
+                {brand.title}
               </Kicker>
               <PageHeading size="sm" className="text-base leading-tight">
                 Design system
