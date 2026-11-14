@@ -71,7 +71,7 @@ export function CatalogNav({
               <li key={chapter.id}>
                 <a
                   {...linkProps(`chapter-${chapter.id}`)}
-                  className="block rounded-md px-2.5 py-1 font-semibold text-foreground outline-none transition-colors duration-150 hover:text-primary focus-visible:ring-2 focus-visible:ring-ring"
+                  className="block rounded-md px-2.5 py-1 font-semibold text-foreground outline-none transition-colors duration-150 hover:bg-muted-soft focus-visible:ring-2 focus-visible:ring-ring"
                 >
                   {chapter.label}
                 </a>
@@ -86,7 +86,7 @@ export function CatalogNav({
                           className={cn(
                             "-ml-px block rounded-r-md border-l-2 py-1 pl-2.5 pr-2 text-[13px] outline-none transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-ring",
                             isActive
-                              ? "border-primary bg-primary-wash text-primary"
+                              ? "border-primary bg-primary-wash font-medium text-foreground"
                               : "border-transparent text-muted-foreground hover:border-primary-soft hover:text-foreground",
                           )}
                         >

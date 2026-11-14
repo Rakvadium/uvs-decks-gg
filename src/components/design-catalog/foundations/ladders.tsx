@@ -111,8 +111,24 @@ export function SurfaceLadder({ ladders }: { ladders: LadderSource }) {
   );
 }
 
+/**
+ * The alias a tone column shares across every tone, written with `{tone}` (`bg-{tone}/10`), or
+ * null when ladders.css gives some tone a different step. Then each cell prints its own alias.
+ */
+function sharedToneAlias(ladders: LadderSource, index: number): string | null {
+  const templates = new Set(
+    ladders.tones.map((row) => {
+      const step = row.steps[index];
+      return step ? step.alias.replace(`-${row.tone}/`, "-{tone}/") : "";
+    }),
+  );
+  const [only] = templates;
+  return templates.size === 1 && only ? only : null;
+}
+
 export function ToneLadder({ ladders }: { ladders: LadderSource }) {
   const columns = ladders.tones[0]?.steps.map((step) => `${step.property}-${step.step}`) ?? [];
+  const sharedAliases = columns.map((_, index) => sharedToneAlias(ladders, index));
   return (
     <CatalogEntrySection
       id="tone-ladder"
@@ -128,32 +144,41 @@ export function ToneLadder({ ladders }: { ladders: LadderSource }) {
         <SpecimenGrid
           label="Tone ladder swatches"
           rowHeader="Tone"
-          columns={columns.map((column) => {
+          columns={columns.map((column, index) => {
             const [property, step] = column.split("-");
-            return { title: `${property}-{tone}-${step}`, note: TONE_ROLES[column] ?? "Not in docs/UI_UX_DESIGN.md" };
+            return {
+              title: `${property}-{tone}-${step}`,
+              alias: sharedAliases[index] ?? undefined,
+              note: TONE_ROLES[column] ?? "Not in docs/UI_UX_DESIGN.md",
+            };
           })}
           cellClassName="px-2"
           rows={ladders.tones.map((row) => ({
             label: <Code>{row.tone}</Code>,
-            cells: row.steps.map((step) => (
-              <div
-                key={step.name}
-                title={`${step.name} = ${step.alias}`}
-                className={cn(
-                  "h-10 w-24 rounded-md",
-                  step.property === "bg" && step.name,
-                  step.property === "border" && cn("border-2 bg-card", step.name),
-                  step.property === "ring" && cn("bg-card ring-2", step.name),
+            cells: row.steps.map((step, index) => (
+              <div key={step.name} className="w-24 space-y-1">
+                <div
+                  className={cn(
+                    "h-10 rounded-md",
+                    step.property === "bg" && step.name,
+                    step.property === "border" && cn("border-2 bg-card", step.name),
+                    step.property === "ring" && cn("bg-card ring-2", step.name),
+                  )}
+                />
+                {sharedAliases[index] ? (
+                  <span className="sr-only">{step.name}</span>
+                ) : (
+                  <SpecimenLabel className="block normal-case tracking-normal">
+                    {step.name} = {step.alias}
+                  </SpecimenLabel>
                 )}
-              >
-                <span className="sr-only">{step.name}</span>
               </div>
             )),
           }))}
         />
         <SpecimenLabel className="mt-4 block">
           Each cell is the utility named by its column with the row&apos;s tone, e.g. <Code>border-warning-soft</Code> ={" "}
-          <Code>border-warning/40</Code>. Hover a cell for its class.
+          <Code>border-warning/40</Code>. The alias sits under each column title.
         </SpecimenLabel>
       </Preview>
       <CodeBlock

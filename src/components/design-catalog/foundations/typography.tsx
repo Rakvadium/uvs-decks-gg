@@ -10,6 +10,7 @@ import {
   sectionHeadingVariants,
 } from "@/components/ui/typography-headings";
 import { readRootToken, useRootSnapshot } from "../appearance/root-store";
+import { normalizeCssValue } from "./css-values";
 import { CatalogEntrySection, Preview } from "../specimen/entry";
 import { Code, CodeBlock } from "../specimen/code-block";
 
@@ -122,7 +123,7 @@ const CASING_TOKENS = [
 
 export function ChromeCasing() {
   const snapshot = useRootSnapshot(() => CASING_TOKENS.map(readRootToken).join("\n"));
-  const values = snapshot.split("\n");
+  const values = snapshot.split("\n").map(normalizeCssValue);
 
   return (
     <CatalogEntrySection

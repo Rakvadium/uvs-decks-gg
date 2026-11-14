@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import { cn } from "@/lib/utils";
 import { readRootToken, useRootSnapshot } from "../appearance/root-store";
+import { normalizeCssValue } from "./css-values";
 import { CatalogEntrySection, Preview, SpecimenLabel } from "../specimen/entry";
 import { Code, CodeBlock } from "../specimen/code-block";
 
@@ -34,7 +35,7 @@ function RadiusTile({ className, role }: { className: string; role: string }) {
 }
 
 export function RadiusEntry() {
-  const radius = useRootSnapshot(() => readRootToken("--radius"));
+  const radius = normalizeCssValue(useRootSnapshot(() => readRootToken("--radius")));
   return (
     <CatalogEntrySection
       id="radius"
@@ -78,7 +79,7 @@ const SHADOWS = [
 
 export function ElevationEntry() {
   const snapshot = useRootSnapshot(() => SHADOWS.map((row) => readRootToken(row.token)).join("\n"));
-  const values = snapshot.split("\n");
+  const values = snapshot.split("\n").map(normalizeCssValue);
   return (
     <CatalogEntrySection
       id="elevation"
@@ -97,7 +98,7 @@ export function ElevationEntry() {
               <div className={cn("h-20 rounded-lg border border-hairline bg-card", row.className)} />
               <Code className="block w-fit max-w-full whitespace-normal break-all">{row.className}</Code>
               <SpecimenLabel className="block">{row.role}</SpecimenLabel>
-              <SpecimenLabel className="line-clamp-2 block normal-case tracking-normal" >
+              <SpecimenLabel className="line-clamp-2 block normal-case tracking-normal">
                 <span title={values[index]}>{values[index] || "—"}</span>
               </SpecimenLabel>
             </li>

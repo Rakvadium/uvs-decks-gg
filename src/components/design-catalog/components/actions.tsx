@@ -9,7 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { ToggleGroup, ToggleGroupItem, type ToggleGroupItemProps, type ToggleGroupProps } from "@/components/ui/toggle-group";
 import { cn } from "@/lib/utils";
-import { CatalogEntrySection, Preview, SpecimenGrid, SpecimenLabel } from "../specimen/entry";
+import { CatalogEntrySection, Preview, ScrollRow, SpecimenGrid, SpecimenLabel } from "../specimen/entry";
 import { Code, CodeBlock } from "../specimen/code-block";
 
 type ButtonVariant = NonNullable<ButtonProps["variant"]>;
@@ -177,12 +177,17 @@ export function SegmentedControlEntry() {
                 <SpecimenLabel className="block">
                   size=&quot;{size}&quot; · {SEGMENTED_SIZES[size]}
                 </SpecimenLabel>
-                <SegmentedControl size={size} items={VIEW_ITEMS} value={value} onValueChange={setValue} />
+                <ScrollRow label={`SegmentedControl size ${size}`}>
+                  <SegmentedControl size={size} items={VIEW_ITEMS} value={value} onValueChange={setValue} />
+                </ScrollRow>
               </div>
             ))}
             <div className="space-y-1.5">
               <SpecimenLabel className="block">stretch</SpecimenLabel>
-              <SegmentedControl stretch items={VIEW_ITEMS.slice(0, 3)} value={value} onValueChange={setValue} />
+              {/* stretch splits the row equally, so give each third room for its label before it scrolls. */}
+              <ScrollRow label="SegmentedControl stretch" className="min-w-96">
+                <SegmentedControl stretch items={VIEW_ITEMS.slice(0, 3)} value={value} onValueChange={setValue} />
+              </ScrollRow>
             </div>
           </div>
         </Preview>
