@@ -17,8 +17,18 @@ const SQUARE = /^size-(\d+(?:\.\d+)?)$/;
 const RADIUS = /^rounded(?:-(?:none|xs|sm|md|lg|xl|2xl|3xl|full))?$/;
 const CORNER_RADIUS = /^rounded-(?:[tblrse]|tl|tr|bl|br|ss|se|es|ee)(?:-|$)/;
 
-export type ButtonRewrite = { line: number; from: string; to: string };
-export type ButtonLeftover = { line: number; text: string; message: string };
+export type ControlRewrite = { line: number; from: string; to: string };
+export type ControlLeftover = { line: number; text: string; message: string };
+
+export type ControlPass = "buttons" | "inputs";
+
+// Button has icon twins; Input and SelectTrigger take a plain size and keep their width.
+const PASS_TAGS: Record<ControlPass, Record<string, { icons: boolean }>> = {
+  buttons: { Button: { icons: true } },
+  inputs: { Input: { icons: false }, SelectTrigger: { icons: false } },
+};
+
+const LEGACY_DEFAULT_SIZE = "default";
 
 function snap(px: number): Step {
   const md = LADDER.find((step) => step.text === DEFAULT_SIZE)!.px;
@@ -61,36 +71,40 @@ function sizeLiteral(attr: ts.JsxAttribute | undefined): string | undefined | nu
 
 type Edit = { start: number; end: number; text: string };
 
-export function rewriteButtonSizes(code: string, filename: string): {
+export function rewriteControlSizes(code: string, filename: string, pass: ControlPass): {
   output: string;
-  rewrites: ButtonRewrite[];
-  left: ButtonLeftover[];
+  rewrites: ControlRewrite[];
+  left: ControlLeftover[];
 } {
+  const tags = PASS_TAGS[pass];
   const kind = filename.endsWith(".tsx") || filename.endsWith(".jsx") ? ts.ScriptKind.TSX : ts.ScriptKind.TS;
   const source = ts.createSourceFile(filename, code, ts.ScriptTarget.Latest, true, kind);
   const edits: Edit[] = [];
-  const rewrites: ButtonRewrite[] = [];
-  const left: ButtonLeftover[] = [];
+  const rewrites: ControlRewrite[] = [];
+  const left: ControlLeftover[] = [];
   const lineOf = (node: ts.Node) => source.getLineAndCharacterOfPosition(node.getStart(source)).line + 1;
 
   const visit = (node: ts.Node) => {
-    if ((ts.isJsxOpeningElement(node) || ts.isJsxSelfClosingElement(node)) && node.tagName.getText(source) === "Button") {
-      rewriteElement(node);
+    if (ts.isJsxOpeningElement(node) || ts.isJsxSelfClosingElement(node)) {
+      const tag = node.tagName.getText(source);
+      if (tags[tag]) rewriteElement(node, tag, tags[tag].icons);
     }
     ts.forEachChild(node, visit);
   };
 
-  function rewriteElement(element: ts.JsxOpeningLikeElement) {
+  function rewriteElement(element: ts.JsxOpeningLikeElement, tag: string, icons: boolean) {
     const classAttr = attribute(element, "className");
     const literal = classLiteral(classAttr);
     const sizeAttr = attribute(element, "size");
-    const size = sizeLiteral(sizeAttr);
+    const rawSize = sizeLiteral(sizeAttr);
+    const legacyDefault = rawSize === LEGACY_DEFAULT_SIZE;
+    const size = legacyDefault ? undefined : rawSize;
     const line = lineOf(element);
 
     if (!literal) {
       const text = classAttr?.getText(source) ?? "";
       if (/(^|[\s"'`])(?:h|w|size)-\d|(^|[\s"'`])rounded\b/.test(text)) {
-        left.push({ line, text, message: "className is not a literal; rewrite the Button size by hand" });
+        left.push({ line, text, message: `className is not a literal; rewrite the ${tag} size by hand` });
       }
       return;
     }
@@ -105,14 +119,14 @@ export function rewriteButtonSizes(code: string, filename: string): {
     const width = tokens.map((t) => t.match(WIDTH)?.[1]).find(Boolean);
     const square = tokens.map((t) => t.match(SQUARE)?.[1]).find(Boolean);
     const hasRadius = tokens.some((t) => RADIUS.test(t));
-    if (!height && !square && !hasRadius) return;
+    if (!height && !square && !hasRadius && !legacyDefault) return;
 
     if (size === null) {
-      left.push({ line, text: `${sizeAttr!.getText(source)} ${literal.text}`, message: "size is not a literal; rewrite the Button size by hand" });
+      left.push({ line, text: `${sizeAttr!.getText(source)} ${literal.text}`, message: `size is not a literal; rewrite the ${tag} size by hand` });
       return;
     }
 
-    const isIcon = Boolean(square) || (size ?? "").startsWith("icon") || (height !== undefined && height === width);
+    const isIcon = icons && (Boolean(square) || (size ?? "").startsWith("icon") || (height !== undefined && height === width));
     const overrideUnits = square ?? height;
     const step = overrideUnits ? snap(Number(overrideUnits) * 4) : undefined;
     const nextSize = step ? (isIcon ? step.icon : step.text) : (size ?? DEFAULT_SIZE);
@@ -129,10 +143,9 @@ export function rewriteButtonSizes(code: string, filename: string): {
         : { start: literal.getStart(source), end: literal.getEnd(), text: `${quote}${keptText}${quote}` }
     );
 
-    if (nextSize !== (size ?? DEFAULT_SIZE)) {
+    if (legacyDefault || nextSize !== (size ?? DEFAULT_SIZE)) {
       if (!sizeAttr) {
-        const anchor = element.tagName.getEnd();
-        edits.push({ start: anchor, end: anchor, text: ` size="${nextSize}"` });
+        edits.push(insertSize(element, `size="${nextSize}"`));
       } else if (nextSize === DEFAULT_SIZE) {
         edits.push({ start: sizeAttr.getFullStart(), end: sizeAttr.getEnd(), text: "" });
       } else {
@@ -140,8 +153,21 @@ export function rewriteButtonSizes(code: string, filename: string): {
       }
     }
 
-    const fromSize = size ? `size="${size}"` : "(default)";
+    const fromSize = rawSize ? `size="${rawSize}"` : "(default)";
     rewrites.push({ line, from: `${fromSize} ${removed.join(" ")}`, to: `size="${nextSize}"` });
+  }
+
+  // One attribute per line stays one attribute per line.
+  function insertSize(element: ts.JsxOpeningLikeElement, text: string): Edit {
+    const first = element.attributes.properties[0];
+    const tagLine = source.getLineAndCharacterOfPosition(element.tagName.getEnd()).line;
+    if (first && source.getLineAndCharacterOfPosition(first.getStart(source)).line > tagLine) {
+      const start = first.getStart(source);
+      const indent = code.slice(code.lastIndexOf("\n", start) + 1, start);
+      return { start, end: start, text: `${text}\n${indent}` };
+    }
+    const anchor = element.tagName.getEnd();
+    return { start: anchor, end: anchor, text: ` ${text}` };
   }
 
   visit(source);
