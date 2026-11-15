@@ -1,5 +1,5 @@
 import type { Doc } from "../../../../convex/_generated/dataModel";
-import { Badge } from "@/components/ui/badge";
+import { Badge, type BadgeSize } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 type TierListModerationStatus = Doc<"tierLists">["listModerationStatus"];
@@ -36,9 +36,11 @@ export function isHiddenByModeration(
  */
 export function TierListModerationBadge({
   status,
+  size,
   className,
 }: {
   status: TierListModerationStatus;
+  size?: BadgeSize;
   className?: string;
 }) {
   if (!isHiddenByModeration(status)) {
@@ -46,7 +48,7 @@ export function TierListModerationBadge({
   }
   const { label, tone, toneClassName, hint } = HIDDEN_STATUS[status];
   return (
-    <Badge tone={tone} title={hint} className={cn(toneClassName, className)}>
+    <Badge tone={tone} size={size} title={hint} className={cn(toneClassName, className)}>
       {label}
       <span className="sr-only">. {hint}</span>
     </Badge>

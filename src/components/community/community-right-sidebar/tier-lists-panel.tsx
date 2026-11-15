@@ -68,7 +68,7 @@ export function CommunityTierListsSidebarPanel() {
                         <span className="text-[10px] text-muted-foreground">
                           {author?.username ?? "Community"}
                         </span>
-                        <TierListModerationBadge status={listModerationStatus} className="h-5 px-1.5 text-[10px]" />
+                        <TierListModerationBadge status={listModerationStatus} size="sm" />
                         <Badge size="sm" variant="outline" className="font-normal">
                           {getTierListScopeLabel(tierList.rankingScope)}
                         </Badge>
@@ -107,10 +107,7 @@ export function CommunityTierListsSidebarPanel() {
                       <div className="line-clamp-2 text-sm font-medium leading-snug">{tierList.title}</div>
                       <div className="mt-1 flex flex-wrap items-center gap-1.5">
                         {tierList.isPublic && isHiddenByModeration(tierList.listModerationStatus) ? (
-                          <TierListModerationBadge
-                            status={tierList.listModerationStatus}
-                            className="h-5 px-1.5 text-[10px]"
-                          />
+                          <TierListModerationBadge status={tierList.listModerationStatus} size="sm" />
                         ) : (
                           <Badge size="sm" variant={tierList.isPublic ? "default" : "outline"}>
                             {tierList.isPublic ? "Public" : "Private"}

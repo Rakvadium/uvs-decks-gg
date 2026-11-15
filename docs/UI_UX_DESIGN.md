@@ -103,7 +103,7 @@ Badges and chips:
 | Read-only tag | `Badge` | `size` `sm` (`h-5`, 10px), `md` (default) or `lg` (`--control-h-sm`, `rounded-island`, header chips). Static unless `interactive` |
 | Badge that is itself a trigger | `Badge interactive` | Adds the tone's hover border and shadow |
 | Count bubble on a tab, rail or filter button | `CountBadge` | `count`, `max` (default 99, then 99+), `tone` `primary` / `soft` / `muted` |
-| Toggle or removable filter pill | `Chip` | `Button` outline `sm`, `rounded-full`. `selected` reads the `--selected-*` role tokens |
+| Toggle or removable filter pill | `Chip` | `Button` outline, `rounded-full`, `size` `sm` (default) or `xs` from the control height tokens. `selected` reads the `--selected-*` role tokens |
 
 `bun run design:codemod --surfaces <path>` moves call-site Badge `text-[10px]`/`h-5` onto `size="sm"` and `h-8` onto `size="lg"`, turns muted `animate-pulse` divs into `Skeleton`, and turns `Loader2 animate-spin` into `Spinner`.
 
@@ -153,7 +153,7 @@ Inside one chrome, `--radius-cta` and `--radius-island` hold one value. The sele
 
 ## Buttons
 
-`Button` reads its height and radius from the role tokens, so a call site never passes `h-*`, `w-*`, `size-*` or `rounded-*`. The same holds for `Badge`, `Input` and `SelectTrigger`. `design/primitive-geometry` reports `h-*`, `size-*` and `rounded-*` (role radii included) in the `className` of any of the four. A raw `<button>` that sets `className` must include a `focus-visible:` class, and `design/button-focus` reports one that doesn't.
+`Button` reads its height and radius from the role tokens, so a call site never passes `h-*`, `w-*`, `size-*` or `rounded-*`. The same holds for `Badge`, `Input`, `SelectTrigger` and `Chip`. `design/primitive-geometry` reports `h-*`, `size-*` and `rounded-*` (role radii included) in the `className` of any of them, and of every shared wrapper that forwards `className` to one (`FilterChip`, `IconToolbarButton`, `DialogCancel`, `TierListModerationBadge` and the rest of `CLASSNAME_FORWARDERS` in `tools/eslint-design/classify.mjs`). `tests/design-lint.test.ts` scans `src/` and fails when a new forwarder is missing from that list. A raw `<button>` that sets `className` must include a `focus-visible:` class, and `design/button-focus` reports one that doesn't.
 
 | `size` | Height | Icon twin |
 |--------|--------|-----------|

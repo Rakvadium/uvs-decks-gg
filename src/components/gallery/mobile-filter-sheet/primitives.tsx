@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { Chip } from "@/components/ui/chip";
+import { Chip, type ChipSize } from "@/components/ui/chip";
 import { Check, ChevronRight, X } from "lucide-react";
 import { Kicker } from "@/components/ui/typography-headings";
 import {
@@ -82,15 +82,17 @@ export function FilterChip({
   label,
   selected,
   onClick,
+  size,
   className,
 }: {
   label: ReactNode;
   selected: boolean;
   onClick: () => void;
+  size?: ChipSize;
   className?: string;
 }) {
   return (
-    <Chip selected={selected} onClick={onClick} className={className}>
+    <Chip selected={selected} onClick={onClick} size={size} className={className}>
       {selected ? <Check strokeWidth={2.5} aria-hidden /> : null}
       <span className="truncate">{label}</span>
     </Chip>

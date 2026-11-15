@@ -21,7 +21,7 @@ import { ColorFacetChips } from "@/components/gallery/mobile-filter-sheet/color-
 import { OptionTile } from "@/components/ui/option-tile";
 import { SegmentedControl } from "@/components/ui/segmented-control";
 
-const compactChipClassName = "h-7 w-[100px] justify-center gap-1 px-2 text-xs";
+const compactChipClassName = "w-[100px] justify-center";
 
 function DesktopFilterSearch({
   value,
@@ -153,6 +153,7 @@ export function GalleryDesktopFilterKeywordsPage() {
               key={keyword}
               label={keyword}
               selected={selected.includes(keyword)}
+              size="xs"
               className={compactChipClassName}
               onClick={() => toggleStringFilter("keywords", keyword)}
             />
@@ -177,7 +178,7 @@ export function GalleryDesktopFilterColorsPage() {
             options={options}
             selected={filters.colors ?? []}
             onToggle={(value) => toggleStringFilter("colors", value)}
-            chipClassName="h-7 gap-1 px-2.5 text-xs"
+            chipSize="xs"
             rowClassName="gap-1.5"
           />
         </FilterRow>
@@ -224,7 +225,8 @@ export function GalleryDesktopFilterTagsPage() {
                 key={tag}
                 label={tag}
                 selected={selected.includes(tag)}
-                className="h-7 w-full justify-center gap-1 px-2 text-xs"
+                size="xs"
+                className="w-full justify-center"
                 onClick={() => toggleStringFilter("tags", tag)}
               />
             ))}

@@ -143,7 +143,7 @@ export const CATALOG_CHAPTERS = [
       {
         id: "chip",
         label: "Chip",
-        ui: [{ file: "chip.tsx", exports: ["Chip", "ChipProps"] }],
+        ui: [{ file: "chip.tsx", exports: ["Chip", "ChipProps", "ChipSize"] }],
       },
       {
         id: "card",

@@ -150,7 +150,7 @@ export function CommunityTierListDetailFloatingTopBar() {
               {publicityControl}
               <TierListModerationBadge
                 status={detail.listModerationStatus}
-                className="h-8 shrink-0 items-center gap-1.5 rounded-island px-2.5 text-[10px]"
+                size="lg"
               />
               {rankingScopeControl}
             </FloatingCapsuleCluster>

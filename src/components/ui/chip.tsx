@@ -3,16 +3,19 @@ import * as React from "react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
+type ChipSize = "xs" | "sm"
+
 interface ChipProps extends Omit<React.ComponentProps<typeof Button>, "variant" | "size" | "shape"> {
   selected?: boolean
+  size?: ChipSize
 }
 
-const Chip = React.forwardRef<HTMLButtonElement, ChipProps>(({ selected, className, ...props }, ref) => (
+const Chip = React.forwardRef<HTMLButtonElement, ChipProps>(({ selected, size = "sm", className, ...props }, ref) => (
   <Button
     ref={ref}
     type="button"
     variant="outline"
-    size="sm"
+    size={size}
     aria-pressed={selected}
     data-slot="chip"
     className={cn(
@@ -27,4 +30,4 @@ const Chip = React.forwardRef<HTMLButtonElement, ChipProps>(({ selected, classNa
 Chip.displayName = "Chip"
 
 export { Chip }
-export type { ChipProps }
+export type { ChipProps, ChipSize }

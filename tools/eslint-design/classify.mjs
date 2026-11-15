@@ -453,12 +453,42 @@ export function classifyGroup(tokens) {
   });
 }
 
-/** Primitives that own their height and radius: a call-site `className` must not set either. */
+/** Shared components that pass their `className` straight to a primitive below, by name. */
+const CLASSNAME_FORWARDERS = {
+  AuthField: "Input",
+  CardFlipButton: "Button",
+  CopyButton: "Button",
+  CreateTeamButton: "Button",
+  CyberpunkSetLegendButton: "Button",
+  DeckFormatLegalityBadge: "Badge",
+  DeckFormatLegalityBadgeContent: "Badge",
+  DialogCancel: "Button",
+  FloatingActionPill: "Button",
+  FooterActionButton: "Button",
+  IconToolbarButton: "Button",
+  InlineScopeSelect: "SelectTrigger",
+  LeftSidebarUserMenuTrigger: "Button",
+  StartingCharacterButton: "Button",
+  TierListModerationBadge: "Badge",
+};
+
+/**
+ * Primitives that own their height and radius, and the wrappers that forward `className` to one:
+ * a call-site `className` must not set either.
+ */
 export const GEOMETRY_PRIMITIVES = {
   Button: "Use `size` (xs, sm, md, lg, icon-*) and `shape` (control, cta, island) instead (UI_UX_DESIGN.md § Buttons).",
   Badge: "Badge owns its height and radius; add a variant to the primitive instead.",
   Input: "Input owns its height and radius; add a variant to the primitive instead.",
   SelectTrigger: "SelectTrigger owns its height and radius; add a variant to the primitive instead.",
+  Chip: "Use `size` (xs, sm) instead; Chip is a rounded-full Button.",
+  FilterChip: "Use `size` (xs, sm) instead; FilterChip renders a Chip.",
+  ...Object.fromEntries(
+    Object.entries(CLASSNAME_FORWARDERS).map(([name, primitive]) => [
+      name,
+      `${name} forwards className to <${primitive}>, which owns its height and radius; give ${name} a prop instead.`,
+    ])
+  ),
 };
 
 /** Raw button elements, which must draw their own keyboard focus ring. */

@@ -24,7 +24,7 @@ export function ColorsSection() {
           options={options}
           selected={filters.colors ?? []}
           onToggle={(value) => toggleStringFilter("colors", value)}
-          chipClassName="h-7 gap-1 px-2.5 text-xs"
+          chipSize="xs"
           rowClassName="gap-1.5"
         />
       </Panel>

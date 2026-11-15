@@ -612,6 +612,7 @@ function classNameForwarders(): string[] {
     const first = component?.parameters[0]?.name;
     if (!first) return [];
     if (ts.isIdentifier(first)) return [first.text];
+    if (!ts.isObjectBindingPattern(first)) return [];
     return first.elements.flatMap((element) => (element.dotDotDotToken && ts.isIdentifier(element.name) ? [element.name.text] : []));
   };
   let grew = true;

@@ -237,7 +237,7 @@ export function CommunityTierListDetailTopBar() {
         </div>
 
         <div className="ml-auto flex shrink-0 items-center gap-2">
-          <TierListModerationBadge status={detail.listModerationStatus} className="h-8 px-2.5 text-[10px]" />
+          <TierListModerationBadge status={detail.listModerationStatus} size="lg" />
           {!isEditingMeta ? publicityControl : null}
           {!isEditingMeta ? rankingScopeControl : null}
           {canEdit ? (isEditingMeta ? saveMetaButton : (

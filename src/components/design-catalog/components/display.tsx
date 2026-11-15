@@ -273,21 +273,28 @@ export function ChipEntry() {
       id="chip"
       description={
         <p>
-          An interactive pill built on <Code>Button</Code> (<Code>outline</Code>, <Code>sm</Code>, <Code>rounded-full</Code>).
-          Selected reads the <Code>--selected-*</Code> role tokens. For a read-only tag use <Code>Badge</Code>.
+          An interactive pill built on <Code>Button</Code> (<Code>outline</Code>, <Code>rounded-full</Code>). <Code>size</Code> is{" "}
+          <Code>sm</Code> (the default) or <Code>xs</Code> for dense filter grids, read from the control height tokens, so a call
+          site never sets <Code>h-*</Code>. Selected reads the <Code>--selected-*</Code> role tokens. For a read-only tag use{" "}
+          <Code>Badge</Code>.
         </p>
       }
     >
       <Preview>
-        <div className="flex flex-wrap gap-2">
-          {CHIP_VALUES.map((value) => (
-            <Chip key={value} selected={selected.includes(value)} onClick={() => toggle(value)}>
-              {value}
-            </Chip>
+        <div className="space-y-3">
+          {(["sm", "xs"] as const).map((size) => (
+            <div key={size} className="flex flex-wrap items-center gap-2">
+              {CHIP_VALUES.map((value) => (
+                <Chip key={value} size={size} selected={selected.includes(value)} onClick={() => toggle(value)}>
+                  {value}
+                </Chip>
+              ))}
+              <SpecimenLabel>size {size}</SpecimenLabel>
+            </div>
           ))}
         </div>
       </Preview>
-      <CodeBlock code={`import { Chip } from "@/components/ui/chip"\n\n<Chip selected={on} onClick={toggle}>Fire</Chip>`} />
+      <CodeBlock code={`import { Chip } from "@/components/ui/chip"\n\n<Chip selected={on} onClick={toggle}>Fire</Chip>\n<Chip size="xs" selected={on} onClick={toggle}>Fire</Chip>`} />
     </CatalogEntrySection>
   );
 }
