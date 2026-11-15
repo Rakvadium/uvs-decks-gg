@@ -92,6 +92,24 @@ Avoid one-off `rounded-[Npx]` except micro geometry (e.g. tooltip arrows). Dialo
 
 Bare `rounded` and `rounded-sm` are off-ladder: `rounded` is a static 4px that ignores the chrome `--radius`, so it drifts from every other control. Buttons (all sizes), badges, tooltips, and segmented controls are `rounded-md`.
 
+## Role tokens
+
+Each chrome sets 12 role tokens in `src/styles/base.css`. Components move onto them from the next parity PRs on, and the `/design` page (Radius & elevation, Role tokens) shows their live values.
+
+| Token | Role | Calm value | Overrides |
+|-------|------|------------|-----------|
+| `--radius-control` (`rounded-control`) | Buttons, inputs, toggles | `calc(var(--radius) - 2px)`, same as `rounded-md` | None |
+| `--radius-surface` (`rounded-surface`) | Cards, panels, popovers, dialogs | `var(--radius)`, same as `rounded-lg` | None |
+| `--radius-cta` (`rounded-cta`) | Primary call to action | `9999px` | Bubblegum and holoterminal: `var(--radius)` |
+| `--radius-island` (`rounded-island`) | Floating islands, capsules, header pills | `9999px` | Bubblegum and holoterminal: `var(--radius)` |
+| `--control-h-xs`, `-sm`, `-md`, `-lg` | Control heights | `28px`, `32px`, `40px`, `48px` | None |
+| `--selected-bg` | Selected or active fill | `--accent` at the selected step (`/20`) | None |
+| `--selected-border` | Selected or active border | `--accent` at the strong step (`/60`) | None |
+| `--selected-fg` | Selected or active text and icon | `var(--accent)` | None |
+| `--hover-bg` | Hover fill | `--accent` at the wash step (`/10`) | None |
+
+Inside one chrome, `--radius-cta` and `--radius-island` hold one value. The selected and hover tokens derive from `--accent` only, so custom palettes follow them. `tests/role-tokens.test.ts` checks every chrome against this table.
+
 ## Z-index stack
 
 | Layer | Value | Class |

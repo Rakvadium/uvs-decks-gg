@@ -81,6 +81,7 @@ export const CATALOG_CHAPTERS = [
     summary: "The radius ladder follows the chrome's --radius. Shadows come from theme and chrome tokens, never ad-hoc rgba.",
     entries: [
       { id: "radius", label: "Radius" },
+      { id: "role-tokens", label: "Role tokens" },
       { id: "elevation", label: "Elevation" },
     ],
   },

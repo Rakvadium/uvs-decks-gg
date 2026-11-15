@@ -12,8 +12,7 @@ const HEIGHT_TOKENS = ["--control-h-xs", "--control-h-sm", "--control-h-md", "--
 const SELECTED_TOKENS = ["--selected-bg", "--selected-border", "--selected-fg", "--hover-bg"] as const;
 const ROLE_TOKENS = [...RADIUS_TOKENS, ...HEIGHT_TOKENS, ...SELECTED_TOKENS];
 
-/** The `@layer chrome-*` blocks of base.css in file order, which is their cascade order. */
-function chromeLayers(css: string): string[] {
+function chromeLayersInCascadeOrder(css: string): string[] {
   const layers: string[] = [];
   for (const match of css.matchAll(/@layer chrome-[\w-]+\s*\{/g)) {
     let depth = 1;
@@ -30,10 +29,9 @@ function chromeLayers(css: string): string[] {
 
 const ROOT_CHROME_SELECTOR = /^:root(?:\[data-chrome="[a-z]+"\]|:is\((?:\[data-chrome="[a-z]+"\],?\s*)+\))$/;
 
-/** Custom properties a light-mode `<html data-chrome={chrome}>` gets from the chrome layers. */
 function chromeVars(chrome: ChromeVariant): Record<string, string> {
   const vars: Record<string, string> = {};
-  for (const layer of chromeLayers(BASE_CSS)) {
+  for (const layer of chromeLayersInCascadeOrder(BASE_CSS)) {
     for (const [, rawSelector, body] of layer.matchAll(/([^{};]+)\{([^{}]*)\}/g)) {
       const selector = rawSelector.trim();
       if (!ROOT_CHROME_SELECTOR.test(selector) || !selector.includes(`[data-chrome="${chrome}"]`)) continue;
@@ -46,8 +44,7 @@ function chromeVars(chrome: ChromeVariant): Record<string, string> {
   return vars;
 }
 
-/** Substitutes `var()` references the chrome itself defines, as the browser does on `<html>`. */
-function resolved(chrome: ChromeVariant): Record<string, string> {
+function resolved(chrome: ChromeVariant): Record<string, string | undefined> {
   const vars = chromeVars(chrome);
   const substitute = (value: string): string =>
     value.replace(/var\((--[\w-]+)\)/g, (ref, name: string) => (name in vars ? substitute(vars[name]) : ref));
@@ -105,7 +102,7 @@ const EXPECTED: Record<ChromeVariant, Record<string, string>> = {
 
 describe("chrome role tokens", () => {
   test("the test covers every chrome the app offers", () => {
-    expect([...CHROME_VARIANT_VALUES].sort()).toEqual(Object.keys(EXPECTED).sort());
+    expect(Object.keys(EXPECTED).sort()).toEqual([...CHROME_VARIANT_VALUES].sort());
   });
 
   for (const chrome of CHROME_VARIANT_VALUES) {
@@ -119,16 +116,13 @@ describe("chrome role tokens", () => {
     });
   }
 
-  test("selected and hover tokens hold no literal colour", () => {
-    const literalColor = /#[0-9a-f]{3,8}\b|\b(?:oklch|oklab|lab|lch|rgba?|hsla?|hwb|color)\(/i;
-    for (const chrome of CHROME_VARIANT_VALUES) {
+  test("selected and hover tokens hold no literal colour, only steps of --accent", () => {
+    const accentOnly = /^(?:var\(--accent\)|color-mix\(in oklab, var\(--accent\) \d+%, transparent\))$/;
+    const offenders = CHROME_VARIANT_VALUES.flatMap((chrome) => {
       const vars = chromeVars(chrome);
-      for (const token of SELECTED_TOKENS) {
-        expect(vars[token]).toContain("var(--accent)");
-        const rest = vars[token].replaceAll("var(--accent)", "").replace(/^color-mix\(in oklab,\s*\d+%,\s*transparent\)$/, "");
-        expect({ token, chrome, rest, literal: literalColor.test(rest) }).toEqual({ token, chrome, rest: "", literal: false });
-      }
-    }
+      return SELECTED_TOKENS.filter((token) => !accentOnly.test(vars[token] ?? "")).map((token) => `${chrome} ${token}: ${vars[token]}`);
+    });
+    expect(offenders).toEqual([]);
   });
 });
 
