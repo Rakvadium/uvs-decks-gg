@@ -9,9 +9,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { DECK_SECTION_META as SECTION_META } from "@/lib/deck/display-config";
-import { useDeckDetailsListCardRowContext } from "./context";
+import { useDeckCardRowContext } from "./context";
 
-export function DeckDetailsListCardRowControls() {
+export function DeckCardRowControls() {
   const {
     addCard,
     canAddToDeck,
@@ -22,7 +22,7 @@ export function DeckDetailsListCardRowControls() {
     moveTargets,
     removeCard,
     sectionKey,
-  } = useDeckDetailsListCardRowContext();
+  } = useDeckCardRowContext();
 
   return (
     <div

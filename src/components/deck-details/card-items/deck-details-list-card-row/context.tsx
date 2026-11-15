@@ -1,25 +1,17 @@
 "use client";
 
-import { createContext, useContext, type ReactNode } from "react";
-import { useDeckDetailsListCardRowModel, type DeckDetailsListCardRowModel } from "./hook";
-import type { DeckDetailsListCardRowProps } from "./types";
+import { createContext, useContext } from "react";
+import type { DeckCardRowModel } from "./types";
 
-const DeckDetailsListCardRowContext = createContext<DeckDetailsListCardRowModel | null>(null);
+const DeckCardRowContext = createContext<DeckCardRowModel | null>(null);
 
-export function DeckDetailsListCardRowProvider({
-  children,
-  ...props
-}: DeckDetailsListCardRowProps & { children: ReactNode }) {
-  const value = useDeckDetailsListCardRowModel(props);
+export const DeckCardRowProvider = DeckCardRowContext.Provider;
 
-  return <DeckDetailsListCardRowContext.Provider value={value}>{children}</DeckDetailsListCardRowContext.Provider>;
-}
-
-export function useDeckDetailsListCardRowContext() {
-  const context = useContext(DeckDetailsListCardRowContext);
+export function useDeckCardRowContext() {
+  const context = useContext(DeckCardRowContext);
 
   if (!context) {
-    throw new Error("useDeckDetailsListCardRowContext must be used within DeckDetailsListCardRowProvider");
+    throw new Error("useDeckCardRowContext must be used within DeckCardRowProvider");
   }
 
   return context;

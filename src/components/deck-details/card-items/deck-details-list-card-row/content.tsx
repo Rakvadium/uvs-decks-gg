@@ -2,13 +2,13 @@
 
 import { useCallback } from "react";
 import { cn } from "@/lib/utils";
-import { DeckDetailsListCardRowControls } from "./controls";
-import { DeckDetailsListCardRowProvider, useDeckDetailsListCardRowContext } from "./context";
-import { DeckDetailsListCardRowThumbnail } from "./thumbnail";
-import type { DeckDetailsListCardRowProps } from "./types";
+import { DeckCardRowControls } from "./controls";
+import { DeckCardRowProvider, useDeckCardRowContext } from "./context";
+import { DeckCardRowThumbnail } from "./thumbnail";
+import type { DeckCardRowModel } from "./types";
 import { useGameModule } from "@/games/game-context";
 
-function DeckDetailsListCardRowContent() {
+function DeckCardRowContent() {
   const { CardDetailsDialog } = useGameModule().ui;
   const {
     backCard,
@@ -23,7 +23,7 @@ function DeckDetailsListCardRowContent() {
     onHoverLeave,
     setIsDialogOpen,
     dragHandleProps,
-  } = useDeckDetailsListCardRowContext();
+  } = useDeckCardRowContext();
 
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent) => {
@@ -47,7 +47,7 @@ function DeckDetailsListCardRowContent() {
           ...dragHandleProps.style,
           cursor: isDragging ? "grabbing" : "pointer",
         }}
-        data-slot="deck-details-list-card-row"
+        data-slot="deck-card-row"
         role="button"
         tabIndex={0}
         onMouseDown={dragHandleProps.onMouseDown}
@@ -63,7 +63,7 @@ function DeckDetailsListCardRowContent() {
         }}
         onMouseLeave={onHoverLeave}
       >
-        <DeckDetailsListCardRowThumbnail />
+        <DeckCardRowThumbnail />
 
         <div
           className={cn(
@@ -83,7 +83,7 @@ function DeckDetailsListCardRowContent() {
           x{count}
         </span>
 
-        {isOwner ? <DeckDetailsListCardRowControls /> : null}
+        {isOwner ? <DeckCardRowControls /> : null}
       </div>
 
       <CardDetailsDialog
@@ -96,10 +96,10 @@ function DeckDetailsListCardRowContent() {
   );
 }
 
-export function DeckDetailsListCardRow(props: DeckDetailsListCardRowProps) {
+export function DeckCardRow({ model }: { model: DeckCardRowModel }) {
   return (
-    <DeckDetailsListCardRowProvider {...props}>
-      <DeckDetailsListCardRowContent />
-    </DeckDetailsListCardRowProvider>
+    <DeckCardRowProvider value={model}>
+      <DeckCardRowContent />
+    </DeckCardRowProvider>
   );
 }
