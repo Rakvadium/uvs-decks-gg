@@ -232,7 +232,8 @@ const MOBILE_SELF_SCROLLING_ROUTES = [
   /^\/collection(\/|$)/,
   /^\/community(\/|$)/,
   /^\/settings(\/|$)/,
-  /^\/teams(\/(?!invite(\/|$))|$)/,
+  /^\/home(\/|$)/,
+  /^\/teams(\/|$)/,
 ];
 
 function routeScrollsItself(pathname: string): boolean {
