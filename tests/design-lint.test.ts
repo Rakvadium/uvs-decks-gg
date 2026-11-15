@@ -1,8 +1,12 @@
 import { describe, expect, test } from "bun:test";
+import { readFileSync } from "node:fs";
+import path from "node:path";
+import { Glob } from "bun";
+import ts from "typescript";
 import { Linter } from "eslint";
 import design, { designRules } from "../tools/eslint-design/index.mjs";
 import parser from "../tools/eslint-design/parser.mjs";
-import { classifyUtility, parseToken } from "../tools/eslint-design/classify.mjs";
+import { classifyUtility, GEOMETRY_PRIMITIVES, parseToken } from "../tools/eslint-design/classify.mjs";
 
 const config: Linter.Config[] = [
   {
@@ -298,6 +302,29 @@ describe("element and colour rules: invalid", () => {
     ]);
   });
 
+  test("primitive-geometry: wrappers that forward className to a primitive", () => {
+    const code = [
+      `const a = <>`,
+      `  <Chip className="h-7 w-full" />`,
+      `  <FilterChip label="Fire" className={cn("h-7 justify-center", on && "rounded-md")} />`,
+      `  <IconToolbarButton className="size-8" />`,
+      `  <TierListModerationBadge className="h-5 px-1.5" />`,
+      `  <DialogCancel className="w-full" />`,
+      `</>;`,
+    ].join("\n");
+    expect(lint(code)).toEqual([
+      { rule: "design/primitive-geometry", text: "h-7" },
+      { rule: "design/primitive-geometry", text: "h-7" },
+      { rule: "design/primitive-geometry", text: "rounded-md" },
+      { rule: "design/primitive-geometry", text: "size-8" },
+      { rule: "design/primitive-geometry", text: "h-5" },
+    ]);
+  });
+
+  test("primitive-geometry covers every component in src that forwards className to a geometry primitive", () => {
+    expect(classNameForwarders().filter((name) => !(name in GEOMETRY_PRIMITIVES))).toEqual([]);
+  });
+
   test("button-focus: a raw button with readable classes and no focus-visible class", () => {
     const code = [
       `const a = <>`,
@@ -565,3 +592,55 @@ describe("classifier", () => {
     }
   });
 });
+
+/**
+ * Names of the components in src that pass their own `className` (directly, or through a rest
+ * spread) to a geometry primitive or to another such component, so a call-site height or radius
+ * would reach the primitive unseen.
+ */
+function classNameForwarders(): string[] {
+  const root = path.join(import.meta.dir, "..");
+  const files = [...new Glob("src/**/*.tsx").scanSync(root)].map((file) =>
+    ts.createSourceFile(file, readFileSync(path.join(root, file), "utf8"), ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX),
+  );
+  const targets = new Set(["Button", "Badge", "Input", "SelectTrigger"]);
+  const forwarders = new Set<string>();
+  const forwardsOwnClassName = (expression: ts.Node): boolean =>
+    (ts.isIdentifier(expression) && expression.text === "className" && !ts.isPropertyAccessExpression(expression.parent)) ||
+    ts.forEachChild(expression, forwardsOwnClassName) === true;
+  const restNames = (component: ts.SignatureDeclaration | undefined) => {
+    const first = component?.parameters[0]?.name;
+    if (!first) return [];
+    if (ts.isIdentifier(first)) return [first.text];
+    return first.elements.flatMap((element) => (element.dotDotDotToken && ts.isIdentifier(element.name) ? [element.name.text] : []));
+  };
+  let grew = true;
+  while (grew) {
+    grew = false;
+    for (const file of files) {
+      const visit = (node: ts.Node, owner: { name: string; fn?: ts.SignatureDeclaration } | null) => {
+        let next = owner;
+        if ((ts.isFunctionDeclaration(node) || ts.isVariableDeclaration(node)) && node.name && ts.isIdentifier(node.name) && /^[A-Z]/.test(node.name.text)) {
+          const init = ts.isVariableDeclaration(node) ? node.initializer : node;
+          const fn = init && (ts.isFunctionLike(init) ? init : ts.isCallExpression(init) ? init.arguments.find(ts.isFunctionLike) : undefined);
+          next = { name: node.name.text, fn: fn as ts.SignatureDeclaration | undefined };
+        }
+        if ((ts.isJsxOpeningElement(node) || ts.isJsxSelfClosingElement(node)) && next && !targets.has(next.name) && targets.has(node.tagName.getText(file))) {
+          const forwards = node.attributes.properties.some((attr) =>
+            ts.isJsxAttribute(attr)
+              ? attr.name.getText(file) === "className" && !!attr.initializer && ts.isJsxExpression(attr.initializer) && !!attr.initializer.expression && forwardsOwnClassName(attr.initializer.expression)
+              : ts.isIdentifier(attr.expression) && restNames(next.fn).includes(attr.expression.text),
+          );
+          if (forwards) {
+            forwarders.add(next.name);
+            targets.add(next.name);
+            grew = true;
+          }
+        }
+        ts.forEachChild(node, (child) => visit(child, next));
+      };
+      visit(file, null);
+    }
+  }
+  return [...forwarders].sort();
+}

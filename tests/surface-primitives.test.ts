@@ -6,6 +6,7 @@ import { Badge, type BadgeTone } from "../src/components/ui/badge";
 import { Banner } from "../src/components/ui/banner";
 import { Card, Surface } from "../src/components/ui/card";
 import { Chip } from "../src/components/ui/chip";
+import { FilterChip } from "../src/components/gallery/mobile-filter-sheet/primitives";
 import { CountBadge } from "../src/components/ui/count-badge";
 import { EmptyState } from "../src/components/ui/empty-state";
 import { LoadingState } from "../src/components/ui/loading-state";
@@ -127,5 +128,12 @@ describe("panels, feedback and counts", () => {
     expect(html).toContain('aria-pressed="true"');
     expect(classesOf(createElement(Chip, { selected: true }, "Fire"))).toContain("bg-(--selected-bg)");
     expect(classesOf(createElement(Chip, null, "Fire"))).toContain("rounded-full");
+  });
+
+  test("Chip and FilterChip take their height from the control height tokens", () => {
+    expect(classesOf(createElement(Chip, null, "Fire"))).toContain("h-(--control-h-sm)");
+    expect(classesOf(createElement(Chip, { size: "xs" }, "Fire"))).toContain("h-(--control-h-xs)");
+    const filterChip = createElement(FilterChip, { label: "Fire", selected: false, onClick: () => {}, size: "xs" });
+    expect(classesOf(filterChip)).toContain("h-(--control-h-xs)");
   });
 });
