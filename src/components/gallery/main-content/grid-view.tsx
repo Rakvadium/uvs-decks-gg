@@ -91,7 +91,7 @@ export function GalleryGridView({ cards, cardsPerRow, onOpenCardDetails }: Galle
                         onOpenCardDetails={onOpenCardDetails}
                         imagePriority={virtualRow.index === 0}
                         imageSizes={imageSizes}
-                        imageQuality={80}
+                        imageQuality={75}
                       />
                     </div>
                   ))}
