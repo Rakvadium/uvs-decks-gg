@@ -100,6 +100,7 @@ function fakeCtx(signedInAs: Id<"users"> | null) {
   };
   const inserted: Array<{ table: string; doc: Record<string, unknown> }> = [];
   const runMutationCalls: unknown[] = [];
+  const issuedIds = new Set(Object.values(tables).flatMap((rows) => rows.map((row) => row._id)));
   const findDoc = (id: string) => {
     for (const rows of Object.values(tables)) {
       const row = rows.find((r) => r._id === id);
@@ -150,16 +151,20 @@ function fakeCtx(signedInAs: Id<"users"> | null) {
     },
     db: {
       // Copies, like Convex: a later patch must not change a document a handler already read.
+      // Like Convex, a string that was never an id throws, and an id from any table resolves.
       get: async (id: string) => {
+        if (!issuedIds.has(id)) throw new Error(`Invalid ID: ${id}`);
         const row = findDoc(id);
         return row ? { ...row } : null;
       },
+      normalizeId: (table: string, id: string) => ((tables[table] ?? []).some((row) => row._id === id) ? id : null),
       query: chain,
       patch: async (id: string, fields: Record<string, unknown>) => {
         Object.assign(findDoc(id) ?? {}, fields);
       },
       insert: async (table: string, doc: Record<string, unknown>) => {
         const _id = `${table}-${inserted.length}`;
+        issuedIds.add(_id);
         (tables[table] ??= []).push({ _id, _creationTime: 1, ...doc });
         inserted.push({ table, doc });
         return _id;
@@ -187,7 +192,7 @@ async function feedAs(viewer: Id<"users"> | null) {
   return (await handlerOf(listPublicFeed)(fakeCtx(viewer).ctx, { limit: 24 })) as FeedEntry[];
 }
 
-async function detailAs(viewer: Id<"users"> | null, tierListId: Id<"tierLists">) {
+async function detailAs(viewer: Id<"users"> | null, tierListId: string) {
   return (await handlerOf(getDetail)(fakeCtx(viewer).ctx, { tierListId })) as Detail;
 }
 
@@ -254,6 +259,14 @@ describe("tierLists:listPublicFeed", () => {
 });
 
 describe("tierLists:getDetail", () => {
+  test("a route param that is not a tier list id gets null, for guests and signed-in callers", async () => {
+    for (const viewer of [null, ownerId, adminId]) {
+      expect(await detailAs(viewer, "not-a-real-id")).toBeNull();
+      expect(await detailAs(viewer, memberId)).toBeNull();
+    }
+    expect((await detailAs(null, approvedId))?.tierList._id).toBe(approvedId);
+  });
+
   test("anonymous and member callers get null for hidden lists", async () => {
     for (const viewer of [null, memberId, bannedAdminId]) {
       for (const id of [...HIDDEN, privateRejectedId]) {
