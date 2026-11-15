@@ -45,17 +45,19 @@ export const listForDeck = query({
 });
 
 export const getPendingInvitePreview = query({
-  args: { deckId: v.id("decks") },
+  args: { deckId: v.string() },
   returns: v.union(v.null(), v.object({ deckName: v.string() })),
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
     if (userId === null) return null;
-    const deck = await ctx.db.get(args.deckId);
+    const deckId = ctx.db.normalizeId("decks", args.deckId);
+    if (deckId === null) return null;
+    const deck = await ctx.db.get(deckId);
     if (!deck || normalizeDeckVisibility(deck) !== "share") return null;
 
     const share = await ctx.db
       .query("deckShares")
-      .withIndex("by_deck_and_user", (q) => q.eq("deckId", args.deckId).eq("userId", userId))
+      .withIndex("by_deck_and_user", (q) => q.eq("deckId", deckId).eq("userId", userId))
       .first();
 
     if (!share || share.status !== "pending") return null;

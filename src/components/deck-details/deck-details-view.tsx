@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useConvexAuth, useQuery } from "convex/react";
 import { BarChart3, Download, Grid2x2Plus, Loader2, Shuffle } from "lucide-react";
 import { api } from "../../../convex/_generated/api";
-import type { Id } from "../../../convex/_generated/dataModel";
 import { Button } from "@/components/ui/button";
 import { DeckInvitePendingGate } from "@/components/deck-details/deck-invite-pending-gate";
 import { DeckDetailsSharePanel } from "@/components/deck-details/deck-details-share-panel";
@@ -73,7 +72,7 @@ export function DeckDetailsView() {
   const pendingInvite = useQuery(
     api.deckShares.getPendingInvitePreview,
     !isLoading && !deck && isAuthenticated && deckId
-      ? { deckId: deckId as Id<"decks"> }
+      ? { deckId }
       : "skip",
   );
 

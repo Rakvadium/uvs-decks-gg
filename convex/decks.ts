@@ -158,15 +158,17 @@ export const listTournament = query({
 export const getById = query({
   args: {
     game: v.optional(gameIdValidator),
-    deckId: v.id("decks"),
+    deckId: v.string(),
   },
   returns: v.union(deckValidator, v.null()),
   handler: async (ctx, rawArgs) => {
     const args = withResolvedGame(rawArgs);
-    const deck = await ctx.db.get(args.deckId);
+    const deckId = ctx.db.normalizeId("decks", args.deckId);
+    if (deckId === null) return null;
+    const deck = await ctx.db.get(deckId);
     // A deck is only visible on its own game's host.
     if (!isDocInGame(deck, args.game)) return null;
-    const allowed = await canViewDeck(ctx, deck, args.deckId);
+    const allowed = await canViewDeck(ctx, deck, deckId);
     if (!allowed) return null;
     return deck;
   },

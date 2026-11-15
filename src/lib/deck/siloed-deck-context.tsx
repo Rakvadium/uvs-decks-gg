@@ -74,10 +74,7 @@ interface SiloedDeckProviderProps {
 export function SiloedDeckProvider({ children, deckId }: SiloedDeckProviderProps) {
   const game = useGameId();
   const gameModule = useGameModule();
-  const deckData = useQuery(
-    api.decks.getById,
-    { game, deckId: deckId as Id<"decks"> }
-  );
+  const deckData = useQuery(api.decks.getById, { game, deckId });
   const cardIndex = useCardIndex();
 
   const addCardMutation = useMutation(api.decks.addCard);

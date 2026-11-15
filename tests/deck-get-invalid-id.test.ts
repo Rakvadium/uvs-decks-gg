@@ -57,8 +57,6 @@ function fakeCtx(signedInAs: Id<"users"> | null) {
             return c;
           },
           first: async () => rows()[0] ?? null,
-          unique: async () => rows()[0] ?? null,
-          collect: async () => rows(),
         };
         return c;
       },

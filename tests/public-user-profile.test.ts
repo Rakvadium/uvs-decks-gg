@@ -113,6 +113,7 @@ function fakeCtx(signedInAs: Id<"users"> | null) {
     },
     db: {
       get: async (id: string) => docs.get(id) ?? null,
+      normalizeId: (_table: string, id: string) => (docs.has(id) ? id : null),
       query: (table: string) => chain(tables[table] ?? []),
     },
   };
