@@ -3,7 +3,6 @@
 import {
   FloatingCapsuleCluster,
   FloatingPageBar,
-  FloatingPageTitle,
   FloatingSearchCapsule,
 } from "@/components/shell/floating-page-bar";
 import { useGalleryTopBarFiltersContext } from "../context";
@@ -28,7 +27,6 @@ export function GalleryTopBarIslandVariant() {
 
   return (
     <FloatingPageBar
-      left={<FloatingPageTitle>Card Gallery</FloatingPageTitle>}
       center={
         <div className="relative w-full min-w-0">
           <FloatingSearchCapsule
