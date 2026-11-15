@@ -561,7 +561,7 @@ export function SpinnerEntry() {
   return (
     <CatalogEntrySection
       id="spinner"
-      description={<p>The one spinner: <Code>Loader2</Code> with <Code>animate-spin</Code>. It takes the text colour around it, so a button spinner matches the label.</p>}
+      description={<p>The one spinner. Never spin an icon yourself; render <Code>Spinner</Code>. It takes the text colour around it, so a button spinner matches the label.</p>}
     >
       <Preview>
         <div className="flex flex-wrap items-end gap-6 text-muted-foreground">

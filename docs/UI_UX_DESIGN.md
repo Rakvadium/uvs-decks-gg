@@ -91,7 +91,7 @@ Pick the primitive by role. None of them takes a fill, border or radius from the
 | One-line notice above content | `Banner` | `rounded-surface border-surface bg-muted-elevated`, `text-xs` |
 | Nothing to show | `EmptyState` | `border-dashed border-placeholder bg-muted-tint rounded-surface`, slots `icon`, `title`, `description`, `action` |
 | Waiting for data | `LoadingState` | Centred `Spinner` and optional label in muted text, `role="status"` |
-| Spinner in a button or row | `Spinner` | `Loader2` with `animate-spin`, `size` `sm` / `md` / `lg`, takes the text colour around it |
+| Spinner in a button, row or toast | `Spinner` | The only spinner: never spin a lucide icon yourself. `size` `sm` / `md` / `lg`, takes the text colour around it |
 | Placeholder shape | `Skeleton` | `bg-muted animate-pulse rounded-md`, the one skeleton tone |
 
 `Card` and `Surface` are static. Hovering a card changes nothing unless the whole card is interactive and passes `fx`. `EmptyState` takes `variant` `page` (a page or tab), `panel` (a section, the default) or `inline` (a sidebar list or picker). The variant sets padding and type size only.
