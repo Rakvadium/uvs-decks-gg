@@ -82,7 +82,7 @@ async function fetchCatalogBytes(url: string): Promise<ArrayBuffer> {
   const controller = new AbortController();
   const timeout = window.setTimeout(() => controller.abort(), R2_FETCH_TIMEOUT_MS);
   try {
-    // No custom headers: the request must match the layout's `<link rel="preload">` to reuse it.
+    // No custom headers: the request must match the middleware's preload header to reuse it.
     const response = await fetch(url, { signal: controller.signal });
     if (!response.ok) {
       throw new Error(`Static catalog HTTP ${response.status}`);
@@ -100,7 +100,7 @@ export async function fetchStaticCatalog(args: {
   // The same-origin proxy goes first: the bucket's CORS rules don't list the app's hosts, so a
   // direct fetch fails after a wasted round trip. The direct URL is the fallback.
   const proxyPath = catalogProxyPath(args.catalogUrl);
-  // On first visits the gallery layout preloads the proxy URL, so this fetch reuses that download.
+  // On first visits the middleware preloads the proxy URL (catalog-preload.ts), so this fetch reuses that download.
   let compressed: ArrayBuffer;
   if (proxyPath) {
     try {
