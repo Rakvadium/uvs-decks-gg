@@ -3,10 +3,10 @@ import path from "node:path";
 import { Linter } from "eslint";
 import design, { designRules } from "../../tools/eslint-design/index.mjs";
 import parser from "../../tools/eslint-design/parser.mjs";
-import { rewriteButtonSizes } from "./button-sizes";
+import { rewriteControlSizes, type ControlPass } from "./control-sizes";
 import { rewriteSurfaces } from "./surfaces";
 
-const USAGE = `Usage: bun run design:codemod [--dry] [--buttons | --surfaces] <path>...
+const USAGE = `Usage: bun run design:codemod [--dry] [--buttons | --inputs | --surfaces] <path>...
 
 Applies the mechanical design-system rewrites (docs/UI_UX_DESIGN.md § Named utilities) to
 class strings in files under the given paths, and lists what is left for human judgment:
@@ -14,7 +14,9 @@ class strings in files under the given paths, and lists what is left for human j
   - rounded, rounded-sm (and side forms) -> rounded-md
   - raw z-30 ... z-[600] -> named z utilities
   - <Button> h-*, w-*, size-* and rounded-* overrides -> the Button size ladder (xs/sm/md/lg, icon-*)
-Only files under <path> are read or written. --dry writes nothing. --buttons runs only the <Button> pass.
+  - <Input> and <SelectTrigger> h-* and rounded-* overrides, and size="default" -> the size prop (xs/sm/md/lg)
+Only files under <path> are read or written. --dry writes nothing. --buttons runs only the <Button>
+pass, --inputs only the <Input> and <SelectTrigger> pass.
 --surfaces runs only the surface pass: <Badge> text-[10px]/h-5 -> size="sm", h-8 -> size="lg",
 self-closing animate-pulse divs on a muted fill -> <Skeleton>, Loader2 animate-spin -> <Spinner>.
 Exit 0 done, 1 a file could not be parsed, 2 bad usage.`;
@@ -32,7 +34,7 @@ const config: Linter.Config[] = [
     languageOptions: { parser, parserOptions: { ecmaFeatures: { jsx: true } } },
     linterOptions: { reportUnusedDisableDirectives: "off" },
     plugins: { design },
-    // The <Button> pass reports Button geometry itself as button/size-override.
+    // The control passes report Button, Input and SelectTrigger geometry as */size-override.
     rules: { ...designRules("warn"), "design/primitive-geometry": "off" },
   },
 ];
@@ -43,18 +45,29 @@ function lineStarts(code: string): number[] {
   return starts;
 }
 
+const PASS_RULE: Record<ControlPass, string> = { buttons: "button/size-override", inputs: "input/size-override" };
+
+type Pass = ControlPass | "surfaces";
+const PASS_FLAGS: Record<string, Pass> = { "--buttons": "buttons", "--inputs": "inputs", "--surfaces": "surfaces" };
+
 /** Rewrites one file's source. Pure: same input, same output; output is a fixed point. */
-export function transformSource(source: string, filename: string, { buttonsOnly = false, surfacesOnly = false } = {}): TransformResult {
+export function transformSource(source: string, filename: string, { only }: { only?: Pass } = {}): TransformResult {
   // ESLint drops a BOM and reports offsets without it; put it back after rewriting.
   const bom = source.startsWith("﻿") ? "﻿" : "";
-  if (surfacesOnly) {
-    const surfaces = rewriteSurfaces(bom ? source.slice(1) : source, filename);
+  let code = bom ? source.slice(1) : source;
+  if (only === "surfaces") {
+    const surfaces = rewriteSurfaces(code, filename);
     return { output: bom + surfaces.output, rewrites: surfaces.rewrites, left: surfaces.left.map((l) => ({ ...l, rule: "surface/left" })) };
   }
-  const buttons = rewriteButtonSizes(bom ? source.slice(1) : source, filename);
-  const buttonLeft = buttons.left.map((l) => ({ line: l.line, rule: "button/size-override", text: l.text, message: l.message }));
-  if (buttonsOnly) return { output: bom + buttons.output, rewrites: buttons.rewrites, left: buttonLeft };
-  const code = buttons.output;
+  const controlRewrites: Rewrite[] = [];
+  const controlLeft: Leftover[] = [];
+  for (const pass of only ? [only] : (Object.keys(PASS_RULE) as ControlPass[])) {
+    const result = rewriteControlSizes(code, filename, pass);
+    code = result.output;
+    controlRewrites.push(...result.rewrites);
+    controlLeft.push(...result.left.map((l) => ({ line: l.line, rule: PASS_RULE[pass], text: l.text, message: l.message })));
+  }
+  if (only) return { output: bom + code, rewrites: controlRewrites, left: controlLeft };
   const linter = new Linter({ configType: "flat" });
   const messages = linter.verify(code, config, path.basename(filename));
   const fatal = messages.find((m) => m.fatal || (m.ruleId === null && m.line === 0));
@@ -64,7 +77,7 @@ export function transformSource(source: string, filename: string, { buttonsOnly 
   const offset = (line: number, column: number) => starts[line - 1] + column - 1;
 
   const fixes: { range: [number, number]; text: string; line: number }[] = [];
-  const left: Leftover[] = buttonLeft;
+  const left: Leftover[] = controlLeft;
   for (const m of messages) {
     if (!m.ruleId?.startsWith("design/")) continue;
     const fix = m.suggestions?.[0]?.fix;
@@ -88,7 +101,7 @@ export function transformSource(source: string, filename: string, { buttonsOnly 
     floor = fix.range[0];
   }
   rewrites.reverse();
-  return { output: bom + output, rewrites: [...buttons.rewrites, ...rewrites], left };
+  return { output: bom + output, rewrites: [...controlRewrites, ...rewrites], left };
 }
 
 /** Source files under `target` (a file or a directory). */
@@ -116,13 +129,20 @@ export function run(argv: string[], options: RunOptions = {}): number {
   const err = options.err ?? ((line: string) => console.error(line));
 
   let dry = false;
-  let buttonsOnly = false;
-  let surfacesOnly = false;
+  let only: Pass | undefined;
   const targets: string[] = [];
   for (const arg of argv) {
     if (arg === "--dry") dry = true;
-    else if (arg === "--buttons") buttonsOnly = true;
-    else if (arg === "--surfaces") surfacesOnly = true;
+    else if (Object.hasOwn(PASS_FLAGS, arg)) {
+      const pass = PASS_FLAGS[arg];
+      if (only && only !== pass) {
+        err(`--buttons, --inputs and --surfaces are exclusive
+
+${USAGE}`);
+        return 2;
+      }
+      only = pass;
+    }
     else if (arg === "--help" || arg === "-h") {
       out(USAGE);
       return 0;
@@ -157,7 +177,7 @@ export function run(argv: string[], options: RunOptions = {}): number {
 
   for (const file of [...files].sort()) {
     const code = fs.readFileSync(file, "utf8");
-    const result = transformSource(code, file, { buttonsOnly, surfacesOnly });
+    const result = transformSource(code, file, { only });
     if (result.fatal) {
       err(`${rel(file)}: parse error ${result.fatal}; skipped`);
       failed++;

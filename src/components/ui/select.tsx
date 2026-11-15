@@ -4,6 +4,12 @@ import * as React from "react"
 import * as SelectPrimitive from "@radix-ui/react-select"
 import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from "lucide-react"
 
+import {
+  controlFieldClassName,
+  controlFocusClassName,
+  controlHeightClassName,
+  type ControlSize,
+} from "@/components/ui/control"
 import { cn } from "@/lib/utils"
 import { popoverSurfaceClassName } from "@/components/ui/popover"
 
@@ -25,31 +31,57 @@ function SelectValue({
   return <SelectPrimitive.Value data-slot="select-value" {...props} />
 }
 
+const SELECT_TRIGGER_SIZE: Record<ControlSize, string> = {
+  xs: "gap-1 px-2",
+  sm: "gap-1.5 px-2.5",
+  md: "gap-2 px-3",
+  lg: "gap-2 px-4",
+}
+
+const SELECT_TRIGGER_VARIANT = {
+  field: controlFieldClassName,
+  inline: cn(
+    "border-0 bg-transparent transition-colors duration-200 hover:bg-(--hover-bg) disabled:cursor-not-allowed disabled:opacity-50",
+    controlFocusClassName
+  ),
+} as const
+
+const SELECT_TRIGGER_SHAPE = {
+  control: "rounded-control",
+  island: "rounded-island",
+} as const
+
+export type SelectTriggerProps = React.ComponentProps<typeof SelectPrimitive.Trigger> & {
+  size?: ControlSize
+  variant?: keyof typeof SELECT_TRIGGER_VARIANT
+  shape?: keyof typeof SELECT_TRIGGER_SHAPE
+  hideIcon?: boolean
+  compactValue?: boolean
+}
+
 function SelectTrigger({
   className,
-  size = "default",
+  size = "md",
+  variant = "field",
+  shape = "control",
   hideIcon = false,
   compactValue = false,
   children,
   ...props
-}: React.ComponentProps<typeof SelectPrimitive.Trigger> & {
-  size?: "sm" | "default"
-  hideIcon?: boolean
-  compactValue?: boolean
-}) {
+}: SelectTriggerProps) {
   return (
     <SelectPrimitive.Trigger
       data-slot="select-trigger"
       data-size={size}
+      data-variant={variant}
       className={cn(
-        "flex w-fit items-center justify-between gap-2 rounded-md border border-[color:var(--control-dual-border)] bg-background-soft px-3 py-2 text-base md:text-sm whitespace-nowrap shadow-xs transition-[border-color,box-shadow,background-color,color] duration-200 outline-none",
-        "hover:border-[color:var(--control-dual-border-strong)] hover:bg-[color-mix(in_oklch,var(--primary)_6%,var(--secondary)_5%,var(--background)_89%)]",
-        "focus-visible:border-[color:var(--control-dual-border-strong)] focus-visible:ring-2 focus-visible:ring-[color:color-mix(in_oklch,var(--primary)_28%,var(--secondary)_28%,transparent)] focus-visible:shadow-[var(--chrome-focus-shadow)]",
-        "disabled:cursor-not-allowed disabled:opacity-50",
+        "flex w-fit items-center justify-between whitespace-nowrap",
+        SELECT_TRIGGER_VARIANT[variant],
+        SELECT_TRIGGER_SHAPE[shape],
+        controlHeightClassName[size],
+        SELECT_TRIGGER_SIZE[size],
         "data-[placeholder]:text-muted-foreground",
         "[&_svg:not([class*='text-'])]:text-muted-foreground",
-        "aria-invalid:ring-destructive-soft aria-invalid:border-destructive",
-        "data-[size=default]:h-10 data-[size=sm]:h-8",
         "chrome-label-case text-base md:text-sm",
         compactValue
           ? "[&>[data-slot=select-value]]:block [&>[data-slot=select-value]]:leading-none"

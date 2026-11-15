@@ -183,7 +183,7 @@ describe("Button size overrides", () => {
 });
 
 describe("surface pass", () => {
-  const surfaces = (code: string) => transformSource(code, "surfaces.tsx", { surfacesOnly: true });
+  const surfaces = (code: string) => transformSource(code, "surfaces.tsx", { only: "surfaces" });
 
   test("Badge text-[10px] and h-5 snap to size sm, h-8 to size lg", () => {
     const result = surfaces(`const a = <>
@@ -220,6 +220,61 @@ const a = <div>
 `);
     expect(result.left.map((l) => l.text)).toEqual(["size-2 animate-pulse rounded-full bg-success"]);
     expect(surfaces(result.output).rewrites).toEqual([]);
+  });
+});
+
+describe("Input and SelectTrigger size pass", () => {
+  const rewrite = (jsx: string) => transformSource(`const a = (
+  ${jsx}
+);
+`, "inputs.tsx", { only: "inputs" });
+
+  test("snaps height overrides onto the size prop and keeps widths", () => {
+    const cases: [string, string][] = [
+      [`<Input className="h-8 w-56 text-sm" />`, `<Input size="sm" className="w-56 text-sm" />`],
+      [`<Input className="h-10" />`, `<Input />`],
+      [`<Input className="h-7 min-w-0" />`, `<Input size="xs" className="min-w-0" />`],
+      [`<Input className="h-12 pl-10" />`, `<Input size="lg" className="pl-10" />`],
+      [`<SelectTrigger size="sm" className="h-8 w-full text-[10px]" />`, `<SelectTrigger size="sm" className="w-full text-[10px]" />`],
+      [`<SelectTrigger id="f" className="h-10 w-full" size="default" />`, `<SelectTrigger id="f" className="w-full" />`],
+      [`<SelectTrigger className="h-6 rounded-sm" />`, `<SelectTrigger size="xs" />`],
+    ];
+    for (const [from, to] of cases) expect(rewrite(from).output).toBe(`const a = (
+  ${to}
+);
+`);
+  });
+
+  test("a multi-line element gets the size on its own line", () => {
+    const from = `const a = (
+  <Input
+    value={v}
+    className="h-8 text-sm"
+  />
+);
+`;
+    expect(transformSource(from, "inputs.tsx", { only: "inputs" }).output).toBe(
+      `const a = (
+  <Input
+    size="sm"
+    value={v}
+    className="text-sm"
+  />
+);
+`
+    );
+  });
+
+  test("leaves Button alone and reports computed classes", () => {
+    expect(rewrite(`<Button className="h-7" />`).rewrites).toEqual([]);
+    expect(rewrite("<Input className={`h-8 ${extra}`} />").left.map((l) => l.rule)).toEqual(["input/size-override"]);
+  });
+
+  test("a second pass changes nothing", () => {
+    const once = rewrite(`<SelectTrigger size="default" className="h-8 w-28" />`);
+    const twice = transformSource(once.output, "inputs.tsx", { only: "inputs" });
+    expect(twice.rewrites).toEqual([]);
+    expect(twice.output).toBe(once.output);
   });
 });
 
@@ -295,6 +350,8 @@ describe("design:codemod CLI", () => {
   });
 
   test("bad usage exits 2", () => {
+    expect(exec(["--buttons", "--inputs", "target"]).code).toBe(2);
+    expect(exec(["--inputs", "--surfaces", "target"]).code).toBe(2);
     expect(exec([]).code).toBe(2);
     expect(exec(["missing-dir"]).code).toBe(2);
     expect(exec(["--nope", "target"]).code).toBe(2);

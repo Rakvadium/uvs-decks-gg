@@ -1,9 +1,9 @@
-import { LayoutGrid, List, Search, SlidersHorizontal, X } from "lucide-react";
+import { LayoutGrid, List, SlidersHorizontal, X } from "lucide-react";
 import { ViewModeOptions } from "@/components/gallery/gallery-top-bar-filters/view-mode-popover";
 import { CountBadge } from "@/components/ui/count-badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { SearchField } from "@/components/ui/search-field";
 import { useAvailableGallerySidebarContext } from "./context";
 
 const SIDEBAR_VIEW_MODES = ["card", "list"] as const;
@@ -19,23 +19,19 @@ export function DeckDetailsGallerySidebarBottomBar() {
   return (
     <div className="z-20 shrink-0 border-b border-border/40 bg-background/95 px-3 py-3 backdrop-blur-lg">
       <div className="flex w-full items-center gap-2">
-        <div className="relative min-w-0 flex-1">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-primary/70" />
-          <Input
-            placeholder={
-              state.searchMode === "name"
-                ? "Search by name…"
-                : state.searchMode === "text"
-                  ? "Search card text…"
-                  : "Search all fields…"
-            }
-            value={state.search}
-            onChange={(event) => actions.setSearch(event.target.value)}
-            className="border-primary-soft pl-9 text-sm shadow-[0_0_10px_-3px_var(--primary)] focus-visible:border-primary focus-visible:shadow-[0_0_15px_-3px_var(--primary)]"
-            name="deck-sidebar-gallery-search"
-            spellCheck={false}
-          />
-        </div>
+        <SearchField
+          placeholder={
+            state.searchMode === "name"
+              ? "Search by name…"
+              : state.searchMode === "text"
+                ? "Search card text…"
+                : "Search all fields…"
+          }
+          value={state.search}
+          onValueChange={actions.setSearch}
+          name="deck-sidebar-gallery-search"
+          className="flex-1"
+        />
 
         <Popover>
           <PopoverTrigger asChild>

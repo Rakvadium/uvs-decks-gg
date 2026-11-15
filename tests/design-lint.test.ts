@@ -310,6 +310,7 @@ describe("element and colour rules: invalid", () => {
       `  <IconToolbarButton className="size-8" />`,
       `  <TierListModerationBadge className="h-5 px-1.5" />`,
       `  <DialogCancel className="w-full" />`,
+      `  <SearchField value={q} onValueChange={setQ} className="h-10 w-56 rounded-full" />`,
       `</>;`,
     ].join("\n");
     expect(lint(code)).toEqual([
@@ -318,6 +319,8 @@ describe("element and colour rules: invalid", () => {
       { rule: "design/primitive-geometry", text: "rounded-md" },
       { rule: "design/primitive-geometry", text: "size-8" },
       { rule: "design/primitive-geometry", text: "h-5" },
+      { rule: "design/primitive-geometry", text: "h-10" },
+      { rule: "design/primitive-geometry", text: "rounded-full" },
     ]);
   });
 

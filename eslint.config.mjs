@@ -19,7 +19,12 @@ const eslintConfig = defineConfig([
     // `bun run lint:design [paths]` prints just these; `bun run design:codemod` applies the mechanical fixes.
     files: ["src/**/*.{js,jsx,mjs,ts,tsx,mts}"],
     plugins: { design },
-    rules: { ...designRules("warn"), "design/no-literal-color": "error" },
+    rules: {
+      ...designRules("warn"),
+      "design/no-literal-color": "error",
+      "design/no-transition-all": "error",
+      "design/no-hsl-border": "error",
+    },
   },
   globalIgnores([
     ".next/**",

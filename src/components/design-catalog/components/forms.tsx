@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
+import type { ControlSize } from "@/components/ui/control";
 import {
   Field,
   FieldContent,
@@ -18,7 +19,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { OptionTile } from "@/components/ui/option-tile";
-import { SearchBar, useSearchBarProps, type SearchBarProps, type SearchConfig } from "@/components/ui/search-bar";
+import { SearchField } from "@/components/ui/search-field";
 import {
   Select,
   SelectContent,
@@ -36,6 +37,8 @@ import { cn } from "@/lib/utils";
 import { CatalogEntrySection, Preview, SpecimenLabel } from "../specimen/entry";
 import { Code, CodeBlock } from "../specimen/code-block";
 
+const CONTROL_SIZES: ControlSize[] = ["xs", "sm", "md", "lg"];
+
 function StateCell({ label, children, className }: { label: string; children: React.ReactNode; className?: string }) {
   return (
     <div className={cn("min-w-0 space-y-1.5", className)}>
@@ -51,13 +54,23 @@ export function InputEntry() {
       id="input"
       description={
         <p>
-          <Code>h-10</Code>, dual control border, focus via <Code>--chrome-focus-shadow</Code>. Invalid is{" "}
+          <Code>size</Code> is <Code>xs</Code>, <Code>sm</Code>, <Code>md</Code> (default) or <Code>lg</Code> and reads{" "}
+          <Code>--control-h-*</Code>. <Code>Input</Code>, <Code>Textarea</Code> and <Code>SelectTrigger</Code> share one field
+          surface: <Code>rounded-control</Code>, <Code>bg-background-soft</Code>, the dual control border and the{" "}
+          <Code>--chrome-focus-shadow</Code> ring. Call sites never pass a height, radius or background. Invalid is{" "}
           <Code>aria-invalid</Code>, not a class. Text is <Code>text-base</Code> on phones so iOS doesn&apos;t zoom.
         </p>
       }
     >
       <Preview>
         <div className="grid gap-x-5 gap-y-5 sm:grid-cols-2 xl:grid-cols-3">
+          <StateCell label="Sizes" className="sm:col-span-2 xl:col-span-3">
+            <div className="grid items-end gap-3 sm:grid-cols-4">
+              {CONTROL_SIZES.map((size) => (
+                <Input key={size} size={size} placeholder={`size="${size}"`} aria-label={`Deck name (${size})`} />
+              ))}
+            </div>
+          </StateCell>
           <StateCell label="Placeholder">
             <Input placeholder="Deck name…" aria-label="Deck name (placeholder)" />
           </StateCell>
@@ -88,7 +101,7 @@ export function InputEntry() {
         </div>
       </Preview>
       <CodeBlock
-        code={`import { Input } from "@/components/ui/input"\nimport { Label } from "@/components/ui/label"\nimport { Textarea } from "@/components/ui/textarea"\n\n<Label htmlFor="name">Display name</Label>\n<Input id="name" aria-invalid={!!error} />\n<Textarea placeholder="Notes" />`}
+        code={`import { Input } from "@/components/ui/input"\nimport { Label } from "@/components/ui/label"\nimport { Textarea } from "@/components/ui/textarea"\n\n<Label htmlFor="name">Display name</Label>\n<Input id="name" aria-invalid={!!error} />\n<Input size="sm" placeholder="Lane name" />\n<Textarea placeholder="Notes" />`}
       />
     </CatalogEntrySection>
   );
@@ -169,10 +182,25 @@ const FORMATS = [
   { value: "draft", label: "Draft" },
 ];
 
-function FormatSelect(props: { size?: "sm" | "default"; disabled?: boolean; invalid?: boolean; label: string; placeholder?: boolean }) {
+function FormatSelect(props: {
+  size?: ControlSize;
+  variant?: "field" | "inline";
+  shape?: "control" | "island";
+  disabled?: boolean;
+  invalid?: boolean;
+  label: string;
+  placeholder?: boolean;
+}) {
   return (
     <Select defaultValue={props.placeholder ? undefined : "standard"} disabled={props.disabled}>
-      <SelectTrigger size={props.size} aria-invalid={props.invalid || undefined} aria-label={props.label} className="w-full">
+      <SelectTrigger
+        size={props.size}
+        variant={props.variant}
+        shape={props.shape}
+        aria-invalid={props.invalid || undefined}
+        aria-label={props.label}
+        className="w-full"
+      >
         <SelectValue placeholder="Choose a format" />
       </SelectTrigger>
       <SelectContent>
@@ -203,19 +231,32 @@ export function SelectEntry() {
       id="select"
       description={
         <p>
-          <Code>SelectTrigger size</Code> is <Code>default</Code> (h-10) or <Code>sm</Code> (h-8); <Code>hideIcon</Code>{" "}
-          and <Code>compactValue</Code> tune dense toolbars. Content portals at <Code>z-select</Code>. Open one to see
-          groups, labels, a separator and a disabled item.
+          <Code>SelectTrigger size</Code> matches <Code>Input</Code>: <Code>xs</Code>, <Code>sm</Code>, <Code>md</Code>{" "}
+          (default) or <Code>lg</Code>. <Code>variant=&quot;inline&quot;</Code> drops the field border and fill for a
+          trigger that sits inside another control&apos;s surface, such as a stat operator or a toolbar scope.{" "}
+          <Code>shape=&quot;island&quot;</Code> rounds it to <Code>--radius-island</Code> inside a floating island, like
+          the island buttons beside it.{" "}
+          <Code>hideIcon</Code> and <Code>compactValue</Code> tune dense toolbars. Content portals at{" "}
+          <Code>z-select</Code>. Open one to see groups, labels, a separator and a disabled item.
         </p>
       }
     >
       <Preview>
-        <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-5">
-          <StateCell label='size="default"'>
-            <FormatSelect label="Format (default size)" />
+        <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
+          {CONTROL_SIZES.map((size) => (
+            <StateCell key={size} label={`size="${size}"`}>
+              <FormatSelect size={size} label={`Format (${size})`} />
+            </StateCell>
+          ))}
+          <StateCell label='variant="inline"'>
+            <div className="flex h-(--control-h-md) items-center rounded-control border border-surface px-1">
+              <FormatSelect variant="inline" size="sm" label="Format (inline)" />
+            </div>
           </StateCell>
-          <StateCell label='size="sm"'>
-            <FormatSelect size="sm" label="Format (small)" />
+          <StateCell label='variant="inline" shape="island"'>
+            <div className="flex h-(--control-h-md) items-center rounded-island border border-surface px-1">
+              <FormatSelect variant="inline" shape="island" size="sm" label="Format (island)" />
+            </div>
           </StateCell>
           <StateCell label="Placeholder">
             <FormatSelect placeholder label="Format (placeholder)" />
@@ -238,7 +279,16 @@ export function SelectEntry() {
 export function ChoiceControlsEntry() {
   const [range, setRange] = useState([2, 6]);
   return (
-    <CatalogEntrySection id="choice-controls" description={<p>Radix-backed, so keyboard and labels come for free: pair each with a <Code>Label htmlFor</Code>.</p>}>
+    <CatalogEntrySection
+      id="choice-controls"
+      description={
+        <p>
+          Radix-backed, so keyboard and labels come for free: pair each with a <Code>Label htmlFor</Code>. A checked{" "}
+          <Code>Switch</Code> reads <Code>--selected-bg</Code>, <Code>--selected-border</Code> and{" "}
+          <Code>--selected-fg</Code>, and focuses with the input ring.
+        </p>
+      }
+    >
       <div className="grid gap-4 lg:grid-cols-3">
         <Preview label="Checkbox">
           <ul className="space-y-3">
@@ -363,48 +413,40 @@ export function OptionTileEntry() {
   );
 }
 
-const SEARCH_CONFIG: SearchConfig = {
-  placeholder: "Search tier lists…",
-  quickFilters: (
-    <div className="space-y-2 text-sm">
-      <div className="font-medium">Quick filters</div>
-      <div className="flex flex-wrap gap-1.5">
-        <Badge tone="outline">Standard</Badge>
-        <Badge tone="outline">This week</Badge>
-        <Badge tone="outline">Mine</Badge>
-      </div>
-    </div>
-  ),
-  advancedFilters: <p className="py-4 text-sm text-muted-foreground">Advanced filters render in a Dialog (size=&quot;xl&quot;).</p>,
-  leftButton: { label: "Advanced", opensAdvancedFilters: true },
-  rightButton: { label: "Search" },
-};
-
 export function SearchFieldsEntry() {
-  const searchBar: SearchBarProps = useSearchBarProps(SEARCH_CONFIG);
+  const [query, setQuery] = useState("");
+  const [filled, setFilled] = useState("Arcane");
 
   return (
     <CatalogEntrySection
       id="search-fields"
       description={
         <p>
-          <Code>SearchBar</Code> adds a quick-filter popover and an advanced dialog; <Code>useSearchBarProps</Code> wires
-          its state.
+          <Code>SearchField</Code> is the one in-page search: an <Code>Input</Code> with a search icon and a clear button
+          that shows once there is text. It takes <Code>value</Code>, <Code>onValueChange</Code> and the{" "}
+          <Code>Input</Code> sizes, and labels itself from the placeholder. <Code>className</Code> sets layout on the
+          wrapper only. The floating header search is the island capsule, not this field.
         </p>
       }
     >
-      <Preview label="SearchBar">
-        <div className="space-y-4">
-          <StateCell label="Plain (no popover)">
-            <SearchBar placeholder="Search decks…" />
+      <Preview label="SearchField">
+        <div className="grid gap-4 sm:grid-cols-2">
+          <StateCell label="Empty">
+            <SearchField value={query} onValueChange={setQuery} placeholder="Search tier lists…" />
           </StateCell>
-          <StateCell label="Quick filters + advanced dialog (desktop toolbar; popover is min-w 800px)">
-            <SearchBar {...searchBar} />
+          <StateCell label="With text (clear button)">
+            <SearchField value={filled} onValueChange={setFilled} placeholder="Search sets…" />
+          </StateCell>
+          <StateCell label='size="sm"'>
+            <SearchField value={query} onValueChange={setQuery} size="sm" placeholder="Search keywords…" />
+          </StateCell>
+          <StateCell label="Disabled">
+            <SearchField value="" onValueChange={() => {}} disabled placeholder="Search decks…" />
           </StateCell>
         </div>
       </Preview>
       <CodeBlock
-        code={`import { SearchBar, useSearchBarProps } from "@/components/ui/search-bar"\n\nconst searchBar = useSearchBarProps({ placeholder: "Search…", quickFilters, advancedFilters })\n<SearchBar {...searchBar} />`}
+        code={`import { SearchField } from "@/components/ui/search-field"\n\n<SearchField\n  value={query}\n  onValueChange={setQuery}\n  placeholder="Search tier lists…"\n  className="w-full max-w-[30rem]"\n/>`}
       />
     </CatalogEntrySection>
   );

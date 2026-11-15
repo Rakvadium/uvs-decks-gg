@@ -5,8 +5,8 @@ import * as m from "framer-motion/m";
 import { usePrefersReducedMotion } from "@/lib/reduced-motion";
 import { Layers3, Presentation } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { EmptyState } from "@/components/ui/empty-state";
+import { SearchField } from "@/components/ui/search-field";
 import { cn } from "@/lib/utils";
 import { useCommunityTierListDetailContext } from "./context";
 import { CommunityTierListPresentationCard } from "./presentation-card";
@@ -67,11 +67,12 @@ export function CommunityTierListDetailPoolPanel() {
 
           <div className="flex flex-col gap-2 sm:flex-row lg:items-center">
             {!isPresentationMode ? (
-              <Input
+              <SearchField
                 value={poolSearch}
-                onChange={(event) => setPoolSearch(event.target.value)}
+                onValueChange={setPoolSearch}
                 placeholder="Search the pool"
-                className="h-10 min-w-0 sm:w-64"
+                name="tier-list-pool-search"
+                className="sm:w-64"
               />
             ) : null}
             <Button

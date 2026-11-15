@@ -251,8 +251,8 @@ export const CATALOG_CHAPTERS = [
         id: "input",
         label: "Input",
         ui: [
-          { file: "input.tsx", exports: ["Input"] },
-          { file: "textarea.tsx", exports: ["Textarea"] },
+          { file: "input.tsx", exports: ["Input", "InputProps"] },
+          { file: "textarea.tsx", exports: ["Textarea", "TextareaProps"] },
           { file: "label.tsx", exports: ["Label"] },
         ],
       },
@@ -293,6 +293,7 @@ export const CATALOG_CHAPTERS = [
               "SelectScrollUpButton",
               "SelectSeparator",
               "SelectTrigger",
+              "SelectTriggerProps",
               "SelectValue",
             ],
             documentedOnly: {
@@ -320,7 +321,7 @@ export const CATALOG_CHAPTERS = [
         id: "search-fields",
         label: "Search fields",
         ui: [
-          { file: "search-bar.tsx", exports: ["SearchBar", "useSearchBarProps", "SearchConfig", "SearchBarProps"] },
+          { file: "search-field.tsx", exports: ["SearchField", "SearchFieldProps"] },
         ],
       },
     ],
