@@ -1,12 +1,11 @@
 import { describe, expect, test } from "bun:test";
-import { createElement } from "react";
+import { createElement, type ComponentProps } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { FloatingPageLayout, type PageWash } from "../src/components/shell/floating-page-bar";
 
 function render(pageWash?: PageWash) {
-  const html = renderToStaticMarkup(
-    createElement(FloatingPageLayout, { bar: createElement("nav", null, "bar"), pageWash, children: "body" })
-  );
+  const props: ComponentProps<typeof FloatingPageLayout> = { bar: createElement("nav", null, "bar"), pageWash, children: "body" };
+  const html = renderToStaticMarkup(createElement(FloatingPageLayout, props));
   const wash = html.match(/<div aria-hidden="true" data-slot="page-wash" data-wash="([a-z]+)" class="([^"]*)"/);
   return { html, washName: wash?.[1], washClasses: wash?.[2].split(/\s+/) ?? [] };
 }
