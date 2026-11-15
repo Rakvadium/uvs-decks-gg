@@ -82,10 +82,8 @@ export function CommunityTierListsPageMobileScopeControl() {
 
   return (
     <SegmentedControl
-      size="sm"
       stretch
-      className="w-full bg-muted/30 md:hidden"
-      itemClassName="h-10"
+      className="w-full md:hidden"
       value={activeTab}
       onValueChange={(value) => setActiveTab(value as typeof activeTab)}
       items={browserTabs.map((tab) => ({

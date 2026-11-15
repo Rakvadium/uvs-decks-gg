@@ -110,7 +110,7 @@ export const CATALOG_CHAPTERS = [
     id: "actions",
     group: "Components",
     label: "Actions",
-    summary: "Buttons and the two single-choice toggles.",
+    summary: "Buttons and the segmented toggle.",
     entries: [
       {
         id: "button",
@@ -121,16 +121,6 @@ export const CATALOG_CHAPTERS = [
         id: "segmented-control",
         label: "SegmentedControl",
         ui: [{ file: "segmented-control.tsx", exports: ["SegmentedControl", "SegmentedControlItem"] }],
-      },
-      {
-        id: "toggle-group",
-        label: "ToggleGroup",
-        ui: [
-          {
-            file: "toggle-group.tsx",
-            exports: ["ToggleGroup", "ToggleGroupItem", "ToggleGroupProps", "ToggleGroupItemProps"],
-          },
-        ],
       },
     ],
   },
@@ -286,6 +276,11 @@ export const CATALOG_CHAPTERS = [
           { file: "switch.tsx", exports: ["Switch"] },
           { file: "slider.tsx", exports: ["Slider"] },
         ],
+      },
+      {
+        id: "option-tile",
+        label: "OptionTile",
+        ui: [{ file: "option-tile.tsx", exports: ["OptionTile", "OptionTileProps"] }],
       },
       {
         id: "search-fields",

@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { api } from "../../../../convex/_generated/api";
 import type { Id } from "../../../../convex/_generated/dataModel";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { SegmentedControl } from "@/components/ui/segmented-control";
 import {
   Table,
   TableBody,
@@ -25,6 +25,12 @@ const COLLAB_LABEL: Record<string, string> = {
 };
 
 type CollabFilter = "all" | "team_viewable" | "team_editable";
+
+const COLLAB_FILTER_ITEMS: { value: CollabFilter; label: string }[] = [
+  { value: "all", label: "All" },
+  { value: "team_viewable", label: COLLAB_LABEL.team_viewable },
+  { value: "team_editable", label: COLLAB_LABEL.team_editable },
+];
 
 interface TeamHubDecksContentProps {
   teamId: string;
@@ -73,11 +79,13 @@ export function TeamHubDecksContent({ teamId }: TeamHubDecksContentProps) {
         <p className="chrome-label-case mb-2 text-xs text-muted-foreground">
           Collaboration
         </p>
-        <ToggleGroup type="single" value={filter} onValueChange={(v) => v && setFilter(v as CollabFilter)}>
-          <ToggleGroupItem value="all">All</ToggleGroupItem>
-          <ToggleGroupItem value="team_viewable">View only</ToggleGroupItem>
-          <ToggleGroupItem value="team_editable">Editable by team</ToggleGroupItem>
-        </ToggleGroup>
+        <SegmentedControl
+          size="sm"
+          aria-label="Collaboration"
+          value={filter}
+          onValueChange={(value) => setFilter(value as CollabFilter)}
+          items={COLLAB_FILTER_ITEMS}
+        />
       </div>
       {isEmpty ? (
         <div

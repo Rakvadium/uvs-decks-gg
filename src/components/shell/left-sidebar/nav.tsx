@@ -69,9 +69,6 @@ export function LeftSidebarNav() {
                     </span>
                   ) : null}
                 </span>
-                {isActive ? (
-                  <div className="pointer-events-none absolute inset-0 rounded-md border border-accent/50" />
-                ) : null}
               </Link>
             );
 

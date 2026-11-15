@@ -12,6 +12,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { OptionTile } from "@/components/ui/option-tile";
 import { cn } from "@/lib/utils";
 import { useCommunityTierListsPageContext } from "./context";
 import {
@@ -116,16 +117,11 @@ export function CommunityTierListsPageCreateDialog() {
                     const isSelected = newRankingScope === option.value;
 
                     return (
-                      <button
+                      <OptionTile
                         key={option.value}
-                        type="button"
+                        selected={isSelected}
                         onClick={() => setNewRankingScope(option.value)}
-                        className={cn(
-                          "rounded-xl border px-4 py-3 text-left transition-colors",
-                          isSelected
-                            ? "border-primary/60 bg-primary/10 shadow-[0_0_15px_-10px_var(--primary)]"
-                            : "border-border/50 bg-background/50 hover:border-primary/30 hover:bg-primary/5"
-                        )}
+                        className="px-4 py-3 text-left"
                       >
                         <div className="flex items-center justify-between gap-3">
                           <div>
@@ -135,11 +131,11 @@ export function CommunityTierListsPageCreateDialog() {
                           <span
                             className={cn(
                               "inline-flex h-3 w-3 shrink-0 rounded-full border transition-colors",
-                              isSelected ? "border-primary bg-primary" : "border-border/50 bg-transparent"
+                              isSelected ? "border-(--selected-border) bg-(--selected-fg)" : "border-surface bg-transparent"
                             )}
                           />
                         </div>
-                      </button>
+                      </OptionTile>
                     );
                   })}
                 </div>

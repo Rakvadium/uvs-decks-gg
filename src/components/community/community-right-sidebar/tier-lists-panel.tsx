@@ -34,7 +34,7 @@ export function CommunityTierListsSidebarPanel() {
     <div className="flex h-full min-h-0 flex-col">
       <Tabs defaultValue="public" className="flex min-h-0 flex-1 flex-col gap-0">
         <div className="shrink-0 border-b border-border/30 px-3 pb-0 pt-2">
-          <TabsList className="h-10 w-full max-w-none">
+          <TabsList className="w-full max-w-none">
             <TabsTrigger value="public" className="flex-1">
               Public
             </TabsTrigger>

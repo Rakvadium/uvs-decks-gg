@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { OptionTile } from "@/components/ui/option-tile";
 import { cn } from "@/lib/utils";
 import { SIZE_MAP } from "./constants";
 import type { SymbolBadgeProps } from "./types";
@@ -11,14 +12,10 @@ export function SymbolBadge({ symbol, selected, onClick, size = "sm", className 
   const pixelSize = SIZE_MAP[size];
 
   return (
-    <button
-      type="button"
+    <OptionTile
+      selected={Boolean(selected)}
       onClick={onClick}
-      className={cn(
-        "inline-flex items-center justify-center rounded-md border p-1.5 transition-colors",
-        selected ? "border-primary bg-primary/10" : "border-border/50 bg-background hover:bg-muted",
-        className
-      )}
+      className={cn("inline-flex items-center justify-center p-1.5", className)}
       title={symbol}
     >
       {path ? (
@@ -26,6 +23,6 @@ export function SymbolBadge({ symbol, selected, onClick, size = "sm", className 
       ) : (
         <span className="text-xs">{symbol}</span>
       )}
-    </button>
+    </OptionTile>
   );
 }

@@ -91,7 +91,7 @@ Do not use `hsl(var(--border)…)` — theme borders are oklch via `var(--border
 
 Avoid one-off `rounded-[Npx]` except micro geometry (e.g. tooltip arrows). Dialogs use this same ladder — panel `rounded-lg`, fields and footer buttons `rounded-md` — not a one-off dialog radius.
 
-Bare `rounded` and `rounded-sm` are off-ladder: `rounded` is a static 4px that ignores the chrome `--radius`, so it drifts from every other control. Badges, tooltips, and segmented controls are `rounded-md`. Buttons take their radius from `shape` ([Buttons](#buttons)).
+Bare `rounded` and `rounded-sm` are off-ladder: `rounded` is a static 4px that ignores the chrome `--radius`, so it drifts from every other control. Badges and tooltips are `rounded-md`. Segmented controls, tabs and option tiles are `rounded-control`. Buttons take their radius from `shape` ([Buttons](#buttons)).
 
 `rounded-2xl` and larger are off-ladder too. Use `rounded-surface` or `rounded-xl`. Corner-only forms such as `rounded-tl-lg rounded-br-lg` hand-build a notch shape; round every corner instead. Side forms such as `rounded-t-xl` are fine. `design/radius-ladder` reports all of these.
 
@@ -137,6 +137,21 @@ Every variant keeps `chrome-label-case` and its `--chrome-button-shadow-*` hooks
 Every floating header element is one island element: `rounded-island`, height `--control-h-md`, an opaque `--background` fill and the gradient ring in its 1px border (`floatingIslandSurfaceClassName` in `src/components/shell/floating-island.tsx`). Capsules, the back pill, the tabs pill, the search capsule and `FloatingActionPill` all use it, so one chrome gives them one radius and one height.
 
 `FloatingActionPill` takes `default`, `secondary`, `destructive` or `floating`. `floating` is the secondary action on the island fill. Outline and ghost pills don't compile, because content scrolls under the header.
+
+## Selected state and toggles
+
+Every selected or active state reads the selected role tokens through the Tailwind variable shorthand: `bg-(--selected-bg)`, `border-(--selected-border)` and `text-(--selected-fg)`. Idle hover on a selectable item reads `hover:bg-(--hover-bg)`. Never write `bg-primary/*` or `bg-accent/*` for selection. The tokens follow the accent, so a custom palette moves every selected state at once.
+
+| Need | Primitive | Selected state |
+|------|-----------|----------------|
+| Sidebar nav item, right rail button | `SHELL_NAV_ITEM_ACTIVE`, `SHELL_RAIL_ITEM_ACTIVE` in `src/components/shell/shell-chrome.ts` | Fill, border and text from the selected tokens |
+| Header tabs on the floating bar | `FloatingTabsPill` | Fill and text. Items are `--control-h-sm` tall and stay `rounded-island` inside the island |
+| In-content toggle, one choice | `SegmentedControl` with `value` and `onValueChange` | Fill and text |
+| In-content toggle, several choices | `SegmentedControl` with `values` and `onToggle` | Fill and text |
+| Tabbed panels with arrow-key focus | `Tabs`, `TabsList`, `TabsTrigger` | Fill and text |
+| Selectable card, chip or list row | `OptionTile` (`variant` `outline` or `ghost`) | Fill, border and text |
+
+`SegmentedControl` `size` is `xs`, `sm` or `md` (default) and sets the height from `--control-h-xs`, `-sm` or `-md`. `TabsList` is `--control-h-md`. Both use `rounded-control`. Call sites don't override their height or background. `OptionTile` owns its radius, border, fill and focus ring, so the call site sets layout and padding only. Every one of these primitives has a `focus-visible:` ring.
 
 ## Z-index stack
 

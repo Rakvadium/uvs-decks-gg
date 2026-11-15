@@ -42,8 +42,10 @@ export function TabsEntry() {
       id="tabs"
       description={
         <p>
-          The same <Code>tab-container</Code> chrome as <Code>SegmentedControl</Code>, but with Radix tab semantics (arrow
-          keys move between triggers). Pass <Code>orientation</Code> to both <Code>Tabs</Code> and <Code>TabsList</Code>.
+          The same container as <Code>SegmentedControl</Code>, but with Radix tab semantics (arrow keys move between
+          triggers). The list is <Code>--control-h-md</Code> tall with <Code>rounded-control</Code>; the active trigger
+          reads <Code>--selected-bg</Code> and <Code>--selected-fg</Code>, and hover reads <Code>--hover-bg</Code>. Pass{" "}
+          <Code>orientation</Code> to both <Code>Tabs</Code> and <Code>TabsList</Code>.
         </p>
       }
     >

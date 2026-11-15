@@ -15,6 +15,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { OptionTile } from "@/components/ui/option-tile";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { GameSetupCardPickerDialogProps } from "@/games/types";
 import { useCardIdMap } from "@/hooks/useCardIdMap";
@@ -146,23 +147,18 @@ export function LegendPickerDialog({ open, onOpenChange, setup, onChange, slotIn
                 const disabled = Boolean(disabledReason) || pendingId !== null;
                 return (
                   <li key={card._id}>
-                    <button
-                      type="button"
+                    <OptionTile
+                      variant="ghost"
+                      selected={selected}
                       disabled={disabled}
-                      aria-pressed={selected}
                       title={disabledReason ?? undefined}
                       onClick={() => void handlePick(card._id as Id<"cards">)}
-                      className={cn(
-                        "group relative block w-full rounded-lg p-1 text-left transition-colors",
-                        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
-                        selected ? "bg-primary/20" : "enabled:hover:bg-primary/10",
-                        disabledReason && "cursor-not-allowed opacity-50"
-                      )}
+                      className={cn("group relative block w-full p-1 text-left", !disabledReason && "disabled:opacity-100")}
                     >
                       <LegendArt
                         card={card}
                         sizes="(max-width: 640px) 45vw, 180px"
-                        className={cn("ring-1", selected ? "ring-2 ring-primary" : "ring-border/50")}
+                        className={cn("ring-1", selected ? "ring-2 ring-(--selected-border)" : "ring-border/50")}
                       />
                       {selected ? (
                         <span className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-[var(--chrome-elevation-low)]">
@@ -185,7 +181,7 @@ export function LegendPickerDialog({ open, onOpenChange, setup, onChange, slotIn
                       {disabledReason ? (
                         <span className="mt-0.5 block text-[10px] leading-tight text-muted-foreground">{disabledReason}</span>
                       ) : null}
-                    </button>
+                    </OptionTile>
                   </li>
                 );
               })}

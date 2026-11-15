@@ -107,10 +107,10 @@ export function FloatingTabsPill({
             onClick={() => onValueChange(item.value)}
             aria-pressed={isActive}
             className={cn(
-              "chrome-label-case flex h-8 shrink-0 items-center gap-1.5 rounded-island px-3 text-[11px] font-semibold transition-colors duration-150",
+              "chrome-label-case flex h-(--control-h-sm) shrink-0 items-center gap-1.5 rounded-island px-3 text-[11px] font-semibold outline-none transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-ring",
               isActive
-                ? "bg-primary/15 text-primary"
-                : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
+                ? "bg-(--selected-bg) text-(--selected-fg)"
+                : "text-muted-foreground hover:bg-(--hover-bg) hover:text-foreground"
             )}
           >
             {Icon ? <Icon className="size-3.5 shrink-0" /> : null}
@@ -119,7 +119,7 @@ export function FloatingTabsPill({
               <span
                 className={cn(
                   "rounded-island px-1.5 py-px text-[10px]",
-                  isActive ? "bg-primary/20" : "bg-muted/70"
+                  isActive ? "bg-(--selected-bg)" : "bg-muted-elevated"
                 )}
               >
                 {item.badge}
@@ -168,7 +168,7 @@ export function FloatingSearchCapsule({
       {value.length > 0 ? (
         <button
           type="button"
-          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-island text-[color:var(--control-dual-mix)] transition-colors hover:bg-[color:var(--control-dual-surface-hover)] hover:text-primary"
+          className="flex size-(--control-h-xs) shrink-0 items-center justify-center rounded-island text-[color:var(--control-dual-mix)] outline-none transition-colors hover:bg-[color:var(--control-dual-surface-hover)] hover:text-primary focus-visible:ring-2 focus-visible:ring-ring"
           aria-label="Clear search"
           onClick={() => onChange("")}
         >

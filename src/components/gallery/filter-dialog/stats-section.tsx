@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { getFilterGroupLayout, type GameZoneFilterDescriptor } from "@shared/games/filters";
 import { useGameModule } from "@/games/game-context";
+import { SegmentedControl } from "@/components/ui/segmented-control";
 import { cn } from "@/lib/utils";
 import { useGalleryFilterDialogContext } from "./context";
 import { StatInput } from "./stat-input";
@@ -22,28 +23,15 @@ function ZoneSelector({
       {!hideZoneLabel ? (
         <span className="w-14 shrink-0 text-[11px] text-muted-foreground md:w-16">{descriptor.label}</span>
       ) : null}
-      <div className="flex h-7 min-w-0 flex-1 items-center overflow-hidden rounded-md border border-border/50 bg-background/50">
-        {descriptor.options.map((zone, index) => {
-          const selected = selectedZones.includes(zone);
-
-          return (
-            <button
-              key={zone}
-              type="button"
-              className={cn(
-                "h-full flex-1 text-[10px] transition-colors",
-                index !== 0 && "border-l border-border/50",
-                selected
-                  ? "bg-primary/20 text-primary shadow-[var(--chrome-filter-tile-shadow-selected-inset)]"
-                  : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
-              )}
-              onClick={() => toggleStringFilter(filterKey, zone)}
-            >
-              {zone}
-            </button>
-          );
-        })}
-      </div>
+      <SegmentedControl
+        size="xs"
+        stretch
+        aria-label={descriptor.label}
+        className="min-w-0 flex-1"
+        values={selectedZones}
+        onToggle={(zone) => toggleStringFilter(filterKey, zone)}
+        items={descriptor.options.map((zone) => ({ value: zone, label: zone }))}
+      />
     </div>
   );
 }

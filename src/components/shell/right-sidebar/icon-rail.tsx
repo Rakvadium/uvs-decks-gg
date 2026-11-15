@@ -68,7 +68,7 @@ export function RightSidebarIconRail() {
             <Tooltip key={slot.id}>
               <TooltipTrigger asChild>
                 <Button
-                  variant="ghost"
+                  variant={null}
                   size="icon"
                   className={cn(
                     "relative border transition-[color,background-color,border-color,box-shadow] duration-200",

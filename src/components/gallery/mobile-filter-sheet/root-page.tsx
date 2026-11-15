@@ -24,7 +24,7 @@ import {
 import { useActiveChips } from "./use-active-chips";
 import { ColorFacetChips } from "./color-facet-chips";
 
-const segmentedItemClassName = "h-10 text-[13px] normal-case tracking-normal";
+const segmentedItemClassName = "text-[13px] normal-case tracking-normal";
 const compactChipClassName = "h-7 gap-1 px-2.5 text-xs";
 const compactChipRowClassName = "gap-1.5";
 
@@ -58,8 +58,7 @@ function SearchGroup() {
       <FilterRow>
         <SegmentedControl
           stretch
-          size="sm"
-          className="w-full bg-muted/30"
+          className="w-full"
           itemClassName={segmentedItemClassName}
           value={state.searchMode}
           onValueChange={(value) => actions.setSearchMode(value as "name" | "text" | "all")}
@@ -528,8 +527,7 @@ function DisplayGroup() {
       <FilterRow className="flex items-center gap-3">
         <SegmentedControl
           stretch
-          size="sm"
-          className="min-w-0 flex-1 bg-muted/30"
+          className="min-w-0 flex-1"
           itemClassName={segmentedItemClassName}
           value={mode}
           onValueChange={(value) => setMode(value as GalleryMobileFilterDisplayMode)}
@@ -540,8 +538,7 @@ function DisplayGroup() {
         />
         {!override && mode === "card" ? (
           <SegmentedControl
-            size="sm"
-            className="shrink-0 bg-muted/30"
+            className="shrink-0"
             itemClassName={cn(segmentedItemClassName, "w-11 px-0")}
             value={String(state.cardsPerRow)}
             onValueChange={(value) => actions.setCardsPerRow(Number(value))}
