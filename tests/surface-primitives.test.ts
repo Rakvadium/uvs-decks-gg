@@ -1,4 +1,7 @@
 import { describe, expect, test } from "bun:test";
+import { readFileSync } from "node:fs";
+import path from "node:path";
+import { Glob } from "bun";
 import { createElement, type ReactElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { Inbox } from "lucide-react";
@@ -12,6 +15,8 @@ import { EmptyState } from "../src/components/ui/empty-state";
 import { LoadingState } from "../src/components/ui/loading-state";
 import { Panel } from "../src/components/ui/panel";
 import { Skeleton } from "../src/components/ui/skeleton";
+import { ButtonEntry } from "../src/components/design-catalog/components/actions";
+import { SpinnerEntry } from "../src/components/design-catalog/components/display";
 
 function classesOf(element: ReactElement): string[] {
   const match = renderToStaticMarkup(element).match(/class="([^"]*)"/);
@@ -135,5 +140,25 @@ describe("panels, feedback and counts", () => {
     expect(classesOf(createElement(Chip, { size: "xs" }, "Fire"))).toContain("h-(--control-h-xs)");
     const filterChip = createElement(FilterChip, { label: "Fire", selected: false, onClick: () => {}, size: "xs" });
     expect(classesOf(filterChip)).toContain("h-(--control-h-xs)");
+  });
+});
+
+describe("Spinner is the one spinner", () => {
+  test("no user-facing file imports a lucide loader icon itself", () => {
+    const root = path.join(import.meta.dir, "..");
+    const offenders = [...new Glob("src/**/*.{ts,tsx}").scanSync(root)]
+      .map((file) => file.replaceAll("\\", "/"))
+      .filter((file) => file !== "src/components/ui/spinner.tsx" && !/(^|\/)admin[-/]/.test(file))
+      .filter((file) => /import\s*\{[^}]*(?<![A-Za-z])Loader(?:2|Circle)?(?:Icon)?(?![A-Za-z0-9])[^}]*\}\s*from\s*"lucide-react"/.test(readFileSync(path.join(root, file), "utf8")))
+      .sort();
+    expect(offenders).toEqual([]);
+  });
+
+  test("the catalog shows and recommends Spinner, never a raw Loader2", () => {
+    for (const entry of [ButtonEntry, SpinnerEntry]) {
+      const html = renderToStaticMarkup(createElement(entry));
+      expect(html).not.toContain("Loader2");
+      expect(html).toContain('data-slot="spinner"');
+    }
   });
 });
