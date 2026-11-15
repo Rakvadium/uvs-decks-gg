@@ -1,6 +1,6 @@
 import { afterAll, afterEach, describe, expect, mock, test } from "bun:test";
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
-import { act, createElement, type ComponentType, type ReactElement, type ReactNode } from "react";
+import { act, createElement, useLayoutEffect, type ComponentType, type ReactElement, type ReactNode } from "react";
 
 const EMPTY_QUERIES: Record<string, unknown> = {
   "teams/permissions:getTeam": { _id: "team-1", name: "Team" },
@@ -29,6 +29,9 @@ const router = { push: () => {}, replace: () => {}, back: () => {}, forward: () 
 mock.module("next/navigation", () => ({ ...realNavigation, useRouter: () => router }));
 
 GlobalRegistrator.register();
+// Radix picks a no-op useLayoutEffect when it first loads without a document, and bun shares
+// that module across test files, so restore the browser binding Presence needs to swap tab panels.
+mock.module("@radix-ui/react-use-layout-effect", () => ({ useLayoutEffect }));
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 const { createRoot } = await import("react-dom/client");
 const { GameProvider } = await import("../src/games/game-context");
