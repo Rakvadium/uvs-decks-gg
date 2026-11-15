@@ -128,10 +128,20 @@ mock.module("../src/games/registry", () => ({
   },
 }));
 
+// The route param reaches the server as typed. Like the Convex client, a query whose own arg
+// validator is `v.id` throws on a string that is not an id.
+const { getDetail } = await import("../convex/tierLists");
+const tierListIdArg = JSON.parse((getDetail as unknown as { exportArgs: () => string }).exportArgs()).value
+  .tierListId.fieldType as { type: string };
+const NOT_AN_ID = "not-a-real-id";
+
 mock.module("convex/react", () => ({
   ...realConvexReact,
   useQuery: (_ref: unknown, args?: { tierListId?: string }) => {
     useStore();
+    if (args?.tierListId === NOT_AN_ID && tierListIdArg.type === "id") {
+      throw new Error(`ArgumentValidationError: Value does not match validator. Value: "${NOT_AN_ID}"`);
+    }
     return args?.tierListId ? store.details.get(args.tierListId) : undefined;
   },
   useMutation: (ref: unknown) => {
@@ -423,6 +433,18 @@ function expectBadgesMatchTiles() {
 }
 
 const withoutMissingCard = () => FULL_CATALOG.filter((entry) => entry._id !== MISSING_FROM_OLD_CACHE);
+
+describe("a route param that is not a tier list id", () => {
+  test("yields the unavailable state (detail null) and never saves", async () => {
+    store.catalog = current();
+    store.details.set(NOT_AN_ID, null);
+    const { result } = mount(NOT_AN_ID);
+    await update(() => {});
+    expect(result.current.detail).toBeNull();
+    expect(result.current.canEdit).toBe(false);
+    expect(store.saves).toEqual([]);
+  });
+});
 
 describe("tier list lanes render every counted card", () => {
   test("while the catalog loads, every placement is a same-size skeleton under a matching badge", () => {

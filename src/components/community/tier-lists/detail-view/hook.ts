@@ -50,7 +50,7 @@ type TierListDraftSnapshot = {
 export function useCommunityTierListDetailModel(tierListId: string) {
   const router = useRouter();
   const game = useGameId();
-  const detail = useQuery(api.tierLists.getDetail, { game, tierListId: tierListId as Id<"tierLists"> });
+  const detail = useQuery(api.tierLists.getDetail, { game, tierListId });
   const saveTierList = useMutation(api.tierLists.save);
   const deleteTierList = useMutation(api.tierLists.remove);
   const { cards, isCatalogDataLoading, isCheckingVersion, cachedVersion, serverVersion } = useCardCatalog();
