@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import { Search, X } from "lucide-react";
 import { FloatingIsland } from "@/components/shell/floating-island";
+import { IconToolbarButton } from "@/components/ui/icon-toolbar-button";
 import { useSlashToFocus } from "@/hooks/use-slash-to-focus";
 import { useGalleryTopBarFiltersContext } from "../context";
 import { AnchoredFilterPanel } from "./anchored-filter-panel";
@@ -29,7 +30,7 @@ export function GalleryTopBarIslandVariant() {
 
   return (
     <FloatingIsland
-      anchored={<AnchoredFilterPanel className="rounded-xl" />}
+      anchored={<AnchoredFilterPanel />}
       below={<FilterTokens centered className="pointer-events-auto" />}
     >
       <Search className="size-4 shrink-0 text-[color:var(--control-dual-mix)]" />
@@ -46,14 +47,9 @@ export function GalleryTopBarIslandVariant() {
         spellCheck={false}
       />
       {state.search.length > 0 ? (
-        <button
-          type="button"
-          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[color:var(--control-dual-mix)] transition-colors hover:bg-[color:var(--control-dual-surface-hover)] hover:text-primary"
-          aria-label="Clear search"
-          onClick={() => actions.setSearch("")}
-        >
-          <X className="size-4" />
-        </button>
+        <IconToolbarButton shape="island" label="Clear search" onClick={() => actions.setSearch("")}>
+          <X />
+        </IconToolbarButton>
       ) : (
         <kbd className="hidden shrink-0 select-none items-center rounded-full border border-border/60 bg-muted/40 px-2 py-0.5 text-[10px] text-muted-foreground lg:flex">
           /
@@ -63,8 +59,8 @@ export function GalleryTopBarIslandVariant() {
       <ToolbarDivider className="h-4" />
       <InlineResultCount className="hidden px-1 md:inline" />
       <ToolbarDivider className="h-4" />
-      <InlineFunnelButton className="rounded-full" />
-      <InlineViewModeButton className="rounded-full" />
+      <InlineFunnelButton />
+      <InlineViewModeButton />
     </FloatingIsland>
   );
 }
