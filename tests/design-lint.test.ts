@@ -324,6 +324,30 @@ describe("element and colour rules: invalid", () => {
     );
   });
 
+  test("no-literal-color: named white and black on borders, rings, text and gradient stops", () => {
+    const code = `cn("border-white/10 border-x-white/[0.06] ring-white group-hover:ring-white/25 text-black from-black via-black/40 to-black/5 from-white via-white/20 to-white shadow-black/40")`;
+    expect(lint(code)).toEqual(
+      ["border-white/10", "border-x-white/[0.06]", "ring-white", "group-hover:ring-white/25", "text-black", "from-black", "via-black/40", "to-black/5", "from-white", "via-white/20", "to-white", "shadow-black/40"].map(
+        (text) => ({ rule: "design/no-literal-color", text }),
+      ),
+    );
+  });
+
+  test("no-literal-color: names that only start with white or black are not colours", () => {
+    expect(lint(`cn("text-whitesmoke bg-blackout border-white-ish from-primary/10 to-transparent ring-offset-background")`)).toEqual([]);
+  });
+
+  test("no-literal-color: a commented disable on the line keeps a printed domain colour", () => {
+    const code = [
+      `const a = <>`,
+      `  {/* eslint-disable-next-line design/no-literal-color -- printed card colour */}`,
+      `  <span className="text-black" />`,
+      `  <span className="text-black" />`,
+      `</>;`,
+    ].join("\n");
+    expect(lint(code)).toEqual([{ rule: "design/no-literal-color", text: "text-black" }]);
+  });
+
   test("radius-ladder: 2xl and larger, and corner-only forms, with no mechanical fix", () => {
     expect(lint(`<div className="rounded-2xl rounded-3xl rounded-t-2xl rounded-tl-lg rounded-br-none rounded-ss-[8px]" />`)).toEqual(
       ["rounded-2xl", "rounded-3xl", "rounded-t-2xl", "rounded-tl-lg", "rounded-br-none", "rounded-ss-[8px]"].map((text) => ({ rule: "design/radius-ladder", text })),

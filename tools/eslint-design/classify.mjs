@@ -88,7 +88,8 @@ const RADIUS_ARB_RE = new RegExp(`^rounded(-(?:${RADIUS_SIDES}))?-\\[(\\d*\\.?\\
  */
 export const MICRO_RADIUS_PX = 4;
 
-const LITERAL_COLOR_RE = /^(?:text-white|bg-white|bg-black)(?:\/\S+)?$/;
+const LITERAL_COLOR_PREFIXES = ["text", "bg", "border(?:-[xytrblse])?", "ring", "ring-offset", "outline", "divide", "from", "via", "to", "fill", "stroke", "shadow", "decoration", "caret", "placeholder", "accent"];
+const LITERAL_COLOR_RE = new RegExp(`^(?:${LITERAL_COLOR_PREFIXES.join("|")})-(?:white|black)(?:/\\S+)?$`);
 const ARBITRARY_LITERAL_COLOR_RE = /\[[^\]]*(?:rgba?\(|#[0-9a-fA-F]{3,8}(?![0-9a-zA-Z]))/;
 
 const Z_RE = /^z-(?:(\d+)|\[(\d+)\])$/;
