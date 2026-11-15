@@ -33,11 +33,6 @@ function literalClass(attr: ts.JsxAttribute | undefined): ts.StringLiteral | und
 
 type Edit = { start: number; end: number; text: string };
 
-/**
- * Snaps call-site Badge geometry onto `size` (`text-[10px]`/`h-5` -> sm, `h-8` -> lg), turns
- * self-closing `animate-pulse` divs on a muted fill into `<Skeleton>`, and `Loader2 animate-spin`
- * into `<Spinner>` on the sm/md/lg ladder.
- */
 export function rewriteSurfaces(code: string, filename: string): {
   output: string;
   rewrites: SurfaceRewrite[];

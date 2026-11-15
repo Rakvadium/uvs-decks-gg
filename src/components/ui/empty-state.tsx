@@ -22,10 +22,9 @@ const emptyStateVariants = cva(
 
 type EmptyStateVariant = NonNullable<VariantProps<typeof emptyStateVariants>["variant"]>
 
-const ICON_CLASS: Record<EmptyStateVariant, string> = {
+const ICON_CLASS: Record<Exclude<EmptyStateVariant, "inline">, string> = {
   page: "size-12 [&>svg]:size-6",
   panel: "size-10 [&>svg]:size-5",
-  inline: "hidden",
 }
 
 const TITLE_CLASS: Record<EmptyStateVariant, string> = {
@@ -60,7 +59,7 @@ function EmptyState({
 }: EmptyStateProps) {
   return (
     <div data-slot="empty-state" data-variant={variant} className={cn(emptyStateVariants({ variant }), className)} {...props}>
-      {Icon ? (
+      {Icon && variant !== "inline" ? (
         <div
           data-slot="empty-state-icon"
           className={cn(
