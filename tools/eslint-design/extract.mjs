@@ -69,8 +69,10 @@ function keyName(prop) {
 /**
  * Collects class-text nodes reachable from `node`.
  * `objects`: "keys" (clsx object syntax: keys are classes) or "values" (maps of class strings).
+ * `whole`: set when the caller needs all of the class text. Class-function calls are then
+ * followed, and `whole.opaque` turns true on anything that cannot be read statically.
  */
-function collect(node, objects, out) {
+function collect(node, objects, out, whole) {
   node = unwrap(node);
   if (!node) return;
   switch (node.type) {
@@ -79,20 +81,20 @@ function collect(node, objects, out) {
       return;
     case "TemplateLiteral":
       out.push(node);
-      for (const expr of node.expressions) collect(expr, objects, out);
+      for (const expr of node.expressions) collect(expr, objects, out, whole);
       return;
     case "ConditionalExpression":
-      collect(node.consequent, objects, out);
-      collect(node.alternate, objects, out);
+      collect(node.consequent, objects, out, whole);
+      collect(node.alternate, objects, out, whole);
       return;
     case "LogicalExpression":
-      if (node.operator !== "&&") collect(node.left, objects, out);
-      collect(node.right, objects, out);
+      if (node.operator !== "&&") collect(node.left, objects, out, whole);
+      collect(node.right, objects, out, whole);
       return;
     case "ArrayExpression":
       for (const el of node.elements) {
         if (!el) continue;
-        collect(el.type === "SpreadElement" ? el.argument : el, objects, out);
+        collect(el.type === "SpreadElement" ? el.argument : el, objects, out, whole);
       }
       return;
     case "ObjectExpression":
@@ -101,16 +103,23 @@ function collect(node, objects, out) {
         if (objects === "keys") {
           if (prop.key.type === "Literal" && typeof prop.key.value === "string") out.push(prop.key);
           else if (!prop.computed && prop.key.type === "Identifier") out.push({ type: "IdentifierKey", node: prop.key, shorthand: prop.shorthand });
-          else if (prop.computed) collect(prop.key, objects, out);
+          else if (prop.computed) collect(prop.key, objects, out, whole);
         } else {
-          collect(prop.value, objects, out);
+          collect(prop.value, objects, out, whole);
         }
       }
       return;
     case "Identifier":
-      out.push({ type: "Ref", name: node.name });
+      if (node.name !== "undefined") out.push({ type: "Ref", name: node.name });
+      return;
+    case "CallExpression":
+      if (!whole) return;
+      if (CLASS_FUNCS.has(calleeName(node.callee))) {
+        for (const arg of node.arguments) collect(arg.type === "SpreadElement" ? arg.argument : arg, "keys", out, whole);
+      } else whole.opaque = true;
       return;
     default:
+      if (whole && node.type !== "Literal") whole.opaque = true;
       return;
   }
 }
@@ -181,14 +190,24 @@ function calleeName(callee) {
   return null;
 }
 
+function elementName(name) {
+  if (name.type === "JSXIdentifier") return name.name;
+  if (name.type === "JSXMemberExpression" && name.object.type === "JSXIdentifier") return `${name.object.name}.${name.property.name}`;
+  return null;
+}
+
 /**
- * Walks the whole program. Returns `{ groups, strings }`:
+ * Walks the whole program. Returns `{ groups, strings, elements }`:
  * - `groups`: arrays of class-text nodes, one array per sink (one className / cn() / cva()).
  * - `strings`: every string-ish node in the file (for `hsl(var(--border` checks).
+ * - `elements`: one `{ name, attribute, nodes, opaque }` per JSX element with a `className`.
+ *   `nodes` is all of its class text, through `cn()` calls and same-file constants. `opaque`
+ *   is true when part of it could not be resolved, or a later spread may replace it.
  */
 export function findClassText(program, visitorKeys) {
   const groups = [];
   const strings = [];
+  const elements = [];
   const seen = new Set();
   /** Identifiers used as class values inside a sink. */
   const refs = new Set();
@@ -232,6 +251,20 @@ export function findClassText(program, visitorKeys) {
             addGroup(out);
           }
         }
+      }
+    }
+
+    if (node.type === "JSXOpeningElement") {
+      const name = elementName(node.name);
+      const index = node.attributes.findIndex((a) => a.type === "JSXAttribute" && a.name.name === "className");
+      const attribute = node.attributes[index];
+      if (name && attribute?.value) {
+        const whole = { opaque: node.attributes.slice(index + 1).some((a) => a.type === "JSXSpreadAttribute") };
+        const nodes = [];
+        if (attribute.value.type === "Literal") nodes.push(attribute.value);
+        else if (attribute.value.type === "JSXExpressionContainer") collect(attribute.value.expression, "keys", nodes, whole);
+        else whole.opaque = true;
+        elements.push({ name, attribute, nodes, whole });
       }
     }
 
@@ -316,7 +349,31 @@ export function findClassText(program, visitorKeys) {
       changed = true;
     }
   }
-  return { groups, strings };
+
+  const constClassText = (name, whole, stack) => {
+    const decls = consts.get(name);
+    const init = decls?.length === 1 ? unwrap(decls[0].init) : null;
+    if (!init || !CONST_INIT_TYPES.has(init.type) || stack.has(name) || (init.type === "Literal" && typeof init.value !== "string")) {
+      whole.opaque = true;
+      return [];
+    }
+    const out = [];
+    collect(init, "values", out, whole);
+    return resolveRefs(out, whole, new Set([...stack, name]));
+  };
+  const resolveRefs = (nodes, whole, stack) =>
+    nodes.flatMap((n) => (n.type === "Ref" ? constClassText(n.name, whole, stack) : [n]));
+
+  return {
+    groups,
+    strings,
+    elements: elements.map(({ name, attribute, nodes, whole }) => ({
+      name,
+      attribute,
+      nodes: resolveRefs(nodes, whole, new Set()),
+      opaque: whole.opaque,
+    })),
+  };
 }
 
 /**

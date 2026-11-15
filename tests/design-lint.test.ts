@@ -219,7 +219,7 @@ describe("design rules: invalid", () => {
   test("radius: side forms, xs and one-off px values", () => {
     expect(lint(`<div className="rounded-t rounded-bl-sm rounded-xs rounded-[6px] rounded-t-[8px] rounded-[0.5rem]" />`)).toEqual([
       { rule: "design/radius-ladder", text: "rounded-t", fix: "rounded-t-md" },
-      { rule: "design/radius-ladder", text: "rounded-bl-sm", fix: "rounded-bl-md" },
+      { rule: "design/radius-ladder", text: "rounded-bl-sm" },
       { rule: "design/radius-ladder", text: "rounded-xs", fix: "rounded-md" },
       { rule: "design/radius-ladder", text: "rounded-[6px]" },
       { rule: "design/radius-ladder", text: "rounded-t-[8px]" },
@@ -242,6 +242,92 @@ describe("design rules: invalid", () => {
     expect(lint(`const buttonClasses = { className: "rounded" };`)).toEqual([
       { rule: "design/radius-ladder", text: "rounded", fix: "rounded-md" },
     ]);
+  });
+});
+
+describe("element and colour rules: valid (no warnings)", () => {
+  const valid: [string, string][] = [
+    ["on-ladder and role radii", `<div className="rounded-xl rounded-full rounded-none rounded-t-xl rounded-control rounded-surface rounded-cta rounded-island" />`],
+    [
+      "primitives without geometry overrides",
+      `<><Button size="sm" shape="cta" className="w-full gap-2 [&_svg]:size-5 [&>span]:h-3" /><Badge variant="outline" className="px-1" /><Input className="w-40" /><SelectTrigger className="w-40 min-h-0" /></>`,
+    ],
+    [
+      "a primitive composing its own classes",
+      `const Button = ({ className, size }) => <Comp className={cn(buttonVariants({ size }), "h-9 rounded-md", className)} />;
+       const Trigger = ({ className }) => <SelectPrimitive.Trigger className={cn("h-9 rounded-md", className)} />;
+       const badgeVariants = cva("h-5 rounded-md", { variants: { size: { sm: "h-4" } } });`,
+    ],
+    ["geometry on other elements", `<><div className="h-7 rounded-md" /><Card className="size-9 rounded-lg" /></>`],
+    [
+      "raw buttons with a focus-visible class",
+      `<><button className="focus-visible:ring-2" /><button className={cn("p-2", on && "md:focus-visible:ring-ring")} /><button className="p-2 [&:focus-visible]:ring-2" /></>`,
+    ],
+    [
+      "raw buttons whose class text cannot be read",
+      `<><button className={cn("p-2", className)} /><button className={styles.button} /><button className="p-2" {...props} /><button className={FOCUS_RING} /><button type="button" /></>`,
+    ],
+    ["theme colours", `<div className="text-foreground bg-background text-primary-foreground bg-transparent bg-[var(--chrome-surface)] shadow-[0_0_0_1px_var(--border)]" />`],
+  ];
+  for (const [name, code] of valid) {
+    test(name, () => expect(lint(code)).toEqual([]));
+  }
+});
+
+describe("element and colour rules: invalid", () => {
+  test("primitive-geometry: height, size and radius on Button, Badge, Input and SelectTrigger", () => {
+    const code = [
+      `const pill = "rounded-island";`,
+      `const a = <>`,
+      `  <Button className="h-7" />`,
+      `  <Button className={cn("size-9 gap-2", on && pill)} />`,
+      `  <Badge className="h-5 rounded-sm" />`,
+      `  <Input className="md:h-12" />`,
+      `  <SelectTrigger className="h-8 w-40" />`,
+      `</>;`,
+    ].join("\n");
+    expect(lint(code)).toEqual([
+      { rule: "design/primitive-geometry", text: "rounded-island" },
+      { rule: "design/primitive-geometry", text: "h-7" },
+      { rule: "design/primitive-geometry", text: "size-9" },
+      { rule: "design/primitive-geometry", text: "h-5" },
+      { rule: "design/radius-ladder", text: "rounded-sm", fix: "rounded-md" },
+      { rule: "design/primitive-geometry", text: "rounded-sm" },
+      { rule: "design/primitive-geometry", text: "md:h-12" },
+      { rule: "design/primitive-geometry", text: "h-8" },
+    ]);
+  });
+
+  test("button-focus: a raw button with readable classes and no focus-visible class", () => {
+    const code = [
+      `const a = <>`,
+      `  <button className="p-2 hover:bg-muted" />`,
+      `  <button className="p-2 focus:ring-2" />`,
+      `  <button {...props} className="p-2" />`,
+      `  <motion.button className={cn("p-2", on ? "bg-primary-wash" : "")} />`,
+      `</>;`,
+    ].join("\n");
+    expect(lint(code)).toEqual([
+      { rule: "design/button-focus", text: `className="p-2 hover:bg-muted"` },
+      { rule: "design/button-focus", text: `className="p-2 focus:ring-2"` },
+      { rule: "design/button-focus", text: `className="p-2"` },
+      { rule: "design/button-focus", text: `className={cn("p-2", on ? "bg-primary-wash" : "")}` },
+    ]);
+  });
+
+  test("no-literal-color: white, black, rgb(a) and hex in any class string", () => {
+    const code = `cn("text-white bg-black/60 bg-white/20 hover:text-white", "shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] bg-[#0b0e14] text-[#FFF] fill-[rgb(0,0,0)]")`;
+    expect(lint(code)).toEqual(
+      ["text-white", "bg-black/60", "bg-white/20", "hover:text-white", "shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]", "bg-[#0b0e14]", "text-[#FFF]", "fill-[rgb(0,0,0)]"].map(
+        (text) => ({ rule: "design/no-literal-color", text }),
+      ),
+    );
+  });
+
+  test("radius-ladder: 2xl and larger, and corner-only forms, with no mechanical fix", () => {
+    expect(lint(`<div className="rounded-2xl rounded-3xl rounded-t-2xl rounded-tl-lg rounded-br-none rounded-ss-[8px]" />`)).toEqual(
+      ["rounded-2xl", "rounded-3xl", "rounded-t-2xl", "rounded-tl-lg", "rounded-br-none", "rounded-ss-[8px]"].map((text) => ({ rule: "design/radius-ladder", text })),
+    );
   });
 });
 
@@ -446,6 +532,9 @@ describe("classifier", () => {
       "transition",
       "uppercase",
       "rounded-[6px]",
+      "rounded-tl-lg",
+      "rounded-2xl",
+      "text-white",
     ]) {
       const finding = classifyUtility(cls);
       expect([cls, Boolean(finding), finding?.replacement]).toEqual([cls, true, undefined]);

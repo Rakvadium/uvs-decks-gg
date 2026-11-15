@@ -5,7 +5,7 @@
  * are offered as suggestions, never `--fix` fixes, so `eslint --fix` leaves call sites alone;
  * `bun run design:codemod` is the only thing that applies them.
  */
-import { classifyGroup, hasHslBorder, HSL_BORDER_MESSAGE, RULES } from "./classify.mjs";
+import { classifyElement, classifyGroup, hasHslBorder, HSL_BORDER_MESSAGE, RULES } from "./classify.mjs";
 import { findClassText, tokensOf } from "./extract.mjs";
 
 const cache = new WeakMap();
@@ -17,7 +17,7 @@ export function analyze(sourceCode) {
   if (cached) return cached;
 
   const text = sourceCode.text;
-  const { groups, strings } = findClassText(program, sourceCode.visitorKeys);
+  const { groups, strings, elements } = findClassText(program, sourceCode.visitorKeys);
   const findings = [];
 
   for (const group of groups) {
@@ -35,6 +35,19 @@ export function analyze(sourceCode) {
         end: token.end,
         fix: fixText && token.fixable ? { range: [token.start, token.end], text: fixText } : undefined,
       });
+    }
+  }
+
+  // One constant can feed several elements; report each of its tokens once.
+  const reported = new Set();
+  for (const { name, attribute, nodes, opaque } of elements) {
+    const tokens = nodes.flatMap((node) => tokensOf(node, text));
+    for (const { token, finding } of classifyElement(name, tokens, { complete: !opaque })) {
+      const [start, end] = token ? [token.start, token.end] : attribute.range;
+      const key = `${finding.rule}:${start}:${end}`;
+      if (reported.has(key)) continue;
+      reported.add(key);
+      findings.push({ rule: finding.rule, message: finding.message, start, end });
     }
   }
 
@@ -57,6 +70,9 @@ const DESCRIPTIONS = {
   [RULES.typography]: "Disallow call-site casing, tracking, font family and sub-10px text.",
   [RULES.zIndex]: "Use named z-index utilities where one exists.",
   [RULES.hslBorder]: "Disallow `hsl(var(--border…))`; theme borders are oklch.",
+  [RULES.literalColor]: "Disallow literal colours (`rgba(`, `#hex`, `text-white`, `bg-white`, `bg-black`) in class strings.",
+  [RULES.primitiveGeometry]: "Disallow `rounded-*`, `h-*` and `size-*` on <Button>, <Badge>, <Input> and <SelectTrigger>.",
+  [RULES.buttonFocus]: "Require a `focus-visible:` class on a raw <button> that sets `className`.",
 };
 
 /** @returns {import("eslint").Rule.RuleModule} */

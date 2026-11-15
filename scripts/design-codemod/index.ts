@@ -29,7 +29,8 @@ const config: Linter.Config[] = [
     languageOptions: { parser, parserOptions: { ecmaFeatures: { jsx: true } } },
     linterOptions: { reportUnusedDisableDirectives: "off" },
     plugins: { design },
-    rules: designRules("warn"),
+    // The <Button> pass reports Button geometry itself as button/size-override.
+    rules: { ...designRules("warn"), "design/primitive-geometry": "off" },
   },
 ];
 

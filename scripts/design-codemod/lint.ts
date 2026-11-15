@@ -4,9 +4,10 @@ import { ESLint } from "eslint";
 const USAGE = `Usage: bun run lint:design [--summary] [--depth N] [path]...
 
 Runs only the design/* rules from eslint.config.mjs (default path: src) and prints each
-warning, then counts per directory (first N path segments, default 3) and per rule.
---summary prints the counts only. Exit 0 (the rules are warn-only), 1 a file could not be
-parsed, 2 bad usage.`;
+finding, then counts per directory (first N path segments, default 3) and per rule. The
+USER-FACING row leaves out admin code and src/components/design-catalog.
+--summary prints the counts only. Exit 0 whatever the findings (eslint enforces severity),
+1 a file could not be parsed, 2 bad usage.`;
 
 const COLUMNS: [string, string][] = [
   ["design/ladder-opacity", "ladder"],
@@ -16,7 +17,12 @@ const COLUMNS: [string, string][] = [
   ["design/chrome-typography", "type"],
   ["design/named-z-index", "z"],
   ["design/no-hsl-border", "hsl"],
+  ["design/no-literal-color", "color"],
+  ["design/primitive-geometry", "geometry"],
+  ["design/button-focus", "focus"],
 ];
+
+const NOT_USER_FACING = /(?:^|\/)admin(?:\/|-)|^src\/components\/design-catalog\//;
 
 export type RunOptions = { cwd?: string; out?: (line: string) => void; err?: (line: string) => void };
 
@@ -52,6 +58,7 @@ export async function run(argv: string[], options: RunOptions = {}): Promise<num
 
   const byDir = new Map<string, Map<string, number>>();
   const byRule = new Map<string, number>();
+  const userFacing = new Map<string, number>();
   let total = 0;
   let fatal = 0;
 
@@ -66,6 +73,7 @@ export async function run(argv: string[], options: RunOptions = {}): Promise<num
       if (!m.ruleId?.startsWith("design/")) continue;
       total++;
       byRule.set(m.ruleId, (byRule.get(m.ruleId) ?? 0) + 1);
+      if (!NOT_USER_FACING.test(rel)) userFacing.set(m.ruleId, (userFacing.get(m.ruleId) ?? 0) + 1);
       const segments = rel.split("/").slice(0, -1);
       const dir = segments.slice(0, depth).join("/") || ".";
       const counts = byDir.get(dir) ?? new Map<string, number>();
@@ -81,9 +89,10 @@ export async function run(argv: string[], options: RunOptions = {}): Promise<num
     .sort((a, b) => sum(b[1]) - sum(a[1]) || a[0].localeCompare(b[0]))
     .map(([dir, counts]) => [dir, String(sum(counts)), ...COLUMNS.map(([id]) => String(counts.get(id) ?? 0))]);
   rows.push(["TOTAL", String(total), ...COLUMNS.map(([id]) => String(byRule.get(id) ?? 0))]);
+  rows.push(["USER-FACING", String(sum(userFacing)), ...COLUMNS.map(([id]) => String(userFacing.get(id) ?? 0))]);
 
   if (!summary) out("");
-  out(`Design warnings: ${total} in ${results.length} file(s) linted (depth ${depth})`);
+  out(`Design findings: ${total} in ${results.length} file(s) linted (depth ${depth})`);
   out(`| ${header.join(" | ")} |`);
   out(`|${header.map((_, i) => (i === 0 ? "---" : "--:")).join("|")}|`);
   for (const row of rows) out(`| ${row.join(" | ")} |`);
