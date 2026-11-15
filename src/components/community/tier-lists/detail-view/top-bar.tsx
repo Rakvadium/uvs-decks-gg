@@ -61,7 +61,7 @@ export function CommunityTierListDetailTopBar() {
     return (
       <div className="flex w-full min-w-0 items-center gap-2">
         <Link href="/community/tier-lists" aria-label="Tier lists">
-          <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" aria-label="Tier lists">
+          <Button variant="ghost" size="icon-sm" className="shrink-0" aria-label="Tier lists">
             <ArrowLeft className="h-4 w-4" />
           </Button>
         </Link>
@@ -77,7 +77,7 @@ export function CommunityTierListDetailTopBar() {
     return (
       <div className="flex w-full min-w-0 items-center gap-2">
         <Link href="/community/tier-lists" aria-label="Tier lists">
-          <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" aria-label="Tier lists">
+          <Button variant="ghost" size="icon-sm" className="shrink-0" aria-label="Tier lists">
             <ArrowLeft className="h-4 w-4" />
           </Button>
         </Link>
@@ -92,8 +92,8 @@ export function CommunityTierListDetailTopBar() {
 
   const saveMetaButton = (
     <Button
-      size="icon"
-      className="h-8 w-8 shrink-0"
+      size="icon-sm"
+      className="shrink-0"
       onClick={() =>
         void persistTierList({
           onSuccess: () => setIsEditingMeta(false),
@@ -167,8 +167,8 @@ export function CommunityTierListDetailTopBar() {
       <AlertDialogTrigger asChild>
         <Button
           variant="destructiveOutline"
-          size="icon"
-          className="h-8 w-8 shrink-0"
+          size="icon-sm"
+          className="shrink-0"
         >
           <Trash2 className="h-4 w-4" />
         </Button>
@@ -199,8 +199,8 @@ export function CommunityTierListDetailTopBar() {
   const cancelButton = isEditingMeta ? (
     <Button
       variant="ghost"
-      size="icon"
-      className="h-8 w-8 shrink-0"
+      size="icon-sm"
+      className="shrink-0"
       onClick={cancelMetaEditing}
       aria-label="Cancel tier list detail edits"
     >
@@ -212,7 +212,7 @@ export function CommunityTierListDetailTopBar() {
     <>
       <div className="flex w-full min-w-0 items-center gap-2">
         <Link href="/community/tier-lists" aria-label="Tier lists">
-          <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" aria-label="Tier lists">
+          <Button variant="ghost" size="icon-sm" className="shrink-0" aria-label="Tier lists">
             <ArrowLeft className="h-4 w-4" />
           </Button>
         </Link>
@@ -243,7 +243,7 @@ export function CommunityTierListDetailTopBar() {
             <Button
               variant="outline"
               size="sm"
-              className="h-8 shrink-0"
+              className="shrink-0"
               onClick={() => setIsEditingMeta(true)}
               aria-label="Edit tier list details"
             >

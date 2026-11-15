@@ -60,11 +60,11 @@ export function CommunityTierListsPageCreateDialog() {
         footer={
           <>
             <DialogClose asChild>
-              <Button variant="outline" className="h-11 px-6">
+              <Button variant="outline" className="px-6">
                 Close
               </Button>
             </DialogClose>
-            <Button className="h-11 px-6" onClick={() => void handleCreate()} disabled={isCreating}>
+            <Button className="px-6" onClick={() => void handleCreate()} disabled={isCreating}>
               {isCreating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
               Create
             </Button>

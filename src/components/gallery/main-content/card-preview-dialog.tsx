@@ -203,7 +203,7 @@ export function CardPreviewDialog({ open, onOpenChange }: CardPreviewDialogProps
                 Hover over cards to see interactive states. Temporary design review tool.
               </p>
             </div>
-            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => onOpenChange(false)}>
+            <Button variant="ghost" size="icon-sm" onClick={() => onOpenChange(false)}>
               <X className="h-4 w-4" />
             </Button>
           </div>

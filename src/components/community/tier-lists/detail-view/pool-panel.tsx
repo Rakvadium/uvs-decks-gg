@@ -75,13 +75,13 @@ export function CommunityTierListDetailPoolPanel() {
             ) : null}
             <Button
               variant={isPresentationMode ? "secondary" : "outline"}
-              className={cn("h-10", isPresentationMode && "border-primary/40")}
+              className={cn("", isPresentationMode && "border-primary/40")}
               onClick={() => setIsPresentationMode((current) => !current)}
             >
               <Presentation className="h-4 w-4" />
               {isPresentationMode ? "Exit Presentation" : "Enter Presentation"}
             </Button>
-            <Button variant="outline" className="h-10" onClick={() => setIsPoolDialogOpen(true)}>
+            <Button variant="outline" onClick={() => setIsPoolDialogOpen(true)}>
               Edit Card Pool
             </Button>
           </div>

@@ -119,7 +119,7 @@ export function TeamHubAnnouncementsContent({ teamId }: TeamHubAnnouncementsCont
         {caps.canPostAnnouncements ? (
           <Button
             type="button"
-            className="h-9 shrink-0 text-xs sm:mt-0.5"
+            className="shrink-0 text-xs sm:mt-0.5"
             onClick={openCreate}
           >
             Announcement
@@ -353,12 +353,12 @@ function AnnouncementCard({
             </div>
           )}
           {caps.canPostAnnouncements && isAuthor && (
-            <Button type="button" variant="ghost" size="sm" className="h-8 text-xs" onClick={() => setEditing(true)}>
+            <Button type="button" variant="ghost" size="sm" className="text-xs" onClick={() => setEditing(true)}>
               Edit
             </Button>
           )}
           {canDelete && (
-            <Button type="button" variant="ghost" size="sm" className="h-8 text-xs text-destructive" onClick={() => void onRemove()}>
+            <Button type="button" variant="ghost" size="sm" className="text-xs text-destructive" onClick={() => void onRemove()}>
               Remove
             </Button>
           )}

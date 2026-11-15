@@ -167,8 +167,8 @@ export function TeamHubChatContent({ teamId }: TeamHubChatContentProps) {
                       <Button
                         type="button"
                         variant="ghost"
-                        size="sm"
-                        className="h-7 text-xs"
+                        size="xs"
+                        className="text-xs"
                         onClick={() => {
                           setEditingId(m._id);
                           setEditDraft(m.body);
@@ -181,8 +181,8 @@ export function TeamHubChatContent({ teamId }: TeamHubChatContentProps) {
                       <Button
                         type="button"
                         variant="ghost"
-                        size="sm"
-                        className="h-7 text-xs"
+                        size="xs"
+                        className="text-xs"
                         onClick={async () => {
                           try {
                             await deleteMessage({ messageId: m._id });

@@ -134,7 +134,7 @@ export function TeamHubEventsContent({ teamId }: TeamHubEventsContentProps) {
         {caps.canManageEvents ? (
           <Button
             type="button"
-            className="h-9 shrink-0 text-xs sm:mt-0.5"
+            className="shrink-0 text-xs sm:mt-0.5"
             onClick={openCreate}
           >
             Create Calendar Item

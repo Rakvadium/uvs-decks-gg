@@ -31,8 +31,8 @@ export function DeckCardRowControls() {
     >
       <Button
         variant="ghost"
-        size="icon-sm"
-        className="h-7 w-7 max-md:h-10 max-md:w-10"
+        size="icon-xs"
+        className="max-md:h-10 max-md:w-10"
         onClick={() => removeCard(card._id, sectionKey)}
         disabled={count <= 0}
         aria-label={`Remove one ${card.name}`}
@@ -46,8 +46,8 @@ export function DeckCardRowControls() {
 
       <Button
         variant="ghost"
-        size="icon-sm"
-        className="h-7 w-7 max-md:h-10 max-md:w-10"
+        size="icon-xs"
+        className="max-md:h-10 max-md:w-10"
         onClick={() => addCard(card._id, sectionKey)}
         disabled={!canAddToDeck}
         aria-label={`Add one ${card.name}`}
@@ -59,8 +59,8 @@ export function DeckCardRowControls() {
         <DropdownMenuTrigger asChild>
           <Button
             variant="ghost"
-            size="icon-sm"
-            className="h-7 w-7 max-md:ml-0.5"
+            size="icon-xs"
+            className="max-md:ml-0.5"
             data-no-drag
             aria-label={`More actions for ${card.name}`}
           >

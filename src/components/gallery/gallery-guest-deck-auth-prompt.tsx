@@ -30,14 +30,14 @@ export function GalleryGuestDeckAuthPrompt({
         </p>
       </div>
       <div className="flex flex-wrap items-center gap-2">
-        <Button type="button" size="sm" className="h-8 px-3 text-xs" onClick={() => startAuth("signIn")}>
+        <Button type="button" size="sm" className="px-3 text-xs" onClick={() => startAuth("signIn")}>
           Sign in
         </Button>
         <Button
           type="button"
           size="sm"
           variant="outline"
-          className="h-8 px-3 text-xs border-primary/30 hover:border-primary/60 hover:bg-primary/10 hover:text-primary"
+          className="px-3 text-xs border-primary/30 hover:border-primary/60 hover:bg-primary/10 hover:text-primary"
           onClick={() => startAuth("signUp")}
         >
           Create account

@@ -290,8 +290,7 @@ export default function CommunityMediaPageClient() {
                         <Button
                           type="button"
                           variant="ghost"
-                          size="icon"
-                          className="h-8 w-8"
+                          size="icon-sm"
                           disabled={i === 0}
                           aria-label="Move up"
                           onClick={() => void move(i, -1)}
@@ -301,8 +300,7 @@ export default function CommunityMediaPageClient() {
                         <Button
                           type="button"
                           variant="ghost"
-                          size="icon"
-                          className="h-8 w-8"
+                          size="icon-sm"
                           disabled={i === rows.length - 1}
                           aria-label="Move down"
                           onClick={() => void move(i, 1)}
@@ -340,8 +338,7 @@ export default function CommunityMediaPageClient() {
                         <Button
                           type="button"
                           variant="ghost"
-                          size="icon"
-                          className="h-8 w-8"
+                          size="icon-sm"
                           aria-label="Edit"
                           onClick={() => openEdit(row)}
                         >
@@ -350,8 +347,8 @@ export default function CommunityMediaPageClient() {
                         <Button
                           type="button"
                           variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-destructive hover:text-destructive"
+                          size="icon-sm"
+                          className="text-destructive hover:text-destructive"
                           aria-label="Remove"
                           onClick={() => void handleDelete(row.curationId)}
                         >

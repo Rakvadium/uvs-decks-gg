@@ -411,14 +411,13 @@ export function UniversusMediaDock() {
               <Button
                 type="button"
                 variant="ghost"
-                size="icon"
-                className="h-8 w-8"
+                size="icon-sm"
                 onClick={() => minimize()}
                 aria-label="Minimize"
               >
                 <Minus className="h-4 w-4" />
               </Button>
-              <Button type="button" variant="ghost" size="icon" className="h-8 w-8" onClick={() => close()} aria-label="Close">
+              <Button type="button" variant="ghost" size="icon-sm" onClick={() => close()} aria-label="Close">
                 <X className="h-4 w-4" />
               </Button>
             </div>

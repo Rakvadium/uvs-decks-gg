@@ -12,8 +12,7 @@ function SetActiveToggle() {
   return (
     <Button
       variant={isActive ? "secondary" : "outline"}
-      size="sm"
-      className="h-11 min-w-[5.5rem] px-3"
+      className="min-w-[5.5rem] px-3"
       onClick={handleSetActive}
     >
       {isActive ? <Check className="h-3.5 w-3.5" /> : null}

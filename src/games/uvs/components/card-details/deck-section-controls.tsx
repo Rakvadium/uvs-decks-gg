@@ -97,10 +97,10 @@ export function DeckSectionControls({ card, layout = "vertical" }: DeckSectionCo
         <div className="flex h-8 shrink-0 items-center gap-1 rounded-md border border-border/40 bg-card/50 px-2">
           <Button
             variant="outline"
-            size="icon-sm"
+            size="icon-xs"
             onClick={() => removeCard(card._id, activeSection.key)}
             disabled={activeSection.count === 0}
-            className="h-6 w-6 border-destructive/30 hover:border-destructive hover:bg-destructive/10"
+            className="border-destructive/30 hover:border-destructive hover:bg-destructive/10"
           >
             <Minus className="h-3 w-3 text-destructive" />
           </Button>
@@ -109,10 +109,10 @@ export function DeckSectionControls({ card, layout = "vertical" }: DeckSectionCo
           </span>
           <Button
             variant="outline"
-            size="icon-sm"
+            size="icon-xs"
             onClick={() => addCard(card._id, activeSection.key)}
             disabled={!activeSection.canAdd}
-            className="h-6 w-6 border-primary/30 hover:border-primary hover:bg-primary/10"
+            className="border-primary/30 hover:border-primary hover:bg-primary/10"
           >
             <Plus className="h-3 w-3 text-primary" />
           </Button>
@@ -151,10 +151,10 @@ export function DeckSectionControls({ card, layout = "vertical" }: DeckSectionCo
             <Button
               type="button"
               variant="ghost"
-              size="icon-sm"
+              size="icon-xs"
               onClick={() => removeCard(card._id, activeSection.key)}
               disabled={activeSection.count === 0}
-              className="h-7 w-7 border-0 text-destructive shadow-none hover:bg-destructive/10 hover:text-destructive"
+              className="border-0 text-destructive shadow-none hover:bg-destructive/10 hover:text-destructive"
             >
               <Minus className="h-3.5 w-3.5" />
             </Button>
@@ -164,10 +164,10 @@ export function DeckSectionControls({ card, layout = "vertical" }: DeckSectionCo
             <Button
               type="button"
               variant="ghost"
-              size="icon-sm"
+              size="icon-xs"
               onClick={() => addCard(card._id, activeSection.key)}
               disabled={!activeSection.canAdd}
-              className="h-7 w-7 border-0 text-primary shadow-none hover:bg-primary/10 hover:text-primary"
+              className="border-0 text-primary shadow-none hover:bg-primary/10 hover:text-primary"
             >
               <Plus className="h-3.5 w-3.5" />
             </Button>

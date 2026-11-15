@@ -119,13 +119,13 @@ function CreateTeamFormDialog({ open, onOpenChange }: CreateTeamFormDialogProps)
         footer={
           <>
             <DialogClose asChild>
-              <Button type="button" variant="outline" className="h-11 px-6" disabled={submitting}>
+              <Button type="button" variant="outline" className="px-6" disabled={submitting}>
                 Close
               </Button>
             </DialogClose>
             <Button
               type="button"
-              className="h-11 px-6"
+              className="px-6"
               onClick={() => void handleSubmit()}
               disabled={submitting}
             >

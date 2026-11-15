@@ -187,8 +187,8 @@ function ChannelRow({
           <Button
             type="button"
             variant="ghost"
-            size="icon"
-            className="h-8 w-8 text-destructive hover:text-destructive"
+            size="icon-sm"
+            className="text-destructive hover:text-destructive"
             aria-label={`Remove ${row.title}`}
             disabled={busy}
             onClick={() => {

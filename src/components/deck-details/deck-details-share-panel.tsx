@@ -75,7 +75,7 @@ export function DeckDetailsSharePanel() {
             }}
           />
         </div>
-        <Button type="button" size="sm" className="h-9 shrink-0" disabled={busy || !username.trim()} onClick={() => void onInvite()}>
+        <Button type="button" className="shrink-0" disabled={busy || !username.trim()} onClick={() => void onInvite()}>
           Invite
         </Button>
       </div>
@@ -92,8 +92,8 @@ export function DeckDetailsSharePanel() {
               <Button
                 type="button"
                 variant="ghost"
-                size="icon"
-                className="h-8 w-8 shrink-0 text-muted-foreground hover:text-destructive"
+                size="icon-sm"
+                className="shrink-0 text-muted-foreground hover:text-destructive"
                 aria-label="Remove access"
                 onClick={() => void onRevoke(row.userId)}
               >

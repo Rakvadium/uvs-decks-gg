@@ -69,7 +69,7 @@ export function CollapsibleEntry() {
       <Preview>
         <Collapsible open={open} onOpenChange={setOpen} className="max-w-md rounded-lg border border-surface bg-card">
           <CollapsibleTrigger asChild>
-            <Button variant="ghost" className="w-full justify-between rounded-lg px-4">
+            <Button variant="ghost" className="w-full justify-between px-4">
               Sideboard · 15 cards
               <ChevronDown className={cn("motion-safe:transition-transform motion-safe:duration-150", open && "rotate-180")} />
             </Button>
