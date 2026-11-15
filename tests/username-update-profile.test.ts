@@ -63,7 +63,7 @@ describe("user.updateProfile username", () => {
 
   test("rejects zero-width characters", async () => {
     const { ctx } = makeCtx(users());
-    await expect(handler(ctx, { username: "bad​name" })).rejects.toThrow(
+    await expect(handler(ctx, { username: "bad\u200Bname" })).rejects.toThrow(
       "Username cannot contain control or zero-width characters",
     );
   });

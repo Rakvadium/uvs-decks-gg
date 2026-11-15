@@ -2,25 +2,33 @@
 
 import { UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { FieldError } from "@/components/ui/field";
 import { PASSWORD_REQUIREMENTS } from "../../../../convex/lib/password";
+import { USERNAME_MAX } from "@shared/username";
 import { AuthField } from "../auth-field";
 import { useSignUpFormModel } from "./hook";
 
 export function SignUpForm({ onSuccess }: { onSuccess: () => void }) {
-  const { submitting, handleSubmit } = useSignUpFormModel(onSuccess);
+  const { submitting, usernameError, clearUsernameError, handleSubmit } = useSignUpFormModel(onSuccess);
 
   return (
     <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
-      <AuthField
-        id="sign-up-username"
-        name="username"
-        type="text"
-        label="Username"
-        autoComplete="username"
-        maxLength={20}
-        required
-        autoFocus
-      />
+      <div className="flex flex-col gap-2">
+        <AuthField
+          id="sign-up-username"
+          name="username"
+          type="text"
+          label="Username"
+          autoComplete="username"
+          maxLength={USERNAME_MAX}
+          aria-required
+          aria-invalid={usernameError ? true : undefined}
+          aria-describedby={usernameError ? "sign-up-username-error" : undefined}
+          onChange={clearUsernameError}
+          autoFocus
+        />
+        {usernameError ? <FieldError id="sign-up-username-error">{usernameError}</FieldError> : null}
+      </div>
       <AuthField
         id="sign-up-email"
         name="email"
