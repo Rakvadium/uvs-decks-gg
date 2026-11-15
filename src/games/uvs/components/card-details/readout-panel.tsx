@@ -74,14 +74,14 @@ function CompactStatsBand({ columns }: { columns: StatColumn[] }) {
                 ? "max-sm:col-start-2 max-sm:row-start-1"
                 : "max-sm:col-span-2 max-sm:row-start-1"),
             leftDivider &&
-              "border-l border-white/[0.06] pl-2 sm:pl-3 md:pl-4",
+              "border-l border-hairline pl-2 sm:pl-3 md:pl-4",
             isAttackCol &&
-              "max-sm:border-l-0 max-sm:pl-0 max-sm:border-t max-sm:border-white/[0.06] max-sm:pt-2 sm:border-l sm:border-t-0 sm:pt-0 sm:pl-3 md:pl-4"
+              "max-sm:border-l-0 max-sm:pl-0 max-sm:border-t max-sm:border-hairline max-sm:pt-2 sm:border-l sm:border-t-0 sm:pt-0 sm:pl-3 md:pl-4"
             )}
           >
             <div className="mb-1 flex items-center gap-1 sm:mb-1.5 sm:gap-1.5">
             <span
-              className="h-1 w-1 shrink-0 rounded-full ring-2 ring-white/10 sm:h-1.5 sm:w-1.5"
+              className="h-1 w-1 shrink-0 rounded-full ring-2 ring-border sm:h-1.5 sm:w-1.5"
               style={{
                 backgroundColor: col.accent,
                 boxShadow: `0 0 8px ${col.accent}`,
@@ -248,7 +248,7 @@ export function CardDetailsReadoutPanel() {
         <div className="mt-3 flex flex-wrap items-center gap-2.5">
           {card.type && typeColor ? (
             <span
-              className="chrome-label-case inline-flex items-center rounded-full border px-3 py-1 text-xs font-bold text-white"
+              className="chrome-label-case inline-flex items-center rounded-full border px-3 py-1 text-xs font-bold text-on-scrim"
               style={{
                 backgroundColor: typeColor,
                 borderColor:
@@ -262,7 +262,7 @@ export function CardDetailsReadoutPanel() {
             </span>
           ) : null}
           {symbols.length > 0 && (
-            <div className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-background/30 px-2.5 py-1 backdrop-blur-md">
+            <div className="inline-flex items-center gap-1.5 rounded-full border border-hairline bg-background-tint px-2.5 py-1 backdrop-blur-md">
               {symbols.map((s) => (
                 <SymbolIcon key={s} symbol={s} size="lg" />
               ))}

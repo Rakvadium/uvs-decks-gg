@@ -8,7 +8,7 @@ export function ColorFacetSwatch({ swatch, className }: { swatch: string; classN
   return (
     <span
       aria-hidden
-      className={className ?? "size-3 shrink-0 rounded-full ring-1 ring-inset ring-white/25"}
+      className={className ?? "size-3 shrink-0 rounded-full ring-1 ring-inset ring-on-scrim/25"}
       style={{ backgroundColor: `hsl(${swatch})`, boxShadow: `0 0 6px hsl(${swatch} / 0.55)` }}
     />
   );

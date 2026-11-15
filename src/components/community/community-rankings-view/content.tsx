@@ -40,7 +40,7 @@ export function CommunityRankingsView({ embedded = false }: CommunityRankingsVie
   return (
     <div className={cn("relative flex h-full flex-col overflow-y-auto", embedded && "overflow-visible")}>
       {!embedded ? (
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.08),transparent_30%),radial-gradient(circle_at_80%_10%,rgba(20,184,166,0.10),transparent_26%)]" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,color-mix(in_oklab,var(--primary)_8%,transparent),transparent_30%),radial-gradient(circle_at_80%_10%,color-mix(in_oklab,var(--secondary)_10%,transparent),transparent_26%)]" />
       ) : null}
 
       <div className={cn("relative z-10 flex min-h-full flex-col gap-4", embedded ? "py-2" : "p-4 md:p-6")}>

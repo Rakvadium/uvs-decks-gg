@@ -52,7 +52,7 @@ export function CommunityTierListDetailPoolPanel() {
         ) : null}
       </AnimatePresence>
 
-      <div className="border-b border-border/50 bg-card/80 px-4 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)] md:px-6">
+      <div className="border-b border-border/50 bg-card/80 px-4 py-3 shadow-[inset_0_1px_0_color-mix(in_oklab,var(--on-scrim)_3%,transparent)] md:px-6">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">

@@ -298,16 +298,16 @@ export function CommunityMediaFeedSection({ media }: { media: GameCommunityMedia
                         )}
                       />
                     )}
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors group-hover:bg-black/30">
+                    <div className="absolute inset-0 flex items-center justify-center bg-scrim/0 transition-colors group-hover:bg-scrim/30">
                       <Play
                         className={cn(
-                          "h-5 w-5 text-white drop-shadow-md transition-opacity",
+                          "h-5 w-5 text-on-scrim drop-shadow-md transition-opacity",
                           isActive ? "opacity-100" : "opacity-0 group-hover:opacity-100"
                         )}
                       />
                     </div>
                     {video.rowStatus === "ok" && video.durationLabel ? (
-                      <span className="absolute bottom-1 right-1 rounded bg-black/70 px-1 py-px text-[10px] leading-none text-white">
+                      <span className="absolute bottom-1 right-1 rounded bg-scrim/70 px-1 py-px text-[10px] leading-none text-on-scrim">
                         {video.durationLabel}
                       </span>
                     ) : null}
