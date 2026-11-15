@@ -8,7 +8,6 @@ import { Calendar, Layers, Loader2, Megaphone, MessageSquare, Plus, Users } from
 import { api } from "../../../convex/_generated/api";
 import { useStartAuth } from "@/components/auth/use-start-auth";
 import {
-  FLOATING_ACTION_PILL_CLASS,
   FloatingActionPill,
   FloatingPageBar,
   FloatingPageLayout,
@@ -27,7 +26,7 @@ function TeamsLandingFloatingBar({ isAuthenticated }: { isAuthenticated: boolean
       }
       right={
         isAuthenticated ? (
-          <CreateTeamButton className={FLOATING_ACTION_PILL_CLASS} />
+          <CreateTeamButton placement="header" />
         ) : (
           <FloatingActionPill onClick={() => startAuth()}>
             <Plus className="h-3.5 w-3.5" />

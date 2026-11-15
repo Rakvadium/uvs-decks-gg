@@ -90,7 +90,7 @@ Do not use `hsl(var(--border)…)` — theme borders are oklch via `var(--border
 
 Avoid one-off `rounded-[Npx]` except micro geometry (e.g. tooltip arrows). Dialogs use this same ladder — panel `rounded-lg`, fields and footer buttons `rounded-md` — not a one-off dialog radius.
 
-Bare `rounded` and `rounded-sm` are off-ladder: `rounded` is a static 4px that ignores the chrome `--radius`, so it drifts from every other control. Buttons (all sizes), badges, tooltips, and segmented controls are `rounded-md`.
+Bare `rounded` and `rounded-sm` are off-ladder: `rounded` is a static 4px that ignores the chrome `--radius`, so it drifts from every other control. Badges, tooltips, and segmented controls are `rounded-md`. Buttons take their radius from `shape` ([Buttons](#buttons)).
 
 ## Role tokens
 
@@ -109,6 +109,31 @@ Each chrome sets 12 role tokens in `src/styles/base.css`. Components move onto t
 | `--hover-bg` | Hover fill | `--accent` at the wash step (`/10`) | None |
 
 Inside one chrome, `--radius-cta` and `--radius-island` hold one value. The selected and hover tokens derive from `--accent` only, so custom palettes follow them. `tests/role-tokens.test.ts` checks every chrome against this table.
+
+## Buttons
+
+`Button` reads its height and radius from the role tokens, so a call site never passes `h-*`, `w-*`, `size-*` or `rounded-*`.
+
+| `size` | Height | Icon twin |
+|--------|--------|-----------|
+| `xs` | `--control-h-xs` (28px) | `icon-xs` |
+| `sm` | `--control-h-sm` (32px) | `icon-sm` |
+| `md` (default) | `--control-h-md` (40px) | `icon` |
+| `lg` | `--control-h-lg` (48px) | `icon-lg` |
+
+| `shape` | Radius | Use |
+|---------|--------|-----|
+| `control` (default) | `rounded-control` | Every in-page button |
+| `cta` | `rounded-cta` | The primary call to action |
+| `island` | `rounded-island` | Floating header pills (set by `FloatingActionPill`) |
+
+Every variant keeps `chrome-label-case` and its `--chrome-button-shadow-*` hooks. To move old overrides onto the ladder, run `bun run design:codemod --buttons <path>`. It snaps an override height to the nearest step, a tie going to `md`, and drops radius overrides. It lists corner-notch radii and computed classes for a person to judge.
+
+### Floating header
+
+Every floating header element is one island element: `rounded-island`, height `--control-h-md`, an opaque `--background` fill and the gradient ring in its 1px border (`floatingIslandSurfaceClassName` in `src/components/shell/floating-island.tsx`). Capsules, the back pill, the tabs pill, the search capsule and `FloatingActionPill` all use it, so one chrome gives them one radius and one height.
+
+`FloatingActionPill` takes `default`, `secondary`, `destructive` or `floating`. `floating` is the secondary action on the island fill. Outline and ghost pills don't compile, because content scrolls under the header.
 
 ## Z-index stack
 

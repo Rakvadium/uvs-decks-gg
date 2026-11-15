@@ -234,7 +234,7 @@ export function CommunityMediaFeedSection({ media }: { media: GameCommunityMedia
                         ? "YouTube"
                         : "Error"}
                   </Badge>
-                  <Button variant="ghost" size="sm" className="h-7 px-2 text-[10px]" asChild>
+                  <Button variant="ghost" size="xs" className="px-2 text-[10px]" asChild>
                     <a href={activeVideo.watchUrl} target="_blank" rel="noopener noreferrer">
                       Open on YouTube
                       <ArrowUpRight className="ml-1 inline h-3 w-3" />

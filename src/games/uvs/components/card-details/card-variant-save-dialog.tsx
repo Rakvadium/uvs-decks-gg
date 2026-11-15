@@ -105,14 +105,14 @@ export function CardVariantSaveDialog({
                 type="button"
                 variant="default"
                 size="sm"
-                className="h-8 gap-1.5 text-[10px]"
+                className="gap-1.5 text-[10px]"
                 onClick={() => void handleSave()}
               >
                 <Save className="h-3 w-3" />
                 Save variant
               </Button>
               <DialogPrimitive.Close asChild>
-                <Button type="button" variant="ghost" size="icon" className="h-8 w-8 shrink-0" aria-label="Close">
+                <Button type="button" variant="ghost" size="icon-sm" className="shrink-0" aria-label="Close">
                   <X className="h-4 w-4" />
                 </Button>
               </DialogPrimitive.Close>
@@ -156,7 +156,7 @@ export function CardVariantSaveTrigger({
       variant="outline"
       size="sm"
       disabled={disabled}
-      className="h-8 gap-1.5 border-primary/25 text-[10px]"
+      className="gap-1.5 border-primary/25 text-[10px]"
       onClick={onClick}
     >
       <Plus className="h-3.5 w-3.5" />

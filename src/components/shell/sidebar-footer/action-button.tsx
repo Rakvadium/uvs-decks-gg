@@ -17,7 +17,7 @@ export function FooterActionButton({
     icon: Icon,
     iconPosition = "left",
     variant = "outline",
-    size = "default",
+    size = "md",
     className,
     disabled,
     fullWidth,

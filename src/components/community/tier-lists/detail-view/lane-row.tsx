@@ -85,8 +85,8 @@ export function CommunityTierListLaneRow({ tier }: { tier: BuilderTier }) {
           {canEdit && !isRankedScope ? (
             <Button
               variant={isEditingLane ? "secondary" : "ghost"}
-              size="icon-sm"
-              className="h-7 w-7 shrink-0"
+              size="icon-xs"
+              className="shrink-0"
               onClick={() => setIsEditingLane((current) => !current)}
               aria-label={isEditingLane ? "Done editing tier lane" : "Edit tier lane"}
             >
@@ -110,7 +110,7 @@ export function CommunityTierListLaneRow({ tier }: { tier: BuilderTier }) {
           )}
 
           {canEdit && !isRankedScope && isEditingLane && tiers.length > 1 ? (
-            <Button variant="ghost" size="icon-sm" className="h-7 w-7 shrink-0" onClick={() => removeTier(tier.id)}>
+            <Button variant="ghost" size="icon-xs" className="shrink-0" onClick={() => removeTier(tier.id)}>
               <Trash2 className="h-4 w-4" />
             </Button>
           ) : null}

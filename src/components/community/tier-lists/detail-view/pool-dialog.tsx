@@ -140,8 +140,8 @@ export function CommunityTierListDetailPoolDialog() {
                       <Button
                         type="button"
                         variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 shrink-0"
+                        size="icon-sm"
+                        className="shrink-0"
                         onClick={() => removePoolScope(scope)}
                         aria-label="Remove pool rule"
                       >
@@ -200,7 +200,7 @@ export function CommunityTierListDetailPoolDialog() {
                 </div>
                 <Button
                   type="button"
-                  className={cn("h-10 shrink-0 sm:w-auto")}
+                  className={cn("shrink-0 sm:w-auto")}
                   onClick={handleAddScope}
                   disabled={!draftSetCode || !draftCardType}
                 >

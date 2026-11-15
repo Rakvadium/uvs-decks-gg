@@ -130,6 +130,56 @@ describe("transformSource", () => {
   });
 });
 
+describe("Button size overrides", () => {
+  const rewrite = (jsx: string) => transformSource(`const a = (
+  ${jsx}
+);
+`, "buttons.tsx");
+
+  test('size="icon-sm" className="h-7 w-7" becomes size="icon-xs"', () => {
+    const result = rewrite(`<Button size="icon-sm" className="h-7 w-7" aria-label="Edit" />`);
+    expect(result.output).toBe(`const a = (
+  <Button size="icon-xs" aria-label="Edit" />
+);
+`);
+    expect(result.rewrites.map((r) => `${r.from} -> ${r.to}`)).toEqual(['size="icon-sm" h-7 w-7 -> size="icon-xs"']);
+  });
+
+  test("heights snap to 28/32/40/48 with ties going to md, and radius overrides go", () => {
+    const cases: [string, string][] = [
+      [`<Button size="sm" className="h-7 text-xs">a</Button>`, `<Button size="xs" className="text-xs">a</Button>`],
+      [`<Button size="icon" className="h-8 w-8" />`, `<Button size="icon-sm" />`],
+      [`<Button size="sm" className={cn("h-9 gap-1.5", open && "ring-2")}>a</Button>`, `<Button className={cn("gap-1.5", open && "ring-2")}>a</Button>`],
+      [`<Button className="h-11 px-6">a</Button>`, `<Button className="px-6">a</Button>`],
+      [`<Button size="sm" className="h-12">a</Button>`, `<Button size="lg">a</Button>`],
+      [`<Button size="icon" className="size-9 rounded-md" />`, `<Button size="icon" />`],
+      [`<Button variant="ghost" size="icon" className="rounded-sm" />`, `<Button variant="ghost" size="icon" />`],
+    ];
+    for (const [from, to] of cases) expect(rewrite(from).output).toBe(`const a = (
+  ${to}
+);
+`);
+  });
+
+  test("corner radii, computed sizes and computed classes are reported, not rewritten", () => {
+    const corner = rewrite(`<Button size="icon" className="rounded-none rounded-bl rounded-tr" />`);
+    const computedSize = rewrite(`<Button size={size} className="h-7" />`);
+    const computedClass = rewrite("<Button className={`h-7 ${extra}`} />");
+    for (const result of [corner, computedSize, computedClass]) {
+      expect(result.rewrites.filter((r) => r.to.startsWith("size="))).toEqual([]);
+      expect(result.left.map((l) => l.rule)).toEqual(["button/size-override"]);
+    }
+    expect(corner.output).toContain('size="icon"');
+  });
+
+  test("a second pass changes nothing", () => {
+    const once = rewrite(`<Button size="icon-sm" className="h-7 w-7 shrink-0" />`);
+    const twice = transformSource(once.output, "buttons.tsx");
+    expect(twice.rewrites).toEqual([]);
+    expect(twice.output).toBe(once.output);
+  });
+});
+
 describe("design:codemod CLI", () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "design-codemod-"));
   afterAll(() => fs.rmSync(root, { recursive: true, force: true }));
@@ -183,6 +233,21 @@ describe("design:codemod CLI", () => {
     reset();
     expect(exec([path.join("target", "tones.ts")]).code).toBe(0);
     expect(fs.readFileSync(insideTs, "utf8")).toContain("z-shell");
+    expect(fs.readFileSync(inside, "utf8")).toBe(FIXTURE);
+  });
+
+  test("--buttons rewrites only Button overrides", () => {
+    reset();
+    const buttons = path.join(root, "target", "buttons.tsx");
+    fs.writeFileSync(buttons, `const a = <Button size="icon-sm" className="h-7 w-7 bg-primary/10" />;
+`);
+    const { code, out } = exec(["--buttons", "target"]);
+    const written = fs.readFileSync(buttons, "utf8");
+    fs.rmSync(buttons);
+    expect(code).toBe(0);
+    expect(out).toContain("Rewrote 1 class(es) in 1 of 3 file(s).");
+    expect(written).toBe(`const a = <Button size="icon-xs" className="bg-primary/10" />;
+`);
     expect(fs.readFileSync(inside, "utf8")).toBe(FIXTURE);
   });
 

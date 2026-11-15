@@ -14,6 +14,7 @@ import { Code, CodeBlock } from "../specimen/code-block";
 
 type ButtonVariant = NonNullable<ButtonProps["variant"]>;
 type ButtonSize = NonNullable<ButtonProps["size"]>;
+type ButtonShape = NonNullable<ButtonProps["shape"]>;
 
 // Records, not arrays: typecheck fails if buttonVariants gains or drops a variant or size.
 const BUTTON_VARIANTS: Record<ButtonVariant, string> = {
@@ -30,12 +31,20 @@ const BUTTON_VARIANTS: Record<ButtonVariant, string> = {
 };
 
 const BUTTON_SIZES: Record<ButtonSize, string> = {
-  default: "h-10",
-  sm: "h-8",
-  lg: "h-12",
-  icon: "size-10",
-  "icon-sm": "size-8",
-  "icon-lg": "size-12",
+  xs: "--control-h-xs",
+  sm: "--control-h-sm",
+  md: "--control-h-md",
+  lg: "--control-h-lg",
+  "icon-xs": "--control-h-xs",
+  "icon-sm": "--control-h-sm",
+  icon: "--control-h-md",
+  "icon-lg": "--control-h-lg",
+};
+
+const BUTTON_SHAPES: Record<ButtonShape, string> = {
+  control: "rounded-control · every in-page button",
+  cta: "rounded-cta · the primary call to action",
+  island: "rounded-island · floating header pills",
 };
 
 const isIconSize = (size: ButtonSize) => size.startsWith("icon");
@@ -43,7 +52,7 @@ const isIconSize = (size: ButtonSize) => size.startsWith("icon");
 function buttonSnippet(variant: ButtonVariant, size: ButtonSize) {
   const props = [
     variant !== "default" ? `variant="${variant}"` : null,
-    size !== "default" ? `size="${size}"` : null,
+    size !== "md" ? `size="${size}"` : null,
     isIconSize(size) ? `aria-label="Add card"` : null,
   ]
     .filter(Boolean)
@@ -53,7 +62,7 @@ function buttonSnippet(variant: ButtonVariant, size: ButtonSize) {
 }
 
 export function ButtonEntry() {
-  const [selected, setSelected] = useState<{ variant: ButtonVariant; size: ButtonSize }>({ variant: "default", size: "default" });
+  const [selected, setSelected] = useState<{ variant: ButtonVariant; size: ButtonSize }>({ variant: "default", size: "md" });
   const [spin, setSpin] = useState(false);
   const variants = Object.keys(BUTTON_VARIANTS) as ButtonVariant[];
   const sizes = Object.keys(BUTTON_SIZES) as ButtonSize[];
@@ -64,8 +73,10 @@ export function ButtonEntry() {
       description={
         <p>
           Pick a role, don&apos;t restyle at the call site: dialogs dismiss with outline <em>Close</em>, commit with the
-          filled default, destroy with <Code>destructive</Code>. Click any specimen to see its props and the classes it
-          resolves to. Hover and focus are live (Tab through the grid).
+          filled default, destroy with <Code>destructive</Code>. Heights come from the chrome&apos;s{" "}
+          <Code>--control-h-*</Code> tokens and the radius from <Code>shape</Code>, so never pass <Code>h-*</Code>,{" "}
+          <Code>size-*</Code> or <Code>rounded-*</Code>. Click any specimen to see its props and the classes it resolves
+          to. Hover and focus are live (Tab through the grid).
         </p>
       }
     >
@@ -105,6 +116,22 @@ export function ButtonEntry() {
             }),
           }))}
         />
+      </Preview>
+
+      <Preview label="Shapes · shape prop">
+        <div className="flex flex-wrap items-start gap-6">
+          {(Object.keys(BUTTON_SHAPES) as ButtonShape[]).map((shape) => (
+            <div key={shape} className="space-y-2">
+              <Button shape={shape}>
+                <Plus />
+                New Deck
+              </Button>
+              <SpecimenLabel className="block">
+                <Code>shape=&quot;{shape}&quot;</Code> · {BUTTON_SHAPES[shape]}
+              </SpecimenLabel>
+            </div>
+          ))}
+        </div>
       </Preview>
 
       <div className="grid gap-4 lg:grid-cols-2">

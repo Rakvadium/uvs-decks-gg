@@ -29,8 +29,7 @@ export function DecksSidebarHeader() {
               <Button
                 type="button"
                 variant="ghost"
-                size="icon"
-                className="h-8 w-8"
+                size="icon-sm"
                 aria-label="Clear search"
                 onClick={() => setSearchQuery("")}
               >
@@ -41,8 +40,7 @@ export function DecksSidebarHeader() {
         />
         {isAuthenticated ? (
           <Button
-            size="sm"
-            className="h-10 shrink-0 gap-1.5 px-3"
+            className="shrink-0 gap-1.5 px-3"
             aria-label="New Deck"
             onClick={() => setIsCreateOpen(true)}
           >

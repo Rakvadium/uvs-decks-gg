@@ -34,12 +34,12 @@ export function DeckCreateDialog() {
         footer={
           <>
             <DialogClose asChild>
-              <Button variant="outline" className="h-11 px-6">
+              <Button variant="outline" className="px-6">
                 Close
               </Button>
             </DialogClose>
             <Button
-              className="h-11 px-6"
+              className="px-6"
               onClick={() => void handleCreate()}
               disabled={!canCreate}
             >

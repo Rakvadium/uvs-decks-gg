@@ -9,8 +9,7 @@ export function SidebarGalleryListItemActions() {
     <div className="flex items-center gap-1" data-no-drag onClick={(event) => event.stopPropagation()}>
       <Button
         variant="ghost"
-        size="icon-sm"
-        className="h-7 w-7"
+        size="icon-xs"
         onClick={() => removeCard(card._id, "main")}
         disabled={quantity <= 0}
       >
@@ -19,8 +18,7 @@ export function SidebarGalleryListItemActions() {
       <span className="w-7 text-center text-[10px] text-primary">{quantity}</span>
       <Button
         variant="ghost"
-        size="icon-sm"
-        className="h-7 w-7"
+        size="icon-xs"
         onClick={() => addCard(card._id, "main")}
         disabled={!canAddToMain}
       >

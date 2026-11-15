@@ -158,9 +158,8 @@ export function VirtualizedSetsTable({
                     <div className="flex justify-end">
                       <Button
                         type="button"
-                        size="icon"
+                        size="icon-sm"
                         variant="ghost"
-                        className="h-8 w-8"
                         onClick={(e) => {
                           e.stopPropagation();
                           onEdit(r);

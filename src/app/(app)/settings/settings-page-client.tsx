@@ -314,7 +314,7 @@ export default function SettingsPageClient() {
           <FloatingPageBar
             left={
               <>
-                <FloatingBackPill onClick={() => router.back()} label="Go back" iconOnly />
+                <FloatingBackPill onClick={() => router.back()} label="Go back" />
                 <FloatingPageTitle>Settings</FloatingPageTitle>
               </>
             }
@@ -351,7 +351,7 @@ export default function SettingsPageClient() {
         <FloatingPageBar
           left={
             <>
-              <FloatingBackPill onClick={handleBack} label="Go back" iconOnly />
+              <FloatingBackPill onClick={handleBack} label="Go back" />
               <FloatingPageTitle>Settings</FloatingPageTitle>
             </>
           }

@@ -15,11 +15,11 @@ export function MobileProfileSheetFooter() {
   return (
     <div className={cn("shrink-0 border-t border-border/30 px-4 pt-3", MOBILE_SAFE_BOTTOM)}>
       <div className="flex gap-2">
-        <Button type="button" variant="outline" className="h-11 flex-1 rounded-xl text-[15px]" onClick={closeSheet}>
+        <Button type="button" variant="outline" className="flex-1 text-[15px]" onClick={closeSheet}>
           Close
         </Button>
         {!isAuthenticated ? (
-          <Button type="button" className="h-11 flex-1 gap-2 rounded-xl text-[15px]" onClick={handleAuthClick}>
+          <Button type="button" className="flex-1 gap-2 text-[15px]" onClick={handleAuthClick}>
             <LogIn className="size-4" />
             Sign In
           </Button>
@@ -27,7 +27,7 @@ export function MobileProfileSheetFooter() {
           <Button
             type="button"
             variant="ghost"
-            className="h-11 flex-1 gap-2 rounded-xl text-[15px] text-destructive hover:bg-destructive/10 hover:text-destructive"
+            className="flex-1 gap-2 text-[15px] text-destructive hover:bg-destructive/10 hover:text-destructive"
             onClick={() => void handleSignOut()}
           >
             <LogOut className="size-4" />

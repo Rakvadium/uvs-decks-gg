@@ -3,8 +3,21 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
-export const floatingIslandRingClassName =
-  "bg-[linear-gradient(115deg,color-mix(in_oklch,var(--primary)_40%,transparent),color-mix(in_oklch,var(--border)_65%,transparent)_28%,color-mix(in_oklch,var(--border)_65%,transparent)_72%,color-mix(in_oklch,var(--secondary)_40%,transparent))]";
+const islandRingVarClassName =
+  "[--island-ring:linear-gradient(115deg,color-mix(in_oklch,var(--primary)_40%,transparent),color-mix(in_oklch,var(--border)_65%,transparent)_28%,color-mix(in_oklch,var(--border)_65%,transparent)_72%,color-mix(in_oklch,var(--secondary)_40%,transparent))]";
+
+export const floatingIslandRingClassName = cn(islandRingVarClassName, "bg-(image:--island-ring)");
+
+// One opaque element: the fill paints the padding box and the gradient ring shows only through the
+// transparent 1px border. Hover states change --island-fill, so backgroundColor tracks the fill.
+export const floatingIslandSurfaceClassName = cn(
+  "rounded-island border border-transparent bg-(--island-fill) shadow-[var(--chrome-floating-shadow)] [--island-fill:var(--background)]",
+  "[background-clip:padding-box,border-box] [background-origin:border-box] [background-image:linear-gradient(var(--island-fill),var(--island-fill)),var(--island-ring)]",
+  islandRingVarClassName
+);
+
+export const floatingIslandHoverClassName =
+  "hover:[--island-fill:color-mix(in_oklab,var(--accent)_10%,var(--background))]";
 
 interface FloatingIslandCapsuleProps {
   children: ReactNode;
@@ -28,20 +41,14 @@ export function FloatingIslandCapsule({
         />
       ) : null}
       <div
+        data-slot="floating-island"
         className={cn(
-          "relative rounded-full p-px shadow-[var(--chrome-floating-shadow)] transition-shadow duration-300",
-          floatingIslandRingClassName,
-          "focus-within:shadow-[var(--chrome-floating-shadow-focus)]"
+          floatingIslandSurfaceClassName,
+          "relative flex h-(--control-h-md) w-full min-w-0 items-center gap-1 pl-4 pr-2 transition-shadow duration-300 focus-within:shadow-[var(--chrome-floating-shadow-focus)]",
+          bodyClassName
         )}
       >
-        <div
-          className={cn(
-            "flex h-11 w-full min-w-0 items-center gap-1 rounded-full bg-background/80 pl-4 pr-2 backdrop-blur-xl",
-            bodyClassName
-          )}
-        >
-          {children}
-        </div>
+        {children}
       </div>
     </div>
   );

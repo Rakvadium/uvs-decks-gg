@@ -38,7 +38,7 @@ export function DeckDetailsPrivateLinkPanel() {
           Anyone with this link can view the deck in read-only mode. It is not listed publicly.
         </p>
       </div>
-      <Button type="button" variant="outline" size="sm" className="h-9 w-full" onClick={() => void onCopyLink()}>
+      <Button type="button" variant="outline" className="w-full" onClick={() => void onCopyLink()}>
         Copy link
       </Button>
     </div>

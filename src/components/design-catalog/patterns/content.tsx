@@ -100,7 +100,7 @@ export function FloatingIslandsEntry() {
         rows={[
           ["Left", "Context: where am I", "Back pill (icon-only), identity pill (h1), local nav tabs"],
           ["Center", "Content tool", "Search / filter capsule, or nothing"],
-          ["Right", "Actions", "Filled primary FloatingActionPill, outline secondaries, overflow menu"],
+          ["Right", "Actions", "Filled primary FloatingActionPill, floating secondaries, overflow menu"],
         ]}
       />
       <DesktopStage caption="Decks list: tabs left, search center, primary action right.">
@@ -130,7 +130,7 @@ export function FloatingIslandsEntry() {
         <FloatingPageBar
           left={
             <>
-              <FloatingBackPill iconOnly label="Decks" onClick={() => undefined} />
+              <FloatingBackPill label="Decks" onClick={() => undefined} />
               <FloatingCapsuleCluster bodyClassName="px-4" glow>
                 {/* The real page uses FloatingPageTitle, which renders the page h1. */}
                 <span className="chrome-heading-case truncate text-sm font-semibold text-foreground">Spellbook Control</span>
@@ -139,14 +139,14 @@ export function FloatingIslandsEntry() {
           }
           right={
             <>
-              <FloatingActionPill variant="outline">Duplicate</FloatingActionPill>
+              <FloatingActionPill variant="floating">Duplicate</FloatingActionPill>
               <FloatingActionPill>Edit</FloatingActionPill>
             </>
           }
         />
       </DesktopStage>
       <CodeBlock
-        code={`import { FloatingActionPill, FloatingBackPill, FloatingPageBar, FloatingPageLayout, FloatingPageTitle } from "@/components/shell/floating-page-bar"\n\n<FloatingPageLayout\n  bar={\n    <FloatingPageBar\n      left={<><FloatingBackPill iconOnly href="/decks" label="Decks" /><FloatingPageTitle>{deck.name}</FloatingPageTitle></>}\n      right={<FloatingActionPill>Edit</FloatingActionPill>}\n    />\n  }\n>\n  {children}\n</FloatingPageLayout>`}
+        code={`import { FloatingActionPill, FloatingBackPill, FloatingPageBar, FloatingPageLayout, FloatingPageTitle } from "@/components/shell/floating-page-bar"\n\n<FloatingPageLayout\n  bar={\n    <FloatingPageBar\n      left={<><FloatingBackPill href="/decks" label="Decks" /><FloatingPageTitle>{deck.name}</FloatingPageTitle></>}\n      right={<FloatingActionPill>Edit</FloatingActionPill>}\n    />\n  }\n>\n  {children}\n</FloatingPageLayout>`}
       />
     </CatalogEntrySection>
   );

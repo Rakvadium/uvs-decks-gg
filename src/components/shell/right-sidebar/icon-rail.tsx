@@ -71,7 +71,7 @@ export function RightSidebarIconRail() {
                   variant="ghost"
                   size="icon"
                   className={cn(
-                    "relative rounded-sm border transition-[color,background-color,border-color,box-shadow] duration-200",
+                    "relative border transition-[color,background-color,border-color,box-shadow] duration-200",
                     SHELL_RAIL_ITEM_SIZE_CLASS,
                     isMediaIcon && "overflow-hidden p-0",
                     isActive ? SHELL_RAIL_ITEM_ACTIVE : SHELL_RAIL_ITEM_IDLE

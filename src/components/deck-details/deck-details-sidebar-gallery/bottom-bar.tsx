@@ -53,8 +53,8 @@ export function DeckDetailsGallerySidebarBottomBar() {
           <Button
             type="button"
             variant="destructiveOutline"
-            size="icon-sm"
-            className="size-9 shrink-0 rounded-md bg-background/50"
+            size="icon"
+            className="shrink-0 bg-background/50"
             onClick={actions.clearAllFilters}
             aria-label="Clear all filters"
           >

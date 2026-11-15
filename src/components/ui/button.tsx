@@ -26,17 +26,25 @@ const buttonVariants = cva(
         cyber: "bg-gradient-to-r from-primary/20 to-secondary/20 text-foreground border border-primary-soft hover:border-primary-strong backdrop-blur-sm",
       },
       size: {
-        default: "h-10 px-5 py-2.5 rounded-md has-[>svg]:px-4",
-        sm: "h-8 rounded-md gap-1.5 px-3.5 text-xs has-[>svg]:px-2.5",
-        lg: "h-12 rounded-md px-8 text-base has-[>svg]:px-5",
-        icon: "size-10 rounded-md",
-        "icon-sm": "size-8 rounded-md",
-        "icon-lg": "size-12 rounded-md",
+        xs: "h-(--control-h-xs) gap-1.5 px-2.5 text-xs has-[>svg]:px-2",
+        sm: "h-(--control-h-sm) gap-1.5 px-3.5 text-xs has-[>svg]:px-2.5",
+        md: "h-(--control-h-md) px-5 py-2.5 has-[>svg]:px-4",
+        lg: "h-(--control-h-lg) px-8 text-base has-[>svg]:px-5",
+        "icon-xs": "size-(--control-h-xs)",
+        "icon-sm": "size-(--control-h-sm)",
+        icon: "size-(--control-h-md)",
+        "icon-lg": "size-(--control-h-lg)",
+      },
+      shape: {
+        control: "rounded-control",
+        cta: "rounded-cta",
+        island: "rounded-island",
       },
     },
     defaultVariants: {
       variant: "default",
-      size: "default",
+      size: "md",
+      shape: "control",
     },
   }
 )
@@ -47,13 +55,13 @@ export type ButtonProps = React.ComponentPropsWithoutRef<"button"> &
   }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, ...props }, ref) => {
+  ({ className, variant, size, shape, asChild = false, ...props }, ref) => {
     const Comp = asChild ? Slot : "button"
 
     return (
       <Comp
         data-slot="button"
-        className={cn(buttonVariants({ variant, size, className }))}
+        className={cn(buttonVariants({ variant, size, shape, className }))}
         ref={ref}
         {...props}
       />

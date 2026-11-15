@@ -60,8 +60,8 @@ export function RightSidebarExpandedPanel() {
               </div>
               <Button
                 variant="ghost"
-                size="icon"
-                className="ml-2 h-8 w-8 shrink-0 border border-transparent text-sidebar-foreground hover:border-accent/35 hover:bg-accent/10 hover:text-accent"
+                size="icon-sm"
+                className="ml-2 shrink-0 border border-transparent text-sidebar-foreground hover:border-accent/35 hover:bg-accent/10 hover:text-accent"
                 onClick={() => setActiveSidebarAction(null)}
               >
                 <X className="h-4 w-4" />

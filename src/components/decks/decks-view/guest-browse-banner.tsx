@@ -15,8 +15,8 @@ export function DecksGuestBrowseBanner() {
       </div>
       <Button
         type="button"
-        size="sm"
-        className="h-7 shrink-0 px-2.5 text-xs"
+        size="xs"
+        className="shrink-0 px-2.5 text-xs"
         onClick={() => startAuth()}
       >
         Sign in to build

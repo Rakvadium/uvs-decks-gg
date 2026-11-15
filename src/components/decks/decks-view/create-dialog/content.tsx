@@ -25,11 +25,11 @@ export function DeckCreateDialog() {
         footer={
           <>
             <DialogClose asChild>
-              <Button variant="outline" className="h-11 px-6" onClick={model.closeDialog}>
+              <Button variant="outline" className="px-6" onClick={model.closeDialog}>
                 Close
               </Button>
             </DialogClose>
-            <Button className="h-11 px-6" onClick={() => void model.handleCreate()} disabled={!model.canCreate}>
+            <Button className="px-6" onClick={() => void model.handleCreate()} disabled={!model.canCreate}>
               {model.isCreating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
               Create Deck
             </Button>

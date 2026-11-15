@@ -1,16 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { useRef, type ComponentType, type ReactNode } from "react";
+import { useRef, type ComponentType, type ReactNode, type Ref } from "react";
 import { ArrowLeft, Search, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button, type ButtonProps } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useSlashToFocus } from "@/hooks/use-slash-to-focus";
 import { useIsMobile } from "@/hooks/useIsMobile";
-import { FloatingIslandCapsule } from "./floating-island";
-
-export const FLOATING_ACTION_PILL_CLASS =
-  "pointer-events-auto h-10 shrink-0 gap-1.5 rounded-full px-4 shadow-[var(--chrome-floating-shadow)]";
+import {
+  FloatingIslandCapsule,
+  floatingIslandHoverClassName,
+  floatingIslandSurfaceClassName,
+} from "./floating-island";
 
 export function FloatingPageBar({
   left,
@@ -106,7 +107,7 @@ export function FloatingTabsPill({
             onClick={() => onValueChange(item.value)}
             aria-pressed={isActive}
             className={cn(
-              "chrome-label-case flex h-8 shrink-0 items-center gap-1.5 rounded-full px-3 text-[11px] font-semibold transition-colors duration-150",
+              "chrome-label-case flex h-8 shrink-0 items-center gap-1.5 rounded-island px-3 text-[11px] font-semibold transition-colors duration-150",
               isActive
                 ? "bg-primary/15 text-primary"
                 : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
@@ -117,7 +118,7 @@ export function FloatingTabsPill({
             {item.badge !== undefined && item.badge !== null && item.badge !== 0 ? (
               <span
                 className={cn(
-                  "rounded-full px-1.5 py-px text-[10px]",
+                  "rounded-island px-1.5 py-px text-[10px]",
                   isActive ? "bg-primary/20" : "bg-muted/70"
                 )}
               >
@@ -167,14 +168,14 @@ export function FloatingSearchCapsule({
       {value.length > 0 ? (
         <button
           type="button"
-          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[color:var(--control-dual-mix)] transition-colors hover:bg-[color:var(--control-dual-surface-hover)] hover:text-primary"
+          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-island text-[color:var(--control-dual-mix)] transition-colors hover:bg-[color:var(--control-dual-surface-hover)] hover:text-primary"
           aria-label="Clear search"
           onClick={() => onChange("")}
         >
           <X className="size-4" />
         </button>
       ) : (
-        <kbd className="hidden shrink-0 select-none items-center rounded-full border border-border/60 bg-muted/40 px-2 py-0.5 text-[10px] text-muted-foreground lg:flex">
+        <kbd className="hidden shrink-0 select-none items-center rounded-island border border-border/60 bg-muted/40 px-2 py-0.5 text-[10px] text-muted-foreground lg:flex">
           /
         </kbd>
       )}
@@ -187,64 +188,27 @@ export function FloatingBackPill({
   onClick,
   label,
   className,
-  iconOnly = false,
 }: {
   href?: string;
   onClick?: () => void;
   label: string;
   className?: string;
-  iconOnly?: boolean;
 }) {
-  if (iconOnly) {
-    const iconInnerClass =
-      "flex size-full items-center justify-center rounded-full bg-background/80 text-muted-foreground backdrop-blur-xl transition-colors hover:bg-muted/60 hover:text-foreground";
+  const pillClass = cn(
+    floatingIslandSurfaceClassName,
+    floatingIslandHoverClassName,
+    "pointer-events-auto flex size-(--control-h-md) shrink-0 items-center justify-center text-muted-foreground transition-[color,background-color,box-shadow] duration-200 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+    className
+  );
 
-    return (
-      <div className={cn("pointer-events-auto relative size-11 shrink-0", className)}>
-        <div
-          className={cn(
-            "relative size-11 rounded-full p-px transition-shadow duration-300",
-            "bg-[linear-gradient(115deg,color-mix(in_oklch,var(--primary)_40%,transparent),color-mix(in_oklch,var(--border)_65%,transparent)_28%,color-mix(in_oklch,var(--border)_65%,transparent)_72%,color-mix(in_oklch,var(--secondary)_40%,transparent))]",
-            "shadow-[var(--chrome-floating-shadow)]"
-          )}
-        >
-          {href ? (
-            <Link href={href} aria-label={label} className={iconInnerClass}>
-              <ArrowLeft className="size-4" />
-            </Link>
-          ) : (
-            <button type="button" onClick={onClick} aria-label={label} className={iconInnerClass}>
-              <ArrowLeft className="size-4" />
-            </button>
-          )}
-        </div>
-      </div>
-    );
-  }
-
-  const labelButtonClass =
-    "h-8 gap-1.5 rounded-full px-3 text-[11px] font-semibold text-muted-foreground hover:bg-muted/60 hover:text-foreground";
-
-  return (
-    <FloatingIslandCapsule
-      className={cn("pointer-events-auto shrink-0", className)}
-      bodyClassName="gap-0 px-1.5"
-      glow={false}
-    >
-      {href ? (
-        <Button variant="ghost" size="sm" className={labelButtonClass} asChild>
-          <Link href={href}>
-            <ArrowLeft className="size-3.5 shrink-0" />
-            <span className="hidden sm:inline">{label}</span>
-          </Link>
-        </Button>
-      ) : (
-        <Button variant="ghost" size="sm" className={labelButtonClass} onClick={onClick}>
-          <ArrowLeft className="size-3.5 shrink-0" />
-          <span className="hidden sm:inline">{label}</span>
-        </Button>
-      )}
-    </FloatingIslandCapsule>
+  return href ? (
+    <Link href={href} aria-label={label} className={pillClass}>
+      <ArrowLeft className="size-4" />
+    </Link>
+  ) : (
+    <button type="button" onClick={onClick} aria-label={label} className={pillClass}>
+      <ArrowLeft className="size-4" />
+    </button>
   );
 }
 
@@ -258,38 +222,37 @@ export function FloatingPageTitle({ children }: { children: ReactNode }) {
   );
 }
 
+export type FloatingActionPillVariant = "default" | "secondary" | "destructive" | "floating";
+
+const floatingPillClassName = cn(
+  floatingIslandSurfaceClassName,
+  floatingIslandHoverClassName,
+  "text-primary hover:text-primary hover:shadow-[var(--chrome-button-shadow-outline-hover)] [&_svg]:text-current"
+);
+
 export function FloatingActionPill({
-  children,
-  className,
-  onClick,
-  type = "button",
   variant = "default",
-  asChild,
-  disabled,
-  "aria-label": ariaLabel,
-}: {
-  children: ReactNode;
-  className?: string;
-  onClick?: () => void;
-  type?: "button" | "submit";
-  variant?: "default" | "outline" | "ghost" | "secondary" | "destructive";
-  asChild?: boolean;
-  disabled?: boolean;
-  "aria-label"?: string;
+  className,
+  type = "button",
+  ...props
+}: Omit<ButtonProps, "variant" | "size" | "shape"> & {
+  variant?: FloatingActionPillVariant;
+  ref?: Ref<HTMLButtonElement>;
 }) {
+  const floating = variant === "floating";
   return (
     <Button
       type={type}
-      variant={variant}
-      size="sm"
-      className={cn(FLOATING_ACTION_PILL_CLASS, className)}
-      onClick={onClick}
-      asChild={asChild}
-      disabled={disabled}
-      aria-label={ariaLabel}
-    >
-      {children}
-    </Button>
+      variant={floating ? null : variant}
+      size="md"
+      shape="island"
+      className={cn(
+        "pointer-events-auto shrink-0 gap-1.5 px-4 text-xs has-[>svg]:px-2.5",
+        floating ? floatingPillClassName : "shadow-[var(--chrome-floating-shadow)]",
+        className
+      )}
+      {...props}
+    />
   );
 }
 

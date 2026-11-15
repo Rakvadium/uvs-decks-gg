@@ -11,7 +11,7 @@ export function GalleryMobileFilterFooter({ onClose }: { onClose: () => void }) 
 
   return (
     <div className={cn("shrink-0 border-t border-border/30 px-4 pt-3", MOBILE_SAFE_BOTTOM)}>
-      <Button type="button" className="h-11 w-full rounded-xl text-[15px]" onClick={onClose}>
+      <Button type="button" className="w-full text-[15px]" onClick={onClose}>
         Show {count.toLocaleString()} {count === 1 ? "card" : "cards"}
       </Button>
     </div>
