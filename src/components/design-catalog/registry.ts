@@ -278,6 +278,11 @@ export const CATALOG_CHAPTERS = [
         ],
       },
       {
+        id: "option-tile",
+        label: "OptionTile",
+        ui: [{ file: "option-tile.tsx", exports: ["OptionTile", "OptionTileProps"] }],
+      },
+      {
         id: "search-fields",
         label: "Search fields",
         ui: [

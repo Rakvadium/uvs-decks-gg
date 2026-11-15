@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { OptionTile } from "@/components/ui/option-tile";
 import { SearchBar, useSearchBarProps, type SearchBarProps, type SearchConfig } from "@/components/ui/search-bar";
 import {
   Select,
@@ -300,6 +301,68 @@ export function ChoiceControlsEntry() {
   );
 }
 
+const SCOPES = [
+  { value: "public", label: "Public", body: "Anyone can rank it." },
+  { value: "team", label: "Team", body: "Your team ranks it." },
+  { value: "private", label: "Private", body: "Only you see it." },
+];
+
+const SYMBOLS = ["Air", "Death", "Fire", "Water", "Life"];
+
+export function OptionTileEntry() {
+  const [scope, setScope] = useState("public");
+  const [symbols, setSymbols] = useState<string[]>(["Fire"]);
+  const toggleSymbol = (symbol: string) =>
+    setSymbols((current) => (current.includes(symbol) ? current.filter((entry) => entry !== symbol) : [...current, symbol]));
+  return (
+    <CatalogEntrySection
+      id="option-tile"
+      description={
+        <p>
+          A selectable tile: a <Code>button</Code> with <Code>aria-pressed</Code>, <Code>rounded-control</Code> and a{" "}
+          <Code>focus-visible</Code> ring. Selected reads <Code>--selected-bg</Code>, <Code>--selected-border</Code> and{" "}
+          <Code>--selected-fg</Code>; idle hover reads <Code>--hover-bg</Code>. <Code>variant=&quot;outline&quot;</Code>{" "}
+          (default) gives idle tiles a surface border, <Code>&quot;ghost&quot;</Code> a transparent one for list rows and
+          popover choices. The call site sets layout and padding only.
+        </p>
+      }
+    >
+      <div className="grid gap-4 lg:grid-cols-2">
+        <Preview label="outline · one choice">
+          <div className="grid gap-2">
+            {SCOPES.map((option) => (
+              <OptionTile key={option.value} selected={scope === option.value} onClick={() => setScope(option.value)} className="px-4 py-3 text-left">
+                <span className="block text-sm font-semibold">{option.label}</span>
+                <span className="block text-xs text-muted-foreground">{option.body}</span>
+              </OptionTile>
+            ))}
+          </div>
+        </Preview>
+        <Preview label="outline · several · disabled">
+          <div className="flex flex-wrap gap-1.5">
+            {SYMBOLS.map((symbol) => (
+              <OptionTile key={symbol} selected={symbols.includes(symbol)} onClick={() => toggleSymbol(symbol)} className="px-2.5 py-1.5 text-xs">
+                {symbol}
+              </OptionTile>
+            ))}
+            <OptionTile selected={false} disabled className="px-2.5 py-1.5 text-xs">
+              Good
+            </OptionTile>
+          </div>
+        </Preview>
+      </div>
+      <CodeBlock
+        code={`import { OptionTile } from "@/components/ui/option-tile"
+
+<OptionTile selected={scope === "team"} onClick={() => setScope("team")} className="px-4 py-3 text-left">
+  Team
+</OptionTile>
+<OptionTile variant="ghost" selected={mode === "list"} onClick={() => setMode("list")}>List</OptionTile>`}
+      />
+    </CatalogEntrySection>
+  );
+}
+
 const SEARCH_CONFIG: SearchConfig = {
   placeholder: "Search tier lists…",
   quickFilters: (
@@ -354,6 +417,7 @@ export function FormsChapter() {
       <FieldEntry />
       <SelectEntry />
       <ChoiceControlsEntry />
+      <OptionTileEntry />
       <SearchFieldsEntry />
     </>
   );

@@ -19,6 +19,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { FieldError } from "@/components/ui/field";
 import { Label } from "@/components/ui/label";
+import { OptionTile } from "@/components/ui/option-tile";
 import { Switch } from "@/components/ui/switch";
 import {
   Card,
@@ -445,16 +446,11 @@ export default function SettingsPageClient() {
                       const selected =
                         normalizeAvatarImagePath(imageUrl) === symbol.path;
                       return (
-                        <button
+                        <OptionTile
                           key={symbol.id}
-                          type="button"
+                          selected={selected}
                           onClick={() => setImageUrl(symbol.path)}
-                          className={cn(
-                            "group relative flex flex-col items-center gap-2 rounded-xl border-2 p-3 transition-colors hover:border-primary/50 hover:bg-muted/50",
-                            selected
-                              ? "border-primary bg-primary/10"
-                              : "border-muted"
-                          )}
+                          className="group relative flex flex-col items-center gap-2 p-3"
                         >
                           <div className="relative h-10 w-10">
                             <Image
@@ -470,7 +466,7 @@ export default function SettingsPageClient() {
                               <Check className="h-3 w-3" />
                             </div>
                           )}
-                        </button>
+                        </OptionTile>
                       );
                     })}
                   </div>
@@ -606,35 +602,30 @@ export default function SettingsPageClient() {
                     {COLOR_SCHEMES.map((scheme) => {
                       const active = colorPreset === scheme.value;
                       return (
-                        <button
+                        <OptionTile
                           key={scheme.value}
-                          type="button"
+                          selected={active}
                           onClick={() =>
                             void setAppearancePreset(scheme.value)
                           }
-                          className={cn(
-                            "group relative rounded-xl border-2 p-3 text-left transition-colors hover:border-primary/50",
-                            active
-                              ? "border-primary bg-primary/5"
-                              : "border-muted hover:bg-muted/50",
-                          )}
+                          className="group relative p-3 text-left"
                         >
                           <div className="flex items-center gap-2">
                             <div
                               className={cn(
                                 "h-4 w-4 rounded-full ring-2 ring-offset-2 ring-offset-background transition-colors",
                                 active
-                                  ? "bg-primary ring-primary"
+                                  ? "bg-(--selected-fg) ring-(--selected-border)"
                                   : "bg-muted ring-transparent group-hover:ring-muted",
                               )}
                             />
                             <span className="text-sm font-medium">{scheme.label}</span>
                           </div>
-                        </button>
+                        </OptionTile>
                       );
                     })}
-                    <button
-                      type="button"
+                    <OptionTile
+                      selected={isCustomAppearance}
                       onClick={() =>
                         void setAppearanceCustom(
                           colorSource.kind === "custom"
@@ -642,19 +633,14 @@ export default function SettingsPageClient() {
                             : { fallback: DEFAULT_CUSTOM_BRAND },
                         )
                       }
-                      className={cn(
-                        "group relative rounded-xl border-2 p-3 text-left transition-colors hover:border-primary/50 sm:col-span-1 col-span-2",
-                        isCustomAppearance
-                          ? "border-primary bg-primary/5"
-                          : "border-muted hover:bg-muted/50",
-                      )}
+                      className="group relative col-span-2 p-3 text-left sm:col-span-1"
                     >
                       <div className="flex items-center gap-2">
                         <div
                           className={cn(
                             "h-4 w-4 rounded-full ring-2 ring-offset-2 ring-offset-background transition-colors",
                             isCustomAppearance
-                              ? "bg-primary ring-primary"
+                              ? "bg-(--selected-fg) ring-(--selected-border)"
                               : "bg-muted ring-transparent group-hover:ring-muted",
                           )}
                         />
@@ -663,7 +649,7 @@ export default function SettingsPageClient() {
                       <p className="mt-1 text-xs text-muted-foreground">
                         Choose primary and secondary for light and dark.
                       </p>
-                    </button>
+                    </OptionTile>
                   </div>
                 </div>
 

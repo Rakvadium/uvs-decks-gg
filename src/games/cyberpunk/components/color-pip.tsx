@@ -1,6 +1,7 @@
 "use client";
 
 import type { GameSymbolBadgeProps, GameSymbolIconProps } from "@/games/types";
+import { OptionTile } from "@/components/ui/option-tile";
 import { cn } from "@/lib/utils";
 import { getCyberpunkColorHex, getCyberpunkColorLabel } from "../config";
 
@@ -31,19 +32,14 @@ export function SymbolIcon({ symbol, size = "sm", className, showLabel = false }
 export function SymbolBadge({ symbol, selected, onClick, size = "sm", className }: GameSymbolBadgeProps) {
   const label = getCyberpunkColorLabel(symbol);
   return (
-    <button
-      type="button"
+    <OptionTile
+      selected={Boolean(selected)}
       onClick={onClick}
-      aria-pressed={selected}
       title={label}
-      className={cn(
-        "inline-flex items-center justify-center gap-1.5 rounded-md border px-2 py-1.5 text-xs transition-colors",
-        selected ? "border-primary/60 bg-primary/10" : "border-border/50 bg-background hover:bg-muted",
-        className
-      )}
+      className={cn("inline-flex items-center justify-center gap-1.5 px-2 py-1.5 text-xs", className)}
     >
       <Pip symbol={symbol} size={size} />
       <span>{label}</span>
-    </button>
+    </OptionTile>
   );
 }

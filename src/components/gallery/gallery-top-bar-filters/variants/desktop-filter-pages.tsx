@@ -18,7 +18,8 @@ import {
   FilterRow,
 } from "@/components/gallery/mobile-filter-sheet/primitives";
 import { ColorFacetChips } from "@/components/gallery/mobile-filter-sheet/color-facet-chips";
-import { cn } from "@/lib/utils";
+import { OptionTile } from "@/components/ui/option-tile";
+import { SegmentedControl } from "@/components/ui/segmented-control";
 
 const compactChipClassName = "h-7 w-[100px] justify-center gap-1 px-2 text-xs";
 
@@ -104,20 +105,14 @@ export function GalleryDesktopFilterSetsPage() {
             {options.map((set) => {
               const isSelected = selected.includes(set.code);
               return (
-                <button
+                <OptionTile
                   key={set.code}
-                  type="button"
-                  aria-pressed={isSelected}
+                  selected={isSelected}
                   onClick={() => toggleStringFilter("set", set.code)}
-                  className={cn(
-                    "flex min-w-0 items-center rounded-lg border px-2.5 py-1.5 text-left text-xs font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                    isSelected
-                      ? "border-primary/50 bg-primary/15 text-primary"
-                      : "border-border/40 bg-background/40 text-foreground hover:bg-muted/50"
-                  )}
+                  className="flex min-w-0 items-center px-2.5 py-1.5 text-left text-xs font-medium"
                 >
                   <span className="truncate">{set.name}</span>
-                </button>
+                </OptionTile>
               );
             })}
           </div>
@@ -253,26 +248,15 @@ function DesktopZoneRule({ zone: descriptor }: { zone: GameZoneFilterDescriptor 
   return (
     <div className="flex items-center gap-2">
       <span className="w-16 shrink-0 text-[11px] text-muted-foreground">{label}</span>
-      <div className="flex h-7 min-w-0 flex-1 overflow-hidden rounded-md border border-border/50 bg-background/50">
-        {descriptor.options.map((zone, index) => {
-          const isSelected = selected.includes(zone);
-          return (
-            <button
-              key={zone}
-              type="button"
-              aria-pressed={isSelected}
-              onClick={() => toggleStringFilter(filterKey, zone)}
-              className={cn(
-                "min-w-0 flex-1 text-[11px] transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring",
-                index !== 0 && "border-l border-border/40",
-                isSelected ? "bg-primary/20 font-medium text-primary" : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              {zone}
-            </button>
-          );
-        })}
-      </div>
+      <SegmentedControl
+        size="xs"
+        stretch
+        aria-label={label}
+        className="min-w-0 flex-1"
+        values={selected}
+        onToggle={(zone) => toggleStringFilter(filterKey, zone)}
+        items={descriptor.options.map((zone) => ({ value: zone, label: zone }))}
+      />
     </div>
   );
 }
