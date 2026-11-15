@@ -25,6 +25,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useTeamHub } from "./hook";
 import { useRegisterTeamHubPrimaryAction } from "./primary-action-context";
 import { Skeleton } from "@/components/ui/skeleton";
+import { EmptyState } from "@/components/ui/empty-state";
 
 function formatRange(starts: number, ends: number | undefined) {
   const a = new Date(starts);
@@ -210,7 +211,7 @@ export function TeamHubEventsContent({ teamId }: TeamHubEventsContentProps) {
       <div className="space-y-3">
         <h2 className="chrome-heading-case text-xs text-muted-foreground">Upcoming &amp; past</h2>
         {events.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No events scheduled.</p>
+          <EmptyState variant="inline" title="No events scheduled." />
         ) : (
           <ul className="space-y-3">
             {events.map((row) => {

@@ -6,6 +6,7 @@ import { usePrefersReducedMotion } from "@/lib/reduced-motion";
 import { Layers3, Presentation } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { EmptyState } from "@/components/ui/empty-state";
 import { cn } from "@/lib/utils";
 import { useCommunityTierListDetailContext } from "./context";
 import { CommunityTierListPresentationCard } from "./presentation-card";
@@ -129,11 +130,14 @@ export function CommunityTierListDetailPoolPanel() {
                   </div>
                 </div>
               ) : (
-                <div className="flex min-h-20 items-center justify-center border-t border-dashed border-border/40 px-4 text-sm text-muted-foreground">
-                  {poolScopes.length > 0
-                    ? "No cards in the pool match that search."
-                    : "Add set and card type rules to populate the card pool."}
-                </div>
+                <EmptyState
+                  variant="inline"
+                  title={
+                    poolScopes.length > 0
+                      ? "No cards in the pool match that search."
+                      : "Add set and card type rules to populate the card pool."
+                  }
+                />
               )}
             </div>
           </m.div>

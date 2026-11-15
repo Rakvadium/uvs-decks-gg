@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useProfanityDisplayText } from "@/lib/moderation/use-profanity-display-text";
 import { useTeamHub } from "./hook";
 import { Skeleton } from "@/components/ui/skeleton";
+import { EmptyState } from "@/components/ui/empty-state";
 
 interface TeamHubChatContentProps {
   teamId: string;
@@ -108,7 +109,7 @@ export function TeamHubChatContent({ teamId }: TeamHubChatContentProps) {
         aria-live="polite"
       >
         {results.length === 0 ? (
-          <p className="text-center text-sm text-muted-foreground">No messages yet.</p>
+          <EmptyState variant="inline" title="No messages yet." />
         ) : (
           results.map((row) => {
             const m = row.message;

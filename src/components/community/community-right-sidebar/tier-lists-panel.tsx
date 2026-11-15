@@ -8,6 +8,7 @@ import { api } from "../../../../convex/_generated/api";
 import { useStartAuth } from "@/components/auth/use-start-auth";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -53,7 +54,7 @@ export function CommunityTierListsSidebarPanel() {
                 ))}
               </div>
             ) : publicFeed.length === 0 ? (
-              <p className="text-center text-xs text-muted-foreground">No public tier lists yet.</p>
+              <EmptyState variant="inline" title="No public tier lists yet." />
             ) : (
               <ul className="space-y-2">
                 {publicFeed.map(({ tierList, author, listModerationStatus }) => (
@@ -94,7 +95,7 @@ export function CommunityTierListsSidebarPanel() {
             ) : myLists === undefined ? (
               <LoadingState className="py-10" />
             ) : myLists.length === 0 ? (
-              <p className="text-center text-xs text-muted-foreground">You have no tier lists yet.</p>
+              <EmptyState variant="inline" title="You have no tier lists yet." />
             ) : (
               <ul className="space-y-2">
                 {myLists.map((tierList) => (

@@ -27,6 +27,7 @@ import { useTeamHub } from "./hook";
 import { useRegisterTeamHubPrimaryAction } from "./primary-action-context";
 import type { TeamHubCaps } from "./team-hub-caps";
 import { Skeleton } from "@/components/ui/skeleton";
+import { EmptyState } from "@/components/ui/empty-state";
 
 interface TeamHubAnnouncementsContentProps {
   teamId: string;
@@ -228,7 +229,7 @@ export function TeamHubAnnouncementsContent({ teamId }: TeamHubAnnouncementsCont
           </div>
         )}
         {results.length === 0 && pinnedList.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No announcements yet.</p>
+          <EmptyState variant="inline" title="No announcements yet." />
         ) : (
           <ul className="space-y-3">
             {results.map((row) => (
