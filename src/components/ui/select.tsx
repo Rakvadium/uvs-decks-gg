@@ -41,14 +41,20 @@ const SELECT_TRIGGER_SIZE: Record<ControlSize, string> = {
 const SELECT_TRIGGER_VARIANT = {
   field: controlFieldClassName,
   inline: cn(
-    "rounded-control border-0 bg-transparent transition-colors duration-200 hover:bg-(--hover-bg) disabled:cursor-not-allowed disabled:opacity-50",
+    "border-0 bg-transparent transition-colors duration-200 hover:bg-(--hover-bg) disabled:cursor-not-allowed disabled:opacity-50",
     controlFocusClassName
   ),
+} as const
+
+const SELECT_TRIGGER_SHAPE = {
+  control: "rounded-control",
+  island: "rounded-island",
 } as const
 
 export type SelectTriggerProps = React.ComponentProps<typeof SelectPrimitive.Trigger> & {
   size?: ControlSize
   variant?: keyof typeof SELECT_TRIGGER_VARIANT
+  shape?: keyof typeof SELECT_TRIGGER_SHAPE
   hideIcon?: boolean
   compactValue?: boolean
 }
@@ -57,6 +63,7 @@ function SelectTrigger({
   className,
   size = "md",
   variant = "field",
+  shape = "control",
   hideIcon = false,
   compactValue = false,
   children,
@@ -70,6 +77,7 @@ function SelectTrigger({
       className={cn(
         "flex w-fit items-center justify-between whitespace-nowrap",
         SELECT_TRIGGER_VARIANT[variant],
+        SELECT_TRIGGER_SHAPE[shape],
         controlHeightClassName[size],
         SELECT_TRIGGER_SIZE[size],
         "data-[placeholder]:text-muted-foreground",

@@ -55,7 +55,7 @@ export function GalleryTopBarIslandVariant() {
           /
         </kbd>
       )}
-      <InlineScopeSelect className="rounded-full" />
+      <InlineScopeSelect shape="island" />
       <ToolbarDivider className="h-4" />
       <InlineResultCount className="hidden px-1 md:inline" />
       <ToolbarDivider className="h-4" />

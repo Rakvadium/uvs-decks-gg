@@ -185,6 +185,7 @@ const FORMATS = [
 function FormatSelect(props: {
   size?: ControlSize;
   variant?: "field" | "inline";
+  shape?: "control" | "island";
   disabled?: boolean;
   invalid?: boolean;
   label: string;
@@ -195,6 +196,7 @@ function FormatSelect(props: {
       <SelectTrigger
         size={props.size}
         variant={props.variant}
+        shape={props.shape}
         aria-invalid={props.invalid || undefined}
         aria-label={props.label}
         className="w-full"
@@ -232,6 +234,8 @@ export function SelectEntry() {
           <Code>SelectTrigger size</Code> matches <Code>Input</Code>: <Code>xs</Code>, <Code>sm</Code>, <Code>md</Code>{" "}
           (default) or <Code>lg</Code>. <Code>variant=&quot;inline&quot;</Code> drops the field border and fill for a
           trigger that sits inside another control&apos;s surface, such as a stat operator or a toolbar scope.{" "}
+          <Code>shape=&quot;island&quot;</Code> rounds it to <Code>--radius-island</Code> inside a floating island, like
+          the island buttons beside it.{" "}
           <Code>hideIcon</Code> and <Code>compactValue</Code> tune dense toolbars. Content portals at{" "}
           <Code>z-select</Code>. Open one to see groups, labels, a separator and a disabled item.
         </p>
@@ -247,6 +251,11 @@ export function SelectEntry() {
           <StateCell label='variant="inline"'>
             <div className="flex h-(--control-h-md) items-center rounded-control border border-surface px-1">
               <FormatSelect variant="inline" size="sm" label="Format (inline)" />
+            </div>
+          </StateCell>
+          <StateCell label='variant="inline" shape="island"'>
+            <div className="flex h-(--control-h-md) items-center rounded-island border border-surface px-1">
+              <FormatSelect variant="inline" shape="island" size="sm" label="Format (island)" />
             </div>
           </StateCell>
           <StateCell label="Placeholder">

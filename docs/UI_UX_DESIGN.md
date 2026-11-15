@@ -153,7 +153,7 @@ Inside one chrome, `--radius-cta` and `--radius-island` hold one value. The sele
 
 ## Buttons
 
-`Button` reads its height and radius from the role tokens, so a call site never passes `h-*`, `w-*`, `size-*` or `rounded-*`. The same holds for `Badge`, `Input`, `SelectTrigger` and `Chip`. `design/primitive-geometry` reports `h-*`, `size-*` and `rounded-*` (role radii included) in the `className` of any of them, and of every shared wrapper that forwards `className` to one (`FilterChip`, `IconToolbarButton`, `DialogCancel`, `TierListModerationBadge` and the rest of `CLASSNAME_FORWARDERS` in `tools/eslint-design/classify.mjs`). `tests/design-lint.test.ts` scans `src/` and fails when a new forwarder is missing from that list. A raw `<button>` that sets `className` must include a `focus-visible:` class, and `design/button-focus` reports one that doesn't.
+`Button` reads its height and radius from the role tokens, so a call site never passes `h-*`, `w-*`, `size-*` or `rounded-*`. The same holds for `Badge`, `Input`, `SelectTrigger`, `SearchField` and `Chip`. `design/primitive-geometry` reports `h-*`, `size-*` and `rounded-*` (role radii included) in the `className` of any of them, and of every shared wrapper that forwards `className` to one (`FilterChip`, `IconToolbarButton`, `DialogCancel`, `TierListModerationBadge` and the rest of `CLASSNAME_FORWARDERS` in `tools/eslint-design/classify.mjs`). `tests/design-lint.test.ts` scans `src/` and fails when a new forwarder is missing from that list. A raw `<button>` that sets `className` must include a `focus-visible:` class, and `design/button-focus` reports one that doesn't.
 
 | `size` | Height | Icon twin |
 |--------|--------|-----------|
@@ -221,7 +221,7 @@ Call sites pass layout (width, padding) only, never a radius, background, border
 | `md` (default) | `--control-h-md` (40px) | 1.5 × `--control-h-md` |
 | `lg` | `--control-h-lg` (48px) | 1.5 × `--control-h-lg` |
 
-`SelectTrigger variant="inline"` drops the border and fill for a trigger that sits inside another control's surface, such as the stat operator, the gallery island scope select and the deck section pill. It keeps the size and the focus ring.
+`SelectTrigger variant="inline"` drops the border and fill for a trigger that sits inside another control's surface, such as the stat operator, the gallery island scope select and the deck section pill. It keeps the size and the focus ring. `shape` picks the radius the same way `Button shape` does: `control` (the default, `--radius-control`) or `island` (`--radius-island`), for a trigger inside a floating island such as the gallery island scope select.
 
 `SearchField` (`src/components/ui/search-field.tsx`) is the one in-page search: an `Input` with a search icon, `type="search"`, and a clear button that appears once there is text. It takes `value`, `onValueChange` and `size`, and labels itself from the placeholder. Its `className` sets layout on the wrapper only. The floating header search stays the island capsule ([Floating header](#floating-header)).
 

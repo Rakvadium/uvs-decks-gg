@@ -13,6 +13,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  type SelectTriggerProps,
 } from "@/components/ui/select";
 import { useGalleryFilterDialogContext } from "@/components/gallery/filter-dialog/context";
 import { cn } from "@/lib/utils";
@@ -86,7 +87,7 @@ export function InlineResultCount({ className }: { className?: string }) {
   );
 }
 
-export function InlineScopeSelect({ className }: { className?: string }) {
+export function InlineScopeSelect({ shape }: { shape?: SelectTriggerProps["shape"] }) {
   const { state, actions } = useGalleryTopBarFiltersContext();
 
   return (
@@ -97,7 +98,8 @@ export function InlineScopeSelect({ className }: { className?: string }) {
       <SelectTrigger
         variant="inline"
         size="xs"
-        className={cn("min-w-[3.25rem] shrink-0 px-1.5 text-[11px] text-muted-foreground hover:text-foreground", className)}
+        shape={shape}
+        className="min-w-[3.25rem] shrink-0 px-1.5 text-[11px] text-muted-foreground hover:text-foreground"
         aria-label="Search scope"
       >
         <SelectValue />

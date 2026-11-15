@@ -21,9 +21,9 @@ function classesOf(element: ReactElement, slot: string): string[] {
 
 const input = (size?: Size) => classesOf(createElement(Input, { size }), "input");
 const textarea = (size?: Size) => classesOf(createElement(Textarea, { size }), "textarea");
-const selectTrigger = (size?: Size, variant?: "field" | "inline") =>
+const selectTrigger = (size?: Size, variant?: "field" | "inline", shape?: "control" | "island") =>
   classesOf(
-    createElement(Select, null, createElement(SelectTrigger, { size, variant }, createElement(SelectValue))),
+    createElement(Select, null, createElement(SelectTrigger, { size, variant, shape }, createElement(SelectValue))),
     "select-trigger"
   );
 
@@ -72,6 +72,14 @@ describe("Input, SelectTrigger and Textarea share the control sizes and one back
     expect(heights(classes)).toEqual(["h-(--control-h-xs)"]);
     expect(backgrounds(classes)).toEqual(["bg-transparent"]);
     expect(classes).toContain("border-0");
+  });
+
+  test("SelectTrigger shape picks the control or island radius in either variant", () => {
+    const radii = (classes: string[]) => classes.filter((c) => /^rounded-/.test(c));
+    expect(radii(selectTrigger())).toEqual(["rounded-control"]);
+    expect(radii(selectTrigger("xs", "inline"))).toEqual(["rounded-control"]);
+    expect(radii(selectTrigger("xs", "inline", "island"))).toEqual(["rounded-island"]);
+    expect(radii(selectTrigger("md", "field", "island"))).toEqual(["rounded-island"]);
   });
 });
 

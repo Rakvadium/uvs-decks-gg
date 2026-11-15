@@ -482,6 +482,7 @@ export const GEOMETRY_PRIMITIVES = {
   SelectTrigger: "SelectTrigger owns its height and radius; add a variant to the primitive instead.",
   Chip: "Use `size` (xs, sm) instead; Chip is a rounded-full Button.",
   FilterChip: "Use `size` (xs, sm) instead; FilterChip renders a Chip.",
+  SearchField: "Use `size` (xs, sm, md, lg) instead; SearchField renders an Input.",
   ...Object.fromEntries(
     Object.entries(CLASSNAME_FORWARDERS).map(([name, primitive]) => [
       name,
