@@ -16,8 +16,17 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useStartAuth } from "@/components/auth/use-start-auth";
+import { FloatingPageBar, FloatingPageLayout, FloatingPageTitle } from "@/components/shell/floating-page-bar";
 
 type InviteModalStep = "choose" | "leaveWarning";
+
+function InviteLayout({ children }: { children: ReactNode }) {
+  return (
+    <FloatingPageLayout bar={<FloatingPageBar left={<FloatingPageTitle>Team invite</FloatingPageTitle>} />}>
+      <div className="mx-auto flex max-w-md flex-col gap-6">{children}</div>
+    </FloatingPageLayout>
+  );
+}
 
 export function TeamInviteClient() {
   const params = useParams();
@@ -109,27 +118,27 @@ export function TeamInviteClient() {
 
   if (!token) {
     return (
-      <div className="mx-auto flex max-w-md flex-col gap-6 p-6">
+      <InviteLayout>
         <p className="text-sm text-muted-foreground">This invite link is missing a token.</p>
-      </div>
+      </InviteLayout>
     );
   }
 
   if (details === undefined || authLoading) {
     return (
-      <div className="mx-auto flex max-w-md flex-col gap-6 p-6">
+      <InviteLayout>
         <p className="text-sm text-muted-foreground">Loading…</p>
-      </div>
+      </InviteLayout>
     );
   }
 
   if (details === null) {
     return (
-      <div className="mx-auto flex max-w-md flex-col gap-6 p-6">
+      <InviteLayout>
         <p className="text-sm text-destructive" role="alert">
           This invite link is invalid.
         </p>
-      </div>
+      </InviteLayout>
     );
   }
 
@@ -168,9 +177,9 @@ export function TeamInviteClient() {
   }
 
   return (
-    <div className="mx-auto flex max-w-md flex-col gap-6 p-6">
+    <InviteLayout>
       <div>
-        <PageHeading size="md">Team invite</PageHeading>
+        <PageHeading size="md" className="md:hidden">Team invite</PageHeading>
         <p className="mt-2 text-sm text-muted-foreground">
           You have been invited to join{" "}
           <span className="font-medium text-foreground">{details.teamName}</span>.
@@ -236,6 +245,6 @@ export function TeamInviteClient() {
           )}
         </DialogContent>
       </Dialog>
-    </div>
+    </InviteLayout>
   );
 }

@@ -517,9 +517,12 @@ export const CATALOG_CHAPTERS = [
     id: "patterns",
     group: "Patterns",
     label: "Shell patterns",
-    summary: "Where page controls live: the desktop floating islands and the mobile slot system.",
+    summary: "Where page controls live: the desktop floating islands, page washes, the right rail panel, sidebar rows and the mobile slot system.",
     entries: [
       { id: "floating-islands", label: "Floating header islands" },
+      { id: "page-wash", label: "Page wash" },
+      { id: "rail-panel", label: "Right rail panel" },
+      { id: "sidebar-rows", label: "Sidebar rows" },
       { id: "mobile-shell", label: "Mobile shell slots" },
     ],
   },

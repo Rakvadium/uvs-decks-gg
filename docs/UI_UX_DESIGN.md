@@ -176,6 +176,23 @@ Every floating header element is one island element: `rounded-island`, height `-
 
 `FloatingActionPill` takes `default`, `secondary`, `destructive` or `floating`. `floating` is the secondary action on the island fill. Outline and ghost pills don't compile, because content scrolls under the header.
 
+### Page chrome
+
+Every desktop page renders `FloatingPageLayout` (`src/components/shell/floating-page-bar.tsx`), the gallery, `/home` and `/teams/invite` included. The bar floats over a scroller whose first row sits at `md:pt-[4.75rem]`, and the bar's centre slot is at most 26rem on every page. Buttons inside an island are transparent on purpose: the island's opaque fill is what sits over the scrolling content.
+
+A page background is the `pageWash` prop, never layers the page paints. The wash sits behind the scroller and does not scroll. Each recipe mixes role colours, so it follows the palette.
+
+| `pageWash` | Recipe | Pages |
+|------------|--------|-------|
+| `fade` | `--primary` fading down from 7% | Teams hub, team decks, teams landing |
+| `radial` | `--primary` radial at the top, `--secondary` radial at the upper right | Tier lists, rankings, tier list detail |
+| `grid` | Primary and secondary radials over a 24px `--border` grid | Community hub, creator program |
+| `glow` | Faint primary and secondary radials | Card gallery, home |
+
+The expanded right rail owns one `PanelHeader` (the slot `label` and an `IconToolbarButton` close, `--control-h-lg` tall) and one opaque `PanelFooter` for the slot's `footer`, both in `src/components/shell/right-sidebar/expanded-panel.tsx`. Panels render only their body, so a dynamic title goes in the slot `label`.
+
+Left sidebar rows take their height from `shell-chrome.ts`. Nav rows, the game switcher and Teams use `SHELL_NAV_ITEM_BASE` at `--control-h-md`. The account row uses `SHELL_ACCOUNT_ROW_HEIGHT_CLASS` at `--control-h-lg`. Collapsed rail items are `--control-h-md` squares.
+
 ## Selected state and toggles
 
 Every selected or active state reads the selected role tokens through the Tailwind variable shorthand: `bg-(--selected-bg)`, `border-(--selected-border)` and `text-(--selected-fg)`. Idle hover on a selectable item reads `hover:bg-(--hover-bg)`. Never write `bg-primary/*` or `bg-accent/*` for selection. The tokens follow the accent, so a custom palette moves every selected state at once.
@@ -208,7 +225,7 @@ Call sites pass layout (width, padding) only, never a radius, background, border
 
 **Create flows.** `CreateEntityDialog` (`src/components/ui/create-entity-dialog.tsx`) is the one create dialog: icon header, a required name field, extra fields as children, then Cancel and a submit that stays disabled until the name has text. Decks, tier lists and teams use it.
 
-**Icon actions.** `IconToolbarButton` (`src/components/ui/icon-toolbar-button.tsx`) is `Button size="icon-xs"` with a required `label` (its `aria-label`), the `--hover-bg` hover and the selected tokens when `active`. It is the close for Dialog, AlertDialog, Sheet and the right side panel, and the gallery island's toolbar icons pass `shape="island"`.
+**Icon actions.** `IconToolbarButton` (`src/components/ui/icon-toolbar-button.tsx`) is `Button size="icon-xs"` with a required `label` (its `aria-label`), the `--hover-bg` hover and the selected tokens when `active`. It is the close for Dialog, AlertDialog, Sheet and the right side panel, and the gallery header's toolbar icons and the search clear button pass `shape="island"`.
 
 ## Inputs
 

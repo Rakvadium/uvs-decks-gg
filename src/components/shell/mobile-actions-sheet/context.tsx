@@ -15,7 +15,6 @@ interface MobileActionsSheetContextValue {
   defaultSlot: SlotRegistration | undefined;
   activeSlot: SlotRegistration | undefined;
   ActiveComponent: SlotRegistration["component"] | undefined;
-  ActiveHeader: SlotRegistration["header"] | undefined;
   ActiveFooter: SlotRegistration["footer"] | undefined;
   openSheet: (slotId?: string) => void;
   closeSheet: () => void;
@@ -35,7 +34,6 @@ export function MobileActionsSheetProvider({ children }: { children: ReactNode }
   const defaultSlot = sidebarSlots[0];
   const activeSlot = sidebarSlots.find((slot) => slot.id === activeActionId) ?? defaultSlot;
   const ActiveComponent = activeSlot?.component;
-  const ActiveHeader = activeSlot?.header;
   const ActiveFooter = activeSlot?.footer;
 
   const closeSheet = useCallback(() => {
@@ -76,7 +74,6 @@ export function MobileActionsSheetProvider({ children }: { children: ReactNode }
       defaultSlot,
       activeSlot,
       ActiveComponent,
-      ActiveHeader,
       ActiveFooter,
       openSheet,
       closeSheet,
@@ -89,7 +86,6 @@ export function MobileActionsSheetProvider({ children }: { children: ReactNode }
       defaultSlot,
       activeSlot,
       ActiveComponent,
-      ActiveHeader,
       ActiveFooter,
       openSheet,
       closeSheet,

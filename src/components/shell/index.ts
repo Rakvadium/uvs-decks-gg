@@ -12,7 +12,7 @@ export {
   FloatingTabsPill,
 } from "./floating-page-bar";
 export type { FloatingTabItem } from "./floating-page-bar";
-export { FloatingIsland, FloatingIslandCapsule } from "./floating-island";
+export { FloatingIslandCapsule } from "./floating-island";
 export {
   SHELL_CHROME_EDGE_BOTTOM,
   SHELL_CHROME_EDGE_LEFT,
