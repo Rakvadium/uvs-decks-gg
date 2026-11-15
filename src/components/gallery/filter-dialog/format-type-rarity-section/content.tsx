@@ -24,7 +24,7 @@ function SearchModeRow() {
         value={state.searchMode}
         onValueChange={(value) => actions.setSearchMode(value as "name" | "text" | "all")}
       >
-        <SelectTrigger size="sm" className="h-8 w-full text-[10px]">
+        <SelectTrigger size="sm" className="w-full text-[10px]">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>

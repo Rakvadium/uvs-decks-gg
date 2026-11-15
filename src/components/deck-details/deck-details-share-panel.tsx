@@ -70,7 +70,6 @@ export function DeckDetailsSharePanel() {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             placeholder="Username"
-            className="h-9"
             onKeyDown={(e) => {
               if (e.key === "Enter") void onInvite();
             }}

@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Search, X } from "lucide-react";
 import {
   getFilterGroupLayout,
   type GameFilterGroupLayout,
@@ -19,48 +18,10 @@ import {
 } from "@/components/gallery/mobile-filter-sheet/primitives";
 import { ColorFacetChips } from "@/components/gallery/mobile-filter-sheet/color-facet-chips";
 import { OptionTile } from "@/components/ui/option-tile";
+import { SearchField } from "@/components/ui/search-field";
 import { SegmentedControl } from "@/components/ui/segmented-control";
 
 const compactChipClassName = "w-[100px] justify-center";
-
-function DesktopFilterSearch({
-  value,
-  onChange,
-  placeholder,
-  name,
-}: {
-  value: string;
-  onChange: (value: string) => void;
-  placeholder: string;
-  name: string;
-}) {
-  return (
-    <div className="relative min-w-0 flex-1">
-      <Search className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" aria-hidden />
-      <input
-        type="search"
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        placeholder={placeholder}
-        aria-label={placeholder}
-        name={name}
-        autoComplete="off"
-        spellCheck={false}
-        className="h-8 w-full rounded-lg border border-border/50 bg-background/60 pl-8 pr-8 text-xs text-foreground outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring [&::-webkit-search-cancel-button]:hidden"
-      />
-      {value ? (
-        <button
-          type="button"
-          onClick={() => onChange("")}
-          aria-label="Clear search"
-          className="absolute right-1 top-1/2 flex size-6 -translate-y-1/2 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        >
-          <X className="size-3.5" />
-        </button>
-      ) : null}
-    </div>
-  );
-}
 
 export function GalleryDesktopFilterSetsPage() {
   const { filters, setOptions, toggleStringFilter } = useGalleryFilterDialogContext();
@@ -78,9 +39,9 @@ export function GalleryDesktopFilterSetsPage() {
   return (
     <div className="flex h-full min-h-0 flex-col">
       <div className="shrink-0 space-y-2 px-4 pb-2 pt-3">
-        <DesktopFilterSearch
+        <SearchField
           value={query}
-          onChange={setQuery}
+          onValueChange={setQuery}
           placeholder="Search sets…"
           name="gallery-desktop-filter-sets"
         />
@@ -139,9 +100,9 @@ export function GalleryDesktopFilterKeywordsPage() {
   return (
     <div className="px-4 pb-4 pt-3">
       <div className="mb-3">
-        <DesktopFilterSearch
+        <SearchField
           value={query}
-          onChange={setQuery}
+          onValueChange={setQuery}
           placeholder="Search keywords…"
           name="gallery-desktop-filter-keywords"
         />
@@ -203,9 +164,9 @@ export function GalleryDesktopFilterTagsPage() {
   return (
     <div className="flex h-full min-h-0 flex-col">
       <div className="shrink-0 space-y-2 px-4 pb-2 pt-3">
-        <DesktopFilterSearch
+        <SearchField
           value={query}
-          onChange={setQuery}
+          onValueChange={setQuery}
           placeholder="Search tags…"
           name="gallery-desktop-filter-tags"
         />

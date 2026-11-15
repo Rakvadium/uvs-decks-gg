@@ -82,7 +82,7 @@ export function DeckSectionControls({ card, layout = "vertical" }: DeckSectionCo
         <Select value={selectedSection} onValueChange={(value) => setSelectedSection(value as DeckSection)}>
           <SelectTrigger
             size="sm"
-            className="h-8 w-[7rem] bg-card/50 px-2 text-[10px] tracking-widest"
+            className="w-[7rem] text-[10px]"
           >
             <SelectValue />
           </SelectTrigger>
@@ -132,10 +132,7 @@ export function DeckSectionControls({ card, layout = "vertical" }: DeckSectionCo
       >
         <div className="flex h-9 min-w-0 max-w-full items-center gap-1.5 py-0 pl-1.5 pr-2 sm:gap-2 sm:pl-1.5 sm:pr-2.5">
           <Select value={selectedSection} onValueChange={(value) => setSelectedSection(value as DeckSection)}>
-            <SelectTrigger
-              size="sm"
-              className="chrome-label-case h-8 w-28 min-w-0 shrink-0 border-0 bg-transparent px-0.5 text-xs font-semibold shadow-none focus:ring-0"
-            >
+            <SelectTrigger variant="inline" size="sm" className="w-28 min-w-0 shrink-0 px-1 text-xs font-semibold">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>

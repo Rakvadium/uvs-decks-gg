@@ -1,8 +1,7 @@
 import { useMemo } from "react";
 import { Panel } from "@/components/ui/panel";
-import { Search, X } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
+import { SearchField } from "@/components/ui/search-field";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { cn } from "@/lib/utils";
 import { useGalleryFilterDialogContext } from "./context";
@@ -11,7 +10,6 @@ import { SearchableMultiSelect } from "./searchable-multi-select";
 export function SetSection({ plain = false }: { plain?: boolean } = {}) {
   const isMobile = useIsMobile();
   const {
-    clearSetSearch,
     filteredSets,
     filters,
     setOptions,
@@ -34,24 +32,7 @@ export function SetSection({ plain = false }: { plain?: boolean } = {}) {
   if (!isMobile) {
     const list = (
       <>
-        <div className="relative">
-          <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            placeholder="Search sets..."
-            value={setSearch}
-            onChange={(event) => setSetSearch(event.target.value)}
-            className="h-7 bg-background/50 pl-8 text-xs"
-          />
-          {setSearch ? (
-            <button
-              type="button"
-              className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-              onClick={clearSetSearch}
-            >
-              <X className="h-3 w-3" />
-            </button>
-          ) : null}
-        </div>
+        <SearchField placeholder="Search sets..." value={setSearch} onValueChange={setSetSearch} name="filter-set-search" />
 
         <div className="grid max-h-[140px] grid-cols-2 gap-1 overflow-y-auto">
           {filteredSets.map((setOption) => {

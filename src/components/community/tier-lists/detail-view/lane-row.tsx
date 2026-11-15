@@ -97,9 +97,10 @@ export function CommunityTierListLaneRow({ tier }: { tier: BuilderTier }) {
 
           {canEdit && !isRankedScope && isEditingLane ? (
             <Input
+              size="xs"
               value={tier.label}
               onChange={(event) => setTierLabel(tier.id, event.target.value)}
-              className="chrome-label-case h-7 min-w-0 max-w-36 bg-background/80 text-sm font-bold"
+              className="chrome-label-case min-w-0 max-w-36 text-sm font-bold"
             />
           ) : (
             <SectionHeading

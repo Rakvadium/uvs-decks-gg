@@ -206,7 +206,7 @@ export function DeckDetailsEditDialog() {
               id="deck-edit-name"
               value={editName}
               onChange={(event) => setEditName(event.target.value)}
-              className="chrome-label-case h-10 text-sm font-semibold"
+              className="chrome-label-case text-sm font-semibold"
               placeholder="Deck name"
             />
           </div>
@@ -228,7 +228,7 @@ export function DeckDetailsEditDialog() {
               onValueChange={handleFormatChange}
               disabled={formats === undefined}
             >
-              <SelectTrigger id="deck-edit-format" className="h-10 w-full" size="default">
+              <SelectTrigger id="deck-edit-format" className="w-full">
                 <SelectValue placeholder={formats === undefined ? "Loading…" : "Select format"} />
               </SelectTrigger>
               <SelectContent>
@@ -248,7 +248,7 @@ export function DeckDetailsEditDialog() {
                 value={editSubFormat.trim() ? editSubFormat : SUBFORMAT_NONE}
                 onValueChange={(v) => setEditSubFormat(v === SUBFORMAT_NONE ? "" : v)}
               >
-                <SelectTrigger id="deck-edit-subformat" className="h-10 w-full" size="default">
+                <SelectTrigger id="deck-edit-subformat" className="w-full">
                   <SelectValue placeholder="Optional" />
                 </SelectTrigger>
                 <SelectContent>
@@ -265,7 +265,7 @@ export function DeckDetailsEditDialog() {
           <div className="space-y-1.5">
             <Label htmlFor="deck-edit-visibility">Visibility</Label>
             <Select value={selectRowValue} onValueChange={(v) => handleVisibilityRowChange(v as VisibilityRow)}>
-              <SelectTrigger id="deck-edit-visibility" className="h-10 w-full" size="default">
+              <SelectTrigger id="deck-edit-visibility" className="w-full">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>

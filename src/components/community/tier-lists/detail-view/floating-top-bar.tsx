@@ -66,7 +66,7 @@ export function CommunityTierListDetailFloatingTopBar() {
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          className="chrome-label-case inline-flex h-8 shrink-0 items-center gap-1.5 rounded-island border border-border/50 px-2.5 text-[10px] text-foreground transition-colors hover:border-primary/40 hover:text-primary"
+          className="chrome-label-case inline-flex h-8 shrink-0 items-center gap-1.5 rounded-island border border-border/50 px-2.5 text-[10px] text-foreground outline-none transition-colors hover:border-primary/40 hover:text-primary focus-visible:ring-2 focus-visible:ring-ring"
         >
           {isPublic ? <Globe className="h-3 w-3" /> : <Lock className="h-3 w-3" />}
           {displayPublicity}
@@ -96,7 +96,7 @@ export function CommunityTierListDetailFloatingTopBar() {
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          className="chrome-label-case inline-flex h-8 shrink-0 items-center gap-1.5 rounded-island border border-border/50 px-2.5 text-[10px] text-foreground transition-colors hover:border-primary/40 hover:text-primary"
+          className="chrome-label-case inline-flex h-8 shrink-0 items-center gap-1.5 rounded-island border border-border/50 px-2.5 text-[10px] text-foreground outline-none transition-colors hover:border-primary/40 hover:text-primary focus-visible:ring-2 focus-visible:ring-ring"
         >
           {rankingScopeLabel}
           <ChevronDown className="h-3 w-3 shrink-0 text-muted-foreground" />
@@ -131,11 +131,12 @@ export function CommunityTierListDetailFloatingTopBar() {
             >
               {canEdit && isEditingMeta ? (
                 <Input
+                  size="sm"
                   value={title}
                   onChange={(event) => setTitle(event.target.value)}
                   placeholder="Tier list name"
                   aria-label="Tier list name"
-                  className="h-8 w-56 border-none bg-transparent px-0 text-sm font-semibold tracking-tight shadow-none focus-visible:ring-0 dark:bg-transparent"
+                  className="w-56 text-sm font-semibold"
                 />
               ) : (
                 <h1

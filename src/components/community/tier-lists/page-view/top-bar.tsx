@@ -1,7 +1,7 @@
 "use client";
 
-import { Plus, Search } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { Plus } from "lucide-react";
+import { SearchField } from "@/components/ui/search-field";
 import { SegmentedControl } from "@/components/ui/segmented-control";
 import { MobileNavIconButton } from "@/components/shell/mobile-nav-bar/nav-icon-button";
 import { MobileSearchField } from "@/components/shell/mobile-tab-bar/search-field";
@@ -58,19 +58,14 @@ export function CommunityTierListsPageSearch() {
   if (activeTab === "rankings") return null;
 
   return (
-    <div className="relative w-full min-w-[300px] max-w-[30rem]">
-      <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" aria-hidden />
-      <Input
-        placeholder="Search tier lists…"
-        value={searchQuery}
-        onChange={(event) => setSearchQuery(event.target.value)}
-        className="h-9 pl-8"
-        name="tier-lists-search-desktop"
-        aria-label="Search tier lists"
-        autoComplete="off"
-        spellCheck={false}
-      />
-    </div>
+    <SearchField
+      placeholder="Search tier lists…"
+      value={searchQuery}
+      onValueChange={setSearchQuery}
+      name="tier-lists-search-desktop"
+      aria-label="Search tier lists"
+      className="w-full min-w-[300px] max-w-[30rem]"
+    />
   );
 }
 

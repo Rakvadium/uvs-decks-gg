@@ -95,11 +95,9 @@ export function InlineScopeSelect({ className }: { className?: string }) {
       onValueChange={(value) => actions.setSearchMode(value as "name" | "text" | "all")}
     >
       <SelectTrigger
-        size="sm"
-        className={cn(
-          "chrome-label-case h-6 min-w-[3.25rem] shrink-0 rounded-sm border-none bg-transparent px-1.5 py-0 text-[11px] text-muted-foreground shadow-none hover:bg-muted/50 hover:text-foreground focus-visible:ring-1 focus-visible:ring-[color:var(--control-dual-ring)] focus-visible:shadow-none",
-          className
-        )}
+        variant="inline"
+        size="xs"
+        className={cn("min-w-[3.25rem] shrink-0 px-1.5 text-[11px] text-muted-foreground hover:text-foreground", className)}
         aria-label="Search scope"
       >
         <SelectValue />

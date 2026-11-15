@@ -113,7 +113,7 @@ export function CommunityTierListDetailTopBar() {
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          className="chrome-label-case inline-flex h-8 shrink-0 items-center gap-1.5 rounded-md border border-border/50 px-2.5 text-[10px] text-foreground transition-colors hover:border-primary/40 hover:text-primary"
+          className="chrome-label-case inline-flex h-8 shrink-0 items-center gap-1.5 rounded-md border border-border/50 px-2.5 text-[10px] text-foreground outline-none transition-colors hover:border-primary/40 hover:text-primary focus-visible:ring-2 focus-visible:ring-ring"
         >
           {isPublic ? <Globe className="h-3 w-3" /> : <Lock className="h-3 w-3" />}
           {displayPublicity}
@@ -143,7 +143,7 @@ export function CommunityTierListDetailTopBar() {
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          className="chrome-label-case inline-flex h-8 shrink-0 items-center gap-1.5 rounded-md border border-border/50 px-2.5 text-[10px] text-foreground transition-colors hover:border-primary/40 hover:text-primary"
+          className="chrome-label-case inline-flex h-8 shrink-0 items-center gap-1.5 rounded-md border border-border/50 px-2.5 text-[10px] text-foreground outline-none transition-colors hover:border-primary/40 hover:text-primary focus-visible:ring-2 focus-visible:ring-ring"
         >
           {rankingScopeLabel}
           <ChevronDown className="h-3 w-3 shrink-0 text-muted-foreground" />
@@ -221,9 +221,10 @@ export function CommunityTierListDetailTopBar() {
         <div className="min-w-0 flex-1">
           {canEdit && isEditingMeta ? (
             <Input
+              size="sm"
               value={title}
               onChange={(event) => setTitle(event.target.value)}
-              className="chrome-label-case h-8 min-w-0 text-sm font-bold"
+              className="chrome-label-case min-w-0 text-sm font-bold"
               placeholder="Tier list name..."
             />
           ) : (
