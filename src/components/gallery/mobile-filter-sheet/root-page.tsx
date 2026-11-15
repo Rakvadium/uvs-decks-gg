@@ -34,7 +34,7 @@ function ActiveChipsStrip() {
   if (chips.length === 0) return null;
 
   return (
-    <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+    <div className="-mx-4 flex gap-2 scroll-row px-4 pb-1">
       {chips.map((chip) => (
         <ActiveFilterChip key={chip.id} label={chip.label} onRemove={chip.remove} />
       ))}

@@ -215,7 +215,7 @@ export function FilterTokens({
   return (
     <div
       className={cn(
-        "flex w-full min-w-0 flex-nowrap items-center gap-1.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
+        "flex w-full min-w-0 flex-nowrap items-center gap-1.5 scroll-row",
         centered && "[justify-content:safe_center]",
         className
       )}
