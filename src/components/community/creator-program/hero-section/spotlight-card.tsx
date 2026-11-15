@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 
 export function CreatorProgramHeroSpotlightCard() {
   return (
-    <Card className="border-glow bg-background/80">
+    <Card className="border-glow">
       <CardHeader className="space-y-2">
         <CardTitle className="text-lg">Creator Spotlight</CardTitle>
         <CardDescription>Featured creator profiles and weekly drops.</CardDescription>
