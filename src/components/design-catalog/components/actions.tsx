@@ -7,7 +7,6 @@ import { Button, buttonVariants, type ButtonProps } from "@/components/ui/button
 import { SegmentedControl, type SegmentedControlItem } from "@/components/ui/segmented-control";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { ToggleGroup, ToggleGroupItem, type ToggleGroupItemProps, type ToggleGroupProps } from "@/components/ui/toggle-group";
 import { cn } from "@/lib/utils";
 import { CatalogEntrySection, Preview, ScrollRow, SpecimenGrid, SpecimenLabel } from "../specimen/entry";
 import { Code, CodeBlock } from "../specimen/code-block";
@@ -174,7 +173,11 @@ export function ButtonEntry() {
 }
 
 type SegmentedSize = NonNullable<ComponentProps<typeof SegmentedControl>["size"]>;
-const SEGMENTED_SIZES: Record<SegmentedSize, string> = { sm: "Toolbars", md: "Default" };
+const SEGMENTED_SIZES: Record<SegmentedSize, string> = {
+  xs: "--control-h-xs · dense panels",
+  sm: "--control-h-sm · toolbars",
+  md: "--control-h-md · default",
+};
 
 const VIEW_ITEMS: SegmentedControlItem[] = [
   { value: "grid", label: "Grid", icon: Grid3x3 },
@@ -186,13 +189,19 @@ const VIEW_ITEMS: SegmentedControlItem[] = [
 export function SegmentedControlEntry() {
   const [value, setValue] = useState("grid");
   const [panel, setPanel] = useState("cards");
+  const [zones, setZones] = useState<string[]>(["high"]);
+  const toggleZone = (zone: string) =>
+    setZones((current) => (current.includes(zone) ? current.filter((entry) => entry !== zone) : [...current, zone]));
   return (
     <CatalogEntrySection
       id="segmented-control"
       description={
         <p>
-          A controlled single choice with <Code>aria-pressed</Code> buttons. Items take an icon, a badge and{" "}
-          <Code>disabled</Code>; the control takes <Code>size</Code>, <Code>orientation</Code> and <Code>stretch</Code>.
+          A controlled choice with <Code>aria-pressed</Code> buttons. Pass <Code>value</Code> and{" "}
+          <Code>onValueChange</Code> for one choice, or <Code>values</Code> and <Code>onToggle</Code> for several. Items
+          take an icon, a badge and <Code>disabled</Code>; the control takes <Code>size</Code>, <Code>orientation</Code>{" "}
+          and <Code>stretch</Code>. Heights read <Code>--control-h-*</Code>, the selected segment reads{" "}
+          <Code>--selected-bg</Code> and <Code>--selected-fg</Code>, and hover reads <Code>--hover-bg</Code>.
         </p>
       }
     >
@@ -218,8 +227,8 @@ export function SegmentedControlEntry() {
             </div>
           </div>
         </Preview>
-        <Preview label='orientation="vertical"'>
-          <div className="max-w-56">
+        <Preview label='orientation="vertical" · values + onToggle'>
+          <div className="max-w-56 space-y-4">
             <SegmentedControl
               orientation="vertical"
               value={panel}
@@ -228,6 +237,18 @@ export function SegmentedControlEntry() {
                 { value: "cards", label: "Cards", badge: 60 },
                 { value: "stats", label: "Stats" },
                 { value: "hand", label: "Hand simulator" },
+              ]}
+            />
+            <SegmentedControl
+              size="xs"
+              stretch
+              aria-label="Zone"
+              values={zones}
+              onToggle={toggleZone}
+              items={[
+                { value: "high", label: "High" },
+                { value: "mid", label: "Mid" },
+                { value: "low", label: "Low" },
               ]}
             />
           </div>
@@ -240,48 +261,11 @@ export function SegmentedControlEntry() {
   );
 }
 
-type ToggleItemSpec = Pick<ToggleGroupItemProps, "value" | "disabled"> & { label: string };
-const TOGGLE_ITEMS: ToggleItemSpec[] = [
-  { value: "owned", label: "Owned" },
-  { value: "missing", label: "Missing" },
-  { value: "all", label: "All" },
-  { value: "trade", label: "Trade", disabled: true },
-];
-
-export function ToggleGroupEntry() {
-  const [value, setValue] = useState<ToggleGroupProps["value"]>("owned");
-  return (
-    <CatalogEntrySection
-      id="toggle-group"
-      description={
-        <p>
-          A lighter single-choice pill. Only <Code>type=&quot;single&quot;</Code> exists. Prefer{" "}
-          <Code>SegmentedControl</Code> in toolbars; it follows the chrome&apos;s label casing.
-        </p>
-      }
-    >
-      <Preview>
-        <ToggleGroup type="single" value={value} onValueChange={setValue} aria-label="Collection filter">
-          {TOGGLE_ITEMS.map((item) => (
-            <ToggleGroupItem key={item.value} value={item.value} disabled={item.disabled}>
-              {item.label}
-            </ToggleGroupItem>
-          ))}
-        </ToggleGroup>
-      </Preview>
-      <CodeBlock
-        code={`import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"\n\n<ToggleGroup type="single" value={filter} onValueChange={setFilter}>\n  <ToggleGroupItem value="owned">Owned</ToggleGroupItem>\n  <ToggleGroupItem value="missing">Missing</ToggleGroupItem>\n</ToggleGroup>`}
-      />
-    </CatalogEntrySection>
-  );
-}
-
 export function ActionsChapter() {
   return (
     <>
       <ButtonEntry />
       <SegmentedControlEntry />
-      <ToggleGroupEntry />
     </>
   );
 }

@@ -53,10 +53,8 @@ export function DecksMobileScopeControl() {
   return (
     <SegmentedControl
       orientation="horizontal"
-      size="sm"
       stretch
-      className="w-full bg-muted/30 md:hidden"
-      itemClassName="h-10"
+      className="w-full md:hidden"
       value={state.activeTab}
       onValueChange={(value) => actions.setActiveTab(value as typeof state.activeTab)}
       items={visibleTabs.map((tab) => {

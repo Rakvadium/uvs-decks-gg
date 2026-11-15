@@ -35,4 +35,29 @@ describe("SegmentedControl single choice", () => {
   test("with no value nothing is pressed", () => {
     expect(render({ items: ITEMS }).map((button) => button.pressed)).toEqual(["false", "false", "false"]);
   });
+
+  test("the pressed segment reads the selected tokens and the rest read the hover token", () => {
+    const [grid, list] = render({ items: ITEMS, value: "list" });
+    expect(list.classes).toEqual(expect.arrayContaining(["bg-(--selected-bg)", "text-(--selected-fg)"]));
+    expect(grid.classes).toContain("hover:bg-(--hover-bg)");
+    expect(grid.classes).not.toContain("bg-(--selected-bg)");
+  });
+});
+
+describe("SegmentedControl multiple choice", () => {
+  test("marks every item in values as pressed", () => {
+    const buttons = render({ items: ITEMS, values: ["grid", "rows"], onToggle: () => {} });
+    expect(buttons.map((button) => button.pressed)).toEqual(["true", "false", "true"]);
+  });
+});
+
+describe("SegmentedControl height", () => {
+  test.each([
+    ["xs", "h-(--control-h-xs)"],
+    ["sm", "h-(--control-h-sm)"],
+    ["md", "h-(--control-h-md)"],
+  ] as const)("size %s reads %s", (size, height) => {
+    const html = renderToStaticMarkup(createElement(SegmentedControl, { items: ITEMS, size }));
+    expect(html.match(/<div[^>]*class="([^"]*)"/)?.[1].split(/\s+/)).toContain(height);
+  });
 });
