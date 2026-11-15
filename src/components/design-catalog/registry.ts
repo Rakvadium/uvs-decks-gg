@@ -306,6 +306,7 @@ export const CATALOG_CHAPTERS = [
             exports: [
               "Dialog",
               "DialogBody",
+              "DialogCancel",
               "DialogClose",
               "DialogContent",
               "DialogDescription",
@@ -316,12 +317,26 @@ export const CATALOG_CHAPTERS = [
               "DialogTitle",
               "DialogTrigger",
               "overlayScrimClassName",
+              "dialogSurfaceClassName",
+              "dialogTitleClassName",
             ],
             documentedOnly: {
               DialogPortal: "DialogContent renders its own portal.",
               DialogOverlay: "DialogContent renders its own overlay.",
               overlayScrimClassName: "The scrim class every overlay (Dialog, AlertDialog, Sheet) shares.",
+              dialogSurfaceClassName: "The panel surface DialogContent and AlertDialogContent share.",
+              dialogTitleClassName: "The title recipe DialogTitle and AlertDialogTitle share.",
             },
+          },
+        ],
+      },
+      {
+        id: "create-entity-dialog",
+        label: "CreateEntityDialog",
+        ui: [
+          {
+            file: "create-entity-dialog.tsx",
+            exports: ["CreateEntityDialog", "CreateEntityDialogProps", "createEntityLabelClassName"],
           },
         ],
       },
@@ -409,9 +424,21 @@ export const CATALOG_CHAPTERS = [
         id: "popover",
         label: "Popover & HoverCard",
         ui: [
-          { file: "popover.tsx", exports: ["Popover", "PopoverTrigger", "PopoverContent", "PopoverAnchor"] },
+          {
+            file: "popover.tsx",
+            exports: ["Popover", "PopoverTrigger", "PopoverContent", "PopoverAnchor", "popoverSurfaceClassName"],
+            documentedOnly: {
+              popoverSurfaceClassName:
+                "The surface Popover, HoverCard, SelectContent, DropdownMenuContent and DropdownMenuSubContent share.",
+            },
+          },
           { file: "hover-card.tsx", exports: ["HoverCard", "HoverCardTrigger", "HoverCardContent"] },
         ],
+      },
+      {
+        id: "icon-toolbar-button",
+        label: "IconToolbarButton",
+        ui: [{ file: "icon-toolbar-button.tsx", exports: ["IconToolbarButton", "IconToolbarButtonProps"] }],
       },
       {
         id: "tooltip",

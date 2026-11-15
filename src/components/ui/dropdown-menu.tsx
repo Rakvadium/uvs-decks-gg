@@ -5,6 +5,7 @@ import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu"
 import { CheckIcon, ChevronRightIcon, CircleIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
+import { popoverSurfaceClassName } from "@/components/ui/popover"
 
 function DropdownMenu({
   ...props
@@ -42,9 +43,8 @@ function DropdownMenuContent({
         data-slot="dropdown-menu-content"
         sideOffset={sideOffset}
         className={cn(
-          "z-select max-h-(--radix-dropdown-menu-content-available-height) min-w-[8rem] origin-(--radix-dropdown-menu-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-lg border border-[color:var(--control-dual-border)] p-1.5",
-          "bg-popover-overlay text-popover-foreground backdrop-blur-lg",
-          "shadow-[var(--chrome-popover-shadow),var(--popover-dual-glow)]",
+          popoverSurfaceClassName,
+          "z-select max-h-(--radix-dropdown-menu-content-available-height) min-w-[8rem] origin-(--radix-dropdown-menu-content-transform-origin) overflow-x-hidden overflow-y-auto p-1.5",
           "data-[state=open]:animate-in data-[state=closed]:animate-out",
           "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
           "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
@@ -254,9 +254,8 @@ function DropdownMenuSubContent({
       <DropdownMenuPrimitive.SubContent
         data-slot="dropdown-menu-sub-content"
         className={cn(
-          "z-select min-w-[8rem] origin-(--radix-dropdown-menu-content-transform-origin) overflow-hidden rounded-lg border border-[color:var(--control-dual-border)] p-1.5",
-          "bg-popover text-popover-foreground",
-          "shadow-[var(--chrome-popover-shadow),var(--popover-dual-glow)]",
+          popoverSurfaceClassName,
+          "z-select min-w-[8rem] origin-(--radix-dropdown-menu-content-transform-origin) overflow-hidden p-1.5",
           "data-[state=open]:animate-in data-[state=closed]:animate-out",
           "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
           "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
