@@ -15,8 +15,8 @@ class strings in files under the given paths, and lists what is left for human j
   - raw z-30 ... z-[600] -> named z utilities
   - <Button> h-*, w-*, size-* and rounded-* overrides -> the Button size ladder (xs/sm/md/lg, icon-*)
 Only files under <path> are read or written. --dry writes nothing. --buttons runs only the <Button> pass.
---surfaces runs only the surface pass: <Badge> text-[10px]/h-5 -> size="sm", h-8 -> size="lg", and
-self-closing animate-pulse divs on a muted fill -> <Skeleton>.
+--surfaces runs only the surface pass: <Badge> text-[10px]/h-5 -> size="sm", h-8 -> size="lg",
+self-closing animate-pulse divs on a muted fill -> <Skeleton>, Loader2 animate-spin -> <Spinner>.
 Exit 0 done, 1 a file could not be parsed, 2 bad usage.`;
 
 const EXTENSIONS = new Set([".ts", ".tsx", ".js", ".jsx", ".mjs", ".mts"]);

@@ -1,6 +1,7 @@
 "use client";
 
 import { PageHeading } from "@/components/ui/typography-headings";
+import { Surface } from "@/components/ui/card";
 import { memo, useEffect, useState } from "react";
 import { Layers, LayoutGrid, ArrowRight, Hexagon, Users, Zap, Database, Activity, ChevronRight, Clapperboard } from "lucide-react";
 import Link from "next/link";
@@ -25,7 +26,7 @@ function StatCard({ label, value, icon: Icon, delay = 0, animate = true }: { lab
       transition={{ duration: 0.5, delay }}
       className="relative group"
     >
-      <div className="relative flex items-center gap-4 rounded-lg border border-border/50 bg-card/80 p-4 shadow-[var(--chrome-elevation-low)] transition-[border-color,box-shadow] duration-150 hover:border-[var(--chrome-card-border-hover)] hover:shadow-[var(--chrome-elevation-mid)]">
+      <Surface className="flex-row items-center gap-4 p-4">
         <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-primary/30 bg-primary/10">
           <Icon className="h-5 w-5 text-primary" />
         </div>
@@ -33,7 +34,7 @@ function StatCard({ label, value, icon: Icon, delay = 0, animate = true }: { lab
           <p className="text-2xl font-bold tabular-nums text-foreground">{value}</p>
           <p className="chrome-label-case text-xs text-muted-foreground">{label}</p>
         </div>
-      </div>
+      </Surface>
     </m.div>
   );
 }

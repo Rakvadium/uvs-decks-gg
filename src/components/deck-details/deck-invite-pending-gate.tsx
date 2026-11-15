@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import { useMutation } from "convex/react";
-import { Loader2 } from "lucide-react";
+
 import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Spinner } from "@/components/ui/spinner";
 
 interface DeckInvitePendingGateProps {
   deckId: Id<"decks">;
@@ -43,7 +44,7 @@ export function DeckInvitePendingGate({ deckId, deckName }: DeckInvitePendingGat
         <CardContent className="space-y-3">
           {error ? <p className="text-sm text-destructive">{error}</p> : null}
           <Button type="button" className="w-full" disabled={busy} onClick={() => void onAccept()}>
-            {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : "Accept invite"}
+            {busy ? <Spinner /> : "Accept invite"}
           </Button>
         </CardContent>
       </Card>

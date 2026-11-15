@@ -41,23 +41,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  User,
-  Palette,
-  Moon,
-  Sun,
-  Monitor,
-  ArrowLeft,
-  Check,
-  Loader2,
-  Mail,
-  AtSign,
-  Shield,
-  Calendar,
-  Sparkles,
-  Filter,
-  ChevronDown,
-} from "lucide-react";
+import { User, Palette, Moon, Sun, Monitor, ArrowLeft, Check, Mail, AtSign, Shield, Calendar, Sparkles, Filter, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { validateUsername } from "@shared/username";
@@ -75,6 +59,7 @@ import {
   normalizeAvatarImagePath,
 } from "@/lib/user-avatar";
 import { SettingsAuthRequiredState } from "./auth-required-state";
+import { Spinner } from "@/components/ui/spinner";
 
 const MODE_OPTIONS: readonly {
   value: ThemePreference;
@@ -501,7 +486,7 @@ export default function SettingsPageClient() {
                     className="gap-2"
                   >
                     {isSaving ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <Spinner />
                     ) : (
                       <Check className="h-4 w-4" />
                     )}

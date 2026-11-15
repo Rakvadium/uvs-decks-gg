@@ -1,5 +1,7 @@
-import { Database, Loader2 } from "lucide-react";
+import { Database } from "lucide-react";
+
 import { Kicker, SectionHeading } from "@/components/ui/typography-headings";
+import { Spinner } from "@/components/ui/spinner";
 
 interface GalleryStatsProps {
   totalCards: number;
@@ -29,7 +31,7 @@ export function GalleryStats({ totalCards, filteredCount, isLoading }: GallerySt
       <div className="flex items-center gap-2">
         {isLoading ? (
           <>
-            <Loader2 className="h-4 w-4 animate-spin text-primary" />
+            <Spinner className="text-primary" />
             <Kicker>Loading</Kicker>
           </>
         ) : (

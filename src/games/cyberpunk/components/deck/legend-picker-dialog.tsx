@@ -1,7 +1,8 @@
 "use client";
 
 import { useCallback, useDeferredValue, useMemo, useState } from "react";
-import { Check, Loader2, Search, XIcon } from "lucide-react";
+import { Check, Search, XIcon } from "lucide-react";
+
 import { CYBERPUNK_COLORS } from "@shared/games/cyberpunk/card-types";
 import { CYBERPUNK_LEGEND_COUNT, normalizeCyberpunkSetup } from "@shared/games/cyberpunk/setup";
 import { Button } from "@/components/ui/button";
@@ -26,6 +27,7 @@ import { cyberpunkCardTitle } from "../../config";
 import { SymbolBadge, SymbolIcon } from "../color-pip";
 import { LegendArt } from "./legend-art";
 import { applyLegendPick, buildLegendPickerOptions } from "./legend-model";
+import { Spinner } from "@/components/ui/spinner";
 
 /**
  * Legend picker: Legend cards only, name search, color filter. Without `slotIndex` it toggles
@@ -167,7 +169,7 @@ export function LegendPickerDialog({ open, onOpenChange, setup, onChange, slotIn
                       ) : null}
                       {pendingId === card._id ? (
                         <span className="absolute inset-1 flex items-center justify-center rounded-md bg-background/60">
-                          <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                          <Spinner size="md" className="text-primary" />
                         </span>
                       ) : null}
                       <span className="mt-1.5 block truncate text-xs font-semibold">{cardTitle}</span>

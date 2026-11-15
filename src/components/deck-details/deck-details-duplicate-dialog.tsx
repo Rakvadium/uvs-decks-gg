@@ -1,6 +1,6 @@
 "use client";
 
-import { Loader2 } from "lucide-react";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -12,6 +12,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useDeckDetails } from "@/providers/DeckDetailsProvider";
+import { Spinner } from "@/components/ui/spinner";
 
 export function DeckDetailsDuplicateDialog() {
   const {
@@ -37,7 +38,7 @@ export function DeckDetailsDuplicateDialog() {
         <AlertDialogFooter>
           <AlertDialogCancel disabled={isDuplicating}>Cancel</AlertDialogCancel>
           <AlertDialogAction onClick={() => void confirmDuplicate()} disabled={isDuplicating}>
-            {isDuplicating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+            {isDuplicating ? <Spinner /> : null}
             Duplicate
           </AlertDialogAction>
         </AlertDialogFooter>

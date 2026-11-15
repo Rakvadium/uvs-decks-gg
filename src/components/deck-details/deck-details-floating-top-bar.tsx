@@ -1,6 +1,7 @@
 "use client";
 
-import { Copy, Edit3, Loader2, Zap } from "lucide-react";
+import { Copy, Edit3, Zap } from "lucide-react";
+
 import {
   FloatingActionPill,
   FloatingBackPill,
@@ -9,6 +10,7 @@ import {
 } from "@/components/shell/floating-page-bar";
 import { cn } from "@/lib/utils";
 import { useDeckDetailsTopBarContext } from "./deck-details-top-bar/context";
+import { Spinner } from "@/components/ui/spinner";
 
 export function DeckDetailsFloatingTopBar() {
   const {
@@ -63,7 +65,7 @@ export function DeckDetailsFloatingTopBar() {
             aria-label="Duplicate deck"
           >
             {isDuplicating ? (
-              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              <Spinner />
             ) : (
               <Copy className="h-3.5 w-3.5" />
             )}

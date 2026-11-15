@@ -3,7 +3,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Id } from "../../../../convex/_generated/dataModel";
 import Image from "next/image";
-import { Loader2, Search, XIcon } from "lucide-react";
+import { Search, XIcon } from "lucide-react";
+
 import { UNIVERSUS_FILTER_SYMBOLS, UNIVERSUS_SYMBOL_DISPLAY, formatUniversusCardType, type UniversusSymbol } from "@/games/uvs/config";
 import { useCardData } from "@/lib/universus/card-data-provider";
 import { filterCards } from "@/lib/universus/use-universus-cards";
@@ -17,6 +18,7 @@ import { Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, Di
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { Spinner } from "@/components/ui/spinner";
 
 interface DeckCharacterPickerDialogProps {
   open: boolean;
@@ -214,7 +216,7 @@ export function DeckCharacterPickerDialog({
                       ) : null}
                       {isSelecting ? (
                         <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-background/50">
-                          <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                          <Spinner size="md" className="text-primary" />
                         </div>
                       ) : null}
                     </div>

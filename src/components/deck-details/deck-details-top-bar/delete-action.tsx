@@ -1,4 +1,4 @@
-import { Loader2, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -12,6 +12,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useDeckDetailsTopBarContext } from "./context";
+import { Spinner } from "@/components/ui/spinner";
 
 interface DeckDetailsTopBarDeleteActionProps {
   compact?: boolean;
@@ -43,7 +44,7 @@ export function DeckDetailsTopBarDeleteAction({ compact = false }: DeckDetailsTo
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction variant="destructive" onClick={() => void deleteDeck()} disabled={isDeleting}>
-            {isDeleting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+            {isDeleting ? <Spinner /> : null}
             Delete
           </AlertDialogAction>
         </AlertDialogFooter>

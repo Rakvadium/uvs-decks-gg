@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useConvexAuth, useQuery } from "convex/react";
-import { Loader2 } from "lucide-react";
+
 import { api } from "../../../../convex/_generated/api";
 import { useStartAuth } from "@/components/auth/use-start-auth";
 import { Badge } from "@/components/ui/badge";
@@ -15,6 +15,7 @@ import {
 } from "@/components/community/tier-lists/moderation-badge";
 import { getTierListScopeLabel } from "@/components/community/tier-lists/utils";
 import { useGameId } from "@/games/game-context";
+import { Spinner } from "@/components/ui/spinner";
 
 function formatUpdatedAt(timestamp: number) {
   return new Intl.DateTimeFormat(undefined, {
@@ -92,7 +93,7 @@ export function CommunityTierListsSidebarPanel() {
               </div>
             ) : myLists === undefined ? (
               <div className="flex justify-center py-10">
-                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                <Spinner size="md" className="text-muted-foreground" />
               </div>
             ) : myLists.length === 0 ? (
               <p className="text-center text-xs text-muted-foreground">You have no tier lists yet.</p>

@@ -1,9 +1,9 @@
-import { Loader2 } from "lucide-react";
+import { Spinner } from "@/components/ui/spinner";
 
 export function CollectionViewLoadingState() {
   return (
     <div className="flex h-full items-center justify-center">
-      <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      <Spinner size="lg" className="text-muted-foreground" />
     </div>
   );
 }

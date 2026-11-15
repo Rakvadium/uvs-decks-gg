@@ -3,7 +3,8 @@
 import { useMemo } from "react";
 import Link from "next/link";
 import { useConvexAuth, useQuery } from "convex/react";
-import { BarChart3, Download, Grid2x2Plus, Loader2, Shuffle } from "lucide-react";
+import { BarChart3, Download, Grid2x2Plus, Shuffle } from "lucide-react";
+
 import { api } from "../../../convex/_generated/api";
 import { Button } from "@/components/ui/button";
 import { DeckInvitePendingGate } from "@/components/deck-details/deck-invite-pending-gate";
@@ -36,6 +37,7 @@ import { DeckDetailsDuplicateDialog } from "./deck-details-duplicate-dialog";
 import { DeckDetailsEditDialog } from "./deck-details-edit-dialog";
 import { TeamEditableWriteConflictBanner } from "@/components/deck/team-editable-write-conflict-banner";
 import { isDeckQuantitiesEmpty } from "./deck-empty";
+import { Spinner } from "@/components/ui/spinner";
 
 function DeckDetailsGallerySlotRegistration() {
   const gallerySlotOptions = useMemo(() => ({ label: "Gallery", icon: Grid2x2Plus, priority: 0 }), []);
@@ -89,7 +91,7 @@ export function DeckDetailsView() {
       {isLoading || (!deck && pendingInvite === undefined) ? (
         <div className="flex h-full items-center justify-center">
           <div className="flex flex-col items-center gap-4">
-            <Loader2 className="h-8 w-8 animate-spin text-primary drop-shadow-[0_0_10px_var(--primary)]" />
+            <Spinner size="lg" className="text-primary drop-shadow-[0_0_10px_var(--primary)]" />
             <span className="chrome-label-case text-sm text-muted-foreground">Loading Deck Data</span>
           </div>
         </div>
