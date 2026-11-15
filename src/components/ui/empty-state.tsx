@@ -82,7 +82,7 @@ function EmptyState({
         </div>
       ) : null}
       {action ? (
-        <div data-slot="empty-state-action" className={cn("flex flex-wrap items-center justify-center gap-2", variant !== "inline" && "mt-2")}>
+        <div data-slot="empty-state-action" className="mt-2 flex w-full flex-wrap items-center justify-center gap-2">
           {action}
         </div>
       ) : null}

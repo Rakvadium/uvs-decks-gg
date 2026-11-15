@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
 import { SidebarGalleryListItem } from "../deck-details-card-items";
 import { useAvailableGallerySidebarContext } from "./context";
 import { useGameModule } from "@/games/game-context";
@@ -17,9 +18,7 @@ export function DeckDetailsGallerySidebarBody() {
   return (
     <div className="min-h-0 flex-1 overflow-y-auto px-3 py-3">
       {visibleCards.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-border/50 p-4 text-center text-xs text-muted-foreground">
-          No cards match your current filters.
-        </div>
+        <EmptyState variant="inline" title="No cards match your current filters." />
       ) : viewMode === "card" ? (
         <div className="grid grid-cols-2 gap-2">
           {visibleCards.map((card, index) => {

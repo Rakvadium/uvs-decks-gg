@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { Panel } from "@/components/ui/panel";
 import { useGameModule } from "@/games/game-context";
 import { type PieChartColorStrategy, resolvePieBucketColor } from "./constants";
 
@@ -63,7 +64,7 @@ export function PieDistributionChart({
   }, [chartTotal, visibleBuckets, colorStrategy, palette, labelColors]);
 
   return (
-    <div className="space-y-2 rounded-lg border border-border/50 bg-card/30 p-3">
+    <Panel className="space-y-2 p-3">
       <div className="flex items-center justify-between">
         <span className="chrome-label-case text-[10px] text-muted-foreground">{title}</span>
         <span className="text-[10px] text-muted-foreground">{chartTotal}</span>
@@ -102,7 +103,7 @@ export function PieDistributionChart({
           </div>
         </div>
       )}
-    </div>
+    </Panel>
   );
 }
 

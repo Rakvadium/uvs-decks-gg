@@ -1,6 +1,7 @@
 "use client";
 
 import { DeckFormatLegalityBadge } from "@/components/deck-details/deck-format-legality-badge";
+import { Surface } from "@/components/ui/card";
 import { DeckVisibilityBadgeMenu } from "@/components/deck-details/deck-visibility-badge-menu";
 import type { DeckTeamSharing, DeckVisibility } from "@/lib/deck/visibility";
 import { normalizeDeckVisibility, deckTeamSharingFromDeck } from "@/lib/deck/visibility";
@@ -20,7 +21,7 @@ export function DeckDetailsMetaPanel() {
   if (!deck) return null;
 
   return (
-    <section className="min-w-0 flex-1 rounded-xl border border-border/50 bg-card/80 p-3 backdrop-blur-sm sm:p-4">
+    <Surface className="min-w-0 flex-1 gap-0 p-3 sm:p-4">
       <div className="space-y-3">
         <div className="space-y-2">
           <h1 className="chrome-heading-case line-clamp-2 text-lg font-bold sm:text-xl" title={deck.name}>
@@ -52,6 +53,6 @@ export function DeckDetailsMetaPanel() {
           {deck.description?.trim() ? deck.description : "No description yet."}
         </p>
       </div>
-    </section>
+    </Surface>
   );
 }

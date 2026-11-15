@@ -1,6 +1,7 @@
 "use client";
 
 import { Eye } from "lucide-react";
+import { Banner } from "@/components/ui/banner";
 import { useConvexAuth } from "convex/react";
 import { useStartAuth } from "@/components/auth/use-start-auth";
 import { Button } from "@/components/ui/button";
@@ -14,7 +15,7 @@ export function DeckDetailsReadOnlyBanner() {
   if (!deck || isOwner) return null;
 
   return (
-    <div className="flex flex-wrap items-center gap-2 rounded-lg border border-border/50 bg-muted/60 px-3 py-2 text-xs text-foreground/80">
+    <Banner>
       <div className="flex min-w-0 flex-1 items-center gap-2">
         <Eye className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
         <span>You&apos;re viewing this deck in read-only mode.</span>
@@ -23,12 +24,12 @@ export function DeckDetailsReadOnlyBanner() {
         <Button
           type="button"
           size="xs"
-          className="shrink-0 px-2.5 text-xs"
+          className="shrink-0"
           onClick={() => startAuth()}
         >
           Sign in to edit
         </Button>
       ) : null}
-    </div>
+    </Banner>
   );
 }

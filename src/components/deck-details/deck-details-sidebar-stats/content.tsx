@@ -1,6 +1,7 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
+import { EmptyState } from "@/components/ui/empty-state";
 import { BarDistributionChart } from "./bar-chart";
 import { PieDistributionChart } from "./distribution-chart";
 import { StatsSidebarProvider, useStatsSidebarContext } from "./context";
@@ -21,9 +22,7 @@ function StatsSidebarContent() {
       </div>
 
       {mainTotal === 0 ? (
-        <div className="rounded-lg border border-dashed border-border/50 p-4 text-xs text-muted-foreground">
-          Add cards to your Main deck to view stats.
-        </div>
+        <EmptyState variant="inline" title="Add cards to your Main deck to view stats." />
       ) : (
         <div className="space-y-3">
           {charts.map(({ chart, buckets, total }) =>
