@@ -25,16 +25,16 @@ export const SHELL_SIDEBAR_SURFACE_STYLE = {
 } as const;
 
 export const SHELL_NAV_ITEM_BASE =
-  "group relative flex items-center gap-3 rounded-md border px-3 py-2.5 text-sm font-medium transition-[color,background-color,border-color] duration-150";
+  "group relative flex items-center gap-3 rounded-control border px-3 py-2.5 text-sm font-medium transition-[color,background-color,border-color] duration-150";
 
 export const SHELL_NAV_ITEM_IDLE =
-  "border-transparent text-sidebar-foreground hover:border-sidebar-border hover:bg-sidebar-accent hover:text-sidebar-accent-foreground";
+  "border-transparent text-sidebar-foreground hover:bg-(--hover-bg) hover:text-foreground";
 
 export const SHELL_NAV_ITEM_ACTIVE =
-  "border-accent/55 bg-accent/18 text-accent shadow-[var(--chrome-shell-nav-active-shadow)]";
+  "border-(--selected-border) bg-(--selected-bg) text-(--selected-fg) shadow-[var(--chrome-shell-nav-active-shadow)]";
 
 export const SHELL_NAV_ICON_ACTIVE =
-  "text-accent [filter:var(--chrome-shell-icon-drop-shadow)]";
+  "text-(--selected-fg) [filter:var(--chrome-shell-icon-drop-shadow)]";
 
 export const SHELL_RAIL_WIDTH = 64;
 
@@ -48,7 +48,7 @@ export const SHELL_RAIL_STACK_CLASS = "flex flex-col items-center gap-2 p-1";
 export const SHELL_RAIL_TOP_PADDING_CLASS = "pt-4";
 
 export const SHELL_RAIL_ITEM_IDLE =
-  "border-transparent text-sidebar-foreground hover:border-accent/40 hover:bg-accent/12 hover:text-accent";
+  "border-transparent text-sidebar-foreground hover:bg-(--hover-bg) hover:text-foreground";
 
 export const SHELL_RAIL_ITEM_ACTIVE =
-  "border-accent/55 bg-accent/18 text-accent shadow-[var(--chrome-shell-rail-active-shadow)]";
+  "border-(--selected-border) bg-(--selected-bg) text-(--selected-fg) shadow-[var(--chrome-shell-rail-active-shadow)]";
