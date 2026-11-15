@@ -1,7 +1,7 @@
 import * as m from "framer-motion/m";
 import { AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { IconToolbarButton } from "@/components/ui/icon-toolbar-button";
 import { usePrefersReducedMotion } from "@/lib/reduced-motion";
 import { cn } from "@/lib/utils";
 import { SectionHeading } from "@/components/ui/typography-headings";
@@ -58,14 +58,13 @@ export function RightSidebarExpandedPanel() {
                   </SectionHeading>
                 )}
               </div>
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                className="ml-2 shrink-0 border border-transparent text-sidebar-foreground hover:border-accent/35 hover:bg-accent/10 hover:text-accent"
+              <IconToolbarButton
+                label="Close panel"
+                className="ml-2 shrink-0"
                 onClick={() => setActiveSidebarAction(null)}
               >
-                <X className="h-4 w-4" />
-              </Button>
+                <X />
+              </IconToolbarButton>
             </div>
 
             <div className="relative z-10 min-h-0 flex-1 overflow-hidden bg-background/40">

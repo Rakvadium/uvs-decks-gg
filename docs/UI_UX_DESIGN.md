@@ -153,6 +153,25 @@ Every selected or active state reads the selected role tokens through the Tailwi
 
 `SegmentedControl` `size` is `xs`, `sm` or `md` (default) and sets the height from `--control-h-xs`, `-sm` or `-md`. `TabsList` is `--control-h-md`. Both use `rounded-control`. Call sites don't override their height or background. `OptionTile` owns its radius, border, fill and focus ring, so the call site sets layout and padding only. Every one of these primitives has a `focus-visible:` ring.
 
+## Overlays
+
+Every overlay draws one of two surfaces, so a chrome changes them all at once.
+
+| Surface | Class | Used by |
+|---------|-------|---------|
+| Dialog | `dialogSurfaceClassName` in `src/components/ui/dialog.tsx`: `bg-card-overlay` with the primary/secondary wash, `border-primary-soft`, `shadow-lg`, `rounded-surface` from `md` (`sm` for AlertDialog) | `DialogContent`, `AlertDialogContent` |
+| Popover | `popoverSurfaceClassName` in `src/components/ui/popover.tsx`: `rounded-surface`, `bg-popover-overlay` with `backdrop-blur-lg`, the `--chrome-popover-border` border and `--chrome-popover-shadow` | `PopoverContent`, `HoverCardContent`, `SelectContent`, `DropdownMenuContent`, `DropdownMenuSubContent`, the gallery filter panel |
+
+Call sites pass layout (width, padding) only, never a radius, background, border or shadow.
+
+**Dialog anatomy.** Every dialog has the X close (top right) and a `DialogCancel` in its footer beside the commit button. `DialogCancel` is an outline `Button` at the default size that closes the dialog, so footers match everywhere. A view-only dialog passes `<DialogCancel>Close</DialogCancel>`. `DialogTitle` and `AlertDialogTitle` share `dialogTitleClassName`, which carries `chrome-heading-case`. Only full-bleed layouts that draw their own header (filter dialog, card details, character and legend pickers) set `showCloseButton={false}`.
+
+**Confirms.** `AlertDialog` shares the Dialog surface, X close and title. A destructive confirm (delete deck, delete tier list) passes `variant="destructive"` to `AlertDialogAction`. A destructive row action, such as a team Remove, uses `destructiveOutline`. Neither ever uses the primary fill or the accent hover.
+
+**Create flows.** `CreateEntityDialog` (`src/components/ui/create-entity-dialog.tsx`) is the one create dialog: icon header, a required name field, extra fields as children, then Cancel and a submit that stays disabled until the name has text. Decks, tier lists and teams use it.
+
+**Icon actions.** `IconToolbarButton` (`src/components/ui/icon-toolbar-button.tsx`) is `Button size="icon-xs"` with a required `label` (its `aria-label`), the `--hover-bg` hover and the selected tokens when `active`. It is the close for Dialog, AlertDialog, Sheet and the right side panel, and the gallery island's toolbar icons pass `shape="island"`.
+
 ## Z-index stack
 
 | Layer | Value | Class |

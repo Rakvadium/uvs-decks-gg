@@ -15,7 +15,7 @@ import { api } from "../../../convex/_generated/api";
 import {
   Dialog,
   DialogBody,
-  DialogClose,
+  DialogCancel,
   DialogContent,
   DialogDescription,
   DialogHeader,
@@ -110,11 +110,7 @@ function FeedbackFormDialog({
         className="overflow-hidden p-0"
         footer={
           <>
-            <DialogClose asChild>
-              <Button type="button" variant="outline" disabled={pending}>
-                Cancel
-              </Button>
-            </DialogClose>
+            <DialogCancel disabled={pending} />
             <Button
               type="button"
               onClick={() => void handleSubmit()}

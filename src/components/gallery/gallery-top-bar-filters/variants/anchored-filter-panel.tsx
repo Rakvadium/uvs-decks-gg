@@ -25,7 +25,7 @@ import {
   GalleryDesktopFilterStatsPage,
   GalleryDesktopFilterTagsPage,
 } from "./desktop-filter-pages";
-import { floatingIslandRingClassName } from "@/components/shell/floating-island";
+import { popoverSurfaceClassName } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { useGalleryTopBarFiltersContext } from "../context";
 
@@ -41,9 +41,6 @@ const PAGE_TITLES: Record<GalleryMobileFilterPage, string> = {
   stats: "Stats",
   rarity: "Rarity",
 };
-
-const headerButtonClassName =
-  "flex h-9 min-w-9 shrink-0 items-center justify-center rounded-full px-2 text-sm font-semibold text-primary transition-colors duration-150 hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-40";
 
 function ActivePage() {
   const { page } = useGalleryMobileFilterNav();
@@ -131,24 +128,20 @@ function DesktopFilterHeader({ onClose }: { onClose: () => void }) {
     <div className="grid h-11 shrink-0 grid-cols-[minmax(2.5rem,1fr)_minmax(0,auto)_minmax(2.5rem,1fr)] items-center border-b border-border/30 px-2">
       <div className="flex items-center justify-start">
         {isRoot ? (
-          <button
+          <Button
             type="button"
-            className={headerButtonClassName}
+            variant="ghost"
+            size="sm"
             onClick={actions.clearAllFilters}
             disabled={!hasActiveFilters}
           >
             Reset
-          </button>
+          </Button>
         ) : (
-          <button
-            type="button"
-            className={cn(headerButtonClassName, "gap-0.5 pl-1")}
-            onClick={back}
-            aria-label="Back to filters"
-          >
-            <ChevronLeft className="size-5" strokeWidth={2.25} aria-hidden />
+          <Button type="button" variant="ghost" size="sm" onClick={back} aria-label="Back to filters">
+            <ChevronLeft aria-hidden />
             Filters
-          </button>
+          </Button>
         )}
       </div>
       <div className="flex min-w-0 flex-col items-center justify-center leading-tight">
@@ -160,9 +153,9 @@ function DesktopFilterHeader({ onClose }: { onClose: () => void }) {
         </span>
       </div>
       <div className="flex items-center justify-end">
-        <button type="button" className={headerButtonClassName} onClick={onClose}>
+        <Button type="button" variant="ghost" size="sm" onClick={onClose}>
           Done
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -200,18 +193,13 @@ function AnchoredFilterPanelBody({
       aria-label="Filter cards"
       aria-modal="false"
       className={cn(
-        "pointer-events-auto relative w-max min-w-[32rem] max-w-[min(48rem,100%)] rounded-xl p-px shadow-[var(--chrome-floating-shadow)]",
-        floatingIslandRingClassName,
+        popoverSurfaceClassName,
+        "pointer-events-auto relative flex w-max min-w-[32rem] max-w-[min(48rem,100%)] max-h-[42rem] flex-col overflow-hidden",
+        scrollsInside ? "h-[72vh]" : "h-auto",
         "motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-top-2 motion-safe:duration-200",
         className
       )}
     >
-      <div
-        className={cn(
-          "flex max-h-[42rem] flex-col overflow-hidden rounded-xl bg-background/80 backdrop-blur-xl",
-          scrollsInside ? "h-[72vh]" : "h-auto"
-        )}
-      >
       <DesktopFilterHeader onClose={onClose} />
       <DesktopFilterToggleBar />
       <div
@@ -226,7 +214,6 @@ function AnchoredFilterPanelBody({
         <ActivePage />
       </div>
       <DesktopFilterFooter onClose={onClose} />
-      </div>
     </div>
   );
 }

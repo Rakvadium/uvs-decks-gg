@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogBody,
+  DialogCancel,
   DialogClose,
   DialogContent,
   DialogDescription,
@@ -205,11 +206,7 @@ export function TeamHubMembersContent({ teamId }: TeamHubMembersContentProps) {
                 </div>
               </DialogBody>
               <DialogFooter>
-                <DialogClose asChild>
-                  <Button type="button" variant="outline" disabled={inviteBusy}>
-                    Cancel
-                  </Button>
-                </DialogClose>
+                <DialogCancel disabled={inviteBusy} />
                 <Button
                   type="button"
                   disabled={inviteBusy}

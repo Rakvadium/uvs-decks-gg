@@ -27,7 +27,7 @@ export function DeckDetailsTopBarDeleteAction({ compact = false }: DeckDetailsTo
       <AlertDialogTrigger asChild>
         <Button
           variant="destructiveOutline"
-          size={compact ? "icon-sm" : "sm"}
+          size={compact ? "icon-sm" : "icon"}
           aria-label="Delete deck"
         >
           <Trash2 className="h-4 w-4" />
@@ -42,7 +42,7 @@ export function DeckDetailsTopBarDeleteAction({ compact = false }: DeckDetailsTo
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={() => void deleteDeck()} disabled={isDeleting}>
+          <AlertDialogAction variant="destructive" onClick={() => void deleteDeck()} disabled={isDeleting}>
             {isDeleting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
             Delete
           </AlertDialogAction>

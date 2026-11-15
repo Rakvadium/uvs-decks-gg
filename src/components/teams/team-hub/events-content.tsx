@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogBody,
-  DialogClose,
+  DialogCancel,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -197,11 +197,7 @@ export function TeamHubEventsContent({ teamId }: TeamHubEventsContentProps) {
             </div>
           </DialogBody>
           <DialogFooter>
-            <DialogClose asChild>
-              <Button type="button" variant="outline" disabled={submitting}>
-                Cancel
-              </Button>
-            </DialogClose>
+            <DialogCancel disabled={submitting} />
             <Button type="button" disabled={submitting || !title.trim()} onClick={() => void onCreate()}>
               Add to calendar
             </Button>
@@ -235,9 +231,9 @@ export function TeamHubEventsContent({ teamId }: TeamHubEventsContentProps) {
                   {caps.canManageEvents && (
                     <Button
                       type="button"
-                      variant="ghost"
+                      variant="destructiveOutline"
                       size="sm"
-                      className="shrink-0 self-start text-destructive"
+                      className="shrink-0 self-start"
                       onClick={async () => {
                         try {
                           await remove({ eventId: e._id });

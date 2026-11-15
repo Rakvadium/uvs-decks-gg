@@ -1,11 +1,10 @@
 import {
   Dialog,
-  DialogClose,
+  DialogCancel,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { DefaultDetails } from "./default-details";
 import { useGenericCardContext } from "./context";
 import { CardArt } from "./card-art";
@@ -34,9 +33,7 @@ export function GenericCardDetailsDialog({
         className="overflow-hidden p-0 md:min-w-[65vw] md:max-h-[90vh]"
         showCloseButton={false}
         footer={
-          <DialogClose asChild>
-            <Button variant="outline">Close</Button>
-          </DialogClose>
+          <DialogCancel>Close</DialogCancel>
         }
       >
         <div className="relative flex h-full min-h-0 flex-col">

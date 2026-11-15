@@ -7,6 +7,7 @@ import { api } from "../../../convex/_generated/api";
 import {
   Dialog,
   DialogBody,
+  DialogCancel,
   DialogContent,
   DialogDescription,
   DialogHeader,
@@ -166,10 +167,8 @@ export function DeckDetailsEditDialog() {
           <div className="flex w-full flex-col-reverse gap-2 max-md:flex-col-reverse md:flex-row md:items-center md:justify-between">
             <DeckDetailsTopBarDeleteAction />
             <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-              <Button type="button" variant="outline" onClick={() => cancelEditing()} disabled={isSaving}>
-                Cancel
-              </Button>
-              <Button type="button" onClick={() => void saveEdits()} disabled={isSaving} className="gap-2">
+              <DialogCancel disabled={isSaving} />
+              <Button type="button" onClick={() => void saveEdits()} disabled={isSaving}>
                 {isSaving ? <Loader2 className="h-4 w-4 shrink-0 animate-spin" /> : null}
                 Save
               </Button>

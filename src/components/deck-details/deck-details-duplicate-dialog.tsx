@@ -35,7 +35,7 @@ export function DeckDetailsDuplicateDialog() {
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isDuplicating}>Close</AlertDialogCancel>
+          <AlertDialogCancel disabled={isDuplicating}>Cancel</AlertDialogCancel>
           <AlertDialogAction onClick={() => void confirmDuplicate()} disabled={isDuplicating}>
             {isDuplicating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
             Duplicate
