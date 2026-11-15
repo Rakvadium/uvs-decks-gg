@@ -1,7 +1,7 @@
 "use client";
 
 import { PageHeading } from "@/components/ui/typography-headings";
-import { useState, useEffect, useOptimistic, useTransition, useCallback } from "react";
+import { useState, useEffect, useOptimistic, useTransition, useCallback, useRef } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import { useRouter } from "next/navigation";
@@ -17,6 +17,7 @@ import { usePrefersReducedMotion } from "@/lib/reduced-motion";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { FieldError } from "@/components/ui/field";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -57,6 +58,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { validateUsername } from "@shared/username";
 import Image from "next/image";
 import {
   FloatingBackPill,
@@ -223,6 +225,8 @@ export default function SettingsPageClient() {
   } = useColorScheme();
 
   const [username, setUsername] = useState("");
+  const [usernameError, setUsernameError] = useState<string | null>(null);
+  const usernameInputRef = useRef<HTMLInputElement>(null);
   const [imageUrl, setImageUrl] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
@@ -274,10 +278,16 @@ export default function SettingsPageClient() {
   };
 
   const handleSaveProfile = async () => {
+    const error = validateUsername(username);
+    setUsernameError(error);
+    if (error) {
+      usernameInputRef.current?.focus();
+      return;
+    }
     setIsSaving(true);
     try {
       await updateProfile({
-        username: username || undefined,
+        username: username.trim(),
         image: normalizeAvatarImagePath(imageUrl) || undefined,
       });
       toast.success("Profile updated successfully");
@@ -409,11 +419,18 @@ export default function SettingsPageClient() {
                         Username
                       </Label>
                       <Input
+                        ref={usernameInputRef}
                         id="username"
                         value={username}
-                        onChange={(e) => setUsername(e.target.value)}
+                        onChange={(e) => {
+                          setUsername(e.target.value);
+                          setUsernameError(null);
+                        }}
                         placeholder="Enter your username"
+                        aria-invalid={usernameError ? true : undefined}
+                        aria-describedby={usernameError ? "username-error" : undefined}
                       />
+                      {usernameError ? <FieldError id="username-error">{usernameError}</FieldError> : null}
                     </div>
                   </div>
                 </div>

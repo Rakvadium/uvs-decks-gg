@@ -3,19 +3,30 @@ import { useAuthActions } from "@convex-dev/auth/react";
 import { ConvexError } from "convex/values";
 import { toast } from "sonner";
 import { passwordRequirementError } from "../../../../convex/lib/password";
+import { validateUsername } from "@shared/username";
 import { clearAuthCookies, isRefreshTokenParseError } from "../auth-recovery";
 
 export function useSignUpFormModel(onSuccess: () => void) {
   const { signIn } = useAuthActions();
   const [submitting, setSubmitting] = useState(false);
+  const [usernameError, setUsernameError] = useState<string | null>(null);
+  const clearUsernameError = useCallback(() => setUsernameError(null), []);
 
   const handleSubmit = useCallback(
     async (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault();
-      setSubmitting(true);
       const form = event.currentTarget;
 
       const formData = new FormData(form);
+      const usernameRaw = formData.get("username");
+      const username = typeof usernameRaw === "string" ? usernameRaw.trim() : "";
+      const usernameMessage = validateUsername(username);
+      setUsernameError(usernameMessage);
+      if (usernameMessage) {
+        form.querySelector<HTMLInputElement>("[name=username]")?.focus();
+        return;
+      }
+      setSubmitting(true);
       if (formData.get("password") !== formData.get("confirmPassword")) {
         toast.error("Passwords do not match");
         setSubmitting(false);
@@ -25,14 +36,6 @@ export function useSignUpFormModel(onSuccess: () => void) {
       const passwordError = passwordRequirementError(typeof password === "string" ? password : "");
       if (passwordError) {
         toast.error(passwordError);
-        setSubmitting(false);
-        return;
-      }
-      const usernameRaw = formData.get("username");
-      const username =
-        typeof usernameRaw === "string" ? usernameRaw.trim() : "";
-      if (!username) {
-        toast.error("Username is required");
         setSubmitting(false);
         return;
       }
@@ -84,6 +87,8 @@ export function useSignUpFormModel(onSuccess: () => void) {
 
   return {
     submitting,
+    usernameError,
+    clearUsernameError,
     handleSubmit,
   };
 }
