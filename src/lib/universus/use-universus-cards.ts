@@ -26,6 +26,7 @@ import {
 } from "@shared/games/filters";
 import { fetchStaticCatalog } from "./static-catalog";
 import { markCatalogCached } from "./catalog-prefetch";
+import { applyCatalogSearchFields, withoutCatalogSearchFields } from "./catalog-search-fields";
 import { useGameId, useGameModule } from "@/games/game-context";
 import { cardMatchesRarityFilter } from "./rarity";
 import type { GameId } from "@shared/games/types";
@@ -156,6 +157,7 @@ export function useUniversusCards(): UseUniversusCardsResult {
 
   const applyCatalog = useCallback(
     (gallery: CachedCard[], companions: CachedCard[], version: number) => {
+      applyCatalogSearchFields(gallery, game);
       setCards(companions.length > 0 ? [...gallery, ...companions] : gallery);
       setCachedVersion(version);
       setIndex(buildCardIndex(gallery, companions));
@@ -164,7 +166,7 @@ export function useUniversusCards(): UseUniversusCardsResult {
       setIsLoading(false);
       setError(null);
     },
-    [filterDefinition]
+    [filterDefinition, game]
   );
 
   const loadFromCache = useCallback(async () => {
@@ -308,7 +310,8 @@ export function useUniversusCards(): UseUniversusCardsResult {
         else applyCatalog(gallery, companions ?? [], version);
         const now = Date.now();
         void setCachedCatalog(game, {
-          cards: gallery,
+          // The search fields are rebuilt on every load; leaving them out keeps the cache smaller.
+          cards: withoutCatalogSearchFields(gallery),
           companions,
           metadata: {
             version,
@@ -471,10 +474,11 @@ export function filterCards(
       }
       if (!ok && (searchMode === "text" || searchMode === "all")) {
         if (card.text?.toLowerCase().includes(searchLower)) ok = true;
-        else if (card.searchText?.toLowerCase().includes(searchLower)) ok = true;
+        // Catalog search fields are already lowercase (catalog-search-fields.ts).
+        else if (card.searchText?.includes(searchLower)) ok = true;
       }
       if (!ok && searchMode === "all") {
-        if (card.searchAll?.toLowerCase().includes(searchLower)) ok = true;
+        if (card.searchAll?.includes(searchLower)) ok = true;
       }
       if (!ok) continue;
     }
