@@ -23,7 +23,7 @@ import { OverlaysChapter } from "./components/overlays";
 import { ColorTokens } from "./foundations/colors";
 import { BorderLadder, SurfaceLadder, ToneLadder } from "./foundations/ladders";
 import { MotionEntry, ZIndexEntry } from "./foundations/layers";
-import { ElevationEntry, RadiusEntry } from "./foundations/shape";
+import { ElevationEntry, RadiusEntry, RoleTokensEntry } from "./foundations/shape";
 import { ChromeCasing, TypographyEntries } from "./foundations/typography";
 import { ALL_CHAPTERS, CatalogNav, useActiveEntry } from "./nav/content";
 import { MobileSectionsSheet } from "./nav/mobile-sheet";
@@ -88,6 +88,7 @@ function renderChapter(id: ChapterId, source: CatalogSource): ReactNode {
       return (
         <>
           <RadiusEntry />
+          <RoleTokensEntry />
           <ElevationEntry />
         </>
       );
