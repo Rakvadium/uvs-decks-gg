@@ -14,22 +14,33 @@ import {
   floatingIslandSurfaceClassName,
 } from "./floating-island";
 
+export const FLOATING_CENTER_WIDTH_CLASS_NAMES = {
+  default: "grid-cols-[minmax(max-content,1fr)_minmax(0,var(--floating-center-w))_minmax(max-content,1fr)]",
+  wide: "grid-cols-[minmax(max-content,1fr)_minmax(0,var(--floating-center-w-wide))_minmax(max-content,1fr)]",
+} as const;
+
+export type FloatingCenterWidth = keyof typeof FLOATING_CENTER_WIDTH_CLASS_NAMES;
+
 export function FloatingPageBar({
   left,
   center,
   right,
+  centerWidth = "default",
   className,
 }: {
   left?: ReactNode;
   center?: ReactNode;
   right?: ReactNode;
+  centerWidth?: FloatingCenterWidth;
   className?: string;
 }) {
   return (
     <div
       data-slot="floating-page-bar"
+      data-center-width={centerWidth}
       className={cn(
-        "pointer-events-none grid w-full min-w-0 grid-cols-[minmax(max-content,1fr)_minmax(0,26rem)_minmax(max-content,1fr)] items-center gap-3 py-0.5",
+        "pointer-events-none grid w-full min-w-0 items-center gap-3 py-0.5",
+        FLOATING_CENTER_WIDTH_CLASS_NAMES[centerWidth],
         className
       )}
     >

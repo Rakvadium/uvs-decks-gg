@@ -1,7 +1,14 @@
 import { describe, expect, test } from "bun:test";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { createElement, type ComponentProps } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { FloatingPageLayout, type PageWash } from "../src/components/shell/floating-page-bar";
+import {
+  FloatingPageBar,
+  FloatingPageLayout,
+  type FloatingCenterWidth,
+  type PageWash,
+} from "../src/components/shell/floating-page-bar";
 
 function render(pageWash?: PageWash) {
   const props: ComponentProps<typeof FloatingPageLayout> = { bar: createElement("nav", null, "bar"), pageWash, children: "body" };
@@ -44,5 +51,32 @@ describe("FloatingPageLayout pageWash", () => {
     expect(html.indexOf('data-slot="page-wash"')).toBeLessThan(html.indexOf("<nav>bar</nav>"));
     expect(html).toMatch(/class="relative min-h-0 flex-1 overflow-y-auto[^"]*md:pt-\[4\.75rem\]/);
     expect(html).toContain(">body</div>");
+  });
+});
+
+function renderBar(centerWidth?: FloatingCenterWidth) {
+  const html = renderToStaticMarkup(createElement(FloatingPageBar, { centerWidth, center: "search" }));
+  const bar = html.match(/data-slot="floating-page-bar" data-center-width="([a-z]+)" class="([^"]*)"/);
+  return { width: bar?.[1], classes: bar?.[2] ?? "" };
+}
+
+const BASE_CSS = readFileSync(join(import.meta.dir, "../src/styles/base.css"), "utf8");
+
+describe("FloatingPageBar centerWidth", () => {
+  test("default caps the center slot at --floating-center-w", () => {
+    const { width, classes } = renderBar();
+    expect(width).toBe("default");
+    expect(classes).toContain("grid-cols-[minmax(max-content,1fr)_minmax(0,var(--floating-center-w))_minmax(max-content,1fr)]");
+  });
+
+  test("wide caps the center slot at --floating-center-w-wide", () => {
+    const { width, classes } = renderBar("wide");
+    expect(width).toBe("wide");
+    expect(classes).toContain("grid-cols-[minmax(max-content,1fr)_minmax(0,var(--floating-center-w-wide))_minmax(max-content,1fr)]");
+  });
+
+  test("both widths are layout tokens on :root", () => {
+    expect(BASE_CSS).toMatch(/--floating-center-w:\s*26rem;/);
+    expect(BASE_CSS).toMatch(/--floating-center-w-wide:\s*40rem;/);
   });
 });
