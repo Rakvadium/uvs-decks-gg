@@ -82,10 +82,8 @@ async function fetchCatalogBytes(url: string): Promise<ArrayBuffer> {
   const controller = new AbortController();
   const timeout = window.setTimeout(() => controller.abort(), R2_FETCH_TIMEOUT_MS);
   try {
-    const response = await fetch(url, {
-      signal: controller.signal,
-      headers: { Accept: "application/json, application/gzip" },
-    });
+    // No custom headers: the request must match the layout's `<link rel="preload">` to reuse it.
+    const response = await fetch(url, { signal: controller.signal });
     if (!response.ok) {
       throw new Error(`Static catalog HTTP ${response.status}`);
     }
@@ -99,14 +97,19 @@ export async function fetchStaticCatalog(args: {
   catalogUrl: string;
   catalogSha256: string;
 }): Promise<CachedCard[]> {
+  // The same-origin proxy goes first: the bucket's CORS rules don't list the app's hosts, so a
+  // direct fetch fails after a wasted round trip. The direct URL is the fallback.
+  const proxyPath = catalogProxyPath(args.catalogUrl);
+  // On first visits the gallery layout preloads the proxy URL, so this fetch reuses that download.
   let compressed: ArrayBuffer;
-  try {
+  if (proxyPath) {
+    try {
+      compressed = await fetchCatalogBytes(proxyPath);
+    } catch {
+      compressed = await fetchCatalogBytes(args.catalogUrl);
+    }
+  } else {
     compressed = await fetchCatalogBytes(args.catalogUrl);
-  } catch (directError) {
-    // Hosts missing from the bucket's CORS rules fail here; retry through the same-origin proxy.
-    const proxyPath = catalogProxyPath(args.catalogUrl);
-    if (!proxyPath) throw directError;
-    compressed = await fetchCatalogBytes(proxyPath);
   }
   const digest = await sha256Hex(compressed);
   if (digest !== args.catalogSha256.toLowerCase()) {

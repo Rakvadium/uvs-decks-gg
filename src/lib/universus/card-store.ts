@@ -1,5 +1,6 @@
 import type { Doc } from "../../../convex/_generated/dataModel";
 import type { GameId } from "@shared/games/types";
+import { createStore, del, delMany, get, getMany, set, setMany, type UseStore } from "idb-keyval";
 import { catalogDbName, deleteLegacyDatabaseOnce } from "@/lib/storage-keys";
 import { dedupeRarityOptions } from "./rarity";
 import { UVS_KEYWORD_LIST } from "@shared/games/uvs/keywords";
@@ -29,8 +30,9 @@ const LEGACY_DB_NAME = "universus-cards";
 const STORE_NAME = "cards";
 const METADATA_KEY = "cache-metadata";
 const CARDS_KEY = "cards-data";
+const COMPANIONS_KEY = "companions-data";
 
-const cardStorePromises = new Map<GameId, Promise<ReturnType<typeof import("idb-keyval").createStore>>>();
+const cardStorePromises = new Map<GameId, Promise<UseStore>>();
 
 async function getCardStore(game: GameId) {
   if (typeof window === "undefined") return null;
@@ -39,9 +41,7 @@ async function getCardStore(game: GameId) {
   if (!storePromise) {
     // Pre multi-game DB; the catalog re-downloads into the per-game DB instead.
     deleteLegacyDatabaseOnce(LEGACY_DB_NAME);
-    storePromise = import("idb-keyval").then(({ createStore }) => {
-      return createStore(catalogDbName(game, "cards"), STORE_NAME);
-    });
+    storePromise = Promise.resolve(createStore(catalogDbName(game, "cards"), STORE_NAME));
     cardStorePromises.set(game, storePromise);
   }
 
@@ -53,7 +53,6 @@ export async function getCacheMetadata(game: GameId): Promise<CardCacheMetadata 
   if (!store) return null;
   
   try {
-    const { get } = await import("idb-keyval");
     const metadata = await get<CardCacheMetadata>(METADATA_KEY, store);
     return metadata ?? null;
   } catch {
@@ -66,7 +65,6 @@ export async function setCacheMetadata(game: GameId, metadata: CardCacheMetadata
   if (!store) return;
   
   try {
-    const { set } = await import("idb-keyval");
     await set(METADATA_KEY, metadata, store);
   } catch (error) {
     console.error("Failed to save cache metadata:", error);
@@ -78,7 +76,6 @@ export async function getCachedCards(game: GameId): Promise<CachedCard[]> {
   if (!store) return [];
   
   try {
-    const { get } = await import("idb-keyval");
     const cards = await get<CachedCard[]>(CARDS_KEY, store);
     return cards ?? [];
   } catch {
@@ -91,10 +88,71 @@ export async function setCachedCards(game: GameId, cards: CachedCard[]): Promise
   if (!store) return;
   
   try {
-    const { set } = await import("idb-keyval");
     await set(CARDS_KEY, cards, store);
   } catch (error) {
     console.error("Failed to save cards to cache:", error);
+  }
+}
+
+export interface CachedCatalog {
+  metadata: CardCacheMetadata | null;
+  cards: CachedCard[];
+  /** Back faces of gallery cards; `null` when the cache predates storing them. */
+  companions: CachedCard[] | null;
+}
+
+/** Reads metadata, gallery cards and companion faces in one IndexedDB transaction. */
+export async function getCachedCatalog(game: GameId): Promise<CachedCatalog> {
+  const empty: CachedCatalog = { metadata: null, cards: [], companions: null };
+  const store = await getCardStore(game);
+  if (!store) return empty;
+
+  try {
+    const [metadata, cards, companions] = await getMany<unknown>(
+      [METADATA_KEY, CARDS_KEY, COMPANIONS_KEY],
+      store
+    );
+    return {
+      metadata: (metadata as CardCacheMetadata | undefined) ?? null,
+      cards: (cards as CachedCard[] | undefined) ?? [],
+      companions: (companions as CachedCard[] | undefined) ?? null,
+    };
+  } catch {
+    return empty;
+  }
+}
+
+/** Writes metadata, gallery cards and companion faces (`null`: not loaded) to IndexedDB; `true` when saved. */
+export async function setCachedCatalog(
+  game: GameId,
+  catalog: { metadata: CardCacheMetadata; cards: CachedCard[]; companions: CachedCard[] | null }
+): Promise<boolean> {
+  const store = await getCardStore(game);
+  if (!store) return false;
+
+  try {
+    if (catalog.companions === null) await del(COMPANIONS_KEY, store);
+    const entries: [IDBValidKey, unknown][] = [[CARDS_KEY, catalog.cards]];
+    if (catalog.companions !== null) entries.push([COMPANIONS_KEY, catalog.companions]);
+    // Metadata last: a cache with metadata always has its cards.
+    entries.push([METADATA_KEY, catalog.metadata]);
+    await setMany(entries, store);
+    return true;
+  } catch (error) {
+    console.error("Failed to save card catalog to cache:", error);
+    return false;
+  }
+}
+
+/** Stores companion faces for a cache written before they were cached. */
+export async function setCachedCompanions(game: GameId, companions: CachedCard[]): Promise<void> {
+  const store = await getCardStore(game);
+  if (!store) return;
+
+  try {
+    await set(COMPANIONS_KEY, companions, store);
+  } catch (error) {
+    console.error("Failed to save companion cards to cache:", error);
   }
 }
 
@@ -103,7 +161,6 @@ export async function appendCachedCards(game: GameId, newCards: CachedCard[]): P
   if (!store) return newCards;
   
   try {
-    const { set } = await import("idb-keyval");
     const existingCards = await getCachedCards(game);
     const existingIds = new Set(existingCards.map(c => c._id));
     const uniqueNewCards = newCards.filter(c => !existingIds.has(c._id));
@@ -121,9 +178,7 @@ export async function clearCardCache(game: GameId): Promise<void> {
   if (!store) return;
   
   try {
-    const { del } = await import("idb-keyval");
-    await del(METADATA_KEY, store);
-    await del(CARDS_KEY, store);
+    await delMany([METADATA_KEY, CARDS_KEY, COMPANIONS_KEY], store);
   } catch (error) {
     console.error("Failed to clear card cache:", error);
   }

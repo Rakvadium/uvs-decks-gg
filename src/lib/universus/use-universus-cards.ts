@@ -4,10 +4,10 @@ import { useState, useEffect, useCallback, useRef, useSyncExternalStore, useMemo
 import { useConvex, useQuery, type ConvexReactClient } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import {
-  getCachedCards,
-  setCachedCards,
-  getCacheMetadata,
-  setCacheMetadata,
+  getCachedCatalog,
+  setCachedCatalog,
+  type CachedCatalog,
+  setCachedCompanions,
   clearCardCache,
   buildCardIndex,
   CardIndex,
@@ -25,6 +25,7 @@ import {
   type GameFilterDefinition,
 } from "@shared/games/filters";
 import { fetchStaticCatalog } from "./static-catalog";
+import { markCatalogCached } from "./catalog-prefetch";
 import { useGameId, useGameModule } from "@/games/game-context";
 import { cardMatchesRarityFilter } from "./rarity";
 import type { GameId } from "@shared/games/types";
@@ -86,14 +87,37 @@ async function fetchCompanionCardsForGallery(
     ),
   ];
   if (ids.length === 0) return [];
-  const out: CachedCard[] = [];
+  const chunks: (typeof ids)[] = [];
   for (let i = 0; i < ids.length; i += COMPANION_ID_CHUNK) {
-    const chunk = ids.slice(i, i + COMPANION_ID_CHUNK);
-    const batch = await convex.query(api.cards.batchGetCardsByIds, { game, ids: chunk });
-    out.push(...batch);
+    chunks.push(ids.slice(i, i + COMPANION_ID_CHUNK));
   }
-  return out;
+  const batches = await Promise.all(
+    chunks.map((chunk) => convex.query(api.cards.batchGetCardsByIds, { game, ids: chunk }))
+  );
+  return batches.flat();
 }
+
+const cacheReads = new Map<GameId, Promise<CachedCatalog>>();
+const prefetchedGames = new Set<GameId>();
+
+/**
+ * Starts reading the IndexedDB catalog cache for `game` (once per page load), so the read can
+ * overlap hydration instead of waiting for the loader's effect. The loader takes the result.
+ */
+export function prefetchCardCache(game: GameId): void {
+  if (typeof window === "undefined" || prefetchedGames.has(game)) return;
+  prefetchedGames.add(game);
+  cacheReads.set(game, getCachedCatalog(game));
+}
+
+function takeCardCacheRead(game: GameId): Promise<CachedCatalog> {
+  const read = cacheReads.get(game) ?? getCachedCatalog(game);
+  cacheReads.delete(game);
+  return read;
+}
+
+/** `pending` until the IndexedDB read settles; syncing waits for it so a cache hit isn't re-downloaded. */
+type CacheState = "pending" | "hit" | "miss";
 
 export function useUniversusCards(): UseUniversusCardsResult {
   const [cards, setCards] = useState<CachedCard[]>([]);
@@ -101,68 +125,91 @@ export function useUniversusCards(): UseUniversusCardsResult {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [loadProgress, setLoadProgress] = useState(0);
   const [cachedVersion, setCachedVersion] = useState<number | null>(null);
+  const [cacheState, setCacheState] = useState<CacheState>("pending");
   const [isSyncing, setIsSyncing] = useState(false);
   const [error, setError] = useState<Error | null>(null);
   const [index, setIndex] = useState<CardIndex | null>(null);
   const [uniqueValues, setUniqueValues] = useState<ReturnType<typeof getUniqueValues> | null>(null);
-  
+
   const syncInProgress = useRef(false);
   const initialLoadDone = useRef(false);
-  const dataEpochRef = useRef(0);
   const convex = useConvex();
   const game = useGameId();
   const { filters: filterDefinition } = useGameModule();
   const isHydrated = useIsClient();
-  
+
   const serverVersionData = useQuery(api.cards.getCardDataVersion, { game });
   const serverVersion = serverVersionData?.version ?? null;
   const isCheckingVersion = serverVersionData === undefined;
 
-  const loadFromCache = useCallback(async (): Promise<{ hasCache: boolean; version: number | null }> => {
-    try {
-      const [cachedCards, metadata] = await Promise.all([
-        getCachedCards(game),
-        getCacheMetadata(game),
-      ]);
+  /** Adds back faces once they load; the grid renders without them first. */
+  const applyCompanions = useCallback((gallery: CachedCard[], companions: CachedCard[]) => {
+    if (companions.length === 0) return;
+    setCards([...gallery, ...companions]);
+    setIndex((prev) => {
+      if (!prev) return buildCardIndex(gallery, companions);
+      const byId = new Map(prev.byId);
+      for (const card of companions) byId.set(card._id, card);
+      return { ...prev, byId };
+    });
+  }, []);
 
-      if (cachedCards.length > 0 && metadata) {
-        if (metadata.schemaVersion !== CARD_CACHE_SCHEMA_VERSION) {
-          await clearCardCache(game);
-          return { hasCache: false, version: null };
-        }
-        let companions: CachedCard[] = [];
+  const applyCatalog = useCallback(
+    (gallery: CachedCard[], companions: CachedCard[], version: number) => {
+      setCards(companions.length > 0 ? [...gallery, ...companions] : gallery);
+      setCachedVersion(version);
+      setIndex(buildCardIndex(gallery, companions));
+      setUniqueValues(getUniqueValues(gallery, filterDefinition));
+      setLoadProgress(100);
+      setIsLoading(false);
+      setError(null);
+    },
+    [filterDefinition]
+  );
+
+  const loadFromCache = useCallback(async () => {
+    try {
+      const { metadata, cards: cachedCards, companions: cachedCompanions } =
+        await takeCardCacheRead(game);
+
+      if (cachedCards.length === 0 || !metadata) {
+        markCatalogCached(game, null);
+        setCacheState("miss");
+        return;
+      }
+      if (metadata.schemaVersion !== CARD_CACHE_SCHEMA_VERSION) {
+        await clearCardCache(game);
+        markCatalogCached(game, null);
+        setCacheState("miss");
+        return;
+      }
+
+      applyCatalog(cachedCards, cachedCompanions ?? [], metadata.version);
+      markCatalogCached(game, metadata.version);
+      setCacheState("hit");
+
+      if (cachedCompanions === null) {
+        // Cache written before back faces were stored: fetch them once and backfill.
         try {
-          companions = await fetchCompanionCardsForGallery(cachedCards, convex, game);
+          const companions = await fetchCompanionCardsForGallery(cachedCards, convex, game);
+          applyCompanions(cachedCards, companions);
+          void setCachedCompanions(game, companions);
         } catch (e) {
           console.error("Failed to load companion card faces:", e);
         }
-        const merged = [...cachedCards, ...companions];
-        setCards(merged);
-        setCachedVersion(metadata.version);
-        const cardIndex = buildCardIndex(cachedCards, companions);
-        setIndex(cardIndex);
-        setUniqueValues(getUniqueValues(cachedCards, filterDefinition));
-        setLoadProgress(100);
-        setIsLoading(false);
-        dataEpochRef.current += 1;
-        return { hasCache: true, version: metadata.version };
       }
-      return { hasCache: false, version: null };
     } catch (err) {
       console.error("Failed to load from cache:", err);
-      return { hasCache: false, version: null };
+      setCacheState("miss");
     }
-  }, [convex, game, filterDefinition]);
+  }, [applyCatalog, applyCompanions, convex, game]);
 
   const galleryTotalEstimate = serverVersionData?.cardCount ?? 0;
   const forceConvexCatalogSync =
     typeof process !== "undefined" &&
     process.env.NEXT_PUBLIC_FORCE_CONVEX_CATALOG_SYNC === "1";
 
-  const fetchFromConvex = useCallback(async (): Promise<{
-    gallery: CachedCard[];
-    companions: CachedCard[];
-  }> => {
+  const fetchFromConvex = useCallback(async (): Promise<CachedCard[]> => {
     await convex.mutation(api.rateLimit.claimCatalogSyncBudget, {});
 
     const gallery: CachedCard[] = [];
@@ -197,14 +244,11 @@ export function useUniversusCards(): UseUniversusCardsResult {
       setLoadProgress(progress);
     }
 
-    const companions = await fetchCompanionCardsForGallery(gallery, convex, game);
-    return { gallery, companions };
+    return gallery;
   }, [convex, game, galleryTotalEstimate]);
 
-  const fetchCatalog = useCallback(async (): Promise<{
-    gallery: CachedCard[];
-    companions: CachedCard[];
-  }> => {
+  /** Gallery cards of the current catalog: the static R2 file, else a paged Convex sync. */
+  const fetchCatalog = useCallback(async (): Promise<CachedCard[]> => {
     const catalogUrl = serverVersionData?.catalogUrl;
     const catalogSha256 = serverVersionData?.catalogSha256;
     const canUseStatic =
@@ -222,9 +266,7 @@ export function useUniversusCards(): UseUniversusCardsResult {
           catalogSha256,
         });
         setLoadProgress(90);
-        const companions = await fetchCompanionCardsForGallery(gallery, convex, game);
-        setLoadProgress(100);
-        return { gallery, companions };
+        return gallery;
       } catch (err) {
         console.warn("Static catalog fetch failed; falling back to Convex sync", err);
       }
@@ -232,59 +274,72 @@ export function useUniversusCards(): UseUniversusCardsResult {
 
     return await fetchFromConvex();
   }, [
-    convex,
     fetchFromConvex,
-    game,
     forceConvexCatalogSync,
     serverVersionData?.catalogSha256,
     serverVersionData?.catalogUrl,
   ]);
 
+  /** Downloads the catalog, shows it, then caches it (the IndexedDB write doesn't block rendering). */
   const syncCatalog = useCallback(
-    async (gallery: CachedCard[], companions: CachedCard[], version: number) => {
+    async (version: number, mode: "initial" | "background") => {
       if (syncInProgress.current) return;
       syncInProgress.current = true;
-      setIsSyncing(true);
+      if (mode === "initial") {
+        setIsLoading(true);
+        setIsLoadingMore(true);
+      } else {
+        setIsSyncing(true);
+      }
 
       try {
+        const gallery = await fetchCatalog();
+        // First load: show the grid now and add back faces when they arrive. A background update
+        // waits for them so the cards already on screen keep theirs.
+        if (mode === "initial") applyCatalog(gallery, [], version);
+        let companions: CachedCard[] | null = null;
+        try {
+          companions = await fetchCompanionCardsForGallery(gallery, convex, game);
+        } catch (e) {
+          // Cached without back faces; the next cache load fetches them.
+          console.error("Failed to load companion card faces:", e);
+        }
+        if (mode === "initial") applyCompanions(gallery, companions ?? []);
+        else applyCatalog(gallery, companions ?? [], version);
         const now = Date.now();
-        const merged = [...gallery, ...companions];
-
-        await setCachedCards(game, gallery);
-        await setCacheMetadata(game, {
-          version,
-          updatedAt: now,
-          cardCount: gallery.length,
-          lastSyncAt: now,
-          schemaVersion: CARD_CACHE_SCHEMA_VERSION,
+        void setCachedCatalog(game, {
+          cards: gallery,
+          companions,
+          metadata: {
+            version,
+            updatedAt: now,
+            cardCount: gallery.length,
+            lastSyncAt: now,
+            schemaVersion: CARD_CACHE_SCHEMA_VERSION,
+          },
+        }).then((saved) => {
+          if (saved) markCatalogCached(game, version);
         });
-
-        setCards(merged);
-        setCachedVersion(version);
-        const cardIndex = buildCardIndex(gallery, companions);
-        setIndex(cardIndex);
-        setUniqueValues(getUniqueValues(gallery, filterDefinition));
-        setLoadProgress(100);
-        setIsLoading(false);
-        setError(null);
-        dataEpochRef.current += 1;
       } catch (err) {
         if (err instanceof Error) {
           setError(err);
           console.error("Failed to sync cards:", err);
         }
+        setIsLoading(false);
       } finally {
+        setIsLoadingMore(false);
         setIsSyncing(false);
         syncInProgress.current = false;
       }
     },
-    [game, filterDefinition]
+    [applyCatalog, applyCompanions, convex, fetchCatalog, game]
   );
 
   const refreshCache = useCallback(async () => {
     if (serverVersion === null) return;
 
     await clearCardCache(game);
+    markCatalogCached(game, null);
     setCachedVersion(null);
     setCards([]);
     setIndex(null);
@@ -293,102 +348,35 @@ export function useUniversusCards(): UseUniversusCardsResult {
     setIsLoading(true);
     syncInProgress.current = false;
 
-    const { gallery, companions } = await fetchCatalog();
-    await syncCatalog(gallery, companions, serverVersion);
-  }, [fetchCatalog, syncCatalog, serverVersion, game]);
+    await syncCatalog(serverVersion, "initial");
+  }, [syncCatalog, serverVersion, game]);
 
   useEffect(() => {
     if (!isHydrated) return;
     if (initialLoadDone.current) return;
     initialLoadDone.current = true;
-    
-    const initializeCards = async () => {
-      const { hasCache, version: localVersion } = await loadFromCache();
-      
-      if (!hasCache) {
-        setIsLoading(true);
-      }
-    };
-    
-    initializeCards();
+    void loadFromCache();
   }, [isHydrated, loadFromCache]);
 
   useEffect(() => {
     if (!isHydrated) return;
+    if (cacheState === "pending") return;
     if (isCheckingVersion) return;
     if (syncInProgress.current) return;
-    
-    const checkAndSync = async () => {
-      if (serverVersion === null) {
-        if (cards.length === 0) {
-          setIsLoading(true);
-          setIsLoadingMore(true);
-          const epochBefore = dataEpochRef.current;
-          try {
-            const { gallery, companions } = await fetchCatalog();
-            if (epochBefore !== dataEpochRef.current) {
-              setIsLoadingMore(false);
-              return;
-            }
-            await syncCatalog(gallery, companions, 1);
-          } catch (err) {
-            if (err instanceof Error) {
-              setError(err);
-              console.error("Failed to sync cards:", err);
-            }
-            setIsLoading(false);
-          }
-          setIsLoadingMore(false);
-        }
-        return;
-      }
 
-      if (cachedVersion === null) {
-        setIsLoading(true);
-        setIsLoadingMore(true);
-        const epochBefore = dataEpochRef.current;
-        try {
-          const { gallery, companions } = await fetchCatalog();
-          if (epochBefore !== dataEpochRef.current) {
-            setIsLoadingMore(false);
-            return;
-          }
-          await syncCatalog(gallery, companions, serverVersion);
-        } catch (err) {
-          if (err instanceof Error) {
-            setError(err);
-            console.error("Failed to sync cards:", err);
-          }
-          setIsLoading(false);
-        }
-        setIsLoadingMore(false);
-        return;
-      }
-
-      if (cachedVersion !== serverVersion) {
-        console.log(`Cache outdated: local v${cachedVersion} vs server v${serverVersion}`);
-        setIsSyncing(true);
-        const epochBefore = dataEpochRef.current;
-        try {
-          const { gallery, companions } = await fetchCatalog();
-          if (epochBefore !== dataEpochRef.current) {
-            setIsSyncing(false);
-            return;
-          }
-          await syncCatalog(gallery, companions, serverVersion);
-        } catch (err) {
-          if (err instanceof Error) {
-            setError(err);
-            console.error("Failed to sync cards:", err);
-          }
-          setIsSyncing(false);
-          setIsLoading(false);
-        }
-      }
-    };
-    
-    checkAndSync();
-  }, [isHydrated, isCheckingVersion, serverVersion, cachedVersion, cards.length, fetchCatalog, syncCatalog]);
+    if (serverVersion === null) {
+      if (cards.length === 0) void syncCatalog(1, "initial");
+      return;
+    }
+    if (cachedVersion === null) {
+      void syncCatalog(serverVersion, "initial");
+      return;
+    }
+    if (cachedVersion !== serverVersion) {
+      console.log(`Cache outdated: local v${cachedVersion} vs server v${serverVersion}`);
+      void syncCatalog(serverVersion, "background");
+    }
+  }, [isHydrated, cacheState, isCheckingVersion, serverVersion, cachedVersion, cards.length, syncCatalog]);
 
   return useMemo(
     () => ({
