@@ -448,7 +448,7 @@ export function UniversusMediaDock() {
             <button
               type="button"
               onClick={() => setQueueOpen((v) => !v)}
-              className="flex min-w-0 flex-1 items-center gap-2 px-3 py-2 text-left hover:bg-muted/50"
+              className="flex min-w-0 flex-1 items-center gap-2 px-3 py-2 text-left hover:bg-muted/50 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
               {queueOpen ? (
                 <ChevronUp className="h-4 w-4 shrink-0 text-muted-foreground" />
@@ -460,7 +460,7 @@ export function UniversusMediaDock() {
             <button
               type="button"
               aria-label="Resize mini player"
-              className="touch-none shrink-0 cursor-nwse-resize border-l border-border/30 px-2.5 py-2 text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+              className="touch-none shrink-0 cursor-nwse-resize border-l border-border/30 px-2.5 py-2 text-muted-foreground hover:bg-muted/50 hover:text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               data-dock-no-drag
               onPointerDown={onResizePointerDown}
               onPointerMove={onResizePointerMove}
@@ -493,7 +493,7 @@ export function UniversusMediaDock() {
                               type="button"
                               onClick={() => setPlayback(row.playback)}
                               className={cn(
-                                "flex w-full items-center gap-2 rounded-lg border border-border/40 px-2 py-2 text-left transition-colors duration-150 hover:border-primary/30 hover:bg-primary/[0.06]",
+                                "flex w-full items-center gap-2 rounded-lg border border-border/40 px-2 py-2 text-left transition-colors duration-150 hover:border-primary/30 hover:bg-primary/[0.06] outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
                                 active && "border-primary/40 bg-primary/[0.08]"
                               )}
                             >
@@ -505,7 +505,7 @@ export function UniversusMediaDock() {
                                     <Play className="h-4 w-4 text-red-400" />
                                   </div>
                                 )}
-                                <span className="absolute bottom-0.5 left-0.5 rounded bg-destructive px-1 text-[10px] font-bold text-destructive-foreground">
+                                <span className="absolute bottom-0.5 left-0.5 rounded-md bg-destructive px-1 text-[10px] font-bold text-destructive-foreground">
                                   LIVE
                                 </span>
                               </div>
@@ -547,7 +547,7 @@ export function UniversusMediaDock() {
                                   type="button"
                                   onClick={() => setPlayback(vodPlayback)}
                                   className={cn(
-                                    "flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left transition-colors duration-150 hover:bg-primary/[0.06]",
+                                    "flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left transition-colors duration-150 hover:bg-primary/[0.06] outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
                                     active && "bg-primary/[0.08]"
                                   )}
                                 >

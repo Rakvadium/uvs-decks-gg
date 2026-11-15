@@ -39,8 +39,12 @@ const buttonVariants = cva(
         control: "rounded-control",
         cta: "rounded-cta",
         island: "rounded-island",
+        pill: "rounded-full",
+        "tab-tl": "rounded-tab-tl",
+        "tab-tr": "rounded-tab-tr",
       },
     },
+    compoundVariants: [{ variant: "link", class: "h-auto p-0 has-[>svg]:px-0" }],
     defaultVariants: {
       variant: "default",
       size: "md",

@@ -70,7 +70,7 @@ export function CardDetailsAdminJsonControls({
       <div
         className={cn(
           "pointer-events-auto absolute right-0 bottom-0 z-20 flex w-max min-w-0 max-w-full items-stretch",
-          "rounded-br-xl rounded-tr-none rounded-tl-xl rounded-bl-none",
+          "rounded-tab-tl",
           "border border-primary/25 bg-card/95 shadow-none backdrop-blur-sm"
         )}
       >
@@ -78,7 +78,7 @@ export function CardDetailsAdminJsonControls({
           type="button"
           onClick={() => setOpen(true)}
           className={cn(
-            "flex h-9 max-w-full min-w-0 items-center gap-1.5 py-0 pr-1.5 pl-2 sm:gap-2 sm:pr-2.5 sm:pl-2.5",
+            "flex h-9 max-w-full min-w-0 items-center gap-1.5 py-0 pr-1.5 pl-2 sm:gap-2 sm:pr-2.5 sm:pl-2.5 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
             "text-muted-foreground transition-colors hover:border-primary/40 hover:text-primary"
           )}
         >

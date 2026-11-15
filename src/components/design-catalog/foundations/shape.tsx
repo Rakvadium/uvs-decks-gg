@@ -9,11 +9,11 @@ import { Code, CodeBlock } from "../specimen/code-block";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 const RADII = [
-  { className: "rounded-md", role: "Controls / inputs / buttons / badges" },
-  { className: "rounded-lg", role: "Cards / panels / dialogs" },
+  { className: "rounded-control", role: "Buttons, inputs, badges, toggles" },
+  { className: "rounded-surface", role: "Cards, panels, popovers, dialogs" },
   { className: "rounded-xl", role: "Large feature surfaces" },
-  { className: "rounded-3xl", role: "Hero / marketing shells" },
-  { className: "rounded-full", role: "Pills / avatars" },
+  { className: "rounded-tab-tl", role: "Corner tab flush in a surface corner (and rounded-tab-tr)" },
+  { className: "rounded-full", role: "Pills, chips, avatars" },
 ] as const;
 
 function RadiusTile({ className, role }: { className: string; role: string }) {
@@ -43,9 +43,10 @@ export function RadiusEntry() {
       sourcePaths={["src/styles/base.css"]}
       description={
         <p>
-          <Code>rounded-md</Code>/<Code>-lg</Code>/<Code>-xl</Code> derive from the chrome&apos;s <Code>--radius</Code>{" "}
-          (now <Code>{radius || "…"}</Code>), so they change with the chrome. Bare <Code>rounded</Code> and{" "}
-          <Code>rounded-sm</Code> are off-ladder; avoid one-off <Code>rounded-[Npx]</Code>.
+          Every step derives from the chrome&apos;s <Code>--radius</Code> (now <Code>{radius || "…"}</Code>), so it
+          changes with the chrome. Bare <Code>rounded</Code>, <Code>rounded-sm</Code>, <Code>rounded-2xl</Code> and up,
+          corner-only forms and one-off <Code>rounded-[Npx]</Code> are off the ladder, and{" "}
+          <Code>design/radius-ladder</Code> fails the lint on them.
         </p>
       }
     >
@@ -56,7 +57,7 @@ export function RadiusEntry() {
           ))}
         </ul>
       </Preview>
-      <CodeBlock code={`<Input className="rounded-md" />          {/* already the default */}\n<section className="rounded-lg border border-surface bg-card" />\n<Avatar className="rounded-full" />`} />
+      <CodeBlock code={`<section className="rounded-surface border border-surface bg-card" />\n<Button shape="tab-tl" size="icon-xs" aria-label="Flip" />  {/* flush in a card corner */}\n<Avatar className="rounded-full" />`} />
     </CatalogEntrySection>
   );
 }

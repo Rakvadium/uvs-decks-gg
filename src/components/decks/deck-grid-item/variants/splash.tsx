@@ -40,7 +40,7 @@ export function DeckSplashItem() {
     >
       <article
         className={cn(
-          "relative aspect-[3/4] overflow-hidden rounded-2xl border border-on-scrim/10 bg-card shadow-[var(--chrome-elevation-low)]",
+          "relative aspect-[3/4] overflow-hidden rounded-surface border border-on-scrim/10 bg-card shadow-[var(--chrome-elevation-low)]",
           "transition-[transform,box-shadow,border-color] duration-300 ease-out",
           "group-hover:-translate-y-1 group-hover:border-[hsl(var(--accent-h)_var(--accent-s)_var(--accent-l)/0.6)] group-hover:shadow-[0_18px_40px_-18px_hsl(var(--accent-h)_var(--accent-s)_var(--accent-l)/0.55)]",
         )}

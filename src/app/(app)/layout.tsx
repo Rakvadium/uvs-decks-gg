@@ -128,7 +128,7 @@ function AdminSidebarContent() {
         <div className="rounded-md border bg-muted/20 p-2 space-y-1">
           <Link
             href="/admin/sets"
-            className="block px-2 py-1.5 rounded text-xs text-muted-foreground hover:text-foreground hover:bg-muted"
+            className="block px-2 py-1.5 rounded-md text-xs text-muted-foreground hover:text-foreground hover:bg-muted"
           >
             ← All sets
           </Link>

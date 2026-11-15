@@ -110,7 +110,7 @@ export function DeckCardStackItem(props: DeckCardStackItemProps) {
               type="button"
               onClick={openDialog}
               onKeyDown={handleKeyDownOpen as unknown as (event: KeyboardEvent<HTMLButtonElement>) => void}
-              className="absolute inset-0 z-20 cursor-pointer rounded-lg"
+              className="absolute inset-0 z-20 cursor-pointer rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               aria-label={`Open ${card.name} details`}
             />
           </div>

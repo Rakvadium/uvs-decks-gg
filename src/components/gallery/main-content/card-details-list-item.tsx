@@ -84,7 +84,7 @@ export function CardDetailsListItem({ card, onOpenCardDetails, imagePriority = f
                 )}
               </div>
               {!prefersReducedMotion ? (
-                <div className="absolute -inset-3 -z-10 rounded-2xl bg-gradient-to-r from-primary/10 via-secondary/10 to-primary/10 blur-2xl" />
+                <div className="absolute -inset-3 -z-10 rounded-xl bg-gradient-to-r from-primary/10 via-secondary/10 to-primary/10 blur-2xl" />
               ) : null}
             </div>
 

@@ -43,6 +43,9 @@ const BUTTON_SHAPES: Record<ButtonShape, string> = {
   control: "rounded-control · every in-page button",
   cta: "rounded-cta · the primary call to action",
   island: "rounded-island · floating header pills",
+  pill: "rounded-full · Chip and filter pills",
+  "tab-tl": "rounded-tab-tl · flush in a top-left or bottom-right surface corner",
+  "tab-tr": "rounded-tab-tr · flush in a top-right or bottom-left surface corner",
 };
 
 const isIconSize = (size: ButtonSize) => size.startsWith("icon");

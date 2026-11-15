@@ -65,7 +65,7 @@ export function CommunityRankingsView() {
                   return (
                     <div
                       key={tier.id}
-                      className="rounded-2xl border px-4 py-3"
+                      className="rounded-surface border px-4 py-3"
                       style={{
                         borderColor: `${tier.color}55`,
                         backgroundColor: `${tier.color}10`,
@@ -144,7 +144,7 @@ export function CommunityRankingsView() {
               </DialogHeader>
               <DialogBody className="px-6 pb-6">
                 <div
-                  className="rounded-2xl border px-4 py-4"
+                  className="rounded-surface border px-4 py-4"
                   style={{
                     borderColor: `${dialogTier.color}55`,
                     backgroundColor: `${dialogTier.color}08`,

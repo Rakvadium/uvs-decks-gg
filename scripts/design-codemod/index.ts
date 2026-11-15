@@ -4,21 +4,28 @@ import { Linter } from "eslint";
 import design, { designRules } from "../../tools/eslint-design/index.mjs";
 import parser from "../../tools/eslint-design/parser.mjs";
 import { rewriteControlSizes, type ControlPass } from "./control-sizes";
+import { rewriteButtonFocus } from "./focus";
+import { rewriteCornerTabs } from "./radius";
 import { rewriteSurfaces } from "./surfaces";
 
-const USAGE = `Usage: bun run design:codemod [--dry] [--buttons | --inputs | --surfaces] <path>...
+const USAGE = `Usage: bun run design:codemod [--dry] [--buttons | --inputs | --surfaces | --radius | --focus] <path>...
 
 Applies the mechanical design-system rewrites (docs/UI_UX_DESIGN.md § Named utilities) to
 class strings in files under the given paths, and lists what is left for human judgment:
   - tone / border / surface opacities -> named ladder utilities (exact aliases and doc-listed snaps)
   - rounded, rounded-sm (and side forms) -> rounded-md
   - raw z-30 ... z-[600] -> named z utilities
-  - <Button> h-*, w-*, size-* and rounded-* overrides -> the Button size ladder (xs/sm/md/lg, icon-*)
+  - <Button> h-*, w-*, size-* and rounded-* overrides -> the Button size ladder (xs/sm/md/lg, icon-*),
+    and a corner-tab radius pair -> shape="tab-tl" or shape="tab-tr"
   - <Input> and <SelectTrigger> h-* and rounded-* overrides, and size="default" -> the size prop (xs/sm/md/lg)
 Only files under <path> are read or written. --dry writes nothing. --buttons runs only the <Button>
 pass, --inputs only the <Input> and <SelectTrigger> pass.
 --surfaces runs only the surface pass: <Badge> text-[10px]/h-5 -> size="sm", h-8 -> size="lg",
 self-closing animate-pulse divs on a muted fill -> <Skeleton>, Loader2 animate-spin -> <Spinner>.
+--radius runs only the radius pass: a corner-tab radius pair -> rounded-tab-tl or rounded-tab-tr,
+rounded, rounded-sm, rounded-xs -> rounded-md; the other radius-ladder findings are listed.
+--focus runs only the focus pass: Button's focus ring is appended to every raw <button> class
+string that has no focus-visible: class.
 Exit 0 done, 1 a file could not be parsed, 2 bad usage.`;
 
 const EXTENSIONS = new Set([".ts", ".tsx", ".js", ".jsx", ".mjs", ".mts"]);
@@ -45,10 +52,19 @@ function lineStarts(code: string): number[] {
   return starts;
 }
 
+const radiusConfig: Linter.Config[] = [{ ...config[0], rules: { "design/radius-ladder": "warn" } }];
+const focusConfig: Linter.Config[] = [{ ...config[0], rules: { "design/button-focus": "warn" } }];
+
 const PASS_RULE: Record<ControlPass, string> = { buttons: "button/size-override", inputs: "input/size-override" };
 
-type Pass = ControlPass | "surfaces";
-const PASS_FLAGS: Record<string, Pass> = { "--buttons": "buttons", "--inputs": "inputs", "--surfaces": "surfaces" };
+type Pass = ControlPass | "surfaces" | "radius" | "focus";
+const PASS_FLAGS: Record<string, Pass> = {
+  "--buttons": "buttons",
+  "--inputs": "inputs",
+  "--surfaces": "surfaces",
+  "--radius": "radius",
+  "--focus": "focus",
+};
 
 /** Rewrites one file's source. Pure: same input, same output; output is a fixed point. */
 export function transformSource(source: string, filename: string, { only }: { only?: Pass } = {}): TransformResult {
@@ -59,6 +75,21 @@ export function transformSource(source: string, filename: string, { only }: { on
     const surfaces = rewriteSurfaces(code, filename);
     return { output: bom + surfaces.output, rewrites: surfaces.rewrites, left: surfaces.left.map((l) => ({ ...l, rule: "surface/left" })) };
   }
+  if (only === "focus") {
+    const messages = new Linter({ configType: "flat" }).verify(code, focusConfig, path.basename(filename));
+    const fatal = messages.find((m) => m.fatal || (m.ruleId === null && m.line === 0));
+    if (fatal) return { output: source, rewrites: [], left: [], fatal: `${fatal.line}:${fatal.column} ${fatal.message}` };
+    const starts = lineStarts(code);
+    const flagged = new Set(messages.map((m) => starts[m.line - 1] + m.column - 1));
+    const focus = rewriteButtonFocus(code, filename, flagged);
+    return { output: bom + focus.output, rewrites: focus.rewrites, left: focus.left.map((l) => ({ ...l, rule: "design/button-focus" })) };
+  }
+  if (only === "radius") {
+    const tabs = rewriteCornerTabs(code, filename);
+    const linted = applySuggestions(tabs.output, source, filename, radiusConfig);
+    if (linted.fatal) return linted;
+    return { output: bom + linted.output, rewrites: [...tabs.rewrites, ...linted.rewrites], left: linted.left };
+  }
   const controlRewrites: Rewrite[] = [];
   const controlLeft: Leftover[] = [];
   for (const pass of only ? [only] : (Object.keys(PASS_RULE) as ControlPass[])) {
@@ -68,8 +99,14 @@ export function transformSource(source: string, filename: string, { only }: { on
     controlLeft.push(...result.left.map((l) => ({ line: l.line, rule: PASS_RULE[pass], text: l.text, message: l.message })));
   }
   if (only) return { output: bom + code, rewrites: controlRewrites, left: controlLeft };
+  const linted = applySuggestions(code, source, filename, config);
+  if (linted.fatal) return linted;
+  return { output: bom + linted.output, rewrites: [...controlRewrites, ...linted.rewrites], left: [...controlLeft, ...linted.left] };
+}
+
+function applySuggestions(code: string, source: string, filename: string, rules: Linter.Config[]): TransformResult {
   const linter = new Linter({ configType: "flat" });
-  const messages = linter.verify(code, config, path.basename(filename));
+  const messages = linter.verify(code, rules, path.basename(filename));
   const fatal = messages.find((m) => m.fatal || (m.ruleId === null && m.line === 0));
   if (fatal) return { output: source, rewrites: [], left: [], fatal: `${fatal.line}:${fatal.column} ${fatal.message}` };
 
@@ -77,7 +114,7 @@ export function transformSource(source: string, filename: string, { only }: { on
   const offset = (line: number, column: number) => starts[line - 1] + column - 1;
 
   const fixes: { range: [number, number]; text: string; line: number }[] = [];
-  const left: Leftover[] = controlLeft;
+  const left: Leftover[] = [];
   for (const m of messages) {
     if (!m.ruleId?.startsWith("design/")) continue;
     const fix = m.suggestions?.[0]?.fix;
@@ -101,7 +138,7 @@ export function transformSource(source: string, filename: string, { only }: { on
     floor = fix.range[0];
   }
   rewrites.reverse();
-  return { output: bom + output, rewrites: [...controlRewrites, ...rewrites], left };
+  return { output, rewrites, left };
 }
 
 /** Source files under `target` (a file or a directory). */
@@ -136,7 +173,7 @@ export function run(argv: string[], options: RunOptions = {}): number {
     else if (Object.hasOwn(PASS_FLAGS, arg)) {
       const pass = PASS_FLAGS[arg];
       if (only && only !== pass) {
-        err(`--buttons, --inputs and --surfaces are exclusive
+        err(`--buttons, --inputs, --surfaces, --radius and --focus are exclusive
 
 ${USAGE}`);
         return 2;

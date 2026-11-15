@@ -26,13 +26,12 @@ export function DeckCardRowControls() {
 
   return (
     <div
-      className="pointer-events-none absolute right-2 top-1/2 flex -translate-y-1/2 items-center gap-1 opacity-0 transition-opacity duration-150 group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100 max-md:pointer-events-auto max-md:opacity-100 max-md:gap-2"
+      className="pointer-events-none absolute right-2 top-1/2 flex -translate-y-1/2 items-center gap-1 opacity-0 transition-opacity duration-150 group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100 max-md:pointer-events-auto max-md:opacity-100 max-md:gap-2 max-md:[--control-h-xs:var(--control-h-md)]"
       onClick={(e) => e.stopPropagation()}
     >
       <Button
         variant="ghost"
         size="icon-xs"
-        className="max-md:h-10 max-md:w-10"
         onClick={() => removeCard(card._id, sectionKey)}
         disabled={count <= 0}
         aria-label={`Remove one ${card.name}`}
@@ -47,7 +46,6 @@ export function DeckCardRowControls() {
       <Button
         variant="ghost"
         size="icon-xs"
-        className="max-md:h-10 max-md:w-10"
         onClick={() => addCard(card._id, sectionKey)}
         disabled={!canAddToDeck}
         aria-label={`Add one ${card.name}`}

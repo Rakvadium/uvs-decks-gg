@@ -190,7 +190,7 @@ export function CardDetailsV2({
                     <button
                       type="button"
                       onClick={onToggleFlip}
-                      className="absolute bottom-0 right-0 z-10 flex items-center gap-2 rounded-none rounded-tl-(--radius-2xl) rounded-br-(--radius-2xl) border border-primary/25 bg-card/95 px-3 py-2 text-muted-foreground shadow-none backdrop-blur-sm transition-colors hover:border-primary/40 hover:text-primary max-md:pointer-events-auto md:bottom-auto md:left-0 md:right-auto md:top-0"
+                      className="absolute bottom-0 right-0 z-10 flex items-center gap-2 rounded-tab-tl border border-primary/25 bg-card/95 px-3 py-2 text-muted-foreground shadow-none backdrop-blur-sm transition-colors hover:border-primary/40 hover:text-primary max-md:pointer-events-auto md:bottom-auto md:left-0 md:right-auto md:top-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                     >
                       <RotateCcw
                         className={cn(
@@ -230,10 +230,11 @@ export function CardDetailsV2({
           <div className="relative flex min-w-0 flex-col overflow-hidden max-md:overflow-visible rounded-xl border border-primary/25 bg-card/95 backdrop-blur-md md:h-full md:max-h-full md:min-h-0 md:flex-1">
             <DialogClose asChild>
               <Button
+                shape="tab-tr"
                 type="button"
                 variant="outline"
                 size="icon"
-                className="pointer-events-auto absolute top-0 right-0 z-30 hidden h-9 w-9 rounded-none rounded-tr-xl rounded-bl-xl !border-primary/25 bg-card/95 shadow-none backdrop-blur-sm hover:!border-primary/40 hover:shadow-none md:inline-flex"
+                className="pointer-events-auto absolute top-0 right-0 z-30 hidden !border-primary/25 bg-card/95 shadow-none backdrop-blur-sm hover:!border-primary/40 hover:shadow-none md:inline-flex"
                 aria-label="Close"
               >
                 <X className="h-4 w-4" />

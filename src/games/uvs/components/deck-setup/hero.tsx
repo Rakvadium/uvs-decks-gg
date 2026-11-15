@@ -64,7 +64,7 @@ export function UvsDeckSetupHero({
             <button
               type="button"
               aria-label="View starting character details"
-              className="absolute inset-0 z-10 cursor-pointer"
+              className="absolute inset-0 z-10 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               onClick={handleImageClick}
             >
               {displayImage ? (
@@ -119,7 +119,7 @@ export function UvsDeckSetupHero({
           <button
             type="button"
             aria-label="View starting character details"
-            className="absolute inset-0 z-10 cursor-pointer overflow-hidden"
+            className="absolute inset-0 z-10 cursor-pointer overflow-hidden outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             onClick={handleImageClick}
           >
             {displayImage ? (

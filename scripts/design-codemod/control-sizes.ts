@@ -1,4 +1,5 @@
 import ts from "typescript";
+import { cornerTab } from "./corners";
 
 type Step = { px: number; text: string; icon: string };
 
@@ -39,14 +40,14 @@ function snap(px: number): Step {
   })[0];
 }
 
-function attribute(element: ts.JsxOpeningLikeElement, name: string): ts.JsxAttribute | undefined {
+export function attribute(element: ts.JsxOpeningLikeElement, name: string): ts.JsxAttribute | undefined {
   return element.attributes.properties.find(
     (prop): prop is ts.JsxAttribute => ts.isJsxAttribute(prop) && prop.name.getText() === name
   );
 }
 
 // Only the first argument of cn() is unconditional, so later arguments are never rewritten.
-function classLiteral(attr: ts.JsxAttribute | undefined): ts.StringLiteral | ts.NoSubstitutionTemplateLiteral | undefined {
+export function classLiteral(attr: ts.JsxAttribute | undefined): ts.StringLiteral | ts.NoSubstitutionTemplateLiteral | undefined {
   const init = attr?.initializer;
   if (!init) return undefined;
   if (ts.isStringLiteral(init)) return init;
@@ -108,7 +109,13 @@ export function rewriteControlSizes(code: string, filename: string, pass: Contro
       return;
     }
 
-    const tokens = literal.text.split(/\s+/).filter(Boolean);
+    const allTokens = literal.text.split(/\s+/).filter(Boolean);
+    const tab = icons ? cornerTab(allTokens) : null;
+    if (tab && attribute(element, "shape")) {
+      left.push({ line, text: literal.text, message: "corner tab on a Button that already sets shape; left as is" });
+      return;
+    }
+    const tokens = tab ? allTokens.filter((t) => !tab.drop.includes(t)) : allTokens;
     if (tokens.some((t) => CORNER_RADIUS.test(t))) {
       left.push({ line, text: literal.text, message: "corner-only radius is a shape, not a size; left as is" });
       return;
@@ -118,7 +125,7 @@ export function rewriteControlSizes(code: string, filename: string, pass: Contro
     const width = tokens.map((t) => t.match(WIDTH)?.[1]).find(Boolean);
     const square = tokens.map((t) => t.match(SQUARE)?.[1]).find(Boolean);
     const hasRadius = tokens.some((t) => RADIUS.test(t));
-    if (!height && !square && !hasRadius && !legacyDefault) return;
+    if (!height && !square && !hasRadius && !legacyDefault && !tab) return;
 
     if (size === null) {
       left.push({ line, text: `${sizeAttr!.getText(source)} ${literal.text}`, message: `size is not a literal; rewrite the ${tag} size by hand` });
@@ -131,7 +138,7 @@ export function rewriteControlSizes(code: string, filename: string, pass: Contro
     const nextSize = step ? (isIcon ? step.icon : step.text) : (size ?? DEFAULT_SIZE);
 
     const drop = (t: string) => RADIUS.test(t) || SQUARE.test(t) || (step !== undefined && HEIGHT.test(t)) || (isIcon && WIDTH.test(t));
-    const removed = tokens.filter(drop);
+    const removed = [...(tab?.drop ?? []), ...tokens.filter(drop)];
     const keptText = tokens.filter((t) => !drop(t)).join(" ");
 
     const quote = code[literal.getStart(source)];
@@ -144,7 +151,7 @@ export function rewriteControlSizes(code: string, filename: string, pass: Contro
 
     if (legacyDefault || nextSize !== (size ?? DEFAULT_SIZE)) {
       if (!sizeAttr) {
-        edits.push(insertSize(element, `size="${nextSize}"`));
+        edits.push(insertAttribute(element, `size="${nextSize}"`));
       } else if (nextSize === DEFAULT_SIZE) {
         edits.push({ start: sizeAttr.getFullStart(), end: sizeAttr.getEnd(), text: "" });
       } else {
@@ -152,17 +159,20 @@ export function rewriteControlSizes(code: string, filename: string, pass: Contro
       }
     }
 
+    if (tab) edits.push(insertAttribute(element, `shape="${tab.shape}"`));
+
     const fromSize = rawSize ? `size="${rawSize}"` : "(default)";
-    rewrites.push({ line, from: `${fromSize} ${removed.join(" ")}`, to: `size="${nextSize}"` });
+    rewrites.push({ line, from: `${fromSize} ${removed.join(" ")}`, to: `size="${nextSize}"${tab ? ` shape="${tab.shape}"` : ""}` });
   }
 
-  function insertSize(element: ts.JsxOpeningLikeElement, text: string): Edit {
+  function insertAttribute(element: ts.JsxOpeningLikeElement, text: string): Edit {
     const first = element.attributes.properties[0];
     const tagLine = source.getLineAndCharacterOfPosition(element.tagName.getEnd()).line;
     if (first && source.getLineAndCharacterOfPosition(first.getStart(source)).line > tagLine) {
       const start = first.getStart(source);
       const indent = code.slice(code.lastIndexOf("\n", start) + 1, start);
-      return { start, end: start, text: `${text}\n${indent}` };
+      const newline = code.includes("\r\n") ? "\r\n" : "\n";
+      return { start, end: start, text: `${text}${newline}${indent}` };
     }
     const anchor = element.tagName.getEnd();
     return { start: anchor, end: anchor, text: ` ${text}` };

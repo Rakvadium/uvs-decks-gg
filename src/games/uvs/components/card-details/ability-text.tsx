@@ -57,7 +57,7 @@ export function AbilityText({ text, showHeading = true }: AbilityTextProps) {
         return (
           <p key={index} className="text-base leading-relaxed text-foreground/90">
             <span
-              className="chrome-label-case mr-0.5 inline-flex items-center rounded-sm px-1.5 py-px text-xs font-bold align-middle"
+              className="chrome-label-case mr-0.5 inline-flex items-center rounded-md px-1.5 py-px text-xs font-bold align-middle"
               style={{
                 backgroundColor: abilityColor,
                 color: "#fff",
