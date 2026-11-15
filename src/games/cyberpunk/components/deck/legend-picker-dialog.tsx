@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useDeferredValue, useMemo, useState } from "react";
+import { EmptyState } from "@/components/ui/empty-state";
 import { Check, Search, XIcon } from "lucide-react";
 
 import { CYBERPUNK_COLORS } from "@shared/games/cyberpunk/card-types";
@@ -137,11 +138,14 @@ export function LegendPickerDialog({ open, onOpenChange, setup, onChange, slotIn
               ))}
             </div>
           ) : options.length === 0 ? (
-            <div className="flex min-h-48 items-center justify-center rounded-lg border border-dashed border-border/80 bg-card/30 px-4 text-center text-sm text-muted-foreground">
-              {cards.some((card) => card.type?.toLowerCase() === "legend")
-                ? "No Legends match the current search and colors."
-                : "No Legend cards are available yet."}
-            </div>
+            <EmptyState
+              className="min-h-48"
+              title={
+                cards.some((card) => card.type?.toLowerCase() === "legend")
+                  ? "No Legends match the current search and colors."
+                  : "No Legend cards are available yet."
+              }
+            />
           ) : (
             <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
               {options.map(({ card, selected, disabledReason }) => {
