@@ -29,7 +29,7 @@ export function CommunityTierListsPageView() {
       <CommunityTierListsPageMobileScopeControl />
       <div className="flex-1 md:pt-0">
         {activeTab === "rankings" ? (
-          <CommunityRankingsView embedded />
+          <CommunityRankingsView />
         ) : activeTab === "mine" && !isAuthenticated ? (
           <CommunityTierListsPageEmptyState
             message="Sign in to keep private tier lists, manage your published ones, and jump straight into editing."

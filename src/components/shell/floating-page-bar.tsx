@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRef, type ComponentType, type ReactNode, type Ref } from "react";
 import { ArrowLeft, Search, X } from "lucide-react";
 import { Button, type ButtonProps } from "@/components/ui/button";
+import { IconToolbarButton } from "@/components/ui/icon-toolbar-button";
 import { cn } from "@/lib/utils";
 import { useSlashToFocus } from "@/hooks/use-slash-to-focus";
 import { useIsMobile } from "@/hooks/useIsMobile";
@@ -26,8 +27,9 @@ export function FloatingPageBar({
 }) {
   return (
     <div
+      data-slot="floating-page-bar"
       className={cn(
-        "pointer-events-none grid w-full min-w-0 grid-cols-[1fr_minmax(0,26rem)_1fr] items-center gap-3 py-0.5",
+        "pointer-events-none grid w-full min-w-0 grid-cols-[minmax(max-content,1fr)_minmax(0,26rem)_minmax(max-content,1fr)] items-center gap-3 py-0.5",
         className
       )}
     >
@@ -38,14 +40,30 @@ export function FloatingPageBar({
   );
 }
 
+export const PAGE_WASH_CLASS_NAMES = {
+  fade: "bg-linear-to-b from-primary/7 via-primary/3 via-40% to-transparent",
+  radial:
+    "bg-[radial-gradient(circle_at_top,color-mix(in_oklab,var(--primary)_8%,transparent),transparent_32%),radial-gradient(circle_at_80%_8%,color-mix(in_oklab,var(--secondary)_10%,transparent),transparent_28%)]",
+  grid:
+    "bg-[radial-gradient(circle_at_30%_0%,color-mix(in_oklab,var(--primary)_10%,transparent),transparent_22rem),radial-gradient(circle_at_100%_45%,color-mix(in_oklab,var(--secondary)_10%,transparent),transparent_24rem),linear-gradient(to_right,color-mix(in_oklab,var(--border)_22%,transparent)_1px,transparent_1px),linear-gradient(to_bottom,color-mix(in_oklab,var(--border)_22%,transparent)_1px,transparent_1px)] bg-size-[100%_100%,100%_100%,24px_24px,24px_24px]",
+  glow:
+    "bg-[radial-gradient(circle_at_30%_0%,color-mix(in_oklab,var(--primary)_4%,transparent),transparent_24rem),radial-gradient(circle_at_70%_100%,color-mix(in_oklab,var(--secondary)_4%,transparent),transparent_24rem)]",
+} as const;
+
+export type PageWash = keyof typeof PAGE_WASH_CLASS_NAMES;
+
 export function FloatingPageLayout({
   bar,
   children,
   contentClassName,
+  pageWash,
+  scrollRef,
 }: {
   bar: ReactNode;
   children: ReactNode;
   contentClassName?: string;
+  pageWash?: PageWash;
+  scrollRef?: Ref<HTMLDivElement>;
 }) {
   // Desktop-only chrome: on mobile the nav bar and its slots own these controls, and a mounted
   // copy here would open a second instance of every bar dialog.
@@ -53,14 +71,23 @@ export function FloatingPageLayout({
 
   return (
     <div className="relative flex min-h-0 flex-1 flex-col md:h-full">
+      {pageWash ? (
+        <div
+          aria-hidden
+          data-slot="page-wash"
+          data-wash={pageWash}
+          className={cn("pointer-events-none absolute inset-0", PAGE_WASH_CLASS_NAMES[pageWash])}
+        />
+      ) : null}
       {isMobile ? null : (
         <div className="pointer-events-none absolute inset-x-0 top-0 z-30 hidden px-4 pt-3 md:block md:px-6">
           {bar}
         </div>
       )}
       <div
+        ref={scrollRef}
         className={cn(
-          "min-h-0 flex-1 overflow-y-auto overflow-x-hidden overscroll-y-contain [-webkit-overflow-scrolling:touch] p-4 md:p-6 md:pt-[4.75rem]",
+          "relative min-h-0 flex-1 overflow-y-auto overflow-x-hidden overscroll-y-contain [-webkit-overflow-scrolling:touch] p-4 md:p-6 md:pt-[4.75rem]",
           "max-md:pt-[calc(var(--mobile-nav-h,3.5rem)+0.75rem)] max-md:pb-[calc(var(--mobile-tab-h,5rem)+1rem)] max-md:[scroll-padding-top:var(--mobile-nav-h,3.5rem)]",
           contentClassName
         )}
@@ -139,6 +166,7 @@ export function FloatingSearchCapsule({
   name,
   "aria-label": ariaLabel,
   className,
+  children,
 }: {
   value: string;
   onChange: (value: string) => void;
@@ -146,6 +174,7 @@ export function FloatingSearchCapsule({
   name: string;
   "aria-label": string;
   className?: string;
+  children?: ReactNode;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   useSlashToFocus(inputRef);
@@ -166,19 +195,15 @@ export function FloatingSearchCapsule({
         spellCheck={false}
       />
       {value.length > 0 ? (
-        <button
-          type="button"
-          className="flex size-(--control-h-xs) shrink-0 items-center justify-center rounded-island text-[color:var(--control-dual-mix)] outline-none transition-colors hover:bg-[color:var(--control-dual-surface-hover)] hover:text-primary focus-visible:ring-2 focus-visible:ring-ring"
-          aria-label="Clear search"
-          onClick={() => onChange("")}
-        >
-          <X className="size-4" />
-        </button>
+        <IconToolbarButton shape="island" label="Clear search" onClick={() => onChange("")}>
+          <X />
+        </IconToolbarButton>
       ) : (
         <kbd className="hidden shrink-0 select-none items-center rounded-island border border-border/60 bg-muted/40 px-2 py-0.5 text-[10px] text-muted-foreground lg:flex">
           /
         </kbd>
       )}
+      {children}
     </FloatingIslandCapsule>
   );
 }

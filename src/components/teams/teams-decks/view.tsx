@@ -22,18 +22,13 @@ export function TeamsDecksView() {
           }
         />
       }
-      contentClassName="relative"
+      pageWash="fade"
     >
-      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
-        <div className="h-full w-full bg-gradient-to-b from-primary/[0.07] via-primary/[0.03] via-40% to-transparent to-100%" />
+      <div className="md:hidden">
+        <TeamsDecksHeading title={TITLE} description={DESCRIPTION} />
       </div>
-      <div className="relative z-10">
-        <div className="md:hidden">
-          <TeamsDecksHeading title={TITLE} description={DESCRIPTION} />
-        </div>
-        <div className="flex-1 pt-4 pb-6 md:pt-0 md:pb-8">
-          <TeamsDecksBody />
-        </div>
+      <div className="flex-1 pt-4 pb-6 md:pt-0 md:pb-8">
+        <TeamsDecksBody />
       </div>
     </FloatingPageLayout>
   );

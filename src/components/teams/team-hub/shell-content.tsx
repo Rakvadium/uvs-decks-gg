@@ -73,12 +73,10 @@ export function TeamHubShellContent({ teamId, children }: TeamHubShellContentPro
             loading={loading}
           />
         }
-        contentClassName="relative min-w-0"
+        contentClassName="min-w-0"
+        pageWash="fade"
       >
-        <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
-          <div className="h-full w-full bg-gradient-to-b from-primary/[0.07] via-primary/[0.03] via-40% to-transparent to-100%" />
-        </div>
-        <div className="relative z-10 min-w-0">
+        <div className="min-w-0">
           <div className="md:hidden min-w-0 border-b border-surface pb-4">
             {mobileBranding}
             <div className="mt-4 w-full min-w-0 overflow-x-auto overflow-y-hidden overscroll-x-contain pb-1 [scrollbar-width:thin]">

@@ -21,30 +21,24 @@ export function CommunityView() {
       <MobileLargeTitle>Community</MobileLargeTitle>
       <CommunityMobileDestinationNav />
 
-      <div className="relative">
-        <div className="pointer-events-none absolute -top-20 left-1/4 h-72 w-72 rounded-full bg-primary/10 blur-3xl" />
-        <div className="pointer-events-none absolute top-1/3 right-0 h-80 w-80 rounded-full bg-secondary/10 blur-3xl" />
-        <div className="pointer-events-none absolute inset-0 grid-pattern opacity-20" />
+      <div className="grid gap-6">
+        {communityMedia ? (
+          <Surface className={sectionClassName}>
+            <CommunityMediaFeedSection media={communityMedia} />
+          </Surface>
+        ) : null}
 
-        <div className="relative grid gap-6">
-          {communityMedia ? (
-            <Surface className={sectionClassName}>
-              <CommunityMediaFeedSection media={communityMedia} />
-            </Surface>
-          ) : null}
+        {tierLists ? (
+          <Surface className={sectionClassName}>
+            <CommunityTierListsSection />
+          </Surface>
+        ) : null}
 
-          {tierLists ? (
-            <Surface className={sectionClassName}>
-              <CommunityTierListsSection />
-            </Surface>
-          ) : null}
-
-          {!communityMedia && !tierLists ? (
-            <Surface className={sectionClassName}>
-              <EmptyState title="Community features for this game are coming soon." />
-            </Surface>
-          ) : null}
-        </div>
+        {!communityMedia && !tierLists ? (
+          <Surface className={sectionClassName}>
+            <EmptyState title="Community features for this game are coming soon." />
+          </Surface>
+        ) : null}
       </div>
     </div>
   );
