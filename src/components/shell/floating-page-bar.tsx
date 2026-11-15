@@ -14,7 +14,7 @@ import {
   floatingIslandSurfaceClassName,
 } from "./floating-island";
 
-export const FLOATING_CENTER_WIDTH_CLASS_NAMES = {
+const FLOATING_CENTER_WIDTH_CLASS_NAMES = {
   default: "grid-cols-[minmax(max-content,1fr)_minmax(0,var(--floating-center-w))_minmax(max-content,1fr)]",
   wide: "grid-cols-[minmax(max-content,1fr)_minmax(0,var(--floating-center-w-wide))_minmax(max-content,1fr)]",
 } as const;
