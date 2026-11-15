@@ -1,7 +1,7 @@
 /**
  * Early catalog download for first visits.
  *
- * The gallery layout preloads the static catalog from the server HTML (`<link rel="preload">`),
+ * The middleware preloads the static catalog with a `Link` response header (catalog-preload.ts),
  * so the download runs while the page JS loads and the client loader's fetch is served from the
  * preload. A cookie holding the catalog version this browser has in IndexedDB lets the server skip
  * the preload for browsers that already have it.

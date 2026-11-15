@@ -6,6 +6,9 @@ import {
   routeRequest,
   type RouteDecision,
 } from "@/lib/routing/route-request";
+import { isGameId } from "@shared/games/types";
+import { catalogCachedCookieName } from "@/lib/universus/catalog-prefetch";
+import { catalogPreloadLink } from "@/lib/universus/catalog-preload";
 
 const isPublicPage = createRouteMatcher([...AUTH_ENTRY_PATHS]);
 const AUTH_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 30;
@@ -36,6 +39,25 @@ function applyDecision(request: NextRequest, decision: RouteDecision): NextRespo
   }
 }
 
+const GALLERY_PAGE_PATH = /^\/([^/?]+)\/gallery\/?(?:\?|$)/;
+
+/**
+ * Adds a `Link` preload header for the static catalog to full gallery page loads, so the download
+ * starts before the HTML and page JS arrive (src/lib/universus/catalog-preload.ts).
+ */
+async function withCatalogPreload(
+  request: NextRequest,
+  decision: RouteDecision,
+  response: NextResponse
+): Promise<NextResponse> {
+  if (decision.type !== "rewrite" || request.headers.has("rsc")) return response;
+  const game = GALLERY_PAGE_PATH.exec(decision.url)?.[1];
+  if (!game || !isGameId(game)) return response;
+  const link = await catalogPreloadLink(game, request.cookies.get(catalogCachedCookieName(game))?.value);
+  if (link) response.headers.append("Link", link);
+  return response;
+}
+
 export default convexAuthNextjsMiddleware(async (request, { convexAuth }) => {
   const decision = routeRequest({
     host: request.headers.get("host"),
@@ -56,7 +78,8 @@ export default convexAuthNextjsMiddleware(async (request, { convexAuth }) => {
     const target = new URL(authenticatedAuthEntryRedirect(request.nextUrl.search), request.url);
     return NextResponse.redirect(target);
   }
-  return applyDecision(request, decision);
+  const response = applyDecision(request, decision);
+  return isPageNavigation ? withCatalogPreload(request, decision, response) : response;
 }, {
   cookieConfig: {
     maxAge: AUTH_COOKIE_MAX_AGE_SECONDS,
