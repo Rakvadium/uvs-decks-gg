@@ -290,7 +290,6 @@ export const CATALOG_CHAPTERS = [
         id: "search-fields",
         label: "Search fields",
         ui: [
-          { file: "gallery-search-field.tsx", exports: ["GallerySearchField", "galleryToolbarControlClassName"] },
           { file: "search-bar.tsx", exports: ["SearchBar", "useSearchBarProps", "SearchConfig", "SearchBarProps"] },
         ],
       },
