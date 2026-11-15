@@ -30,7 +30,7 @@ export function DeckDetailsFloatingTopBar() {
     <FloatingPageBar
       left={
         <div className="flex min-w-0 items-center gap-2">
-          <FloatingBackPill href="/decks" label="Decks" iconOnly />
+          <FloatingBackPill href="/decks" label="Decks" />
           <FloatingCapsuleCluster
             className="min-w-0 max-w-[min(100%,28rem)]"
             bodyClassName="min-w-0 px-4"
@@ -46,7 +46,7 @@ export function DeckDetailsFloatingTopBar() {
         <>
           {isOwner ? (
             <FloatingActionPill
-              variant="outline"
+              variant="floating"
               onClick={setAsActiveDeck}
               disabled={isActiveDeck}
               aria-label={isActiveDeck ? "Active deck" : "Set as active deck"}
@@ -57,7 +57,7 @@ export function DeckDetailsFloatingTopBar() {
             </FloatingActionPill>
           ) : null}
           <FloatingActionPill
-            variant={isOwner ? "outline" : "default"}
+            variant={isOwner ? "floating" : "default"}
             onClick={requestDuplicate}
             disabled={isDuplicating}
             aria-label="Duplicate deck"

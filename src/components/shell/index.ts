@@ -2,7 +2,6 @@ export { LeftSidebar } from "./left-sidebar";
 export { AppPageHeader } from "./app-page-header";
 export type { AppPageHeaderProps } from "./app-page-header";
 export {
-  FLOATING_ACTION_PILL_CLASS,
   FloatingActionPill,
   FloatingBackPill,
   FloatingCapsuleCluster,

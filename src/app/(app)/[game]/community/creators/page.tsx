@@ -8,7 +8,7 @@ export default function CreatorProgramPage() {
     <FloatingPageLayout
       bar={
         <FloatingPageBar
-          left={<FloatingBackPill href="/community" label="Community" iconOnly />}
+          left={<FloatingBackPill href="/community" label="Community" />}
         />
       }
     >

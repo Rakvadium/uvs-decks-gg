@@ -1,12 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useState, type ComponentProps } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useConvexAuth, useMutation } from "convex/react";
 import { Link2, Loader2, PenLine, Plus, UsersRound } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "../../../convex/_generated/api";
 import { useStartAuth } from "@/components/auth/use-start-auth";
+import { FloatingActionPill } from "@/components/shell/floating-page-bar";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -23,11 +24,10 @@ import { cn } from "@/lib/utils";
 
 type CreateTeamButtonProps = {
   className?: string;
-  size?: ComponentProps<typeof Button>["size"];
-  variant?: ComponentProps<typeof Button>["variant"];
+  placement?: "header" | "inline";
 };
 
-export function CreateTeamButton({ className, size = "sm", variant = "default" }: CreateTeamButtonProps) {
+export function CreateTeamButton({ className, placement = "inline" }: CreateTeamButtonProps) {
   const [open, setOpen] = useState(false);
   const { isAuthenticated } = useConvexAuth();
   const startAuth = useStartAuth();
@@ -40,18 +40,24 @@ export function CreateTeamButton({ className, size = "sm", variant = "default" }
     setOpen(true);
   }, [isAuthenticated, startAuth]);
 
+  const label = (
+    <>
+      <Plus className="h-3.5 w-3.5" />
+      <span className="text-xs">Create team</span>
+    </>
+  );
+
   return (
     <>
-      <Button
-        type="button"
-        variant={variant}
-        size={size}
-        className={cn("h-9 gap-1.5 text-xs", className)}
-        onClick={onOpen}
-      >
-        <Plus className="h-3.5 w-3.5" />
-        Create team
-      </Button>
+      {placement === "header" ? (
+        <FloatingActionPill className={className} onClick={onOpen}>
+          {label}
+        </FloatingActionPill>
+      ) : (
+        <Button type="button" className={cn("gap-1.5", className)} onClick={onOpen}>
+          {label}
+        </Button>
+      )}
       {isAuthenticated ? <CreateTeamFormDialog open={open} onOpenChange={setOpen} /> : null}
     </>
   );
