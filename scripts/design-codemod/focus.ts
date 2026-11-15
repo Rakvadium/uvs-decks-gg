@@ -4,7 +4,6 @@ import { attribute, classLiteral } from "./control-sizes";
 export type FocusRewrite = { line: number; from: string; to: string };
 export type FocusLeftover = { line: number; text: string; message: string };
 
-/** Button's own keyboard focus ring (`buttonVariants` base in src/components/ui/button.tsx). */
 export const BUTTON_FOCUS_RING =
   "outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background";
 

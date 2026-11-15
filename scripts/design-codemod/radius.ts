@@ -6,7 +6,6 @@ export type RadiusRewrite = { line: number; from: string; to: string };
 
 type Edit = { start: number; end: number; text: string };
 
-/** The JSX element whose `className` holds `node`, if any. */
 function classNameOwner(node: ts.Node): ts.JsxOpeningLikeElement | undefined {
   for (let n: ts.Node | undefined = node.parent; n; n = n.parent) {
     if (ts.isJsxAttribute(n)) {

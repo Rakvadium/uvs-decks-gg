@@ -111,8 +111,7 @@ export function rewriteControlSizes(code: string, filename: string, pass: Contro
 
     const allTokens = literal.text.split(/\s+/).filter(Boolean);
     const tab = icons ? cornerTab(allTokens) : null;
-    const shapeAttr = attribute(element, "shape");
-    if (tab && shapeAttr) {
+    if (tab && attribute(element, "shape")) {
       left.push({ line, text: literal.text, message: "corner tab on a Button that already sets shape; left as is" });
       return;
     }

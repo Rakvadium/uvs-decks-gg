@@ -87,7 +87,7 @@ export function transformSource(source: string, filename: string, { only }: { on
   if (only === "radius") {
     const tabs = rewriteCornerTabs(code, filename);
     const linted = applySuggestions(tabs.output, source, filename, radiusConfig);
-    if (linted.fatal) return { ...linted, output: source };
+    if (linted.fatal) return linted;
     return { output: bom + linted.output, rewrites: [...tabs.rewrites, ...linted.rewrites], left: linted.left };
   }
   const controlRewrites: Rewrite[] = [];
@@ -100,11 +100,10 @@ export function transformSource(source: string, filename: string, { only }: { on
   }
   if (only) return { output: bom + code, rewrites: controlRewrites, left: controlLeft };
   const linted = applySuggestions(code, source, filename, config);
-  if (linted.fatal) return { ...linted, output: source };
+  if (linted.fatal) return linted;
   return { output: bom + linted.output, rewrites: [...controlRewrites, ...linted.rewrites], left: [...controlLeft, ...linted.left] };
 }
 
-/** Applies the first suggestion of every design finding `rules` reports and lists the rest. */
 function applySuggestions(code: string, source: string, filename: string, rules: Linter.Config[]): TransformResult {
   const linter = new Linter({ configType: "flat" });
   const messages = linter.verify(code, rules, path.basename(filename));
