@@ -15,7 +15,7 @@ import {
   ToolbarDivider,
 } from "./toolbar-bits";
 
-export function GalleryTopBarIslandVariant() {
+export function GalleryTopBarFilters() {
   const { state, actions } = useGalleryTopBarFiltersContext();
 
   const placeholder =
