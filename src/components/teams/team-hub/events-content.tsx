@@ -217,36 +217,36 @@ export function TeamHubEventsContent({ teamId }: TeamHubEventsContentProps) {
               const e = row.event;
               return (
                 <Panel asChild key={e._id}>
-                <li className="flex flex-col gap-1 px-4 py-3 sm:flex-row sm:items-start sm:justify-between">
-                  <div className="min-w-0">
-                    <p className="font-medium text-foreground">{e.title}</p>
-                    {e.description?.trim() ? (
-                      <p className="mt-1 text-sm text-muted-foreground whitespace-pre-wrap">{e.description}</p>
-                    ) : null}
-                    <p className="mt-1 text-xs text-primary">{formatRange(e.startsAt, e.endsAt)}</p>
-                    <p className="text-xs text-muted-foreground">
-                      Added by {row.creatorUsername?.trim() || e.createdByUserId.slice(-6)}
-                    </p>
-                  </div>
-                  {caps.canManageEvents && (
-                    <Button
-                      type="button"
-                      variant="destructiveOutline"
-                      size="sm"
-                      className="shrink-0 self-start"
-                      onClick={async () => {
-                        try {
-                          await remove({ eventId: e._id });
-                          toast.success("Event removed");
-                        } catch (err) {
-                          toast.error(err instanceof Error ? err.message : "Could not remove");
-                        }
-                      }}
-                    >
-                      Remove
-                    </Button>
-                  )}
-                </li>
+                  <li className="flex flex-col gap-1 px-4 py-3 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="min-w-0">
+                      <p className="font-medium text-foreground">{e.title}</p>
+                      {e.description?.trim() ? (
+                        <p className="mt-1 text-sm text-muted-foreground whitespace-pre-wrap">{e.description}</p>
+                      ) : null}
+                      <p className="mt-1 text-xs text-primary">{formatRange(e.startsAt, e.endsAt)}</p>
+                      <p className="text-xs text-muted-foreground">
+                        Added by {row.creatorUsername?.trim() || e.createdByUserId.slice(-6)}
+                      </p>
+                    </div>
+                    {caps.canManageEvents && (
+                      <Button
+                        type="button"
+                        variant="destructiveOutline"
+                        size="sm"
+                        className="shrink-0 self-start"
+                        onClick={async () => {
+                          try {
+                            await remove({ eventId: e._id });
+                            toast.success("Event removed");
+                          } catch (err) {
+                            toast.error(err instanceof Error ? err.message : "Could not remove");
+                          }
+                        }}
+                      >
+                        Remove
+                      </Button>
+                    )}
+                  </li>
                 </Panel>
               );
             })}
