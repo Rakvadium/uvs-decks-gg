@@ -12,6 +12,24 @@
 - **Composition:** Follow [component-architecture-playbook.md](./component-architecture-playbook.md) so dialogs, panels, and pages stay small and testable.
 - **Theming:** Session-backed theme and palette preferences should remain coherent with `next-themes` and existing color scheme tokens.
 
+## Pick a shared primitive first
+
+These primitives own their radius, height, fill and focus ring, so a call site passes layout only. Each links to its recipe below.
+
+| Need | Primitive | Section |
+|------|-----------|---------|
+| Any button, sized and shaped by role | `Button` `size` and `shape` | [Buttons](#buttons) |
+| Icon-only action with a label | `IconToolbarButton` | [Overlays](#overlays) |
+| Toggle or removable filter pill | `Chip` | [Surfaces and feedback](#surfaces-and-feedback) |
+| Count bubble | `CountBadge` | [Surfaces and feedback](#surfaces-and-feedback) |
+| Selectable card, chip or row | `OptionTile` | [Selected state and toggles](#selected-state-and-toggles) |
+| Inset panel, notice, empty and loading states | `Panel`, `Banner`, `EmptyState`, `LoadingState`, `Spinner` | [Surfaces and feedback](#surfaces-and-feedback) |
+| Create dialog | `CreateEntityDialog` | [Overlays](#overlays) |
+| In-page search | `SearchField` | [Inputs](#inputs) |
+| Field height | `Input`, `SelectTrigger` and `Textarea` `size` | [Inputs](#inputs) |
+| Page background | `FloatingPageLayout` `pageWash` | [Page chrome](#page-chrome) |
+| Right rail header | `PanelHeader` | [Page chrome](#page-chrome) |
+
 ## Border ladder
 
 Structural borders use only these steps. Write the named utility ([Named utilities](#named-utilities)):
@@ -122,38 +140,57 @@ Do not use `hsl(var(--border)…)` — theme borders are oklch via `var(--border
 
 | Role | Class |
 |------|--------|
-| Controls / inputs | `rounded-control` |
-| Cards / panels | `rounded-lg` |
-| Large feature surfaces | `rounded-xl` |
-| Pills / avatars | `rounded-full` |
+| Controls, inputs, badges, tooltips | `rounded-control` (same value as `rounded-md`) |
+| Cards, panels, popovers, dialogs | `rounded-surface` (same value as `rounded-lg`) |
+| Large feature surfaces, card art | `rounded-xl` |
+| A control flush in a surface corner | `rounded-tab-tl` or `rounded-tab-tr` |
+| Pills, chips, avatars | `rounded-full` |
 
-Avoid one-off `rounded-[Npx]` except micro geometry (e.g. tooltip arrows). Dialogs use this same ladder — panel `rounded-lg`, fields and footer buttons `rounded-md` — not a one-off dialog radius.
+Every step derives from the chrome's `--radius`. Buttons take their radius from `shape` ([Buttons](#buttons)). Side forms such as `rounded-t-xl` are fine. A one-off `rounded-[Npx]` is allowed only at 4px or less, for micro geometry such as a checkbox or a tooltip arrow.
 
-Bare `rounded` and `rounded-sm` are off-ladder: `rounded` is a static 4px that ignores the chrome `--radius`, so it drifts from every other control. Badges and tooltips are `rounded-md`. Segmented controls, tabs and option tiles are `rounded-control`. Buttons take their radius from `shape` ([Buttons](#buttons)).
+A corner tab, such as a card's flip button, rounds two opposite corners at `--radius-surface` and leaves the other two square. `rounded-tab-tl` rounds top-left and bottom-right, for a tab in either of those corners. `rounded-tab-tr` rounds the other diagonal. On a `Button`, pass `shape="tab-tl"` or `shape="tab-tr"`.
 
-`rounded-2xl` and larger are off-ladder too. Use `rounded-surface` or `rounded-xl`. Corner-only forms such as `rounded-tl-lg rounded-br-lg` hand-build a notch shape; round every corner instead. Side forms such as `rounded-t-xl` are fine. `design/radius-ladder` reports all of these.
+These are off the ladder, and `design/radius-ladder` fails the lint on them:
+
+- Bare `rounded`, `rounded-sm` and `rounded-xs`. `rounded` is a static 4px that ignores the chrome.
+- `rounded-2xl` and larger. Use `rounded-surface` or `rounded-xl`.
+- Corner-only forms such as `rounded-tl-lg rounded-br-lg`. Use a corner tab, or round every corner.
+
+Printed card art keeps its own corners. Put `// eslint-disable-next-line design/radius-ladder -- printed card art: <why>` on the line before, never a file-wide disable.
 
 ## Role tokens
 
-Each chrome sets 12 role tokens in `src/styles/base.css`. Components move onto them from the next parity PRs on, and the `/design` page (Radius & elevation, Role tokens) shows their live values.
+Each chrome sets 12 role tokens in `src/styles/base.css`. Every CTA, island, control and surface in one chrome reads the same token, so chromes can differ in shape while each stays consistent. The `/design` page (Radius & elevation, Role tokens) shows their live values for the active chrome.
 
-| Token | Role | Calm value | Overrides |
-|-------|------|------------|-----------|
-| `--radius-control` (`rounded-control`) | Buttons, inputs, toggles | `calc(var(--radius) - 2px)`, same as `rounded-md` | None |
-| `--radius-surface` (`rounded-surface`) | Cards, panels, popovers, dialogs | `var(--radius)`, same as `rounded-lg` | None |
-| `--radius-cta` (`rounded-cta`) | Primary call to action | `9999px` | Bubblegum and holoterminal: `var(--radius)` |
-| `--radius-island` (`rounded-island`) | Floating islands, capsules, header pills | `9999px` | Bubblegum and holoterminal: `var(--radius)` |
-| `--control-h-xs`, `-sm`, `-md`, `-lg` | Control heights | `28px`, `32px`, `40px`, `48px` | None |
-| `--selected-bg` | Selected or active fill | `--accent` at the selected step (`/20`) | None |
-| `--selected-border` | Selected or active border | `--accent` at the strong step (`/60`) | None |
-| `--selected-fg` | Selected or active text and icon | `var(--accent)` | None |
-| `--hover-bg` | Hover fill | `--accent` at the wash step (`/10`) | None |
+| Token | Role | Value in every chrome |
+|-------|------|-----------------------|
+| `--radius-control` (`rounded-control`) | Buttons, inputs, toggles | `calc(var(--radius) - 2px)`, same as `rounded-md` |
+| `--radius-surface` (`rounded-surface`) | Cards, panels, popovers, dialogs, corner tabs | `var(--radius)`, same as `rounded-lg` |
+| `--radius-cta` (`rounded-cta`) | Primary call to action | `9999px`, or `var(--radius)` in bubblegum and holoterminal |
+| `--radius-island` (`rounded-island`) | Floating islands, capsules, header pills | Same value as `--radius-cta` |
+| `--control-h-xs`, `-sm`, `-md`, `-lg` | Control heights | `28px`, `32px`, `40px`, `48px` |
+| `--selected-bg` | Selected or active fill | `--accent` at the selected step (`/20`) |
+| `--selected-border` | Selected or active border | `--accent` at the strong step (`/60`) |
+| `--selected-fg` | Selected or active text and icon | `var(--accent)` |
+| `--hover-bg` | Hover fill | `--accent` at the wash step (`/10`) |
 
-Inside one chrome, `--radius-cta` and `--radius-island` hold one value. The selected and hover tokens derive from `--accent` only, so custom palettes follow them. `tests/role-tokens.test.ts` checks every chrome against this table.
+The radii resolve per chrome from its `--radius` (16px root font):
+
+| Chrome | `--radius` | `--radius-control` | `--radius-surface` | `--radius-cta`, `--radius-island` |
+|--------|-----------|--------------------|--------------------|-----------------------------------|
+| Calm | `0.625rem` (10px) | 8px | 10px | `9999px` |
+| Bubblegum | `0.4rem` (6.4px) | 4.4px | 6.4px | 6.4px |
+| Darkmatter | `0.75rem` (12px) | 10px | 12px | `9999px` |
+| Expressive | `0.625rem` (10px) | 8px | 10px | `9999px` |
+| Holoterminal | `0.375rem` (6px) | 4px | 6px | 6px |
+
+The selected and hover tokens derive from `--accent` only, so custom palettes follow them. In palettes where `--accent` equals `--primary` (caffeine, singularity, sorbet light), selected reads as primary. `tests/role-tokens.test.ts` checks every chrome sets all 12 tokens with no literal colour.
 
 ## Buttons
 
-`Button` reads its height and radius from the role tokens, so a call site never passes `h-*`, `w-*`, `size-*` or `rounded-*`. The same holds for `Badge`, `Input`, `SelectTrigger`, `SearchField` and `Chip`. `design/primitive-geometry` reports `h-*`, `size-*` and `rounded-*` (role radii included) in the `className` of any of them, and of every shared wrapper that forwards `className` to one (`FilterChip`, `IconToolbarButton`, `DialogCancel`, `TierListModerationBadge` and the rest of `CLASSNAME_FORWARDERS` in `tools/eslint-design/classify.mjs`). `tests/design-lint.test.ts` scans `src/` and fails when a new forwarder is missing from that list. A raw `<button>` that sets `className` must include a `focus-visible:` class, and `design/button-focus` reports one that doesn't.
+`Button` reads its height and radius from the role tokens, so a call site never passes `h-*`, `w-*`, `size-*` or `rounded-*`. The same holds for `Badge`, `Input`, `SelectTrigger`, `SearchField` and `Chip`. `design/primitive-geometry` reports `h-*`, `size-*` and `rounded-*` (role radii included) in the `className` of any of them, and of every shared wrapper that forwards `className` to one (`FilterChip`, `IconToolbarButton`, `DialogCancel`, `TierListModerationBadge` and the rest of `CLASSNAME_FORWARDERS` in `tools/eslint-design/classify.mjs`). `tests/design-lint.test.ts` scans `src/` and fails when a new forwarder is missing from that list.
+
+A raw `<button>` that sets `className` must draw a keyboard focus ring, and `design/button-focus` fails the lint on one that has no `focus-visible:` class. Prefer `Button`. Otherwise add Button's ring, `outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background`. Inside a container that clips overflow, use the inset form that `Tabs` uses, `focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring`. `bun run design:codemod --focus <path>` adds Button's ring to every raw button the rule reports.
 
 | `size` | Height | Icon twin |
 |--------|--------|-----------|
@@ -167,8 +204,14 @@ Inside one chrome, `--radius-cta` and `--radius-island` hold one value. The sele
 | `control` (default) | `rounded-control` | Every in-page button |
 | `cta` | `rounded-cta` | The primary call to action |
 | `island` | `rounded-island` | Floating header pills (set by `FloatingActionPill`) |
+| `pill` | `rounded-full` | `Chip` and filter pills |
+| `tab-tl`, `tab-tr` | `rounded-tab-tl`, `rounded-tab-tr` | An icon button flush in a surface corner ([Radius](#radius)) |
 
-Every variant keeps `chrome-label-case` and its `--chrome-button-shadow-*` hooks. To move old overrides onto the ladder, run `bun run design:codemod --buttons <path>`. It snaps an override height to the nearest step, a tie going to `md`, and drops radius overrides. It lists corner-notch radii and computed classes for a person to judge.
+`variant="link"` is inline text, so it has no height or padding at any size. Every variant keeps `chrome-label-case` and its `--chrome-button-shadow-*` hooks.
+
+To enlarge touch targets on phones, raise the token on the container rather than the buttons: `max-md:[--control-h-xs:var(--control-h-md)]` makes every `size="icon-xs"` button inside it 40px below `md`.
+
+To move old overrides onto the ladder, run `bun run design:codemod --buttons <path>`. It snaps an override height to the nearest step, a tie going to `md`, drops radius overrides, and turns a corner-tab pair into `shape="tab-tl"` or `shape="tab-tr"`. It lists other corner radii and computed classes for a person to judge.
 
 ### Floating header
 
@@ -245,6 +288,27 @@ Call sites pass layout (width, padding) only, never a radius, background, border
 A checked `Switch` reads the selected tokens (`--selected-bg`, `--selected-border`, `--selected-fg`) and focuses with the same ring as the fields.
 
 `design/primitive-geometry` reports `h-*`, `size-*` and `rounded-*` on `Input` and `SelectTrigger`. To move old overrides onto the `size` prop, run `bun run design:codemod --inputs <path>`. It snaps a height to the nearest step, a tie going to `md`, drops radius overrides, and removes the old `size="default"`.
+
+## Design lint
+
+`tools/eslint-design/index.mjs` holds the `design/*` rules, and `eslint.config.mjs` sets their levels. `bun run lint` fails on an error. `bun run lint:design --summary` prints the count per rule and directory. Its USER-FACING row leaves out admin code and `src/components/design-catalog`.
+
+| Rule | Reports | Level | Mechanical fix |
+|------|---------|-------|----------------|
+| `design/no-literal-color` | `rgba(`, `#hex`, named `white` and `black` in class strings | Error | None |
+| `design/no-transition-all` | `transition-all` and bare `transition` | Error | None |
+| `design/no-hsl-border` | `hsl(var(--border…))` | Error | None |
+| `design/primitive-geometry` | `h-*`, `size-*` and `rounded-*` on `Button`, `Badge`, `Input`, `SelectTrigger`, `Chip`, `SearchField` and their forwarders | Error | `--buttons`, `--inputs` |
+| `design/button-focus` | A raw `<button>` with no `focus-visible:` class | Error | `--focus` |
+| `design/radius-ladder` | Off-ladder radii ([Radius](#radius)) | Error | `--radius` |
+| `design/ladder-opacity` | Opacity classes with a named ladder utility | Warn | Default pass |
+| `design/no-palette-hue` | Raw Tailwind palette hues | Warn | None |
+| `design/named-z-index` | Raw z-index with a named utility | Warn | Default pass |
+| `design/chrome-typography` | Call-site casing, tracking, font family and sub-10px text | Warn | None |
+
+Admin files keep `primitive-geometry`, `button-focus` and `radius-ladder` at warn, because admin pages are outside the parity program. Set a warn rule to error in the PR that brings its user-facing count to zero.
+
+A genuine domain exception, such as printed card art or a card avatar, gets a one-line `// eslint-disable-next-line design/<rule> -- <domain>: <why>` on the line before. Never disable a rule for a whole file.
 
 ## Z-index stack
 

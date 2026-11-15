@@ -1,8 +1,14 @@
 # Floating header islands
 
-Desktop pages use a floating "island" header: pill-shaped capsules overlaid on the top of the scroll area instead of a solid chrome bar. This doc defines the slot semantics every page must follow so headers stay predictable as the app grows.
+Desktop pages use a floating "island" header: islands overlaid on the top of the scroll area instead of a solid chrome bar. This doc defines the slot semantics every page must follow so headers stay predictable as the app grows.
 
-**Primitives:** `src/components/shell/floating-page-bar.tsx` (`FloatingPageLayout`, `FloatingPageBar`, `FloatingTabsPill`, `FloatingSearchCapsule`, `FloatingBackPill`, `FloatingActionPill`, `FloatingCapsuleCluster`) and `src/components/shell/floating-island.tsx` (`FloatingIslandCapsule`).
+**Primitives:** `src/components/shell/floating-page-bar.tsx` (`FloatingPageLayout`, `FloatingPageBar`, `FloatingTabsPill`, `FloatingSearchCapsule`, `FloatingBackPill`, `FloatingActionPill`, `FloatingCapsuleCluster`) and `src/components/shell/floating-island.tsx` (`FloatingIslandCapsule`, `floatingIslandSurfaceClassName`).
+
+## One island surface
+
+Every header element draws the same island: `rounded-island`, `--control-h-md` (40px) tall, an opaque `--background` fill, and a primary-to-secondary gradient ring in its 1px border. `floatingIslandSurfaceClassName` owns that recipe, and `--chrome-floating-shadow` lifts it. `rounded-island` is a pill in calm, darkmatter and expressive, and the chrome's own `--radius` in bubblegum and holoterminal, so the back pill, capsules, tabs, search and action pills share one shape in each chrome.
+
+Content scrolls under the header, so no header control is transparent. A filled `FloatingActionPill` is the primary action, and `variant="floating"` is the secondary on the island fill. Outline and ghost pills don't compile. Buttons inside an island, such as its tab items or toolbar icons, may be transparent, because the island's fill is what sits over the content.
 
 ## The rule: strict roles, lenient occupancy
 
@@ -38,7 +44,7 @@ Search or filtering for the page's primary collection, via `FloatingSearchCapsul
 
 ## Right slot
 
-Page-level actions, and on the gallery the collection's tools (result count, filter panel, view mode) in one `FloatingCapsuleCluster`. Primary action as a filled `FloatingActionPill` (opens a flow). Secondary as outline. A **context toggle** (Set Active → Active) is not a second primary and is not a dialog opener — off and on must read as different states. Beyond two or three actions, fold the rest into an overflow menu. See [theme-and-chrome.md](./theme-and-chrome.md) control roles.
+Page-level actions, and on the gallery the collection's tools (result count, filter panel, view mode) in one `FloatingCapsuleCluster`. Primary action as a filled `FloatingActionPill` (opens a flow). Secondary as `FloatingActionPill variant="floating"`. A **context toggle** (Set Active → Active) is not a second primary and is not a dialog opener — off and on must read as different states. Beyond two or three actions, fold the rest into an overflow menu. See [theme-and-chrome.md](./theme-and-chrome.md) control roles.
 
 ## Titles and descriptions
 
