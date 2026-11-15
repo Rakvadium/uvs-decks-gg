@@ -50,11 +50,19 @@ export const uploadCatalogBlob = internalAction({
       isDone = page.isDone;
     }
 
+    // Clients rebuild `searchText` / `searchAll` from each card's own fields
+    // (src/lib/universus/catalog-search-fields.ts); they were about a third of the file.
+    const cards = gallery.map((card) => {
+      const copy = { ...card };
+      delete copy.searchText;
+      delete copy.searchAll;
+      return copy;
+    });
     const payload = JSON.stringify({
       schemaVersion: CATALOG_STATIC_SCHEMA_VERSION,
       version: args.version,
-      cardCount: gallery.length,
-      cards: gallery,
+      cardCount: cards.length,
+      cards,
     });
     const compressed = gzipSync(Buffer.from(payload, "utf8"));
     const catalogSha256 = createHash("sha256").update(compressed).digest("hex");
