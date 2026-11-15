@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { Trophy } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
 import {
   Dialog,
   DialogBody,
@@ -42,12 +44,7 @@ export function CommunityRankingsView({ embedded = false }: CommunityRankingsVie
       ) : null}
 
       <div className={cn("relative z-10 flex min-h-full flex-col gap-4", embedded ? "py-2" : "p-4 md:p-6")}>
-        <Card
-          className={cn(
-            "bg-card/80",
-            leaderboard ? "border-border/50" : "border-dashed border-border/80",
-          )}
-        >
+        <Card>
           {leaderboard ? (
             <CardHeader className="space-y-1">
               <Badge variant="outline" className="w-fit shrink-0 text-xs font-normal">
@@ -57,11 +54,14 @@ export function CommunityRankingsView({ embedded = false }: CommunityRankingsVie
           ) : null}
           <CardContent>
             {!leaderboard ? (
-              <div className="flex min-h-48 items-center justify-center rounded-xl border border-dashed border-border/80 bg-background/30 px-4 py-8 text-center text-sm text-muted-foreground">
-                {scopeType === "set_scope"
-                  ? "No ranked set-scoped lists are available yet."
-                  : "No ranked global lists are available yet."}
-              </div>
+              <EmptyState
+                icon={Trophy}
+                title={
+                  scopeType === "set_scope"
+                    ? "No ranked set-scoped lists are available yet."
+                    : "No ranked global lists are available yet."
+                }
+              />
             ) : (
               <div className="space-y-4">
                 {leaderboard.tiers.map((tier) => {
@@ -127,9 +127,7 @@ export function CommunityRankingsView({ embedded = false }: CommunityRankingsVie
                           })}
                         </div>
                       ) : (
-                        <div className="rounded-xl border border-dashed border-border/80 bg-background/30 px-4 py-5 text-sm text-muted-foreground">
-                          No cards have landed in this community tier yet.
-                        </div>
+                        <EmptyState variant="inline" title="No cards have landed in this community tier yet." />
                       )}
                     </div>
                   );

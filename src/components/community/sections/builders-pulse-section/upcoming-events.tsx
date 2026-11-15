@@ -1,4 +1,5 @@
 import { Badge } from "@/components/ui/badge";
+import { Panel } from "@/components/ui/panel";
 import { Button } from "@/components/ui/button";
 import { COMMUNITY_EVENTS } from "../../community-content-data";
 
@@ -16,12 +17,9 @@ export function CommunityUpcomingEvents() {
         const Icon = event.icon;
 
         return (
-          <div
-            key={event.label}
-            className="flex items-center justify-between rounded-lg border border-border/50 bg-background/50 px-3 py-2"
-          >
+          <Panel key={event.label} className="flex items-center justify-between px-3 py-2">
             <div className="flex items-center gap-2">
-              <div className="flex h-7 w-7 items-center justify-center rounded-md border border-border/50 bg-card/80">
+              <div className="flex size-7 items-center justify-center rounded-control border border-surface bg-background-elevated">
                 <Icon className="h-3.5 w-3.5 text-secondary" />
               </div>
               <div>
@@ -32,7 +30,7 @@ export function CommunityUpcomingEvents() {
             <Button variant="ghost" size="sm">
               Remind
             </Button>
-          </div>
+          </Panel>
         );
       })}
     </div>

@@ -1,10 +1,13 @@
 import Link from "next/link";
 import { useQuery } from "convex/react";
-import { Loader2 } from "lucide-react";
+import { Layers } from "lucide-react";
 import { api } from "../../../../convex/_generated/api";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
+import { LoadingState } from "@/components/ui/loading-state";
+import { Panel } from "@/components/ui/panel";
 import { SectionHeading } from "@/components/ui/typography-headings";
 import { useGameId } from "@/games/game-context";
 
@@ -31,23 +34,20 @@ export function CommunityDeckSpotlightsSection() {
       </div>
 
       {isLoadingDecks ? (
-        <div className="flex items-center justify-center rounded-xl border border-dashed border-border/50 bg-card/50 py-12">
-          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-        </div>
+        <Panel>
+          <LoadingState label="Loading decks" />
+        </Panel>
       ) : deckSpotlights.length === 0 ? (
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-12">
-            <p className="text-muted-foreground">No public decks available yet</p>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Be the first to share your deck with the community!
-            </p>
-          </CardContent>
-        </Card>
+        <EmptyState
+          icon={Layers}
+          title="No public decks available yet"
+          description="Be the first to share your deck with the community!"
+        />
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {deckSpotlights.map((deck, index) => (
             <Link key={deck._id} href={`/decks/${deck._id}`}>
-              <Card className="h-full cursor-pointer transition-colors hover:bg-accent/40">
+              <Card fx className="h-full cursor-pointer">
                 <CardHeader className="space-y-3">
                   <div className="flex items-center justify-between">
                     <Badge size="sm" tone="entity">

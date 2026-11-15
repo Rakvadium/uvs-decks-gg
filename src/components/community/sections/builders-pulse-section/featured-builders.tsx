@@ -1,4 +1,5 @@
 import { ArrowUpRight } from "lucide-react";
+import { Panel } from "@/components/ui/panel";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -9,13 +10,13 @@ function FeaturedBuilderCard({ index }: { index: number }) {
   const creator = FEATURED_BUILDERS[index];
 
   return (
-    <div className="group relative overflow-hidden rounded-xl border border-border/50 bg-card/80 p-4">
+    <Panel className="relative overflow-hidden p-4">
       <div className={cn("absolute inset-0 bg-gradient-to-br opacity-40", creator.accent)} />
 
       <div className="relative space-y-3">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="relative h-12 w-12 overflow-hidden rounded-lg border border-border/50 bg-background/80">
+            <div className="relative size-12 overflow-hidden rounded-control border border-surface bg-background-elevated">
               <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-transparent" />
               <div className="chrome-label-case absolute bottom-2 left-2 text-xs font-bold">{creator.name.slice(0, 2)}</div>
             </div>
@@ -56,7 +57,7 @@ function FeaturedBuilderCard({ index }: { index: number }) {
           </Button>
         </div>
       </div>
-    </div>
+    </Panel>
   );
 }
 

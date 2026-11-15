@@ -1,12 +1,13 @@
 import { CheckCircle2, Flame } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Panel } from "@/components/ui/panel";
 import { CREATOR_BENEFITS, CONTENT_FORMATS, VERIFICATION_STEPS } from "./data";
 
 export function CreatorProgramVerificationSection() {
   return (
     <section id="creator-verification" className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
-      <Card className="border border-border/50">
+      <Card>
         <CardHeader className="space-y-2">
           <CardTitle className="text-lg">Verification Path</CardTitle>
           <CardDescription>Unlock creator tools in four clean steps.</CardDescription>
@@ -26,7 +27,7 @@ export function CreatorProgramVerificationSection() {
             </div>
           ))}
 
-          <div className="rounded-lg border border-dashed border-border/50 bg-card/50 px-3 py-3">
+          <Panel className="px-3 py-3">
             <div className="chrome-label-case flex items-center gap-2 text-xs text-muted-foreground">
               <Flame className="h-4 w-4 text-secondary" />
               Creator perks
@@ -34,12 +35,12 @@ export function CreatorProgramVerificationSection() {
             <p className="mt-2 text-xs text-muted-foreground">
               Early partners get profile modules, subscriber analytics, and spotlight priority.
             </p>
-          </div>
+          </Panel>
         </CardContent>
       </Card>
 
       <div className="space-y-4">
-        <Card className="border border-border/50">
+        <Card>
           <CardHeader className="space-y-2">
             <CardTitle className="text-lg">Creator Benefits</CardTitle>
             <CardDescription>Grow your presence and host community experiences.</CardDescription>
@@ -49,10 +50,7 @@ export function CreatorProgramVerificationSection() {
               const Icon = benefit.icon;
 
               return (
-                <div
-                  key={benefit.title}
-                  className="flex items-start gap-3 rounded-lg border border-border/50 bg-background/50 px-3 py-2"
-                >
+                <Panel key={benefit.title} className="flex items-start gap-3 px-3 py-2">
                   <div className="flex h-8 w-8 items-center justify-center rounded-md border border-border/50 bg-card/80">
                     <Icon className="h-4 w-4 text-primary" />
                   </div>
@@ -60,7 +58,7 @@ export function CreatorProgramVerificationSection() {
                     <p className="text-sm font-semibold">{benefit.title}</p>
                     <p className="text-xs text-muted-foreground">{benefit.description}</p>
                   </div>
-                </div>
+                </Panel>
               );
             })}
           </CardContent>
