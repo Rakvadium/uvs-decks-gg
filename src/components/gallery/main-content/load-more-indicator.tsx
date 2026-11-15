@@ -1,7 +1,6 @@
 import type { RefObject } from "react";
 
-import { Kicker } from "@/components/ui/typography-headings";
-import { Spinner } from "@/components/ui/spinner";
+import { LoadingState } from "@/components/ui/loading-state";
 
 interface LoadMoreIndicatorProps {
   loadMoreRef: RefObject<HTMLDivElement | null>;
@@ -9,14 +8,8 @@ interface LoadMoreIndicatorProps {
 
 export function LoadMoreIndicator({ loadMoreRef }: LoadMoreIndicatorProps) {
   return (
-    <div ref={loadMoreRef} className="flex justify-center py-12">
-      <div className="flex flex-col items-center gap-3">
-        <div className="relative">
-          <Spinner size="lg" className="text-primary" />
-          <div className="absolute inset-0 h-8 w-8 animate-ping rounded-full bg-primary/20" />
-        </div>
-        <Kicker>Loading more cards</Kicker>
-      </div>
+    <div ref={loadMoreRef}>
+      <LoadingState size="lg" label="Loading more cards" />
     </div>
   );
 }

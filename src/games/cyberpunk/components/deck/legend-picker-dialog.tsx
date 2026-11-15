@@ -169,7 +169,7 @@ export function LegendPickerDialog({ open, onOpenChange, setup, onChange, slotIn
                       ) : null}
                       {pendingId === card._id ? (
                         <span className="absolute inset-1 flex items-center justify-center rounded-md bg-background/60">
-                          <Spinner size="md" className="text-primary" />
+                          <Spinner size="md" />
                         </span>
                       ) : null}
                       <span className="mt-1.5 block truncate text-xs font-semibold">{cardTitle}</span>

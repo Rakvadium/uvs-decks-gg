@@ -31,7 +31,7 @@ export function GalleryStats({ totalCards, filteredCount, isLoading }: GallerySt
       <div className="flex items-center gap-2">
         {isLoading ? (
           <>
-            <Spinner className="text-primary" />
+            <Spinner />
             <Kicker>Loading</Kicker>
           </>
         ) : (

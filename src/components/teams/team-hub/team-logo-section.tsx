@@ -40,7 +40,7 @@ export function TeamLogoSection({ teamId, presentation }: TeamLogoSectionProps) 
         )}
       >
         {loadingPresentation ? (
-          <Spinner size="lg" className="text-muted-foreground" aria-hidden />
+          <Spinner size="lg" className="text-muted-foreground" />
         ) : displayUrl ? (
           <img src={displayUrl} alt="" className="h-full w-full object-cover" />
         ) : (

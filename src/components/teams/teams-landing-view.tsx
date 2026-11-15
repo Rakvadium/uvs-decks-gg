@@ -1,6 +1,7 @@
 "use client";
 
 import { PageHeading, SectionHeading } from "@/components/ui/typography-headings";
+import { LoadingState } from "@/components/ui/loading-state";
 import { Panel } from "@/components/ui/panel";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -16,7 +17,6 @@ import {
 } from "@/components/shell/floating-page-bar";
 import { CreateTeamButton } from "@/components/teams/create-team-dialog";
 import { Surface } from "@/components/ui/card";
-import { Spinner } from "@/components/ui/spinner";
 
 function TeamsLandingFloatingBar({ isAuthenticated }: { isAuthenticated: boolean }) {
   const startAuth = useStartAuth();
@@ -55,25 +55,19 @@ export function TeamsLandingView() {
 
   if (authLoading) {
     return (
-      <div className="flex min-h-[30vh] items-center justify-center">
-        <Spinner size="lg" className="text-muted-foreground" />
-      </div>
+      <LoadingState size="lg" className="min-h-[30vh]" />
     );
   }
 
   if (isAuthenticated && myTeam === undefined) {
     return (
-      <div className="flex min-h-[30vh] items-center justify-center">
-        <Spinner size="lg" className="text-muted-foreground" />
-      </div>
+      <LoadingState size="lg" className="min-h-[30vh]" />
     );
   }
 
   if (isAuthenticated && myTeam !== null) {
     return (
-      <div className="flex min-h-[30vh] items-center justify-center">
-        <Spinner size="lg" className="text-muted-foreground" />
-      </div>
+      <LoadingState size="lg" className="min-h-[30vh]" />
     );
   }
 

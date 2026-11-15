@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { LoadingState } from "@/components/ui/loading-state";
 import { useConvexAuth, useQuery } from "convex/react";
 
 import { api } from "../../../../convex/_generated/api";
@@ -15,7 +16,6 @@ import {
 } from "@/components/community/tier-lists/moderation-badge";
 import { getTierListScopeLabel } from "@/components/community/tier-lists/utils";
 import { useGameId } from "@/games/game-context";
-import { Spinner } from "@/components/ui/spinner";
 
 function formatUpdatedAt(timestamp: number) {
   return new Intl.DateTimeFormat(undefined, {
@@ -92,9 +92,7 @@ export function CommunityTierListsSidebarPanel() {
                 </Button>
               </div>
             ) : myLists === undefined ? (
-              <div className="flex justify-center py-10">
-                <Spinner size="md" className="text-muted-foreground" />
-              </div>
+              <LoadingState className="py-10" />
             ) : myLists.length === 0 ? (
               <p className="text-center text-xs text-muted-foreground">You have no tier lists yet.</p>
             ) : (

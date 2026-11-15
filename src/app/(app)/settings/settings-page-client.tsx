@@ -1,6 +1,7 @@
 "use client";
 
 import { PageHeading } from "@/components/ui/typography-headings";
+import { LoadingState } from "@/components/ui/loading-state";
 import { Panel } from "@/components/ui/panel";
 import { useState, useEffect, useOptimistic, useTransition, useCallback, useRef } from "react";
 import { useQuery, useMutation } from "convex/react";
@@ -288,9 +289,7 @@ export default function SettingsPageClient() {
 
   if (user === undefined) {
     return (
-      <div className="flex h-full items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-      </div>
+      <LoadingState size="lg" className="h-full" />
     );
   }
 

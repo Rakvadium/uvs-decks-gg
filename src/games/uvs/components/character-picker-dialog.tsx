@@ -216,7 +216,7 @@ export function DeckCharacterPickerDialog({
                       ) : null}
                       {isSelecting ? (
                         <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-background/50">
-                          <Spinner size="md" className="text-primary" />
+                          <Spinner size="md" />
                         </div>
                       ) : null}
                     </div>

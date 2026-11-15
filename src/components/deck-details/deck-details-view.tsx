@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import { LoadingState } from "@/components/ui/loading-state";
 import Link from "next/link";
 import { useConvexAuth, useQuery } from "convex/react";
 import { BarChart3, Download, Grid2x2Plus, Shuffle } from "lucide-react";
@@ -37,7 +38,6 @@ import { DeckDetailsDuplicateDialog } from "./deck-details-duplicate-dialog";
 import { DeckDetailsEditDialog } from "./deck-details-edit-dialog";
 import { TeamEditableWriteConflictBanner } from "@/components/deck/team-editable-write-conflict-banner";
 import { isDeckQuantitiesEmpty } from "./deck-empty";
-import { Spinner } from "@/components/ui/spinner";
 
 function DeckDetailsGallerySlotRegistration() {
   const gallerySlotOptions = useMemo(() => ({ label: "Gallery", icon: Grid2x2Plus, priority: 0 }), []);
@@ -89,12 +89,7 @@ export function DeckDetailsView() {
       {features.drawSimulator ? <DeckDetailsSimulatorSlotRegistration /> : null}
       {features.deckImportExport ? <DeckDetailsImportExportSlotRegistration /> : null}
       {isLoading || (!deck && pendingInvite === undefined) ? (
-        <div className="flex h-full items-center justify-center">
-          <div className="flex flex-col items-center gap-4">
-            <Spinner size="lg" className="text-primary drop-shadow-[0_0_10px_var(--primary)]" />
-            <span className="chrome-label-case text-sm text-muted-foreground">Loading Deck Data</span>
-          </div>
-        </div>
+        <LoadingState size="lg" label="Loading Deck Data" className="h-full" />
       ) : !deck && pendingInvite && deckId ? (
         <DeckInvitePendingGate deckId={deckId} deckName={pendingInvite.deckName} />
       ) : !deck ? (

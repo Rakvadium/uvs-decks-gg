@@ -1,14 +1,5 @@
-import { Spinner } from "@/components/ui/spinner";
+import { LoadingState } from "@/components/ui/loading-state";
 
 export function DecksLoadingState() {
-  return (
-    <div className="flex h-full items-center justify-center">
-      <div className="flex flex-col items-center gap-4">
-        <Spinner size="lg" className="text-primary drop-shadow-[0_0_10px_var(--primary)]" />
-        <span className="chrome-label-case text-sm text-muted-foreground">
-          Initializing Deck Database
-        </span>
-      </div>
-    </div>
-  );
+  return <LoadingState size="lg" label="Initializing Deck Database" className="h-full" />;
 }
