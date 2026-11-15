@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { Glob } from "bun";
 import ts from "typescript";
-import { Linter } from "eslint";
+import { ESLint, Linter } from "eslint";
 import design, { designRules } from "../tools/eslint-design/index.mjs";
 import parser from "../tools/eslint-design/parser.mjs";
 import { classifyUtility, GEOMETRY_PRIMITIVES, parseToken } from "../tools/eslint-design/classify.mjs";
@@ -251,7 +251,7 @@ describe("design rules: invalid", () => {
 
 describe("element and colour rules: valid (no warnings)", () => {
   const valid: [string, string][] = [
-    ["on-ladder and role radii", `<div className="rounded-xl rounded-full rounded-none rounded-t-xl rounded-control rounded-surface rounded-cta rounded-island" />`],
+    ["on-ladder and role radii", `<div className="rounded-xl rounded-full rounded-none rounded-t-xl rounded-control rounded-surface rounded-cta rounded-island rounded-tab-tl rounded-tab-tr" />`],
     [
       "primitives without geometry overrides",
       `<><Button size="sm" shape="cta" className="w-full gap-2 [&_svg]:size-5 [&>span]:h-3" /><Badge variant="outline" className="px-1" /><Input className="w-40" /><SelectTrigger className="w-40 min-h-0" /></>`,
@@ -382,6 +382,34 @@ describe("element and colour rules: invalid", () => {
     expect(lint(`<div className="rounded-2xl rounded-3xl rounded-t-2xl rounded-tl-lg rounded-br-none rounded-ss-[8px]" />`)).toEqual(
       ["rounded-2xl", "rounded-3xl", "rounded-t-2xl", "rounded-tl-lg", "rounded-br-none", "rounded-ss-[8px]"].map((text) => ({ rule: "design/radius-ladder", text })),
     );
+  });
+});
+
+describe("rule severity in eslint.config.mjs", () => {
+  const eslint = new ESLint({ cwd: path.join(import.meta.dir, "..") });
+  const GEOMETRY = ["design/primitive-geometry", "design/button-focus", "design/radius-ladder"];
+  const severity = async (file: string, rule: string) => {
+    const level = (await eslint.calculateConfigForFile(file)).rules?.[rule];
+    return Array.isArray(level) ? level[0] : level;
+  };
+
+  test("the geometry rules are errors in user-facing code and warnings in admin code", async () => {
+    for (const rule of GEOMETRY) {
+      expect(await severity("src/components/ui/chip.tsx", rule)).toBe(2);
+      expect(await severity("src/components/design-catalog/foundations/shape.tsx", rule)).toBe(2);
+      expect(await severity("src/features/admin-format/format-form-content.tsx", rule)).toBe(1);
+    }
+    expect(await severity("src/features/admin-format/format-form-content.tsx", "design/no-literal-color")).toBe(2);
+  });
+
+  test("a height override on a Button fails the lint with design/primitive-geometry", async () => {
+    const [result] = await eslint.lintText(
+      `import { Button } from "@/components/ui/button";
+export const A = () => <Button className="h-7">a</Button>;
+`,
+      { filePath: "src/components/fixture.tsx" },
+    );
+    expect(result.messages.filter((m) => m.severity === 2).map((m) => m.ruleId)).toEqual(["design/primitive-geometry"]);
   });
 });
 
