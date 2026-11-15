@@ -6,6 +6,7 @@ import { usePrefersReducedMotion } from "@/lib/reduced-motion";
 import { Layers3, Presentation } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { EmptyState } from "@/components/ui/empty-state";
 import { cn } from "@/lib/utils";
 import { useCommunityTierListDetailContext } from "./context";
 import { CommunityTierListPresentationCard } from "./presentation-card";
@@ -52,7 +53,7 @@ export function CommunityTierListDetailPoolPanel() {
         ) : null}
       </AnimatePresence>
 
-      <div className="border-b border-border/50 bg-card/80 px-4 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)] md:px-6">
+      <div className="border-b border-border/50 bg-card/80 px-4 py-3 shadow-[inset_0_1px_0_color-mix(in_oklab,var(--on-scrim)_3%,transparent)] md:px-6">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
@@ -129,11 +130,14 @@ export function CommunityTierListDetailPoolPanel() {
                   </div>
                 </div>
               ) : (
-                <div className="flex min-h-20 items-center justify-center border-t border-dashed border-border/40 px-4 text-sm text-muted-foreground">
-                  {poolScopes.length > 0
-                    ? "No cards in the pool match that search."
-                    : "Add set and card type rules to populate the card pool."}
-                </div>
+                <EmptyState
+                  variant="inline"
+                  title={
+                    poolScopes.length > 0
+                      ? "No cards in the pool match that search."
+                      : "Add set and card type rules to populate the card pool."
+                  }
+                />
               )}
             </div>
           </m.div>

@@ -35,7 +35,7 @@ export function CommunityTierListDetailView() {
       <CardNavigationProvider cards={selectedCards} getBackCard={getBackCard}>
         <div className="relative z-10 flex min-h-full flex-col">
           <div className="relative space-y-6 px-3 pt-3 md:px-6 md:pt-6 flex-1 flex flex-col">
-            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.08),transparent_28%),radial-gradient(circle_at_80%_10%,rgba(20,184,166,0.10),transparent_24%)]" />
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,color-mix(in_oklab,var(--primary)_8%,transparent),transparent_28%),radial-gradient(circle_at_80%_10%,color-mix(in_oklab,var(--secondary)_10%,transparent),transparent_24%)]" />
 
             <div
               className={cn(

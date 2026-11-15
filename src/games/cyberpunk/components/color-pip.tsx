@@ -12,7 +12,7 @@ function Pip({ symbol, size }: { symbol: string; size: keyof typeof PIP_SIZE }) 
   return (
     <span
       aria-hidden
-      className={cn("inline-block shrink-0 rounded-full ring-1 ring-inset ring-white/25", PIP_SIZE[size])}
+      className={cn("inline-block shrink-0 rounded-full ring-1 ring-inset ring-on-scrim/25", PIP_SIZE[size])}
       style={{ backgroundColor: hex, boxShadow: `0 0 6px ${hex}99` }}
     />
   );

@@ -101,7 +101,7 @@ export function DeckRowItem() {
                 </span>
               ) : null}
             </span>
-            <Badge tone={isReady ? "success" : "warning"} className="px-1.5 py-0 text-[10px]">
+            <Badge size="sm" tone={isReady ? "success" : "warning"}>
               {isReady ? "Ready" : "Building"}
             </Badge>
             <VisibilityGlyph deck={deck} visibility={visibility} className="h-6 w-6" />

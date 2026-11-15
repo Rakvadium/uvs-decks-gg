@@ -6,7 +6,8 @@ import { useEffect, useState } from "react";
 import { AlertCircle, ArrowUpRight, Play } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
+import { Panel } from "@/components/ui/panel";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { useChromeMode } from "@/lib/theme";
@@ -36,8 +37,8 @@ function MediaFeedSectionChrome({ media }: { media: GameCommunityMediaFeature })
 function MediaFeedSkeleton() {
   return (
     <div className="grid gap-4 xl:grid-cols-[minmax(0,1.4fr)_minmax(300px,0.6fr)]">
-      <Card className="overflow-hidden border-border/50 bg-background/50 shadow-none">
-        <CardContent className="p-0">
+      <Panel className="overflow-hidden">
+        <div>
           <Skeleton className="aspect-video w-full rounded-none" />
           <div className="space-y-5 p-6 md:p-7">
             <div className="flex flex-wrap items-center justify-between gap-3">
@@ -53,9 +54,9 @@ function MediaFeedSkeleton() {
               <Skeleton className="h-16 w-full max-w-xl" />
             </div>
           </div>
-        </CardContent>
-      </Card>
-      <div className="flex flex-col rounded-lg border border-border/50 bg-background/50">
+        </div>
+      </Panel>
+      <Panel className="flex flex-col">
         {[0, 1, 2].map((key) => (
           <div key={key} className="flex items-center gap-3 border-b border-border/30 px-3 py-2 last:border-b-0">
             <div className="w-28 shrink-0">
@@ -67,7 +68,7 @@ function MediaFeedSkeleton() {
             </div>
           </div>
         ))}
-      </div>
+      </Panel>
     </div>
   );
 }
@@ -103,23 +104,18 @@ export function CommunityMediaFeedSection({ media }: { media: GameCommunityMedia
     return (
       <section id="universus-content" className="space-y-5 scroll-mt-24">
         <MediaFeedSectionChrome media={media} />
-        <Card className="border-border/50 bg-background/50 shadow-none">
-          <CardContent className="flex flex-col items-center gap-2 py-12 text-center">
-            <p className="text-sm text-muted-foreground">
-              The video queue is not available yet. Check back soon.
-            </p>
+        <EmptyState
+          icon={Play}
+          title="The video queue is not available yet. Check back soon."
+          action={
             <Button variant="outline" size="sm" asChild>
-              <a
-                href={media.youtubeChannelUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              <a href={media.youtubeChannelUrl} target="_blank" rel="noopener noreferrer">
                 {media.youtubeChannelLabel}
-                <ArrowUpRight className="ml-1 inline h-3.5 w-3.5" />
+                <ArrowUpRight />
               </a>
             </Button>
-          </CardContent>
-        </Card>
+          }
+        />
         <AttributionFooter />
       </section>
     );
@@ -159,8 +155,8 @@ export function CommunityMediaFeedSection({ media }: { media: GameCommunityMedia
       ) : null}
 
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1.4fr)_minmax(300px,0.6fr)]">
-        <Card className="overflow-hidden border-border/50 bg-background/50 shadow-none">
-          <CardContent className="p-0">
+        <Panel className="overflow-hidden">
+          <div>
             {activeVideo.rowStatus === "error" ? (
               <div className="relative flex aspect-video min-h-[200px] flex-col items-center justify-center gap-3 bg-gradient-to-br from-background via-background to-card px-6 text-center">
                 <div
@@ -204,7 +200,7 @@ export function CommunityMediaFeedSection({ media }: { media: GameCommunityMedia
               <div className="pointer-events-none absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
 
               <div className="relative z-[1] flex flex-wrap items-center justify-between gap-3">
-                <Badge variant="secondary" className="border border-border/50 bg-background/80 text-[10px]">
+                <Badge size="sm" variant="secondary" className="border border-border/50 bg-background/80">
                   {activeVideo.youtubeVideoId === featuredVideo.youtubeVideoId ? "Featured drop" : "Now playing"}
                 </Badge>
                 <div className="chrome-label-case text-[10px] text-muted-foreground">
@@ -266,10 +262,10 @@ export function CommunityMediaFeedSection({ media }: { media: GameCommunityMedia
                 </div>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </Panel>
 
-        <div className="flex flex-col rounded-lg border border-border/50 bg-background/50">
+        <Panel className="flex flex-col">
           {feed.items.map((video, index) => {
             const isActive = video.youtubeVideoId === resolvedActiveId;
             return (
@@ -302,16 +298,16 @@ export function CommunityMediaFeedSection({ media }: { media: GameCommunityMedia
                         )}
                       />
                     )}
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors group-hover:bg-black/30">
+                    <div className="absolute inset-0 flex items-center justify-center bg-scrim/0 transition-colors group-hover:bg-scrim/30">
                       <Play
                         className={cn(
-                          "h-5 w-5 text-white drop-shadow-md transition-opacity",
+                          "h-5 w-5 text-on-scrim drop-shadow-md transition-opacity",
                           isActive ? "opacity-100" : "opacity-0 group-hover:opacity-100"
                         )}
                       />
                     </div>
                     {video.rowStatus === "ok" && video.durationLabel ? (
-                      <span className="absolute bottom-1 right-1 rounded bg-black/70 px-1 py-px text-[10px] leading-none text-white">
+                      <span className="absolute bottom-1 right-1 rounded bg-scrim/70 px-1 py-px text-[10px] leading-none text-on-scrim">
                         {video.durationLabel}
                       </span>
                     ) : null}
@@ -344,7 +340,7 @@ export function CommunityMediaFeedSection({ media }: { media: GameCommunityMedia
                     ) : null}
                   </div>
                   {video.editorialLabel ? (
-                    <Badge variant="secondary" className="w-fit bg-primary/10 px-1.5 py-0 text-[10px] leading-4 text-primary">
+                    <Badge size="sm" variant="default" className="w-fit">
                       {video.editorialLabel}
                     </Badge>
                   ) : null}
@@ -352,7 +348,7 @@ export function CommunityMediaFeedSection({ media }: { media: GameCommunityMedia
               </button>
             );
           })}
-        </div>
+        </Panel>
       </div>
 
       <AttributionFooter />

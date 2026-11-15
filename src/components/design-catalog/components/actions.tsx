@@ -2,11 +2,10 @@
 
 import { useState, type ComponentProps } from "react";
 import Link from "next/link";
-import { Grid3x3, LayoutList, Loader2, Plus, Rows3, Settings2, Trash2 } from "lucide-react";
+import { Grid3x3, LayoutList, Plus, Rows3, Settings2, Trash2 } from "lucide-react";
 import { Button, buttonVariants, type ButtonProps } from "@/components/ui/button";
 import { SegmentedControl, type SegmentedControlItem } from "@/components/ui/segmented-control";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
+import { Spinner } from "@/components/ui/spinner";
 import { cn } from "@/lib/utils";
 import { CatalogEntrySection, Preview, ScrollRow, SpecimenGrid, SpecimenLabel } from "../specimen/entry";
 import { Code, CodeBlock } from "../specimen/code-block";
@@ -62,7 +61,6 @@ function buttonSnippet(variant: ButtonVariant, size: ButtonSize) {
 
 export function ButtonEntry() {
   const [selected, setSelected] = useState<{ variant: ButtonVariant; size: ButtonSize }>({ variant: "default", size: "md" });
-  const [spin, setSpin] = useState(false);
   const variants = Object.keys(BUTTON_VARIANTS) as ButtonVariant[];
   const sizes = Object.keys(BUTTON_SIZES) as ButtonSize[];
 
@@ -144,8 +142,8 @@ export function ButtonEntry() {
             <Button variant={selected.variant} disabled>
               Disabled
             </Button>
-            <Button variant={selected.variant} disabled aria-busy={spin || undefined}>
-              <Loader2 className={cn(spin && "animate-spin")} />
+            <Button variant={selected.variant} disabled aria-busy>
+              <Spinner />
               Saving…
             </Button>
             <Button variant={selected.variant}>
@@ -156,14 +154,8 @@ export function ButtonEntry() {
               <Link href="#button">asChild link</Link>
             </Button>
           </div>
-          <div className="mt-4 flex items-center gap-2">
-            <Switch id="button-spin" checked={spin} onCheckedChange={setSpin} />
-            <Label htmlFor="button-spin" className="text-xs font-normal text-muted-foreground">
-              Animate the loading spinner
-            </Label>
-          </div>
           <SpecimenLabel className="mt-3 block">
-            Loading has no prop: disable the button, lead with <Code>Loader2</Code> + <Code>animate-spin</Code>, and set{" "}
+            Loading has no prop: disable the button, lead with <Code>Spinner</Code>, and set{" "}
             <Code>aria-busy</Code>.
           </SpecimenLabel>
         </Preview>

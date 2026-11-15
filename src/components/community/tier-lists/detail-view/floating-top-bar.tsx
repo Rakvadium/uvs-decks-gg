@@ -26,10 +26,11 @@ import {
 } from "@/components/shell/floating-page-bar";
 import { Input } from "@/components/ui/input";
 import { COMMUNITY_TIER_RANKING, getRankingScopeLabel } from "../../../../../shared/app-config";
-import { ChevronDown, Edit3, Globe, Loader2, Lock, Save, Trash2, X } from "lucide-react";
+import { ChevronDown, Edit3, Globe, Lock, Save, Trash2, X } from "lucide-react";
 import { useProfanityDisplayText } from "@/lib/moderation/use-profanity-display-text";
 import { TierListModerationBadge } from "../moderation-badge";
 import { useCommunityTierListDetailContext } from "./context";
+import { Spinner } from "@/components/ui/spinner";
 
 export function CommunityTierListDetailFloatingTopBar() {
   const { display } = useProfanityDisplayText();
@@ -84,7 +85,7 @@ export function CommunityTierListDetailFloatingTopBar() {
       </DropdownMenuContent>
     </DropdownMenu>
   ) : (
-    <Badge variant={isPublic ? "default" : "outline"} className="h-8 shrink-0 items-center gap-1.5 rounded-island px-2.5 text-[10px]">
+    <Badge size="lg" variant={isPublic ? "default" : "outline"} className="shrink-0">
       {isPublic ? <Globe className="h-3 w-3" /> : <Lock className="h-3 w-3" />}
       {displayPublicity}
     </Badge>
@@ -110,7 +111,7 @@ export function CommunityTierListDetailFloatingTopBar() {
       </DropdownMenuContent>
     </DropdownMenu>
   ) : (
-    <Badge variant="outline" className="h-8 shrink-0 items-center gap-1.5 rounded-island px-2.5 text-[10px]">
+    <Badge size="lg" variant="outline" className="shrink-0">
       {rankingScopeLabel}
     </Badge>
   );
@@ -149,7 +150,7 @@ export function CommunityTierListDetailFloatingTopBar() {
               {publicityControl}
               <TierListModerationBadge
                 status={detail.listModerationStatus}
-                className="h-8 shrink-0 items-center gap-1.5 rounded-island px-2.5 text-[10px]"
+                size="lg"
               />
               {rankingScopeControl}
             </FloatingCapsuleCluster>
@@ -168,7 +169,7 @@ export function CommunityTierListDetailFloatingTopBar() {
                   }
                   className={isSaving ? "pointer-events-none opacity-70" : undefined}
                 >
-                  {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                  {isSaving ? <Spinner /> : <Save className="h-4 w-4" />}
                   <span className="text-xs">Save</span>
                 </FloatingActionPill>
                 <FloatingActionPill variant="floating" onClick={cancelMetaEditing}>
@@ -195,7 +196,7 @@ export function CommunityTierListDetailFloatingTopBar() {
                         variant="destructive"
                         onClick={() => void handleDelete()}
                       >
-                        {isDeleting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                        {isDeleting ? <Spinner /> : null}
                         Delete
                       </AlertDialogAction>
                     </AlertDialogFooter>

@@ -1,7 +1,9 @@
 "use client";
 
 import { useCallback, useDeferredValue, useMemo, useState } from "react";
-import { Check, Loader2, Search, XIcon } from "lucide-react";
+import { EmptyState } from "@/components/ui/empty-state";
+import { Check, Search, XIcon } from "lucide-react";
+
 import { CYBERPUNK_COLORS } from "@shared/games/cyberpunk/card-types";
 import { CYBERPUNK_LEGEND_COUNT, normalizeCyberpunkSetup } from "@shared/games/cyberpunk/setup";
 import { Button } from "@/components/ui/button";
@@ -26,6 +28,7 @@ import { cyberpunkCardTitle } from "../../config";
 import { SymbolBadge, SymbolIcon } from "../color-pip";
 import { LegendArt } from "./legend-art";
 import { applyLegendPick, buildLegendPickerOptions } from "./legend-model";
+import { Spinner } from "@/components/ui/spinner";
 
 /**
  * Legend picker: Legend cards only, name search, color filter. Without `slotIndex` it toggles
@@ -135,11 +138,14 @@ export function LegendPickerDialog({ open, onOpenChange, setup, onChange, slotIn
               ))}
             </div>
           ) : options.length === 0 ? (
-            <div className="flex min-h-48 items-center justify-center rounded-lg border border-dashed border-border/80 bg-card/30 px-4 text-center text-sm text-muted-foreground">
-              {cards.some((card) => card.type?.toLowerCase() === "legend")
-                ? "No Legends match the current search and colors."
-                : "No Legend cards are available yet."}
-            </div>
+            <EmptyState
+              className="min-h-48"
+              title={
+                cards.some((card) => card.type?.toLowerCase() === "legend")
+                  ? "No Legends match the current search and colors."
+                  : "No Legend cards are available yet."
+              }
+            />
           ) : (
             <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
               {options.map(({ card, selected, disabledReason }) => {
@@ -167,7 +173,7 @@ export function LegendPickerDialog({ open, onOpenChange, setup, onChange, slotIn
                       ) : null}
                       {pendingId === card._id ? (
                         <span className="absolute inset-1 flex items-center justify-center rounded-md bg-background/60">
-                          <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                          <Spinner size="md" />
                         </span>
                       ) : null}
                       <span className="mt-1.5 block truncate text-xs font-semibold">{cardTitle}</span>

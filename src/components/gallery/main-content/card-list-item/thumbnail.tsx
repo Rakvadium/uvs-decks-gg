@@ -10,7 +10,7 @@ export function CardListItemThumbnail() {
   } = useCardListItemContext();
 
   return (
-    <div className="relative h-16 w-12 shrink-0 overflow-hidden rounded-2xl border border-border/40 bg-muted/50">
+    <div className="relative h-16 w-12 shrink-0 overflow-hidden rounded-xl border border-divider bg-muted-soft">
       {imageUrl ? (
         <Image
           ref={dragPreviewImageRef}

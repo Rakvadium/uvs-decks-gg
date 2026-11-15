@@ -19,7 +19,7 @@ export function DeckCardsStackedView() {
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-2">
                 <span className="chrome-label-case text-sm font-bold">{group.label}</span>
-                <Badge variant="outline" className="text-[10px]">
+                <Badge size="sm" variant="outline">
                   {totalCount}
                 </Badge>
               </div>

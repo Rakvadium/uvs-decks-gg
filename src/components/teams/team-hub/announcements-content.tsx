@@ -1,6 +1,7 @@
 "use client";
 
 import { PageHeading, SectionHeading } from "@/components/ui/typography-headings";
+import { Panel } from "@/components/ui/panel";
 import { useMutation, usePaginatedQuery, useQuery } from "convex/react";
 import { Plus } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
@@ -25,6 +26,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { useTeamHub } from "./hook";
 import { useRegisterTeamHubPrimaryAction } from "./primary-action-context";
 import type { TeamHubCaps } from "./team-hub-caps";
+import { Skeleton } from "@/components/ui/skeleton";
+import { EmptyState } from "@/components/ui/empty-state";
 
 interface TeamHubAnnouncementsContentProps {
   teamId: string;
@@ -99,8 +102,8 @@ export function TeamHubAnnouncementsContent({ teamId }: TeamHubAnnouncementsCont
   if (caps === undefined || pinned === undefined || (isLoading && results.length === 0)) {
     return (
       <div className="space-y-3">
-        <div className="h-6 w-40 animate-pulse rounded-md bg-muted" />
-        <div className="h-40 w-full animate-pulse rounded-md bg-muted-overlay" />
+        <Skeleton className="h-6 w-40" />
+        <Skeleton className="h-40 w-full" />
       </div>
     );
   }
@@ -226,7 +229,7 @@ export function TeamHubAnnouncementsContent({ teamId }: TeamHubAnnouncementsCont
           </div>
         )}
         {results.length === 0 && pinnedList.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No announcements yet.</p>
+          <EmptyState variant="inline" title="No announcements yet." />
         ) : (
           <ul className="space-y-3">
             {results.map((row) => (
@@ -297,69 +300,71 @@ function AnnouncementCard({
   const canDelete = isAuthor || caps.canModerateChat;
 
   return (
-    <li className="rounded-lg border border-surface bg-background-soft p-4">
-      <div className="flex flex-wrap items-start justify-between gap-2">
-        <div className="min-w-0 flex-1">
-          {editing ? (
-            <div className="space-y-2">
-              <Input value={t} onChange={(e) => setT(e.target.value)} className="font-medium" />
-              <Textarea value={b} onChange={(e) => setB(e.target.value)} className="min-h-[100px] resize-y" />
-              <div className="flex gap-2">
-                <Button
-                  type="button"
-                  size="sm"
-                  onClick={async () => {
-                    await onSaveEdit(t, b);
-                    setEditing(false);
-                  }}
-                >
-                  Save
-                </Button>
-                <Button type="button" size="sm" variant="ghost" onClick={() => setEditing(false)}>
-                  Cancel
-                </Button>
+    <Panel asChild>
+      <li className="p-4">
+        <div className="flex flex-wrap items-start justify-between gap-2">
+          <div className="min-w-0 flex-1">
+            {editing ? (
+              <div className="space-y-2">
+                <Input value={t} onChange={(e) => setT(e.target.value)} className="font-medium" />
+                <Textarea value={b} onChange={(e) => setB(e.target.value)} className="min-h-[100px] resize-y" />
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    size="sm"
+                    onClick={async () => {
+                      await onSaveEdit(t, b);
+                      setEditing(false);
+                    }}
+                  >
+                    Save
+                  </Button>
+                  <Button type="button" size="sm" variant="ghost" onClick={() => setEditing(false)}>
+                    Cancel
+                  </Button>
+                </div>
               </div>
-            </div>
-          ) : (
-            <>
-              <SectionHeading as="h3" size="sm">{a.title}</SectionHeading>
-              <p className="mt-2 whitespace-pre-wrap break-words text-sm text-foreground/90">{a.body}</p>
-            </>
-          )}
+            ) : (
+              <>
+                <SectionHeading as="h3" size="sm">{a.title}</SectionHeading>
+                <p className="mt-2 whitespace-pre-wrap break-words text-sm text-foreground/90">{a.body}</p>
+              </>
+            )}
+          </div>
+          <div className="shrink-0 text-right text-xs text-muted-foreground">
+            <p>{row.authorUsername?.trim() || a.authorUserId.slice(-6)}</p>
+            <time className="mt-0.5 block" dateTime={new Date(a.createdAt).toISOString()}>
+              {formatDate(a.createdAt)}
+            </time>
+          </div>
         </div>
-        <div className="shrink-0 text-right text-xs text-muted-foreground">
-          <p>{row.authorUsername?.trim() || a.authorUserId.slice(-6)}</p>
-          <time className="mt-0.5 block" dateTime={new Date(a.createdAt).toISOString()}>
-            {formatDate(a.createdAt)}
-          </time>
-        </div>
-      </div>
-      {!editing && (
-        <div className="mt-3 flex flex-wrap items-center gap-3 border-t border-divider pt-3">
-          {caps.canPinAnnouncements && (
-            <div className="flex items-center gap-2">
-              <Switch
-                id={`pin-${a._id}`}
-                checked={a.pinned}
-                onCheckedChange={(c) => void onPin(c === true)}
-              />
-              <Label htmlFor={`pin-${a._id}`} className="text-xs text-muted-foreground">
-                Pinned
-              </Label>
-            </div>
-          )}
-          {caps.canPostAnnouncements && isAuthor && (
-            <Button type="button" variant="ghost" size="sm" className="text-xs" onClick={() => setEditing(true)}>
-              Edit
-            </Button>
-          )}
-          {canDelete && (
-            <Button type="button" variant="destructiveOutline" size="sm" onClick={() => void onRemove()}>
-              Remove
-            </Button>
-          )}
-        </div>
-      )}
-    </li>
+        {!editing && (
+          <div className="mt-3 flex flex-wrap items-center gap-3 border-t border-divider pt-3">
+            {caps.canPinAnnouncements && (
+              <div className="flex items-center gap-2">
+                <Switch
+                  id={`pin-${a._id}`}
+                  checked={a.pinned}
+                  onCheckedChange={(c) => void onPin(c === true)}
+                />
+                <Label htmlFor={`pin-${a._id}`} className="text-xs text-muted-foreground">
+                  Pinned
+                </Label>
+              </div>
+            )}
+            {caps.canPostAnnouncements && isAuthor && (
+              <Button type="button" variant="ghost" size="sm" className="text-xs" onClick={() => setEditing(true)}>
+                Edit
+              </Button>
+            )}
+            {canDelete && (
+              <Button type="button" variant="destructiveOutline" size="sm" onClick={() => void onRemove()}>
+                Remove
+              </Button>
+            )}
+          </div>
+        )}
+      </li>
+    </Panel>
   );
 }

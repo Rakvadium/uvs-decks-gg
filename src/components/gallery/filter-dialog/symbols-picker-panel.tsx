@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { Panel } from "@/components/ui/panel";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator"
@@ -96,13 +97,9 @@ export function SymbolsPickerPanel({
   onSymbolMatchAllChange,
   plain = false,
 }: SymbolsPickerPanelProps) {
+  const Shell = plain ? "div" : Panel;
   return (
-    <div
-      className={cn(
-        "space-y-3",
-        !plain && "rounded-lg border p-3 border-border/50 bg-card/30 backdrop-blur-sm"
-      )}
-    >
+    <Shell className={cn("space-y-3", !plain && "p-3")}>
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-2">
           <Switch
@@ -151,6 +148,6 @@ export function SymbolsPickerPanel({
           />
         </div>
       </div>
-    </div>
+    </Shell>
   );
 }

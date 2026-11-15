@@ -1,9 +1,11 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { EmptyState } from "@/components/ui/empty-state";
 import type { Id } from "../../../../convex/_generated/dataModel";
 import Image from "next/image";
-import { Loader2, Search, XIcon } from "lucide-react";
+import { Search, XIcon } from "lucide-react";
+
 import { UNIVERSUS_FILTER_SYMBOLS, UNIVERSUS_SYMBOL_DISPLAY, formatUniversusCardType, type UniversusSymbol } from "@/games/uvs/config";
 import { useCardData } from "@/lib/universus/card-data-provider";
 import { filterCards } from "@/lib/universus/use-universus-cards";
@@ -17,6 +19,7 @@ import { Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, Di
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { Spinner } from "@/components/ui/spinner";
 
 interface DeckCharacterPickerDialogProps {
   open: boolean;
@@ -189,9 +192,7 @@ export function DeckCharacterPickerDialog({
           {isLoading ? <CharacterPickerSkeleton /> : null}
 
           {!isLoading && visibleCharacters.length === 0 ? (
-            <div className="flex min-h-48 min-w-0 items-center justify-center rounded-xl border border-dashed border-border/50 bg-card/30 px-0 text-center text-sm text-muted-foreground sm:min-h-64">
-              No characters match the current search and symbol filters.
-            </div>
+            <EmptyState className="min-h-48 sm:min-h-64" title="No characters match the current search and symbol filters." />
           ) : null}
 
           {!isLoading && visibleCharacters.length > 0 ? (
@@ -214,7 +215,7 @@ export function DeckCharacterPickerDialog({
                       ) : null}
                       {isSelecting ? (
                         <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-background/50">
-                          <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                          <Spinner size="md" />
                         </div>
                       ) : null}
                     </div>

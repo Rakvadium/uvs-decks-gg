@@ -25,7 +25,6 @@ import { useActiveChips } from "./use-active-chips";
 import { ColorFacetChips } from "./color-facet-chips";
 
 const segmentedItemClassName = "text-[13px] normal-case tracking-normal";
-const compactChipClassName = "h-7 gap-1 px-2.5 text-xs";
 const compactChipRowClassName = "gap-1.5";
 
 function ActiveChipsStrip() {
@@ -123,7 +122,7 @@ function FormatRows({
             key={format.key}
             label={format.name}
             selected={activeFormat === format.key}
-            className={compact ? compactChipClassName : undefined}
+            size={compact ? "xs" : undefined}
             onClick={() => {
               if (activeFormat === format.key) return;
               toggleFormat(format.key);
@@ -161,7 +160,7 @@ function TypeRows({
             key={type}
             label={type}
             selected={filters.type?.includes(type) ?? false}
-            className={compact ? compactChipClassName : undefined}
+            size={compact ? "xs" : undefined}
             onClick={() => toggleStringFilter("type", type)}
           />
         ))}
@@ -191,7 +190,7 @@ function RarityRows({
             key={rarity}
             label={rarity}
             selected={rarityFilterSelected(filters.rarity, rarity)}
-            className={compact ? compactChipClassName : undefined}
+            size={compact ? "xs" : undefined}
             onClick={() => actions.updateFilter("rarity", toggleCanonicalRarityFilter(filters.rarity, rarity))}
           />
         ))}
@@ -234,7 +233,7 @@ function ColorsSection({ compact = false }: { compact?: boolean }) {
           options={options}
           selected={filters.colors ?? []}
           onToggle={(value) => toggleStringFilter("colors", value)}
-          chipClassName={compact ? compactChipClassName : undefined}
+          chipSize={compact ? "xs" : undefined}
           rowClassName={compact ? compactChipRowClassName : undefined}
         />
       </FilterRow>

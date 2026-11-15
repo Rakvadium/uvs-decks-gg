@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
+import { EmptyState } from "@/components/ui/empty-state";
 import type { BuilderTier } from "../types";
 import { TCG_DND_ACCEPTS_CARD_ONLY, type DragItem, useTcgDroppable } from "@/lib/dnd";
 import { Badge } from "@/components/ui/badge";
@@ -116,7 +117,7 @@ export function CommunityTierListLaneRow({ tier }: { tier: BuilderTier }) {
           ) : null}
         </div>
 
-        <Badge variant="outline" className="ml-auto h-5 shrink-0 px-2 text-[10px]">
+        <Badge size="sm" variant="outline" className="ml-auto shrink-0 px-2">
           {cardIds.length} cards
         </Badge>
       </div>
@@ -150,9 +151,7 @@ export function CommunityTierListLaneRow({ tier }: { tier: BuilderTier }) {
             })}
           </div>
         ) : (
-          <div className="flex min-h-32 w-full items-center justify-center rounded-xl border border-dashed border-border/50 bg-background/30 text-sm text-muted-foreground">
-            {canEdit ? "Drag cards here" : "No cards in this lane"}
-          </div>
+          <EmptyState className="min-h-32 w-full" title={canEdit ? "Drag cards here" : "No cards in this lane"} />
         )}
       </div>
     </div>

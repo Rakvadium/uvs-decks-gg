@@ -128,12 +128,22 @@ export const CATALOG_CHAPTERS = [
     id: "display",
     group: "Components",
     label: "Display",
-    summary: "Read-only surfaces: badges, cards, alerts, avatars, tables and data bars.",
+    summary: "Surfaces and feedback: badges, chips, cards, panels, banners, empty and loading states, alerts, avatars, tables and data bars.",
     entries: [
       {
         id: "badge",
         label: "Badge",
-        ui: [{ file: "badge.tsx", exports: ["Badge", "badgeVariants", "BadgeTone", "BadgeVariantLegacy"] }],
+        ui: [{ file: "badge.tsx", exports: ["Badge", "badgeVariants", "BadgeSize", "BadgeTone", "BadgeVariantLegacy"] }],
+      },
+      {
+        id: "count-badge",
+        label: "CountBadge",
+        ui: [{ file: "count-badge.tsx", exports: ["CountBadge", "countBadgeVariants", "CountBadgeProps", "CountBadgeTone"] }],
+      },
+      {
+        id: "chip",
+        label: "Chip",
+        ui: [{ file: "chip.tsx", exports: ["Chip", "ChipProps", "ChipSize"] }],
       },
       {
         id: "card",
@@ -150,11 +160,25 @@ export const CATALOG_CHAPTERS = [
               "CardAction",
               "CardDescription",
               "CardContent",
-              "CardVariant",
               "CardProps",
             ],
           },
         ],
+      },
+      {
+        id: "panel",
+        label: "Panel",
+        ui: [{ file: "panel.tsx", exports: ["Panel", "PanelProps"] }],
+      },
+      {
+        id: "banner",
+        label: "Banner",
+        ui: [{ file: "banner.tsx", exports: ["Banner"] }],
+      },
+      {
+        id: "empty-state",
+        label: "EmptyState",
+        ui: [{ file: "empty-state.tsx", exports: ["EmptyState", "emptyStateVariants", "EmptyStateProps", "EmptyStateVariant"] }],
       },
       {
         id: "alert",
@@ -194,6 +218,16 @@ export const CATALOG_CHAPTERS = [
         id: "skeleton",
         label: "Skeleton",
         ui: [{ file: "skeleton.tsx", exports: ["Skeleton"] }],
+      },
+      {
+        id: "spinner",
+        label: "Spinner",
+        ui: [{ file: "spinner.tsx", exports: ["Spinner", "SpinnerProps", "SpinnerSize"] }],
+      },
+      {
+        id: "loading-state",
+        label: "LoadingState",
+        ui: [{ file: "loading-state.tsx", exports: ["LoadingState", "LoadingStateProps"] }],
       },
       {
         id: "separator",

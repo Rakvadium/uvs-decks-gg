@@ -23,10 +23,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { PageHeading } from "@/components/ui/typography-headings";
 import { COMMUNITY_TIER_RANKING, getRankingScopeLabel } from "../../../../../shared/app-config";
-import { ArrowLeft, ChevronDown, Edit3, Globe, Loader2, Lock, Save, Trash2, X } from "lucide-react";
+import { ArrowLeft, ChevronDown, Edit3, Globe, Lock, Save, Trash2, X } from "lucide-react";
 import { useProfanityDisplayText } from "@/lib/moderation/use-profanity-display-text";
 import { TierListModerationBadge } from "../moderation-badge";
 import { useOptionalCommunityTierListDetailContext } from "./context";
+import { Spinner } from "@/components/ui/spinner";
 
 export function CommunityTierListDetailTopBar() {
   const { display } = useProfanityDisplayText();
@@ -66,7 +67,7 @@ export function CommunityTierListDetailTopBar() {
           </Button>
         </Link>
         <div className="chrome-label-case flex items-center gap-2 text-sm text-muted-foreground">
-          <Loader2 className="h-4 w-4 animate-spin" />
+          <Spinner />
           <span>Loading Tier List</span>
         </div>
       </div>
@@ -103,7 +104,7 @@ export function CommunityTierListDetailTopBar() {
       disabled={isSaving}
       aria-label="Save tier list details"
     >
-      {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+      {isSaving ? <Spinner /> : <Save className="h-4 w-4" />}
     </Button>
   );
 
@@ -131,7 +132,7 @@ export function CommunityTierListDetailTopBar() {
       </DropdownMenuContent>
     </DropdownMenu>
   ) : (
-    <Badge variant={isPublic ? "default" : "outline"} className="hidden h-8 items-center gap-1.5 px-2.5 text-[10px] sm:inline-flex">
+    <Badge size="lg" variant={isPublic ? "default" : "outline"} className="hidden sm:inline-flex">
       {isPublic ? <Globe className="h-3 w-3" /> : <Lock className="h-3 w-3" />}
       {displayPublicity}
     </Badge>
@@ -157,7 +158,7 @@ export function CommunityTierListDetailTopBar() {
       </DropdownMenuContent>
     </DropdownMenu>
   ) : (
-    <Badge variant="outline" className="hidden h-8 items-center gap-1.5 px-2.5 text-[10px] sm:inline-flex">
+    <Badge size="lg" variant="outline" className="hidden sm:inline-flex">
       {rankingScopeLabel}
     </Badge>
   );
@@ -186,7 +187,7 @@ export function CommunityTierListDetailTopBar() {
             variant="destructive"
             onClick={() => void handleDelete()}
           >
-            {isDeleting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+            {isDeleting ? <Spinner /> : null}
             Delete
           </AlertDialogAction>
         </AlertDialogFooter>
@@ -236,7 +237,7 @@ export function CommunityTierListDetailTopBar() {
         </div>
 
         <div className="ml-auto flex shrink-0 items-center gap-2">
-          <TierListModerationBadge status={detail.listModerationStatus} className="h-8 px-2.5 text-[10px]" />
+          <TierListModerationBadge status={detail.listModerationStatus} size="lg" />
           {!isEditingMeta ? publicityControl : null}
           {!isEditingMeta ? rankingScopeControl : null}
           {canEdit ? (isEditingMeta ? saveMetaButton : (

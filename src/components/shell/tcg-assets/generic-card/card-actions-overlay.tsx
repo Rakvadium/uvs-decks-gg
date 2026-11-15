@@ -22,7 +22,7 @@ export function CardActionsOverlay({
           <Button
             size="sm"
             variant="secondary"
-            className="flex-1 border-white/30 bg-white/20 text-white backdrop-blur-sm hover:bg-white/30"
+            className="flex-1 border-on-scrim/30 bg-on-scrim/20 text-on-scrim backdrop-blur-sm hover:bg-on-scrim/30"
             onClick={(event) => {
               event.stopPropagation();
               onRemoveFromDeck?.(cardId);
@@ -42,7 +42,7 @@ export function CardActionsOverlay({
           <Button
             size="sm"
             variant="secondary"
-            className="flex-1 border-white/30 bg-white/20 text-white backdrop-blur-sm hover:bg-white/30"
+            className="flex-1 border-on-scrim/30 bg-on-scrim/20 text-on-scrim backdrop-blur-sm hover:bg-on-scrim/30"
             onClick={(event) => {
               event.stopPropagation();
               onAddToDeck?.(cardId);

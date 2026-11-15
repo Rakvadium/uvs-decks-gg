@@ -1,6 +1,5 @@
 "use client";
 
-import { Loader2 } from "lucide-react";
 import { useCallback, useMemo, useRef } from "react";
 import { useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
@@ -32,6 +31,7 @@ import {
 import { useDeckDetailsTopBarContext } from "./deck-details-top-bar/context";
 import { DeckDetailsTopBarDeleteAction } from "./deck-details-top-bar/delete-action";
 import { useGameId } from "@/games/game-context";
+import { Spinner } from "@/components/ui/spinner";
 
 const FORMAT_NONE = "__format_none__";
 const SUBFORMAT_NONE = "__subformat_none__";
@@ -169,7 +169,7 @@ export function DeckDetailsEditDialog() {
             <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
               <DialogCancel disabled={isSaving} />
               <Button type="button" onClick={() => void saveEdits()} disabled={isSaving}>
-                {isSaving ? <Loader2 className="h-4 w-4 shrink-0 animate-spin" /> : null}
+                {isSaving ? <Spinner /> : null}
                 Save
               </Button>
             </div>

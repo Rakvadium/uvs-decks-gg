@@ -8,6 +8,7 @@ import { AppBrandMark } from "@/components/brand/mark";
 import { GameBadge } from "@/components/shell/game-switcher/game-badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
 import { Kicker, PageHeading, SectionHeading } from "@/components/ui/typography-headings";
 import { getRequestGame } from "@/lib/routing/request-game";
 
@@ -88,10 +89,7 @@ async function GamePicker() {
             );
           })}
           <li className="flex">
-            <div className="flex flex-1 flex-col justify-center gap-1 rounded-lg border border-dashed border-border/80 p-6 text-center">
-              <SectionHeading size="sm">More games coming</SectionHeading>
-              <p className="text-sm text-muted-foreground">Riftbound is next.</p>
-            </div>
+            <EmptyState className="flex-1" title="More games coming" description="Riftbound is next." />
           </li>
         </ul>
       </section>

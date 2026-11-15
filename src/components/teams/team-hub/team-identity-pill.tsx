@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { FloatingCapsuleCluster } from "@/components/shell/floating-page-bar";
 import { TeamLogoCropDialog } from "./team-logo-crop-dialog";
 import { useTeamLogoPicker, type TeamLogoPresentation } from "./use-team-logo-picker";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface TeamIdentityPillProps {
   teamId: Id<"teams">;
@@ -30,8 +31,8 @@ export function TeamIdentityPill({ teamId, name, presentation, loading }: TeamId
   if (loading || !name) {
     return (
       <FloatingCapsuleCluster bodyClassName="gap-2 pl-1.5 pr-4">
-        <span className="size-8 shrink-0 animate-pulse rounded-full bg-muted" />
-        <span className="h-3.5 w-24 animate-pulse rounded-full bg-muted" />
+        <Skeleton className="size-8 shrink-0 rounded-full" />
+        <Skeleton className="h-3.5 w-24 rounded-full" />
       </FloatingCapsuleCluster>
     );
   }

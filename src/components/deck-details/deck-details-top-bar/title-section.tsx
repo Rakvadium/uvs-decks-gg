@@ -64,7 +64,6 @@ export function DeckDetailsTopBarTitleSection({
           editTeamCollaboration={deckTeamSharingFromDeck(deck)}
           onSelect={noopVis}
           onSelectTeamSharing={noopTeam}
-          compact
           canSetTournamentVisibility={isAdmin}
           canSetTeamVisibility={canSetTeamVisibility}
         />

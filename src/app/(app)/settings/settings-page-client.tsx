@@ -1,6 +1,8 @@
 "use client";
 
 import { PageHeading } from "@/components/ui/typography-headings";
+import { LoadingState } from "@/components/ui/loading-state";
+import { Panel } from "@/components/ui/panel";
 import { useState, useEffect, useOptimistic, useTransition, useCallback, useRef } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
@@ -40,23 +42,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  User,
-  Palette,
-  Moon,
-  Sun,
-  Monitor,
-  ArrowLeft,
-  Check,
-  Loader2,
-  Mail,
-  AtSign,
-  Shield,
-  Calendar,
-  Sparkles,
-  Filter,
-  ChevronDown,
-} from "lucide-react";
+import { User, Palette, Moon, Sun, Monitor, ArrowLeft, Check, Mail, AtSign, Shield, Calendar, Sparkles, Filter, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { validateUsername } from "@shared/username";
@@ -74,6 +60,7 @@ import {
   normalizeAvatarImagePath,
 } from "@/lib/user-avatar";
 import { SettingsAuthRequiredState } from "./auth-required-state";
+import { Spinner } from "@/components/ui/spinner";
 
 const MODE_OPTIONS: readonly {
   value: ThemePreference;
@@ -302,9 +289,7 @@ export default function SettingsPageClient() {
 
   if (user === undefined) {
     return (
-      <div className="flex h-full items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-      </div>
+      <LoadingState size="lg" className="h-full" />
     );
   }
 
@@ -500,7 +485,7 @@ export default function SettingsPageClient() {
                     className="gap-2"
                   >
                     {isSaving ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <Spinner />
                     ) : (
                       <Check className="h-4 w-4" />
                     )}
@@ -666,7 +651,7 @@ export default function SettingsPageClient() {
                       <CollapsibleTrigger className="flex w-full items-center gap-2 rounded-lg border border-border/50 px-3 py-2 text-left text-sm font-medium hover:bg-muted/60 [&[data-state=open]_svg:first-child]:rotate-180">
                         <ChevronDown className="h-4 w-4 shrink-0 transition-transform" />
                         Per-chrome color overrides
-                        <Badge variant="secondary" className="ml-auto text-[10px]">
+                        <Badge size="sm" variant="secondary" className="ml-auto">
                           Advanced
                         </Badge>
                       </CollapsibleTrigger>
@@ -682,16 +667,13 @@ export default function SettingsPageClient() {
                             const hasOverride = Boolean(customDraft.byChrome?.[opt.id]);
 
                             return (
-                              <div
-                                key={opt.id}
-                                className="rounded-xl border border-border/50 bg-muted/20 p-3 space-y-2"
-                              >
+                              <Panel key={opt.id} className="space-y-2 p-3">
                                 <div className="flex flex-wrap items-start justify-between gap-2">
                                   <div className="min-w-0 space-y-0.5">
                                     <div className="flex flex-wrap items-center gap-2">
                                       <p className="text-sm font-medium">{opt.label}</p>
                                       {hasOverride ? (
-                                        <Badge variant="outline" className="text-[10px]">
+                                        <Badge size="sm" variant="outline">
                                           Override
                                         </Badge>
                                       ) : (
@@ -734,7 +716,7 @@ export default function SettingsPageClient() {
                                     }))
                                   }
                                 />
-                              </div>
+                              </Panel>
                             );
                           })}
                         </div>

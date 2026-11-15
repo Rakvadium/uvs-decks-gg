@@ -1,9 +1,11 @@
 "use client";
 
 import { useMemo } from "react";
+import { LoadingState } from "@/components/ui/loading-state";
 import Link from "next/link";
 import { useConvexAuth, useQuery } from "convex/react";
-import { BarChart3, Download, Grid2x2Plus, Loader2, Shuffle } from "lucide-react";
+import { BarChart3, Download, Grid2x2Plus, Shuffle } from "lucide-react";
+
 import { api } from "../../../convex/_generated/api";
 import { Button } from "@/components/ui/button";
 import { DeckInvitePendingGate } from "@/components/deck-details/deck-invite-pending-gate";
@@ -87,12 +89,7 @@ export function DeckDetailsView() {
       {features.drawSimulator ? <DeckDetailsSimulatorSlotRegistration /> : null}
       {features.deckImportExport ? <DeckDetailsImportExportSlotRegistration /> : null}
       {isLoading || (!deck && pendingInvite === undefined) ? (
-        <div className="flex h-full items-center justify-center">
-          <div className="flex flex-col items-center gap-4">
-            <Loader2 className="h-8 w-8 animate-spin text-primary drop-shadow-[0_0_10px_var(--primary)]" />
-            <span className="chrome-label-case text-sm text-muted-foreground">Loading Deck Data</span>
-          </div>
-        </div>
+        <LoadingState size="lg" label="Loading Deck Data" className="h-full" />
       ) : !deck && pendingInvite && deckId ? (
         <DeckInvitePendingGate deckId={deckId} deckName={pendingInvite.deckName} />
       ) : !deck ? (

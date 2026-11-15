@@ -1,6 +1,7 @@
 "use client";
 
 import type { GameColorFacetOption } from "@shared/games/filters";
+import type { ChipSize } from "@/components/ui/chip";
 import { FilterChip, FilterChipRow } from "./primitives";
 
 /** Swatch dot for a color facet option (`swatch` is an HSL triplet). */
@@ -8,7 +9,7 @@ export function ColorFacetSwatch({ swatch, className }: { swatch: string; classN
   return (
     <span
       aria-hidden
-      className={className ?? "size-3 shrink-0 rounded-full ring-1 ring-inset ring-white/25"}
+      className={className ?? "size-3 shrink-0 rounded-full ring-1 ring-inset ring-on-scrim/25"}
       style={{ backgroundColor: `hsl(${swatch})`, boxShadow: `0 0 6px hsl(${swatch} / 0.55)` }}
     />
   );
@@ -19,13 +20,13 @@ export function ColorFacetChips({
   options,
   selected,
   onToggle,
-  chipClassName,
+  chipSize,
   rowClassName,
 }: {
   options: readonly GameColorFacetOption[];
   selected: readonly string[];
   onToggle: (value: string) => void;
-  chipClassName?: string;
+  chipSize?: ChipSize;
   rowClassName?: string;
 }) {
   return (
@@ -34,7 +35,7 @@ export function ColorFacetChips({
         <FilterChip
           key={option.value}
           selected={selected.includes(option.value)}
-          className={chipClassName}
+          size={chipSize}
           onClick={() => onToggle(option.value)}
           label={
             <span className="inline-flex items-center gap-1.5">

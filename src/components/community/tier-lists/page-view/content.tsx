@@ -2,7 +2,6 @@
 
 import { CommunityRankingsView } from "@/components/community/community-rankings-view";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { TierListBrowserCard } from "./browser-card";
 import { useCommunityTierListsPageContext } from "./context";
 import { CommunityTierListsPageCreateDialog } from "./create-dialog";
@@ -32,14 +31,10 @@ export function CommunityTierListsPageView() {
         {activeTab === "rankings" ? (
           <CommunityRankingsView embedded />
         ) : activeTab === "mine" && !isAuthenticated ? (
-          <Card className="border-dashed border-border/80 bg-card/80">
-            <CardContent className="flex flex-col items-center gap-4 py-14 text-center">
-              <p className="max-w-lg text-sm text-muted-foreground">
-                Sign in to keep private tier lists, manage your published ones, and jump straight into editing.
-              </p>
-              <Button onClick={() => startAuth()}>Sign in to view your lists</Button>
-            </CardContent>
-          </Card>
+          <CommunityTierListsPageEmptyState
+            message="Sign in to keep private tier lists, manage your published ones, and jump straight into editing."
+            action={<Button onClick={() => startAuth()}>Sign in to view your lists</Button>}
+          />
         ) : isLoadingActiveTab ? (
           <CommunityTierListsPageLoadingState />
         ) : activeTab === "public" && filteredPublicLists.length > 0 ? (

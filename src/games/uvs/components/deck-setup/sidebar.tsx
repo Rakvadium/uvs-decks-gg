@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Panel } from "@/components/ui/panel";
 import Image from "next/image";
 import { Hexagon, Layers } from "lucide-react";
 import type { GameDeckSetupPanelProps } from "@/games/types";
@@ -43,7 +44,7 @@ export function UvsDeckSetupSidebar({ setup, getCard, onChange, readOnly, deckDe
 
   return (
     <>
-      <div className="overflow-hidden rounded-lg border border-border/50 bg-card/50">
+      <Panel className="overflow-hidden">
         <div className="flex items-stretch justify-between">
           <div className="min-w-0 flex flex-1 items-stretch">
             <div className="relative">
@@ -122,7 +123,7 @@ export function UvsDeckSetupSidebar({ setup, getCard, onChange, readOnly, deckDe
             </div>
           </div>
         </div>
-      </div>
+      </Panel>
 
       <CardDetailsDialog
         card={startingCharacter}

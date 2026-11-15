@@ -525,4 +525,14 @@ describe("tier list lanes render every counted card", () => {
     expect(rtl.screen.getAllByRole("group", { name: "Unavailable card" })).toHaveLength(1);
     expect(rtl.screen.getByText("5 cards waiting to be ranked")).toBeTruthy();
   });
+
+  test("a pool with every card ranked shows the inline empty state", () => {
+    store.details.set(LIST_A, makeList(LIST_A, "a"));
+    store.catalog = current(A_CARDS);
+    mountView();
+    const empties = [...document.querySelectorAll<HTMLElement>('[data-slot="empty-state"]')];
+    expect(empties.map((node) => [node.dataset.variant, node.textContent])).toEqual([
+      ["inline", "No cards in the pool match that search."],
+    ]);
+  });
 });

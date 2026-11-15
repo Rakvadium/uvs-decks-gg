@@ -63,6 +63,7 @@ export function CyberpunkCardTextFrame({
       role="img"
       aria-label={`${card?.name ?? name}${type ? `, ${type}` : ""} (no image)`}
       className={cn(
+        // eslint-disable-next-line design/no-literal-color -- printed card: the Cyberpunk card face is dark in every theme
         "relative flex h-full w-full flex-col overflow-hidden bg-[#0b0e14] text-left text-slate-100 [container-type:inline-size]",
         className
       )}
@@ -100,6 +101,7 @@ export function CyberpunkCardTextFrame({
         <div className="flex items-start justify-between" style={{ gap: "2cqw" }}>
           {card?.cost !== undefined ? (
             <span
+              // eslint-disable-next-line design/no-literal-color -- printed card: black cost digits on the yellow cost hexagon
               className="flex items-center justify-center font-black tabular-nums leading-none text-black"
               style={{
                 width: "13cqw",
@@ -175,6 +177,7 @@ export function CyberpunkCardTextFrame({
         {/* Rules text */}
         {card?.text ? (
           <div
+            // eslint-disable-next-line design/no-literal-color -- printed card: the rules-text box of the Cyberpunk card face
             className="min-h-0 flex-1 overflow-hidden rounded-sm border border-white/10 bg-black/35 leading-snug text-slate-200"
             style={{ padding: "2.5cqw 3cqw", fontSize: "4.2cqw" }}
           >
@@ -201,6 +204,7 @@ export function CyberpunkCardTextFrame({
           </div>
           {card?.power !== undefined ? (
             <span
+              // eslint-disable-next-line design/no-literal-color -- printed card: white power digits on the card colour
               className="inline-flex shrink-0 items-baseline rounded-sm font-black leading-none text-white"
               style={{
                 gap: "1.2cqw",

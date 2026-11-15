@@ -1,12 +1,14 @@
 "use client";
 
-import { Loader2, UsersRound } from "lucide-react";
+import { UsersRound } from "lucide-react";
+
 import type { Id } from "../../../../convex/_generated/dataModel";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { TeamLogoCropDialog } from "./team-logo-crop-dialog";
 import { useTeamLogoPicker, type TeamLogoPresentation } from "./use-team-logo-picker";
+import { Spinner } from "@/components/ui/spinner";
 
 interface TeamLogoSectionProps {
   teamId: Id<"teams">;
@@ -33,12 +35,12 @@ export function TeamLogoSection({ teamId, presentation }: TeamLogoSectionProps) 
       />
       <div
         className={cn(
-          "relative flex h-24 w-24 items-center justify-center overflow-hidden rounded-2xl border border-surface bg-muted-soft",
+          "relative flex h-24 w-24 items-center justify-center overflow-hidden rounded-xl border border-surface bg-muted-soft",
           "shadow-[var(--chrome-shell-nav-active-shadow)]",
         )}
       >
         {loadingPresentation ? (
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" aria-hidden />
+          <Spinner size="lg" className="text-muted-foreground" />
         ) : displayUrl ? (
           <img src={displayUrl} alt="" className="h-full w-full object-cover" />
         ) : (

@@ -70,8 +70,8 @@ const DESCRIPTIONS = {
   [RULES.typography]: "Disallow call-site casing, tracking, font family and sub-10px text.",
   [RULES.zIndex]: "Use named z-index utilities where one exists.",
   [RULES.hslBorder]: "Disallow `hsl(var(--border…))`; theme borders are oklch.",
-  [RULES.literalColor]: "Disallow literal colours (`rgba(`, `#hex`, `text-white`, `bg-white`, `bg-black`) in class strings.",
-  [RULES.primitiveGeometry]: "Disallow `rounded-*`, `h-*` and `size-*` on <Button>, <Badge>, <Input> and <SelectTrigger>.",
+  [RULES.literalColor]: "Disallow literal colours (`rgba(`, `#hex`, and named `white` / `black` such as `text-white`, `border-white/10`, `from-black`) in class strings.",
+  [RULES.primitiveGeometry]: "Disallow `rounded-*`, `h-*` and `size-*` on <Button>, <Badge>, <Input>, <SelectTrigger>, <Chip> and the wrappers that forward `className` to them.",
   [RULES.buttonFocus]: "Require a `focus-visible:` class on a raw <button> that sets `className`.",
 };
 

@@ -1,11 +1,10 @@
 import { ActiveDeckCardRow } from "../card-row";
+import { EmptyState } from "@/components/ui/empty-state";
 import { useActiveDeckSectionContext } from "./context";
 
 function ActiveDeckSectionEmptyState() {
   return (
-    <div className="rounded-md border border-dashed border-border/80 px-3 py-2 text-[11px] text-muted-foreground">
-      No cards in this section yet.
-    </div>
+    <EmptyState variant="inline" title="No cards in this section yet." />
   );
 }
 

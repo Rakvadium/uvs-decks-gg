@@ -23,7 +23,7 @@ export function DeckDetailsGallerySidebarHeader() {
               {meta.filteredCount.toLocaleString()} cards
             </span>
             {meta.activeFilterCount > 0 ? (
-              <Badge variant="secondary" className="h-4 px-1 text-[10px]">
+              <Badge size="sm" variant="secondary">
                 {meta.activeFilterCount} filter{meta.activeFilterCount === 1 ? "" : "s"}
               </Badge>
             ) : null}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { Panel } from "@/components/ui/panel";
 import { CYBERPUNK_LEGEND_COUNT, normalizeCyberpunkSetup } from "@shared/games/cyberpunk/setup";
 import { Kicker } from "@/components/ui/typography-headings";
 import type { GameDeckSetupPanelProps } from "@/games/types";
@@ -70,50 +71,52 @@ function CyberpunkDeckSetupEditor({
 
   return (
     <>
-      <section
-        aria-label="Legends"
+      <Panel
+        asChild
         className={cn(
-          "relative space-y-3 rounded-lg border border-border/50 bg-card/50 p-3",
+          "relative space-y-3 p-3",
           isHero && "mx-auto w-full max-w-[260px] shrink-0 lg:mx-0 lg:w-48",
           className
         )}
       >
-        <div className="flex items-center justify-between gap-2 pr-14">
-          <Kicker size="sm" tone="foreground" className="font-semibold">
-            Legends{" "}
-            <span className="font-normal normal-case tracking-normal tabular-nums text-muted-foreground">
-              {legendIds.length}/{CYBERPUNK_LEGEND_COUNT}
-            </span>
-          </Kicker>
-        </div>
-        {overlay}
+        <section aria-label="Legends">
+          <div className="flex items-center justify-between gap-2 pr-14">
+            <Kicker size="sm" tone="foreground" className="font-semibold">
+              Legends{" "}
+              <span className="font-normal normal-case tracking-normal tabular-nums text-muted-foreground">
+                {legendIds.length}/{CYBERPUNK_LEGEND_COUNT}
+              </span>
+            </Kicker>
+          </div>
+          {overlay}
 
-        {!isHero && deckDescription?.trim() ? (
-          <p className="line-clamp-2 text-[11px] text-muted-foreground">{deckDescription}</p>
-        ) : null}
+          {!isHero && deckDescription?.trim() ? (
+            <p className="line-clamp-2 text-[11px] text-muted-foreground">{deckDescription}</p>
+          ) : null}
 
-        <div className={cn(isHero ? "space-y-1.5" : "grid grid-cols-3 gap-2")}>
-          {SLOT_INDEXES.map((index) => (
-            <LegendSlot
-              key={index}
-              index={index}
-              card={slots[index]}
-              editable={editable}
-              layout={isHero ? "row" : "tile"}
-              onPick={openPicker}
-              onRemove={removeLegend}
-              onOpenCard={setDetailsCard}
-            />
-          ))}
-        </div>
+          <div className={cn(isHero ? "space-y-1.5" : "grid grid-cols-3 gap-2")}>
+            {SLOT_INDEXES.map((index) => (
+              <LegendSlot
+                key={index}
+                index={index}
+                card={slots[index]}
+                editable={editable}
+                layout={isHero ? "row" : "tile"}
+                onPick={openPicker}
+                onRemove={removeLegend}
+                onOpenCard={setDetailsCard}
+              />
+            ))}
+          </div>
 
-        <RamBudgetSummary
-          legends={legends}
-          mainQuantities={mainQuantities}
-          getCard={getCard}
-          className="border-t border-border/40 pt-3"
-        />
-      </section>
+          <RamBudgetSummary
+            legends={legends}
+            mainQuantities={mainQuantities}
+            getCard={getCard}
+            className="border-t border-border/40 pt-3"
+          />
+        </section>
+      </Panel>
 
       {editable && onChange ? (
         <LegendPickerDialog

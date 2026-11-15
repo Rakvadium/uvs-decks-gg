@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Surface } from "@/components/ui/card";
 import { ArrowUpRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SectionHeading } from "@/components/ui/typography-headings";
@@ -10,7 +11,7 @@ export function CreatorProgramCtaSection() {
   const { startCreatorApply } = useCreatorApply();
 
   return (
-    <section className="rounded-2xl border border-border/50 bg-card/80 p-6 md:p-8">
+    <Surface className="gap-0 p-6 md:p-8">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div className="space-y-2">
           <SectionHeading size="lg">Ready to Apply?</SectionHeading>
@@ -37,6 +38,6 @@ export function CreatorProgramCtaSection() {
           </Link>
         </div>
       </div>
-    </section>
+    </Surface>
   );
 }

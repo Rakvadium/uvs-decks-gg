@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Loader2, PenLine, type LucideIcon } from "lucide-react"
+import { PenLine, type LucideIcon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Spinner } from "@/components/ui/spinner"
 
 type CreateEntityNameField = {
   id: string
@@ -63,7 +64,7 @@ function CreateEntityDialog({
           <>
             <DialogCancel disabled={submitting} />
             <Button type="submit" form={formId} disabled={!canSubmit}>
-              {submitting ? <Loader2 className="animate-spin" /> : null}
+              {submitting ? <Spinner /> : null}
               {submitLabel}
             </Button>
           </>

@@ -1,4 +1,6 @@
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Panel } from "@/components/ui/panel";
+import { EmptyState } from "@/components/ui/empty-state";
 import type { DistributionBucket } from "./chart-data";
 
 interface BarDistributionChartProps {
@@ -18,14 +20,14 @@ export function BarDistributionChart({ title, buckets, total }: BarDistributionC
   const max = Math.max(1, ...buckets.map((bucket) => bucket.value));
 
   return (
-    <div className="space-y-2 rounded-lg border border-border/50 bg-card/30 p-3">
+    <Panel className="space-y-2 p-3">
       <div className="flex items-center justify-between">
         <span className="chrome-label-case text-[10px] text-muted-foreground">{title}</span>
         <span className="text-[10px] text-muted-foreground">{chartTotal}</span>
       </div>
 
       {buckets.length === 0 ? (
-        <p className="text-[11px] text-muted-foreground">No data.</p>
+        <EmptyState variant="inline" title="No data." />
       ) : (
         <div role="table" aria-label={title} className="space-y-1">
           <div role="row" className="flex items-end gap-0.5" style={{ height: PLOT_HEIGHT + 14 }}>
@@ -68,6 +70,6 @@ export function BarDistributionChart({ title, buckets, total }: BarDistributionC
           </div>
         </div>
       )}
-    </div>
+    </Panel>
   );
 }

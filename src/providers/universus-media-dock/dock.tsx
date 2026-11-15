@@ -402,7 +402,7 @@ export function UniversusMediaDock() {
                 Mini player
               </span>
               {liveRows.length > 0 ? (
-                <Badge variant="destructive" className="h-5 px-1.5 text-[10px]">
+                <Badge size="sm" variant="destructive">
                   Live
                 </Badge>
               ) : null}
@@ -505,7 +505,7 @@ export function UniversusMediaDock() {
                                     <Play className="h-4 w-4 text-red-400" />
                                   </div>
                                 )}
-                                <span className="absolute bottom-0.5 left-0.5 rounded bg-red-600 px-1 text-[10px] font-bold text-white">
+                                <span className="absolute bottom-0.5 left-0.5 rounded bg-destructive px-1 text-[10px] font-bold text-destructive-foreground">
                                   LIVE
                                 </span>
                               </div>

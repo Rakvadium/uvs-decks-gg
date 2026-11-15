@@ -1,13 +1,13 @@
 "use client";
 
 import { useMemo } from "react";
+import { Panel } from "@/components/ui/panel";
 import { Badge } from "@/components/ui/badge";
 import { useGameModule } from "@/games/game-context";
 import { ColorFacetChips } from "../mobile-filter-sheet/color-facet-chips";
 import { useGalleryFilterDialogContext } from "./context";
 import { SearchableMultiSelect } from "./searchable-multi-select";
 
-const sectionShellClassName = "rounded-lg border border-border/50 bg-card/30 p-3 backdrop-blur-sm";
 
 /** Color facet picker; renders only for games whose filter definition declares `facets.colors`. */
 export function ColorsSection() {
@@ -19,15 +19,15 @@ export function ColorsSection() {
   return (
     <div className="space-y-2">
       <span className="chrome-label-case text-xs text-muted-foreground">Colors</span>
-      <div className={sectionShellClassName}>
+      <Panel className="p-3">
         <ColorFacetChips
           options={options}
           selected={filters.colors ?? []}
           onToggle={(value) => toggleStringFilter("colors", value)}
-          chipClassName="h-7 gap-1 px-2.5 text-xs"
+          chipSize="xs"
           rowClassName="gap-1.5"
         />
-      </div>
+      </Panel>
     </div>
   );
 }
@@ -45,7 +45,7 @@ export function TagsSection() {
   return (
     <div className="space-y-2">
       <span className="chrome-label-case text-xs text-muted-foreground">Tags</span>
-      <div className={`space-y-2 ${sectionShellClassName}`}>
+      <Panel className="space-y-2 p-3">
         <SearchableMultiSelect
           options={options}
           selectedValues={selected}
@@ -57,13 +57,13 @@ export function TagsSection() {
         {selected.length > 0 ? (
           <div className="flex flex-wrap gap-1">
             {selected.map((tag) => (
-              <Badge key={`tag-selected-${tag}`} variant="outline" className="px-1.5 py-0.5 text-[10px]">
+              <Badge size="sm" key={`tag-selected-${tag}`} variant="outline">
                 {tag}
               </Badge>
             ))}
           </div>
         ) : null}
-      </div>
+      </Panel>
     </div>
   );
 }

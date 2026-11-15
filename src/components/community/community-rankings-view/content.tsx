@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { Trophy } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
 import {
   Dialog,
   DialogBody,
@@ -38,16 +40,11 @@ export function CommunityRankingsView({ embedded = false }: CommunityRankingsVie
   return (
     <div className={cn("relative flex h-full flex-col overflow-y-auto", embedded && "overflow-visible")}>
       {!embedded ? (
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.08),transparent_30%),radial-gradient(circle_at_80%_10%,rgba(20,184,166,0.10),transparent_26%)]" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,color-mix(in_oklab,var(--primary)_8%,transparent),transparent_30%),radial-gradient(circle_at_80%_10%,color-mix(in_oklab,var(--secondary)_10%,transparent),transparent_26%)]" />
       ) : null}
 
       <div className={cn("relative z-10 flex min-h-full flex-col gap-4", embedded ? "py-2" : "p-4 md:p-6")}>
-        <Card
-          className={cn(
-            "bg-card/80",
-            leaderboard ? "border-border/50" : "border-dashed border-border/80",
-          )}
-        >
+        <Card>
           {leaderboard ? (
             <CardHeader className="space-y-1">
               <Badge variant="outline" className="w-fit shrink-0 text-xs font-normal">
@@ -57,11 +54,14 @@ export function CommunityRankingsView({ embedded = false }: CommunityRankingsVie
           ) : null}
           <CardContent>
             {!leaderboard ? (
-              <div className="flex min-h-48 items-center justify-center rounded-xl border border-dashed border-border/80 bg-background/30 px-4 py-8 text-center text-sm text-muted-foreground">
-                {scopeType === "set_scope"
-                  ? "No ranked set-scoped lists are available yet."
-                  : "No ranked global lists are available yet."}
-              </div>
+              <EmptyState
+                icon={Trophy}
+                title={
+                  scopeType === "set_scope"
+                    ? "No ranked set-scoped lists are available yet."
+                    : "No ranked global lists are available yet."
+                }
+              />
             ) : (
               <div className="space-y-4">
                 {leaderboard.tiers.map((tier) => {
@@ -79,7 +79,7 @@ export function CommunityRankingsView({ embedded = false }: CommunityRankingsVie
                     >
                       <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <div className="flex flex-wrap items-center gap-2">
-                          <Badge variant="outline" className="text-[10px]">
+                          <Badge size="sm" variant="outline">
                             {tier.label}
                           </Badge>
                           <span className="text-xs text-muted-foreground">
@@ -127,9 +127,7 @@ export function CommunityRankingsView({ embedded = false }: CommunityRankingsVie
                           })}
                         </div>
                       ) : (
-                        <div className="rounded-xl border border-dashed border-border/80 bg-background/30 px-4 py-5 text-sm text-muted-foreground">
-                          No cards have landed in this community tier yet.
-                        </div>
+                        <EmptyState variant="inline" title="No cards have landed in this community tier yet." />
                       )}
                     </div>
                   );

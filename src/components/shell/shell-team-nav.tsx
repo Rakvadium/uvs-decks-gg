@@ -14,6 +14,7 @@ import {
   SHELL_NAV_ITEM_IDLE,
   SHELL_RAIL_ITEM_COLLAPSED_CLASS,
 } from "./shell-chrome";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type ShellTeamNavSidebarProps = {
   variant: "sidebar";
@@ -77,7 +78,7 @@ function TeamMark({
       )}
     >
       {logoPending ? (
-        <div className="h-full w-full animate-pulse bg-muted/50" />
+        <Skeleton className="h-full w-full" />
       ) : displayUrl ? (
         <img src={displayUrl} alt="" className={cn("h-full w-full object-cover", imgClassName)} />
       ) : (

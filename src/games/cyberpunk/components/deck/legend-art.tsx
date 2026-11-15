@@ -30,7 +30,7 @@ export function LegendAvatar({ card, className }: { card: CachedCard; className?
       ) : (
         <span
           aria-label={title}
-          className="flex h-full w-full items-center justify-center text-[10px] font-bold text-white"
+          className="flex h-full w-full items-center justify-center text-[10px] font-bold text-on-scrim"
           style={{ backgroundColor: `${hex}cc` }}
         >
           {title.slice(0, 2)}

@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { Chip, type ChipSize } from "@/components/ui/chip";
 import { Check, ChevronRight, X } from "lucide-react";
 import { Kicker } from "@/components/ui/typography-headings";
 import {
@@ -81,29 +82,20 @@ export function FilterChip({
   label,
   selected,
   onClick,
+  size,
   className,
 }: {
   label: ReactNode;
   selected: boolean;
   onClick: () => void;
+  size?: ChipSize;
   className?: string;
 }) {
   return (
-    <button
-      type="button"
-      aria-pressed={selected}
-      onClick={onClick}
-      className={cn(
-        "inline-flex h-9 items-center gap-1.5 rounded-full border px-3.5 text-[13px] font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring motion-safe:active:scale-95 motion-safe:transition-[color,background-color,border-color,transform]",
-        selected
-          ? "border-primary/50 bg-primary/20 text-primary shadow-[var(--chrome-filter-tile-shadow-selected)]"
-          : "border-border/50 bg-background/60 text-foreground hover:border-primary/30 hover:bg-muted/60",
-        className
-      )}
-    >
-      {selected ? <Check className="size-3.5" strokeWidth={2.5} aria-hidden /> : null}
+    <Chip selected={selected} onClick={onClick} size={size} className={className}>
+      {selected ? <Check strokeWidth={2.5} aria-hidden /> : null}
       <span className="truncate">{label}</span>
-    </button>
+    </Chip>
   );
 }
 
@@ -119,15 +111,10 @@ export function FilterChipRow({
 
 export function ActiveFilterChip({ label, onRemove }: { label: string; onRemove: () => void }) {
   return (
-    <button
-      type="button"
-      onClick={onRemove}
-      aria-label={`Remove ${label}`}
-      className="inline-flex h-8 shrink-0 items-center gap-1 rounded-full border border-primary/40 bg-primary/15 pl-3 pr-2 text-xs font-medium text-primary transition-colors duration-150 hover:bg-primary/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-    >
+    <Chip selected onClick={onRemove} aria-label={`Remove ${label}`} className="shrink-0 pr-2">
       <span className="max-w-[10rem] truncate">{label}</span>
-      <X className="size-3.5" strokeWidth={2.5} aria-hidden />
-    </button>
+      <X strokeWidth={2.5} aria-hidden />
+    </Chip>
   );
 }
 

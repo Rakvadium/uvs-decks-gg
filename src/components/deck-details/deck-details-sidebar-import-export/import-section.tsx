@@ -1,9 +1,11 @@
-import { Download, Loader2 } from "lucide-react";
+import { Download } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useImportExportSidebarContext } from "./context";
 import { useDeckDetailsOptional } from "@/providers/DeckDetailsProvider";
 import { useDeckImportExportFeature } from "./feature";
+import { Spinner } from "@/components/ui/spinner";
 
 export function ImportExportSidebarImportSection() {
   const deckDetails = useDeckDetailsOptional();
@@ -40,7 +42,7 @@ export function ImportExportSidebarImportSection() {
         disabled={isImporting || !importText.trim() || !deck}
       >
         {isImporting ? (
-          <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+          <Spinner />
         ) : (
           <Download className="mr-1.5 h-3.5 w-3.5" />
         )}

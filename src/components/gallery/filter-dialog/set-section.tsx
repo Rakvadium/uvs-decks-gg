@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { Panel } from "@/components/ui/panel";
 import { Search, X } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -90,9 +91,9 @@ export function SetSection({ plain = false }: { plain?: boolean } = {}) {
     return (
       <div className="space-y-2">
         <span className="chrome-label-case text-xs text-muted-foreground">Set</span>
-        <div className="space-y-2 rounded-lg border border-border/50 bg-card/30 p-3 backdrop-blur-sm">
+        <Panel className="space-y-2 p-3">
           {list}
-        </div>
+        </Panel>
       </div>
     );
   }

@@ -67,7 +67,45 @@ State is expressed with semantic tokens, never Tailwind palette hues:
 
 Inline usage follows the tone ladder: `bg-warning-wash`, `border-warning-soft`, `text-warning`. Domain colors (card symbols, stat tints) live in `src/games/uvs/config.ts` and are not status colors.
 
-Class strings carry no literal colours: no `text-white`, `bg-white` or `bg-black`, and no `rgba(…)` or `#hex` inside an arbitrary value. They ignore the chrome and the palette. `design/no-literal-color` reports them.
+Class strings carry no literal colours: no named `white` or `black` on any colour utility (`text-white`, `bg-black/60`, `border-white/10`, `ring-white`, `from-black`, `via-black/40`, `to-white`), and no `rgba(…)` or `#hex` inside an arbitrary value. They ignore the chrome and the palette. `design/no-literal-color` reports them, at error.
+
+Over card art, video and a user's own colour, text and scrims stay light-on-dark in every theme. They read two tokens from `src/styles/base.css` instead of white and black:
+
+| Token | Utility | Use |
+|-------|---------|-----|
+| `--scrim` | `bg-scrim/45`, `from-scrim via-scrim/40` | Dark gradient or fill behind text on art |
+| `--on-scrim` | `text-on-scrim/70`, `border-on-scrim/10`, `ring-on-scrim/25` | Text, hairlines and pip rings on art or a domain colour |
+
+On a themed surface use the theme tokens (`border-hairline`, `ring-border`, `text-foreground`) instead. A colour printed on the card itself, such as the Cyberpunk card face in `src/games/cyberpunk/components/card-text-frame.tsx`, stays literal behind an `eslint-disable-next-line design/no-literal-color -- printed card: …` comment on that line only.
+
+## Surfaces and feedback
+
+Pick the primitive by role. None of them takes a fill, border or radius from the call site. `className` sets layout and padding only.
+
+| Role | Primitive | Recipe |
+|------|-----------|--------|
+| Top-level card on the page | `Card` | `bg-card-elevated border-surface rounded-surface`, chrome card shadow |
+| Card that is itself a link or button | `Card fx` | Adds the chrome hover shadow, hover border and primary wash |
+| Quiet grouping card | `Surface` | Same fill, low elevation |
+| Inset panel inside a card, sidebar or dialog | `Panel` | `rounded-surface border-surface bg-card-tint`, with `asChild` for a `li`, `section` or link |
+| One-line notice above content | `Banner` | `rounded-surface border-surface bg-muted-elevated`, `text-xs` |
+| Nothing to show | `EmptyState` | `border-dashed border-placeholder bg-muted-tint rounded-surface`, slots `icon`, `title`, `description`, `action` |
+| Waiting for data | `LoadingState` | Centred `Spinner` and optional label in muted text, `role="status"` |
+| Spinner in a button, row or toast | `Spinner` | The only spinner: never spin a lucide icon yourself. `size` `sm` / `md` / `lg`, takes the text colour around it |
+| Placeholder shape | `Skeleton` | `bg-muted animate-pulse rounded-md`, the one skeleton tone |
+
+`Card` and `Surface` are static. Hovering a card changes nothing unless the whole card is interactive and passes `fx`. `EmptyState` takes `variant` `page` (a page or tab), `panel` (a section, the default) or `inline` (a sidebar list or picker). The variant sets padding and type size only.
+
+Badges and chips:
+
+| Role | Primitive | Notes |
+|------|-----------|-------|
+| Read-only tag | `Badge` | `size` `sm` (`h-5`, 10px), `md` (default) or `lg` (`--control-h-sm`, `rounded-island`, header chips). Static unless `interactive` |
+| Badge that is itself a trigger | `Badge interactive` | Adds the tone's hover border and shadow |
+| Count bubble on a tab, rail or filter button | `CountBadge` | `count`, `max` (default 99, then 99+), `tone` `primary` / `soft` / `muted` |
+| Toggle or removable filter pill | `Chip` | `Button` outline, `rounded-full`, `size` `sm` (default) or `xs` from the control height tokens. `selected` reads the `--selected-*` role tokens |
+
+`bun run design:codemod --surfaces <path>` moves call-site Badge `text-[10px]`/`h-5` onto `size="sm"` and `h-8` onto `size="lg"`, turns muted `animate-pulse` divs into `Skeleton`, and turns `Loader2 animate-spin` into `Spinner`.
 
 ## Elevation
 
@@ -115,7 +153,7 @@ Inside one chrome, `--radius-cta` and `--radius-island` hold one value. The sele
 
 ## Buttons
 
-`Button` reads its height and radius from the role tokens, so a call site never passes `h-*`, `w-*`, `size-*` or `rounded-*`. The same holds for `Badge`, `Input` and `SelectTrigger`. `design/primitive-geometry` reports `h-*`, `size-*` and `rounded-*` (role radii included) in the `className` of any of the four. A raw `<button>` that sets `className` must include a `focus-visible:` class, and `design/button-focus` reports one that doesn't.
+`Button` reads its height and radius from the role tokens, so a call site never passes `h-*`, `w-*`, `size-*` or `rounded-*`. The same holds for `Badge`, `Input`, `SelectTrigger` and `Chip`. `design/primitive-geometry` reports `h-*`, `size-*` and `rounded-*` (role radii included) in the `className` of any of them, and of every shared wrapper that forwards `className` to one (`FilterChip`, `IconToolbarButton`, `DialogCancel`, `TierListModerationBadge` and the rest of `CLASSNAME_FORWARDERS` in `tools/eslint-design/classify.mjs`). `tests/design-lint.test.ts` scans `src/` and fails when a new forwarder is missing from that list. A raw `<button>` that sets `className` must include a `focus-visible:` class, and `design/button-focus` reports one that doesn't.
 
 | `size` | Height | Icon twin |
 |--------|--------|-----------|
