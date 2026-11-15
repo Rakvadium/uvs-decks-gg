@@ -90,7 +90,7 @@ async function GamePicker() {
           <li className="flex">
             <div className="flex flex-1 flex-col justify-center gap-1 rounded-lg border border-dashed border-border/80 p-6 text-center">
               <SectionHeading size="sm">More games coming</SectionHeading>
-              <p className="text-sm text-muted-foreground">Cyberpunk TCG is next.</p>
+              <p className="text-sm text-muted-foreground">Riftbound is next.</p>
             </div>
           </li>
         </ul>
