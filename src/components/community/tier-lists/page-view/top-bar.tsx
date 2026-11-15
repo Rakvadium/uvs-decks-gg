@@ -1,7 +1,6 @@
 "use client";
 
 import { Plus } from "lucide-react";
-import { SearchField } from "@/components/ui/search-field";
 import { SegmentedControl } from "@/components/ui/segmented-control";
 import { MobileNavIconButton } from "@/components/shell/mobile-nav-bar/nav-icon-button";
 import { MobileSearchField } from "@/components/shell/mobile-tab-bar/search-field";
@@ -46,25 +45,6 @@ export function CommunityTierListsPageTabs() {
       value={activeTab}
       onValueChange={(value) => setActiveTab(value as typeof activeTab)}
       items={items}
-    />
-  );
-}
-
-export function CommunityTierListsPageSearch() {
-  const context = useOptionalCommunityTierListsPageContext();
-  if (!context) return null;
-
-  const { activeTab, searchQuery, setSearchQuery } = context;
-  if (activeTab === "rankings") return null;
-
-  return (
-    <SearchField
-      placeholder="Search tier lists…"
-      value={searchQuery}
-      onValueChange={setSearchQuery}
-      name="tier-lists-search-desktop"
-      aria-label="Search tier lists"
-      className="w-full min-w-[300px] max-w-[30rem]"
     />
   );
 }
