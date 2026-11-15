@@ -3,6 +3,8 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { run, transformSource } from "../scripts/design-codemod/index";
+import { BUTTON_FOCUS_RING } from "../scripts/design-codemod/focus";
+import { buttonVariants } from "../src/components/ui/button";
 
 const FIXTURE = `import { cn } from "@/lib/utils";
 import { cva } from "class-variance-authority";
@@ -161,8 +163,22 @@ describe("Button size overrides", () => {
 `);
   });
 
+  test("a corner-tab radius pair becomes shape tab-tl or tab-tr", () => {
+    const cases: [string, string][] = [
+      [
+        `<Button size="icon" className="h-7 w-7 rounded-bl-none rounded-br-md rounded-tl-md rounded-tr-none border" />`,
+        `<Button shape="tab-tl" size="icon-xs" className="border" />`,
+      ],
+      [`<Button variant="outline" size="icon" className="h-9 w-9 rounded-none rounded-bl-xl rounded-tr-xl" />`, `<Button shape="tab-tr" variant="outline" size="icon" />`],
+    ];
+    for (const [from, to] of cases) expect(rewrite(from).output).toBe(`const a = (
+  ${to}
+);
+`);
+  });
+
   test("corner radii, computed sizes and computed classes are reported, not rewritten", () => {
-    const corner = rewrite(`<Button size="icon" className="rounded-none rounded-bl rounded-tr" />`);
+    const corner = rewrite(`<Button size="icon" className="rounded-none rounded-tl-lg" />`);
     const computedSize = rewrite(`<Button size={size} className="h-7" />`);
     const computedClass = rewrite("<Button className={`h-7 ${extra}`} />");
     for (const result of [corner, computedSize, computedClass]) {
@@ -170,7 +186,7 @@ describe("Button size overrides", () => {
     }
     expect(computedSize.left.map((l) => l.rule)).toEqual(["button/size-override"]);
     expect(computedClass.left.map((l) => l.rule)).toEqual(["button/size-override"]);
-    expect(corner.left.map((l) => l.rule)).toEqual(["button/size-override", "design/radius-ladder", "design/radius-ladder"]);
+    expect(corner.left.map((l) => l.rule)).toEqual(["button/size-override", "design/radius-ladder"]);
     expect(corner.output).toContain('size="icon"');
   });
 
@@ -275,6 +291,71 @@ describe("Input and SelectTrigger size pass", () => {
     const twice = transformSource(once.output, "inputs.tsx", { only: "inputs" });
     expect(twice.rewrites).toEqual([]);
     expect(twice.output).toBe(once.output);
+  });
+});
+
+describe("radius pass", () => {
+  const rewrite = (code: string) => transformSource(code, "radius.tsx", { only: "radius" });
+
+  test("corner-tab pairs become rounded-tab-tl or rounded-tab-tr and off-ladder radii snap to rounded-md", () => {
+    const result = rewrite(`const a = cn("absolute top-0", "rounded-tl-lg rounded-br-lg rounded-tr-none rounded-bl-none", "border");
+const b = <div className="rounded-none rounded-tr-xl rounded-bl-xl bg-card rounded-sm z-50 bg-primary/10" />;
+`);
+    expect(result.output).toBe(`const a = cn("absolute top-0", "rounded-tab-tl", "border");
+const b = <div className="rounded-tab-tr bg-card rounded-md z-50 bg-primary/10" />;
+`);
+    expect(result.left).toEqual([]);
+  });
+
+  test("leaves Button corners to the --buttons pass and lists radii that need judgment", () => {
+    const code = `const a = <><Button className="rounded-tl-lg rounded-br-lg" /><div className="rounded-2xl rounded-tl-xl" /></>;
+`;
+    const result = rewrite(code);
+    expect(result.output).toBe(code);
+    expect(result.left.map((l) => l.text)).toEqual(["rounded-tl-lg", "rounded-br-lg", "rounded-2xl", "rounded-tl-xl"]);
+  });
+
+  test("a second pass changes nothing", () => {
+    const once = rewrite(`const a = <div className="rounded-tr-lg rounded-bl-lg rounded" />;
+`);
+    expect(rewrite(once.output).rewrites).toEqual([]);
+  });
+});
+
+describe("focus pass", () => {
+  const rewrite = (code: string) => transformSource(code, "focus.tsx", { only: "focus" });
+
+  test("the ring it adds is Button's own focus ring", () => {
+    const base = buttonVariants({ variant: null, size: null, shape: null }).split(" ");
+    for (const token of BUTTON_FOCUS_RING.split(" ")) expect(base).toContain(token);
+  });
+
+  test("adds Button's ring to raw buttons the lint reports, in a literal or the first cn() argument", () => {
+    const result = rewrite(`const a = <>
+  <button type="button" className="p-2" />
+  <button className={cn("flex", on && "bg-card")} />
+  <button className="focus-visible:ring-2" />
+  <button className={cn("p-2", className)} />
+  <div className="p-2" />
+</>;
+`);
+    expect(result.output).toBe(`const a = <>
+  <button type="button" className="p-2 ${BUTTON_FOCUS_RING}" />
+  <button className={cn("flex ${BUTTON_FOCUS_RING}", on && "bg-card")} />
+  <button className="focus-visible:ring-2" />
+  <button className={cn("p-2", className)} />
+  <div className="p-2" />
+</>;
+`);
+    expect(rewrite(result.output).rewrites).toEqual([]);
+  });
+
+  test("a flagged button whose classes are not a leading literal is listed", () => {
+    const result = rewrite(`const base = "p-2";
+const a = <button className={cn(base, "flex")} />;
+`);
+    expect(result.rewrites).toEqual([]);
+    expect(result.left.map((l) => l.rule)).toEqual(["design/button-focus"]);
   });
 });
 

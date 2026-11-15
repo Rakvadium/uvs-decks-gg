@@ -530,6 +530,14 @@
   letter-spacing: var(--chrome-label-letter-spacing, normal);
 }
 
+@utility rounded-tab-tl {
+  border-radius: var(--radius-surface) 0;
+}
+
+@utility rounded-tab-tr {
+  border-radius: 0 var(--radius-surface);
+}
+
 @layer utilities {
   :root:is([data-chrome="expressive"], [data-chrome="holoterminal"], [data-fx="on"]) .text-glow-cyan {
     text-shadow: 0 0 10px var(--glow-cyan, oklch(0.78 0.18 195)),

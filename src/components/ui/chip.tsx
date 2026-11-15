@@ -16,10 +16,11 @@ const Chip = React.forwardRef<HTMLButtonElement, ChipProps>(({ selected, size = 
     type="button"
     variant="outline"
     size={size}
+    shape="pill"
     aria-pressed={selected}
     data-slot="chip"
     className={cn(
-      "rounded-full text-foreground",
+      "text-foreground",
       selected &&
         "border-(--selected-border) bg-(--selected-bg) text-(--selected-fg) hover:border-(--selected-border) hover:bg-(--selected-bg) hover:text-(--selected-fg)",
       className
