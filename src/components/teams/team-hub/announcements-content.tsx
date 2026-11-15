@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogBody,
-  DialogClose,
+  DialogCancel,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -159,11 +159,7 @@ export function TeamHubAnnouncementsContent({ teamId }: TeamHubAnnouncementsCont
             </div>
           </DialogBody>
           <DialogFooter>
-            <DialogClose asChild>
-              <Button type="button" variant="outline" disabled={submitting}>
-                Cancel
-              </Button>
-            </DialogClose>
+            <DialogCancel disabled={submitting} />
             <Button
               type="button"
               disabled={submitting || !title.trim() || !body.trim()}
@@ -358,7 +354,7 @@ function AnnouncementCard({
             </Button>
           )}
           {canDelete && (
-            <Button type="button" variant="ghost" size="sm" className="text-xs text-destructive" onClick={() => void onRemove()}>
+            <Button type="button" variant="destructiveOutline" size="sm" onClick={() => void onRemove()}>
               Remove
             </Button>
           )}
