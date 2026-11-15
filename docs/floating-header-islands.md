@@ -12,7 +12,7 @@ Content scrolls under the header, so no header control is transparent. A filled 
 
 ## The rule: strict roles, lenient occupancy
 
-`FloatingPageBar` is a three-slot grid (`minmax(max-content,1fr) / minmax(0,26rem) / minmax(max-content,1fr)`). The side slots never shrink below their content, so when the left cluster is wide the center capsule gives up width instead of overlapping it. Each slot has one fixed role:
+`FloatingPageBar` is a three-slot grid (`minmax(max-content,1fr) / minmax(0,<center width>) / minmax(max-content,1fr)`). The side slots never shrink below their content, so when a side cluster is wide the center capsule gives up width instead of overlapping it. Each slot has one fixed role:
 
 | Slot | Role | Contents |
 | --- | --- | --- |
@@ -40,11 +40,20 @@ If the cluster gets tight, demote the identity (avatar-only, truncated name) —
 
 ## Center slot
 
-Search or filtering for the page's primary collection, via `FloatingSearchCapsule`. Trailing controls that belong to the search (the gallery's scope select) go in as its children. Nothing else goes here. If a page has no content tool, leave it empty — it stays reserved so search always appears in the same place when added later.
+Search or filtering for the page's primary collection, via `FloatingSearchCapsule`. Trailing controls that belong to the search go in as its children: a scope select, then the result controls (result count, filter panel toggle, view mode), because they act on the search results. Nothing else goes here. If a page has no content tool, leave it empty — it stays reserved so search always appears in the same place when added later.
+
+The center slot has two widths, picked with `FloatingPageBar` `centerWidth`:
+
+| `centerWidth` | Token | Value | When |
+| --- | --- | --- | --- |
+| `default` | `--floating-center-w` | 26rem | Every page with a plain search, or none |
+| `wide` | `--floating-center-w-wide` | 40rem | A search whose result controls live inside its island. The gallery is the one current user |
+
+Both tokens live on `:root` in `src/styles/base.css`. Never use `wide` to fit page actions; those belong in the right slot.
 
 ## Right slot
 
-Page-level actions, and on the gallery the collection's tools (result count, filter panel, view mode) in one `FloatingCapsuleCluster`. Primary action as a filled `FloatingActionPill` (opens a flow). Secondary as `FloatingActionPill variant="floating"`. A **context toggle** (Set Active → Active) is not a second primary and is not a dialog opener — off and on must read as different states. Beyond two or three actions, fold the rest into an overflow menu. See [theme-and-chrome.md](./theme-and-chrome.md) control roles.
+Page-level actions. Primary action as a filled `FloatingActionPill` (opens a flow). Secondary as `FloatingActionPill variant="floating"`. A **context toggle** (Set Active → Active) is not a second primary and is not a dialog opener — off and on must read as different states. Beyond two or three actions, fold the rest into an overflow menu. See [theme-and-chrome.md](./theme-and-chrome.md) control roles.
 
 ## Titles and descriptions
 
@@ -63,7 +72,7 @@ The floating bar is desktop-only (`hidden md:block` inside `FloatingPageLayout`)
 | Page | Left | Center | Right |
 | --- | --- | --- | --- |
 | Home | Title pill | — | — |
-| Gallery | — | Search with scope select, filter panel anchored below | Result count, filter panel toggle, view mode |
+| Gallery | — | Wide search island: search, scope select, result count, filter panel toggle, view mode; filter panel anchored below | — |
 | Decks list | Tabs (My / Public / Tournament) | Search | New Deck |
 | Deck details | Icon-only back + deck name pill | — | Set Active (owner), Duplicate, Edit (owner) |
 | Community hub | Dest tabs (Tier Lists / Rankings / Creators) | — | — |

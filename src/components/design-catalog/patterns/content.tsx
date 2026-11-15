@@ -111,11 +111,11 @@ export function FloatingIslandsEntry() {
       <SlotTable
         rows={[
           ["Left", "Context: where am I", "Back pill (icon-only), identity pill (h1), local nav tabs"],
-          ["Center", "Content tool", "Search / filter capsule, or nothing"],
+          ["Center", "Content tool", "Search / filter capsule, or nothing. centerWidth=\"wide\" only when the result controls live in the search island"],
           ["Right", "Actions", "Filled primary FloatingActionPill, floating secondaries, overflow menu"],
         ]}
       />
-      <DesktopStage caption="Decks list: tabs left, search center, primary action right.">
+      <DesktopStage caption="Decks list, default center (--floating-center-w, 26rem): tabs left, search center, primary action right.">
         <FloatingPageBar
           left={
             <FloatingTabsPill
@@ -138,23 +138,22 @@ export function FloatingIslandsEntry() {
           }
         />
       </DesktopStage>
-      <DesktopStage caption="Card gallery: untitled, search with its scope in the same 26rem center slot, count and view tools right.">
+      <DesktopStage caption="Card gallery, wide center (--floating-center-w-wide, 40rem): untitled, one search island holding scope, result count, filter toggle and view mode. Sides empty.">
         <FloatingPageBar
+          centerWidth="wide"
           center={
             <FloatingSearchCapsule value={query} onChange={setQuery} placeholder="Search all card information…" name="catalog-gallery-search" aria-label="Search cards">
               <span className="chrome-label-case shrink-0 px-1.5 text-[11px] text-muted-foreground">All</span>
-            </FloatingSearchCapsule>
-          }
-          right={
-            <FloatingCapsuleCluster>
-              <span className="px-1 text-[11px] tabular-nums text-muted-foreground">2,622 / 2,622</span>
+              <span aria-hidden className="h-4 w-px shrink-0 bg-border/60" />
+              <span className="shrink-0 px-1 text-[11px] tabular-nums text-muted-foreground">2,622 / 2,622</span>
+              <span aria-hidden className="h-4 w-px shrink-0 bg-border/60" />
               <IconToolbarButton shape="island" label="Toggle filter panel">
                 <SlidersHorizontal />
               </IconToolbarButton>
               <IconToolbarButton shape="island" label="Change view mode">
                 <LayoutGrid />
               </IconToolbarButton>
-            </FloatingCapsuleCluster>
+            </FloatingSearchCapsule>
           }
         />
       </DesktopStage>

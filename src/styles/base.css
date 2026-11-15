@@ -14,6 +14,9 @@
 
   --scrim: oklch(0 0 0);
   --on-scrim: oklch(1 0 0);
+
+  --floating-center-w: 26rem;
+  --floating-center-w-wide: 40rem;
 }
 
 :root.dark {

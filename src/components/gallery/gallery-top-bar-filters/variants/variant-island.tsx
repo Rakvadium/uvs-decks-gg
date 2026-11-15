@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  FloatingCapsuleCluster,
-  FloatingPageBar,
-  FloatingSearchCapsule,
-} from "@/components/shell/floating-page-bar";
+import { FloatingPageBar, FloatingSearchCapsule } from "@/components/shell/floating-page-bar";
 import { useGalleryTopBarFiltersContext } from "../context";
 import { AnchoredFilterPanel } from "./anchored-filter-panel";
 import {
@@ -27,6 +23,7 @@ export function GalleryTopBarFilters() {
 
   return (
     <FloatingPageBar
+      centerWidth="wide"
       center={
         <div className="relative w-full min-w-0">
           <FloatingSearchCapsule
@@ -37,19 +34,16 @@ export function GalleryTopBarFilters() {
             aria-label="Search cards"
           >
             <InlineScopeSelect shape="island" />
+            <ToolbarDivider className="h-4" />
+            <InlineResultCount className="px-1" />
+            <ToolbarDivider className="h-4" />
+            <InlineFunnelButton />
+            <InlineViewModeButton />
           </FloatingSearchCapsule>
           <div className="pointer-events-none absolute inset-x-0 top-full z-[140] mt-2 flex justify-center">
             <AnchoredFilterPanel />
           </div>
         </div>
-      }
-      right={
-        <FloatingCapsuleCluster>
-          <InlineResultCount className="px-1" />
-          <ToolbarDivider className="h-4" />
-          <InlineFunnelButton />
-          <InlineViewModeButton />
-        </FloatingCapsuleCluster>
       }
     />
   );

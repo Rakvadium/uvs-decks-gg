@@ -28,6 +28,7 @@ These primitives own their radius, height, fill and focus ring, so a call site p
 | In-page search | `SearchField` | [Inputs](#inputs) |
 | Field height | `Input`, `SelectTrigger` and `Textarea` `size` | [Inputs](#inputs) |
 | Page background | `FloatingPageLayout` `pageWash` | [Page chrome](#page-chrome) |
+| Header centre slot width | `FloatingPageBar` `centerWidth` | [Page chrome](#page-chrome) |
 | Right rail header | `PanelHeader` | [Page chrome](#page-chrome) |
 
 ## Border ladder
@@ -221,7 +222,16 @@ Every floating header element is one island element: `rounded-island`, height `-
 
 ### Page chrome
 
-Every desktop page renders `FloatingPageLayout` (`src/components/shell/floating-page-bar.tsx`), the gallery, `/home` and `/teams/invite` included. The bar floats over a scroller whose first row sits at `md:pt-[4.75rem]`, and the bar's centre slot is at most 26rem on every page. Buttons inside an island are transparent on purpose: the island's opaque fill is what sits over the scrolling content.
+Every desktop page renders `FloatingPageLayout` (`src/components/shell/floating-page-bar.tsx`), the gallery, `/home` and `/teams/invite` included. The bar floats over a scroller whose first row sits at `md:pt-[4.75rem]`. Buttons inside an island are transparent on purpose: the island's opaque fill is what sits over the scrolling content.
+
+The centre slot has two widths, set by `FloatingPageBar` `centerWidth` and read from layout tokens in `src/styles/base.css`. The side slots never shrink below their content, so a crowded side shrinks the centre instead of overlapping it.
+
+| `centerWidth` | Token | Value | Use |
+|---------------|-------|-------|-----|
+| `default` | `--floating-center-w` | 26rem | Every page unless the next row applies |
+| `wide` | `--floating-center-w-wide` | 40rem | A search whose result controls (count, filter toggle, view mode) live inside its island. The gallery is the one user |
+
+Don't pass `wide` to make room for page actions. Actions go in the right slot.
 
 A page background is the `pageWash` prop, never layers the page paints. The wash sits behind the scroller and does not scroll. Each recipe mixes role colours, so it follows the palette.
 
