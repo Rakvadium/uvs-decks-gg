@@ -453,7 +453,6 @@ export function classifyGroup(tokens) {
   });
 }
 
-/** Shared components that pass their `className` straight to a primitive below, by name. */
 const CLASSNAME_FORWARDERS = {
   AuthField: "Input",
   CardFlipButton: "Button",

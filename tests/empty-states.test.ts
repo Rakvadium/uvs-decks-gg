@@ -1,5 +1,3 @@
-// Renders each user-facing empty state with react-dom/client on happy-dom, as
-// tests/create-entity-dialog.test.ts does, with Convex replaced by empty query results.
 import { afterAll, afterEach, describe, expect, mock, test } from "bun:test";
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
 import { act, createElement, type ComponentType, type ReactElement, type ReactNode } from "react";

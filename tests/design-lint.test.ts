@@ -593,11 +593,6 @@ describe("classifier", () => {
   });
 });
 
-/**
- * Names of the components in src that pass their own `className` (directly, or through a rest
- * spread) to a geometry primitive or to another such component, so a call-site height or radius
- * would reach the primitive unseen.
- */
 function classNameForwarders(): string[] {
   const root = path.join(import.meta.dir, "..");
   const files = [...new Glob("src/**/*.tsx").scanSync(root)].map((file) =>
