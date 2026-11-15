@@ -46,7 +46,7 @@ export function GalleryDesktopFilterSetsPage() {
           name="gallery-desktop-filter-sets"
         />
         {selected.length > 0 ? (
-          <div className="-mx-4 flex gap-1.5 overflow-x-auto px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <div className="-mx-4 flex gap-1.5 scroll-row px-4">
             {selected.map((code) => {
               const set = setOptions.find((option) => option.code === code);
               return (
@@ -171,7 +171,7 @@ export function GalleryDesktopFilterTagsPage() {
           name="gallery-desktop-filter-tags"
         />
         {selected.length > 0 ? (
-          <div className="-mx-4 flex gap-1.5 overflow-x-auto px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <div className="-mx-4 flex gap-1.5 scroll-row px-4">
             {selected.map((tag) => (
               <ActiveFilterChip key={tag} label={tag} onRemove={() => toggleStringFilter("tags", tag)} />
             ))}

@@ -134,6 +134,7 @@ Prefer theme/chrome tokens over ad-hoc `rgba`/`hsl` shadows:
 - Mid: `shadow-[var(--chrome-elevation-mid)]` or `shadow-md` / `shadow-lg`
 - Component-specific: `--chrome-card-shadow*`, `--chrome-popover-shadow`, `--chrome-search-field-shadow*`, button/badge chrome shadows
 - Floating islands / pills / rail buttons: `shadow-[var(--chrome-floating-shadow)]` (+ `focus-within:shadow-[var(--chrome-floating-shadow-focus)]`). No `dark:` shadow forks at call sites — the token forks by mode.
+- A row of chips or tabs that scrolls sideways uses `scroll-row`, never a hand-rolled `overflow-x-auto` with a hidden scrollbar. A scroll container clips on both axes, so `scroll-row` pads below and at the inline end by `--chrome-shadow-reach`: 4px in bubblegum, which covers its hard offset control shadows, and 0 in every other chrome. A row's own `pb-*` or `px-*` still wins. `tests/scroll-row.test.ts` checks the reach against bubblegum's shadow tokens and fails on a hand-rolled hidden scrollbar.
 
 Do not use `hsl(var(--border)…)` — theme borders are oklch via `var(--border)`.
 

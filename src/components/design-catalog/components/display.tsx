@@ -276,9 +276,12 @@ export function ChipEntry() {
           An interactive pill built on <Code>Button</Code> (<Code>outline</Code>, <Code>rounded-full</Code>). <Code>size</Code> is{" "}
           <Code>sm</Code> (the default) or <Code>xs</Code> for dense filter grids, read from the control height tokens, so a call
           site never sets <Code>h-*</Code>. Selected reads the <Code>--selected-*</Code> role tokens. For a read-only tag use{" "}
-          <Code>Badge</Code>.
+          <Code>Badge</Code>. A row of chips that scrolls sideways uses <Code>scroll-row</Code>: no scrollbar, and padding below
+          and at the end equal to <Code>--chrome-shadow-reach</Code>, so bubblegum&apos;s offset shadow is not clipped. The reach
+          is 0 in every other chrome.
         </p>
       }
+      sourcePaths={["src/styles/base.css"]}
     >
       <Preview>
         <div className="space-y-3">
@@ -294,7 +297,16 @@ export function ChipEntry() {
           ))}
         </div>
       </Preview>
-      <CodeBlock code={`import { Chip } from "@/components/ui/chip"\n\n<Chip selected={on} onClick={toggle}>Fire</Chip>\n<Chip size="xs" selected={on} onClick={toggle}>Fire</Chip>`} />
+      <Preview label="scroll-row">
+        <div className="flex max-w-xs gap-2 scroll-row">
+          {[...CHIP_VALUES, "Good", "Evil", "Air", "Earth"].map((value) => (
+            <Chip key={value} className="shrink-0" selected={selected.includes(value)} onClick={() => toggle(value)}>
+              {value}
+            </Chip>
+          ))}
+        </div>
+      </Preview>
+      <CodeBlock code={`import { Chip } from "@/components/ui/chip"\n\n<Chip selected={on} onClick={toggle}>Fire</Chip>\n<Chip size="xs" selected={on} onClick={toggle}>Fire</Chip>\n\n<div className="flex gap-2 scroll-row">{chips}</div>`} />
     </CatalogEntrySection>
   );
 }

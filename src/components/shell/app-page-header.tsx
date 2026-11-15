@@ -76,7 +76,7 @@ export function AppPageHeader({
       )}
     >
       {tabs ? (
-        <div className="flex min-h-[2.25rem] min-w-0 flex-1 items-center overflow-x-auto pb-0.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div className="flex min-h-[2.25rem] min-w-0 flex-1 items-center scroll-row pb-0.5">
           {tabs}
         </div>
       ) : null}

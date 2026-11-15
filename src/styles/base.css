@@ -94,6 +94,7 @@
 
     --chrome-focus-ring-color: var(--ring);
     --chrome-focus-shadow: 0 0 0 2px var(--ring);
+    --chrome-shadow-reach: 0px;
 
     --chrome-elevation-low: 0 1px 3px 0 oklch(0 0 0 / 0.06);
     --chrome-elevation-mid: 0 4px 12px -2px oklch(0 0 0 / 0.1);
@@ -257,6 +258,7 @@
     --shadow-2xl: 3px 3px 0 0 color-mix(in srgb, var(--primary) 100%, transparent);
 
     --chrome-focus-shadow: 3px 3px 0 0 color-mix(in srgb, var(--primary) 45%, transparent);
+    --chrome-shadow-reach: 4px;
 
     --chrome-button-shadow-default: var(--shadow-xs);
     --chrome-button-shadow-default-hover: var(--shadow-sm);
@@ -307,6 +309,7 @@
   :root:is([data-chrome="expressive"], [data-chrome="holoterminal"]) {
     --chrome-focus-ring-color: var(--primary);
     --chrome-focus-shadow: 0 0 0 2px var(--primary), 0 0 12px oklch(from var(--primary) l c h / 0.4);
+    --chrome-shadow-reach: 0px;
 
     --chrome-elevation-low: 0 2px 8px -2px oklch(from var(--primary) l c h / 0.15), 0 0 4px oklch(from var(--primary) l c h / 0.08);
     --chrome-elevation-mid: 0 4px 16px -2px oklch(from var(--primary) l c h / 0.25), 0 0 12px oklch(from var(--primary) l c h / 0.12);
@@ -531,6 +534,17 @@
 @utility chrome-label-case {
   text-transform: var(--chrome-label-transform, none);
   letter-spacing: var(--chrome-label-letter-spacing, normal);
+}
+
+@utility scroll-row {
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  padding-block-end: var(--chrome-shadow-reach);
+  padding-inline-end: var(--chrome-shadow-reach);
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 @utility rounded-tab-tl {
