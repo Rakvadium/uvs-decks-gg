@@ -2,13 +2,16 @@
 
 import type { ReactNode } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { X } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Kicker, PageHeading } from "@/components/ui/typography-headings";
+import { useBrand } from "@/games/game-context";
 import { CHROME_OPTIONS, COLOR_PRESET_OPTIONS } from "@/providers/ColorSchemeProvider";
 import { CatalogAppearanceProvider, useCatalogAppearance } from "./appearance/context";
 import type { CatalogOverride } from "./appearance/params";
+import { AppearanceSheet } from "./appearance/sheet";
 import { AppearanceLinkActions, AppearanceSwitcher } from "./appearance/switcher";
 import { ThemeTiles } from "./appearance/theme-tiles";
 import { ChapterSection } from "./chapter";
@@ -29,6 +32,7 @@ import type { ChapterId } from "./registry";
 import type { CatalogSource } from "./source/read";
 import { CatalogEntrySection } from "./specimen/entry";
 import { Code, CodeBlock } from "./specimen/code-block";
+import { NEUTRAL_OUTLINE } from "./chrome-tone";
 
 const UI_FILE_COUNT = new Set(ALL_CHAPTERS.flatMap((chapter) => chapter.entries.flatMap((entry) => entry.ui ?? []).map((ui) => ui.file))).size;
 
@@ -38,9 +42,9 @@ function Overview() {
       id="themes"
       description={
         <p>
-          Pick a preset to pin it for this page; mode and chrome are in the header. Pins live in the URL, so a link
-          reproduces exactly what you see. Nothing is saved to your account, and leaving the page restores your own
-          appearance. The reset button (↺) in the header drops the pins.
+          Pick a preset to pin it for this page; mode and chrome are in the header (under Theme on phones). Pins live in
+          the URL, so a link reproduces exactly what you see. Nothing is saved to your account, and leaving the page
+          restores your own appearance. The reset button (↺) in the header drops the pins.
         </p>
       }
     >
@@ -122,6 +126,7 @@ function CatalogLayout({ source }: { source: CatalogSource }) {
   const chapters = focus ? ALL_CHAPTERS.filter((chapter) => chapter.id === focus) : ALL_CHAPTERS;
   const active = useActiveEntry(focus);
   const focused = focus ? ALL_CHAPTERS.find((chapter) => chapter.id === focus) : null;
+  const brand = useBrand();
 
   return (
     <div id="top" className="min-h-dvh bg-background text-foreground">
@@ -132,24 +137,34 @@ function CatalogLayout({ source }: { source: CatalogSource }) {
         Skip to the catalog
       </a>
       <header className="sticky top-0 z-sticky border-b border-hairline bg-background-elevated backdrop-blur-sm">
-        <div className="mx-auto flex max-w-[90rem] flex-wrap items-center gap-x-4 gap-y-2.5 px-4 py-3 md:px-6">
-          <div className="order-1 mr-auto flex min-w-0 items-center gap-2.5">
-            <Image src="/brand-mark.svg" alt="" width={28} height={28} className="size-7 shrink-0" priority />
-            <div className="min-w-0">
+        {/* One row at every width: below lg the switchers fold into the Theme sheet. */}
+        <div className="mx-auto flex max-w-[90rem] items-center gap-2 px-4 py-2.5 sm:gap-3 md:px-6 lg:gap-4 lg:py-3">
+          <div className="mr-auto flex items-center gap-2 sm:gap-2.5">
+            <Link
+              href="/"
+              aria-label={`Back to ${brand.title}`}
+              title="Back to the app"
+              className="shrink-0 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            >
+              <Image src="/brand-mark.svg" alt="" width={28} height={28} className="size-7" priority />
+            </Link>
+            <div>
               <Kicker size="meta" className="block leading-tight">
-                UVSDECKS.GG
+                {brand.title}
               </Kicker>
-              <PageHeading size="sm" className="truncate text-base leading-tight">
+              <PageHeading size="sm" className="text-base leading-tight">
                 Design system
               </PageHeading>
             </div>
           </div>
-          {/* Phones: brand · links · Sections, then the selects on their own row. lg: one row. */}
-          <AppearanceLinkActions className="order-2 lg:order-4" />
-          <div className="order-3 lg:hidden">
+          <div className="hidden items-center gap-4 lg:flex">
+            <AppearanceSwitcher />
+            <AppearanceLinkActions />
+          </div>
+          <div className="flex shrink-0 items-center gap-2 lg:hidden">
+            <AppearanceSheet />
             <MobileSectionsSheet chapters={chapters} active={active} />
           </div>
-          <AppearanceSwitcher className="order-4 w-full lg:order-3 lg:w-auto" />
         </div>
       </header>
 
@@ -169,7 +184,7 @@ function CatalogLayout({ source }: { source: CatalogSource }) {
                 <span className="text-muted-foreground">
                   <Code>?focus={focused.id}</Code> isolates one chapter for review and captures.
                 </span>
-                <Button size="sm" variant="outline" onClick={() => setFocus(null)}>
+                <Button size="sm" variant="outline" className={NEUTRAL_OUTLINE} onClick={() => setFocus(null)}>
                   <X />
                   Show the whole catalog
                 </Button>

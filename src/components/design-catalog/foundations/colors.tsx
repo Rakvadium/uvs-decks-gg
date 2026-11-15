@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { converter, parse, wcagContrast } from "culori";
+import { wcagContrast } from "culori";
 import { Badge } from "@/components/ui/badge";
 import { Kicker } from "@/components/ui/typography-headings";
 import { COLOR_PRESET_OPTIONS } from "@/providers/ColorSchemeProvider";
@@ -10,6 +10,7 @@ import { readRootToken, useRootSnapshot } from "../appearance/root-store";
 import { useCatalogAppearance } from "../appearance/context";
 import type { ColorTokenSource } from "../source/read";
 import { CatalogEntrySection } from "../specimen/entry";
+import { formatOklch } from "./css-values";
 import { Code, CodeBlock } from "../specimen/code-block";
 
 const GROUPS: { label: string; match: RegExp; usage: string }[] = [
@@ -28,16 +29,6 @@ const GROUPS: { label: string; match: RegExp; usage: string }[] = [
   { label: "Charts", match: /^--chart-/, usage: "fill-chart-1" },
   { label: "Sidebar", match: /^--sidebar/, usage: "bg-sidebar text-sidebar-foreground" },
 ];
-
-const toOklch = converter("oklch");
-
-function asOklch(value: string): string | null {
-  if (!value || value.startsWith("oklch(")) return null;
-  const color = parse(value);
-  if (!color) return null;
-  const { l, c, h } = toOklch(color);
-  return `oklch(${l.toFixed(3)} ${c.toFixed(3)} ${(h ?? 0).toFixed(1)})`;
-}
 
 function contrastLabel(ratio: number): { text: string; tone: "success" | "warning" | "destructive" } {
   if (ratio >= 7) return { text: "AAA", tone: "success" };
@@ -71,21 +62,18 @@ function toSwatches(tokens: ColorTokenSource[]): Swatch[] {
   return swatches;
 }
 
-/** Shows the value as oklch (the CSS pipeline may hand back lab/hex), plus the computed string when it differs. */
+/** The value as oklch (see `formatOklch`). The string the browser computed is in the tooltip. */
 function TokenValue({ name, value }: { name: string; value: string }) {
-  const converted = asOklch(value);
-  const primary = converted ?? value;
+  const shown = formatOklch(value) ?? value;
   return (
     <div className="min-w-0">
       <div className="truncate text-xs font-medium normal-case tracking-normal text-foreground">{name}</div>
-      <div className="truncate text-[11px] normal-case tracking-normal text-foreground/80" title={primary || undefined}>
-        {primary || "not set by this preset"}
+      <div
+        className="truncate text-[11px] normal-case tracking-normal text-foreground/80"
+        title={value && value !== shown ? `computed ${value}` : undefined}
+      >
+        {shown || "not set by this preset"}
       </div>
-      {converted ? (
-        <div className="truncate text-[11px] normal-case tracking-normal text-muted-foreground" title={value}>
-          computed {value}
-        </div>
-      ) : null}
     </div>
   );
 }
@@ -183,7 +171,7 @@ export function ColorTokens({ tokens }: { tokens: ColorTokenSource[] }) {
               <Kicker tone="foreground" size="md">
                 {group.label}
               </Kicker>
-              {group.usage ? <Code>{group.usage}</Code> : null}
+              {group.usage ? <Code className="whitespace-normal break-words">{group.usage}</Code> : null}
             </div>
             <ul className={cn("grid gap-3", "grid-cols-[repeat(auto-fill,minmax(10.5rem,1fr))]")}>
               {group.rows.map((swatch) => (

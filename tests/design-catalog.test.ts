@@ -12,6 +12,8 @@ import { CATALOG_CHAPTERS, CHAPTER_IDS, type CatalogChapter, type UiSource } fro
 import { parseLadders, parseBlockPropertyNames } from "../src/components/design-catalog/source/parse";
 import { readCatalogSource } from "../src/components/design-catalog/source/read";
 import { LADDER_SAFELIST } from "../src/components/design-catalog/foundations/ladder-safelist";
+import { formatOklch, normalizeCssValue } from "../src/components/design-catalog/foundations/css-values";
+import { converter, formatCss, parse } from "culori";
 
 const ROOT = path.join(import.meta.dir, "..");
 const UI_DIR = path.join(ROOT, "src/components/ui");
@@ -178,5 +180,33 @@ describe("catalog never writes appearance prefs", () => {
       forbidden.filter((pattern) => pattern.test(catalogText[index])).map((pattern) => `${path.relative(ROOT, file)} ${pattern}`),
     );
     expect(hits).toEqual([]);
+  });
+});
+
+describe("catalog value readouts", () => {
+  test("dev (lab) and minified (oklch) forms of one token print the same", () => {
+    const minified = formatOklch("oklch(14.5% .014 265)");
+    expect(minified).toBe("oklch(0.145 0.014 265.0)");
+    // The same color as `next dev` computes it.
+    const lab = formatCss(converter("lab")(parse("oklch(0.145 0.014 265)")!));
+    expect(formatOklch(lab)).toBe(minified);
+  });
+
+  test("greys print no hue", () => {
+    expect(formatOklch("oklch(0.471 0 172.4)")).toBe("oklch(0.471 0 none)");
+    expect(formatOklch("oklch(0.471 0.003 172.4)")).toBe("oklch(0.471 0 none)");
+    expect(formatOklch("#ffffff")).toBe("oklch(1.000 0 none)");
+    expect(formatOklch("oklch(0.5 0.1 30 / 0.4)")).toBe("oklch(0.500 0.100 30.0 / 0.4)");
+    expect(formatOklch("var(--x)")).toBeNull();
+    expect(formatOklch("")).toBeNull();
+  });
+
+  test("shadows, radius and spacing normalize the minifier's spelling", () => {
+    expect(normalizeCssValue(".625rem")).toBe("0.625rem");
+    expect(normalizeCssValue("0.08em")).toBe(normalizeCssValue(".08em"));
+    expect(normalizeCssValue("0 1px 2px 0 #0000000d")).toBe(normalizeCssValue("0px 1px 2px 0px rgba(0,0,0,.05)"));
+    expect(normalizeCssValue("0px 1px 2px 0px rgba(0,0,0,.05)")).toBe("0 1px 2px 0 oklch(0.000 0 none / 0.05)");
+    expect(normalizeCssValue("none")).toBe("none");
+    expect(normalizeCssValue("uppercase")).toBe("uppercase");
   });
 });

@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import type { CatalogChapter } from "../registry";
 import { CatalogNav } from "./content";
+import { NEUTRAL_OUTLINE } from "../chrome-tone";
+import { cn } from "@/lib/utils";
 
 /** Scrolls to an entry and moves focus to its heading link, like a hash jump would. */
 export function jumpTo(id: string) {
@@ -23,7 +25,7 @@ export function MobileSectionsSheet({ chapters, active }: { chapters: readonly C
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button variant="outline" size="sm" className="lg:hidden">
+        <Button variant="outline" size="sm" className={cn(NEUTRAL_OUTLINE, "lg:hidden")}>
           <ListTree />
           Sections
         </Button>
