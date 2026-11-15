@@ -22,7 +22,6 @@ export type ControlLeftover = { line: number; text: string; message: string };
 
 export type ControlPass = "buttons" | "inputs";
 
-// Button has icon twins; Input and SelectTrigger take a plain size and keep their width.
 const PASS_TAGS: Record<ControlPass, Record<string, { icons: boolean }>> = {
   buttons: { Button: { icons: true } },
   inputs: { Input: { icons: false }, SelectTrigger: { icons: false } },
@@ -157,7 +156,6 @@ export function rewriteControlSizes(code: string, filename: string, pass: Contro
     rewrites.push({ line, from: `${fromSize} ${removed.join(" ")}`, to: `size="${nextSize}"` });
   }
 
-  // One attribute per line stays one attribute per line.
   function insertSize(element: ts.JsxOpeningLikeElement, text: string): Edit {
     const first = element.attributes.properties[0];
     const tagLine = source.getLineAndCharacterOfPosition(element.tagName.getEnd()).line;
