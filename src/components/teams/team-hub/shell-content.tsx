@@ -45,7 +45,7 @@ export function TeamHubShellContent({ teamId, children }: TeamHubShellContentPro
 
   const mobileBranding = loading ? (
     <div className="flex flex-wrap items-start gap-4">
-      <Skeleton className="h-24 w-24 shrink-0 rounded-2xl" />
+      <Skeleton className="h-24 w-24 shrink-0 rounded-xl" />
       <div className="min-w-0 flex-1 space-y-2 pt-1">
         <Skeleton className="h-8 w-48 max-w-full" />
       </div>

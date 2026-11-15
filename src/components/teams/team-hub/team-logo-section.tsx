@@ -35,7 +35,7 @@ export function TeamLogoSection({ teamId, presentation }: TeamLogoSectionProps) 
       />
       <div
         className={cn(
-          "relative flex h-24 w-24 items-center justify-center overflow-hidden rounded-2xl border border-surface bg-muted-soft",
+          "relative flex h-24 w-24 items-center justify-center overflow-hidden rounded-xl border border-surface bg-muted-soft",
           "shadow-[var(--chrome-shell-nav-active-shadow)]",
         )}
       >
