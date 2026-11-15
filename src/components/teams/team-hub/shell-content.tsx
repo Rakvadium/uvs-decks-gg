@@ -12,6 +12,7 @@ import { TeamHubFloatingTopBar } from "./floating-top-bar";
 import { TeamHubPrimaryActionProvider } from "./primary-action-context";
 import { TeamHubSectionNav } from "./team-hub-section-nav";
 import { TeamLogoSection } from "./team-logo-section";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface TeamHubShellContentProps {
   teamId: string;
@@ -44,9 +45,9 @@ export function TeamHubShellContent({ teamId, children }: TeamHubShellContentPro
 
   const mobileBranding = loading ? (
     <div className="flex flex-wrap items-start gap-4">
-      <div className="h-24 w-24 shrink-0 animate-pulse rounded-2xl bg-muted" />
+      <Skeleton className="h-24 w-24 shrink-0 rounded-2xl" />
       <div className="min-w-0 flex-1 space-y-2 pt-1">
-        <div className="h-8 w-48 max-w-full animate-pulse rounded-md bg-muted" />
+        <Skeleton className="h-8 w-48 max-w-full" />
       </div>
     </div>
   ) : team && id ? (

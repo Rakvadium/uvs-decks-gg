@@ -42,7 +42,7 @@ function DeckFormatLegalityBadgeContent({
 
   if (validation === undefined) {
     return (
-      <Badge variant="outline" className={cn(compact ? "h-8 text-[10px]" : "text-[10px]", className)}>
+      <Badge variant="outline" size={compact ? "lg" : "sm"} className={className}>
         {label}
       </Badge>
     );
@@ -57,7 +57,7 @@ function DeckFormatLegalityBadgeContent({
     !validation.isValid ? "destructive" : validation.warnings.length > 0 ? "outline" : "cyber";
 
   const badge = (
-    <Badge variant={variant} className={cn("cursor-default", compact ? "h-8 text-[10px]" : "text-[10px]", className)}>
+    <Badge variant={variant} size={compact ? "lg" : "sm"} className={cn("cursor-default", className)}>
       {label}
     </Badge>
   );

@@ -39,6 +39,7 @@ import {
 } from "@/components/ui/table";
 import { useTeamHub } from "./hook";
 import { useRegisterTeamHubPrimaryAction } from "./primary-action-context";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const ROLE_LABEL: Record<string, string> = {
   captain: "Captain",
@@ -146,8 +147,8 @@ export function TeamHubMembersContent({ teamId }: TeamHubMembersContentProps) {
   if (data === undefined) {
     return (
       <div className="space-y-3">
-        <div className="h-6 w-40 animate-pulse rounded-md bg-muted" />
-        <div className="h-32 w-full animate-pulse rounded-md bg-muted-overlay" />
+        <Skeleton className="h-6 w-40" />
+        <Skeleton className="h-32 w-full" />
       </div>
     );
   }

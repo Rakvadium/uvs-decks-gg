@@ -17,7 +17,7 @@ export function CreatorProgramHeroSpotlightCard() {
           <div>
             <div className="flex items-center gap-2">
               <p className="text-sm font-semibold">NovaEdge</p>
-              <Badge variant="secondary" className="text-[10px]">
+              <Badge size="sm" variant="secondary">
                 Verified
               </Badge>
             </div>
@@ -26,13 +26,13 @@ export function CreatorProgramHeroSpotlightCard() {
         </div>
 
         <div className="flex flex-wrap gap-2">
-          <Badge variant="outline" className="text-[10px]">
+          <Badge size="sm" variant="outline">
             Meta Briefing
           </Badge>
-          <Badge variant="outline" className="text-[10px]">
+          <Badge size="sm" variant="outline">
             Deck Spotlight
           </Badge>
-          <Badge variant="outline" className="text-[10px]">
+          <Badge size="sm" variant="outline">
             Matchup Lab
           </Badge>
         </div>

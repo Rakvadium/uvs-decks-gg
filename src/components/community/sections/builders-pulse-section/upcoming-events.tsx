@@ -7,7 +7,7 @@ export function CommunityUpcomingEvents() {
     <div id="community-events" className="space-y-3">
       <div className="chrome-label-case flex items-center justify-between text-xs text-muted-foreground">
         <span>Upcoming</span>
-        <Badge variant="outline" className="text-[10px]">
+        <Badge size="sm" variant="outline">
           Events
         </Badge>
       </div>

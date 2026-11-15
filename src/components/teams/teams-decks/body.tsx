@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/table";
 import { useProfanityDisplayText } from "@/lib/moderation/use-profanity-display-text";
 import { useTeamsIndex } from "../teams-index/hook";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const COLLAB_LABEL: Record<string, string> = {
   team_viewable: "View only",
@@ -51,8 +52,8 @@ export function TeamsDecksBody() {
   if (loadingTeams) {
     return (
       <div className="space-y-3">
-        <div className="h-8 w-48 animate-pulse rounded-md bg-muted" />
-        <div className="mt-4 h-32 w-full animate-pulse rounded-md bg-muted-overlay" />
+        <Skeleton className="h-8 w-48" />
+        <Skeleton className="mt-4 h-32 w-full" />
       </div>
     );
   }
@@ -76,9 +77,9 @@ export function TeamsDecksBody() {
   if (loading) {
     return (
       <div className="space-y-3">
-        <div className="h-8 w-56 animate-pulse rounded-md bg-muted" />
-        <div className="h-10 w-full max-w-sm animate-pulse rounded-md bg-muted-elevated" />
-        <div className="h-32 w-full animate-pulse rounded-md bg-muted-overlay" />
+        <Skeleton className="h-8 w-56" />
+        <Skeleton className="h-10 w-full max-w-sm" />
+        <Skeleton className="h-32 w-full" />
       </div>
     );
   }

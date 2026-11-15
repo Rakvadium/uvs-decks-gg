@@ -1,6 +1,7 @@
 "use client";
 
 import type { ComponentPropsWithoutRef, ReactNode } from "react";
+import { CountBadge } from "@/components/ui/count-badge";
 import { cn } from "@/lib/utils";
 import { MOBILE_TAB_ACT_SIZE_CLASS } from "./metrics";
 
@@ -42,12 +43,7 @@ export function MobileActButton({
     >
       {children}
       {showBadge ? (
-        <span
-          aria-hidden
-          className="absolute right-1.5 top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold leading-none text-primary-foreground shadow-[var(--chrome-floating-shadow)]"
-        >
-          {badge}
-        </span>
+        <CountBadge aria-hidden count={badge} className="absolute right-1.5 top-1.5 shadow-[var(--chrome-floating-shadow)]" />
       ) : null}
     </button>
   );

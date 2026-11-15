@@ -4,8 +4,9 @@ import { Linter } from "eslint";
 import design, { designRules } from "../../tools/eslint-design/index.mjs";
 import parser from "../../tools/eslint-design/parser.mjs";
 import { rewriteButtonSizes } from "./button-sizes";
+import { rewriteSurfaces } from "./surfaces";
 
-const USAGE = `Usage: bun run design:codemod [--dry] [--buttons] <path>...
+const USAGE = `Usage: bun run design:codemod [--dry] [--buttons | --surfaces] <path>...
 
 Applies the mechanical design-system rewrites (docs/UI_UX_DESIGN.md § Named utilities) to
 class strings in files under the given paths, and lists what is left for human judgment:
@@ -14,6 +15,8 @@ class strings in files under the given paths, and lists what is left for human j
   - raw z-30 ... z-[600] -> named z utilities
   - <Button> h-*, w-*, size-* and rounded-* overrides -> the Button size ladder (xs/sm/md/lg, icon-*)
 Only files under <path> are read or written. --dry writes nothing. --buttons runs only the <Button> pass.
+--surfaces runs only the surface pass: <Badge> text-[10px]/h-5 -> size="sm", h-8 -> size="lg", and
+self-closing animate-pulse divs on a muted fill -> <Skeleton>.
 Exit 0 done, 1 a file could not be parsed, 2 bad usage.`;
 
 const EXTENSIONS = new Set([".ts", ".tsx", ".js", ".jsx", ".mjs", ".mts"]);
@@ -41,9 +44,13 @@ function lineStarts(code: string): number[] {
 }
 
 /** Rewrites one file's source. Pure: same input, same output; output is a fixed point. */
-export function transformSource(source: string, filename: string, { buttonsOnly = false } = {}): TransformResult {
+export function transformSource(source: string, filename: string, { buttonsOnly = false, surfacesOnly = false } = {}): TransformResult {
   // ESLint drops a BOM and reports offsets without it; put it back after rewriting.
   const bom = source.startsWith("﻿") ? "﻿" : "";
+  if (surfacesOnly) {
+    const surfaces = rewriteSurfaces(bom ? source.slice(1) : source, filename);
+    return { output: bom + surfaces.output, rewrites: surfaces.rewrites, left: surfaces.left.map((l) => ({ ...l, rule: "surface/left" })) };
+  }
   const buttons = rewriteButtonSizes(bom ? source.slice(1) : source, filename);
   const buttonLeft = buttons.left.map((l) => ({ line: l.line, rule: "button/size-override", text: l.text, message: l.message }));
   if (buttonsOnly) return { output: bom + buttons.output, rewrites: buttons.rewrites, left: buttonLeft };
@@ -110,10 +117,12 @@ export function run(argv: string[], options: RunOptions = {}): number {
 
   let dry = false;
   let buttonsOnly = false;
+  let surfacesOnly = false;
   const targets: string[] = [];
   for (const arg of argv) {
     if (arg === "--dry") dry = true;
     else if (arg === "--buttons") buttonsOnly = true;
+    else if (arg === "--surfaces") surfacesOnly = true;
     else if (arg === "--help" || arg === "-h") {
       out(USAGE);
       return 0;
@@ -148,7 +157,7 @@ export function run(argv: string[], options: RunOptions = {}): number {
 
   for (const file of [...files].sort()) {
     const code = fs.readFileSync(file, "utf8");
-    const result = transformSource(code, file, { buttonsOnly });
+    const result = transformSource(code, file, { buttonsOnly, surfacesOnly });
     if (result.fatal) {
       err(`${rel(file)}: parse error ${result.fatal}; skipped`);
       failed++;

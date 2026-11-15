@@ -131,7 +131,7 @@ export function CommunityTierListDetailTopBar() {
       </DropdownMenuContent>
     </DropdownMenu>
   ) : (
-    <Badge variant={isPublic ? "default" : "outline"} className="hidden h-8 items-center gap-1.5 px-2.5 text-[10px] sm:inline-flex">
+    <Badge size="lg" variant={isPublic ? "default" : "outline"} className="hidden sm:inline-flex">
       {isPublic ? <Globe className="h-3 w-3" /> : <Lock className="h-3 w-3" />}
       {displayPublicity}
     </Badge>
@@ -157,7 +157,7 @@ export function CommunityTierListDetailTopBar() {
       </DropdownMenuContent>
     </DropdownMenu>
   ) : (
-    <Badge variant="outline" className="hidden h-8 items-center gap-1.5 px-2.5 text-[10px] sm:inline-flex">
+    <Badge size="lg" variant="outline" className="hidden sm:inline-flex">
       {rankingScopeLabel}
     </Badge>
   );

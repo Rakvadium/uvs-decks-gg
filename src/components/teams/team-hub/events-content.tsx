@@ -23,6 +23,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useTeamHub } from "./hook";
 import { useRegisterTeamHubPrimaryAction } from "./primary-action-context";
+import { Skeleton } from "@/components/ui/skeleton";
 
 function formatRange(starts: number, ends: number | undefined) {
   const a = new Date(starts);
@@ -117,8 +118,8 @@ export function TeamHubEventsContent({ teamId }: TeamHubEventsContentProps) {
   if (caps === undefined || events === undefined) {
     return (
       <div className="space-y-3">
-        <div className="h-6 w-28 animate-pulse rounded-md bg-muted" />
-        <div className="h-40 w-full animate-pulse rounded-md bg-muted-overlay" />
+        <Skeleton className="h-6 w-28" />
+        <Skeleton className="h-40 w-full" />
       </div>
     );
   }

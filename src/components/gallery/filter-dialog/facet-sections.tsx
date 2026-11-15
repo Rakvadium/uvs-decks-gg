@@ -57,7 +57,7 @@ export function TagsSection() {
         {selected.length > 0 ? (
           <div className="flex flex-wrap gap-1">
             {selected.map((tag) => (
-              <Badge key={`tag-selected-${tag}`} variant="outline" className="px-1.5 py-0.5 text-[10px]">
+              <Badge size="sm" key={`tag-selected-${tag}`} variant="outline">
                 {tag}
               </Badge>
             ))}

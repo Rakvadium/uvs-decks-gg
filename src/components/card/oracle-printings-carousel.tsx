@@ -8,6 +8,7 @@ import type { CachedCard } from "@/lib/universus/card-store";
 import { cn } from "@/lib/utils";
 import { useGameId } from "@/games/game-context";
 import { useCardCatalog } from "@/lib/universus/card-data-provider";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface OraclePrintingsCarouselProps {
   oracleId: string | undefined;
@@ -49,9 +50,9 @@ export function OraclePrintingsCarousel({
         <div className="flex w-max max-w-full gap-2 overflow-x-auto overflow-y-hidden pb-1 [scrollbar-width:thin]">
           {printings === undefined
             ? Array.from({ length: 4 }).map((_, i) => (
-                <div
+                <Skeleton
                   key={i}
-                  className="h-[72px] w-[52px] shrink-0 animate-pulse rounded-lg bg-muted/50"
+                  className="h-[72px] w-[52px] shrink-0 rounded-lg"
                 />
               ))
             : items.map((c) => {

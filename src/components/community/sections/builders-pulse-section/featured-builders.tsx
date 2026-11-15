@@ -22,7 +22,7 @@ function FeaturedBuilderCard({ index }: { index: number }) {
             <div>
               <div className="flex items-center gap-2">
                 <p className="text-sm font-semibold">{creator.name}</p>
-                <Badge variant="secondary" className="text-[10px]">
+                <Badge size="sm" variant="secondary">
                   Featured
                 </Badge>
               </div>
@@ -30,7 +30,7 @@ function FeaturedBuilderCard({ index }: { index: number }) {
             </div>
           </div>
 
-          <Badge variant="outline" className="text-[10px]">
+          <Badge size="sm" variant="outline">
             {creator.status}
           </Badge>
         </div>
@@ -42,7 +42,7 @@ function FeaturedBuilderCard({ index }: { index: number }) {
 
         <div className="flex flex-wrap gap-2">
           {creator.tags.map((tag) => (
-            <Badge key={tag} variant="outline" className="text-[10px]">
+            <Badge size="sm" key={tag} variant="outline">
               {tag}
             </Badge>
           ))}

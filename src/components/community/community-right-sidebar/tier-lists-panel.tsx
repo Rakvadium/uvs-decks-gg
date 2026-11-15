@@ -67,7 +67,7 @@ export function CommunityTierListsSidebarPanel() {
                           {author?.username ?? "Community"}
                         </span>
                         <TierListModerationBadge status={listModerationStatus} className="h-5 px-1.5 text-[10px]" />
-                        <Badge variant="outline" className="h-5 px-1.5 text-[10px] font-normal">
+                        <Badge size="sm" variant="outline" className="font-normal">
                           {getTierListScopeLabel(tierList.rankingScope)}
                         </Badge>
                         <span className="chrome-label-case text-[10px] text-muted-foreground">
@@ -112,11 +112,11 @@ export function CommunityTierListsSidebarPanel() {
                             className="h-5 px-1.5 text-[10px]"
                           />
                         ) : (
-                          <Badge variant={tierList.isPublic ? "default" : "outline"} className="h-5 px-1.5 text-[10px]">
+                          <Badge size="sm" variant={tierList.isPublic ? "default" : "outline"}>
                             {tierList.isPublic ? "Public" : "Private"}
                           </Badge>
                         )}
-                        <Badge variant="outline" className="h-5 px-1.5 text-[10px] font-normal">
+                        <Badge size="sm" variant="outline" className="font-normal">
                           {getTierListScopeLabel(tierList.rankingScope)}
                         </Badge>
                         <span className="chrome-label-case text-[10px] text-muted-foreground">

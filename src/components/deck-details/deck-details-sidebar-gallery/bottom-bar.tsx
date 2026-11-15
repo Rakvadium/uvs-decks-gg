@@ -1,6 +1,6 @@
 import { LayoutGrid, List, Search, SlidersHorizontal, X } from "lucide-react";
 import { ViewModeOptions } from "@/components/gallery/gallery-top-bar-filters/view-mode-popover";
-import { Badge } from "@/components/ui/badge";
+import { CountBadge } from "@/components/ui/count-badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -59,12 +59,7 @@ export function DeckDetailsGallerySidebarBottomBar() {
         >
           <SlidersHorizontal className="size-4" />
           {meta.activeFilterCount > 0 ? (
-            <Badge
-              variant="secondary"
-              className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center px-1 text-[10px]"
-            >
-              {meta.activeFilterCount}
-            </Badge>
+            <CountBadge count={meta.activeFilterCount} className="absolute -right-1 -top-1" />
           ) : null}
         </button>
 

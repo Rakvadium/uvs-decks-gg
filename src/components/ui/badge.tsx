@@ -37,7 +37,7 @@ const badgeVariants = cva(
       size: {
         sm: "h-5 px-1.5 text-[10px]",
         md: "px-2.5 py-0.5 text-xs",
-        lg: "h-(--control-h-sm) px-3 text-xs",
+        lg: "h-(--control-h-sm) rounded-island px-3 text-xs",
       },
       interactive: {
         true: "cursor-pointer transition-[color,border-color,box-shadow] duration-200",

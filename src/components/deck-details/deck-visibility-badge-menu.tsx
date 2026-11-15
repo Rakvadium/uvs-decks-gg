@@ -11,7 +11,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { cn } from "@/lib/utils";
 import {
   type DeckTeamSharing,
   type DeckVisibility,
@@ -104,7 +103,6 @@ interface DeckVisibilityBadgeMenuProps {
   editTeamCollaboration: DeckTeamSharing;
   onSelect: (value: DeckVisibility) => void;
   onSelectTeamSharing?: (mode: DeckTeamSharing) => void;
-  compact?: boolean;
   canSetTournamentVisibility?: boolean;
   canSetTeamVisibility?: boolean;
   readOnly?: boolean;
@@ -118,7 +116,6 @@ export function DeckVisibilityBadgeMenu({
   editTeamCollaboration,
   onSelect,
   onSelectTeamSharing,
-  compact = false,
   canSetTournamentVisibility = false,
   canSetTeamVisibility = false,
   readOnly = false,
@@ -140,12 +137,8 @@ export function DeckVisibilityBadgeMenu({
   const publicityBadge = (
     <Badge
       variant={visibilityBadgeVariant(displayVisibility)}
-      className={cn(
-        compact
-          ? "h-8 shrink-0 items-center gap-1.5 px-2.5 text-[10px] sm:inline-flex"
-          : "h-8 shrink-0 items-center gap-1.5 px-2.5 text-[10px] inline-flex",
-        isOwner && !readOnly && "cursor-pointer",
-      )}
+      size="lg"
+      interactive={isOwner && !readOnly}
     >
       {badgeGlyph}
       {badgeLabel}

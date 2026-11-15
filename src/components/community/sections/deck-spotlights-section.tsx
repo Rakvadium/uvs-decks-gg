@@ -50,7 +50,7 @@ export function CommunityDeckSpotlightsSection() {
               <Card className="h-full cursor-pointer transition-colors hover:bg-accent/40">
                 <CardHeader className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <Badge tone="entity" className="text-[10px]">
+                    <Badge size="sm" tone="entity">
                       Spotlight
                     </Badge>
                     <span className="chrome-label-case text-[10px] text-muted-foreground">

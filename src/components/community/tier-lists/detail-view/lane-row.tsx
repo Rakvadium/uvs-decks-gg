@@ -116,7 +116,7 @@ export function CommunityTierListLaneRow({ tier }: { tier: BuilderTier }) {
           ) : null}
         </div>
 
-        <Badge variant="outline" className="ml-auto h-5 shrink-0 px-2 text-[10px]">
+        <Badge size="sm" variant="outline" className="ml-auto shrink-0 px-2">
           {cardIds.length} cards
         </Badge>
       </div>

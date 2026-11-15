@@ -6,7 +6,7 @@ export function CommunityPulsePosts() {
     <div className="space-y-3">
       <div className="chrome-label-case flex items-center justify-between text-xs text-muted-foreground">
         <span>Top Posts</span>
-        <Badge variant="default" className="text-[10px]">
+        <Badge size="sm" variant="default">
           Live
         </Badge>
       </div>

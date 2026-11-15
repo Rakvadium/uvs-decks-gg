@@ -97,7 +97,7 @@ export function TierListBrowserCard({
             <span>{tierList.itemCount} cards</span>
             <span>{tierList.tierCount} tiers</span>
             {tierList.selectedSetCodes.slice(0, 2).map((setCode) => (
-              <Badge key={setCode} variant="outline" className="text-[10px]">
+              <Badge size="sm" key={setCode} variant="outline">
                 {setCode}
               </Badge>
             ))}

@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/table";
 import { useProfanityDisplayText } from "@/lib/moderation/use-profanity-display-text";
 import { useTeamHub } from "./hook";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const COLLAB_LABEL: Record<string, string> = {
   team_viewable: "View only",
@@ -57,8 +58,8 @@ export function TeamHubDecksContent({ teamId }: TeamHubDecksContentProps) {
   if (data === undefined) {
     return (
       <div className="space-y-3">
-        <div className="h-6 w-48 animate-pulse rounded-md bg-muted" />
-        <div className="h-32 w-full animate-pulse rounded-md bg-muted-overlay" />
+        <Skeleton className="h-6 w-48" />
+        <Skeleton className="h-32 w-full" />
       </div>
     );
   }

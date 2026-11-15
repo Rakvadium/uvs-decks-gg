@@ -34,7 +34,7 @@ function CardPreviewSection({ title, description, icon, badge, children, classNa
           <div className="flex items-center gap-2">
             <SectionHeading as="h3" size="xs">{title}</SectionHeading>
             {badge && (
-              <Badge variant="outline" className="h-4 px-1.5 text-[10px]">
+              <Badge size="sm" variant="outline">
                 {badge}
               </Badge>
             )}

@@ -666,7 +666,7 @@ export default function SettingsPageClient() {
                       <CollapsibleTrigger className="flex w-full items-center gap-2 rounded-lg border border-border/50 px-3 py-2 text-left text-sm font-medium hover:bg-muted/60 [&[data-state=open]_svg:first-child]:rotate-180">
                         <ChevronDown className="h-4 w-4 shrink-0 transition-transform" />
                         Per-chrome color overrides
-                        <Badge variant="secondary" className="ml-auto text-[10px]">
+                        <Badge size="sm" variant="secondary" className="ml-auto">
                           Advanced
                         </Badge>
                       </CollapsibleTrigger>
@@ -691,7 +691,7 @@ export default function SettingsPageClient() {
                                     <div className="flex flex-wrap items-center gap-2">
                                       <p className="text-sm font-medium">{opt.label}</p>
                                       {hasOverride ? (
-                                        <Badge variant="outline" className="text-[10px]">
+                                        <Badge size="sm" variant="outline">
                                           Override
                                         </Badge>
                                       ) : (

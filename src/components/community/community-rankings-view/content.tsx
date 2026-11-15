@@ -79,7 +79,7 @@ export function CommunityRankingsView({ embedded = false }: CommunityRankingsVie
                     >
                       <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <div className="flex flex-wrap items-center gap-2">
-                          <Badge variant="outline" className="text-[10px]">
+                          <Badge size="sm" variant="outline">
                             {tier.label}
                           </Badge>
                           <span className="text-xs text-muted-foreground">

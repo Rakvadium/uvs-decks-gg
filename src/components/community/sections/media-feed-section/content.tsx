@@ -204,7 +204,7 @@ export function CommunityMediaFeedSection({ media }: { media: GameCommunityMedia
               <div className="pointer-events-none absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
 
               <div className="relative z-[1] flex flex-wrap items-center justify-between gap-3">
-                <Badge variant="secondary" className="border border-border/50 bg-background/80 text-[10px]">
+                <Badge size="sm" variant="secondary" className="border border-border/50 bg-background/80">
                   {activeVideo.youtubeVideoId === featuredVideo.youtubeVideoId ? "Featured drop" : "Now playing"}
                 </Badge>
                 <div className="chrome-label-case text-[10px] text-muted-foreground">
@@ -344,7 +344,7 @@ export function CommunityMediaFeedSection({ media }: { media: GameCommunityMedia
                     ) : null}
                   </div>
                   {video.editorialLabel ? (
-                    <Badge variant="secondary" className="w-fit bg-primary/10 px-1.5 py-0 text-[10px] leading-4 text-primary">
+                    <Badge size="sm" variant="secondary" className="w-fit bg-primary/10 leading-4 text-primary">
                       {video.editorialLabel}
                     </Badge>
                   ) : null}

@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useProfanityDisplayText } from "@/lib/moderation/use-profanity-display-text";
 import { useTeamHub } from "./hook";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface TeamHubChatContentProps {
   teamId: string;
@@ -72,8 +73,8 @@ export function TeamHubChatContent({ teamId }: TeamHubChatContentProps) {
   if (caps === undefined || (isLoading && results.length === 0)) {
     return (
       <div className="space-y-3">
-        <div className="h-6 w-32 animate-pulse rounded-md bg-muted" />
-        <div className="h-64 w-full animate-pulse rounded-md bg-muted-overlay" />
+        <Skeleton className="h-6 w-32" />
+        <Skeleton className="h-64 w-full" />
       </div>
     );
   }

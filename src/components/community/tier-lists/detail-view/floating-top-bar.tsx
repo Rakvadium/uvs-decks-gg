@@ -84,7 +84,7 @@ export function CommunityTierListDetailFloatingTopBar() {
       </DropdownMenuContent>
     </DropdownMenu>
   ) : (
-    <Badge variant={isPublic ? "default" : "outline"} className="h-8 shrink-0 items-center gap-1.5 rounded-island px-2.5 text-[10px]">
+    <Badge size="lg" variant={isPublic ? "default" : "outline"} className="shrink-0">
       {isPublic ? <Globe className="h-3 w-3" /> : <Lock className="h-3 w-3" />}
       {displayPublicity}
     </Badge>
@@ -110,7 +110,7 @@ export function CommunityTierListDetailFloatingTopBar() {
       </DropdownMenuContent>
     </DropdownMenu>
   ) : (
-    <Badge variant="outline" className="h-8 shrink-0 items-center gap-1.5 rounded-island px-2.5 text-[10px]">
+    <Badge size="lg" variant="outline" className="shrink-0">
       {rankingScopeLabel}
     </Badge>
   );

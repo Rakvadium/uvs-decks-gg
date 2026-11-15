@@ -174,7 +174,7 @@ export function DeckNameplateItem() {
           </p>
 
           <div className="mt-2 flex items-center justify-between gap-2 border-t border-border/30 pt-1.5">
-            <Badge tone={isReady ? "success" : "warning"} className="px-1.5 py-0 text-[10px]">
+            <Badge size="sm" tone={isReady ? "success" : "warning"}>
               {isReady ? "Ready" : "Building"}
             </Badge>
             {deck.format ? (

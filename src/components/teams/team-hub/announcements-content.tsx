@@ -25,6 +25,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useTeamHub } from "./hook";
 import { useRegisterTeamHubPrimaryAction } from "./primary-action-context";
 import type { TeamHubCaps } from "./team-hub-caps";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface TeamHubAnnouncementsContentProps {
   teamId: string;
@@ -99,8 +100,8 @@ export function TeamHubAnnouncementsContent({ teamId }: TeamHubAnnouncementsCont
   if (caps === undefined || pinned === undefined || (isLoading && results.length === 0)) {
     return (
       <div className="space-y-3">
-        <div className="h-6 w-40 animate-pulse rounded-md bg-muted" />
-        <div className="h-40 w-full animate-pulse rounded-md bg-muted-overlay" />
+        <Skeleton className="h-6 w-40" />
+        <Skeleton className="h-40 w-full" />
       </div>
     );
   }

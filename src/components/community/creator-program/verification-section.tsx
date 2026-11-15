@@ -73,7 +73,7 @@ export function CreatorProgramVerificationSection() {
           </CardHeader>
           <CardContent className="flex flex-wrap gap-2">
             {CONTENT_FORMATS.map((format) => (
-              <Badge key={format} variant="outline" className="text-[10px]">
+              <Badge size="sm" key={format} variant="outline">
                 {format}
               </Badge>
             ))}
