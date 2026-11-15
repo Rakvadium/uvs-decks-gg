@@ -55,7 +55,7 @@ export function UvsDeckSetupHero({
     <>
       <div
         className={cn(
-          "relative mx-auto w-full max-w-[260px] shrink-0 overflow-hidden rounded-lg bg-card shadow-[0_0_0_1px_var(--primary)/15,0_0_8px_var(--primary)/30] lg:mx-0 lg:w-48",
+          "relative mx-auto w-full max-w-[260px] shrink-0 overflow-hidden rounded-lg bg-card lg:mx-0 lg:w-48",
           compactEmptyMobile ? "aspect-auto h-24 max-lg:max-w-none" : "aspect-[2.5/3.5]",
         )}
       >
