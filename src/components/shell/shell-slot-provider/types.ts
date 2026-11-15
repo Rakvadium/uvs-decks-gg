@@ -15,7 +15,6 @@ export interface SlotRegistration {
   icon?: SlotIcon;
   iconFit?: SlotIconFit;
   mobileAccessory?: boolean;
-  header?: ComponentType;
   footer?: ComponentType;
 }
 
@@ -26,7 +25,6 @@ export interface SlotRegistrationOptions {
   icon?: SlotIcon;
   mobileAccessory?: boolean;
   iconFit?: SlotIconFit;
-  header?: ComponentType;
   footer?: ComponentType;
 }
 
