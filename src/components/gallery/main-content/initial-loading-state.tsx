@@ -8,7 +8,7 @@ export function GalleryInitializationState() {
         <div className="flex h-16 w-16 items-center justify-center rounded-xl border border-primary/30 bg-primary/5">
           <Database className="h-8 w-8 animate-pulse text-primary" />
         </div>
-        <div className="absolute -inset-4 animate-pulse rounded-2xl blur-xl" style={{ background: "var(--chrome-gallery-empty-wash)" }} />
+        <div className="absolute -inset-4 animate-pulse rounded-xl blur-xl" style={{ background: "var(--chrome-gallery-empty-wash)" }} />
       </div>
       <div className="space-y-2 text-center">
         <SectionHeading size="sm">Initializing Database</SectionHeading>

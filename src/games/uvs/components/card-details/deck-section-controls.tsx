@@ -126,7 +126,7 @@ export function DeckSectionControls({ card, layout = "vertical" }: DeckSectionCo
       <div
         className={cn(
           "pointer-events-auto absolute bottom-0 left-0 z-20 flex w-max min-w-0 max-w-full items-stretch",
-          "rounded-bl-xl rounded-tl-none rounded-tr-xl rounded-br-none",
+          "rounded-tab-tr",
           "border border-primary/25 bg-card/95 shadow-none backdrop-blur-sm"
         )}
       >

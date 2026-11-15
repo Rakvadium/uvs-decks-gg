@@ -44,7 +44,7 @@ export function CardGridItemFrame({ children }: { children: ReactNode }) {
     >
       <div
         className={cn(
-          "pointer-events-none absolute -inset-px z-0 rounded-2xl transition-opacity duration-150",
+          "pointer-events-none absolute -inset-px z-0 rounded-xl transition-opacity duration-150",
           isDragging ? "opacity-0" : isHovered ? "opacity-70" : "opacity-25"
         )}
         style={{

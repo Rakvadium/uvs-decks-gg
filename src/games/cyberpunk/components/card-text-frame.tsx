@@ -119,6 +119,7 @@ export function CyberpunkCardTextFrame({
           )}
           {card?.ram !== undefined ? (
             <span
+              // eslint-disable-next-line design/radius-ladder -- printed card: the RAM chip on the Cyberpunk card face
               className="chrome-label-case inline-flex items-baseline rounded-sm border font-bold leading-none"
               style={{
                 gap: "1cqw",
@@ -155,6 +156,7 @@ export function CyberpunkCardTextFrame({
           <div className="chrome-label-case flex flex-wrap items-center font-bold" style={{ gap: "1.5cqw", fontSize: "4cqw" }}>
             {type ? (
               <span
+                // eslint-disable-next-line design/radius-ladder -- printed card: the type chip on the Cyberpunk card face
                 className="rounded-sm border leading-none"
                 style={{ padding: "1cqw 2cqw", color: typeColor, borderColor: `${typeColor}99`, backgroundColor: `${typeColor}1f` }}
               >
@@ -177,7 +179,7 @@ export function CyberpunkCardTextFrame({
         {/* Rules text */}
         {card?.text ? (
           <div
-            // eslint-disable-next-line design/no-literal-color -- printed card: the rules-text box of the Cyberpunk card face
+            // eslint-disable-next-line design/no-literal-color, design/radius-ladder -- printed card: the rules-text box of the Cyberpunk card face
             className="min-h-0 flex-1 overflow-hidden rounded-sm border border-white/10 bg-black/35 leading-snug text-slate-200"
             style={{ padding: "2.5cqw 3cqw", fontSize: "4.2cqw" }}
           >
@@ -204,7 +206,7 @@ export function CyberpunkCardTextFrame({
           </div>
           {card?.power !== undefined ? (
             <span
-              // eslint-disable-next-line design/no-literal-color -- printed card: white power digits on the card colour
+              // eslint-disable-next-line design/no-literal-color, design/radius-ladder -- printed card: white power digits on the card colour
               className="inline-flex shrink-0 items-baseline rounded-sm font-black leading-none text-white"
               style={{
                 gap: "1.2cqw",

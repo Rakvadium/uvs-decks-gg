@@ -154,7 +154,7 @@ function ColorSwatchRow({
       <input
         aria-label={`${label} color`}
         type="color"
-        className="h-9 w-12 cursor-pointer rounded border border-input bg-background"
+        className="h-9 w-12 cursor-pointer rounded-md border border-input bg-background"
         value={safePick}
         onChange={(e) => onChange(e.target.value)}
       />
@@ -361,7 +361,7 @@ export default function SettingsPageClient() {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
               <User className="h-6 w-6 text-primary" />
             </div>
             <div>

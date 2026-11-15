@@ -28,8 +28,8 @@ export function UvsSetupSymbolSelector({
           type="button"
           aria-label="Change symbol"
           className={cn(
-            "absolute bottom-0 left-0 z-20 flex h-9 w-9 items-center justify-center",
-            "rounded-bl-lg rounded-tr-lg rounded-tl-none rounded-br-none",
+            "absolute bottom-0 left-0 z-20 flex h-9 w-9 items-center justify-center outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+            "rounded-tab-tr",
             "bg-background/80 backdrop-blur-sm",
             "border-r border-t border-border/40",
             "transition-colors hover:bg-primary/10 hover:border-primary/40"

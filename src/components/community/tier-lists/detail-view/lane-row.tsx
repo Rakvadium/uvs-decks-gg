@@ -63,7 +63,7 @@ export function CommunityTierListLaneRow({ tier }: { tier: BuilderTier }) {
     <div
       {...droppableProps}
       className={cn(
-        "rounded-2xl border px-4 py-2.5 transition-shadow transition-colors duration-150",
+        "rounded-surface border px-4 py-2.5 transition-shadow transition-colors duration-150",
         canEdit && canDrop && "shadow-[0_0_20px_-15px_var(--primary)]",
         canEdit && isOver && "ring-2 ring-primary/45"
       )}

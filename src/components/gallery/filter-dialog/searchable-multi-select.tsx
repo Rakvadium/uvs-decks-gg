@@ -95,7 +95,7 @@ export function SearchableMultiSelect({
                     >
                       <span
                         className={cn(
-                          "flex h-4 w-4 items-center justify-center rounded border",
+                          "flex h-4 w-4 items-center justify-center rounded-[4px] border",
                           selected
                             ? "border-primary bg-primary text-primary-foreground"
                             : "border-muted-foreground/55 bg-background dark:border-muted-foreground/65"
@@ -131,13 +131,13 @@ export function SearchableMultiSelect({
           {selectedLabels.slice(0, 3).map((label) => (
             <span
               key={`${triggerLabel}-${label}`}
-              className="chrome-label-case rounded border border-primary/40 bg-primary/10 px-1.5 py-0.5 text-[10px] text-primary"
+              className="chrome-label-case rounded-md border border-primary/40 bg-primary/10 px-1.5 py-0.5 text-[10px] text-primary"
             >
               {label}
             </span>
           ))}
           {selectedLabels.length > 3 ? (
-            <span className="chrome-label-case rounded border border-border/50 px-1.5 py-0.5 text-[10px] text-muted-foreground">
+            <span className="chrome-label-case rounded-md border border-border/50 px-1.5 py-0.5 text-[10px] text-muted-foreground">
               +{selectedLabels.length - 3}
             </span>
           ) : null}

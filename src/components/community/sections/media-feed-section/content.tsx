@@ -307,7 +307,7 @@ export function CommunityMediaFeedSection({ media }: { media: GameCommunityMedia
                       />
                     </div>
                     {video.rowStatus === "ok" && video.durationLabel ? (
-                      <span className="absolute bottom-1 right-1 rounded bg-scrim/70 px-1 py-px text-[10px] leading-none text-on-scrim">
+                      <span className="absolute bottom-1 right-1 rounded-md bg-scrim/70 px-1 py-px text-[10px] leading-none text-on-scrim">
                         {video.durationLabel}
                       </span>
                     ) : null}

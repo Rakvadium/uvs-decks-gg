@@ -58,7 +58,7 @@ export function UvsDeckSetupSidebar({ setup, getCard, onChange, readOnly, deckDe
                 <button
                   type="button"
                   aria-label="View starting character details"
-                  className="absolute inset-0 z-10 cursor-pointer border-0 bg-transparent p-0"
+                  className="absolute inset-0 z-10 cursor-pointer border-0 bg-transparent p-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                   onClick={handleImageClick}
                 >
                   {startingCharacter?.imageUrl ? (

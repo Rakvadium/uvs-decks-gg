@@ -22,6 +22,7 @@ export function InlineVariant({ className, ...props }: InlineVariantProps) {
         alt={cardData.name}
         width={24}
         height={24}
+        // eslint-disable-next-line design/radius-ladder -- card art avatar: a 24px crop of the card image
         className="h-6 w-6 rounded object-cover"
       />
       <span className="max-w-32 truncate">{cardData.name}</span>

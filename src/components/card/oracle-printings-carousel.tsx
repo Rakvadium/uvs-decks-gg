@@ -72,7 +72,7 @@ export function OraclePrintingsCarousel({
                     type="button"
                     aria-label={ariaLabel}
                     onClick={() => onSelectPrinting(c)}
-                    className="group flex w-[52px] shrink-0 flex-col gap-1 text-left"
+                    className="group flex w-[52px] shrink-0 flex-col gap-1 text-left outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                   >
                     <div
                       className={cn(
