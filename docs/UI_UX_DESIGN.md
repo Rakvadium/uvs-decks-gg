@@ -67,6 +67,8 @@ State is expressed with semantic tokens, never Tailwind palette hues:
 
 Inline usage follows the tone ladder: `bg-warning-wash`, `border-warning-soft`, `text-warning`. Domain colors (card symbols, stat tints) live in `src/games/uvs/config.ts` and are not status colors.
 
+Class strings carry no literal colours: no `text-white`, `bg-white` or `bg-black`, and no `rgba(…)` or `#hex` inside an arbitrary value. They ignore the chrome and the palette. `design/no-literal-color` reports them.
+
 ## Elevation
 
 Prefer theme/chrome tokens over ad-hoc `rgba`/`hsl` shadows:
@@ -85,12 +87,13 @@ Do not use `hsl(var(--border)…)` — theme borders are oklch via `var(--border
 | Controls / inputs | `rounded-md` |
 | Cards / panels | `rounded-lg` |
 | Large feature surfaces | `rounded-xl` |
-| Hero / marketing shells | `rounded-3xl` |
 | Pills / avatars | `rounded-full` |
 
 Avoid one-off `rounded-[Npx]` except micro geometry (e.g. tooltip arrows). Dialogs use this same ladder — panel `rounded-lg`, fields and footer buttons `rounded-md` — not a one-off dialog radius.
 
 Bare `rounded` and `rounded-sm` are off-ladder: `rounded` is a static 4px that ignores the chrome `--radius`, so it drifts from every other control. Badges, tooltips, and segmented controls are `rounded-md`. Buttons take their radius from `shape` ([Buttons](#buttons)).
+
+`rounded-2xl` and larger are off-ladder too. Use `rounded-surface` or `rounded-xl`. Corner-only forms such as `rounded-tl-lg rounded-br-lg` hand-build a notch shape; round every corner instead. Side forms such as `rounded-t-xl` are fine. `design/radius-ladder` reports all of these.
 
 ## Role tokens
 
@@ -112,7 +115,7 @@ Inside one chrome, `--radius-cta` and `--radius-island` hold one value. The sele
 
 ## Buttons
 
-`Button` reads its height and radius from the role tokens, so a call site never passes `h-*`, `w-*`, `size-*` or `rounded-*`.
+`Button` reads its height and radius from the role tokens, so a call site never passes `h-*`, `w-*`, `size-*` or `rounded-*`. The same holds for `Badge`, `Input` and `SelectTrigger`. `design/primitive-geometry` reports `h-*`, `size-*` and `rounded-*` (role radii included) in the `className` of any of the four. A raw `<button>` that sets `className` must include a `focus-visible:` class, and `design/button-focus` reports one that doesn't.
 
 | `size` | Height | Icon twin |
 |--------|--------|-----------|

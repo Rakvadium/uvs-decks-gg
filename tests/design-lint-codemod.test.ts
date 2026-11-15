@@ -167,8 +167,10 @@ describe("Button size overrides", () => {
     const computedClass = rewrite("<Button className={`h-7 ${extra}`} />");
     for (const result of [corner, computedSize, computedClass]) {
       expect(result.rewrites.filter((r) => r.to.startsWith("size="))).toEqual([]);
-      expect(result.left.map((l) => l.rule)).toEqual(["button/size-override"]);
     }
+    expect(computedSize.left.map((l) => l.rule)).toEqual(["button/size-override"]);
+    expect(computedClass.left.map((l) => l.rule)).toEqual(["button/size-override"]);
+    expect(corner.left.map((l) => l.rule)).toEqual(["button/size-override", "design/radius-ladder", "design/radius-ladder"]);
     expect(corner.output).toContain('size="icon"');
   });
 
