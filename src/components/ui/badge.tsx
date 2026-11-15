@@ -5,18 +5,18 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const badgeVariants = cva(
-  "inline-flex items-center justify-center border px-2.5 py-0.5 text-xs font-semibold w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 gap-1.5 [&>svg]:pointer-events-none transition-colors duration-200 overflow-hidden chrome-label-case",
+  "inline-flex items-center justify-center border font-semibold w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 gap-1.5 [&>svg]:pointer-events-none overflow-hidden chrome-label-case",
   {
     variants: {
       tone: {
         default:
-          "rounded-md bg-primary-selected text-primary border-primary-soft shadow-[var(--chrome-badge-default-shadow)] hover:shadow-[var(--chrome-badge-default-shadow-hover)] hover:border-primary-strong",
+          "rounded-md bg-primary-selected text-primary border-primary-soft shadow-[var(--chrome-badge-default-shadow)]",
         secondary:
-          "rounded-md bg-secondary-selected text-[color:var(--badge-secondary,var(--secondary))] border-[color:color-mix(in_oklab,var(--badge-secondary,var(--secondary))_40%,transparent)] shadow-[var(--chrome-badge-secondary-shadow)] hover:shadow-[var(--chrome-badge-secondary-shadow-hover)] hover:border-[color:color-mix(in_oklab,var(--badge-secondary,var(--secondary))_60%,transparent)]",
+          "rounded-md bg-secondary-selected text-[color:var(--badge-secondary,var(--secondary))] border-[color:color-mix(in_oklab,var(--badge-secondary,var(--secondary))_40%,transparent)] shadow-[var(--chrome-badge-secondary-shadow)]",
         destructive:
-          "rounded-md bg-destructive-selected text-destructive border-destructive-soft shadow-[var(--chrome-badge-destructive-shadow)] hover:shadow-[var(--chrome-badge-destructive-shadow-hover)]",
+          "rounded-md bg-destructive-selected text-destructive border-destructive-soft shadow-[var(--chrome-badge-destructive-shadow)]",
         outline:
-          "rounded-md bg-transparent text-foreground border-surface hover:border-primary-strong hover:text-primary hover:shadow-[var(--chrome-badge-outline-shadow-hover)]",
+          "rounded-md bg-transparent text-foreground border-surface",
         success:
           "rounded-md bg-success-selected text-success border-success-soft",
         warning:
@@ -34,14 +34,49 @@ const badgeVariants = cva(
         signalViolet:
           "rounded-none bg-transparent text-accent border border-accent shadow-[var(--chrome-badge-signal-violet-shadow)]",
       },
+      size: {
+        sm: "h-5 px-1.5 text-[10px]",
+        md: "px-2.5 py-0.5 text-xs",
+        lg: "h-(--control-h-sm) px-3 text-xs",
+      },
+      interactive: {
+        true: "cursor-pointer transition-[color,border-color,box-shadow] duration-200",
+        false: "",
+      },
     },
+    compoundVariants: [
+      {
+        interactive: true,
+        tone: "default",
+        className: "hover:shadow-[var(--chrome-badge-default-shadow-hover)] hover:border-primary-strong",
+      },
+      {
+        interactive: true,
+        tone: "secondary",
+        className:
+          "hover:shadow-[var(--chrome-badge-secondary-shadow-hover)] hover:border-[color:color-mix(in_oklab,var(--badge-secondary,var(--secondary))_60%,transparent)]",
+      },
+      {
+        interactive: true,
+        tone: "destructive",
+        className: "hover:shadow-[var(--chrome-badge-destructive-shadow-hover)] hover:border-destructive-strong",
+      },
+      {
+        interactive: true,
+        tone: "outline",
+        className: "hover:border-primary-strong hover:text-primary hover:shadow-[var(--chrome-badge-outline-shadow-hover)]",
+      },
+    ],
     defaultVariants: {
       tone: "default",
+      size: "md",
+      interactive: false,
     },
   }
 )
 
 type BadgeTone = NonNullable<VariantProps<typeof badgeVariants>["tone"]>
+type BadgeSize = NonNullable<VariantProps<typeof badgeVariants>["size"]>
 
 type BadgeVariantLegacy =
   | "default"
@@ -69,6 +104,8 @@ const VARIANT_TO_TONE: Record<BadgeVariantLegacy, BadgeTone> = {
 function Badge({
   className,
   tone,
+  size,
+  interactive,
   variant,
   asChild = false,
   ...props
@@ -83,11 +120,11 @@ function Badge({
   return (
     <Comp
       data-slot="badge"
-      className={cn(badgeVariants({ tone: resolvedTone }), className)}
+      className={cn(badgeVariants({ tone: resolvedTone, size, interactive }), className)}
       {...props}
     />
   )
 }
 
 export { Badge, badgeVariants }
-export type { BadgeTone, BadgeVariantLegacy }
+export type { BadgeSize, BadgeTone, BadgeVariantLegacy }

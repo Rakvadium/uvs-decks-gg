@@ -2,33 +2,26 @@ import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
-type CardVariant = "fx" | "quiet"
+const cardBaseClassName =
+  "relative bg-card-elevated text-card-foreground flex flex-col gap-6 py-6 backdrop-blur-sm border border-surface rounded-surface overflow-hidden"
 
-const cardVariantStyles: Record<CardVariant, string> = {
-  fx: cn(
-    "shadow-[var(--chrome-card-shadow)] hover:shadow-[var(--chrome-card-shadow-hover)]",
-    "hover:border-[var(--chrome-card-border-hover)] transition-[border-color,box-shadow,background-color,opacity] duration-150",
-    "before:absolute before:inset-0 before:rounded-lg before:bg-gradient-to-br before:from-primary/10 before:to-transparent before:opacity-0 before:transition-opacity before:duration-150 hover:before:opacity-100",
-  ),
-  quiet: cn(
-    "shadow-[var(--chrome-elevation-low)] hover:shadow-[var(--chrome-elevation-mid)]",
-    "hover:border-surface transition-[border-color,box-shadow,background-color,opacity] duration-150",
-  ),
-}
+const cardFxClassName = cn(
+  "group hover:shadow-[var(--chrome-card-shadow-hover)] hover:border-[var(--chrome-card-border-hover)] transition-[border-color,box-shadow] duration-150",
+  "before:absolute before:inset-0 before:rounded-[inherit] before:bg-gradient-to-br before:from-primary/10 before:to-transparent before:opacity-0 before:transition-opacity before:duration-150 hover:before:opacity-100",
+)
 
 interface CardProps extends React.ComponentProps<"div"> {
-  variant?: CardVariant
+  fx?: boolean
 }
 
-function Card({ className, variant = "fx", ...props }: CardProps) {
+function Card({ className, fx = false, ...props }: CardProps) {
   return (
     <div
       data-slot="card"
       className={cn(
-        "group relative bg-card-elevated text-card-foreground flex flex-col gap-6 py-6 backdrop-blur-sm",
-        "border border-surface rounded-lg",
-        "overflow-hidden",
-        cardVariantStyles[variant],
+        cardBaseClassName,
+        "shadow-[var(--chrome-card-shadow)]",
+        fx && cardFxClassName,
         className
       )}
       {...props}
@@ -36,10 +29,15 @@ function Card({ className, variant = "fx", ...props }: CardProps) {
   )
 }
 
-const Surface = React.forwardRef<HTMLDivElement, Omit<CardProps, "variant">>(
-  ({ ...props }, ref) => <Card ref={ref} variant="quiet" {...props} />
-)
-Surface.displayName = "Surface"
+function Surface({ className, ...props }: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="card"
+      className={cn(cardBaseClassName, "shadow-[var(--chrome-elevation-low)]", className)}
+      {...props}
+    />
+  )
+}
 
 function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
   return (
@@ -132,4 +130,4 @@ export {
   CardContent,
 }
 
-export type { CardVariant, CardProps }
+export type { CardProps }

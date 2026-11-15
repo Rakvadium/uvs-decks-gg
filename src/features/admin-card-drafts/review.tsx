@@ -34,7 +34,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CardContent, CardHeader, CardTitle, Surface } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   Select,
@@ -851,7 +851,7 @@ export default function AdminCardDraftReview({
       />
 
       {batchVision ? (
-        <Card variant="quiet">
+        <Surface>
           <CardHeader className="gap-3">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div className="space-y-1">
@@ -935,15 +935,15 @@ export default function AdminCardDraftReview({
               ))}
             </div>
           </CardContent>
-        </Card>
+        </Surface>
       ) : null}
 
       {drafts === undefined ? (
-        <Card variant="quiet">
+        <Surface>
           <CardContent className="p-6 text-sm text-muted-foreground">Loading drafts...</CardContent>
-        </Card>
+        </Surface>
       ) : !hasDrafts ? (
-        <Card variant="quiet">
+        <Surface>
           <CardHeader>
             <CardTitle>No pending drafts</CardTitle>
           </CardHeader>
@@ -959,7 +959,7 @@ export default function AdminCardDraftReview({
               Upload card images
             </Button>
           </CardContent>
-        </Card>
+        </Surface>
       ) : !activeDraft ? null : (
         <div className={batchVisionRunning ? "pointer-events-none opacity-60" : undefined}>
         <>
@@ -1031,7 +1031,7 @@ export default function AdminCardDraftReview({
             </div>
           </div>
           <div className="grid min-h-0 gap-4 xl:grid-cols-[minmax(320px,45%)_minmax(420px,1fr)]">
-            <Card variant="quiet" className="overflow-hidden">
+            <Surface className="overflow-hidden">
             <CardContent className="space-y-4 p-4">
               {activeDraft.imageUrl ? (
                 <img
@@ -1060,9 +1060,9 @@ export default function AdminCardDraftReview({
                 ) : null}
               </div>
             </CardContent>
-            </Card>
+            </Surface>
 
-            <Card variant="quiet">
+            <Surface>
             <CardContent className="space-y-5 p-4">
               <div className="grid gap-3 sm:grid-cols-2">
                 <Field label="Name">
@@ -1228,7 +1228,7 @@ export default function AdminCardDraftReview({
                 </Link>
               </p>
             </CardContent>
-            </Card>
+            </Surface>
           </div>
         </>
         </div>
