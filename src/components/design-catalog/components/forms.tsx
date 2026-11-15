@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowUpDown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -16,7 +15,6 @@ import {
   FieldSet,
   FieldTitle,
 } from "@/components/ui/field";
-import { GallerySearchField, galleryToolbarControlClassName } from "@/components/ui/gallery-search-field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SearchBar, useSearchBarProps, type SearchBarProps, type SearchConfig } from "@/components/ui/search-bar";
@@ -320,8 +318,6 @@ const SEARCH_CONFIG: SearchConfig = {
 };
 
 export function SearchFieldsEntry() {
-  const [prominent, setProminent] = useState("Kaito");
-  const [quiet, setQuiet] = useState("");
   const searchBar: SearchBarProps = useSearchBarProps(SEARCH_CONFIG);
 
   return (
@@ -329,55 +325,23 @@ export function SearchFieldsEntry() {
       id="search-fields"
       description={
         <p>
-          <Code>GallerySearchField</Code> is the gallery/collection field (<Code>appearance</Code>{" "}
-          <Code>prominent</Code> or <Code>quiet</Code>, clear button when <Code>onClear</Code> is set).{" "}
-          <Code>galleryToolbarControlClassName</Code> makes sibling toolbar buttons match it. <Code>SearchBar</Code> adds a
-          quick-filter popover and an advanced dialog; <Code>useSearchBarProps</Code> wires its state.
+          <Code>SearchBar</Code> adds a quick-filter popover and an advanced dialog; <Code>useSearchBarProps</Code> wires
+          its state.
         </p>
       }
     >
-      <div className="grid gap-4 lg:grid-cols-2">
-        <Preview label="GallerySearchField">
-          <div className="space-y-4">
-            <StateCell label='appearance="prominent" + onClear'>
-              <div className="flex gap-2">
-                <GallerySearchField
-                  value={prominent}
-                  onChange={(event) => setProminent(event.target.value)}
-                  onClear={() => setProminent("")}
-                  placeholder="Search cards…"
-                />
-                <button type="button" className={cn(galleryToolbarControlClassName, "inline-flex shrink-0 items-center gap-2 px-3")}>
-                  <ArrowUpDown className="size-4" />
-                  Sort
-                </button>
-              </div>
-            </StateCell>
-            <StateCell label='appearance="quiet"'>
-              <GallerySearchField
-                appearance="quiet"
-                value={quiet}
-                onChange={(event) => setQuiet(event.target.value)}
-                onClear={() => setQuiet("")}
-                placeholder="Filter your collection…"
-                aria-label="Filter collection"
-              />
-            </StateCell>
-          </div>
-        </Preview>
-        <Preview label="SearchBar">
-          <div className="space-y-4">
-            <StateCell label="Plain (no popover)">
-              <SearchBar placeholder="Search decks…" />
-            </StateCell>
-            <StateCell label="Quick filters + advanced dialog (desktop toolbar; popover is min-w 800px)">
-              <SearchBar {...searchBar} />
-            </StateCell>
-          </div>
-        </Preview>
-      </div>
+      <Preview label="SearchBar">
+        <div className="space-y-4">
+          <StateCell label="Plain (no popover)">
+            <SearchBar placeholder="Search decks…" />
+          </StateCell>
+          <StateCell label="Quick filters + advanced dialog (desktop toolbar; popover is min-w 800px)">
+            <SearchBar {...searchBar} />
+          </StateCell>
+        </div>
+      </Preview>
       <CodeBlock
-        code={`import { GallerySearchField, galleryToolbarControlClassName } from "@/components/ui/gallery-search-field"\nimport { SearchBar, useSearchBarProps } from "@/components/ui/search-bar"\n\n<GallerySearchField value={q} onChange={(e) => setQ(e.target.value)} onClear={() => setQ("")} />\n<button className={cn(galleryToolbarControlClassName, "px-3")}>Sort</button>\n\nconst searchBar = useSearchBarProps({ placeholder: "Search…", quickFilters, advancedFilters })\n<SearchBar {...searchBar} />`}
+        code={`import { SearchBar, useSearchBarProps } from "@/components/ui/search-bar"\n\nconst searchBar = useSearchBarProps({ placeholder: "Search…", quickFilters, advancedFilters })\n<SearchBar {...searchBar} />`}
       />
     </CatalogEntrySection>
   );

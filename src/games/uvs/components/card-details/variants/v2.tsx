@@ -227,7 +227,7 @@ export function CardDetailsV2({
         </div>
 
         <div className="relative flex min-w-0 max-md:flex-none flex-col max-md:!pointer-events-auto md:min-h-0 md:flex-1">
-          <div className="relative flex min-w-0 flex-col overflow-hidden max-md:overflow-visible rounded-xl border border-primary/25 bg-card/95 shadow-[0_0_2px_var(--primary)/35,0_0_10px_var(--primary)/42,0_0_22px_var(--primary)/12] backdrop-blur-md md:h-full md:max-h-full md:min-h-0 md:flex-1">
+          <div className="relative flex min-w-0 flex-col overflow-hidden max-md:overflow-visible rounded-xl border border-primary/25 bg-card/95 backdrop-blur-md md:h-full md:max-h-full md:min-h-0 md:flex-1">
             <DialogClose asChild>
               <Button
                 type="button"
