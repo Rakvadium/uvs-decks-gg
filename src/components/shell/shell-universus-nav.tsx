@@ -62,9 +62,6 @@ function ShellUniversusNavSidebarInner() {
           {label}
         </span>
       ) : null}
-      {isOpen ? (
-        <div className="pointer-events-none absolute inset-0 rounded-md border border-accent/50" />
-      ) : null}
     </button>
   );
 

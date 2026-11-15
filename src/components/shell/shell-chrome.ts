@@ -25,7 +25,9 @@ export const SHELL_SIDEBAR_SURFACE_STYLE = {
 } as const;
 
 export const SHELL_NAV_ITEM_BASE =
-  "group relative flex items-center gap-3 rounded-control border px-3 py-2.5 text-sm font-medium transition-[color,background-color,border-color] duration-150";
+  "group relative flex h-(--control-h-md) items-center gap-3 rounded-control border px-3 text-sm font-medium transition-[color,background-color,border-color] duration-150";
+
+export const SHELL_ACCOUNT_ROW_HEIGHT_CLASS = "h-(--control-h-lg)";
 
 export const SHELL_NAV_ITEM_IDLE =
   "border-transparent text-sidebar-foreground hover:bg-(--hover-bg) hover:text-foreground";
@@ -38,10 +40,10 @@ export const SHELL_NAV_ICON_ACTIVE =
 
 export const SHELL_RAIL_WIDTH = 64;
 
-export const SHELL_RAIL_ITEM_SIZE_CLASS = "size-9";
+export const SHELL_RAIL_ITEM_SIZE_CLASS = "size-(--control-h-md)";
 
 export const SHELL_RAIL_ITEM_COLLAPSED_CLASS =
-  "size-9 shrink-0 justify-center gap-0 p-0";
+  "size-(--control-h-md) shrink-0 justify-center gap-0 p-0";
 
 export const SHELL_RAIL_STACK_CLASS = "flex flex-col items-center gap-2 p-1";
 

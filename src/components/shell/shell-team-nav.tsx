@@ -11,6 +11,7 @@ import { useLeftSidebarContext } from "./left-sidebar/context";
 import { MOBILE_INSET_ROW } from "./mobile-glass";
 import {
   SHELL_NAV_ITEM_ACTIVE,
+  SHELL_NAV_ITEM_BASE,
   SHELL_NAV_ITEM_IDLE,
   SHELL_RAIL_ITEM_COLLAPSED_CLASS,
 } from "./shell-chrome";
@@ -140,8 +141,8 @@ function ShellTeamNavSidebarInner({
     <Link
       href={teamHref}
       className={cn(
-        "relative flex items-center rounded-md border text-sm font-medium transition-colors duration-200",
-        collapsed ? cn(SHELL_RAIL_ITEM_COLLAPSED_CLASS, "overflow-hidden") : "w-full gap-3 px-3 py-2.5",
+        SHELL_NAV_ITEM_BASE,
+        collapsed ? cn(SHELL_RAIL_ITEM_COLLAPSED_CLASS, "overflow-hidden") : "w-full",
         isActive ? SHELL_NAV_ITEM_ACTIVE : SHELL_NAV_ITEM_IDLE
       )}
     >
@@ -150,13 +151,12 @@ function ShellTeamNavSidebarInner({
         logoPending={hasTeam && logoPending}
         hasTeam={hasTeam}
         markIsActive={isActive}
-        className={collapsed ? "size-full rounded-md border-0" : "h-8 w-8 rounded-full"}
+        className={collapsed ? "size-full rounded-control border-0" : "size-7 rounded-full"}
         imgClassName=""
       />
       {!collapsed ? (
         <span className="chrome-label-case whitespace-nowrap text-xs">{label}</span>
       ) : null}
-      {isActive ? <div className="pointer-events-none absolute inset-0 rounded-md border border-accent/50" /> : null}
     </Link>
   );
   if (collapsed) {
