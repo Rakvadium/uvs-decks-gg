@@ -9,6 +9,7 @@ import {
   type GameZoneFilterDescriptor,
 } from "@shared/games/filters";
 import { useGameModule } from "@/games/game-context";
+import { SegmentedControl } from "@/components/ui/segmented-control";
 import type { StatOperator } from "@/providers/UIStateProvider";
 import { cn } from "@/lib/utils";
 import { OPERATOR_OPTIONS } from "../filter-dialog/constants";
@@ -40,7 +41,7 @@ function StatRule({ stat }: { stat: GameStatFilterDescriptor }) {
   return (
     <FilterRow className="space-y-2.5">
       <div className="flex items-center justify-between gap-3">
-        <span className={cn("text-sm font-medium", isActive ? "text-primary" : "text-foreground")}>{label}</span>
+        <span className={cn("text-sm font-medium", isActive ? "text-(--selected-fg)" : "text-foreground")}>{label}</span>
         {isActive ? (
           <button
             type="button"
@@ -55,36 +56,23 @@ function StatRule({ stat }: { stat: GameStatFilterDescriptor }) {
         )}
       </div>
       <div className="flex items-center gap-2">
-        <div
-          role="radiogroup"
+        <SegmentedControl
+          stretch
           aria-label={`${label} comparison`}
-          className="flex h-10 min-w-0 flex-1 items-stretch overflow-hidden rounded-lg border border-border/50 bg-muted/30"
-        >
-          {OPERATOR_OPTIONS.map((option, index) => {
-            const selected = isActive && operator === option.value;
-            return (
-              <button
-                key={option.value}
-                type="button"
-                role="radio"
-                aria-checked={selected}
-                aria-label={option.label}
-                onClick={() => setOperator(option.value)}
-                className={cn(
-                  "min-w-0 flex-1 text-sm tabular-nums transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring",
-                  index !== 0 && "border-l border-border/40",
-                  selected ? "bg-primary/20 font-semibold text-primary" : "text-muted-foreground hover:text-foreground"
-                )}
-              >
-                {OPERATOR_GLYPHS[option.value]}
-              </button>
-            );
-          })}
-        </div>
+          className="min-w-0 flex-1"
+          itemClassName="px-0 text-sm tabular-nums"
+          value={isActive ? operator : undefined}
+          onValueChange={(next) => setOperator(next as StatOperator)}
+          items={OPERATOR_OPTIONS.map((option) => ({
+            value: option.value,
+            label: OPERATOR_GLYPHS[option.value],
+            ariaLabel: option.label,
+          }))}
+        />
         <div
           className={cn(
-            "flex h-10 shrink-0 items-stretch overflow-hidden rounded-lg border bg-background/60",
-            isActive ? "border-primary/50" : "border-border/50"
+            "flex h-(--control-h-md) shrink-0 items-stretch overflow-hidden rounded-control border bg-background-soft",
+            isActive ? "border-(--selected-border)" : "border-surface"
           )}
         >
           <button
