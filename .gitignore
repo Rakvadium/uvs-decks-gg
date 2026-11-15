@@ -56,3 +56,6 @@ next-env.d.ts
 !/scripts/ocr-calibration/fixtures.json
 /scripts/ocr-calibration/output/
 /screenshots/
+
+# verify-uvs skill: pid files, logs, evidence
+/.verify-uvs/
