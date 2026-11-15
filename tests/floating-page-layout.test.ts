@@ -5,7 +5,7 @@ import { FloatingPageLayout, type PageWash } from "../src/components/shell/float
 
 function render(pageWash?: PageWash) {
   const html = renderToStaticMarkup(
-    createElement(FloatingPageLayout, { bar: createElement("nav", null, "bar"), pageWash }, "body")
+    createElement(FloatingPageLayout, { bar: createElement("nav", null, "bar"), pageWash, children: "body" })
   );
   const wash = html.match(/<div aria-hidden="true" data-slot="page-wash" data-wash="([a-z]+)" class="([^"]*)"/);
   return { html, washName: wash?.[1], washClasses: wash?.[2].split(/\s+/) ?? [] };

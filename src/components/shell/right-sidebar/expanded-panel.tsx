@@ -12,7 +12,7 @@ import {
 } from "../shell-chrome";
 import { useRightSidebarContext } from "./context";
 
-function PanelHeader({ title, onClose }: { title: string; onClose: () => void }) {
+export function PanelHeader({ title, onClose }: { title: string; onClose: () => void }) {
   return (
     <div
       data-slot="panel-header"
@@ -28,7 +28,7 @@ function PanelHeader({ title, onClose }: { title: string; onClose: () => void })
   );
 }
 
-function PanelFooter({ children }: { children: ReactNode }) {
+export function PanelFooter({ children }: { children: ReactNode }) {
   return (
     <div
       data-slot="panel-footer"

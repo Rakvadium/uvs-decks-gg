@@ -2,11 +2,11 @@
 
 Desktop pages use a floating "island" header: pill-shaped capsules overlaid on the top of the scroll area instead of a solid chrome bar. This doc defines the slot semantics every page must follow so headers stay predictable as the app grows.
 
-**Primitives:** `src/components/shell/floating-page-bar.tsx` (`FloatingPageLayout`, `FloatingPageBar`, `FloatingTabsPill`, `FloatingSearchCapsule`, `FloatingBackPill`, `FloatingActionPill`, `FloatingCapsuleCluster`) and `src/components/shell/floating-island.tsx` (`FloatingIsland`, `FloatingIslandCapsule`).
+**Primitives:** `src/components/shell/floating-page-bar.tsx` (`FloatingPageLayout`, `FloatingPageBar`, `FloatingTabsPill`, `FloatingSearchCapsule`, `FloatingBackPill`, `FloatingActionPill`, `FloatingCapsuleCluster`) and `src/components/shell/floating-island.tsx` (`FloatingIslandCapsule`).
 
 ## The rule: strict roles, lenient occupancy
 
-`FloatingPageBar` is a three-slot grid (`1fr / minmax(0,26rem) / 1fr`). Each slot has one fixed role:
+`FloatingPageBar` is a three-slot grid (`minmax(max-content,1fr) / minmax(0,26rem) / minmax(max-content,1fr)`). The side slots never shrink below their content, so when the left cluster is wide the center capsule gives up width instead of overlapping it. Each slot has one fixed role:
 
 | Slot | Role | Contents |
 | --- | --- | --- |
@@ -34,18 +34,18 @@ If the cluster gets tight, demote the identity (avatar-only, truncated name) —
 
 ## Center slot
 
-Search or filtering for the page's primary collection, via `FloatingSearchCapsule` or a `FloatingIsland` (gallery). Nothing else goes here. If a page has no content tool, leave it empty — it stays reserved so search always appears in the same place when added later.
+Search or filtering for the page's primary collection, via `FloatingSearchCapsule`. Trailing controls that belong to the search (the gallery's scope select) go in as its children. Nothing else goes here. If a page has no content tool, leave it empty — it stays reserved so search always appears in the same place when added later.
 
 ## Right slot
 
-Page-level actions. Primary action as a filled `FloatingActionPill` (opens a flow). Secondary as outline. A **context toggle** (Set Active → Active) is not a second primary and is not a dialog opener — off and on must read as different states. Beyond two or three actions, fold the rest into an overflow menu. See [theme-and-chrome.md](./theme-and-chrome.md) control roles.
+Page-level actions, and on the gallery the collection's tools (result count, filter panel, view mode) in one `FloatingCapsuleCluster`. Primary action as a filled `FloatingActionPill` (opens a flow). Secondary as outline. A **context toggle** (Set Active → Active) is not a second primary and is not a dialog opener — off and on must read as different states. Beyond two or three actions, fold the rest into an overflow menu. See [theme-and-chrome.md](./theme-and-chrome.md) control roles.
 
 ## Titles and descriptions
 
 - Desktop page titles live in the left identity pill, not in an in-content hero. Do not add `PageHero`-style title/description blocks above page content on desktop.
 - Descriptive/instructional verbiage ("Shared workspace for…", "Drag cards into lanes…") is dropped, not relocated. If guidance is genuinely needed, put it next to the thing it explains, or in an empty state.
 - The pill title should be the `h1` for the desktop layout.
-- Section roots (Decks, Collection, Community, Teams, Settings) show an identity title pill (`FloatingPageTitle`). Gallery is the exception and stays untitled.
+- Section roots (Home, Decks, Collection, Community, Teams, Settings) show an identity title pill (`FloatingPageTitle`). Gallery is the exception and stays untitled.
 - Floating title, back, and tab labels derive family / transform / tracking from chrome via `chrome-heading-case` / `chrome-label-case`. Do not hardcode `uppercase` or `tracking-*` on those controls. Capsule and pill shadows come from `--chrome-floating-shadow`.
 
 ## Mobile
@@ -56,7 +56,8 @@ The floating bar is desktop-only (`hidden md:block` inside `FloatingPageLayout`)
 
 | Page | Left | Center | Right |
 | --- | --- | --- | --- |
-| Gallery | — | Search island (`FloatingIsland`) | — |
+| Home | Title pill | — | — |
+| Gallery | — | Search with scope select, filter panel anchored below | Result count, filter panel toggle, view mode |
 | Decks list | Tabs (My / Public / Tournament) | Search | New Deck |
 | Deck details | Icon-only back + deck name pill | — | Set Active (owner), Duplicate, Edit (owner) |
 | Community hub | Dest tabs (Tier Lists / Rankings / Creators) | — | — |
@@ -66,12 +67,13 @@ The floating bar is desktop-only (`hidden md:block` inside `FloatingPageLayout`)
 | Teams landing | Title pill | — | Create Team / Sign in |
 | Team hub | Team identity pill + tabs (News … Calendar) | — | Section primary (Create Announcement / Invite member / Create Calendar Item) |
 | Teams decks index | Title pill | — | — |
+| Team invite | Title pill | — | — |
 | Settings | Icon-only back + title pill | — | — |
 | Collection | Title pill | — | — |
 
 ## Adding a new page
 
-1. Wrap the page in `FloatingPageLayout` and pass a feature-owned `floating-top-bar.tsx` composing `FloatingPageBar`.
+1. Wrap the page in `FloatingPageLayout` and pass a feature-owned `floating-top-bar.tsx` composing `FloatingPageBar`. For a page background, pass `pageWash` (`fade`, `radial`, `grid` or `glow`) instead of painting layers in the page.
 2. Assign content to slots by role using the table above; leave slots empty rather than borrowing roles.
 3. Add the page to [mobile-shell.md](./mobile-shell.md) and place mobile search/actions/back in those slots.
 4. Put the page/entity title in the left pill as the `h1`; skip the description.
