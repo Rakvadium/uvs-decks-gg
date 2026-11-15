@@ -1,6 +1,9 @@
 "use client";
 
 import { PageHeading } from "@/components/ui/typography-headings";
+import { Layers } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
 import { useQuery } from "convex/react";
 import Link from "next/link";
 import { useState } from "react";
@@ -89,25 +92,19 @@ export function TeamHubDecksContent({ teamId }: TeamHubDecksContentProps) {
         />
       </div>
       {isEmpty ? (
-        <div
-          className="rounded-lg border border-dashed border-placeholder bg-muted-tint px-4 py-10 text-center"
+        <EmptyState
           role="status"
-        >
-          <p className="text-sm text-muted-foreground">
-            No team-visible decks in this list yet{filter === "all" ? "" : " for this filter"}.
-          </p>
-          {canCreateTeamDeck ? (
-            <p className="mt-3 text-sm">
-              <Link
-                href="/decks"
-                className="chrome-label-case text-xs text-primary underline-offset-4 hover:underline"
-              >
-                Open decks
-              </Link>
-              <span className="text-muted-foreground"> to create a deck and set its visibility to team.</span>
-            </p>
-          ) : null}
-        </div>
+          icon={Layers}
+          title={`No team-visible decks in this list yet${filter === "all" ? "" : " for this filter"}.`}
+          description={canCreateTeamDeck ? "Create a deck and set its visibility to team." : undefined}
+          action={
+            canCreateTeamDeck ? (
+              <Button variant="outline" size="sm" asChild>
+                <Link href="/decks">Open decks</Link>
+              </Button>
+            ) : undefined
+          }
+        />
       ) : (
         <div className="overflow-x-auto rounded-lg border border-surface">
           <Table>

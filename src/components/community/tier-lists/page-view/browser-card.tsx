@@ -58,11 +58,11 @@ export function TierListBrowserCard({
       href={href}
       aria-label={`Open tier list: ${showTitle}`}
       className={cn(
-        "block h-full rounded-lg outline-none",
+        "block h-full rounded-surface outline-none",
         "focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
       )}
     >
-      <Card className="h-full cursor-pointer border-border/50 bg-card/80 shadow-[var(--chrome-elevation-mid)] transition-colors hover:border-primary/25">
+      <Card fx className="h-full cursor-pointer">
         <CardHeader className="space-y-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex flex-wrap items-center gap-2">

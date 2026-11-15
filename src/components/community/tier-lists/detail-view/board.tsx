@@ -10,7 +10,7 @@ export function CommunityTierListDetailBoard() {
   const { canEdit, addTier, tiers, isRankedScope } = useCommunityTierListDetailContext();
 
   return (
-    <Card className="border-border/50 bg-card/80 shadow-[var(--chrome-elevation-mid)]">
+    <Card>
       <CardHeader className="space-y-3 pb-0 pt-6">
         <div className="md:hidden">
           <CardDescription>

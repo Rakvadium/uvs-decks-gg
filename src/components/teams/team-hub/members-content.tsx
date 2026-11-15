@@ -1,8 +1,9 @@
 "use client";
 
 import { PageHeading } from "@/components/ui/typography-headings";
+import { EmptyState } from "@/components/ui/empty-state";
 import { useMutation, useQuery } from "convex/react";
-import { Check, Copy, Plus } from "lucide-react";
+import { Check, Copy, Plus, Users } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { api } from "../../../../convex/_generated/api";
@@ -244,12 +245,7 @@ export function TeamHubMembersContent({ teamId }: TeamHubMembersContentProps) {
       </Dialog>
 
       {isEmpty ? (
-        <div
-          className="rounded-lg border border-dashed border-placeholder bg-muted-tint px-4 py-10 text-center"
-          role="status"
-        >
-          <p className="text-sm text-muted-foreground">No active members in this team.</p>
-        </div>
+        <EmptyState role="status" icon={Users} title="No active members in this team." />
       ) : (
         <div className="overflow-x-auto rounded-lg border border-surface">
           <Table>
