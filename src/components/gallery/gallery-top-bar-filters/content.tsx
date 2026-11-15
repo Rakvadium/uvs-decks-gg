@@ -1,28 +1,24 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { useGalleryFiltersOptional } from "@/providers/GalleryFiltersProvider";
 import { GalleryFilterDialogProvider } from "@/components/gallery/filter-dialog/context";
 import { GalleryTopBarFiltersProvider } from "./context";
-import { GalleryTopBarIslandVariant } from "./variants/variant-island";
 
-function GalleryTopBarFiltersContent() {
+function GalleryFilterDialogBridge({ children }: { children: ReactNode }) {
   const filtersContext = useGalleryFiltersOptional();
 
   if (!filtersContext) {
     return null;
   }
 
-  return (
-    <GalleryFilterDialogProvider filtersContext={filtersContext}>
-      <GalleryTopBarIslandVariant />
-    </GalleryFilterDialogProvider>
-  );
+  return <GalleryFilterDialogProvider filtersContext={filtersContext}>{children}</GalleryFilterDialogProvider>;
 }
 
-export function GalleryTopBarFilters() {
+export function GalleryToolbarProvider({ children }: { children: ReactNode }) {
   return (
     <GalleryTopBarFiltersProvider>
-      <GalleryTopBarFiltersContent />
+      <GalleryFilterDialogBridge>{children}</GalleryFilterDialogBridge>
     </GalleryTopBarFiltersProvider>
   );
 }

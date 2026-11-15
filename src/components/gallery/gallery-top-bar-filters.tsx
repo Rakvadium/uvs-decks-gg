@@ -1,4 +1,5 @@
 "use client";
 
-export { GalleryTopBarFilters } from "./gallery-top-bar-filters/content";
-export { GalleryTopBarFilters as GalleryHeader } from "./gallery-top-bar-filters/content";
+export { GalleryToolbarProvider } from "./gallery-top-bar-filters/content";
+export { GalleryTopBarIslandVariant as GalleryTopBarFilters } from "./gallery-top-bar-filters/variants/variant-island";
+export { FilterTokens } from "./gallery-top-bar-filters/variants/filter-tokens";
