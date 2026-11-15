@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
 import { LoadingState } from "@/components/ui/loading-state";
 import { EmptyState } from "@/components/ui/empty-state";
-import { Layers, Loader2 } from "lucide-react";
+import { Layers } from "lucide-react";
 import { CardHoverPreviewPortal } from "@/components/deck/shared";
 import { TeamEditableWriteConflictBanner } from "@/components/deck/team-editable-write-conflict-banner";
 import { useShellSlotActions } from "@/components/shell/shell-slot-provider";
