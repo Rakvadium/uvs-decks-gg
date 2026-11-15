@@ -1,6 +1,7 @@
 "use client";
 
 import { PageHeading } from "@/components/ui/typography-headings";
+import { Panel } from "@/components/ui/panel";
 import { useMutation, useQuery } from "convex/react";
 import { Plus } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
@@ -215,10 +216,8 @@ export function TeamHubEventsContent({ teamId }: TeamHubEventsContentProps) {
             {events.map((row) => {
               const e = row.event;
               return (
-                <li
-                  key={e._id}
-                  className="flex flex-col gap-1 rounded-lg border border-surface bg-background-soft px-4 py-3 sm:flex-row sm:items-start sm:justify-between"
-                >
+                <Panel asChild key={e._id}>
+                <li className="flex flex-col gap-1 px-4 py-3 sm:flex-row sm:items-start sm:justify-between">
                   <div className="min-w-0">
                     <p className="font-medium text-foreground">{e.title}</p>
                     {e.description?.trim() ? (
@@ -248,6 +247,7 @@ export function TeamHubEventsContent({ teamId }: TeamHubEventsContentProps) {
                     </Button>
                   )}
                 </li>
+                </Panel>
               );
             })}
           </ul>

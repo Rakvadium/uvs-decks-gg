@@ -1,6 +1,7 @@
 "use client";
 
 import { PageHeading, SectionHeading } from "@/components/ui/typography-headings";
+import { Panel } from "@/components/ui/panel";
 import { useMutation, usePaginatedQuery, useQuery } from "convex/react";
 import { Plus } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
@@ -298,7 +299,8 @@ function AnnouncementCard({
   const canDelete = isAuthor || caps.canModerateChat;
 
   return (
-    <li className="rounded-lg border border-surface bg-background-soft p-4">
+    <Panel asChild>
+    <li className="p-4">
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div className="min-w-0 flex-1">
           {editing ? (
@@ -362,5 +364,6 @@ function AnnouncementCard({
         </div>
       )}
     </li>
+    </Panel>
   );
 }

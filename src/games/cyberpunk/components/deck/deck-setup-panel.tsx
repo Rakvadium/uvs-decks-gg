@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { Panel } from "@/components/ui/panel";
 import { CYBERPUNK_LEGEND_COUNT, normalizeCyberpunkSetup } from "@shared/games/cyberpunk/setup";
 import { Kicker } from "@/components/ui/typography-headings";
 import type { GameDeckSetupPanelProps } from "@/games/types";
@@ -70,14 +71,15 @@ function CyberpunkDeckSetupEditor({
 
   return (
     <>
-      <section
-        aria-label="Legends"
+      <Panel
+        asChild
         className={cn(
-          "relative space-y-3 rounded-lg border border-border/50 bg-card/50 p-3",
+          "relative space-y-3 p-3",
           isHero && "mx-auto w-full max-w-[260px] shrink-0 lg:mx-0 lg:w-48",
           className
         )}
       >
+      <section aria-label="Legends">
         <div className="flex items-center justify-between gap-2 pr-14">
           <Kicker size="sm" tone="foreground" className="font-semibold">
             Legends{" "}
@@ -114,6 +116,7 @@ function CyberpunkDeckSetupEditor({
           className="border-t border-border/40 pt-3"
         />
       </section>
+      </Panel>
 
       {editable && onChange ? (
         <LegendPickerDialog

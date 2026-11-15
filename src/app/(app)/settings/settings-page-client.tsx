@@ -1,6 +1,7 @@
 "use client";
 
 import { PageHeading } from "@/components/ui/typography-headings";
+import { Panel } from "@/components/ui/panel";
 import { useState, useEffect, useOptimistic, useTransition, useCallback, useRef } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
@@ -682,10 +683,7 @@ export default function SettingsPageClient() {
                             const hasOverride = Boolean(customDraft.byChrome?.[opt.id]);
 
                             return (
-                              <div
-                                key={opt.id}
-                                className="rounded-xl border border-border/50 bg-muted/20 p-3 space-y-2"
-                              >
+                              <Panel key={opt.id} className="space-y-2 p-3">
                                 <div className="flex flex-wrap items-start justify-between gap-2">
                                   <div className="min-w-0 space-y-0.5">
                                     <div className="flex flex-wrap items-center gap-2">
@@ -734,7 +732,7 @@ export default function SettingsPageClient() {
                                     }))
                                   }
                                 />
-                              </div>
+                              </Panel>
                             );
                           })}
                         </div>
