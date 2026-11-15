@@ -1,5 +1,6 @@
 import type { Doc } from "../../../convex/_generated/dataModel";
 import type { GameId } from "@shared/games/types";
+import { createStore, del, get, set, type UseStore } from "idb-keyval";
 import { catalogDbName, deleteLegacyDatabaseOnce } from "@/lib/storage-keys";
 
 export type CachedSet = Doc<"sets">;
@@ -15,7 +16,7 @@ const STORE_NAME = "sets";
 const METADATA_KEY = "cache-metadata";
 const SETS_KEY = "sets-data";
 
-const setStorePromises = new Map<GameId, Promise<ReturnType<typeof import("idb-keyval").createStore>>>();
+const setStorePromises = new Map<GameId, Promise<UseStore>>();
 
 async function getSetStore(game: GameId) {
   if (typeof window === "undefined") return null;
@@ -24,9 +25,7 @@ async function getSetStore(game: GameId) {
   if (!storePromise) {
     // Pre multi-game DB; sets re-sync into the per-game DB instead.
     deleteLegacyDatabaseOnce(LEGACY_DB_NAME);
-    storePromise = import("idb-keyval").then(({ createStore }) => {
-      return createStore(catalogDbName(game, "sets"), STORE_NAME);
-    });
+    storePromise = Promise.resolve(createStore(catalogDbName(game, "sets"), STORE_NAME));
     setStorePromises.set(game, storePromise);
   }
 
@@ -38,7 +37,6 @@ export async function getSetCacheMetadata(game: GameId): Promise<SetCacheMetadat
   if (!store) return null;
   
   try {
-    const { get } = await import("idb-keyval");
     const metadata = await get<SetCacheMetadata>(METADATA_KEY, store);
     return metadata ?? null;
   } catch {
@@ -51,7 +49,6 @@ export async function setSetCacheMetadata(game: GameId, metadata: SetCacheMetada
   if (!store) return;
   
   try {
-    const { set } = await import("idb-keyval");
     await set(METADATA_KEY, metadata, store);
   } catch (error) {
     console.error("Failed to save set cache metadata:", error);
@@ -63,7 +60,6 @@ export async function getCachedSets(game: GameId): Promise<CachedSet[]> {
   if (!store) return [];
   
   try {
-    const { get } = await import("idb-keyval");
     const sets = await get<CachedSet[]>(SETS_KEY, store);
     return sets ?? [];
   } catch {
@@ -76,7 +72,6 @@ export async function setCachedSets(game: GameId, sets: CachedSet[]): Promise<vo
   if (!store) return;
   
   try {
-    const { set } = await import("idb-keyval");
     await set(SETS_KEY, sets, store);
   } catch (error) {
     console.error("Failed to save sets to cache:", error);
@@ -88,7 +83,6 @@ export async function clearSetCache(game: GameId): Promise<void> {
   if (!store) return;
   
   try {
-    const { del } = await import("idb-keyval");
     await del(METADATA_KEY, store);
     await del(SETS_KEY, store);
   } catch (error) {
