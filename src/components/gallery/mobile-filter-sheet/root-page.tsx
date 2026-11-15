@@ -22,7 +22,7 @@ import {
   FilterRow,
 } from "./primitives";
 import { useActiveChips } from "./use-active-chips";
-import { ColorFacetChips, colorFacetLabel } from "./color-facet-chips";
+import { ColorFacetChips } from "./color-facet-chips";
 
 const segmentedItemClassName = "h-10 text-[13px] normal-case tracking-normal";
 const compactChipClassName = "h-7 gap-1 px-2.5 text-xs";
@@ -201,46 +201,59 @@ function RarityRows({
   );
 }
 
-function selectionLabel(count: number) {
-  if (count === 0) return "Any";
-  return count === 1 ? "1 selected" : `${count} selected`;
-}
-
-function MobileFilterIndex() {
-  const { filters, meta } = useGalleryFilterDialogContext();
-  const { filters: filterDefinition } = useGameModule();
-  const { push } = useGalleryMobileFilterNav();
-  const setCount = filters.set?.length ?? 0;
-  const typeCount = filters.type?.length ?? 0;
-  const symbolCount = filters.symbols?.length ?? 0;
-  const keywordCount = filters.keywords?.length ?? 0;
-  const colorCount = filters.colors?.length ?? 0;
-  const tagCount = filters.tags?.length ?? 0;
-  const statCount = countActiveStatPageFilters(filterDefinition, filters);
-  const rarityCount = filters.rarity?.length ?? 0;
-  const formatName = meta.formats.find((format) => format.key === (filters.format ?? meta.formats[0]?.key))?.name ?? "Any";
-  const { facets } = filterDefinition;
+function FormatSection({ compact = false }: { compact?: boolean }) {
+  const { meta } = useGalleryFilterDialogContext();
+  if (meta.formats.length === 0) return null;
 
   return (
-    <FilterGroup>
-      <FilterDrillRow label="Format" value={formatName} count={formatName === "Any" ? 0 : 1} onClick={() => push("format")} />
-      <FilterDrillRow label="Sets" value={selectionLabel(setCount)} count={setCount} onClick={() => push("sets")} />
-      <FilterDrillRow label="Type" value={selectionLabel(typeCount)} count={typeCount} onClick={() => push("type")} />
-      {facets.colors ? (
-        <FilterDrillRow label="Colors" value={selectionLabel(colorCount)} count={colorCount} onClick={() => push("colors")} />
-      ) : null}
-      {facets.symbols ? (
-        <FilterDrillRow label="Symbols" value={selectionLabel(symbolCount)} count={symbolCount} onClick={() => push("symbols")} />
-      ) : null}
-      {facets.keywords ? (
-        <FilterDrillRow label="Keywords" value={selectionLabel(keywordCount)} count={keywordCount} onClick={() => push("keywords")} />
-      ) : null}
-      {facets.tags ? (
-        <FilterDrillRow label="Tags" value={selectionLabel(tagCount)} count={tagCount} onClick={() => push("tags")} />
-      ) : null}
-      <FilterDrillRow label="Stats" value={selectionLabel(statCount)} count={statCount} onClick={() => push("stats")} />
-      <FilterDrillRow label="Rarity" value={selectionLabel(rarityCount)} count={rarityCount} onClick={() => push("rarity")} />
+    <FilterGroup label="Format" trailing={<IncludeBannedToggle />}>
+      <FormatRows compact={compact} bannedPlacement="none" heading={false} />
     </FilterGroup>
+  );
+}
+
+function TypeSection({ compact = false }: { compact?: boolean }) {
+  const { meta } = useGalleryFilterDialogContext();
+  if ((meta.uniqueValues?.types ?? []).length === 0) return null;
+
+  return (
+    <FilterGroup label="Type">
+      <TypeRows compact={compact} heading={false} />
+    </FilterGroup>
+  );
+}
+
+function ColorsSection({ compact = false }: { compact?: boolean }) {
+  const { filters, toggleStringFilter } = useGalleryFilterDialogContext();
+  const options = useGameModule().filters.facets.colors;
+  if (!options || options.length === 0) return null;
+
+  return (
+    <FilterGroup label="Colors">
+      <FilterRow className={compact ? "py-2" : undefined}>
+        <ColorFacetChips
+          options={options}
+          selected={filters.colors ?? []}
+          onToggle={(value) => toggleStringFilter("colors", value)}
+          chipClassName={compact ? compactChipClassName : undefined}
+          rowClassName={compact ? compactChipRowClassName : undefined}
+        />
+      </FilterRow>
+    </FilterGroup>
+  );
+}
+
+/** The most-used filters, shown inline on the root page instead of behind a drill row. */
+function QuickFilterSections({ compact = false }: { compact?: boolean }) {
+  const { facets } = useGameModule().filters;
+
+  return (
+    <>
+      <FormatSection compact={compact} />
+      <TypeSection compact={compact} />
+      <ColorsSection compact={compact} />
+      {facets.symbols ? <SymbolsGroup spread={compact} labelled /> : null}
+    </>
   );
 }
 
@@ -331,10 +344,13 @@ function SymbolsGroup({
   compact = false,
   spread = false,
   showSwitches = true,
+  labelled = false,
 }: {
   compact?: boolean;
   spread?: boolean;
   showSwitches?: boolean;
+  /** Keep the "Symbols" heading and switches in the group header even when embedded. */
+  labelled?: boolean;
 }) {
   const { filters, meta, toggleStringFilter, setBooleanFilter, setIncludeInfinityResults } =
     useGalleryFilterDialogContext();
@@ -369,12 +385,13 @@ function SymbolsGroup({
   );
 
   const embedded = compact || spread;
+  const headed = !embedded || labelled;
 
   return (
-    <FilterGroup label={embedded ? undefined : "Symbols"} trailing={embedded || !showSwitches ? undefined : symbolSwitches}>
+    <FilterGroup label={headed ? "Symbols" : undefined} trailing={headed && showSwitches ? symbolSwitches : undefined}>
       {embedded ? (
         <FilterRow className="space-y-2 py-2">
-          {showSwitches ? (
+          {headed ? null : showSwitches ? (
             <div className="flex items-center justify-between gap-2">
               <p className="text-xs text-muted-foreground">Standard</p>
               <div className="flex shrink-0 items-center gap-x-3">{symbolSwitches}</div>
@@ -441,38 +458,21 @@ function raritySummary(selected: string[] | undefined) {
   return selected.join(", ");
 }
 
-function DrillGroup({ compact = false }: { compact?: boolean }) {
-  const { filters, meta } = useGalleryFilterDialogContext();
+/** Less-used filters that keep their own drill-in page. */
+function MoreFiltersGroup({ compact = false }: { compact?: boolean }) {
+  const { filters } = useGalleryFilterDialogContext();
   const { filters: filterDefinition } = useGameModule();
   const { push } = useGalleryMobileFilterNav();
   const setCount = filters.set?.length ?? 0;
-  const typeCount = filters.type?.length ?? 0;
-  const symbolCount = filters.symbols?.length ?? 0;
   const keywordCount = filters.keywords?.length ?? 0;
-  const colorCount = filters.colors?.length ?? 0;
   const tagCount = filters.tags?.length ?? 0;
   const statCount = countActiveStatPageFilters(filterDefinition, filters);
   const rarityCount = filters.rarity?.length ?? 0;
   const { facets } = filterDefinition;
   const rowClassName = compact ? "min-h-10" : undefined;
-  const defaultFormat = meta.formats[0]?.key;
-  const activeFormat = filters.format ?? defaultFormat;
-  const formatName = meta.formats.find((format) => format.key === activeFormat)?.name ?? "Any";
-  const formatValue = filters.includeBanned ? `${formatName} · banned` : formatName;
-  const formatCount =
-    (filters.format && filters.format !== defaultFormat ? 1 : 0) + (filters.includeBanned ? 1 : 0);
 
   return (
-    <FilterGroup label={compact ? undefined : "More"}>
-      {compact ? (
-        <FilterDrillRow
-          label="Format"
-          value={formatValue}
-          count={formatCount}
-          className={rowClassName}
-          onClick={() => push("format")}
-        />
-      ) : null}
+    <FilterGroup label="More filters">
       <FilterDrillRow
         label="Sets"
         value={summarize(setCount, "set")}
@@ -480,37 +480,6 @@ function DrillGroup({ compact = false }: { compact?: boolean }) {
         className={rowClassName}
         onClick={() => push("sets")}
       />
-      {compact ? (
-        <FilterDrillRow
-          label="Type"
-          value={typeCount > 0 ? (filters.type ?? []).join(", ") : "Any"}
-          count={typeCount}
-          className={rowClassName}
-          onClick={() => push("type")}
-        />
-      ) : null}
-      {compact && facets.colors ? (
-        <FilterDrillRow
-          label="Colors"
-          value={
-            colorCount > 0
-              ? (filters.colors ?? []).map((value) => colorFacetLabel(facets.colors, value)).join(", ")
-              : "Any"
-          }
-          count={colorCount}
-          className={rowClassName}
-          onClick={() => push("colors")}
-        />
-      ) : null}
-      {compact && facets.symbols ? (
-        <FilterDrillRow
-          label="Symbols"
-          value={summarize(symbolCount, "symbol")}
-          count={symbolCount}
-          className={rowClassName}
-          onClick={() => push("symbols")}
-        />
-      ) : null}
       {facets.keywords ? (
         <FilterDrillRow
           label="Keywords"
@@ -536,15 +505,13 @@ function DrillGroup({ compact = false }: { compact?: boolean }) {
         className={rowClassName}
         onClick={() => push("stats")}
       />
-      {compact ? (
-        <FilterDrillRow
-          label="Rarity"
-          value={raritySummary(filters.rarity)}
-          count={rarityCount}
-          className={rowClassName}
-          onClick={() => push("rarity")}
-        />
-      ) : null}
+      <FilterDrillRow
+        label="Rarity"
+        value={raritySummary(filters.rarity)}
+        count={rarityCount}
+        className={rowClassName}
+        onClick={() => push("rarity")}
+      />
     </FilterGroup>
   );
 }
@@ -593,7 +560,8 @@ export function GalleryMobileFilterRootPage() {
   return (
     <div className="space-y-5 px-4 pb-4 pt-3">
       <ActiveChipsStrip />
-      <MobileFilterIndex />
+      <QuickFilterSections />
+      <MoreFiltersGroup />
       <SearchGroup />
       <DisplayGroup />
     </div>
@@ -604,7 +572,8 @@ export function GalleryDesktopFilterRootPage() {
   return (
     <div className="space-y-4 px-4 pb-4 pt-3">
       <ActiveChipsStrip />
-      <DrillGroup compact />
+      <QuickFilterSections compact />
+      <MoreFiltersGroup compact />
     </div>
   );
 }

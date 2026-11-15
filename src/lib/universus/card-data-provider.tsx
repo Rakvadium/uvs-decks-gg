@@ -16,6 +16,7 @@ import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
 import {
   useUniversusCards,
+  prefetchCardCache,
   filterCards,
   sortCards,
   paginateCards,
@@ -238,18 +239,25 @@ function CardDataProviderInner({ children }: CardDataProviderProps) {
     };
   }, [setsData, stableFormatsData, isSetLegalInFormat]);
 
-  const catalogValue = useMemo((): CardCatalogContextValue => {
-    const getFilteredCards = (filters: CardFilters) => {
+  // Its own callback so only card or legality changes (not e.g. the version check) refilter the gallery.
+  const catalogCards = cardData.cards;
+  const isCardBannedInFormat = stableFormatsData.isCardBannedInFormat;
+  const getFilteredCards = useCallback(
+    (filters: CardFilters) => {
       const formatKey = filters.format;
-      return filterCards(cardData.cards, filters, {
+      return filterCards(catalogCards, filters, {
         passesFormatLegality: formatKey
           ? (setCode) => !setCode || isSetLegalInFormat(setCode, formatKey)
           : undefined,
         isCardBannedInFormat: formatKey
-          ? (cardId) => stableFormatsData.isCardBannedInFormat(formatKey, cardId)
+          ? (cardId) => isCardBannedInFormat(formatKey, cardId)
           : undefined,
       }, filterDefinition);
-    };
+    },
+    [catalogCards, isSetLegalInFormat, isCardBannedInFormat, filterDefinition]
+  );
+
+  const catalogValue = useMemo((): CardCatalogContextValue => {
 
     const getSortedCards = (cards: CachedCard[], options: CardSortOptions) => {
       return sortCards(cards, options, filterDefinition);
@@ -278,7 +286,7 @@ function CardDataProviderInner({ children }: CardDataProviderProps) {
       getPaginatedCards,
       getFilteredAndSortedCards,
     };
-  }, [cardData, index, extraCards, ensureCards, registerCards, isSetLegalInFormat, stableFormatsData, filterDefinition]);
+  }, [cardData, index, extraCards, ensureCards, registerCards, getFilteredCards, filterDefinition]);
 
   return (
     <CardReferenceContext.Provider value={referenceValue}>
@@ -289,6 +297,9 @@ function CardDataProviderInner({ children }: CardDataProviderProps) {
 
 export function CardDataProvider({ children }: CardDataProviderProps) {
   const isClient = useIsClient();
+  const game = useGameId();
+  // The inner provider mounts after hydration; start the cache read now so it overlaps hydration.
+  if (typeof window !== "undefined") prefetchCardCache(game);
 
   if (!isClient) {
     return (
