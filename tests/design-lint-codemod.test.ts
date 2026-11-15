@@ -182,6 +182,47 @@ describe("Button size overrides", () => {
   });
 });
 
+describe("surface pass", () => {
+  const surfaces = (code: string) => transformSource(code, "surfaces.tsx", { surfacesOnly: true });
+
+  test("Badge text-[10px] and h-5 snap to size sm, h-8 to size lg", () => {
+    const result = surfaces(`const a = <>
+  <Badge variant="outline" className="h-5 px-1.5 text-[10px] font-normal">x</Badge>
+  <Badge className="text-[10px]">y</Badge>
+  <Badge variant="outline" className="h-8 shrink-0 px-2.5">z</Badge>
+  <Badge size="sm" className="text-[10px]">kept</Badge>
+</>;
+`);
+    expect(result.output).toBe(`const a = <>
+  <Badge size="sm" variant="outline" className="font-normal">x</Badge>
+  <Badge size="sm">y</Badge>
+  <Badge size="lg" variant="outline" className="shrink-0">z</Badge>
+  <Badge size="sm" className="text-[10px]">kept</Badge>
+</>;
+`);
+  });
+
+  test("muted pulse divs become Skeleton, with the import added once", () => {
+    const result = surfaces(`import { cn } from "@/lib/utils";
+const a = <div>
+  <div className="h-6 w-40 animate-pulse rounded-md bg-muted" />
+  <span className="size-8 animate-pulse rounded-full bg-muted-overlay" />
+  <div className="size-2 animate-pulse rounded-full bg-success" />
+</div>;
+`);
+    expect(result.output).toBe(`import { cn } from "@/lib/utils";
+import { Skeleton } from "@/components/ui/skeleton";
+const a = <div>
+  <Skeleton className="h-6 w-40" />
+  <Skeleton className="size-8 rounded-full" />
+  <div className="size-2 animate-pulse rounded-full bg-success" />
+</div>;
+`);
+    expect(result.left.map((l) => l.text)).toEqual(["size-2 animate-pulse rounded-full bg-success"]);
+    expect(surfaces(result.output).rewrites).toEqual([]);
+  });
+});
+
 describe("design:codemod CLI", () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "design-codemod-"));
   afterAll(() => fs.rmSync(root, { recursive: true, force: true }));
