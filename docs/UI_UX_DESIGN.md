@@ -122,7 +122,7 @@ Do not use `hsl(var(--border)…)` — theme borders are oklch via `var(--border
 
 | Role | Class |
 |------|--------|
-| Controls / inputs | `rounded-md` |
+| Controls / inputs | `rounded-control` |
 | Cards / panels | `rounded-lg` |
 | Large feature surfaces | `rounded-xl` |
 | Pills / avatars | `rounded-full` |
@@ -209,6 +209,25 @@ Call sites pass layout (width, padding) only, never a radius, background, border
 **Create flows.** `CreateEntityDialog` (`src/components/ui/create-entity-dialog.tsx`) is the one create dialog: icon header, a required name field, extra fields as children, then Cancel and a submit that stays disabled until the name has text. Decks, tier lists and teams use it.
 
 **Icon actions.** `IconToolbarButton` (`src/components/ui/icon-toolbar-button.tsx`) is `Button size="icon-xs"` with a required `label` (its `aria-label`), the `--hover-bg` hover and the selected tokens when `active`. It is the close for Dialog, AlertDialog, Sheet and the right side panel, and the gallery island's toolbar icons pass `shape="island"`.
+
+## Inputs
+
+`Input`, `SelectTrigger` and `Textarea` share one field surface from `src/components/ui/control.ts`: `rounded-control`, `bg-background-soft`, the dual control border, and the focus ring from `--chrome-focus-ring-color` and `--chrome-focus-shadow`. A call site never passes a height, radius or background. A transparent textarea or a primary glow on one search does not compile into the design.
+
+| `size` | `Input` and `SelectTrigger` height | `Textarea` minimum height |
+|--------|------------------------------------|---------------------------|
+| `xs` | `--control-h-xs` (28px) | 1.5 × `--control-h-xs` |
+| `sm` | `--control-h-sm` (32px) | 1.5 × `--control-h-sm` |
+| `md` (default) | `--control-h-md` (40px) | 1.5 × `--control-h-md` |
+| `lg` | `--control-h-lg` (48px) | 1.5 × `--control-h-lg` |
+
+`SelectTrigger variant="inline"` drops the border and fill for a trigger that sits inside another control's surface, such as the stat operator, the gallery island scope select and the deck section pill. It keeps the size and the focus ring.
+
+`SearchField` (`src/components/ui/search-field.tsx`) is the one in-page search: an `Input` with a search icon, `type="search"`, and a clear button that appears once there is text. It takes `value`, `onValueChange` and `size`, and labels itself from the placeholder. Its `className` sets layout on the wrapper only. The floating header search stays the island capsule ([Floating header](#floating-header)).
+
+A checked `Switch` reads the selected tokens (`--selected-bg`, `--selected-border`, `--selected-fg`) and focuses with the same ring as the fields.
+
+`design/primitive-geometry` reports `h-*`, `size-*` and `rounded-*` on `Input` and `SelectTrigger`. To move old overrides onto the `size` prop, run `bun run design:codemod --inputs <path>`. It snaps a height to the nearest step, a tie going to `md`, drops radius overrides, and removes the old `size="default"`.
 
 ## Z-index stack
 
