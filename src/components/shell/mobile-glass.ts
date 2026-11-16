@@ -11,7 +11,7 @@ export const MOBILE_GLASS_HAIRLINE_BOTTOM = "border-b border-hairline";
 export const MOBILE_GLASS_HAIRLINE_TOP = "border-t border-hairline";
 
 export const MOBILE_NAV_ICON_BUTTON =
-  "relative flex size-9 shrink-0 items-center justify-center rounded-pill text-foreground transition-colors duration-150 motion-safe:active:scale-95 motion-safe:transition-[color,background-color,transform] hover:bg-muted-elevated focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
+  "relative flex size-9 shrink-0 items-center justify-center rounded-island text-foreground transition-colors duration-150 motion-safe:active:scale-95 motion-safe:transition-[color,background-color,transform] hover:bg-muted-elevated focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
 
 export const MOBILE_NAV_ICON_BUTTON_ACTIVE = "bg-primary-selected text-primary";
 
@@ -28,6 +28,6 @@ export const MOBILE_SHEET_PANEL =
   "rounded-t-xl border-x border-t [border-color:var(--chrome-sheet-border)] bg-background-overlay backdrop-blur-xl shadow-[var(--chrome-sheet-shadow)]";
 
 export const MOBILE_SHEET_GRABBER =
-  "mx-auto h-1.5 w-10 rounded-pill bg-muted-foreground/40";
+  "mx-auto h-1.5 w-10 rounded-full bg-muted-foreground/40";
 
 export const MOBILE_SAFE_BOTTOM = "pb-[max(0.75rem,env(safe-area-inset-bottom))]";

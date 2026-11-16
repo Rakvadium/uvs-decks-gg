@@ -43,9 +43,9 @@ export function DeprecatedImportBanner() {
       </AlertDescription>
       <Button
         type="button"
-        size="icon"
+        size="icon-sm"
         variant="ghost"
-        className="absolute right-2 top-2 h-8 w-8"
+        className="absolute right-2 top-2"
         onClick={dismiss}
         aria-label="Dismiss"
       >

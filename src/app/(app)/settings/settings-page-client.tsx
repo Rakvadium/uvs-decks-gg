@@ -1,7 +1,9 @@
 "use client";
 
 import { PageHeading } from "@/components/ui/typography-headings";
-import { useState, useEffect, useOptimistic, useTransition, useCallback } from "react";
+import { LoadingState } from "@/components/ui/loading-state";
+import { Panel } from "@/components/ui/panel";
+import { useState, useEffect, useOptimistic, useTransition, useCallback, useRef } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import { useRouter } from "next/navigation";
@@ -17,7 +19,9 @@ import { usePrefersReducedMotion } from "@/lib/reduced-motion";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { FieldError } from "@/components/ui/field";
 import { Label } from "@/components/ui/label";
+import { OptionTile } from "@/components/ui/option-tile";
 import { Switch } from "@/components/ui/switch";
 import {
   Card,
@@ -38,25 +42,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  User,
-  Palette,
-  Moon,
-  Sun,
-  Monitor,
-  ArrowLeft,
-  Check,
-  Loader2,
-  Mail,
-  AtSign,
-  Shield,
-  Calendar,
-  Sparkles,
-  Filter,
-  ChevronDown,
-} from "lucide-react";
+import { User, Palette, Moon, Sun, Monitor, ArrowLeft, Check, Mail, AtSign, Shield, Calendar, Sparkles, Filter, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { validateUsername } from "@shared/username";
 import Image from "next/image";
 import {
   FloatingBackPill,
@@ -71,6 +60,7 @@ import {
   normalizeAvatarImagePath,
 } from "@/lib/user-avatar";
 import { SettingsAuthRequiredState } from "./auth-required-state";
+import { Spinner } from "@/components/ui/spinner";
 
 const MODE_OPTIONS: readonly {
   value: ThemePreference;
@@ -164,7 +154,7 @@ function ColorSwatchRow({
       <input
         aria-label={`${label} color`}
         type="color"
-        className="h-9 w-12 cursor-pointer rounded border border-input bg-background"
+        className="h-9 w-12 cursor-pointer rounded-md border border-input bg-background"
         value={safePick}
         onChange={(e) => onChange(e.target.value)}
       />
@@ -223,6 +213,8 @@ export default function SettingsPageClient() {
   } = useColorScheme();
 
   const [username, setUsername] = useState("");
+  const [usernameError, setUsernameError] = useState<string | null>(null);
+  const usernameInputRef = useRef<HTMLInputElement>(null);
   const [imageUrl, setImageUrl] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
@@ -274,10 +266,16 @@ export default function SettingsPageClient() {
   };
 
   const handleSaveProfile = async () => {
+    const error = validateUsername(username);
+    setUsernameError(error);
+    if (error) {
+      usernameInputRef.current?.focus();
+      return;
+    }
     setIsSaving(true);
     try {
       await updateProfile({
-        username: username || undefined,
+        username: username.trim(),
         image: normalizeAvatarImagePath(imageUrl) || undefined,
       });
       toast.success("Profile updated successfully");
@@ -291,9 +289,7 @@ export default function SettingsPageClient() {
 
   if (user === undefined) {
     return (
-      <div className="flex h-full items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-      </div>
+      <LoadingState size="lg" className="h-full" />
     );
   }
 
@@ -304,7 +300,7 @@ export default function SettingsPageClient() {
           <FloatingPageBar
             left={
               <>
-                <FloatingBackPill onClick={() => router.back()} label="Go back" iconOnly />
+                <FloatingBackPill onClick={() => router.back()} label="Go back" />
                 <FloatingPageTitle>Settings</FloatingPageTitle>
               </>
             }
@@ -341,7 +337,7 @@ export default function SettingsPageClient() {
         <FloatingPageBar
           left={
             <>
-              <FloatingBackPill onClick={handleBack} label="Go back" iconOnly />
+              <FloatingBackPill onClick={handleBack} label="Go back" />
               <FloatingPageTitle>Settings</FloatingPageTitle>
             </>
           }
@@ -365,7 +361,7 @@ export default function SettingsPageClient() {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
               <User className="h-6 w-6 text-primary" />
             </div>
             <div>
@@ -409,11 +405,18 @@ export default function SettingsPageClient() {
                         Username
                       </Label>
                       <Input
+                        ref={usernameInputRef}
                         id="username"
                         value={username}
-                        onChange={(e) => setUsername(e.target.value)}
+                        onChange={(e) => {
+                          setUsername(e.target.value);
+                          setUsernameError(null);
+                        }}
                         placeholder="Enter your username"
+                        aria-invalid={usernameError ? true : undefined}
+                        aria-describedby={usernameError ? "username-error" : undefined}
                       />
+                      {usernameError ? <FieldError id="username-error">{usernameError}</FieldError> : null}
                     </div>
                   </div>
                 </div>
@@ -428,16 +431,11 @@ export default function SettingsPageClient() {
                       const selected =
                         normalizeAvatarImagePath(imageUrl) === symbol.path;
                       return (
-                        <button
+                        <OptionTile
                           key={symbol.id}
-                          type="button"
+                          selected={selected}
                           onClick={() => setImageUrl(symbol.path)}
-                          className={cn(
-                            "group relative flex flex-col items-center gap-2 rounded-xl border-2 p-3 transition-colors hover:border-primary/50 hover:bg-muted/50",
-                            selected
-                              ? "border-primary bg-primary/10"
-                              : "border-muted"
-                          )}
+                          className="group relative flex flex-col items-center gap-2 p-3"
                         >
                           <div className="relative h-10 w-10">
                             <Image
@@ -453,7 +451,7 @@ export default function SettingsPageClient() {
                               <Check className="h-3 w-3" />
                             </div>
                           )}
-                        </button>
+                        </OptionTile>
                       );
                     })}
                   </div>
@@ -487,7 +485,7 @@ export default function SettingsPageClient() {
                     className="gap-2"
                   >
                     {isSaving ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <Spinner />
                     ) : (
                       <Check className="h-4 w-4" />
                     )}
@@ -589,35 +587,30 @@ export default function SettingsPageClient() {
                     {COLOR_SCHEMES.map((scheme) => {
                       const active = colorPreset === scheme.value;
                       return (
-                        <button
+                        <OptionTile
                           key={scheme.value}
-                          type="button"
+                          selected={active}
                           onClick={() =>
                             void setAppearancePreset(scheme.value)
                           }
-                          className={cn(
-                            "group relative rounded-xl border-2 p-3 text-left transition-colors hover:border-primary/50",
-                            active
-                              ? "border-primary bg-primary/5"
-                              : "border-muted hover:bg-muted/50",
-                          )}
+                          className="group relative p-3 text-left"
                         >
                           <div className="flex items-center gap-2">
                             <div
                               className={cn(
                                 "h-4 w-4 rounded-full ring-2 ring-offset-2 ring-offset-background transition-colors",
                                 active
-                                  ? "bg-primary ring-primary"
+                                  ? "bg-(--selected-fg) ring-(--selected-border)"
                                   : "bg-muted ring-transparent group-hover:ring-muted",
                               )}
                             />
                             <span className="text-sm font-medium">{scheme.label}</span>
                           </div>
-                        </button>
+                        </OptionTile>
                       );
                     })}
-                    <button
-                      type="button"
+                    <OptionTile
+                      selected={isCustomAppearance}
                       onClick={() =>
                         void setAppearanceCustom(
                           colorSource.kind === "custom"
@@ -625,19 +618,14 @@ export default function SettingsPageClient() {
                             : { fallback: DEFAULT_CUSTOM_BRAND },
                         )
                       }
-                      className={cn(
-                        "group relative rounded-xl border-2 p-3 text-left transition-colors hover:border-primary/50 sm:col-span-1 col-span-2",
-                        isCustomAppearance
-                          ? "border-primary bg-primary/5"
-                          : "border-muted hover:bg-muted/50",
-                      )}
+                      className="group relative col-span-2 p-3 text-left sm:col-span-1"
                     >
                       <div className="flex items-center gap-2">
                         <div
                           className={cn(
                             "h-4 w-4 rounded-full ring-2 ring-offset-2 ring-offset-background transition-colors",
                             isCustomAppearance
-                              ? "bg-primary ring-primary"
+                              ? "bg-(--selected-fg) ring-(--selected-border)"
                               : "bg-muted ring-transparent group-hover:ring-muted",
                           )}
                         />
@@ -646,7 +634,7 @@ export default function SettingsPageClient() {
                       <p className="mt-1 text-xs text-muted-foreground">
                         Choose primary and secondary for light and dark.
                       </p>
-                    </button>
+                    </OptionTile>
                   </div>
                 </div>
 
@@ -663,7 +651,7 @@ export default function SettingsPageClient() {
                       <CollapsibleTrigger className="flex w-full items-center gap-2 rounded-lg border border-border/50 px-3 py-2 text-left text-sm font-medium hover:bg-muted/60 [&[data-state=open]_svg:first-child]:rotate-180">
                         <ChevronDown className="h-4 w-4 shrink-0 transition-transform" />
                         Per-chrome color overrides
-                        <Badge variant="secondary" className="ml-auto text-[10px]">
+                        <Badge size="sm" variant="secondary" className="ml-auto">
                           Advanced
                         </Badge>
                       </CollapsibleTrigger>
@@ -679,16 +667,13 @@ export default function SettingsPageClient() {
                             const hasOverride = Boolean(customDraft.byChrome?.[opt.id]);
 
                             return (
-                              <div
-                                key={opt.id}
-                                className="rounded-xl border border-border/50 bg-muted/20 p-3 space-y-2"
-                              >
+                              <Panel key={opt.id} className="space-y-2 p-3">
                                 <div className="flex flex-wrap items-start justify-between gap-2">
                                   <div className="min-w-0 space-y-0.5">
                                     <div className="flex flex-wrap items-center gap-2">
                                       <p className="text-sm font-medium">{opt.label}</p>
                                       {hasOverride ? (
-                                        <Badge variant="outline" className="text-[10px]">
+                                        <Badge size="sm" variant="outline">
                                           Override
                                         </Badge>
                                       ) : (
@@ -731,7 +716,7 @@ export default function SettingsPageClient() {
                                     }))
                                   }
                                 />
-                              </div>
+                              </Panel>
                             );
                           })}
                         </div>

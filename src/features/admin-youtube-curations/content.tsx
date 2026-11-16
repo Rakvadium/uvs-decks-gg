@@ -214,9 +214,9 @@ function SortableCurationRow({
               <Button
                 key={p.value}
                 type="button"
-                size="sm"
+                size="xs"
                 variant="outline"
-                className="h-7 text-xs"
+                className="text-xs"
                 onClick={() => {
                   setAccent(p.value);
                   void onUpdateField({ curationId: row.curationId, accentClass: p.value });

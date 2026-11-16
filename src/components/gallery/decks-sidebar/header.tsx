@@ -1,6 +1,6 @@
-import { Plus, X } from "lucide-react";
+import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { SearchBar } from "@/components/ui/search-bar";
+import { SearchField } from "@/components/ui/search-field";
 import { SegmentedControl } from "@/components/ui/segmented-control";
 import { TABS } from "./constants";
 import { useDecksSidebarContext } from "./context";
@@ -19,30 +19,16 @@ export function DecksSidebarHeader() {
   return (
     <div className="shrink-0 space-y-3 border-b border-border/30 p-4">
       <div className="flex items-center gap-2">
-        <SearchBar
+        <SearchField
           placeholder="Search decks…"
           value={searchQuery}
-          onSearchChange={setSearchQuery}
-          className="max-w-none"
-          endAdornment={
-            searchQuery ? (
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8"
-                aria-label="Clear search"
-                onClick={() => setSearchQuery("")}
-              >
-                <X className="h-3.5 w-3.5" />
-              </Button>
-            ) : null
-          }
+          onValueChange={setSearchQuery}
+          name="decks-sidebar-search"
+          className="flex-1"
         />
         {isAuthenticated ? (
           <Button
-            size="sm"
-            className="h-10 shrink-0 gap-1.5 px-3"
+            className="shrink-0 gap-1.5 px-3"
             aria-label="New Deck"
             onClick={() => setIsCreateOpen(true)}
           >

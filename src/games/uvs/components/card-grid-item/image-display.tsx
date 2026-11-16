@@ -38,7 +38,7 @@ export function CardImageDisplay({
     return (
       <div className={cn("flex h-full w-full items-center justify-center border border-border/50 bg-muted/50", className)}>
         <div className="text-center">
-          <div className="mx-auto mb-2 flex h-8 w-8 items-center justify-center rounded border border-primary/30">
+          <div className="mx-auto mb-2 flex h-8 w-8 items-center justify-center rounded-md border border-primary/30">
             <span className="text-lg text-primary/50">?</span>
           </div>
           <span className="chrome-label-case text-xs text-muted-foreground">No Image</span>

@@ -12,6 +12,7 @@ export function CharacterThumbnail({
   className: string;
 }) {
   return (
+    // eslint-disable-next-line design/radius-ladder -- printed card art: a character card thumbnail keeps the small card corner
     <div className={cn("relative overflow-hidden rounded border border-border/40 bg-muted/50", className)}>
       {imageUrl ? (
         <Image src={imageUrl} alt={name} fill sizes="48px" className="object-cover object-top" />

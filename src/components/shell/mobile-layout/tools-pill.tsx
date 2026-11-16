@@ -83,7 +83,7 @@ export function MobileToolsPill({ triggers, children, label }: MobileToolsPillPr
         tabIndex={open ? 0 : -1}
         onClick={close}
         className={cn(
-          "absolute inset-0 bg-background-soft backdrop-blur-sm transition-opacity",
+          "absolute inset-0 bg-background-soft backdrop-blur-sm transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring",
           open ? "duration-300" : "duration-200",
           open ? "pointer-events-auto opacity-100" : "opacity-0"
         )}
@@ -121,7 +121,7 @@ export function MobileToolsPill({ triggers, children, label }: MobileToolsPillPr
           ref={panelRef}
           role="dialog"
           aria-label={label}
-          className={cn("absolute inset-0 flex flex-col overflow-hidden rounded-3xl text-foreground [-webkit-touch-callout:none]", LIQUID_GLASS, open && "pointer-events-auto")}
+          className={cn("absolute inset-0 flex flex-col overflow-hidden rounded-xl text-foreground [-webkit-touch-callout:none]", LIQUID_GLASS, open && "pointer-events-auto")}
           style={{ clipPath: clip, WebkitClipPath: clip, opacity: open ? 1 : 0, transition: morphTransition(open) }}
         >
           <GlassRing />
@@ -150,7 +150,7 @@ export function MobileToolsPanelHeader({ title, detail, onDone }: { title: strin
       <button
         type="button"
         onClick={onDone}
-        className="flex h-9 shrink-0 items-center rounded-pill px-3 text-sm font-semibold text-primary hover:bg-primary-wash focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="flex h-9 shrink-0 items-center rounded-island px-3 text-sm font-semibold text-primary hover:bg-primary-wash focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
         Done
       </button>
@@ -187,10 +187,10 @@ export function MobileToolsOptionList<T extends string>({
             role="radio"
             aria-checked={selected}
             onClick={() => onChange(option.value)}
-            className="flex min-h-11 w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-foreground transition-colors duration-150 hover:bg-muted-elevated"
+            className="flex min-h-11 w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-foreground transition-colors duration-150 hover:bg-muted-elevated focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
           >
             <span className="min-w-0 flex-1">{option.label}</span>
-            {selected ? <Check className="size-4 shrink-0 text-primary" aria-hidden /> : null}
+            {selected ? <Check className="size-4 shrink-0 text-(--selected-fg)" aria-hidden /> : null}
           </button>
         );
       })}

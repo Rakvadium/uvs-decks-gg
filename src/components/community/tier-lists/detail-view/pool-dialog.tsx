@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { Banner } from "@/components/ui/banner";
+import { Panel } from "@/components/ui/panel";
 import { Plus, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -127,33 +129,32 @@ export function CommunityTierListDetailPoolDialog() {
                 </p>
                 <ul className="max-h-[28vh] space-y-2 overflow-y-auto pr-1">
                   {poolScopes.map((scope) => (
-                    <li
-                      key={tierListPoolScopeKey(scope)}
-                      className="flex items-center justify-between gap-3 rounded-xl border border-border/50 bg-background/50 px-3 py-2"
-                    >
-                      <span className="min-w-0 text-sm">
-                        {formatTierListPoolScopeLabel(
-                          scope,
-                          visibleSets.find((set) => set.code === scope.setCode)?.name
-                        )}
-                      </span>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 shrink-0"
-                        onClick={() => removePoolScope(scope)}
-                        aria-label="Remove pool rule"
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </li>
+                    <Panel asChild key={tierListPoolScopeKey(scope)}>
+                      <li className="flex items-center justify-between gap-3 px-3 py-2">
+                        <span className="min-w-0 text-sm">
+                          {formatTierListPoolScopeLabel(
+                            scope,
+                            visibleSets.find((set) => set.code === scope.setCode)?.name
+                          )}
+                        </span>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon-sm"
+                          className="shrink-0"
+                          onClick={() => removePoolScope(scope)}
+                          aria-label="Remove pool rule"
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </li>
+                    </Panel>
                   ))}
                 </ul>
               </div>
             ) : null}
 
-            <div className="space-y-3 rounded-xl border border-border/50 bg-card/50 p-4">
+            <Panel className="space-y-3 p-4">
               <p className="chrome-label-case text-[11px] text-muted-foreground">Add to pool</p>
               <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
                 <div className="min-w-0 flex-1 space-y-2">
@@ -200,7 +201,7 @@ export function CommunityTierListDetailPoolDialog() {
                 </div>
                 <Button
                   type="button"
-                  className={cn("h-10 shrink-0 sm:w-auto")}
+                  className={cn("shrink-0 sm:w-auto")}
                   onClick={handleAddScope}
                   disabled={!draftSetCode || !draftCardType}
                 >
@@ -214,12 +215,12 @@ export function CommunityTierListDetailPoolDialog() {
                   data may look empty until those cards are available.
                 </p>
               ) : null}
-            </div>
+            </Panel>
 
-            <div className="rounded-lg border border-dashed border-border/50 bg-muted/20 px-3 py-2 text-xs text-muted-foreground">
+            <Banner className="block text-muted-foreground">
               Lists created before this change used entire sets; they may show as one “All types” rule per set. Remove
               those and add set + type rows here to narrow the pool.
-            </div>
+            </Banner>
           </DialogBody>
         </div>
       </DialogContent>

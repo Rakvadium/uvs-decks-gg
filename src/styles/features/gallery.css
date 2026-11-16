@@ -13,7 +13,6 @@
 
     --chrome-gallery-loading-shadow: var(--chrome-elevation-mid);
     --chrome-gallery-progress-bar-glow: none;
-    --chrome-gallery-empty-icon-shadow: var(--chrome-elevation-low);
     --chrome-gallery-empty-wash: none;
     --chrome-gallery-stats-dot-shadow: none;
   }
@@ -28,7 +27,6 @@
 
     --chrome-gallery-loading-shadow: 0 0 30px -5px var(--primary);
     --chrome-gallery-progress-bar-glow: 0 0 10px var(--primary);
-    --chrome-gallery-empty-icon-shadow: 0 0 30px -5px var(--primary);
     --chrome-gallery-empty-wash: linear-gradient(to right, oklch(from var(--primary) l c h / 0.1), oklch(from var(--secondary) l c h / 0.1), oklch(from var(--primary) l c h / 0.1));
     --chrome-gallery-stats-dot-shadow: 0 0 8px var(--success);
   }

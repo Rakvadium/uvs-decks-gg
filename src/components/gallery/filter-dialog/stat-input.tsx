@@ -63,7 +63,7 @@ export function StatInput({ label, filterKey, labelPosition = "start" }: StatInp
       ) : null}
       <div
         className={cn(
-          "relative flex h-7 min-w-0 items-stretch overflow-hidden rounded-md border bg-background/50 transition-colors",
+          "relative flex h-(--control-h-xs) min-w-0 items-stretch overflow-hidden rounded-md border bg-background/50 transition-colors",
           labelPosition === "start" ? "flex-1" : "w-full flex-1",
           hasValue
             ? "border-primary/40 shadow-[var(--chrome-filter-tile-shadow-selected)]"
@@ -72,14 +72,14 @@ export function StatInput({ label, filterKey, labelPosition = "start" }: StatInp
       >
         <div className="flex h-full min-h-0 w-10 shrink-0 items-center justify-center border-r border-border/50 bg-muted/60">          <Select value={value?.operator ?? "eq"} onValueChange={handleOperatorChange}>
             <SelectTrigger
-              size="sm"
+              variant="inline"
+              size="xs"
               hideIcon
               compactValue
               className={cn(
-                "flex h-full min-h-0 w-full !items-center !justify-center gap-0 rounded-none border-0 bg-transparent p-0 shadow-none",
+                "w-full !justify-center gap-0 p-0 focus-visible:z-10",
                 "text-center text-[11px] normal-case leading-none tracking-normal",
-                "focus-visible:z-10 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-0",
-                "[&>[data-slot=select-value]]:block [&>[data-slot=select-value]]:text-center [&>[data-slot=select-value]]:tabular-nums"
+                "[&>[data-slot=select-value]]:text-center [&>[data-slot=select-value]]:tabular-nums"
               )}
             >
               <SelectValue />

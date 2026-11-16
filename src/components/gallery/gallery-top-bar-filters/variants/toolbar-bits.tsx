@@ -1,6 +1,7 @@
 "use client";
 
 import { FileText, LayoutGrid, List, SlidersHorizontal } from "lucide-react";
+import { IconToolbarButton } from "@/components/ui/icon-toolbar-button";
 import {
   Popover,
   PopoverContent,
@@ -12,17 +13,12 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  type SelectTriggerProps,
 } from "@/components/ui/select";
 import { useGalleryFilterDialogContext } from "@/components/gallery/filter-dialog/context";
 import { cn } from "@/lib/utils";
 import { useGalleryTopBarFiltersContext } from "../context";
 import { GalleryViewModeFields } from "../view-mode-popover";
-
-export const variantPopoverClassName =
-  "z-[200] border border-[color:var(--control-dual-border)] bg-popover/95 p-3 shadow-[var(--chrome-popover-shadow),var(--popover-dual-glow)] backdrop-blur-lg outline-hidden data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95";
-
-const inlineControlClassName =
-  "relative flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-[color:var(--control-dual-mix)] transition-colors hover:bg-[color:var(--control-dual-surface-hover)] hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--control-dual-ring)]";
 
 const VIEW_MODE_ICONS = {
   card: LayoutGrid,
@@ -30,19 +26,15 @@ const VIEW_MODE_ICONS = {
   details: FileText,
 };
 
-export function InlineFunnelButton({ className }: { className?: string }) {
+export function InlineFunnelButton() {
   const { meta, isFilterPanelOpen, setFilterPanelOpen } = useGalleryTopBarFiltersContext();
 
   return (
-    <button
-      type="button"
+    <IconToolbarButton
       data-gallery-filter-panel-trigger=""
-      className={cn(
-        inlineControlClassName,
-        isFilterPanelOpen && "bg-[color:var(--control-dual-surface-hover)] text-primary",
-        className
-      )}
-      aria-label="Toggle filter panel"
+      shape="island"
+      label="Toggle filter panel"
+      active={isFilterPanelOpen}
       aria-expanded={isFilterPanelOpen}
       onClick={() => setFilterPanelOpen(!isFilterPanelOpen)}
     >
@@ -52,11 +44,11 @@ export function InlineFunnelButton({ className }: { className?: string }) {
           {meta.activeFilterCount}
         </span>
       ) : null}
-    </button>
+    </IconToolbarButton>
   );
 }
 
-export function InlineViewModeButton({ className }: { className?: string }) {
+export function InlineViewModeButton() {
   const { state } = useGalleryTopBarFiltersContext();
   const currentMode = state.viewMode;
   const CurrentIcon = VIEW_MODE_ICONS[currentMode] ?? LayoutGrid;
@@ -64,15 +56,11 @@ export function InlineViewModeButton({ className }: { className?: string }) {
   return (
     <Popover modal={false}>
       <PopoverTrigger asChild>
-        <button
-          type="button"
-          className={cn(inlineControlClassName, className)}
-          aria-label="Change view mode"
-        >
-          <CurrentIcon className="size-4" />
-        </button>
+        <IconToolbarButton shape="island" label="Change view mode">
+          <CurrentIcon />
+        </IconToolbarButton>
       </PopoverTrigger>
-      <PopoverContent className={cn(variantPopoverClassName, "w-52")} align="end" sideOffset={10}>
+      <PopoverContent className="w-52 p-3" align="end" sideOffset={10}>
         <GalleryViewModeFields layout="popover" />
       </PopoverContent>
     </Popover>
@@ -99,7 +87,7 @@ export function InlineResultCount({ className }: { className?: string }) {
   );
 }
 
-export function InlineScopeSelect({ className }: { className?: string }) {
+export function InlineScopeSelect({ shape }: { shape?: SelectTriggerProps["shape"] }) {
   const { state, actions } = useGalleryTopBarFiltersContext();
 
   return (
@@ -108,11 +96,10 @@ export function InlineScopeSelect({ className }: { className?: string }) {
       onValueChange={(value) => actions.setSearchMode(value as "name" | "text" | "all")}
     >
       <SelectTrigger
-        size="sm"
-        className={cn(
-          "chrome-label-case h-6 min-w-[3.25rem] shrink-0 rounded-sm border-none bg-transparent px-1.5 py-0 text-[11px] text-muted-foreground shadow-none hover:bg-muted/50 hover:text-foreground focus-visible:ring-1 focus-visible:ring-[color:var(--control-dual-ring)] focus-visible:shadow-none",
-          className
-        )}
+        variant="inline"
+        size="xs"
+        shape={shape}
+        className="min-w-[3.25rem] shrink-0 px-1.5 text-[11px] text-muted-foreground hover:text-foreground"
         aria-label="Search scope"
       >
         <SelectValue />

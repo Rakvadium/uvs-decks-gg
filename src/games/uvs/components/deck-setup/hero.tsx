@@ -55,7 +55,7 @@ export function UvsDeckSetupHero({
     <>
       <div
         className={cn(
-          "relative mx-auto w-full max-w-[260px] shrink-0 overflow-hidden rounded-lg bg-card shadow-[0_0_0_1px_var(--primary)/15,0_0_8px_var(--primary)/30] lg:mx-0 lg:w-48",
+          "relative mx-auto w-full max-w-[260px] shrink-0 overflow-hidden rounded-lg bg-card lg:mx-0 lg:w-48",
           compactEmptyMobile ? "aspect-auto h-24 max-lg:max-w-none" : "aspect-[2.5/3.5]",
         )}
       >
@@ -64,7 +64,7 @@ export function UvsDeckSetupHero({
             <button
               type="button"
               aria-label="View starting character details"
-              className="absolute inset-0 z-10 cursor-pointer"
+              className="absolute inset-0 z-10 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               onClick={handleImageClick}
             >
               {displayImage ? (
@@ -119,7 +119,7 @@ export function UvsDeckSetupHero({
           <button
             type="button"
             aria-label="View starting character details"
-            className="absolute inset-0 z-10 cursor-pointer overflow-hidden"
+            className="absolute inset-0 z-10 cursor-pointer overflow-hidden outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             onClick={handleImageClick}
           >
             {displayImage ? (

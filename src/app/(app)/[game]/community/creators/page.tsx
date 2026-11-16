@@ -6,9 +6,10 @@ import { FloatingBackPill, FloatingPageBar, FloatingPageLayout } from "@/compone
 export default function CreatorProgramPage() {
   return (
     <FloatingPageLayout
+      pageWash="grid"
       bar={
         <FloatingPageBar
-          left={<FloatingBackPill href="/community" label="Community" iconOnly />}
+          left={<FloatingBackPill href="/community" label="Community" />}
         />
       }
     >

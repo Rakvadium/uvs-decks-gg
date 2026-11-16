@@ -1,6 +1,7 @@
 "use client";
 
 import { PageHeading } from "@/components/ui/typography-headings";
+import { Surface } from "@/components/ui/card";
 import { memo, useEffect, useState } from "react";
 import { Layers, LayoutGrid, ArrowRight, Hexagon, Users, Zap, Database, Activity, ChevronRight, Clapperboard } from "lucide-react";
 import Link from "next/link";
@@ -13,6 +14,7 @@ import * as m from "framer-motion/m";
 import { usePrefersReducedMotion } from "@/lib/reduced-motion";
 import { useStartAuth } from "@/components/auth/use-start-auth";
 import { useBrand, useGameId, useGameModule } from "@/games/game-context";
+import { FloatingPageBar, FloatingPageLayout, FloatingPageTitle } from "@/components/shell/floating-page-bar";
 
 function StatCard({ label, value, icon: Icon, delay = 0, animate = true }: { label: string; value: string | number; icon: typeof Database; delay?: number; animate?: boolean }) {
   const prefersReducedMotion = usePrefersReducedMotion();
@@ -25,7 +27,7 @@ function StatCard({ label, value, icon: Icon, delay = 0, animate = true }: { lab
       transition={{ duration: 0.5, delay }}
       className="relative group"
     >
-      <div className="relative flex items-center gap-4 rounded-lg border border-border/50 bg-card/80 p-4 shadow-[var(--chrome-elevation-low)] transition-[border-color,box-shadow] duration-150 hover:border-[var(--chrome-card-border-hover)] hover:shadow-[var(--chrome-elevation-mid)]">
+      <Surface className="flex-row items-center gap-4 p-4">
         <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-primary/30 bg-primary/10">
           <Icon className="h-5 w-5 text-primary" />
         </div>
@@ -33,7 +35,7 @@ function StatCard({ label, value, icon: Icon, delay = 0, animate = true }: { lab
           <p className="text-2xl font-bold tabular-nums text-foreground">{value}</p>
           <p className="chrome-label-case text-xs text-muted-foreground">{label}</p>
         </div>
-      </div>
+      </Surface>
     </m.div>
   );
 }
@@ -122,14 +124,8 @@ function HomePage() {
   const greetingName = isAuthenticated ? username : displayName;
 
   return (
-    <div className="relative flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-y-contain [-webkit-overflow-scrolling:touch] md:h-full" style={{ transform: "translateZ(0)" }}>
-      <div className="pointer-events-none absolute inset-0 overflow-hidden" style={{ opacity: "var(--chrome-page-hero-wash-opacity)" as unknown as number }}>
-        <div className="absolute left-1/4 top-0 h-96 w-96 rounded-full bg-primary/5 blur-3xl" />
-        <div className="absolute bottom-0 right-1/4 h-96 w-96 rounded-full bg-secondary/5 blur-3xl" />
-        <div className="absolute left-1/2 top-1/2 h-[800px] w-[800px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-r from-primary/3 via-transparent to-secondary/3 blur-3xl" />
-      </div>
-
-      <div className="relative z-10 space-y-10 p-6 md:p-8 lg:p-10">
+    <FloatingPageLayout bar={<FloatingPageBar left={<FloatingPageTitle>Home</FloatingPageTitle>} />} pageWash="glow">
+      <div className="space-y-10 pb-4 lg:px-4">
         <m.div
           initial={introAnimations ? { opacity: 0, y: -20 } : false}
           animate={{ opacity: 1, y: 0 }}
@@ -288,7 +284,7 @@ function HomePage() {
           <Hexagon className="h-4 w-4" />
         </m.div>
       </div>
-    </div>
+    </FloatingPageLayout>
   );
 }
 

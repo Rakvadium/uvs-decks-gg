@@ -1,32 +1,46 @@
 "use client";
 
 import Link from "next/link";
-import { useRef, type ComponentType, type ReactNode } from "react";
+import { useRef, type ComponentType, type ReactNode, type Ref } from "react";
 import { ArrowLeft, Search, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button, type ButtonProps } from "@/components/ui/button";
+import { IconToolbarButton } from "@/components/ui/icon-toolbar-button";
 import { cn } from "@/lib/utils";
 import { useSlashToFocus } from "@/hooks/use-slash-to-focus";
 import { useIsMobile } from "@/hooks/useIsMobile";
-import { FloatingIslandCapsule } from "./floating-island";
+import {
+  FloatingIslandCapsule,
+  floatingIslandHoverClassName,
+  floatingIslandSurfaceClassName,
+} from "./floating-island";
 
-export const FLOATING_ACTION_PILL_CLASS =
-  "pointer-events-auto h-10 shrink-0 gap-1.5 rounded-full px-4 shadow-[var(--chrome-floating-shadow)]";
+const FLOATING_CENTER_WIDTH_CLASS_NAMES = {
+  default: "grid-cols-[minmax(max-content,1fr)_minmax(0,var(--floating-center-w))_minmax(max-content,1fr)]",
+  wide: "grid-cols-[minmax(max-content,1fr)_minmax(0,var(--floating-center-w-wide))_minmax(max-content,1fr)]",
+} as const;
+
+export type FloatingCenterWidth = keyof typeof FLOATING_CENTER_WIDTH_CLASS_NAMES;
 
 export function FloatingPageBar({
   left,
   center,
   right,
+  centerWidth = "default",
   className,
 }: {
   left?: ReactNode;
   center?: ReactNode;
   right?: ReactNode;
+  centerWidth?: FloatingCenterWidth;
   className?: string;
 }) {
   return (
     <div
+      data-slot="floating-page-bar"
+      data-center-width={centerWidth}
       className={cn(
-        "pointer-events-none grid w-full min-w-0 grid-cols-[1fr_minmax(0,26rem)_1fr] items-center gap-3 py-0.5",
+        "pointer-events-none grid w-full min-w-0 items-center gap-3 py-0.5",
+        FLOATING_CENTER_WIDTH_CLASS_NAMES[centerWidth],
         className
       )}
     >
@@ -37,14 +51,30 @@ export function FloatingPageBar({
   );
 }
 
+export const PAGE_WASH_CLASS_NAMES = {
+  fade: "bg-linear-to-b from-primary/7 via-primary/3 via-40% to-transparent",
+  radial:
+    "bg-[radial-gradient(circle_at_top,color-mix(in_oklab,var(--primary)_8%,transparent),transparent_32%),radial-gradient(circle_at_80%_8%,color-mix(in_oklab,var(--secondary)_10%,transparent),transparent_28%)]",
+  grid:
+    "bg-[radial-gradient(circle_at_30%_0%,color-mix(in_oklab,var(--primary)_10%,transparent),transparent_22rem),radial-gradient(circle_at_100%_45%,color-mix(in_oklab,var(--secondary)_10%,transparent),transparent_24rem),linear-gradient(to_right,color-mix(in_oklab,var(--border)_22%,transparent)_1px,transparent_1px),linear-gradient(to_bottom,color-mix(in_oklab,var(--border)_22%,transparent)_1px,transparent_1px)] bg-size-[100%_100%,100%_100%,24px_24px,24px_24px]",
+  glow:
+    "bg-[radial-gradient(circle_at_30%_0%,color-mix(in_oklab,var(--primary)_4%,transparent),transparent_24rem),radial-gradient(circle_at_70%_100%,color-mix(in_oklab,var(--secondary)_4%,transparent),transparent_24rem)]",
+} as const;
+
+export type PageWash = keyof typeof PAGE_WASH_CLASS_NAMES;
+
 export function FloatingPageLayout({
   bar,
   children,
   contentClassName,
+  pageWash,
+  scrollRef,
 }: {
   bar: ReactNode;
   children: ReactNode;
   contentClassName?: string;
+  pageWash?: PageWash;
+  scrollRef?: Ref<HTMLDivElement>;
 }) {
   // Desktop-only chrome: on mobile the nav bar and its slots own these controls, and a mounted
   // copy here would open a second instance of every bar dialog.
@@ -52,14 +82,23 @@ export function FloatingPageLayout({
 
   return (
     <div className="relative flex min-h-0 flex-1 flex-col md:h-full">
+      {pageWash ? (
+        <div
+          aria-hidden
+          data-slot="page-wash"
+          data-wash={pageWash}
+          className={cn("pointer-events-none absolute inset-0", PAGE_WASH_CLASS_NAMES[pageWash])}
+        />
+      ) : null}
       {isMobile ? null : (
         <div className="pointer-events-none absolute inset-x-0 top-0 z-30 hidden px-4 pt-3 md:block md:px-6">
           {bar}
         </div>
       )}
       <div
+        ref={scrollRef}
         className={cn(
-          "min-h-0 flex-1 overflow-y-auto overflow-x-hidden overscroll-y-contain [-webkit-overflow-scrolling:touch] p-4 md:p-6 md:pt-[4.75rem]",
+          "relative min-h-0 flex-1 overflow-y-auto overflow-x-hidden overscroll-y-contain [-webkit-overflow-scrolling:touch] p-4 md:p-6 md:pt-[4.75rem]",
           "max-md:pt-[calc(var(--mobile-nav-h,3.5rem)+0.75rem)] max-md:pb-[calc(var(--mobile-tab-h,5rem)+1rem)] max-md:[scroll-padding-top:var(--mobile-nav-h,3.5rem)]",
           contentClassName
         )}
@@ -106,10 +145,10 @@ export function FloatingTabsPill({
             onClick={() => onValueChange(item.value)}
             aria-pressed={isActive}
             className={cn(
-              "chrome-label-case flex h-8 shrink-0 items-center gap-1.5 rounded-full px-3 text-[11px] font-semibold transition-colors duration-150",
+              "chrome-label-case flex h-(--control-h-sm) shrink-0 items-center gap-1.5 rounded-island px-3 text-[11px] font-semibold outline-none transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-ring",
               isActive
-                ? "bg-primary/15 text-primary"
-                : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
+                ? "bg-(--selected-bg) text-(--selected-fg)"
+                : "text-muted-foreground hover:bg-(--hover-bg) hover:text-foreground"
             )}
           >
             {Icon ? <Icon className="size-3.5 shrink-0" /> : null}
@@ -117,8 +156,8 @@ export function FloatingTabsPill({
             {item.badge !== undefined && item.badge !== null && item.badge !== 0 ? (
               <span
                 className={cn(
-                  "rounded-full px-1.5 py-px text-[10px]",
-                  isActive ? "bg-primary/20" : "bg-muted/70"
+                  "rounded-island px-1.5 py-px text-[10px]",
+                  isActive ? "bg-(--selected-bg)" : "bg-muted-elevated"
                 )}
               >
                 {item.badge}
@@ -138,6 +177,7 @@ export function FloatingSearchCapsule({
   name,
   "aria-label": ariaLabel,
   className,
+  children,
 }: {
   value: string;
   onChange: (value: string) => void;
@@ -145,6 +185,7 @@ export function FloatingSearchCapsule({
   name: string;
   "aria-label": string;
   className?: string;
+  children?: ReactNode;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   useSlashToFocus(inputRef);
@@ -165,19 +206,15 @@ export function FloatingSearchCapsule({
         spellCheck={false}
       />
       {value.length > 0 ? (
-        <button
-          type="button"
-          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[color:var(--control-dual-mix)] transition-colors hover:bg-[color:var(--control-dual-surface-hover)] hover:text-primary"
-          aria-label="Clear search"
-          onClick={() => onChange("")}
-        >
-          <X className="size-4" />
-        </button>
+        <IconToolbarButton shape="island" label="Clear search" onClick={() => onChange("")}>
+          <X />
+        </IconToolbarButton>
       ) : (
-        <kbd className="hidden shrink-0 select-none items-center rounded-full border border-border/60 bg-muted/40 px-2 py-0.5 text-[10px] text-muted-foreground lg:flex">
+        <kbd className="hidden shrink-0 select-none items-center rounded-island border border-border/60 bg-muted/40 px-2 py-0.5 text-[10px] text-muted-foreground lg:flex">
           /
         </kbd>
       )}
+      {children}
     </FloatingIslandCapsule>
   );
 }
@@ -187,64 +224,27 @@ export function FloatingBackPill({
   onClick,
   label,
   className,
-  iconOnly = false,
 }: {
   href?: string;
   onClick?: () => void;
   label: string;
   className?: string;
-  iconOnly?: boolean;
 }) {
-  if (iconOnly) {
-    const iconInnerClass =
-      "flex size-full items-center justify-center rounded-full bg-background/80 text-muted-foreground backdrop-blur-xl transition-colors hover:bg-muted/60 hover:text-foreground";
+  const pillClass = cn(
+    floatingIslandSurfaceClassName,
+    floatingIslandHoverClassName,
+    "pointer-events-auto flex size-(--control-h-md) shrink-0 items-center justify-center text-muted-foreground transition-[color,background-color,box-shadow] duration-200 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+    className
+  );
 
-    return (
-      <div className={cn("pointer-events-auto relative size-11 shrink-0", className)}>
-        <div
-          className={cn(
-            "relative size-11 rounded-full p-px transition-shadow duration-300",
-            "bg-[linear-gradient(115deg,color-mix(in_oklch,var(--primary)_40%,transparent),color-mix(in_oklch,var(--border)_65%,transparent)_28%,color-mix(in_oklch,var(--border)_65%,transparent)_72%,color-mix(in_oklch,var(--secondary)_40%,transparent))]",
-            "shadow-[var(--chrome-floating-shadow)]"
-          )}
-        >
-          {href ? (
-            <Link href={href} aria-label={label} className={iconInnerClass}>
-              <ArrowLeft className="size-4" />
-            </Link>
-          ) : (
-            <button type="button" onClick={onClick} aria-label={label} className={iconInnerClass}>
-              <ArrowLeft className="size-4" />
-            </button>
-          )}
-        </div>
-      </div>
-    );
-  }
-
-  const labelButtonClass =
-    "h-8 gap-1.5 rounded-full px-3 text-[11px] font-semibold text-muted-foreground hover:bg-muted/60 hover:text-foreground";
-
-  return (
-    <FloatingIslandCapsule
-      className={cn("pointer-events-auto shrink-0", className)}
-      bodyClassName="gap-0 px-1.5"
-      glow={false}
-    >
-      {href ? (
-        <Button variant="ghost" size="sm" className={labelButtonClass} asChild>
-          <Link href={href}>
-            <ArrowLeft className="size-3.5 shrink-0" />
-            <span className="hidden sm:inline">{label}</span>
-          </Link>
-        </Button>
-      ) : (
-        <Button variant="ghost" size="sm" className={labelButtonClass} onClick={onClick}>
-          <ArrowLeft className="size-3.5 shrink-0" />
-          <span className="hidden sm:inline">{label}</span>
-        </Button>
-      )}
-    </FloatingIslandCapsule>
+  return href ? (
+    <Link href={href} aria-label={label} className={pillClass}>
+      <ArrowLeft className="size-4" />
+    </Link>
+  ) : (
+    <button type="button" onClick={onClick} aria-label={label} className={pillClass}>
+      <ArrowLeft className="size-4" />
+    </button>
   );
 }
 
@@ -258,38 +258,37 @@ export function FloatingPageTitle({ children }: { children: ReactNode }) {
   );
 }
 
+export type FloatingActionPillVariant = "default" | "secondary" | "destructive" | "floating";
+
+const floatingPillClassName = cn(
+  floatingIslandSurfaceClassName,
+  floatingIslandHoverClassName,
+  "text-primary hover:text-primary hover:shadow-[var(--chrome-button-shadow-outline-hover)] [&_svg]:text-current"
+);
+
 export function FloatingActionPill({
-  children,
-  className,
-  onClick,
-  type = "button",
   variant = "default",
-  asChild,
-  disabled,
-  "aria-label": ariaLabel,
-}: {
-  children: ReactNode;
-  className?: string;
-  onClick?: () => void;
-  type?: "button" | "submit";
-  variant?: "default" | "outline" | "ghost" | "secondary" | "destructive";
-  asChild?: boolean;
-  disabled?: boolean;
-  "aria-label"?: string;
+  className,
+  type = "button",
+  ...props
+}: Omit<ButtonProps, "variant" | "size" | "shape"> & {
+  variant?: FloatingActionPillVariant;
+  ref?: Ref<HTMLButtonElement>;
 }) {
+  const floating = variant === "floating";
   return (
     <Button
       type={type}
-      variant={variant}
-      size="sm"
-      className={cn(FLOATING_ACTION_PILL_CLASS, className)}
-      onClick={onClick}
-      asChild={asChild}
-      disabled={disabled}
-      aria-label={ariaLabel}
-    >
-      {children}
-    </Button>
+      variant={floating ? null : variant}
+      size="md"
+      shape="island"
+      className={cn(
+        "pointer-events-auto shrink-0 gap-1.5 px-4 text-xs has-[>svg]:px-2.5",
+        floating ? floatingPillClassName : "shadow-[var(--chrome-floating-shadow)]",
+        className
+      )}
+      {...props}
+    />
   );
 }
 

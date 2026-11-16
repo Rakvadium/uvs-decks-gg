@@ -24,8 +24,7 @@ import {
 import { useActiveChips } from "./use-active-chips";
 import { ColorFacetChips } from "./color-facet-chips";
 
-const segmentedItemClassName = "h-10 text-sm normal-case tracking-normal";
-const compactChipClassName = "h-7 gap-1 px-2.5 text-xs";
+const segmentedItemClassName = "text-[13px] normal-case tracking-normal";
 const compactChipRowClassName = "gap-1.5";
 
 function ActiveChipsStrip() {
@@ -35,14 +34,14 @@ function ActiveChipsStrip() {
   if (chips.length === 0) return null;
 
   return (
-    <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+    <div className="-mx-4 flex gap-2 scroll-row px-4 pb-1">
       {chips.map((chip) => (
         <ActiveFilterChip key={chip.id} label={chip.label} onRemove={chip.remove} />
       ))}
       <button
         type="button"
         onClick={actions.clearAllFilters}
-        className="inline-flex h-8 shrink-0 items-center rounded-pill px-3 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="inline-flex h-8 shrink-0 items-center rounded-full px-3 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
         Clear all
       </button>
@@ -58,8 +57,7 @@ function SearchGroup() {
       <FilterRow>
         <SegmentedControl
           stretch
-          size="sm"
-          className="w-full bg-muted-tint"
+          className="w-full"
           itemClassName={segmentedItemClassName}
           value={state.searchMode}
           onValueChange={(value) => actions.setSearchMode(value as "name" | "text" | "all")}
@@ -124,7 +122,7 @@ function FormatRows({
             key={format.key}
             label={format.name}
             selected={activeFormat === format.key}
-            className={compact ? compactChipClassName : undefined}
+            size={compact ? "xs" : undefined}
             onClick={() => {
               if (activeFormat === format.key) return;
               toggleFormat(format.key);
@@ -162,7 +160,7 @@ function TypeRows({
             key={type}
             label={type}
             selected={filters.type?.includes(type) ?? false}
-            className={compact ? compactChipClassName : undefined}
+            size={compact ? "xs" : undefined}
             onClick={() => toggleStringFilter("type", type)}
           />
         ))}
@@ -192,7 +190,7 @@ function RarityRows({
             key={rarity}
             label={rarity}
             selected={rarityFilterSelected(filters.rarity, rarity)}
-            className={compact ? compactChipClassName : undefined}
+            size={compact ? "xs" : undefined}
             onClick={() => actions.updateFilter("rarity", toggleCanonicalRarityFilter(filters.rarity, rarity))}
           />
         ))}
@@ -235,7 +233,7 @@ function ColorsSection({ compact = false }: { compact?: boolean }) {
           options={options}
           selected={filters.colors ?? []}
           onToggle={(value) => toggleStringFilter("colors", value)}
-          chipClassName={compact ? compactChipClassName : undefined}
+          chipSize={compact ? "xs" : undefined}
           rowClassName={compact ? compactChipRowClassName : undefined}
         />
       </FilterRow>
@@ -528,8 +526,7 @@ function DisplayGroup() {
       <FilterRow className="flex items-center gap-3">
         <SegmentedControl
           stretch
-          size="sm"
-          className="min-w-0 flex-1 bg-muted-tint"
+          className="min-w-0 flex-1"
           itemClassName={segmentedItemClassName}
           value={mode}
           onValueChange={(value) => setMode(value as GalleryMobileFilterDisplayMode)}
@@ -540,8 +537,7 @@ function DisplayGroup() {
         />
         {!override && mode === "card" ? (
           <SegmentedControl
-            size="sm"
-            className="shrink-0 bg-muted-tint"
+            className="shrink-0"
             itemClassName={cn(segmentedItemClassName, "w-11 px-0")}
             value={String(state.cardsPerRow)}
             onValueChange={(value) => actions.setCardsPerRow(Number(value))}

@@ -1,9 +1,9 @@
 "use client";
 
-import { Copy, Edit3, Loader2 } from "lucide-react";
+import { Copy, Edit3 } from "lucide-react";
 import { MobileActButton } from "@/components/shell/mobile-tab-bar/act-button";
 import { MOBILE_TAB_ICON_CLASS } from "@/components/shell/mobile-tab-bar/metrics";
-import { cn } from "@/lib/utils";
+import { Spinner } from "@/components/ui/spinner";
 import { useDeckDetailsOptional } from "@/providers/DeckDetailsProvider";
 
 export function useDeckDetailsMobileActionsState() {
@@ -27,7 +27,7 @@ export function DeckDetailsMobileActions() {
         onClick={context.requestDuplicate}
       >
         {context.isDuplicating ? (
-          <Loader2 className={cn(MOBILE_TAB_ICON_CLASS, "animate-spin")} strokeWidth={2.25} />
+          <Spinner className={MOBILE_TAB_ICON_CLASS} strokeWidth={2.25} />
         ) : (
           <Copy className={MOBILE_TAB_ICON_CLASS} strokeWidth={2.25} />
         )}

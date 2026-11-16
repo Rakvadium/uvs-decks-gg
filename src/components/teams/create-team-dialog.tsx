@@ -1,33 +1,26 @@
 "use client";
 
-import { useCallback, useEffect, useState, type ComponentProps } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useConvexAuth, useMutation } from "convex/react";
-import { Link2, Loader2, PenLine, Plus, UsersRound } from "lucide-react";
+import { Link2, Plus, UsersRound } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "../../../convex/_generated/api";
 import { useStartAuth } from "@/components/auth/use-start-auth";
+import { FloatingActionPill } from "@/components/shell/floating-page-bar";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogBody,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { CreateEntityDialog, createEntityLabelClassName } from "@/components/ui/create-entity-dialog";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 
 type CreateTeamButtonProps = {
   className?: string;
-  size?: ComponentProps<typeof Button>["size"];
-  variant?: ComponentProps<typeof Button>["variant"];
+  placement?: "header" | "inline";
 };
 
-export function CreateTeamButton({ className, size = "sm", variant = "default" }: CreateTeamButtonProps) {
+export function CreateTeamButton({ className, placement = "inline" }: CreateTeamButtonProps) {
   const [open, setOpen] = useState(false);
   const { isAuthenticated } = useConvexAuth();
   const startAuth = useStartAuth();
@@ -40,18 +33,24 @@ export function CreateTeamButton({ className, size = "sm", variant = "default" }
     setOpen(true);
   }, [isAuthenticated, startAuth]);
 
+  const label = (
+    <>
+      <Plus className="h-3.5 w-3.5" />
+      <span className="text-xs">Create team</span>
+    </>
+  );
+
   return (
     <>
-      <Button
-        type="button"
-        variant={variant}
-        size={size}
-        className={cn("h-9 gap-1.5 text-xs", className)}
-        onClick={onOpen}
-      >
-        <Plus className="h-3.5 w-3.5" />
-        Create team
-      </Button>
+      {placement === "header" ? (
+        <FloatingActionPill className={className} onClick={onOpen}>
+          {label}
+        </FloatingActionPill>
+      ) : (
+        <Button type="button" className={cn("gap-1.5", className)} onClick={onOpen}>
+          {label}
+        </Button>
+      )}
       {isAuthenticated ? <CreateTeamFormDialog open={open} onOpenChange={setOpen} /> : null}
     </>
   );
@@ -79,10 +78,7 @@ function CreateTeamFormDialog({ open, onOpenChange }: CreateTeamFormDialogProps)
 
   const handleSubmit = useCallback(async () => {
     const trimmed = name.trim();
-    if (!trimmed) {
-      toast.error("Team name is required");
-      return;
-    }
+    if (!trimmed) return;
     setSubmitting(true);
     try {
       const teamId = await createTeam({
@@ -104,111 +100,55 @@ function CreateTeamFormDialog({ open, onOpenChange }: CreateTeamFormDialogProps)
   }, [createTeam, name, slug, description, onOpenChange, router]);
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent
-        size="md"
-        contentPadding="none"
-        className="overflow-hidden p-0"
-        showCloseButton={false}
-        footer={
-          <>
-            <DialogClose asChild>
-              <Button type="button" variant="outline" className="h-11 px-6" disabled={submitting}>
-                Close
-              </Button>
-            </DialogClose>
-            <Button
-              type="button"
-              className="h-11 px-6"
-              onClick={() => void handleSubmit()}
-              disabled={submitting}
-            >
-              {submitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-              Create team
-            </Button>
-          </>
-        }
-      >
-        <div className="relative flex h-full min-h-0 max-h-[85vh] flex-col">
-          <div className="pointer-events-none absolute inset-0">
-            <div className="absolute -top-16 left-10 h-24 w-24 rounded-full bg-primary-selected blur-3xl" />
-            <div className="absolute -bottom-16 right-10 h-24 w-24 rounded-full bg-secondary-selected blur-3xl" />
-            <div className="absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
-          </div>
-
-          <div className="relative min-h-0 flex-1 overflow-y-auto px-6">
-            <DialogHeader className="border-hairline pb-4 pt-6">
-              <div className="flex items-start gap-3">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-primary-soft bg-primary-wash shadow-[0_0_2px_var(--primary)/40,0_0_6px_var(--primary)/40]">
-                  <UsersRound className="h-5 w-5 text-primary" />
-                </div>
-                <div className="min-w-0">
-                  <DialogTitle className="text-xl">Create a team</DialogTitle>
-                  <DialogDescription className="text-sm">
-                    You will be the captain. You can upload a logo, invite members, and manage shared decks
-                    from the team hub.
-                  </DialogDescription>
-                </div>
-              </div>
-            </DialogHeader>
-
-            <DialogBody className="space-y-5 pt-2">
-              <div>
-                <label className="chrome-label-case text-[11px] text-muted-foreground">
-                  Name
-                </label>
-                <div className="relative mt-2">
-                  <PenLine className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/70" />
-                  <Input
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="Team name…"
-                    className="h-12 bg-background-soft pl-10 text-base focus-visible:ring-primary-soft"
-                    autoComplete="off"
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        e.preventDefault();
-                        void handleSubmit();
-                      }
-                    }}
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="chrome-label-case text-[11px] text-muted-foreground">
-                  URL slug (optional)
-                </label>
-                <div className="relative mt-2">
-                  <Link2 className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/70" />
-                  <Input
-                    value={slug}
-                    onChange={(e) => setSlug(e.target.value)}
-                    placeholder="my-team"
-                    className="h-12 bg-background-soft pl-10 text-sm focus-visible:ring-primary-soft"
-                    autoComplete="off"
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="chrome-label-case text-[11px] text-muted-foreground">
-                  Description (optional)
-                </label>
-                <Textarea
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="What is this team for?"
-                  rows={3}
-                  className="mt-2 min-h-[4.5rem] resize-y bg-background-soft focus-visible:ring-primary-soft"
-                />
-                <p className="mt-2 text-xs text-muted-foreground/70">
-                  Tip: A short blurb helps members know what the team is for. You can change this later in the
-                  team hub.
-                </p>
-              </div>
-            </DialogBody>
-          </div>
+    <CreateEntityDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      icon={UsersRound}
+      title="Create a team"
+      description="You will be the captain. You can upload a logo, invite members, and manage shared decks from the team hub."
+      name={{
+        id: "create-team-name",
+        label: "Name",
+        placeholder: "Team name…",
+        value: name,
+        onChange: setName,
+      }}
+      submitLabel="Create team"
+      submitting={submitting}
+      onSubmit={() => void handleSubmit()}
+    >
+      <div className="space-y-2">
+        <Label htmlFor="create-team-slug" className={createEntityLabelClassName}>
+          URL slug (optional)
+        </Label>
+        <div className="relative">
+          <Link2 className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            id="create-team-slug"
+            value={slug}
+            onChange={(e) => setSlug(e.target.value)}
+            placeholder="my-team"
+            className="pl-10"
+            autoComplete="off"
+          />
         </div>
-      </DialogContent>
-    </Dialog>
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="create-team-description" className={createEntityLabelClassName}>
+          Description (optional)
+        </Label>
+        <Textarea
+          id="create-team-description"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          placeholder="What is this team for?"
+          rows={3}
+          className="resize-y"
+        />
+        <p className="text-xs text-muted-foreground">
+          Tip: A short blurb helps members know what the team is for. You can change this later in the team hub.
+        </p>
+      </div>
+    </CreateEntityDialog>
   );
 }

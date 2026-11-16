@@ -38,7 +38,7 @@ export function RulesTokenBadge({ token, compact = false }: { token: string; com
   return (
     <span
       className={cn(
-        "chrome-label-case mx-0.5 inline-flex items-center gap-1 whitespace-nowrap rounded-sm border align-[0.08em] font-bold leading-none",
+        "chrome-label-case mx-0.5 inline-flex items-center gap-1 whitespace-nowrap rounded-md border align-[0.08em] font-bold leading-none",
         compact ? "px-[0.35em] py-[0.2em] text-[0.8em]" : "px-1.5 py-0.5 text-[0.72rem]"
       )}
       style={{ backgroundColor: `${color}26`, borderColor: `${color}80`, color }}

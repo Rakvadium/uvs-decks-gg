@@ -1,7 +1,8 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { ListOrdered } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
 
 interface CommunityTierListsPageEmptyStateProps {
   action?: ReactNode;
@@ -13,15 +14,17 @@ export function CommunityTierListsPageEmptyState({
   message,
 }: CommunityTierListsPageEmptyStateProps) {
   return (
-    <Card className="border-dashed border-border/80 bg-card/80">
-      <CardContent className="flex flex-col items-center gap-4 py-14 text-center">
-        <p className="max-w-lg text-sm text-muted-foreground">{message}</p>
-        {action ?? (
+    <EmptyState
+      variant="page"
+      icon={ListOrdered}
+      title={message}
+      action={
+        action ?? (
           <Button variant="outline" asChild>
             <Link href="/community">Back to Community</Link>
           </Button>
-        )}
-      </CardContent>
-    </Card>
+        )
+      }
+    />
   );
 }

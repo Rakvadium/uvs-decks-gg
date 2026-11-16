@@ -59,7 +59,7 @@ function PickerList({
           {trailing}
         </div>
         {selected.length > 0 ? (
-          <div className="-mx-4 flex gap-2 overflow-x-auto px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <div className="-mx-4 flex gap-2 scroll-row px-4">
             {selected.map((value) => (
               <ActiveFilterChip key={value} label={labelFor.get(value) ?? value} onRemove={() => onToggle(value)} />
             ))}

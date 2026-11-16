@@ -14,12 +14,12 @@ export function MobileGlassCapsule({ children, className, bodyClassName }: Mobil
   return (
     <div
       className={cn(
-        "relative rounded-pill p-px shadow-[var(--chrome-floating-shadow)]",
+        "relative rounded-island p-px shadow-[var(--chrome-floating-shadow)]",
         MOBILE_GLASS_GRADIENT_RING,
         className
       )}
     >
-      <div className={cn("relative flex items-center rounded-pill", MOBILE_GLASS_SURFACE, bodyClassName)}>
+      <div className={cn("relative flex items-center rounded-island", MOBILE_GLASS_SURFACE, bodyClassName)}>
         {children}
       </div>
     </div>
@@ -27,4 +27,4 @@ export function MobileGlassCapsule({ children, className, bodyClassName }: Mobil
 }
 
 export const MOBILE_ROUND_BUTTON =
-  "flex size-full items-center justify-center rounded-pill text-foreground transition-colors duration-150 hover:bg-muted-elevated focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring motion-safe:active:scale-95 motion-safe:transition-[color,background-color,transform]";
+  "flex size-full items-center justify-center rounded-island text-foreground transition-colors duration-150 hover:bg-muted-elevated focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring motion-safe:active:scale-95 motion-safe:transition-[color,background-color,transform]";

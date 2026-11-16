@@ -12,7 +12,7 @@ export function TwitchStreamEmbed({ channel, title, className }: TwitchStreamEmb
   const parent = typeof window !== "undefined" ? window.location.hostname : "";
   const src = `https://player.twitch.tv/?channel=${encodeURIComponent(channel)}&parent=${encodeURIComponent(parent)}&muted=false`;
   return (
-    <div className={cn("relative aspect-video w-full overflow-hidden bg-black", className)}>
+    <div className={cn("relative aspect-video w-full overflow-hidden bg-scrim", className)}>
       <iframe
         className="absolute inset-0 h-full w-full border-0"
         src={src}

@@ -14,9 +14,9 @@ const NAV_ITEMS: Array<{ path: string; label: string; icon: LucideIcon }> = [
 ];
 
 export const DOCK_ITEM_CLASS =
-  "group flex h-12 min-w-0 flex-1 basis-0 flex-col items-center justify-center gap-1 rounded-pill px-1 text-muted-foreground transition-colors duration-150 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring motion-safe:active:scale-95 motion-safe:transition-[color,background-color,transform] touch-manipulation select-none [-webkit-touch-callout:none]";
+  "group flex h-12 min-w-0 flex-1 basis-0 flex-col items-center justify-center gap-1 rounded-island px-1 text-muted-foreground transition-colors duration-150 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring motion-safe:active:scale-95 motion-safe:transition-[color,background-color,transform] touch-manipulation select-none [-webkit-touch-callout:none]";
 
-export const DOCK_ITEM_ACTIVE_CLASS = "bg-primary-selected text-primary";
+export const DOCK_ITEM_ACTIVE_CLASS = "bg-(--selected-bg) text-(--selected-fg)";
 
 function DockItemBody({ icon, label }: { icon: ReactNode; label: string }) {
   return (
@@ -40,7 +40,7 @@ interface DockItemProps {
 
 /** One labeled item in a dock row. Navigation tabs and panel actions share this look. */
 export function DockItem({ icon, label, active = false, indicator = false, href, onClick, className }: DockItemProps) {
-  const classes = cn(DOCK_ITEM_CLASS, "relative z-10", active && (indicator ? "text-primary" : DOCK_ITEM_ACTIVE_CLASS), className);
+  const classes = cn(DOCK_ITEM_CLASS, "relative z-10", active && (indicator ? "text-(--selected-fg)" : DOCK_ITEM_ACTIVE_CLASS), className);
   const marker = indicator && active ? { "data-indicator-active": "true" } : {};
 
   if (href) {
@@ -68,7 +68,7 @@ export function DockNavItems({ pathname, className, trailing }: { pathname: stri
 
   return (
     <div ref={containerRef} className={cn("relative flex w-full min-w-0 items-stretch gap-0.5", className)}>
-      <SlidingIndicator indicatorRef={indicatorRef} className="rounded-pill bg-primary-selected" />
+      <SlidingIndicator indicatorRef={indicatorRef} className="rounded-island bg-(--selected-bg)" />
       {NAV_ITEMS.map((item) => {
         const Icon = item.icon;
         const active = item.path === activePath;

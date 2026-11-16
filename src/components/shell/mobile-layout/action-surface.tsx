@@ -160,7 +160,7 @@ function useSurfaceGeometry(
 }
 
 const MENU_ROW = cn(
-  "group flex min-h-12 w-full items-center gap-3 rounded-2xl px-2 text-left text-base font-medium text-foreground transition-colors duration-150 hover:bg-muted-elevated focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
+  "group flex min-h-12 w-full items-center gap-3 rounded-surface px-2 text-left text-base font-medium text-foreground transition-colors duration-150 hover:bg-muted-elevated focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
   TAP_TARGET
 );
 const ICON_TILE = "flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-muted-tint text-foreground";
@@ -174,11 +174,11 @@ function MenuActionRow({ action, onDone }: { action: MobileMenuAction; onDone: (
   const primary = action.tone === "primary";
   const body = (
     <>
-      <span className={cn(ICON_TILE, primary && "bg-primary text-primary-foreground", action.selected && "bg-primary-selected text-primary")}>
+      <span className={cn(ICON_TILE, primary && "bg-primary text-primary-foreground", action.selected && "bg-(--selected-bg) text-(--selected-fg)")}>
         <Icon className="size-[18px]" />
       </span>
-      <span className={cn("min-w-0 flex-1 truncate", primary && "text-primary", action.selected && "text-primary")}>{action.label}</span>
-      {action.selected ? <Check className="mr-1 size-4 shrink-0 text-primary" aria-hidden /> : null}
+      <span className={cn("min-w-0 flex-1 truncate", primary && "text-primary", action.selected && "text-(--selected-fg)")}>{action.label}</span>
+      {action.selected ? <Check className="mr-1 size-4 shrink-0 text-(--selected-fg)" aria-hidden /> : null}
     </>
   );
 
@@ -229,7 +229,7 @@ interface ActionSurfaceProps {
  */
 export function ActionSurface({ menu, triggerRef, dockRef }: ActionSurfaceProps) {
   const { stage, slots, actions, sheet } = menu;
-  const { activeSlot, ActiveComponent, ActiveHeader, ActiveFooter, selectSlot, closeSheet } = sheet;
+  const { activeSlot, ActiveComponent, ActiveFooter, selectSlot, closeSheet } = sheet;
   const surfaceRef = useRef<HTMLDivElement | null>(null);
   const clipRef = useRef<HTMLDivElement | null>(null);
   const { primeRef } = menu;
@@ -274,7 +274,7 @@ export function ActionSurface({ menu, triggerRef, dockRef }: ActionSurfaceProps)
     return () => observer.disconnect();
   }, [chromeKey]);
 
-  // Menu and panel corners follow the chrome's rounded-3xl step, read from the rendered menu.
+  // Menu and panel corners follow the rounded-xl step (from the chrome radius), read from the rendered menu.
   const surfaceRadius = menuRadius;
   const clip =
     stage === "panel"
@@ -306,7 +306,7 @@ export function ActionSurface({ menu, triggerRef, dockRef }: ActionSurfaceProps)
         className={cn(
           // Above the tools pill, so a tap anywhere outside closes the menu first. Only a panel
           // dims and blurs what's behind it; a menu leaves the page as it is.
-          "absolute inset-0 z-modal transition-opacity",
+          "absolute inset-0 z-modal transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring",
           stage === "panel" && "bg-background-soft backdrop-blur-sm",
           stage === "closed" ? "duration-200" : "duration-300",
           stage === "closed" ? "pointer-events-none opacity-0" : "opacity-100"
@@ -335,7 +335,7 @@ export function ActionSurface({ menu, triggerRef, dockRef }: ActionSurfaceProps)
             role="menu"
             aria-label="Page actions"
             className={cn(
-              "absolute flex flex-col gap-0.5 rounded-3xl p-2",
+              "absolute flex flex-col gap-0.5 rounded-xl p-2",
               "bg-[linear-gradient(180deg,color-mix(in_oklch,var(--primary)_9%,transparent),transparent_55%)]",
               stage !== "menu" && "pointer-events-none"
             )}
@@ -370,7 +370,7 @@ export function ActionSurface({ menu, triggerRef, dockRef }: ActionSurfaceProps)
           {panelPresent ? (
             <div
               className={cn(
-                "absolute inset-0 flex flex-col rounded-3xl p-1.5",
+                "absolute inset-0 flex flex-col rounded-xl p-1.5",
                 stage !== "panel" && "pointer-events-none"
               )}
               style={{
@@ -381,27 +381,23 @@ export function ActionSurface({ menu, triggerRef, dockRef }: ActionSurfaceProps)
               <GlassRing />
               <div className="flex h-12 shrink-0 items-center gap-2 pl-3 pr-1">
                 <div className="min-w-0 flex-1">
-                  {ActiveHeader ? (
-                    <ActiveHeader />
-                  ) : (
-                    <h2 className={cn(sectionHeadingVariants({ size: "sm" }), "truncate text-foreground")}>
+                  <h2 className={cn(sectionHeadingVariants({ size: "sm" }), "truncate text-foreground")}>
                       {activeSlot ? (activeSlot.label ?? activeSlot.id) : "Panel"}
                     </h2>
-                  )}
                 </div>
                 <button
                   type="button"
                   onClick={closeSheet}
                   aria-label="Close panel"
                   className={cn(
-                    "flex size-9 shrink-0 items-center justify-center rounded-pill bg-muted-elevated text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                    "flex size-9 shrink-0 items-center justify-center rounded-island bg-muted-elevated text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                     TAP_TARGET
                   )}
                 >
                   <X className="size-5" strokeWidth={2.25} />
                 </button>
               </div>
-              <div key={activeSlot?.id} className="min-h-0 flex-1 select-text overflow-y-auto overscroll-contain rounded-2xl">
+              <div key={activeSlot?.id} className="min-h-0 flex-1 select-text overflow-y-auto overscroll-contain rounded-surface">
                 {ActiveComponent ? <ActiveComponent /> : null}
               </div>
               {showSlotFooter && ActiveFooter ? (

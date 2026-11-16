@@ -10,6 +10,8 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useProfanityDisplayText } from "@/lib/moderation/use-profanity-display-text";
 import { useTeamHub } from "./hook";
+import { Skeleton } from "@/components/ui/skeleton";
+import { EmptyState } from "@/components/ui/empty-state";
 
 interface TeamHubChatContentProps {
   teamId: string;
@@ -72,8 +74,8 @@ export function TeamHubChatContent({ teamId }: TeamHubChatContentProps) {
   if (caps === undefined || (isLoading && results.length === 0)) {
     return (
       <div className="space-y-3">
-        <div className="h-6 w-32 animate-pulse rounded-md bg-muted" />
-        <div className="h-64 w-full animate-pulse rounded-md bg-muted-overlay" />
+        <Skeleton className="h-6 w-32" />
+        <Skeleton className="h-64 w-full" />
       </div>
     );
   }
@@ -107,7 +109,7 @@ export function TeamHubChatContent({ teamId }: TeamHubChatContentProps) {
         aria-live="polite"
       >
         {results.length === 0 ? (
-          <p className="text-center text-sm text-muted-foreground">No messages yet.</p>
+          <EmptyState variant="inline" title="No messages yet." />
         ) : (
           results.map((row) => {
             const m = row.message;
@@ -167,8 +169,8 @@ export function TeamHubChatContent({ teamId }: TeamHubChatContentProps) {
                       <Button
                         type="button"
                         variant="ghost"
-                        size="sm"
-                        className="h-7 text-xs"
+                        size="xs"
+                        className="text-xs"
                         onClick={() => {
                           setEditingId(m._id);
                           setEditDraft(m.body);
@@ -181,8 +183,8 @@ export function TeamHubChatContent({ teamId }: TeamHubChatContentProps) {
                       <Button
                         type="button"
                         variant="ghost"
-                        size="sm"
-                        className="h-7 text-xs"
+                        size="xs"
+                        className="text-xs"
                         onClick={async () => {
                           try {
                             await deleteMessage({ messageId: m._id });

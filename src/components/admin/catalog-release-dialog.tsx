@@ -28,7 +28,7 @@ type CatalogReleaseDialogProps = {
 export function CatalogReleaseDialog({
   triggerLabel = "Release catalog",
   buttonVariant = "outline",
-  buttonSize = "default",
+  buttonSize = "md",
   buttonClassName,
 }: CatalogReleaseDialogProps) {
   const game = useGameId();

@@ -25,7 +25,7 @@ export function morphTransition(open: boolean) {
 
 /**
  * An element's rendered corner radius in px, so clip shapes match whatever the active chrome sets
- * (`rounded-pill`, `rounded-3xl`, ...). A 9999px pill is clamped to half the shorter side.
+ * (`rounded-island`, `rounded-xl`, ...). A 9999px pill is clamped to half the shorter side.
  */
 export function cornerRadius(element: Element | null | undefined, fallback = 0) {
   if (!element) return fallback;

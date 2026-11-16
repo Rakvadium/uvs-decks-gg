@@ -1,4 +1,5 @@
 import { HERO_STATS } from "../data";
+import { Panel } from "@/components/ui/panel";
 
 export function CreatorProgramHeroStatsGrid() {
   return (
@@ -7,16 +8,13 @@ export function CreatorProgramHeroStatsGrid() {
         const Icon = stat.icon;
 
         return (
-          <div
-            key={stat.label}
-            className="rounded-xl border border-border/50 bg-background/50 px-4 py-3 backdrop-blur-sm"
-          >
+          <Panel key={stat.label} className="px-4 py-3">
             <div className="flex items-center justify-between">
               <span className="chrome-label-case text-xs text-muted-foreground">{stat.label}</span>
               <Icon className="h-4 w-4 text-primary" />
             </div>
             <div className="mt-2 text-2xl font-bold text-foreground">{stat.value}</div>
-          </div>
+          </Panel>
         );
       })}
     </div>

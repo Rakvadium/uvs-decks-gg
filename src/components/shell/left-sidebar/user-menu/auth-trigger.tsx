@@ -2,7 +2,7 @@ import type { ComponentProps } from "react";
 import { ChevronsUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { SHELL_RAIL_ITEM_SIZE_CLASS } from "../../shell-chrome";
+import { SHELL_ACCOUNT_ROW_HEIGHT_CLASS, SHELL_RAIL_ITEM_SIZE_CLASS } from "../../shell-chrome";
 import { useLeftSidebarContext } from "../context";
 import { LeftSidebarUserIdentity } from "./user-identity";
 
@@ -18,7 +18,7 @@ export function LeftSidebarUserMenuTrigger({ className, ...props }: LeftSidebarU
         "normal-case tracking-normal text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground",
         collapsed
           ? cn(SHELL_RAIL_ITEM_SIZE_CLASS, "p-0")
-          : "h-12 w-full justify-start gap-2 px-2",
+          : cn(SHELL_ACCOUNT_ROW_HEIGHT_CLASS, "w-full justify-start gap-2 px-2"),
         className
       )}
       {...props}

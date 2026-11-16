@@ -41,7 +41,7 @@ export function LegendSlot({ index, card, editable, layout, onPick, onRemove, on
         onClick={() => onPick(index)}
         aria-label={editable ? `Add ${slotLabel}` : `${slotLabel}: empty`}
         className={cn(
-          "flex items-center justify-center gap-1.5 rounded-md border border-dashed border-border/80 bg-background/30 text-[11px] text-muted-foreground",
+          "flex items-center justify-center gap-1.5 rounded-md border border-dashed border-border/80 bg-background/30 text-[11px] text-muted-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
           "transition-colors enabled:hover:border-primary/60 enabled:hover:bg-primary/10 enabled:hover:text-primary disabled:cursor-default",
           layout === "row" ? "h-14 w-full" : "aspect-[2.5/3.5] w-full flex-col"
         )}
@@ -59,7 +59,7 @@ export function LegendSlot({ index, card, editable, layout, onPick, onRemove, on
       onClick={() => onRemove(index)}
       aria-label={`Remove ${title} from Legends`}
       className={cn(
-        "flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive",
+        "flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
         layout === "tile" && "absolute right-1 top-1 z-10 bg-background/80 backdrop-blur-sm"
       )}
     >
@@ -84,7 +84,7 @@ export function LegendSlot({ index, card, editable, layout, onPick, onRemove, on
           <button
             type="button"
             onClick={() => onPick(index)}
-            className="mt-0.5 text-[10px] text-muted-foreground underline-offset-2 transition-colors hover:text-primary hover:underline"
+            className="mt-0.5 text-[10px] text-muted-foreground underline-offset-2 transition-colors hover:text-primary hover:underline outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
             Change
           </button>
@@ -109,7 +109,7 @@ export function LegendSlot({ index, card, editable, layout, onPick, onRemove, on
         disabled={!editable}
         onClick={() => onPick(index)}
         aria-label={editable ? `Change ${slotLabel} (${title})` : title}
-        className="min-w-0 flex-1 text-left disabled:cursor-default"
+        className="min-w-0 flex-1 text-left disabled:cursor-default outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       >
         <span className="block truncate text-xs font-semibold leading-tight">{title}</span>
         {subname ? <span className="block truncate text-[10px] text-muted-foreground">{subname}</span> : null}

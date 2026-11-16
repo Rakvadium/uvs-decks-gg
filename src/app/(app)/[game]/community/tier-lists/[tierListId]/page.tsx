@@ -3,7 +3,6 @@ import dynamic from "next/dynamic";
 import { fetchQuery } from "convex/nextjs";
 import { RouteChunkFallback } from "@/components/shell/route-chunk-fallback";
 import { api } from "../../../../../../../convex/_generated/api";
-import type { Id } from "../../../../../../../convex/_generated/dataModel";
 import { DEFAULT_GAME_ID, isGameId } from "@shared/games/types";
 
 const CommunityTierListDetailView = dynamic(
@@ -30,7 +29,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     const detail = await fetchQuery(api.tierLists.getDetail, {
       // `[game]/layout.tsx` already 404s unknown games.
       game: isGameId(game) ? game : DEFAULT_GAME_ID,
-      tierListId: tierListId as Id<"tierLists">,
+      tierListId,
     });
     if (!detail) {
       return {

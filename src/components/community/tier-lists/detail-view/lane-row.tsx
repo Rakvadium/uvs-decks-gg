@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
+import { EmptyState } from "@/components/ui/empty-state";
 import type { BuilderTier } from "../types";
 import { TCG_DND_ACCEPTS_CARD_ONLY, type DragItem, useTcgDroppable } from "@/lib/dnd";
 import { Badge } from "@/components/ui/badge";
@@ -62,7 +63,7 @@ export function CommunityTierListLaneRow({ tier }: { tier: BuilderTier }) {
     <div
       {...droppableProps}
       className={cn(
-        "rounded-2xl border px-4 py-2.5 transition-shadow transition-colors duration-150",
+        "rounded-surface border px-4 py-2.5 transition-shadow transition-colors duration-150",
         canEdit && canDrop && "shadow-[0_0_20px_-15px_var(--primary)]",
         canEdit && isOver && "ring-2 ring-primary/45"
       )}
@@ -85,8 +86,8 @@ export function CommunityTierListLaneRow({ tier }: { tier: BuilderTier }) {
           {canEdit && !isRankedScope ? (
             <Button
               variant={isEditingLane ? "secondary" : "ghost"}
-              size="icon-sm"
-              className="h-7 w-7 shrink-0"
+              size="icon-xs"
+              className="shrink-0"
               onClick={() => setIsEditingLane((current) => !current)}
               aria-label={isEditingLane ? "Done editing tier lane" : "Edit tier lane"}
             >
@@ -96,9 +97,10 @@ export function CommunityTierListLaneRow({ tier }: { tier: BuilderTier }) {
 
           {canEdit && !isRankedScope && isEditingLane ? (
             <Input
+              size="xs"
               value={tier.label}
               onChange={(event) => setTierLabel(tier.id, event.target.value)}
-              className="chrome-label-case h-7 min-w-0 max-w-36 bg-background/80 text-sm font-bold"
+              className="chrome-label-case min-w-0 max-w-36 text-sm font-bold"
             />
           ) : (
             <SectionHeading
@@ -110,13 +112,13 @@ export function CommunityTierListLaneRow({ tier }: { tier: BuilderTier }) {
           )}
 
           {canEdit && !isRankedScope && isEditingLane && tiers.length > 1 ? (
-            <Button variant="ghost" size="icon-sm" className="h-7 w-7 shrink-0" onClick={() => removeTier(tier.id)}>
+            <Button variant="ghost" size="icon-xs" className="shrink-0" onClick={() => removeTier(tier.id)}>
               <Trash2 className="h-4 w-4" />
             </Button>
           ) : null}
         </div>
 
-        <Badge variant="outline" className="ml-auto h-5 shrink-0 px-2 text-[10px]">
+        <Badge size="sm" variant="outline" className="ml-auto shrink-0 px-2">
           {cardIds.length} cards
         </Badge>
       </div>
@@ -150,9 +152,7 @@ export function CommunityTierListLaneRow({ tier }: { tier: BuilderTier }) {
             })}
           </div>
         ) : (
-          <div className="flex min-h-32 w-full items-center justify-center rounded-xl border border-dashed border-border/50 bg-background/30 text-sm text-muted-foreground">
-            {canEdit ? "Drag cards here" : "No cards in this lane"}
-          </div>
+          <EmptyState className="min-h-32 w-full" title={canEdit ? "Drag cards here" : "No cards in this lane"} />
         )}
       </div>
     </div>

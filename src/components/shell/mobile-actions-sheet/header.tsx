@@ -7,10 +7,10 @@ import { sectionHeadingVariants } from "@/components/ui/typography-headings";
 type MobileActionsSheetHeaderProps = HTMLAttributes<HTMLDivElement>;
 
 const headerButtonClassName =
-  "flex h-9 min-w-9 shrink-0 items-center justify-center rounded-pill px-2 text-sm font-semibold text-primary transition-colors duration-150 hover:bg-primary-wash focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
+  "flex h-9 min-w-9 shrink-0 items-center justify-center rounded-island px-2 text-sm font-semibold text-primary transition-colors duration-150 hover:bg-primary-wash focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
 
 export function MobileActionsSheetHeader({ className, ...props }: MobileActionsSheetHeaderProps) {
-  const { activeSlot, ActiveHeader, closeSheet } = useMobileActionsSheetContext();
+  const { activeSlot, closeSheet } = useMobileActionsSheetContext();
 
   return (
     <div className={cn("flex shrink-0 flex-col", className)} {...props}>
@@ -20,13 +20,9 @@ export function MobileActionsSheetHeader({ className, ...props }: MobileActionsS
       <div className="grid h-11 grid-cols-[minmax(2.5rem,1fr)_minmax(0,auto)_minmax(2.5rem,1fr)] items-center border-b border-hairline px-2">
         <div />
         <div className="flex min-w-0 items-center justify-center">
-          {ActiveHeader ? (
-            <ActiveHeader />
-          ) : (
-            <h2 className={cn(sectionHeadingVariants({ size: "sm" }), "min-w-0 truncate text-foreground")}>
-              {activeSlot ? (activeSlot.label ?? activeSlot.id) : "Page details"}
-            </h2>
-          )}
+          <h2 className={cn(sectionHeadingVariants({ size: "sm" }), "min-w-0 truncate text-foreground")}>
+            {activeSlot ? (activeSlot.label ?? activeSlot.id) : "Page details"}
+          </h2>
         </div>
         <div className="flex items-center justify-end">
           <button type="button" className={headerButtonClassName} onClick={closeSheet}>

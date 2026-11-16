@@ -41,7 +41,7 @@ export function CardDeckControls({
     <div
       className={cn(
         "pointer-events-none absolute bottom-0 right-0 z-30 flex flex-col items-center overflow-hidden",
-        "rounded-tl-lg rounded-br-lg rounded-tr-none rounded-bl-none",
+        "rounded-tab-tl",
         "border-l border-t border-border/70 shadow-md",
         frosted ? "bg-card/95 backdrop-blur-md" : "bg-card"
       )}
@@ -52,7 +52,7 @@ export function CardDeckControls({
           onClick={onAdd}
           disabled={!canAdd || !onAdd}
           className={cn(
-            "pointer-events-auto flex items-center justify-center",
+            "pointer-events-auto flex items-center justify-center outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring",
             cellClass,
             "text-primary transition-colors duration-150",
             "hover:bg-primary/15",
@@ -85,7 +85,7 @@ export function CardDeckControls({
           onClick={onRemove}
           disabled={deckCount === 0 || !onRemove}
           className={cn(
-            "pointer-events-auto flex items-center justify-center",
+            "pointer-events-auto flex items-center justify-center outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring",
             cellClass,
             "text-destructive transition-colors duration-150",
             "hover:bg-destructive/15",

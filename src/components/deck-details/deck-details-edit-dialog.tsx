@@ -1,12 +1,12 @@
 "use client";
 
-import { Loader2 } from "lucide-react";
 import { useCallback, useMemo, useRef } from "react";
 import { useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import {
   Dialog,
   DialogBody,
+  DialogCancel,
   DialogContent,
   DialogDescription,
   DialogHeader,
@@ -31,6 +31,7 @@ import {
 import { useDeckDetailsTopBarContext } from "./deck-details-top-bar/context";
 import { DeckDetailsTopBarDeleteAction } from "./deck-details-top-bar/delete-action";
 import { useGameId } from "@/games/game-context";
+import { Spinner } from "@/components/ui/spinner";
 
 const FORMAT_NONE = "__format_none__";
 const SUBFORMAT_NONE = "__subformat_none__";
@@ -166,11 +167,9 @@ export function DeckDetailsEditDialog() {
           <div className="flex w-full flex-col-reverse gap-2 max-md:flex-col-reverse md:flex-row md:items-center md:justify-between">
             <DeckDetailsTopBarDeleteAction />
             <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-              <Button type="button" variant="outline" onClick={() => cancelEditing()} disabled={isSaving}>
-                Cancel
-              </Button>
-              <Button type="button" onClick={() => void saveEdits()} disabled={isSaving} className="gap-2">
-                {isSaving ? <Loader2 className="h-4 w-4 shrink-0 animate-spin" /> : null}
+              <DialogCancel disabled={isSaving} />
+              <Button type="button" onClick={() => void saveEdits()} disabled={isSaving}>
+                {isSaving ? <Spinner /> : null}
                 Save
               </Button>
             </div>
@@ -207,7 +206,7 @@ export function DeckDetailsEditDialog() {
               id="deck-edit-name"
               value={editName}
               onChange={(event) => setEditName(event.target.value)}
-              className="chrome-label-case h-10 text-sm font-semibold"
+              className="chrome-label-case text-sm font-semibold"
               placeholder="Deck name"
             />
           </div>
@@ -229,7 +228,7 @@ export function DeckDetailsEditDialog() {
               onValueChange={handleFormatChange}
               disabled={formats === undefined}
             >
-              <SelectTrigger id="deck-edit-format" className="h-10 w-full" size="default">
+              <SelectTrigger id="deck-edit-format" className="w-full">
                 <SelectValue placeholder={formats === undefined ? "Loading…" : "Select format"} />
               </SelectTrigger>
               <SelectContent>
@@ -249,7 +248,7 @@ export function DeckDetailsEditDialog() {
                 value={editSubFormat.trim() ? editSubFormat : SUBFORMAT_NONE}
                 onValueChange={(v) => setEditSubFormat(v === SUBFORMAT_NONE ? "" : v)}
               >
-                <SelectTrigger id="deck-edit-subformat" className="h-10 w-full" size="default">
+                <SelectTrigger id="deck-edit-subformat" className="w-full">
                   <SelectValue placeholder="Optional" />
                 </SelectTrigger>
                 <SelectContent>
@@ -266,7 +265,7 @@ export function DeckDetailsEditDialog() {
           <div className="space-y-1.5">
             <Label htmlFor="deck-edit-visibility">Visibility</Label>
             <Select value={selectRowValue} onValueChange={(v) => handleVisibilityRowChange(v as VisibilityRow)}>
-              <SelectTrigger id="deck-edit-visibility" className="h-10 w-full" size="default">
+              <SelectTrigger id="deck-edit-visibility" className="w-full">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>

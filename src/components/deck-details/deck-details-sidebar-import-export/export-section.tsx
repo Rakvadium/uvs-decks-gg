@@ -14,7 +14,7 @@ export function ImportExportSidebarExportSection() {
         <span className="chrome-label-case text-[10px] text-muted-foreground">
           Export to {formatLabel}
         </span>
-        <Button variant="outline" size="sm" className="h-7 px-2" onClick={() => void handleCopyExport()}>
+        <Button variant="outline" size="xs" className="px-2" onClick={() => void handleCopyExport()}>
           <Copy className="mr-1.5 h-3.5 w-3.5" />
           Copy
         </Button>

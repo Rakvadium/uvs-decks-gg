@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useMemo } from "react";
+import { Panel } from "@/components/ui/panel";
 import { Link2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -28,7 +29,7 @@ export function DeckDetailsPrivateLinkPanel() {
   if (!deck || !isOwner || normalizeDeckVisibility(deck) !== "unlisted") return null;
 
   return (
-    <div className="space-y-2 rounded-lg border border-border/50 bg-background/50 p-3">
+    <Panel className="space-y-2 p-3">
       <div className="space-y-1">
         <p className="chrome-label-case flex items-center gap-1.5 text-[10px] text-muted-foreground">
           <Link2 className="h-3 w-3" />
@@ -38,9 +39,9 @@ export function DeckDetailsPrivateLinkPanel() {
           Anyone with this link can view the deck in read-only mode. It is not listed publicly.
         </p>
       </div>
-      <Button type="button" variant="outline" size="sm" className="h-9 w-full" onClick={() => void onCopyLink()}>
+      <Button type="button" variant="outline" className="w-full" onClick={() => void onCopyLink()}>
         Copy link
       </Button>
-    </div>
+    </Panel>
   );
 }

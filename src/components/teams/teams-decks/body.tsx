@@ -4,7 +4,7 @@ import { useQuery } from "convex/react";
 import Link from "next/link";
 import { useState } from "react";
 import { api } from "../../../../convex/_generated/api";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { SegmentedControl } from "@/components/ui/segmented-control";
 import {
   Table,
   TableBody,
@@ -15,6 +15,10 @@ import {
 } from "@/components/ui/table";
 import { useProfanityDisplayText } from "@/lib/moderation/use-profanity-display-text";
 import { useTeamsIndex } from "../teams-index/hook";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Layers } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
 
 const COLLAB_LABEL: Record<string, string> = {
   team_viewable: "View only",
@@ -23,6 +27,12 @@ const COLLAB_LABEL: Record<string, string> = {
 };
 
 type CollabFilter = "all" | "team_viewable" | "team_editable";
+
+const COLLAB_FILTER_ITEMS: { value: CollabFilter; label: string }[] = [
+  { value: "all", label: "All" },
+  { value: "team_viewable", label: COLLAB_LABEL.team_viewable },
+  { value: "team_editable", label: COLLAB_LABEL.team_editable },
+];
 
 function collabKey(
   c: "none" | "team_viewable" | "team_editable" | undefined,
@@ -45,8 +55,8 @@ export function TeamsDecksBody() {
   if (loadingTeams) {
     return (
       <div className="space-y-3">
-        <div className="h-8 w-48 animate-pulse rounded-md bg-muted" />
-        <div className="mt-4 h-32 w-full animate-pulse rounded-md bg-muted-overlay" />
+        <Skeleton className="h-8 w-48" />
+        <Skeleton className="mt-4 h-32 w-full" />
       </div>
     );
   }
@@ -70,9 +80,9 @@ export function TeamsDecksBody() {
   if (loading) {
     return (
       <div className="space-y-3">
-        <div className="h-8 w-56 animate-pulse rounded-md bg-muted" />
-        <div className="h-10 w-full max-w-sm animate-pulse rounded-md bg-muted-elevated" />
-        <div className="h-32 w-full animate-pulse rounded-md bg-muted-overlay" />
+        <Skeleton className="h-8 w-56" />
+        <Skeleton className="h-10 w-full max-w-sm" />
+        <Skeleton className="h-32 w-full" />
       </div>
     );
   }
@@ -84,31 +94,28 @@ export function TeamsDecksBody() {
       <div className="space-y-4">
         <div>
           <p className="chrome-label-case mb-2 text-xs text-muted-foreground">Collaboration</p>
-          <ToggleGroup type="single" value={filter} onValueChange={(v) => v && setFilter(v as CollabFilter)}>
-            <ToggleGroupItem value="all">All</ToggleGroupItem>
-            <ToggleGroupItem value="team_viewable">View only</ToggleGroupItem>
-            <ToggleGroupItem value="team_editable">Editable by team</ToggleGroupItem>
-          </ToggleGroup>
+          <SegmentedControl
+            size="sm"
+            aria-label="Collaboration"
+            value={filter}
+            onValueChange={(value) => setFilter(value as CollabFilter)}
+            items={COLLAB_FILTER_ITEMS}
+          />
         </div>
       </div>
       {isEmpty ? (
-        <div
-          className="mt-6 rounded-lg border border-dashed border-placeholder bg-muted-tint px-4 py-10 text-center"
+        <EmptyState
           role="status"
-        >
-          <p className="text-sm text-muted-foreground">No team-visible decks yet for this filter.</p>
-          <p className="mt-3 text-sm text-muted-foreground">
-            Create a deck, set its visibility to team, and pick your team in the deck editor.
-          </p>
-          <p className="mt-3 text-sm">
-            <Link
-              href="/decks"
-              className="chrome-label-case text-xs text-primary underline-offset-4 hover:underline"
-            >
-              Open decks
-            </Link>
-          </p>
-        </div>
+          className="mt-6"
+          icon={Layers}
+          title="No team-visible decks yet for this filter."
+          description="Create a deck, set its visibility to team, and pick your team in the deck editor."
+          action={
+            <Button variant="outline" size="sm" asChild>
+              <Link href="/decks">Open decks</Link>
+            </Button>
+          }
+        />
       ) : (
         <div className="mt-6 overflow-x-auto rounded-lg border border-surface">
           <Table>

@@ -29,10 +29,8 @@ export function CommunityMobileDestinationNav({
   return (
     <nav className={cn("min-w-0 md:hidden", className)} aria-label="Community destinations">
       <SegmentedControl
-        size="sm"
         stretch
-        className="w-full bg-muted-tint"
-        itemClassName="h-10"
+        className="w-full"
         value={value === "hub" ? undefined : value}
         onValueChange={(next) => {
           const dest = destinations.find((item) => item.value === next);

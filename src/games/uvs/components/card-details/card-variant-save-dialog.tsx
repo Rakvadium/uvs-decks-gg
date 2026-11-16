@@ -82,7 +82,7 @@ export function CardVariantSaveDialog({
             "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
             "fixed top-[50%] left-[50%] z-[410] flex max-h-[min(85dvh,720px)] w-[calc(100vw-1.5rem)] max-w-3xl",
             "-translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-xl duration-200",
-            "border border-primary/25 bg-card/95 shadow-[0_0_2px_var(--primary)/35,0_0_12px_var(--primary)/22] backdrop-blur-md",
+            "border border-primary/25 bg-card/95 backdrop-blur-md",
             "p-0 outline-none"
           )}
         >
@@ -105,14 +105,14 @@ export function CardVariantSaveDialog({
                 type="button"
                 variant="default"
                 size="sm"
-                className="h-8 gap-1.5 text-[10px]"
+                className="gap-1.5 text-[10px]"
                 onClick={() => void handleSave()}
               >
                 <Save className="h-3 w-3" />
                 Save variant
               </Button>
               <DialogPrimitive.Close asChild>
-                <Button type="button" variant="ghost" size="icon" className="h-8 w-8 shrink-0" aria-label="Close">
+                <Button type="button" variant="ghost" size="icon-sm" className="shrink-0" aria-label="Close">
                   <X className="h-4 w-4" />
                 </Button>
               </DialogPrimitive.Close>
@@ -156,7 +156,7 @@ export function CardVariantSaveTrigger({
       variant="outline"
       size="sm"
       disabled={disabled}
-      className="h-8 gap-1.5 border-primary/25 text-[10px]"
+      className="gap-1.5 border-primary/25 text-[10px]"
       onClick={onClick}
     >
       <Plus className="h-3.5 w-3.5" />

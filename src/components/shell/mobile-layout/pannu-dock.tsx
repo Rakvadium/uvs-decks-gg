@@ -35,8 +35,8 @@ export function MobilePannuDock() {
       >
         <div style={dockHiddenStyle(hidden)}>
           <MobileGlassCapsule
-            className={cn("rounded-3xl", !hidden && "pointer-events-auto")}
-            bodyClassName={cn("flex-col items-stretch gap-1.5 rounded-3xl p-1.5", LIQUID_GLASS)}
+            className={cn("rounded-xl", !hidden && "pointer-events-auto")}
+            bodyClassName={cn("flex-col items-stretch gap-1.5 rounded-xl p-1.5", LIQUID_GLASS)}
           >
             <div className="empty:hidden">
               <PannuActionBar route={route} menu={menu} pathname={pathname} />

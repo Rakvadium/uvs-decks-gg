@@ -81,6 +81,7 @@ export const CATALOG_CHAPTERS = [
     summary: "The radius ladder follows the chrome's --radius. Shadows come from theme and chrome tokens, never ad-hoc rgba.",
     entries: [
       { id: "radius", label: "Radius" },
+      { id: "role-tokens", label: "Role tokens" },
       { id: "elevation", label: "Elevation" },
     ],
   },
@@ -109,7 +110,7 @@ export const CATALOG_CHAPTERS = [
     id: "actions",
     group: "Components",
     label: "Actions",
-    summary: "Buttons and the two single-choice toggles.",
+    summary: "Buttons and the segmented toggle.",
     entries: [
       {
         id: "button",
@@ -121,28 +122,28 @@ export const CATALOG_CHAPTERS = [
         label: "SegmentedControl",
         ui: [{ file: "segmented-control.tsx", exports: ["SegmentedControl", "SegmentedControlItem"] }],
       },
-      {
-        id: "toggle-group",
-        label: "ToggleGroup",
-        ui: [
-          {
-            file: "toggle-group.tsx",
-            exports: ["ToggleGroup", "ToggleGroupItem", "ToggleGroupProps", "ToggleGroupItemProps"],
-          },
-        ],
-      },
     ],
   },
   {
     id: "display",
     group: "Components",
     label: "Display",
-    summary: "Read-only surfaces: badges, cards, alerts, avatars, tables and data bars.",
+    summary: "Surfaces and feedback: badges, chips, cards, panels, banners, empty and loading states, alerts, avatars, tables and data bars.",
     entries: [
       {
         id: "badge",
         label: "Badge",
-        ui: [{ file: "badge.tsx", exports: ["Badge", "badgeVariants", "BadgeTone", "BadgeVariantLegacy"] }],
+        ui: [{ file: "badge.tsx", exports: ["Badge", "badgeVariants", "BadgeSize", "BadgeTone", "BadgeVariantLegacy"] }],
+      },
+      {
+        id: "count-badge",
+        label: "CountBadge",
+        ui: [{ file: "count-badge.tsx", exports: ["CountBadge", "countBadgeVariants", "CountBadgeProps", "CountBadgeTone"] }],
+      },
+      {
+        id: "chip",
+        label: "Chip",
+        ui: [{ file: "chip.tsx", exports: ["Chip", "ChipProps", "ChipSize"] }],
       },
       {
         id: "card",
@@ -159,11 +160,25 @@ export const CATALOG_CHAPTERS = [
               "CardAction",
               "CardDescription",
               "CardContent",
-              "CardVariant",
               "CardProps",
             ],
           },
         ],
+      },
+      {
+        id: "panel",
+        label: "Panel",
+        ui: [{ file: "panel.tsx", exports: ["Panel", "PanelProps"] }],
+      },
+      {
+        id: "banner",
+        label: "Banner",
+        ui: [{ file: "banner.tsx", exports: ["Banner"] }],
+      },
+      {
+        id: "empty-state",
+        label: "EmptyState",
+        ui: [{ file: "empty-state.tsx", exports: ["EmptyState", "emptyStateVariants", "EmptyStateProps", "EmptyStateVariant"] }],
       },
       {
         id: "alert",
@@ -205,6 +220,16 @@ export const CATALOG_CHAPTERS = [
         ui: [{ file: "skeleton.tsx", exports: ["Skeleton"] }],
       },
       {
+        id: "spinner",
+        label: "Spinner",
+        ui: [{ file: "spinner.tsx", exports: ["Spinner", "SpinnerProps", "SpinnerSize"] }],
+      },
+      {
+        id: "loading-state",
+        label: "LoadingState",
+        ui: [{ file: "loading-state.tsx", exports: ["LoadingState", "LoadingStateProps"] }],
+      },
+      {
         id: "separator",
         label: "Separator",
         ui: [{ file: "separator.tsx", exports: ["Separator"] }],
@@ -226,8 +251,8 @@ export const CATALOG_CHAPTERS = [
         id: "input",
         label: "Input",
         ui: [
-          { file: "input.tsx", exports: ["Input"] },
-          { file: "textarea.tsx", exports: ["Textarea"] },
+          { file: "input.tsx", exports: ["Input", "InputProps"] },
+          { file: "textarea.tsx", exports: ["Textarea", "TextareaProps"] },
           { file: "label.tsx", exports: ["Label"] },
         ],
       },
@@ -268,6 +293,7 @@ export const CATALOG_CHAPTERS = [
               "SelectScrollUpButton",
               "SelectSeparator",
               "SelectTrigger",
+              "SelectTriggerProps",
               "SelectValue",
             ],
             documentedOnly: {
@@ -287,11 +313,15 @@ export const CATALOG_CHAPTERS = [
         ],
       },
       {
+        id: "option-tile",
+        label: "OptionTile",
+        ui: [{ file: "option-tile.tsx", exports: ["OptionTile", "OptionTileProps"] }],
+      },
+      {
         id: "search-fields",
         label: "Search fields",
         ui: [
-          { file: "gallery-search-field.tsx", exports: ["GallerySearchField", "galleryToolbarControlClassName"] },
-          { file: "search-bar.tsx", exports: ["SearchBar", "useSearchBarProps", "SearchConfig", "SearchBarProps"] },
+          { file: "search-field.tsx", exports: ["SearchField", "SearchFieldProps"] },
         ],
       },
     ],
@@ -311,6 +341,7 @@ export const CATALOG_CHAPTERS = [
             exports: [
               "Dialog",
               "DialogBody",
+              "DialogCancel",
               "DialogClose",
               "DialogContent",
               "DialogDescription",
@@ -321,12 +352,26 @@ export const CATALOG_CHAPTERS = [
               "DialogTitle",
               "DialogTrigger",
               "overlayScrimClassName",
+              "dialogSurfaceClassName",
+              "dialogTitleClassName",
             ],
             documentedOnly: {
               DialogPortal: "DialogContent renders its own portal.",
               DialogOverlay: "DialogContent renders its own overlay.",
               overlayScrimClassName: "The scrim class every overlay (Dialog, AlertDialog, Sheet) shares.",
+              dialogSurfaceClassName: "The panel surface DialogContent and AlertDialogContent share.",
+              dialogTitleClassName: "The title recipe DialogTitle and AlertDialogTitle share.",
             },
+          },
+        ],
+      },
+      {
+        id: "create-entity-dialog",
+        label: "CreateEntityDialog",
+        ui: [
+          {
+            file: "create-entity-dialog.tsx",
+            exports: ["CreateEntityDialog", "CreateEntityDialogProps", "createEntityLabelClassName"],
           },
         ],
       },
@@ -414,9 +459,21 @@ export const CATALOG_CHAPTERS = [
         id: "popover",
         label: "Popover & HoverCard",
         ui: [
-          { file: "popover.tsx", exports: ["Popover", "PopoverTrigger", "PopoverContent", "PopoverAnchor"] },
+          {
+            file: "popover.tsx",
+            exports: ["Popover", "PopoverTrigger", "PopoverContent", "PopoverAnchor", "popoverSurfaceClassName"],
+            documentedOnly: {
+              popoverSurfaceClassName:
+                "The surface Popover, HoverCard, SelectContent, DropdownMenuContent and DropdownMenuSubContent share.",
+            },
+          },
           { file: "hover-card.tsx", exports: ["HoverCard", "HoverCardTrigger", "HoverCardContent"] },
         ],
+      },
+      {
+        id: "icon-toolbar-button",
+        label: "IconToolbarButton",
+        ui: [{ file: "icon-toolbar-button.tsx", exports: ["IconToolbarButton", "IconToolbarButtonProps"] }],
       },
       {
         id: "tooltip",
@@ -460,9 +517,12 @@ export const CATALOG_CHAPTERS = [
     id: "patterns",
     group: "Patterns",
     label: "Shell patterns",
-    summary: "Where page controls live: the desktop floating islands and the mobile slot system.",
+    summary: "Where page controls live: the desktop floating islands, page washes, the right rail panel, sidebar rows and the mobile slot system.",
     entries: [
       { id: "floating-islands", label: "Floating header islands" },
+      { id: "page-wash", label: "Page wash" },
+      { id: "rail-panel", label: "Right rail panel" },
+      { id: "sidebar-rows", label: "Sidebar rows" },
       { id: "mobile-shell", label: "Mobile shell slots" },
     ],
   },

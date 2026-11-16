@@ -70,7 +70,7 @@ export function MobileMenuDock() {
                 aria-haspopup="menu"
                 aria-expanded={menu.stage === "menu"}
                 className={cn(
-                  "flex size-full items-center justify-center rounded-pill text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring motion-safe:active:scale-95",
+                  "flex size-full items-center justify-center rounded-island text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring motion-safe:active:scale-95",
                   TAP_TARGET
                 )}
               >

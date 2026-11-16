@@ -1,8 +1,12 @@
 import { describe, expect, test } from "bun:test";
-import { Linter } from "eslint";
+import { readFileSync } from "node:fs";
+import path from "node:path";
+import { Glob } from "bun";
+import ts from "typescript";
+import { ESLint, Linter } from "eslint";
 import design, { designRules } from "../tools/eslint-design/index.mjs";
 import parser from "../tools/eslint-design/parser.mjs";
-import { classifyUtility, parseToken } from "../tools/eslint-design/classify.mjs";
+import { classifyUtility, GEOMETRY_PRIMITIVES, parseToken } from "../tools/eslint-design/classify.mjs";
 
 const config: Linter.Config[] = [
   {
@@ -219,7 +223,7 @@ describe("design rules: invalid", () => {
   test("radius: side forms, xs and one-off px values", () => {
     expect(lint(`<div className="rounded-t rounded-bl-sm rounded-xs rounded-[6px] rounded-t-[8px] rounded-[0.5rem]" />`)).toEqual([
       { rule: "design/radius-ladder", text: "rounded-t", fix: "rounded-t-md" },
-      { rule: "design/radius-ladder", text: "rounded-bl-sm", fix: "rounded-bl-md" },
+      { rule: "design/radius-ladder", text: "rounded-bl-sm" },
       { rule: "design/radius-ladder", text: "rounded-xs", fix: "rounded-md" },
       { rule: "design/radius-ladder", text: "rounded-[6px]" },
       { rule: "design/radius-ladder", text: "rounded-t-[8px]" },
@@ -242,6 +246,170 @@ describe("design rules: invalid", () => {
     expect(lint(`const buttonClasses = { className: "rounded" };`)).toEqual([
       { rule: "design/radius-ladder", text: "rounded", fix: "rounded-md" },
     ]);
+  });
+});
+
+describe("element and colour rules: valid (no warnings)", () => {
+  const valid: [string, string][] = [
+    ["on-ladder and role radii", `<div className="rounded-xl rounded-full rounded-none rounded-t-xl rounded-control rounded-surface rounded-cta rounded-island rounded-tab-tl rounded-tab-tr" />`],
+    [
+      "primitives without geometry overrides",
+      `<><Button size="sm" shape="cta" className="w-full gap-2 [&_svg]:size-5 [&>span]:h-3" /><Badge variant="outline" className="px-1" /><Input className="w-40" /><SelectTrigger className="w-40 min-h-0" /></>`,
+    ],
+    [
+      "a primitive composing its own classes",
+      `const Button = ({ className, size }) => <Comp className={cn(buttonVariants({ size }), "h-9 rounded-md", className)} />;
+       const Trigger = ({ className }) => <SelectPrimitive.Trigger className={cn("h-9 rounded-md", className)} />;
+       const badgeVariants = cva("h-5 rounded-md", { variants: { size: { sm: "h-4" } } });`,
+    ],
+    ["geometry on other elements", `<><div className="h-7 rounded-md" /><Card className="size-9 rounded-lg" /></>`],
+    [
+      "raw buttons with a focus-visible class",
+      `<><button className="focus-visible:ring-2" /><button className={cn("p-2", on && "md:focus-visible:ring-ring")} /><button className="p-2 [&:focus-visible]:ring-2" /></>`,
+    ],
+    [
+      "raw buttons whose class text cannot be read",
+      `<><button className={cn("p-2", className)} /><button className={styles.button} /><button className="p-2" {...props} /><button className={FOCUS_RING} /><button type="button" /></>`,
+    ],
+    ["theme colours", `<div className="text-foreground bg-background text-primary-foreground bg-transparent bg-[var(--chrome-surface)] shadow-[0_0_0_1px_var(--border)]" />`],
+  ];
+  for (const [name, code] of valid) {
+    test(name, () => expect(lint(code)).toEqual([]));
+  }
+});
+
+describe("element and colour rules: invalid", () => {
+  test("primitive-geometry: height, size and radius on Button, Badge, Input and SelectTrigger", () => {
+    const code = [
+      `const pill = "rounded-island";`,
+      `const a = <>`,
+      `  <Button className="h-7" />`,
+      `  <Button className={cn("size-9 gap-2", on && pill)} />`,
+      `  <Badge className="h-5 rounded-sm" />`,
+      `  <Input className="md:h-12" />`,
+      `  <SelectTrigger className="h-8 w-40" />`,
+      `</>;`,
+    ].join("\n");
+    expect(lint(code)).toEqual([
+      { rule: "design/primitive-geometry", text: "rounded-island" },
+      { rule: "design/primitive-geometry", text: "h-7" },
+      { rule: "design/primitive-geometry", text: "size-9" },
+      { rule: "design/primitive-geometry", text: "h-5" },
+      { rule: "design/radius-ladder", text: "rounded-sm", fix: "rounded-md" },
+      { rule: "design/primitive-geometry", text: "rounded-sm" },
+      { rule: "design/primitive-geometry", text: "md:h-12" },
+      { rule: "design/primitive-geometry", text: "h-8" },
+    ]);
+  });
+
+  test("primitive-geometry: wrappers that forward className to a primitive", () => {
+    const code = [
+      `const a = <>`,
+      `  <Chip className="h-7 w-full" />`,
+      `  <FilterChip label="Fire" className={cn("h-7 justify-center", on && "rounded-md")} />`,
+      `  <IconToolbarButton className="size-8" />`,
+      `  <TierListModerationBadge className="h-5 px-1.5" />`,
+      `  <DialogCancel className="w-full" />`,
+      `  <SearchField value={q} onValueChange={setQ} className="h-10 w-56 rounded-full" />`,
+      `</>;`,
+    ].join("\n");
+    expect(lint(code)).toEqual([
+      { rule: "design/primitive-geometry", text: "h-7" },
+      { rule: "design/primitive-geometry", text: "h-7" },
+      { rule: "design/primitive-geometry", text: "rounded-md" },
+      { rule: "design/primitive-geometry", text: "size-8" },
+      { rule: "design/primitive-geometry", text: "h-5" },
+      { rule: "design/primitive-geometry", text: "h-10" },
+      { rule: "design/primitive-geometry", text: "rounded-full" },
+    ]);
+  });
+
+  test("primitive-geometry covers every component in src that forwards className to a geometry primitive", () => {
+    expect(classNameForwarders().filter((name) => !(name in GEOMETRY_PRIMITIVES))).toEqual([]);
+  });
+
+  test("button-focus: a raw button with readable classes and no focus-visible class", () => {
+    const code = [
+      `const a = <>`,
+      `  <button className="p-2 hover:bg-muted" />`,
+      `  <button className="p-2 focus:ring-2" />`,
+      `  <button {...props} className="p-2" />`,
+      `  <motion.button className={cn("p-2", on ? "bg-primary-wash" : "")} />`,
+      `</>;`,
+    ].join("\n");
+    expect(lint(code)).toEqual([
+      { rule: "design/button-focus", text: `className="p-2 hover:bg-muted"` },
+      { rule: "design/button-focus", text: `className="p-2 focus:ring-2"` },
+      { rule: "design/button-focus", text: `className="p-2"` },
+      { rule: "design/button-focus", text: `className={cn("p-2", on ? "bg-primary-wash" : "")}` },
+    ]);
+  });
+
+  test("no-literal-color: white, black, rgb(a) and hex in any class string", () => {
+    const code = `cn("text-white bg-black/60 bg-white/20 hover:text-white", "shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] bg-[#0b0e14] text-[#FFF] fill-[rgb(0,0,0)]")`;
+    expect(lint(code)).toEqual(
+      ["text-white", "bg-black/60", "bg-white/20", "hover:text-white", "shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]", "bg-[#0b0e14]", "text-[#FFF]", "fill-[rgb(0,0,0)]"].map(
+        (text) => ({ rule: "design/no-literal-color", text }),
+      ),
+    );
+  });
+
+  test("no-literal-color: named white and black on borders, rings, text and gradient stops", () => {
+    const code = `cn("border-white/10 border-x-white/[0.06] ring-white group-hover:ring-white/25 text-black from-black via-black/40 to-black/5 from-white via-white/20 to-white shadow-black/40")`;
+    expect(lint(code)).toEqual(
+      ["border-white/10", "border-x-white/[0.06]", "ring-white", "group-hover:ring-white/25", "text-black", "from-black", "via-black/40", "to-black/5", "from-white", "via-white/20", "to-white", "shadow-black/40"].map(
+        (text) => ({ rule: "design/no-literal-color", text }),
+      ),
+    );
+  });
+
+  test("no-literal-color: names that only start with white or black are not colours", () => {
+    expect(lint(`cn("text-whitesmoke bg-blackout border-white-ish from-primary/10 to-transparent ring-offset-background")`)).toEqual([]);
+  });
+
+  test("no-literal-color: a commented disable on the line keeps a printed domain colour", () => {
+    const code = [
+      `const a = <>`,
+      `  {/* eslint-disable-next-line design/no-literal-color -- printed card colour */}`,
+      `  <span className="text-black" />`,
+      `  <span className="text-black" />`,
+      `</>;`,
+    ].join("\n");
+    expect(lint(code)).toEqual([{ rule: "design/no-literal-color", text: "text-black" }]);
+  });
+
+  test("radius-ladder: 2xl and larger, and corner-only forms, with no mechanical fix", () => {
+    expect(lint(`<div className="rounded-2xl rounded-3xl rounded-t-2xl rounded-tl-lg rounded-br-none rounded-ss-[8px]" />`)).toEqual(
+      ["rounded-2xl", "rounded-3xl", "rounded-t-2xl", "rounded-tl-lg", "rounded-br-none", "rounded-ss-[8px]"].map((text) => ({ rule: "design/radius-ladder", text })),
+    );
+  });
+});
+
+describe("rule severity in eslint.config.mjs", () => {
+  const eslint = new ESLint({ cwd: path.join(import.meta.dir, "..") });
+  const GEOMETRY = ["design/primitive-geometry", "design/button-focus", "design/radius-ladder"];
+  const severity = async (file: string, rule: string) => {
+    const level = (await eslint.calculateConfigForFile(file)).rules?.[rule];
+    return Array.isArray(level) ? level[0] : level;
+  };
+
+  test("the geometry rules are errors in user-facing code and warnings in admin code", async () => {
+    for (const rule of GEOMETRY) {
+      expect(await severity("src/components/ui/chip.tsx", rule)).toBe(2);
+      expect(await severity("src/components/design-catalog/foundations/shape.tsx", rule)).toBe(2);
+      expect(await severity("src/features/admin-format/format-form-content.tsx", rule)).toBe(1);
+    }
+    expect(await severity("src/features/admin-format/format-form-content.tsx", "design/no-literal-color")).toBe(2);
+  });
+
+  test("a height override on a Button fails the lint with design/primitive-geometry", async () => {
+    const [result] = await eslint.lintText(
+      `import { Button } from "@/components/ui/button";
+export const A = () => <Button className="h-7">a</Button>;
+`,
+      { filePath: "src/components/fixture.tsx" },
+    );
+    expect(result.messages.filter((m) => m.severity === 2).map((m) => m.ruleId)).toEqual(["design/primitive-geometry"]);
   });
 });
 
@@ -446,9 +614,60 @@ describe("classifier", () => {
       "transition",
       "uppercase",
       "rounded-[6px]",
+      "rounded-tl-lg",
+      "rounded-2xl",
+      "text-white",
     ]) {
       const finding = classifyUtility(cls);
       expect([cls, Boolean(finding), finding?.replacement]).toEqual([cls, true, undefined]);
     }
   });
 });
+
+function classNameForwarders(): string[] {
+  const root = path.join(import.meta.dir, "..");
+  const files = [...new Glob("src/**/*.tsx").scanSync(root)].map((file) =>
+    ts.createSourceFile(file, readFileSync(path.join(root, file), "utf8"), ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX),
+  );
+  const targets = new Set(["Button", "Badge", "Input", "SelectTrigger"]);
+  const forwarders = new Set<string>();
+  const forwardsOwnClassName = (expression: ts.Node): boolean =>
+    (ts.isIdentifier(expression) && expression.text === "className" && !ts.isPropertyAccessExpression(expression.parent)) ||
+    ts.forEachChild(expression, forwardsOwnClassName) === true;
+  const restNames = (component: ts.SignatureDeclaration | undefined) => {
+    const first = component?.parameters[0]?.name;
+    if (!first) return [];
+    if (ts.isIdentifier(first)) return [first.text];
+    if (!ts.isObjectBindingPattern(first)) return [];
+    return first.elements.flatMap((element) => (element.dotDotDotToken && ts.isIdentifier(element.name) ? [element.name.text] : []));
+  };
+  let grew = true;
+  while (grew) {
+    grew = false;
+    for (const file of files) {
+      const visit = (node: ts.Node, owner: { name: string; fn?: ts.SignatureDeclaration } | null) => {
+        let next = owner;
+        if ((ts.isFunctionDeclaration(node) || ts.isVariableDeclaration(node)) && node.name && ts.isIdentifier(node.name) && /^[A-Z]/.test(node.name.text)) {
+          const init = ts.isVariableDeclaration(node) ? node.initializer : node;
+          const fn = init && (ts.isFunctionLike(init) ? init : ts.isCallExpression(init) ? init.arguments.find(ts.isFunctionLike) : undefined);
+          next = { name: node.name.text, fn: fn as ts.SignatureDeclaration | undefined };
+        }
+        if ((ts.isJsxOpeningElement(node) || ts.isJsxSelfClosingElement(node)) && next && !targets.has(next.name) && targets.has(node.tagName.getText(file))) {
+          const forwards = node.attributes.properties.some((attr) =>
+            ts.isJsxAttribute(attr)
+              ? attr.name.getText(file) === "className" && !!attr.initializer && ts.isJsxExpression(attr.initializer) && !!attr.initializer.expression && forwardsOwnClassName(attr.initializer.expression)
+              : ts.isIdentifier(attr.expression) && restNames(next.fn).includes(attr.expression.text),
+          );
+          if (forwards) {
+            forwarders.add(next.name);
+            targets.add(next.name);
+            grew = true;
+          }
+        }
+        ts.forEachChild(node, (child) => visit(child, next));
+      };
+      visit(file, null);
+    }
+  }
+  return [...forwarders].sort();
+}

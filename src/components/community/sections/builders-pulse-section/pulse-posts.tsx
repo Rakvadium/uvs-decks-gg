@@ -1,4 +1,5 @@
 import { Badge } from "@/components/ui/badge";
+import { Panel } from "@/components/ui/panel";
 import { COMMUNITY_PULSE } from "../../community-content-data";
 
 export function CommunityPulsePosts() {
@@ -6,7 +7,7 @@ export function CommunityPulsePosts() {
     <div className="space-y-3">
       <div className="chrome-label-case flex items-center justify-between text-xs text-muted-foreground">
         <span>Top Posts</span>
-        <Badge variant="default" className="text-[10px]">
+        <Badge size="sm" variant="default">
           Live
         </Badge>
       </div>
@@ -15,10 +16,10 @@ export function CommunityPulsePosts() {
         const Icon = post.icon;
 
         return (
-          <div key={post.title} className="rounded-lg border border-border/50 bg-background/50 px-3 py-2">
+          <Panel key={post.title} className="px-3 py-2">
             <div className="flex items-center justify-between gap-2">
               <div className="min-w-0 flex items-center gap-2">
-                <div className="flex h-7 w-7 items-center justify-center rounded-md border border-border/50 bg-card/80">
+                <div className="flex size-7 items-center justify-center rounded-control border border-surface bg-background-elevated">
                   <Icon className="h-3.5 w-3.5 text-primary" />
                 </div>
                 <div className="min-w-0">
@@ -32,7 +33,7 @@ export function CommunityPulsePosts() {
                 {post.comments} comments
               </span>
             </div>
-          </div>
+          </Panel>
         );
       })}
     </div>

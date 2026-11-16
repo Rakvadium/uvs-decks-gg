@@ -1,6 +1,7 @@
 "use client";
 
 import { FolderKanban } from "lucide-react";
+import { Banner } from "@/components/ui/banner";
 import { useStartAuth } from "@/components/auth/use-start-auth";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -15,12 +16,7 @@ export function GalleryGuestDeckAuthPrompt({
   const startAuth = useStartAuth();
 
   return (
-    <div
-      className={cn(
-        "flex flex-col gap-3 rounded-lg border border-border/50 bg-muted/60 px-3 py-3",
-        className
-      )}
-    >
+    <Banner className={cn("flex-col flex-nowrap items-stretch gap-3 py-3", className)}>
       <div className="flex items-start gap-2">
         <FolderKanban aria-hidden className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
         <p className="min-w-0 text-xs leading-relaxed text-foreground/80">
@@ -30,19 +26,18 @@ export function GalleryGuestDeckAuthPrompt({
         </p>
       </div>
       <div className="flex flex-wrap items-center gap-2">
-        <Button type="button" size="sm" className="h-8 px-3 text-xs" onClick={() => startAuth("signIn")}>
+        <Button type="button" size="sm" onClick={() => startAuth("signIn")}>
           Sign in
         </Button>
         <Button
           type="button"
           size="sm"
           variant="outline"
-          className="h-8 px-3 text-xs border-primary/30 hover:border-primary/60 hover:bg-primary/10 hover:text-primary"
           onClick={() => startAuth("signUp")}
         >
           Create account
         </Button>
       </div>
-    </div>
+    </Banner>
   );
 }

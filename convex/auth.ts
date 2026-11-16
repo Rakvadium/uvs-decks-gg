@@ -13,10 +13,14 @@ import {
   isValidHandoffState,
 } from "../shared/auth-handoff";
 import { isAllowedHandoffOrigin } from "../shared/hosts";
+import { validateUsername } from "../shared/username";
 
 const SignUpProfileSchema = z.object({
   email: z.string().email("Invalid email format"),
-  username: z.string().min(1, "Username is required").max(20, "Username too long"),
+  username: z.string().superRefine((username, ctx) => {
+    const message = validateUsername(username);
+    if (message) ctx.addIssue({ code: "custom", message });
+  }),
 });
 
 function normalizeAuthEmail(email: unknown): string {

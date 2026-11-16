@@ -2,7 +2,7 @@
 
 import { useState, type ComponentProps } from "react";
 import { toast } from "sonner";
-import { Copy, Download, Pencil, Share2, Trash2, Upload } from "lucide-react";
+import { Copy, Download, Layers, Pencil, Share2, SlidersHorizontal, Trash2, Upload, X } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,10 +15,12 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
+import { CreateEntityDialog, createEntityLabelClassName } from "@/components/ui/create-entity-dialog";
 import {
   Dialog,
   DialogBody,
+  DialogCancel,
   DialogClose,
   DialogContent,
   DialogDescription,
@@ -44,6 +46,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
+import { IconToolbarButton } from "@/components/ui/icon-toolbar-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -86,12 +89,12 @@ function dialogSnippet(size: DialogSize, footer: FooterMode, showClose: boolean)
   const props = [size !== "default" ? `size="${size}"` : null, showClose ? null : "showCloseButton={false}"].filter(Boolean);
   const footerProp =
     footer === "prop"
-      ? `\n    footer={\n      <>\n        <DialogClose asChild><Button variant="outline">Close</Button></DialogClose>\n        <Button>Save</Button>\n      </>\n    }`
+      ? `\n    footer={\n      <>\n        <DialogCancel />\n        <Button>Save</Button>\n      </>\n    }`
       : "";
   const open = `  <DialogContent${props.length ? ` ${props.join(" ")}` : ""}${footerProp}>`;
   const footerChild =
     footer === "component"
-      ? `\n    <DialogFooter>\n      <DialogClose asChild><Button variant="outline">Close</Button></DialogClose>\n      <Button>Save</Button>\n    </DialogFooter>`
+      ? `\n    <DialogFooter>\n      <DialogCancel />\n      <Button>Save</Button>\n    </DialogFooter>`
       : "";
   return `<Dialog>\n  <DialogTrigger asChild><Button>Rename deck</Button></DialogTrigger>\n${open}\n    <DialogHeader>\n      <DialogTitle>Rename deck</DialogTitle>\n      <DialogDescription>…</DialogDescription>\n    </DialogHeader>\n    <DialogBody>…</DialogBody>${footerChild}\n  </DialogContent>\n</Dialog>`;
 }
@@ -102,9 +105,7 @@ export function DialogEntry() {
   const [showClose, setShowClose] = useState(true);
   const actions = (
     <>
-      <DialogClose asChild>
-        <Button variant="outline">Close</Button>
-      </DialogClose>
+      <DialogCancel />
       <DialogClose asChild>
         <Button>Save</Button>
       </DialogClose>
@@ -116,8 +117,11 @@ export function DialogEntry() {
       id="dialog"
       description={
         <p>
-          Full-screen on phones, centered from <Code>md</Code>. Dismiss is always an outline <em>Close</em>; commit is the
-          filled default. Prefer the <Code>footer</Code> prop: on phones it pins above the safe area.
+          Full-screen on phones, centered from <Code>md</Code>. Every dialog has the X close and a{" "}
+          <Code>DialogCancel</Code> (an outline <em>Cancel</em> at the default size) beside a filled commit, so footers
+          match everywhere. A view-only dialog passes <Code>{"<DialogCancel>Close</DialogCancel>"}</Code>. Prefer the{" "}
+          <Code>footer</Code> prop: on phones it pins above the safe area. Only full-bleed layouts with their own header
+          turn off <Code>showCloseButton</Code>.
         </p>
       }
     >
@@ -191,7 +195,13 @@ export function AlertDialogEntry() {
   return (
     <CatalogEntrySection
       id="alert-dialog"
-      description={<p>For confirmations that need an explicit answer: no outside-click dismiss. The action takes <Code>buttonVariants</Code> for its role.</p>}
+      description={
+        <p>
+          For confirmations that need an explicit answer: no outside-click dismiss. It shares the Dialog surface, X close
+          and heading-case title. A destructive confirm passes <Code>variant=&quot;destructive&quot;</Code> to{" "}
+          <Code>AlertDialogAction</Code>, never the primary fill.
+        </p>
+      }
     >
       <Preview>
         <AlertDialog>
@@ -207,14 +217,57 @@ export function AlertDialogEntry() {
               <AlertDialogDescription>This removes the deck and its history. It can&apos;t be undone.</AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel>Close</AlertDialogCancel>
-              <AlertDialogAction className={buttonVariants({ variant: "destructive" })}>Delete</AlertDialogAction>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction variant="destructive">Delete</AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
       </Preview>
       <CodeBlock
-        code={`import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"\n\n<AlertDialogFooter>\n  <AlertDialogCancel>Close</AlertDialogCancel>\n  <AlertDialogAction className={buttonVariants({ variant: "destructive" })}>Delete</AlertDialogAction>\n</AlertDialogFooter>`}
+        code={`import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"\n\n<AlertDialogFooter>\n  <AlertDialogCancel>Cancel</AlertDialogCancel>\n  <AlertDialogAction variant="destructive">Delete</AlertDialogAction>\n</AlertDialogFooter>`}
+      />
+    </CatalogEntrySection>
+  );
+}
+
+export function CreateEntityDialogEntry() {
+  const [open, setOpen] = useState(false);
+  const [name, setName] = useState("");
+  return (
+    <CatalogEntrySection
+      id="create-entity-dialog"
+      description={
+        <p>
+          The one create flow for decks, tier lists and teams: icon header, a required name field, optional extra fields
+          as children, then Cancel and a submit that stays disabled until the name has text. Enter submits.
+        </p>
+      }
+    >
+      <Preview>
+        <Button size="sm" data-catalog-open="create-entity-dialog" onClick={() => setOpen(true)}>
+          <Layers />
+          New deck
+        </Button>
+        <CreateEntityDialog
+          open={open}
+          onOpenChange={setOpen}
+          icon={Layers}
+          title="Create New Deck"
+          description="Give it a name now; you can always refine it later."
+          name={{ id: "catalog-create-deck-name", label: "Deck name", placeholder: "My Standard Aggro…", value: name, onChange: setName }}
+          submitLabel="Create Deck"
+          submitting={false}
+          onSubmit={() => {
+            toast.success(`Created ${name.trim()}`);
+            setOpen(false);
+            setName("");
+          }}
+        >
+          <p className={createEntityLabelClassName}>Extra fields render here as children.</p>
+        </CreateEntityDialog>
+      </Preview>
+      <CodeBlock
+        code={`<CreateEntityDialog\n  open={open}\n  onOpenChange={setOpen}\n  icon={Layers}\n  title="Create New Deck"\n  description="Give it a name now; you can always refine it later."\n  name={{ id: "create-deck-name", label: "Deck name", placeholder: "My Standard Aggro…", value, onChange }}\n  submitLabel="Create Deck"\n  submitting={isCreating}\n  onSubmit={create}\n/>`}
       />
     </CatalogEntrySection>
   );
@@ -246,7 +299,7 @@ export function SheetEntry() {
                 </div>
                 <SheetFooter className="gap-2 p-4">
                   <SheetClose asChild>
-                    <Button variant="outline">Close</Button>
+                    <Button variant="outline">Cancel</Button>
                   </SheetClose>
                   <SheetClose asChild>
                     <Button>Apply</Button>
@@ -351,6 +404,9 @@ export function PopoverEntry() {
         <p>
           <Code>Popover</Code> is click-to-open (<Code>z-popover</Code>); <Code>PopoverAnchor</Code> positions it against
           another element than the trigger. <Code>HoverCard</Code> previews on hover or focus (<Code>z-chrome</Code>).
+          Both, plus <Code>SelectContent</Code>, <Code>DropdownMenuContent</Code> and its sub-menu, draw{" "}
+          <Code>popoverSurfaceClassName</Code>: <Code>rounded-surface</Code>, <Code>bg-popover-overlay</Code>, the chrome
+          popover border and <Code>--chrome-popover-shadow</Code>. Pass layout classes only.
         </p>
       }
     >
@@ -409,6 +465,38 @@ export function PopoverEntry() {
       <CodeBlock
         code={`<Popover>\n  <PopoverTrigger asChild><Button variant="outline">Card quantity</Button></PopoverTrigger>\n  <PopoverContent align="start">…</PopoverContent>\n</Popover>\n\n<HoverCard openDelay={150}>\n  <HoverCardTrigger asChild><a href={profileUrl}>@agent</a></HoverCardTrigger>\n  <HoverCardContent>…</HoverCardContent>\n</HoverCard>`}
       />
+    </CatalogEntrySection>
+  );
+}
+
+export function IconToolbarButtonEntry() {
+  const [active, setActive] = useState(false);
+  return (
+    <CatalogEntrySection
+      id="icon-toolbar-button"
+      description={
+        <p>
+          The icon-only action for overlay closes and toolbars: <Code>Button size=&quot;icon-xs&quot;</Code> with a
+          required <Code>label</Code> (its accessible name), the <Code>--hover-bg</Code> hover and the selected tokens
+          when <Code>active</Code>. Dialog, AlertDialog, Sheet and the side panel close with it, and the gallery island
+          passes <Code>shape=&quot;island&quot;</Code>.
+        </p>
+      }
+    >
+      <Preview>
+        <div className="flex items-center gap-2">
+          <IconToolbarButton label="Close">
+            <X />
+          </IconToolbarButton>
+          <IconToolbarButton label="Toggle filter panel" active={active} aria-pressed={active} onClick={() => setActive(!active)}>
+            <SlidersHorizontal />
+          </IconToolbarButton>
+          <IconToolbarButton label="Close (island)" shape="island">
+            <X />
+          </IconToolbarButton>
+        </div>
+      </Preview>
+      <CodeBlock code={`<IconToolbarButton label="Close" onClick={close}>\n  <X />\n</IconToolbarButton>\n<IconToolbarButton label="Toggle filter panel" active={open} shape="island">\n  <SlidersHorizontal />\n</IconToolbarButton>`} />
     </CatalogEntrySection>
   );
 }
@@ -516,10 +604,12 @@ export function OverlaysChapter() {
   return (
     <>
       <DialogEntry />
+      <CreateEntityDialogEntry />
       <AlertDialogEntry />
       <SheetEntry />
       <DropdownMenuEntry />
       <PopoverEntry />
+      <IconToolbarButtonEntry />
       <TooltipEntry />
       <ToastEntry />
     </>

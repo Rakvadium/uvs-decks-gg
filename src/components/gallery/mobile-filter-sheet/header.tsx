@@ -21,7 +21,7 @@ const PAGE_TITLES: Record<GalleryMobileFilterPage, string> = {
 };
 
 const headerButtonClassName =
-  "flex h-9 min-w-9 shrink-0 items-center justify-center rounded-pill px-2 text-sm font-semibold text-primary transition-colors duration-150 hover:bg-primary-wash focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-40";
+  "flex h-9 min-w-9 shrink-0 items-center justify-center rounded-island px-2 text-sm font-semibold text-primary transition-colors duration-150 hover:bg-primary-wash focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-40";
 
 /** `inline` renders outside a Sheet (the Menu layout's tools panel), so the title is a plain heading. */
 export function GalleryMobileFilterHeader({ onClose, inline = false }: { onClose: () => void; inline?: boolean }) {

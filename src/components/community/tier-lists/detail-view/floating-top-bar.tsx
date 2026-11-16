@@ -12,7 +12,6 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,10 +26,11 @@ import {
 } from "@/components/shell/floating-page-bar";
 import { Input } from "@/components/ui/input";
 import { COMMUNITY_TIER_RANKING, getRankingScopeLabel } from "../../../../../shared/app-config";
-import { ChevronDown, Edit3, Globe, Loader2, Lock, Save, Trash2, X } from "lucide-react";
+import { ChevronDown, Edit3, Globe, Lock, Save, Trash2, X } from "lucide-react";
 import { useProfanityDisplayText } from "@/lib/moderation/use-profanity-display-text";
 import { TierListModerationBadge } from "../moderation-badge";
 import { useCommunityTierListDetailContext } from "./context";
+import { Spinner } from "@/components/ui/spinner";
 
 export function CommunityTierListDetailFloatingTopBar() {
   const { display } = useProfanityDisplayText();
@@ -66,7 +66,7 @@ export function CommunityTierListDetailFloatingTopBar() {
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          className="chrome-label-case inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full border border-border/50 px-2.5 text-[10px] text-foreground transition-colors hover:border-primary/40 hover:text-primary"
+          className="chrome-label-case inline-flex h-8 shrink-0 items-center gap-1.5 rounded-island border border-border/50 px-2.5 text-[10px] text-foreground outline-none transition-colors hover:border-primary/40 hover:text-primary focus-visible:ring-2 focus-visible:ring-ring"
         >
           {isPublic ? <Globe className="h-3 w-3" /> : <Lock className="h-3 w-3" />}
           {displayPublicity}
@@ -85,7 +85,7 @@ export function CommunityTierListDetailFloatingTopBar() {
       </DropdownMenuContent>
     </DropdownMenu>
   ) : (
-    <Badge variant={isPublic ? "default" : "outline"} className="h-8 shrink-0 items-center gap-1.5 rounded-full px-2.5 text-[10px]">
+    <Badge size="lg" variant={isPublic ? "default" : "outline"} className="shrink-0">
       {isPublic ? <Globe className="h-3 w-3" /> : <Lock className="h-3 w-3" />}
       {displayPublicity}
     </Badge>
@@ -96,7 +96,7 @@ export function CommunityTierListDetailFloatingTopBar() {
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          className="chrome-label-case inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full border border-border/50 px-2.5 text-[10px] text-foreground transition-colors hover:border-primary/40 hover:text-primary"
+          className="chrome-label-case inline-flex h-8 shrink-0 items-center gap-1.5 rounded-island border border-border/50 px-2.5 text-[10px] text-foreground outline-none transition-colors hover:border-primary/40 hover:text-primary focus-visible:ring-2 focus-visible:ring-ring"
         >
           {rankingScopeLabel}
           <ChevronDown className="h-3 w-3 shrink-0 text-muted-foreground" />
@@ -111,7 +111,7 @@ export function CommunityTierListDetailFloatingTopBar() {
       </DropdownMenuContent>
     </DropdownMenu>
   ) : (
-    <Badge variant="outline" className="h-8 shrink-0 items-center gap-1.5 rounded-full px-2.5 text-[10px]">
+    <Badge size="lg" variant="outline" className="shrink-0">
       {rankingScopeLabel}
     </Badge>
   );
@@ -123,7 +123,7 @@ export function CommunityTierListDetailFloatingTopBar() {
       <FloatingPageBar
         left={
           <>
-            <FloatingBackPill href="/community/tier-lists" label="Tier lists" iconOnly />
+            <FloatingBackPill href="/community/tier-lists" label="Tier lists" />
             <FloatingCapsuleCluster
               className="min-w-0 max-w-[min(100%,22rem)]"
               bodyClassName="min-w-0 px-4"
@@ -131,11 +131,12 @@ export function CommunityTierListDetailFloatingTopBar() {
             >
               {canEdit && isEditingMeta ? (
                 <Input
+                  size="sm"
                   value={title}
                   onChange={(event) => setTitle(event.target.value)}
                   placeholder="Tier list name"
                   aria-label="Tier list name"
-                  className="h-8 w-56 border-none bg-transparent px-0 text-sm font-semibold tracking-tight shadow-none focus-visible:ring-0 dark:bg-transparent"
+                  className="w-56 text-sm font-semibold"
                 />
               ) : (
                 <h1
@@ -150,7 +151,7 @@ export function CommunityTierListDetailFloatingTopBar() {
               {publicityControl}
               <TierListModerationBadge
                 status={detail.listModerationStatus}
-                className="h-8 shrink-0 items-center gap-1.5 rounded-full px-2.5 text-[10px]"
+                size="lg"
               />
               {rankingScopeControl}
             </FloatingCapsuleCluster>
@@ -169,23 +170,19 @@ export function CommunityTierListDetailFloatingTopBar() {
                   }
                   className={isSaving ? "pointer-events-none opacity-70" : undefined}
                 >
-                  {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                  {isSaving ? <Spinner /> : <Save className="h-4 w-4" />}
                   <span className="text-xs">Save</span>
                 </FloatingActionPill>
-                <FloatingActionPill variant="outline" onClick={cancelMetaEditing}>
+                <FloatingActionPill variant="floating" onClick={cancelMetaEditing}>
                   <X className="h-4 w-4" />
                   <span className="text-xs">Cancel</span>
                 </FloatingActionPill>
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
-                    <Button
-                      variant="destructiveOutline"
-                      size="sm"
-                      className="pointer-events-auto h-10 shrink-0 gap-1.5 rounded-full px-4"
-                    >
+                    <FloatingActionPill variant="destructive">
                       <Trash2 className="h-4 w-4" />
                       <span className="text-xs">Delete</span>
-                    </Button>
+                    </FloatingActionPill>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>
@@ -200,7 +197,7 @@ export function CommunityTierListDetailFloatingTopBar() {
                         variant="destructive"
                         onClick={() => void handleDelete()}
                       >
-                        {isDeleting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                        {isDeleting ? <Spinner /> : null}
                         Delete
                       </AlertDialogAction>
                     </AlertDialogFooter>
@@ -208,7 +205,7 @@ export function CommunityTierListDetailFloatingTopBar() {
                 </AlertDialog>
               </>
             ) : (
-              <FloatingActionPill variant="outline" onClick={() => setIsEditingMeta(true)}>
+              <FloatingActionPill variant="floating" onClick={() => setIsEditingMeta(true)}>
                 <Edit3 className="h-4 w-4" />
                 <span className="text-xs">Edit</span>
               </FloatingActionPill>

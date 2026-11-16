@@ -23,7 +23,6 @@ interface GalleryFilterDialogContextValue {
   hasActiveFilters: boolean;
   setSearch: string;
   setSetSearch: (value: string) => void;
-  clearSetSearch: () => void;
   filteredSets: SetFilterOption[];
   setOptions: SetFilterOption[];
   toggleFormat: (formatKey: string) => void;
@@ -146,7 +145,6 @@ export function GalleryFilterDialogProvider({
       hasActiveFilters: meta.hasClearableFilters,
       setSearch,
       setSetSearch,
-      clearSetSearch: () => setSetSearch(""),
       filteredSets,
       setOptions,
       toggleFormat,

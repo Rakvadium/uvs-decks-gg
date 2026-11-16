@@ -1,4 +1,5 @@
 import { useCardDetailsContent } from "./content-context";
+import { Panel } from "@/components/ui/panel";
 import { AbilityText } from "./ability-text";
 import { PreviousAbilityText } from "./previous-ability-text";
 
@@ -10,10 +11,10 @@ export function CardDetailsTextSection() {
   return (
     <div className="space-y-2">
       <span className="chrome-label-case text-xs text-muted-foreground">Card Text</span>
-      <div className="rounded-lg border border-border/50 bg-card/30 p-4 backdrop-blur-sm">
+      <Panel className="p-4">
         <AbilityText text={card.text} />
         <PreviousAbilityText cardId={card._id} />
-      </div>
+      </Panel>
     </div>
   );
 }

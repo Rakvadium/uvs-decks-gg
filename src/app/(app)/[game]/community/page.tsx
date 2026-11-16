@@ -6,7 +6,7 @@ import { FloatingPageLayout } from "@/components/shell/floating-page-bar";
 
 export default function CommunityPage() {
   return (
-    <FloatingPageLayout bar={<CommunityFloatingTopBar />}>
+    <FloatingPageLayout bar={<CommunityFloatingTopBar />} pageWash="grid">
       <CommunityView />
     </FloatingPageLayout>
   );

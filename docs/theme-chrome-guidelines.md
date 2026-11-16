@@ -64,7 +64,6 @@ Name tokens by **role**, not by look:
 | Focus | `--chrome-focus-ring-*`, `--chrome-focus-shadow` | Focus must remain visible in every chrome |
 | Type feel | `--chrome-heading-transform`, `--chrome-heading-letter-spacing`, `--chrome-card-title-font` | Uppercase / tracking is chrome, not a one-off class |
 | Shell | `--chrome-page-bg`, `--chrome-shell-*` | App frame follows chrome without per-page CSS |
-| Shape | `--chrome-pill-radius` | Pill controls go square-ish in tight chromes |
 | Glass | `--chrome-glass-highlight` | Floating glass edge; `none` in flat chromes (Bubble Gum) |
 | FX intensity | glow/scanline/halo tokens that resolve to `none` in quiet chromes | Feature markup stays the same; chrome turns FX off |
 
@@ -125,11 +124,11 @@ Prefer chrome elevation tokens over ad-hoc `rgba` / `hsl` shadows:
 | Controls / inputs | `rounded-md` |
 | Cards / panels | `rounded-lg` |
 | Large feature surfaces | `rounded-xl` |
-| Hero / marketing shells, floating shell panels | `rounded-3xl` |
-| Chrome pills (mobile capsules, tab items, round shell buttons, chips) | `rounded-pill` |
+| Floating islands and capsules (mobile dock, tools pill, tab items, round shell buttons) | `rounded-island` |
+| Floating shell panels (mobile action menu and panels, the Pannu dock) | `rounded-xl` |
 | Avatars, status dots, true circles | `rounded-full` |
 
-Avoid one-off `rounded-[Npx]` except micro geometry (tooltip arrows). Chrome may change `--radius`; the *roles* stay the same so a loud chrome can tighten or loosen the whole scale. `rounded-md` through `rounded-3xl` all derive from `--radius`; `rounded-pill` reads `--chrome-pill-radius`, which every chrome assigns (9999px, or a radius step in tight chromes).
+Avoid one-off `rounded-[Npx]` except micro geometry (tooltip arrows). Chrome may change `--radius`; the *roles* stay the same so a loud chrome can tighten or loosen the whole scale. Role radii (`rounded-control`, `rounded-surface`, `rounded-cta`, `rounded-island`) are chrome-owned; see [UI_UX_DESIGN.md](./UI_UX_DESIGN.md#role-tokens).
 
 ### Z-index stack
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { lazy, Suspense, useCallback, useEffect, useState } from "react";
+import { LoadingState } from "@/components/ui/loading-state";
 import { createPortal } from "react-dom";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { useQuery } from "convex/react";
@@ -21,12 +22,7 @@ const CardDetailsV2 = lazy(() =>
 
 function CardDetailsPanelFallback() {
   return (
-    <div className="flex min-h-[min(400px,60vh)] w-full items-center justify-center p-8">
-      <div
-        className="h-9 w-9 animate-spin rounded-full border-2 border-primary border-t-transparent"
-        aria-hidden
-      />
-    </div>
+    <LoadingState size="lg" className="min-h-[min(400px,60vh)] w-full p-8" />
   );
 }
 

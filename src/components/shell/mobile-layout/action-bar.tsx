@@ -26,7 +26,7 @@ interface BarSegment {
 }
 
 const SEGMENT = cn(
-  "flex h-10 min-w-0 flex-1 items-center justify-center gap-1.5 rounded-xl px-2 text-sm font-medium text-muted-foreground transition-colors duration-150 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring motion-safe:active:scale-[0.97]",
+  "flex h-10 min-w-0 flex-1 items-center justify-center gap-1.5 rounded-surface px-2 text-sm font-medium text-muted-foreground transition-colors duration-150 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring motion-safe:active:scale-[0.97]",
   TAP_TARGET
 );
 const SEGMENT_ACTIVE = "text-foreground";
@@ -42,15 +42,15 @@ function BarSegments({ items, label }: { items: BarSegment[]; label: string }) {
 
   return (
     <nav aria-label={label}>
-      <div ref={containerRef} className="relative flex gap-1 rounded-2xl bg-muted-tint p-1">
-        <SlidingIndicator indicatorRef={indicatorRef} className="rounded-xl bg-background shadow-[var(--chrome-floating-shadow)]" />
+      <div ref={containerRef} className="relative flex gap-1 rounded-xl bg-muted-tint p-1">
+        <SlidingIndicator indicatorRef={indicatorRef} className="rounded-surface bg-background shadow-[var(--chrome-floating-shadow)]" />
         {items.map((item) => {
           const body = (
             <>
               <span className="flex size-4 shrink-0 items-center justify-center">{item.icon}</span>
               <span className="max-w-full truncate">{item.label}</span>
               {item.badge !== undefined && !stacked ? (
-                <span className="rounded-pill bg-muted-soft px-1.5 text-[10px] tabular-nums text-muted-foreground">{item.badge}</span>
+                <span className="rounded-full bg-muted-soft px-1.5 text-[10px] tabular-nums text-muted-foreground">{item.badge}</span>
               ) : null}
             </>
           );
@@ -89,7 +89,7 @@ function PeekRow({ slot, onOpen }: { slot: SlotRegistration; onOpen: (element: H
       onClick={(event) => onOpen(event.currentTarget)}
       aria-haspopup="dialog"
       className={cn(
-        "flex w-full min-w-0 items-center gap-3 rounded-2xl bg-muted-tint p-1 pr-2 text-left transition-colors duration-150 hover:bg-muted-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+        "flex w-full min-w-0 items-center gap-3 rounded-xl bg-muted-tint p-1 pr-2 text-left transition-colors duration-150 hover:bg-muted-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
         TAP_TARGET
       )}
     >
@@ -105,7 +105,7 @@ function PeekRow({ slot, onOpen }: { slot: SlotRegistration; onOpen: (element: H
         <span className="block truncate text-sm font-semibold text-foreground">{slot.label ?? slot.id}</span>
         <span className="block truncate text-xs text-muted-foreground">{subtitle}</span>
       </span>
-      <span className="flex size-8 shrink-0 items-center justify-center rounded-pill bg-muted-elevated text-foreground">
+      <span className="flex size-8 shrink-0 items-center justify-center rounded-island bg-muted-elevated text-foreground">
         <ChevronUp className="size-4" />
       </span>
     </button>

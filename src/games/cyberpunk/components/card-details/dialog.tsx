@@ -120,13 +120,14 @@ export function CardDetailsDialog({
           <div className="flex w-full shrink-0 flex-col items-center md:w-[340px] md:justify-center">
             <div className="flex w-full items-center justify-center gap-3">
               <div className={cn("shrink-0 justify-center md:hidden", prevButton ? "flex w-10" : "hidden")}>{prevButton}</div>
+              {/* eslint-disable-next-line design/radius-ladder -- printed card art: the hero card keeps the 2xl card corner the UVS dialog uses */}
               <div className="relative aspect-[2.5/3.5] w-full max-w-[260px] overflow-hidden rounded-2xl md:max-w-[340px]" style={{ boxShadow: "var(--chrome-card-image-glow-rest)" }}>
                 <CardImageDisplay imageUrl={displayCard.imageUrl} name={displayCard.name} card={displayCard} sizes={HERO_SIZES} priority />
                 {currentBack && !selectedPrinting ? (
                   <button
                     type="button"
                     onClick={() => setFlippedCardId(isFlipped ? null : currentCard._id)}
-                    className="chrome-label-case absolute bottom-0 right-0 z-10 flex items-center gap-2 rounded-tl-2xl border border-primary/40 bg-card/95 px-3 py-2 text-[10px] text-muted-foreground backdrop-blur-sm transition-colors hover:border-primary/60 hover:text-primary"
+                    className="chrome-label-case absolute bottom-0 right-0 z-10 flex items-center gap-2 rounded-tab-tl border border-primary/40 bg-card/95 px-3 py-2 text-[10px] text-muted-foreground backdrop-blur-sm transition-colors hover:border-primary/60 hover:text-primary outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                   >
                     <RotateCcw className={cn("h-3.5 w-3.5", isFlipped && "rotate-180")} />
                     {isFlipped ? "Front" : "Back"}
@@ -149,10 +150,11 @@ export function CardDetailsDialog({
             <div className="relative flex min-w-0 flex-col overflow-hidden rounded-xl border border-primary/40 bg-card/95 backdrop-blur-md max-md:overflow-visible md:h-full md:min-h-0 md:flex-1">
               <DialogClose asChild>
                 <Button
+                  shape="tab-tr"
                   type="button"
                   variant="outline"
                   size="icon"
-                  className="absolute right-0 top-0 z-30 hidden h-9 w-9 rounded-none rounded-bl-xl rounded-tr-xl !border-primary/40 bg-card/95 shadow-none md:inline-flex"
+                  className="absolute right-0 top-0 z-30 hidden !border-primary/40 bg-card/95 shadow-none md:inline-flex"
                   aria-label="Close"
                 >
                   <X className="h-4 w-4" />

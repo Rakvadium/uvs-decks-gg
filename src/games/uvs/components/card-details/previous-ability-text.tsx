@@ -1,6 +1,7 @@
 "use client";
 
 import { useQuery } from "convex/react";
+import { Panel } from "@/components/ui/panel";
 import { ChevronDown } from "lucide-react";
 import { api } from "../../../../../convex/_generated/api";
 import type { Id } from "../../../../../convex/_generated/dataModel";
@@ -28,10 +29,7 @@ export function PreviousAbilityText({ cardId }: { cardId: Id<"cards"> }) {
       </CollapsibleTrigger>
       <CollapsibleContent className="space-y-3 pt-3">
         {history.map((entry, index) => (
-          <div
-            key={entry._id}
-            className="rounded-lg border border-border/40 bg-muted/20 p-3"
-          >
+          <Panel key={entry._id} className="p-3">
             {history.length > 1 ? (
               <p className="chrome-label-case mb-2 text-[10px] text-muted-foreground/70">
                 {index === 0 ? "Most recent" : `Older version ${index + 1}`}
@@ -42,7 +40,7 @@ export function PreviousAbilityText({ cardId }: { cardId: Id<"cards"> }) {
               </p>
             )}
             <AbilityText text={entry.text} showHeading={false} />
-          </div>
+          </Panel>
         ))}
       </CollapsibleContent>
     </Collapsible>

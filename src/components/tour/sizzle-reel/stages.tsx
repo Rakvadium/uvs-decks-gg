@@ -78,7 +78,7 @@ function OpenStage({ active, animate }: StageProps) {
 function GalleryStage({ active, animate }: StageProps) {
   return (
     <StageShell active={active} animate={animate}>
-      <div className="w-full max-w-5xl overflow-hidden rounded-3xl border border-surface bg-background-elevated shadow-[var(--chrome-elevation-mid)] backdrop-blur-md">
+      <div className="w-full max-w-5xl overflow-hidden rounded-xl border border-surface bg-background-elevated shadow-[var(--chrome-elevation-mid)] backdrop-blur-md">
         <div className="flex items-center gap-3 border-b border-divider px-4 py-3">
           <div className="h-8 flex-1 rounded-full border border-[color:var(--control-dual-border)] bg-muted-tint" />
           <div className="hidden h-8 w-24 rounded-md border border-surface bg-card-elevated sm:block" />
@@ -98,7 +98,7 @@ function DecksStage({ active, animate }: StageProps) {
   return (
     <StageShell active={active} animate={animate}>
       <div className="grid w-full max-w-5xl gap-3 md:grid-cols-[1.1fr_0.9fr] md:gap-4">
-        <div className="overflow-hidden rounded-3xl border border-surface bg-card-elevated p-4 shadow-[var(--chrome-elevation-mid)] backdrop-blur-md md:p-6">
+        <div className="overflow-hidden rounded-xl border border-surface bg-card-elevated p-4 shadow-[var(--chrome-elevation-mid)] backdrop-blur-md md:p-6">
           <p className="chrome-label-case mb-3 text-[10px] text-muted-foreground">Main</p>
           <div className="grid grid-cols-4 gap-2 md:grid-cols-5">
             {Array.from({ length: 10 }).map((_, i) => (
@@ -110,7 +110,7 @@ function DecksStage({ active, animate }: StageProps) {
           {["Side", "Reference"].map((label, lane) => (
             <div
               key={label}
-              className="rounded-2xl border border-surface bg-background-elevated p-4 shadow-[var(--chrome-elevation-low)] backdrop-blur-md"
+              className="rounded-xl border border-surface bg-background-elevated p-4 shadow-[var(--chrome-elevation-low)] backdrop-blur-md"
             >
               <p className="chrome-label-case mb-3 text-[10px] text-muted-foreground">{label}</p>
               <div className="grid grid-cols-3 gap-2">
@@ -129,7 +129,7 @@ function DecksStage({ active, animate }: StageProps) {
 function CollectionStage({ active, animate }: StageProps) {
   return (
     <StageShell active={active} animate={animate}>
-      <div className="w-full max-w-3xl space-y-3 rounded-3xl border border-surface bg-card-elevated p-4 shadow-[var(--chrome-elevation-mid)] backdrop-blur-md md:p-6">
+      <div className="w-full max-w-3xl space-y-3 rounded-xl border border-surface bg-card-elevated p-4 shadow-[var(--chrome-elevation-mid)] backdrop-blur-md md:p-6">
         {["Character", "Attack", "Foundation"].map((row, i) => (
           <m.div
             key={row}
@@ -169,7 +169,7 @@ function CommunityStage({ active, animate }: StageProps) {
 
   return (
     <StageShell active={active} animate={animate}>
-      <div className="w-full max-w-4xl space-y-3 rounded-3xl border border-surface bg-background-elevated p-4 shadow-[var(--chrome-elevation-mid)] backdrop-blur-md md:p-6">
+      <div className="w-full max-w-4xl space-y-3 rounded-xl border border-surface bg-background-elevated p-4 shadow-[var(--chrome-elevation-mid)] backdrop-blur-md md:p-6">
         {lanes.map((lane, i) => (
           <m.div
             key={lane.label}
@@ -205,7 +205,7 @@ function TeamsStage({ active, animate }: StageProps) {
   return (
     <StageShell active={active} animate={animate}>
       <div className="grid w-full max-w-4xl gap-3 md:grid-cols-[0.9fr_1.1fr]">
-        <div className="rounded-3xl border border-surface bg-card-elevated p-5 shadow-[var(--chrome-elevation-mid)] backdrop-blur-md">
+        <div className="rounded-xl border border-surface bg-card-elevated p-5 shadow-[var(--chrome-elevation-mid)] backdrop-blur-md">
           <div className="mb-4 flex items-center gap-3">
             <div className="flex h-12 w-12 items-center justify-center rounded-full border border-primary-soft bg-primary-selected text-lg font-bold text-primary">
               T
@@ -229,7 +229,7 @@ function TeamsStage({ active, animate }: StageProps) {
             ))}
           </div>
         </div>
-        <div className="rounded-3xl border border-surface bg-background-elevated p-5 shadow-[var(--chrome-elevation-low)] backdrop-blur-md">
+        <div className="rounded-xl border border-surface bg-background-elevated p-5 shadow-[var(--chrome-elevation-low)] backdrop-blur-md">
           <p className="chrome-label-case mb-3 text-[10px] text-muted-foreground">Shared Decks</p>
           <div className="grid grid-cols-2 gap-3">
             {Array.from({ length: 4 }).map((_, i) => (

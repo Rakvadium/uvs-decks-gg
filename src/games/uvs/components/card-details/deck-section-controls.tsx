@@ -82,7 +82,7 @@ export function DeckSectionControls({ card, layout = "vertical" }: DeckSectionCo
         <Select value={selectedSection} onValueChange={(value) => setSelectedSection(value as DeckSection)}>
           <SelectTrigger
             size="sm"
-            className="h-8 w-[7rem] bg-card/50 px-2 text-[10px] tracking-widest"
+            className="w-[7rem] text-[10px]"
           >
             <SelectValue />
           </SelectTrigger>
@@ -97,10 +97,10 @@ export function DeckSectionControls({ card, layout = "vertical" }: DeckSectionCo
         <div className="flex h-8 shrink-0 items-center gap-1 rounded-md border border-border/40 bg-card/50 px-2">
           <Button
             variant="outline"
-            size="icon-sm"
+            size="icon-xs"
             onClick={() => removeCard(card._id, activeSection.key)}
             disabled={activeSection.count === 0}
-            className="h-6 w-6 border-destructive/30 hover:border-destructive hover:bg-destructive/10"
+            className="border-destructive/30 hover:border-destructive hover:bg-destructive/10"
           >
             <Minus className="h-3 w-3 text-destructive" />
           </Button>
@@ -109,10 +109,10 @@ export function DeckSectionControls({ card, layout = "vertical" }: DeckSectionCo
           </span>
           <Button
             variant="outline"
-            size="icon-sm"
+            size="icon-xs"
             onClick={() => addCard(card._id, activeSection.key)}
             disabled={!activeSection.canAdd}
-            className="h-6 w-6 border-primary/30 hover:border-primary hover:bg-primary/10"
+            className="border-primary/30 hover:border-primary hover:bg-primary/10"
           >
             <Plus className="h-3 w-3 text-primary" />
           </Button>
@@ -126,16 +126,13 @@ export function DeckSectionControls({ card, layout = "vertical" }: DeckSectionCo
       <div
         className={cn(
           "pointer-events-auto absolute bottom-0 left-0 z-20 flex w-max min-w-0 max-w-full items-stretch",
-          "rounded-bl-xl rounded-tl-none rounded-tr-xl rounded-br-none",
+          "rounded-tab-tr",
           "border border-primary/25 bg-card/95 shadow-none backdrop-blur-sm"
         )}
       >
         <div className="flex h-9 min-w-0 max-w-full items-center gap-1.5 py-0 pl-1.5 pr-2 sm:gap-2 sm:pl-1.5 sm:pr-2.5">
           <Select value={selectedSection} onValueChange={(value) => setSelectedSection(value as DeckSection)}>
-            <SelectTrigger
-              size="sm"
-              className="chrome-label-case h-8 w-28 min-w-0 shrink-0 border-0 bg-transparent px-0.5 text-xs font-semibold shadow-none focus:ring-0"
-            >
+            <SelectTrigger variant="inline" size="sm" className="w-28 min-w-0 shrink-0 px-1 text-xs font-semibold">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -151,10 +148,10 @@ export function DeckSectionControls({ card, layout = "vertical" }: DeckSectionCo
             <Button
               type="button"
               variant="ghost"
-              size="icon-sm"
+              size="icon-xs"
               onClick={() => removeCard(card._id, activeSection.key)}
               disabled={activeSection.count === 0}
-              className="h-7 w-7 border-0 text-destructive shadow-none hover:bg-destructive/10 hover:text-destructive"
+              className="border-0 text-destructive shadow-none hover:bg-destructive/10 hover:text-destructive"
             >
               <Minus className="h-3.5 w-3.5" />
             </Button>
@@ -164,10 +161,10 @@ export function DeckSectionControls({ card, layout = "vertical" }: DeckSectionCo
             <Button
               type="button"
               variant="ghost"
-              size="icon-sm"
+              size="icon-xs"
               onClick={() => addCard(card._id, activeSection.key)}
               disabled={!activeSection.canAdd}
-              className="h-7 w-7 border-0 text-primary shadow-none hover:bg-primary/10 hover:text-primary"
+              className="border-0 text-primary shadow-none hover:bg-primary/10 hover:text-primary"
             >
               <Plus className="h-3.5 w-3.5" />
             </Button>

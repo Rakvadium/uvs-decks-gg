@@ -48,7 +48,7 @@ const NO_SEARCH: MobileSearchState = { available: false, active: false };
 const expandEase = "cubic-bezier(0.32, 0.72, 0, 1)";
 
 const tabItemClassName = cn(
-  "group relative flex min-w-0 shrink-0 items-center justify-center rounded-pill transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+  "group relative flex min-w-0 shrink-0 items-center justify-center rounded-island transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
   MOBILE_TAB_ITEM_WIDTH_CLASS
 );
 

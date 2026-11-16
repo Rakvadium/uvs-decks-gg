@@ -2,7 +2,7 @@ import { LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { SHELL_RAIL_ITEM_SIZE_CLASS } from "../../shell-chrome";
+import { SHELL_ACCOUNT_ROW_HEIGHT_CLASS, SHELL_RAIL_ITEM_SIZE_CLASS } from "../../shell-chrome";
 import { useLeftSidebarContext } from "../context";
 
 export function LeftSidebarGuestSignInButton() {
@@ -16,7 +16,7 @@ export function LeftSidebarGuestSignInButton() {
           onClick={() => startAuth()}
           className={cn(
             "border-accent/35 text-sidebar-foreground hover:border-accent/60 hover:bg-accent/10 hover:text-accent [&_svg]:text-sidebar-foreground hover:[&_svg]:text-accent",
-            collapsed ? cn(SHELL_RAIL_ITEM_SIZE_CLASS, "p-0") : "h-12 w-full justify-start gap-3 px-3"
+            collapsed ? cn(SHELL_RAIL_ITEM_SIZE_CLASS, "p-0") : cn(SHELL_ACCOUNT_ROW_HEIGHT_CLASS, "w-full justify-start gap-3 px-3")
           )}
         >
           <LogIn className="h-4 w-4 shrink-0" />

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { BookOpen, Filter, Layers, LayoutGrid, PanelBottomOpen, Plus, Search, UserRound, Users } from "lucide-react";
+import { BookOpen, Filter, Layers, LayoutGrid, PanelBottomOpen, Plus, Search, SlidersHorizontal, UserRound, Users } from "lucide-react";
 import {
   FloatingActionPill,
   FloatingBackPill,
@@ -9,7 +9,19 @@ import {
   FloatingPageBar,
   FloatingSearchCapsule,
   FloatingTabsPill,
+  PAGE_WASH_CLASS_NAMES,
+  type PageWash,
 } from "@/components/shell/floating-page-bar";
+import { PanelFooter, PanelHeader } from "@/components/shell/right-sidebar/expanded-panel";
+import {
+  SHELL_ACCOUNT_ROW_HEIGHT_CLASS,
+  SHELL_NAV_ITEM_ACTIVE,
+  SHELL_NAV_ITEM_BASE,
+  SHELL_NAV_ITEM_IDLE,
+  SHELL_RAIL_ITEM_COLLAPSED_CLASS,
+} from "@/components/shell/shell-chrome";
+import { Button } from "@/components/ui/button";
+import { IconToolbarButton } from "@/components/ui/icon-toolbar-button";
 import { MobileActButton } from "@/components/shell/mobile-tab-bar/act-button";
 import { MobileGlassCapsule } from "@/components/shell/mobile-tab-bar/glass-capsule";
 import {
@@ -99,11 +111,11 @@ export function FloatingIslandsEntry() {
       <SlotTable
         rows={[
           ["Left", "Context: where am I", "Back pill (icon-only), identity pill (h1), local nav tabs"],
-          ["Center", "Content tool", "Search / filter capsule, or nothing"],
-          ["Right", "Actions", "Filled primary FloatingActionPill, outline secondaries, overflow menu"],
+          ["Center", "Content tool", "Search / filter capsule, or nothing. centerWidth=\"wide\" only when the result controls live in the search island"],
+          ["Right", "Actions", "Filled primary FloatingActionPill, floating secondaries, overflow menu"],
         ]}
       />
-      <DesktopStage caption="Decks list: tabs left, search center, primary action right.">
+      <DesktopStage caption="Decks list, default center (--floating-center-w, 26rem): tabs left, search center, primary action right.">
         <FloatingPageBar
           left={
             <FloatingTabsPill
@@ -126,11 +138,30 @@ export function FloatingIslandsEntry() {
           }
         />
       </DesktopStage>
+      <DesktopStage caption="Card gallery, wide center (--floating-center-w-wide, 40rem): untitled, one search island holding scope, result count, filter toggle and view mode. Sides empty.">
+        <FloatingPageBar
+          centerWidth="wide"
+          center={
+            <FloatingSearchCapsule value={query} onChange={setQuery} placeholder="Search all card information…" name="catalog-gallery-search" aria-label="Search cards">
+              <span className="chrome-label-case shrink-0 px-1.5 text-[11px] text-muted-foreground">All</span>
+              <span aria-hidden className="h-4 w-px shrink-0 bg-border/60" />
+              <span className="shrink-0 px-1 text-[11px] tabular-nums text-muted-foreground">2,622 / 2,622</span>
+              <span aria-hidden className="h-4 w-px shrink-0 bg-border/60" />
+              <IconToolbarButton shape="island" label="Toggle filter panel">
+                <SlidersHorizontal />
+              </IconToolbarButton>
+              <IconToolbarButton shape="island" label="Change view mode">
+                <LayoutGrid />
+              </IconToolbarButton>
+            </FloatingSearchCapsule>
+          }
+        />
+      </DesktopStage>
       <DesktopStage caption="Deck details: icon-only back + identity pill left, center empty, owner actions right.">
         <FloatingPageBar
           left={
             <>
-              <FloatingBackPill iconOnly label="Decks" onClick={() => undefined} />
+              <FloatingBackPill label="Decks" onClick={() => undefined} />
               <FloatingCapsuleCluster bodyClassName="px-4" glow>
                 {/* The real page uses FloatingPageTitle, which renders the page h1. */}
                 <span className="chrome-heading-case truncate text-sm font-semibold text-foreground">Spellbook Control</span>
@@ -139,15 +170,123 @@ export function FloatingIslandsEntry() {
           }
           right={
             <>
-              <FloatingActionPill variant="outline">Duplicate</FloatingActionPill>
+              <FloatingActionPill variant="floating">Duplicate</FloatingActionPill>
               <FloatingActionPill>Edit</FloatingActionPill>
             </>
           }
         />
       </DesktopStage>
       <CodeBlock
-        code={`import { FloatingActionPill, FloatingBackPill, FloatingPageBar, FloatingPageLayout, FloatingPageTitle } from "@/components/shell/floating-page-bar"\n\n<FloatingPageLayout\n  bar={\n    <FloatingPageBar\n      left={<><FloatingBackPill iconOnly href="/decks" label="Decks" /><FloatingPageTitle>{deck.name}</FloatingPageTitle></>}\n      right={<FloatingActionPill>Edit</FloatingActionPill>}\n    />\n  }\n>\n  {children}\n</FloatingPageLayout>`}
+        code={`import { FloatingActionPill, FloatingBackPill, FloatingPageBar, FloatingPageLayout, FloatingPageTitle } from "@/components/shell/floating-page-bar"\n\n<FloatingPageLayout\n  bar={\n    <FloatingPageBar\n      left={<><FloatingBackPill href="/decks" label="Decks" /><FloatingPageTitle>{deck.name}</FloatingPageTitle></>}\n      right={<FloatingActionPill>Edit</FloatingActionPill>}\n    />\n  }\n>\n  {children}\n</FloatingPageLayout>`}
       />
+    </CatalogEntrySection>
+  );
+}
+
+const PAGE_WASH_USES: Record<PageWash, string> = {
+  fade: "Teams hub, team decks, teams landing",
+  radial: "Tier lists, rankings, tier list detail",
+  grid: "Community hub, creator program",
+  glow: "Card gallery, home",
+};
+
+export function PageWashEntry() {
+  return (
+    <CatalogEntrySection
+      id="page-wash"
+      sourcePaths={["src/components/shell/floating-page-bar.tsx"]}
+      description={
+        <p>
+          A page background is a <Code>pageWash</Code> prop on <Code>FloatingPageLayout</Code>, never a layer the page
+          paints itself. Each recipe mixes <Code>--primary</Code>, <Code>--secondary</Code> or <Code>--border</Code>, so
+          it follows the palette and never holds a literal colour. The wash sits behind the scroller and does not scroll.
+        </p>
+      }
+    >
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {(Object.keys(PAGE_WASH_CLASS_NAMES) as PageWash[]).map((wash) => (
+          <Preview key={wash} label={`pageWash="${wash}"`}>
+            <div className="relative h-36 overflow-hidden rounded-lg border border-hairline bg-background">
+              <div aria-hidden className={cn("absolute inset-0", PAGE_WASH_CLASS_NAMES[wash])} />
+              <p className="relative p-3 text-xs text-muted-foreground">{PAGE_WASH_USES[wash]}</p>
+            </div>
+          </Preview>
+        ))}
+      </div>
+      <CodeBlock code={`<FloatingPageLayout bar={<CommunityTierListsFloatingTopBar />} pageWash="radial">\n  <CommunityTierListsPageView />\n</FloatingPageLayout>`} />
+    </CatalogEntrySection>
+  );
+}
+
+export function RailPanelEntry() {
+  return (
+    <CatalogEntrySection
+      id="rail-panel"
+      sourcePaths={["src/components/shell/right-sidebar/expanded-panel.tsx"]}
+      description={
+        <p>
+          The expanded right rail draws one <Code>PanelHeader</Code> (the slot <Code>label</Code> and an{" "}
+          <Code>IconToolbarButton</Code> close) and one opaque <Code>PanelFooter</Code> for the slot&apos;s{" "}
+          <Code>footer</Code>. Panels render only their body. A dynamic title goes in the slot <Code>label</Code>.
+        </p>
+      }
+    >
+      <Preview label="Active deck panel">
+        <div className="flex h-64 max-w-sm flex-col overflow-hidden rounded-lg border border-sidebar-border bg-sidebar text-sidebar-foreground">
+          <PanelHeader title="Spellbook Control" onClose={() => undefined} />
+          <div className="min-h-0 flex-1 p-4 text-sm text-muted-foreground">Panel body</div>
+          <PanelFooter>
+            <Button size="sm">Open Deck Details</Button>
+          </PanelFooter>
+        </div>
+      </Preview>
+      <CodeBlock code={`useRegisterSlot("right-sidebar", "active-deck", ActiveDeckSidebar, {\n  label: activeDeck?.name ?? "Active Deck",\n  footer: ActiveDeckFooter,\n})`} />
+    </CatalogEntrySection>
+  );
+}
+
+export function SidebarRowsEntry() {
+  return (
+    <CatalogEntrySection
+      id="sidebar-rows"
+      sourcePaths={["src/components/shell/shell-chrome.ts"]}
+      description={
+        <p>
+          Left sidebar rows read the control heights from <Code>shell-chrome.ts</Code>. Nav rows, the game switcher and
+          Teams use <Code>SHELL_NAV_ITEM_BASE</Code> at <Code>--control-h-md</Code>. The account row uses{" "}
+          <Code>SHELL_ACCOUNT_ROW_HEIGHT_CLASS</Code> at <Code>--control-h-lg</Code>. Collapsed rail items are{" "}
+          <Code>--control-h-md</Code> squares.
+        </p>
+      }
+    >
+      <div className="grid gap-4 sm:grid-cols-[16rem_auto]">
+        <Preview label="Expanded">
+          <div className="flex flex-col gap-1 rounded-lg bg-sidebar p-2">
+            <span className={cn(SHELL_NAV_ITEM_BASE, SHELL_NAV_ITEM_ACTIVE)}>
+              <LayoutGrid className="size-4" />
+              <span className="chrome-label-case text-xs">Card Gallery</span>
+            </span>
+            <span className={cn(SHELL_NAV_ITEM_BASE, SHELL_NAV_ITEM_IDLE)}>
+              <Layers className="size-4" />
+              <span className="chrome-label-case text-xs">Decks</span>
+            </span>
+            <span className={cn(SHELL_NAV_ITEM_BASE, SHELL_NAV_ITEM_IDLE, SHELL_ACCOUNT_ROW_HEIGHT_CLASS)}>
+              <UserRound className="size-5" />
+              <span className="text-xs">Account row</span>
+            </span>
+          </div>
+        </Preview>
+        <Preview label="Collapsed">
+          <div className="flex flex-col items-center gap-2 rounded-lg bg-sidebar p-1">
+            <span aria-label="Card Gallery" role="img" className={cn(SHELL_NAV_ITEM_BASE, SHELL_RAIL_ITEM_COLLAPSED_CLASS, SHELL_NAV_ITEM_ACTIVE)}>
+              <LayoutGrid className="size-4" />
+            </span>
+            <span aria-label="Decks" role="img" className={cn(SHELL_NAV_ITEM_BASE, SHELL_RAIL_ITEM_COLLAPSED_CLASS, SHELL_NAV_ITEM_IDLE)}>
+              <Layers className="size-4" />
+            </span>
+          </div>
+        </Preview>
+      </div>
     </CatalogEntrySection>
   );
 }
@@ -255,6 +394,9 @@ export function PatternsChapter() {
   return (
     <>
       <FloatingIslandsEntry />
+      <PageWashEntry />
+      <RailPanelEntry />
+      <SidebarRowsEntry />
       <MobileShellEntry />
     </>
   );

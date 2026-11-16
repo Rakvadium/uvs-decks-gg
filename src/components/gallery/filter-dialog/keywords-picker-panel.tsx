@@ -1,6 +1,7 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
+import { Panel } from "@/components/ui/panel";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
@@ -61,9 +62,9 @@ export function KeywordsPickerPanel({
       </div>
 
       {plain ? keywordGrid : (
-        <div className="rounded-lg border border-border/50 bg-card/30 p-3 backdrop-blur-sm">
+        <Panel className="p-3">
           {keywordGrid}
-        </div>
+        </Panel>
       )}
     </div>
   );

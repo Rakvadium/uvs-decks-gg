@@ -15,8 +15,8 @@ export function UvsChangeCharacterButton({ onClick }: { onClick: () => void }) {
             onClick();
           }}
           className={cn(
-            "absolute right-0 top-0 z-20 flex h-8 w-8 items-center justify-center",
-            "rounded-tr-lg rounded-bl-lg rounded-tl-none rounded-br-none",
+            "absolute right-0 top-0 z-20 flex h-8 w-8 items-center justify-center outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+            "rounded-tab-tr",
             "bg-background/80 backdrop-blur-sm",
             "border-l border-b border-border/40",
             "transition-colors hover:bg-primary/10 hover:border-primary/40"

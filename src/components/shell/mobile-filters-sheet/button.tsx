@@ -7,7 +7,7 @@ export function MobileFiltersButton({ onClick }: MobileFiltersButtonProps) {
     <Button
       variant="outline"
       size="icon"
-      className="h-9 w-9 shrink-0"
+      className="shrink-0"
       onClick={onClick}
       aria-label="Open filters"
     >

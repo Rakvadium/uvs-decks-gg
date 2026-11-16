@@ -22,7 +22,7 @@ export function StartingCharacterButton({ card, className, compact }: StartingCh
   return (
     <Button
       variant={isStartingCharacter ? "default" : "outline"}
-      size={compact ? "sm" : "default"}
+      size={compact ? "sm" : "md"}
       onClick={() =>
         updateDeck({
           setup: { game: "uvs", startingCharacterId: isStartingCharacter ? null : card._id },

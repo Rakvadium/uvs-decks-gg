@@ -1,22 +1,31 @@
 import * as React from "react"
 
+import { controlFieldClassName, type ControlSize } from "@/components/ui/control"
 import { cn } from "@/lib/utils"
 
-const Textarea = React.forwardRef<
-  HTMLTextAreaElement,
-  React.ComponentProps<"textarea">
->(({ className, ...props }, ref) => {
+const TEXTAREA_SIZE: Record<ControlSize, string> = {
+  xs: "min-h-[calc(var(--control-h-xs)*1.5)] px-2.5 py-1.5 text-base md:text-xs",
+  sm: "min-h-[calc(var(--control-h-sm)*1.5)] px-3 py-1.5 text-base md:text-sm",
+  md: "min-h-[calc(var(--control-h-md)*1.5)] px-3 py-2 text-base md:text-sm",
+  lg: "min-h-[calc(var(--control-h-lg)*1.5)] px-4 py-3 text-base",
+}
+
+export type TextareaProps = React.ComponentProps<"textarea"> & { size?: ControlSize }
+
+function Textarea({ className, size = "md", ...props }: TextareaProps) {
   return (
     <textarea
+      data-slot="textarea"
+      data-size={size}
       className={cn(
-        "flex min-h-[60px] w-full rounded-md border border-[color:var(--control-dual-border)] bg-transparent px-3 py-2 text-base shadow-sm placeholder:text-muted-foreground transition-[border-color,box-shadow,background-color] duration-200 hover:border-[color:var(--control-dual-border-strong)] focus-visible:outline-none focus-visible:border-[var(--chrome-focus-ring-color)] focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
+        "flex w-full placeholder:text-muted-foreground",
+        controlFieldClassName,
+        TEXTAREA_SIZE[size],
         className
       )}
-      ref={ref}
       {...props}
     />
   )
-})
-Textarea.displayName = "Textarea"
+}
 
 export { Textarea }

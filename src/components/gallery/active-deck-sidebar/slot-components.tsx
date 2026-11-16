@@ -36,25 +36,6 @@ export function ActiveDeckIcon({ className }: { className?: string }) {
   );
 }
 
-export function ActiveDeckHeader() {
-  const { activeDeck, isLoading } = useActiveDeck();
-
-  if (isLoading) {
-    return <span className="chrome-label-case text-xs text-muted-foreground">Loading deck</span>;
-  }
-
-  const label = activeDeck?.name ?? "Active Deck";
-
-  return (
-    <h3
-      className="chrome-heading-case truncate text-[13px] font-bold text-primary [filter:var(--chrome-shell-deck-label-drop-shadow)]"
-      title={label}
-    >
-      {label}
-    </h3>
-  );
-}
-
 export function ActiveDeckFooter() {
   const { activeDeck } = useActiveDeck();
 

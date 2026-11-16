@@ -4,7 +4,6 @@ import { useMemo } from "react";
 import { useConvexAuth } from "convex/react";
 import {
   ActiveDeckFooter,
-  ActiveDeckHeader,
   ActiveDeckIcon,
   ActiveDeckSidebar,
 } from "@/components/gallery/gallery-active-deck-sidebar";
@@ -24,7 +23,6 @@ function DecksActiveDeckPeekSlot() {
       icon: ActiveDeckIcon,
       mobileAccessory: true,
       iconFit: "media" as const,
-      header: ActiveDeckHeader,
       footer: ActiveDeckFooter,
     }),
     [label]

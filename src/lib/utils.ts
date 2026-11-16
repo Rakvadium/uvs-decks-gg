@@ -18,12 +18,14 @@ const NAMED_Z_INDEX = [
   "drag",
 ] as const
 
+// Role radii from src/styles/base.css (rounded-control, rounded-cta, ...). Without them in the
+// radius theme, a role radius never conflicts with rounded-md or rounded-full.
+const ROLE_RADII = ["control", "surface", "cta", "island"] as const
+
 const twMerge = extendTailwindMerge({
   extend: {
-    // `rounded-pill` (ladders.css) is a radius step; registering it lets a later `rounded-3xl`
-    // replace a component's default `rounded-pill` instead of both applying.
     theme: {
-      radius: ["pill"],
+      radius: [...ROLE_RADII],
     },
     classGroups: {
       z: [{ z: [...NAMED_Z_INDEX] }],

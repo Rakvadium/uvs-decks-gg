@@ -1,7 +1,10 @@
 "use client";
 
 import { PageHeading } from "@/components/ui/typography-headings";
+import { BarChart3 } from "lucide-react";
+import { EmptyState } from "@/components/ui/empty-state";
 import { useTeamHub } from "./hook";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface TeamHubStatsContentProps {
   teamId: string;
@@ -17,8 +20,8 @@ export function TeamHubStatsContent({ teamId }: TeamHubStatsContentProps) {
   if (loading || !team) {
     return (
       <div className="space-y-3">
-        <div className="h-6 w-32 animate-pulse rounded-md bg-muted" />
-        <div className="h-24 w-full animate-pulse rounded-md bg-muted-overlay" />
+        <Skeleton className="h-6 w-32" />
+        <Skeleton className="h-24 w-full" />
       </div>
     );
   }
@@ -26,12 +29,7 @@ export function TeamHubStatsContent({ teamId }: TeamHubStatsContentProps) {
   return (
     <div className="space-y-4">
       <PageHeading size="sm" className="md:hidden">Stats</PageHeading>
-      <div
-        className="rounded-lg border border-dashed border-placeholder bg-muted-tint px-4 py-12 text-center"
-        role="status"
-      >
-        <p className="text-sm text-muted-foreground">No statistics available yet.</p>
-      </div>
+      <EmptyState role="status" icon={BarChart3} title="No statistics available yet." />
     </div>
   );
 }

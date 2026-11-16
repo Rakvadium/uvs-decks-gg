@@ -8,7 +8,6 @@ import { useActiveDeck } from "@/providers/ActiveDeckProvider";
 import { DecksSidebar } from "../decks-sidebar";
 import {
   ActiveDeckFooter,
-  ActiveDeckHeader,
   ActiveDeckIcon,
   ActiveDeckSidebar,
 } from "../gallery-active-deck-sidebar";
@@ -25,7 +24,6 @@ function GalleryAuthenticatedSidebarSlots() {
       icon: ActiveDeckIcon,
       mobileAccessory: true,
       iconFit: "media" as const,
-      header: ActiveDeckHeader,
       footer: ActiveDeckFooter,
     }),
     [activeDeckLabel]

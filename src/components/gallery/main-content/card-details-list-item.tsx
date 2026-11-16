@@ -1,4 +1,5 @@
 import { useMemo, useRef, useState } from "react";
+import { Panel } from "@/components/ui/panel";
 import Image from "next/image";
 import { FileText, Hexagon, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -43,15 +44,13 @@ export function CardDetailsListItem({ card, onOpenCardDetails, imagePriority = f
 
   return (
     <>
-      <div
-        className={cn("rounded-xl border border-border/40 bg-card/30 p-4 transition-colors md:p-6", isDragging && "opacity-70")}
-      >
+      <Panel className={cn("p-4 transition-opacity md:p-6", isDragging && "opacity-70")}>
         <div className="grid gap-6 lg:grid-cols-[260px_1fr]">
           <div className="space-y-4">
             <div className="relative mx-auto w-full max-w-[260px] lg:mx-0">
               <div
                 className={cn(
-                  "relative aspect-[2.5/3.5] w-full overflow-hidden rounded-2xl border border-border/50 bg-muted/50",
+                  "relative aspect-[2.5/3.5] w-full overflow-hidden rounded-xl border border-surface bg-muted-soft",
                   "shadow-[var(--chrome-card-image-glow-rest)]"
                 )}
                 style={{
@@ -85,7 +84,7 @@ export function CardDetailsListItem({ card, onOpenCardDetails, imagePriority = f
                 )}
               </div>
               {!prefersReducedMotion ? (
-                <div className="absolute -inset-3 -z-10 rounded-2xl bg-gradient-to-r from-primary/10 via-secondary/10 to-primary/10 blur-2xl" />
+                <div className="absolute -inset-3 -z-10 rounded-xl bg-gradient-to-r from-primary/10 via-secondary/10 to-primary/10 blur-2xl" />
               ) : null}
             </div>
 
@@ -126,7 +125,7 @@ export function CardDetailsListItem({ card, onOpenCardDetails, imagePriority = f
 
           <CardDetailsContent card={displayCard} className="overflow-visible p-0" />
         </div>
-      </div>
+      </Panel>
 
       {onOpenCardDetails ? null : (
         <CardDetailsDialog

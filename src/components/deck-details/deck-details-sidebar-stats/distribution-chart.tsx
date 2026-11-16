@@ -1,4 +1,6 @@
 import { useMemo } from "react";
+import { Panel } from "@/components/ui/panel";
+import { EmptyState } from "@/components/ui/empty-state";
 import { useGameModule } from "@/games/game-context";
 import { type PieChartColorStrategy, resolvePieBucketColor } from "./constants";
 
@@ -63,14 +65,14 @@ export function PieDistributionChart({
   }, [chartTotal, visibleBuckets, colorStrategy, palette, labelColors]);
 
   return (
-    <div className="space-y-2 rounded-lg border border-border/50 bg-card/30 p-3">
+    <Panel className="space-y-2 p-3">
       <div className="flex items-center justify-between">
         <span className="chrome-label-case text-[10px] text-muted-foreground">{title}</span>
         <span className="text-[10px] text-muted-foreground">{chartTotal}</span>
       </div>
 
       {visibleBuckets.length === 0 ? (
-        <p className="text-[11px] text-muted-foreground">No data.</p>
+        <EmptyState variant="inline" title="No data." />
       ) : (
         <div className="grid grid-cols-[86px_1fr] items-start gap-3">
           <div
@@ -102,7 +104,7 @@ export function PieDistributionChart({
           </div>
         </div>
       )}
-    </div>
+    </Panel>
   );
 }
 

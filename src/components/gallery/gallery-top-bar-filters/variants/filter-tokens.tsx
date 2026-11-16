@@ -215,7 +215,7 @@ export function FilterTokens({
   return (
     <div
       className={cn(
-        "flex w-full min-w-0 flex-nowrap items-center gap-1.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
+        "flex w-full min-w-0 flex-nowrap items-center gap-1.5 scroll-row",
         centered && "[justify-content:safe_center]",
         className
       )}
@@ -224,13 +224,13 @@ export function FilterTokens({
         <span
           key={token.id}
           className={cn(
-            "inline-flex max-w-[28rem] shrink-0 rounded-full p-px shadow-[var(--chrome-floating-shadow)] focus-within:shadow-[var(--chrome-floating-shadow-focus)]",
+            "inline-flex max-w-[28rem] shrink-0 rounded-island p-px shadow-[var(--chrome-floating-shadow)] focus-within:shadow-[var(--chrome-floating-shadow-focus)]",
             floatingIslandRingClassName
           )}
         >
           <span
             className={cn(
-              "inline-flex min-w-0 items-stretch overflow-hidden rounded-full backdrop-blur-xl",
+              "inline-flex min-w-0 items-stretch overflow-hidden rounded-island backdrop-blur-xl",
               token.active ? "bg-primary/10" : "bg-background/80"
             )}
           >
@@ -266,13 +266,13 @@ export function FilterTokens({
       {hasActiveToken ? (
         <span
           className={cn(
-            "inline-flex shrink-0 rounded-full p-px shadow-[var(--chrome-floating-shadow)] focus-within:shadow-[var(--chrome-floating-shadow-focus)]",
+            "inline-flex shrink-0 rounded-island p-px shadow-[var(--chrome-floating-shadow)] focus-within:shadow-[var(--chrome-floating-shadow-focus)]",
             floatingIslandRingClassName
           )}
         >
           <button
             type="button"
-            className="chrome-label-case inline-flex h-6 items-center gap-1 rounded-full bg-background/80 px-2.5 text-[10px] text-muted-foreground backdrop-blur-xl transition-colors duration-150 hover:bg-destructive/10 hover:text-destructive focus-visible:outline-none"
+            className="chrome-label-case inline-flex h-6 items-center gap-1 rounded-island bg-background/80 px-2.5 text-[10px] text-muted-foreground backdrop-blur-xl transition-colors duration-150 hover:bg-destructive/10 hover:text-destructive focus-visible:outline-none"
             onClick={actions.clearAllFilters}
           >
             <FilterX className="size-3.5" />

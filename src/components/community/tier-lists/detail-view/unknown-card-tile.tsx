@@ -78,8 +78,8 @@ function UnavailableCardTile({
       {canEdit ? (
         <Button
           variant="ghost"
-          size="icon-sm"
-          className="absolute right-1.5 top-1.5 h-7 w-7"
+          size="icon-xs"
+          className="absolute right-1.5 top-1.5"
           aria-label="Remove unavailable card"
           onClick={onRemove}
         >

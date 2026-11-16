@@ -1,4 +1,5 @@
 import { PageHeading } from "@/components/ui/typography-headings";
+import { Surface } from "@/components/ui/card";
 import { CreatorProgramHeroActions } from "./actions";
 import { CreatorProgramHeroBadges } from "./badges";
 import { CreatorProgramHeroSpotlightCard } from "./spotlight-card";
@@ -6,7 +7,7 @@ import { CreatorProgramHeroStatsGrid } from "./stats-grid";
 
 export function CreatorProgramHeroSection() {
   return (
-    <section className="relative overflow-hidden rounded-2xl border border-border/50 bg-card/80 p-6 md:p-10">
+    <Surface className="gap-0 p-6 md:p-10">
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-secondary/10" />
       <div className="pointer-events-none absolute inset-0 holo-shimmer opacity-30" />
 
@@ -30,6 +31,6 @@ export function CreatorProgramHeroSection() {
 
         <CreatorProgramHeroSpotlightCard />
       </div>
-    </section>
+    </Surface>
   );
 }

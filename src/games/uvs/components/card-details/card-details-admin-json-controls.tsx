@@ -70,7 +70,7 @@ export function CardDetailsAdminJsonControls({
       <div
         className={cn(
           "pointer-events-auto absolute right-0 bottom-0 z-20 flex w-max min-w-0 max-w-full items-stretch",
-          "rounded-br-xl rounded-tr-none rounded-tl-xl rounded-bl-none",
+          "rounded-tab-tl",
           "border border-primary/25 bg-card/95 shadow-none backdrop-blur-sm"
         )}
       >
@@ -78,7 +78,7 @@ export function CardDetailsAdminJsonControls({
           type="button"
           onClick={() => setOpen(true)}
           className={cn(
-            "flex h-9 max-w-full min-w-0 items-center gap-1.5 py-0 pr-1.5 pl-2 sm:gap-2 sm:pr-2.5 sm:pl-2.5",
+            "flex h-9 max-w-full min-w-0 items-center gap-1.5 py-0 pr-1.5 pl-2 sm:gap-2 sm:pr-2.5 sm:pl-2.5 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
             "text-muted-foreground transition-colors hover:border-primary/40 hover:text-primary"
           )}
         >
@@ -103,7 +103,7 @@ export function CardDetailsAdminJsonControls({
               "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
               "fixed top-[50%] left-[50%] z-[410] flex max-h-[min(85dvh,720px)] w-[calc(100vw-1.5rem)] max-w-3xl",
               "-translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-xl duration-200",
-              "border border-primary/25 bg-card/95 shadow-[0_0_2px_var(--primary)/35,0_0_12px_var(--primary)/22] backdrop-blur-md",
+              "border border-primary/25 bg-card/95 backdrop-blur-md",
               "p-0 outline-none"
             )}
           >
@@ -121,7 +121,7 @@ export function CardDetailsAdminJsonControls({
                   type="button"
                   variant="outline"
                   size="sm"
-                  className="h-8 gap-1.5 border-primary/25 text-[10px]"
+                  className="gap-1.5 border-primary/25 text-[10px]"
                   onClick={async () => {
                     try {
                       await navigator.clipboard.writeText(draft);
@@ -136,14 +136,14 @@ export function CardDetailsAdminJsonControls({
                   type="button"
                   variant="default"
                   size="sm"
-                  className="h-8 gap-1.5 text-[10px]"
+                  className="gap-1.5 text-[10px]"
                   onClick={() => void handleSave()}
                 >
                   <Save className="h-3 w-3" />
                   Save
                 </Button>
                 <DialogPrimitive.Close asChild>
-                  <Button type="button" variant="ghost" size="icon" className="h-8 w-8 shrink-0" aria-label="Close">
+                  <Button type="button" variant="ghost" size="icon-sm" className="shrink-0" aria-label="Close">
                     <X className="h-4 w-4" />
                   </Button>
                 </DialogPrimitive.Close>
