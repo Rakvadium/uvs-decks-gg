@@ -10,10 +10,10 @@ import {
 import { DecksGuestBrowseBanner } from "./guest-browse-banner";
 
 function getEmptyMode(
-  searchQuery: string,
+  isNarrowed: boolean,
   activeTab: "my-decks" | "public" | "tournament",
 ) {
-  if (searchQuery.trim()) return "search";
+  if (isNarrowed) return "search";
   if (activeTab === "my-decks") return "my-decks";
   if (activeTab === "tournament") return "tournament";
   return "public";
@@ -30,12 +30,12 @@ function withGuestBrowseBanner(isAuthenticated: boolean, body: ReactNode) {
 }
 
 export function DecksViewContent() {
-  const { state, actions, catalog } = useDecks();
-  const { isAuthenticated, isTabLoading, currentDecks } = catalog;
+  const { state, actions, catalog, visibleDecks: currentDecks } = useDecks();
+  const { isAuthenticated, isTabLoading } = catalog;
 
   const emptyMode = useMemo(
-    () => getEmptyMode(state.searchQuery, state.activeTab),
-    [state.searchQuery, state.activeTab],
+    () => getEmptyMode(Boolean(state.searchQuery.trim() || state.formatFilter), state.activeTab),
+    [state.searchQuery, state.formatFilter, state.activeTab],
   );
 
   if (isTabLoading) {

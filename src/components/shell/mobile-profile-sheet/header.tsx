@@ -1,5 +1,7 @@
 import { UserAvatar } from "@/components/user-avatar";
 import { useMobileProfileSheetContext } from "./context";
+import { sectionHeadingVariants } from "@/components/ui/typography-headings";
+import { cn } from "@/lib/utils";
 
 export function MobileProfileSheetHeader() {
   const { user, isAuthenticated } = useMobileProfileSheetContext();
@@ -10,11 +12,11 @@ export function MobileProfileSheetHeader() {
         username={user?.username}
         image={user?.image}
         alt={user?.username || "User"}
-        className="size-16 border border-border/50 shadow-[var(--chrome-shell-avatar-ring)]"
-        fallbackClassName="bg-primary/20 text-xl font-semibold text-primary"
+        className="size-16 border border-surface shadow-[var(--chrome-shell-avatar-ring)]"
+        fallbackClassName="bg-primary-selected text-xl font-semibold text-primary"
       />
       <div className="flex min-w-0 flex-col">
-        <p className="chrome-heading-case truncate text-lg font-semibold text-foreground">
+        <p className={cn(sectionHeadingVariants({ size: "md" }), "truncate text-foreground")}>
           {user?.username || (isAuthenticated ? "Loading…" : "Guest")}
         </p>
         <p className="truncate text-sm text-muted-foreground">{user?.email || "Not signed in"}</p>

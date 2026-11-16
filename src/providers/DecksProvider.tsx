@@ -14,17 +14,26 @@ import {
 import { usePathname, useRouter } from "next/navigation";
 import { useDeckCatalogData, type DeckTab } from "@/hooks/useDeckCatalogData";
 import { useLocationSearchParams } from "@/hooks/useLocationSearchParams";
+import { applyDeckListView, deckFormatOptions, type DeckListSort } from "@/lib/deck/deck-list-view";
+
+export type DeckCreateIntent = "blank" | "import";
 
 interface DecksState {
   activeTab: DeckTab;
   searchQuery: string;
   isCreateDialogOpen: boolean;
+  /** "import" opens the new deck with its Import/Export panel showing. */
+  createIntent: DeckCreateIntent;
+  sort: DeckListSort;
+  formatFilter: string | null;
 }
 
 interface DecksActions {
   setActiveTab: (tab: DeckTab) => void;
   setSearchQuery: (query: string) => void;
-  openCreateDialog: () => void;
+  setSort: (sort: DeckListSort) => void;
+  setFormatFilter: (format: string | null) => void;
+  openCreateDialog: (intent?: DeckCreateIntent) => void;
   closeCreateDialog: () => void;
 }
 
@@ -32,6 +41,9 @@ interface DecksContextValue {
   state: DecksState;
   actions: DecksActions;
   catalog: ReturnType<typeof useDeckCatalogData>;
+  /** `catalog.currentDecks` after the sort and format filter. */
+  visibleDecks: ReturnType<typeof useDeckCatalogData>["currentDecks"];
+  formatOptions: string[];
 }
 
 const DecksContext = createContext<DecksContextValue | null>(null);
@@ -54,7 +66,16 @@ export function DecksProvider({ children }: { children: ReactNode }) {
   const [activeTab, setActiveTabState] = useState<DeckTab>(tabFromUrl ?? "public");
   const [searchQuery, setSearchQueryState] = useState(searchFromUrl);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [createIntent, setCreateIntent] = useState<DeckCreateIntent>("blank");
+  const [sort, setSort] = useState<DeckListSort>("default");
+  const [formatFilter, setFormatFilter] = useState<string | null>(null);
   const catalog = useDeckCatalogData(searchQuery, activeTab);
+  const formatOptions = useMemo(() => deckFormatOptions(catalog.currentDecks), [catalog.currentDecks]);
+  const activeFormatFilter = formatFilter && formatOptions.includes(formatFilter) ? formatFilter : null;
+  const visibleDecks = useMemo(
+    () => applyDeckListView(catalog.currentDecks, sort, activeFormatFilter),
+    [catalog.currentDecks, sort, activeFormatFilter]
+  );
   const appliedDefaultTabRef = useRef(false);
 
   const replaceDecksUrl = useCallback(
@@ -129,16 +150,38 @@ export function DecksProvider({ children }: { children: ReactNode }) {
         activeTab,
         searchQuery,
         isCreateDialogOpen,
+        createIntent,
+        sort,
+        formatFilter: activeFormatFilter,
       },
       actions: {
         setActiveTab,
         setSearchQuery,
-        openCreateDialog: () => setIsCreateDialogOpen(true),
+        setSort,
+        setFormatFilter,
+        openCreateDialog: (intent: DeckCreateIntent = "blank") => {
+          setCreateIntent(intent);
+          setIsCreateDialogOpen(true);
+        },
         closeCreateDialog: () => setIsCreateDialogOpen(false),
       },
       catalog,
+      visibleDecks,
+      formatOptions,
     }),
-    [activeTab, searchQuery, isCreateDialogOpen, catalog, setActiveTab, setSearchQuery]
+    [
+      activeTab,
+      searchQuery,
+      isCreateDialogOpen,
+      createIntent,
+      sort,
+      activeFormatFilter,
+      catalog,
+      visibleDecks,
+      formatOptions,
+      setActiveTab,
+      setSearchQuery,
+    ]
   );
 
   return (

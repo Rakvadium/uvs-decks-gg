@@ -5,6 +5,7 @@ import { SheetTitle } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { useGalleryFilterDialogContext } from "../filter-dialog/context";
 import { useGalleryMobileFilterNav, type GalleryMobileFilterPage } from "./context";
+import { sectionHeadingVariants } from "@/components/ui/typography-headings";
 
 const PAGE_TITLES: Record<GalleryMobileFilterPage, string> = {
   root: "Filters",
@@ -20,15 +21,16 @@ const PAGE_TITLES: Record<GalleryMobileFilterPage, string> = {
 };
 
 const headerButtonClassName =
-  "flex h-9 min-w-9 shrink-0 items-center justify-center rounded-full px-2 text-sm font-semibold text-primary transition-colors duration-150 hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-40";
+  "flex h-9 min-w-9 shrink-0 items-center justify-center rounded-island px-2 text-sm font-semibold text-primary transition-colors duration-150 hover:bg-primary-wash focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-40";
 
-export function GalleryMobileFilterHeader({ onClose }: { onClose: () => void }) {
+/** `inline` renders outside a Sheet (the Menu layout's tools panel), so the title is a plain heading. */
+export function GalleryMobileFilterHeader({ onClose, inline = false }: { onClose: () => void; inline?: boolean }) {
   const { page, back } = useGalleryMobileFilterNav();
   const { meta, actions, hasActiveFilters } = useGalleryFilterDialogContext();
   const isRoot = page === "root";
 
   return (
-    <div className="grid h-11 shrink-0 grid-cols-[minmax(2.5rem,1fr)_minmax(0,auto)_minmax(2.5rem,1fr)] items-center border-b border-border/30 px-2">
+    <div className="grid h-11 shrink-0 grid-cols-[minmax(2.5rem,1fr)_minmax(0,auto)_minmax(2.5rem,1fr)] items-center border-b border-hairline px-2">
       <div className="flex items-center justify-start">
         {isRoot ? (
           <button
@@ -47,10 +49,14 @@ export function GalleryMobileFilterHeader({ onClose }: { onClose: () => void }) 
         )}
       </div>
       <div className="flex min-w-0 flex-col items-center justify-center leading-tight">
-        <SheetTitle className="chrome-heading-case truncate text-[15px] font-semibold text-foreground">
-          {PAGE_TITLES[page]}
-        </SheetTitle>
-        <span className="text-[11px] tabular-nums text-muted-foreground">
+        {inline ? (
+          <h2 className={cn(sectionHeadingVariants({ size: "sm" }), "truncate text-foreground")}>{PAGE_TITLES[page]}</h2>
+        ) : (
+          <SheetTitle className={cn(sectionHeadingVariants({ size: "sm" }), "truncate text-foreground")}>
+            {PAGE_TITLES[page]}
+          </SheetTitle>
+        )}
+        <span className="text-xs tabular-nums text-muted-foreground">
           {meta.filteredCount.toLocaleString()} of {meta.formatCardCount.toLocaleString()}
         </span>
       </div>

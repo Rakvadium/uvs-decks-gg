@@ -19,7 +19,7 @@ import { FilterChip, FilterChipRow, FilterGroup, FilterRow } from "./primitives"
 import { OPERATOR_GLYPHS } from "./use-active-chips";
 
 const stepperButtonClassName =
-  "flex size-10 shrink-0 items-center justify-center text-foreground transition-colors duration-150 hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-40 motion-safe:active:scale-90 motion-safe:transition-[color,background-color,transform]";
+  "flex size-10 shrink-0 items-center justify-center text-foreground transition-colors duration-150 hover:bg-muted-elevated focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-40 motion-safe:active:scale-90 motion-safe:transition-[color,background-color,transform]";
 
 function StatRule({ stat }: { stat: GameStatFilterDescriptor }) {
   const { filters, setStatFilter } = useGalleryFilterDialogContext();
@@ -47,7 +47,7 @@ function StatRule({ stat }: { stat: GameStatFilterDescriptor }) {
             type="button"
             onClick={() => setStatFilter(filterKey, undefined)}
             aria-label={`Clear ${label} rule`}
-            className="flex size-7 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="flex size-7 items-center justify-center rounded-island text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <X className="size-4" />
           </button>
@@ -97,7 +97,7 @@ function StatRule({ stat }: { stat: GameStatFilterDescriptor }) {
               }
               setAmount(parsed);
             }}
-            className="w-10 min-w-0 border-x border-border/40 bg-transparent text-center text-base tabular-nums outline-none placeholder:text-muted-foreground/60 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+            className="w-10 min-w-0 border-x border-divider bg-transparent text-center text-base tabular-nums outline-none placeholder:text-muted-foreground/60 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
           />
           <button
             type="button"

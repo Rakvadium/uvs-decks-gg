@@ -51,11 +51,29 @@ function ActivePage() {
   return <GalleryMobileFilterRootPage />;
 }
 
+function ActivePageScroller() {
+  const { page, direction } = useGalleryMobileFilterNav();
+  const scrollsInside = page === "sets" || page === "keywords" || page === "tags";
+
+  return (
+    <div
+      key={page}
+      className={cn(
+        "min-h-0 flex-1 overscroll-contain",
+        scrollsInside ? "overflow-hidden" : "overflow-y-auto",
+        "motion-safe:animate-in motion-safe:fade-in-0 motion-safe:duration-200",
+        direction === "forward" ? "motion-safe:slide-in-from-right-4" : "motion-safe:slide-in-from-left-4"
+      )}
+    >
+      <ActivePage />
+    </div>
+  );
+}
+
 function GalleryMobileFilterSheetBody({ open, onOpenChange }: GalleryMobileFilterSheetBodyProps) {
-  const { page, direction, reset } = useGalleryMobileFilterNav();
+  const { reset } = useGalleryMobileFilterNav();
   const close = () => onOpenChange(false);
   const { panelRef, resetTranslate, grabberProps } = useGrabberDismiss(close);
-  const scrollsInside = page === "sets" || page === "keywords" || page === "tags";
 
   useEffect(() => {
     if (!open) {
@@ -86,17 +104,7 @@ function GalleryMobileFilterSheetBody({ open, onOpenChange }: GalleryMobileFilte
             <span aria-hidden className={MOBILE_SHEET_GRABBER} />
           </div>
           <GalleryMobileFilterHeader onClose={close} />
-          <div
-            key={page}
-            className={cn(
-              "min-h-0 flex-1 overscroll-contain",
-              scrollsInside ? "overflow-hidden" : "overflow-y-auto",
-              "motion-safe:animate-in motion-safe:fade-in-0 motion-safe:duration-200",
-              direction === "forward" ? "motion-safe:slide-in-from-right-4" : "motion-safe:slide-in-from-left-4"
-            )}
-          >
-            <ActivePage />
-          </div>
+          <ActivePageScroller />
           <GalleryMobileFilterFooter onClose={close} />
         </div>
       </SheetContent>
@@ -114,6 +122,28 @@ export function GalleryMobileFilterSheet({ display, ...props }: GalleryMobileFil
         <GalleryMobileFilterDisplayProvider value={display}>
           <GalleryMobileFilterNavProvider>
             <GalleryMobileFilterSheetBody {...props} />
+          </GalleryMobileFilterNavProvider>
+        </GalleryMobileFilterDisplayProvider>
+      </GalleryTopBarFiltersProvider>
+    </GalleryFilterDialogProvider>
+  );
+}
+
+/** The filter pages without the sheet, for the Menu layout's search and filter panel. */
+export function GalleryMobileFilterPanel({ onClose }: { onClose: () => void }) {
+  const filtersContext = useGalleryFiltersOptional();
+  if (!filtersContext) return null;
+
+  return (
+    <GalleryFilterDialogProvider filtersContext={filtersContext}>
+      <GalleryTopBarFiltersProvider>
+        <GalleryMobileFilterDisplayProvider value={undefined}>
+          <GalleryMobileFilterNavProvider>
+            <div className="flex min-h-0 flex-1 flex-col">
+              <GalleryMobileFilterHeader onClose={onClose} inline />
+              <ActivePageScroller />
+              <GalleryMobileFilterFooter onClose={onClose} inline />
+            </div>
           </GalleryMobileFilterNavProvider>
         </GalleryMobileFilterDisplayProvider>
       </GalleryTopBarFiltersProvider>

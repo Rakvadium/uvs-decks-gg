@@ -23,6 +23,11 @@ import {
   useMobileShell,
 } from "@/components/shell";
 import { useMobileVisualViewportFrame } from "@/components/shell/use-mobile-visual-viewport";
+import { MobileChromePortalProvider } from "@/components/shell/mobile-layout/chrome-portal";
+import { MobileHeaderTools } from "@/components/shell/mobile-layout/header-tools";
+import { MobileMenuDock } from "@/components/shell/mobile-layout/menu-dock";
+import { MobilePannuDock } from "@/components/shell/mobile-layout/pannu-dock";
+import { MobileLayoutModeProvider, useMobileLayoutMode } from "@/components/shell/mobile-layout/mode";
 import { usePathname, useParams } from "next/navigation";
 import { useShellFrame } from "@/components/shell/use-shell-frame";
 import {
@@ -248,6 +253,7 @@ function MobileShellFrame({
   children: ReactNode;
 }) {
   const { navBarHeight, tabBarHeight } = useMobileShell();
+  const { mode } = useMobileLayoutMode();
   const frameRef = useRef<HTMLDivElement>(null);
   const padsContent = !routeScrollsItself(pathname);
   useMobileVisualViewportFrame(frameRef);
@@ -279,9 +285,19 @@ function MobileShellFrame({
           <AccountStatusBanner className={padsContent ? undefined : "pt-[calc(var(--mobile-nav-h)+0.5rem)]"} />
           {children}
         </div>
-        <MobileActionsSheet>
-          <MobileNavBar />
-          <MobileTabBar />
+        <MobileActionsSheet withSheet={mode === "classic"}>
+          {mode === "classic" ? (
+            <>
+              <MobileNavBar />
+              <MobileTabBar />
+            </>
+          ) : (
+            <>
+              <MobileNavBar showProfile />
+              <MobileHeaderTools />
+              {mode === "pannu" ? <MobilePannuDock /> : <MobileMenuDock />}
+            </>
+          )}
         </MobileActionsSheet>
       </main>
       <MobileProfileSheet />
@@ -371,9 +387,13 @@ function ShellLayoutInner({ children }: { children: ReactNode }) {
 
   const mobileLayout = (
     <MobileShellProvider>
-      <MobileShellFrame pathname={pathname}>
-        {children}
-      </MobileShellFrame>
+      <MobileLayoutModeProvider>
+        <MobileChromePortalProvider>
+          <MobileShellFrame pathname={pathname}>
+            {children}
+          </MobileShellFrame>
+        </MobileChromePortalProvider>
+      </MobileLayoutModeProvider>
     </MobileShellProvider>
   );
 

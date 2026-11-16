@@ -101,6 +101,9 @@
     --chrome-floating-shadow: 0 4px 16px -10px oklch(0 0 0 / 0.25);
     --chrome-floating-shadow-focus: 0 6px 24px -12px color-mix(in oklch, var(--primary) 24%, transparent);
 
+    /* Top edge highlight on floating glass chrome (mobile dock, tools pill, action menu). */
+    --chrome-glass-highlight: inset 0 1px 0 oklch(1 0 0 / 0.14);
+
     --chrome-heading-transform: none;
     --chrome-heading-letter-spacing: normal;
     --chrome-label-transform: none;
@@ -288,6 +291,8 @@
     --chrome-shell-rail-active-shadow: var(--shadow-2xs);
     --chrome-floating-shadow: var(--shadow-xs);
     --chrome-floating-shadow-focus: var(--shadow-sm);
+
+    --chrome-glass-highlight: none;
   }
 }
 
@@ -314,6 +319,7 @@
     --chrome-elevation-low: 0 2px 8px -2px oklch(from var(--primary) l c h / 0.15), 0 0 4px oklch(from var(--primary) l c h / 0.08);
     --chrome-elevation-mid: 0 4px 16px -2px oklch(from var(--primary) l c h / 0.25), 0 0 12px oklch(from var(--primary) l c h / 0.12);
     --chrome-floating-shadow: 0 0 2px oklch(from var(--primary) l c h / 0.3), 0 10px 28px -14px oklch(from var(--primary) l c h / 0.5);
+    --chrome-glass-highlight: inset 0 1px 0 oklch(from var(--primary) l c h / 0.22);
     --chrome-floating-shadow-focus: 0 0 4px oklch(from var(--primary) l c h / 0.5), 0 12px 36px -12px oklch(from var(--primary) l c h / 0.6), 0 0 24px -8px oklch(from var(--secondary) l c h / 0.35);
 
     --chrome-heading-transform: uppercase;

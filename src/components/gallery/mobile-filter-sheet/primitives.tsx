@@ -148,7 +148,7 @@ export function FilterOptionRow({
       </span>
       <span className="flex min-w-0 flex-1 flex-col items-start leading-tight">
         <span className="w-full truncate font-medium">{label}</span>
-        {meta ? <span className="w-full truncate text-[11px] text-muted-foreground">{meta}</span> : null}
+        {meta ? <span className="w-full truncate text-xs text-muted-foreground">{meta}</span> : null}
       </span>
     </button>
   );

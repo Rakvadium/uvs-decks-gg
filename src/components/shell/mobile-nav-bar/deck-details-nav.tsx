@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { Zap } from "lucide-react";
 import { useDeckDetailsOptional } from "@/providers/DeckDetailsProvider";
 import { cn } from "@/lib/utils";
@@ -27,7 +28,7 @@ export function DeckDetailsSetActiveNavButton() {
   );
 }
 
-export function DeckDetailsMobileNav() {
+export function DeckDetailsMobileNav({ trailing }: { trailing?: ReactNode } = {}) {
   const context = useDeckDetailsOptional();
   const deck = context?.deck;
 
@@ -37,7 +38,7 @@ export function DeckDetailsMobileNav() {
         <MobileNavBackButton href="/decks" label="Decks" />
       </div>
       <MobileNavTitle>{deck?.name ?? (context?.isLoading ? "Loading…" : "Deck")}</MobileNavTitle>
-      <div />
+      <div className="flex min-w-0 items-center justify-end">{trailing}</div>
     </>
   );
 }

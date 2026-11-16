@@ -6,9 +6,11 @@ import { AppBrandLink } from "@/components/brand/app-brand-link";
 import { useBrand } from "@/games/game-context";
 import { CommunityTierListsPageMobileNavAction } from "@/components/community/tier-lists/page-view/top-bar";
 import { cn } from "@/lib/utils";
-import { MOBILE_GLASS_BAR, MOBILE_GLASS_HAIRLINE_BOTTOM } from "../mobile-glass";
+import { MOBILE_GLASS_BAR, MOBILE_GLASS_HAIRLINE_BOTTOM, MOBILE_NAV_ICON_BUTTON } from "../mobile-glass";
 import { useMobileShell } from "../mobile-shell-context";
 import { MOBILE_NAV_ROW_HEIGHT_CLASS } from "../mobile-tab-bar/metrics";
+import { MobileProfileTab } from "../mobile-tab-bar/profile-tab";
+import { useMobileLayoutModeOptional, usesMenuChrome } from "../mobile-layout/mode";
 import { ShellUniversusNav } from "../shell-universus-nav";
 import { SlotRenderer } from "../shell-slot-provider";
 import { DeckDetailsMobileNav } from "./deck-details-nav";
@@ -17,16 +19,31 @@ import { MobileNavTitle } from "./nav-title";
 import { resolveMobileNavPage, type MobileNavPageConfig } from "./page-config";
 
 function PageAction({ pathname }: { pathname: string }) {
+  const mode = useMobileLayoutModeOptional();
+  // Menu and Pannu offer New Tier List in the action menu instead.
+  if (usesMenuChrome(mode)) return null;
   if (/^\/community\/tier-lists\/?$/.test(pathname)) {
     return <CommunityTierListsPageMobileNavAction />;
   }
   return null;
 }
 
-function NavRow({ config, pathname }: { config: MobileNavPageConfig; pathname: string }) {
+function HeaderProfileButton() {
+  return <MobileProfileTab className={cn(MOBILE_NAV_ICON_BUTTON, "group")} />;
+}
+
+function NavRow({
+  config,
+  pathname,
+  showProfile,
+}: {
+  config: MobileNavPageConfig;
+  pathname: string;
+  showProfile: boolean;
+}) {
   const brand = useBrand();
   if (config.kind === "deck-details") {
-    return <DeckDetailsMobileNav />;
+    return <DeckDetailsMobileNav trailing={showProfile ? <HeaderProfileButton /> : null} />;
   }
 
   if (config.kind === "tier-list-detail") {
@@ -61,12 +78,14 @@ function NavRow({ config, pathname }: { config: MobileNavPageConfig; pathname: s
       <div className="flex min-w-0 items-center justify-end gap-0.5">
         <PageAction pathname={pathname} />
         {config.showMediaToggle ? <ShellUniversusNav variant="mobile-nav" /> : null}
+        {showProfile ? <HeaderProfileButton /> : null}
       </div>
     </>
   );
 }
 
-export function MobileNavBar() {
+/** `showProfile` puts the profile avatar in the header (Menu layout; Classic keeps it in the tab bar). */
+export function MobileNavBar({ showProfile = false }: { showProfile?: boolean }) {
   const rawPathname = usePathname();
   const pathname = rawPathname.split("?")[0] ?? "";
   const config = resolveMobileNavPage(pathname);
@@ -89,7 +108,7 @@ export function MobileNavBar() {
     <header
       ref={headerRef}
       className={cn(
-        "absolute inset-x-0 top-0 z-40 flex flex-col pt-[env(safe-area-inset-top)]",
+        "absolute inset-x-0 top-0 z-shell flex flex-col pt-[env(safe-area-inset-top)]",
         MOBILE_GLASS_BAR,
         MOBILE_GLASS_HAIRLINE_BOTTOM
       )}
@@ -100,7 +119,7 @@ export function MobileNavBar() {
           MOBILE_NAV_ROW_HEIGHT_CLASS
         )}
       >
-        <NavRow config={config} pathname={pathname} />
+        <NavRow config={config} pathname={pathname} showProfile={showProfile} />
       </div>
     </header>
   );

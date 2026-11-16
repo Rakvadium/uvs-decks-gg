@@ -34,7 +34,7 @@ export function MobileProfileTab({ className }: MobileProfileTabProps) {
       }}
       className={cn(
         className,
-        isProfileSheetOpen ? "bg-primary/20 text-primary" : "text-muted-foreground hover:text-foreground"
+        isProfileSheetOpen ? "bg-primary-selected text-primary" : "text-muted-foreground hover:text-foreground"
       )}
     >
       {isAuthenticated ? (
@@ -43,10 +43,10 @@ export function MobileProfileTab({ className }: MobileProfileTabProps) {
           image={user?.image}
           alt={user?.username || "User"}
           className={cn(
-            "size-6 border border-border/50 shadow-[var(--chrome-shell-avatar-ring)] motion-safe:transition-transform motion-safe:duration-150 motion-safe:group-active:scale-90",
-            isProfileSheetOpen && "ring-2 ring-primary/60"
+            "size-6 border border-surface shadow-[var(--chrome-shell-avatar-ring)] motion-safe:transition-transform motion-safe:duration-150 motion-safe:group-active:scale-90",
+            isProfileSheetOpen && "ring-2 ring-primary-strong"
           )}
-          fallbackClassName="bg-primary/20 text-[10px] font-bold text-primary"
+          fallbackClassName="bg-primary-selected text-[10px] font-bold text-primary"
         />
       ) : (
         <LogIn
