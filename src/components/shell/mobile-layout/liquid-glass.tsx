@@ -6,11 +6,11 @@ import { MOBILE_GLASS_GRADIENT_RING } from "../mobile-glass";
 
 /**
  * One glass look for the Menu/Pannu chrome (dock, tools pill, action menu, panels): the
- * `bg-background-elevated` surface step (80%), the `backdrop-glass` ladder step (blur + saturation),
+ * `bg-background-elevated` surface step (80%), the floating-overlay blur plus saturation,
  * and the chrome's `--chrome-glass-highlight` edge. Pair it with `GlassRing` so every piece has the
  * same border as the nav capsules.
  */
-export const LIQUID_GLASS = "bg-background-elevated backdrop-glass shadow-[var(--chrome-glass-highlight)]";
+export const LIQUID_GLASS = "bg-background-elevated backdrop-blur-xl backdrop-saturate-150 shadow-[var(--chrome-glass-highlight)]";
 
 const RING_MASK: CSSProperties = {
   WebkitMask: "linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)",

@@ -185,7 +185,7 @@ Meta / eyebrow labels: `text-[10px]` (or the nearest type-scale step), `font-mon
 
 ### Backdrop
 
-Default frosted chrome: `backdrop-blur-sm`. Use `backdrop-blur-md` / `xl` only for full-screen or floating overlays. Floating glass chrome (mobile dock, tools pill, action menu and panels) uses `backdrop-glass` (`backdrop-blur-xl` + `backdrop-saturate-150`) on `bg-background-elevated`, with `shadow-[var(--chrome-glass-highlight)]` for its top edge.
+Default frosted chrome: `backdrop-blur-sm`. Use `backdrop-blur-md` / `xl` only for full-screen or floating overlays. Floating glass chrome (mobile dock, tools pill, action menu and panels) uses `backdrop-blur-xl backdrop-saturate-150` (`LIQUID_GLASS` in `mobile-layout/liquid-glass.tsx`) on `bg-background-elevated`, with `shadow-[var(--chrome-glass-highlight)]` for its top edge.
 
 ## Component consumption
 
