@@ -8,6 +8,7 @@ import {
   ActiveDeckIcon,
   ActiveDeckSidebar,
 } from "@/components/gallery/gallery-active-deck-sidebar";
+import { useMobileLayoutModeOptional, usesMenuChrome } from "@/components/shell/mobile-layout/mode";
 import { useRegisterSlot } from "@/components/shell/shell-slot-provider";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { useActiveDeck } from "@/providers/ActiveDeckProvider";
@@ -36,7 +37,9 @@ function DecksActiveDeckPeekSlot() {
 export function DecksMobilePeekSlots() {
   const isMobile = useIsMobile();
   const { isAuthenticated, isLoading } = useConvexAuth();
+  const mode = useMobileLayoutModeOptional();
 
-  if (!isMobile || isLoading || !isAuthenticated) return null;
+  // In Menu and Pannu the Decks page has no panels; its action menu holds scope and create actions.
+  if (!isMobile || isLoading || !isAuthenticated || usesMenuChrome(mode)) return null;
   return <DecksActiveDeckPeekSlot />;
 }

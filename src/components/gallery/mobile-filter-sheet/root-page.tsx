@@ -24,7 +24,7 @@ import {
 import { useActiveChips } from "./use-active-chips";
 import { ColorFacetChips } from "./color-facet-chips";
 
-const segmentedItemClassName = "h-10 text-[13px] normal-case tracking-normal";
+const segmentedItemClassName = "h-10 text-sm normal-case tracking-normal";
 const compactChipClassName = "h-7 gap-1 px-2.5 text-xs";
 const compactChipRowClassName = "gap-1.5";
 
@@ -42,7 +42,7 @@ function ActiveChipsStrip() {
       <button
         type="button"
         onClick={actions.clearAllFilters}
-        className="inline-flex h-8 shrink-0 items-center rounded-full px-3 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="inline-flex h-8 shrink-0 items-center rounded-pill px-3 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
         Clear all
       </button>
@@ -59,7 +59,7 @@ function SearchGroup() {
         <SegmentedControl
           stretch
           size="sm"
-          className="w-full bg-muted/30"
+          className="w-full bg-muted-tint"
           itemClassName={segmentedItemClassName}
           value={state.searchMode}
           onValueChange={(value) => actions.setSearchMode(value as "name" | "text" | "all")}
@@ -286,8 +286,8 @@ function SymbolTile({
         size === "sm" ? "size-8" : size === "md" ? "size-10" : "size-11",
         shape === "circle" ? "rounded-full" : "rounded-md",
         selected
-          ? "border-primary ring-2 ring-primary/60 ring-offset-background shadow-[var(--chrome-filter-tile-shadow-selected)]"
-          : "border-border/50 hover:border-primary/40",
+          ? "border-primary ring-2 ring-primary-strong ring-offset-background shadow-[var(--chrome-filter-tile-shadow-selected)]"
+          : "border-surface hover:border-primary-soft",
         selected && (size === "lg" ? "ring-offset-2" : "ring-offset-1")
       )}
     >
@@ -529,7 +529,7 @@ function DisplayGroup() {
         <SegmentedControl
           stretch
           size="sm"
-          className="min-w-0 flex-1 bg-muted/30"
+          className="min-w-0 flex-1 bg-muted-tint"
           itemClassName={segmentedItemClassName}
           value={mode}
           onValueChange={(value) => setMode(value as GalleryMobileFilterDisplayMode)}
@@ -541,7 +541,7 @@ function DisplayGroup() {
         {!override && mode === "card" ? (
           <SegmentedControl
             size="sm"
-            className="shrink-0 bg-muted/30"
+            className="shrink-0 bg-muted-tint"
             itemClassName={cn(segmentedItemClassName, "w-11 px-0")}
             value={String(state.cardsPerRow)}
             onValueChange={(value) => actions.setCardsPerRow(Number(value))}

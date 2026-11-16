@@ -90,6 +90,14 @@
 @utility bg-popover-elevated { @apply bg-popover/80; }
 @utility bg-popover-overlay { @apply bg-popover/95; }
 
+/* Chrome pill: capsules, tab items and round shell buttons. 9999px in soft chromes; tight
+   chromes (Bubble Gum, Holoterminal) set --chrome-pill-radius to their radius scale. Avatars
+   and status dots stay rounded-full. */
+@utility rounded-pill { border-radius: var(--chrome-pill-radius, 9999px); }
+
+/* Floating glass chrome: one blur + saturation step for the mobile dock, tools pill and menus. */
+@utility backdrop-glass { @apply backdrop-blur-xl backdrop-saturate-150; }
+
 /* Z-index stack. Local stacking inside a component stays z-10 / z-20. */
 @utility z-sticky { z-index: 30; }
 @utility z-shell { z-index: 40; }

@@ -20,6 +20,11 @@ const NAMED_Z_INDEX = [
 
 const twMerge = extendTailwindMerge({
   extend: {
+    // `rounded-pill` (ladders.css) is a radius step; registering it lets a later `rounded-3xl`
+    // replace a component's default `rounded-pill` instead of both applying.
+    theme: {
+      radius: ["pill"],
+    },
     classGroups: {
       z: [{ z: [...NAMED_Z_INDEX] }],
     },

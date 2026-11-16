@@ -64,6 +64,8 @@ Name tokens by **role**, not by look:
 | Focus | `--chrome-focus-ring-*`, `--chrome-focus-shadow` | Focus must remain visible in every chrome |
 | Type feel | `--chrome-heading-transform`, `--chrome-heading-letter-spacing`, `--chrome-card-title-font` | Uppercase / tracking is chrome, not a one-off class |
 | Shell | `--chrome-page-bg`, `--chrome-shell-*` | App frame follows chrome without per-page CSS |
+| Shape | `--chrome-pill-radius` | Pill controls go square-ish in tight chromes |
+| Glass | `--chrome-glass-highlight` | Floating glass edge; `none` in flat chromes (Bubble Gum) |
 | FX intensity | glow/scanline/halo tokens that resolve to `none` in quiet chromes | Feature markup stays the same; chrome turns FX off |
 
 Quiet chrome sets glow tokens to `none` or a near-invisible hairline. Loud chrome sets the same names to tinted glows that reference `var(--primary)`. Feature code always reads the token.
@@ -123,10 +125,11 @@ Prefer chrome elevation tokens over ad-hoc `rgba` / `hsl` shadows:
 | Controls / inputs | `rounded-md` |
 | Cards / panels | `rounded-lg` |
 | Large feature surfaces | `rounded-xl` |
-| Hero / marketing shells | `rounded-3xl` |
-| Pills / avatars | `rounded-full` |
+| Hero / marketing shells, floating shell panels | `rounded-3xl` |
+| Chrome pills (mobile capsules, tab items, round shell buttons, chips) | `rounded-pill` |
+| Avatars, status dots, true circles | `rounded-full` |
 
-Avoid one-off `rounded-[Npx]` except micro geometry (tooltip arrows). Chrome may change `--radius`; the *roles* stay the same so a loud chrome can tighten or loosen the whole scale.
+Avoid one-off `rounded-[Npx]` except micro geometry (tooltip arrows). Chrome may change `--radius`; the *roles* stay the same so a loud chrome can tighten or loosen the whole scale. `rounded-md` through `rounded-3xl` all derive from `--radius`; `rounded-pill` reads `--chrome-pill-radius`, which every chrome assigns (9999px, or a radius step in tight chromes).
 
 ### Z-index stack
 
@@ -155,6 +158,7 @@ Finite steps. If a needed duration or property set is missing, add it here — d
 | Hover / press / chrome feedback | `duration-150` | Color, opacity, `transform` |
 | Controls (input, button, focus chrome) | `duration-200` | Color, border, background, `box-shadow` when the shadow token actually changes |
 | Overlay enter / exit | `duration-200` close / `duration-300` open | Opacity + `transform` via the overlay primitive, not a hover list |
+| Shell morph (mobile action menu, tools pill, sliding tab indicator) | 420ms `cubic-bezier(0.32, 0.72, 0, 1)` (`MORPH_MS` / `MORPH_EASE`) | `clip-path` (and the indicator's `transform` / size) written by one JS driver; reduced motion cross-fades instead |
 
 **Properties.** Prefer `transition-colors`, `transition-opacity`, `transition-transform`, or an explicit list of only the properties that change. Never `transition-all`. Never a bare `transition` class — Tailwind’s default set is almost `all` (includes `filter`, `box-shadow`, `transform`).
 
@@ -182,7 +186,7 @@ Meta / eyebrow labels: `text-[10px]` (or the nearest type-scale step), `font-mon
 
 ### Backdrop
 
-Default frosted chrome: `backdrop-blur-sm`. Use `backdrop-blur-md` / `xl` only for full-screen or floating overlays.
+Default frosted chrome: `backdrop-blur-sm`. Use `backdrop-blur-md` / `xl` only for full-screen or floating overlays. Floating glass chrome (mobile dock, tools pill, action menu and panels) uses `backdrop-glass` (`backdrop-blur-xl` + `backdrop-saturate-150`) on `bg-background-elevated`, with `shadow-[var(--chrome-glass-highlight)]` for its top edge.
 
 ## Component consumption
 

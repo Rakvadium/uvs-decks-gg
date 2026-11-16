@@ -48,7 +48,7 @@ const NO_SEARCH: MobileSearchState = { available: false, active: false };
 const expandEase = "cubic-bezier(0.32, 0.72, 0, 1)";
 
 const tabItemClassName = cn(
-  "group relative flex min-w-0 shrink-0 items-center justify-center rounded-full transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+  "group relative flex min-w-0 shrink-0 items-center justify-center rounded-pill transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
   MOBILE_TAB_ITEM_WIDTH_CLASS
 );
 
@@ -84,8 +84,8 @@ function PeekTrigger({ slot, isOpen, onOpen, variant = "circle" }: PeekTriggerPr
         isAct && cn(MOBILE_ACT_BUTTON_CLASS, MOBILE_TAB_ACT_SIZE_CLASS),
         !isTab && !isAct && MOBILE_ROUND_BUTTON,
         !isTab && isMedia && "overflow-hidden p-0",
-        isOpen && !isMedia && "bg-primary/20 text-primary",
-        isOpen && isMedia && !isTab && "ring-2 ring-primary/60"
+        isOpen && !isMedia && "bg-primary-selected text-primary",
+        isOpen && isMedia && !isTab && "ring-2 ring-primary-strong"
       )}
     >
       {Icon ? (
@@ -96,7 +96,7 @@ function PeekTrigger({ slot, isOpen, onOpen, variant = "circle" }: PeekTriggerPr
             isMedia && "overflow-hidden rounded-full",
             isMedia
               ? isTab
-                ? cn("size-7 border border-border/50 shadow-[var(--chrome-shell-avatar-ring)]", isOpen && "ring-2 ring-primary/60")
+                ? cn("size-7 border border-surface shadow-[var(--chrome-shell-avatar-ring)]", isOpen && "ring-2 ring-primary-strong")
                 : "size-full"
               : MOBILE_TAB_ICON_CLASS,
             isTab && "motion-safe:transition-transform motion-safe:duration-150 motion-safe:group-active:scale-90",
@@ -127,7 +127,7 @@ function PrimaryTabs({ pathname, peek }: { pathname: string; peek?: ReactNode })
             aria-current={isActive ? "page" : undefined}
             className={cn(
               tabItemClassName,
-              isActive ? "bg-primary/20 text-primary" : "text-muted-foreground hover:text-foreground"
+              isActive ? "bg-primary-selected text-primary" : "text-muted-foreground hover:text-foreground"
             )}
           >
             <Icon
@@ -221,7 +221,7 @@ function MobileTabBarBody({ tools }: { tools: MobileBottomTools }) {
     <div
       ref={containerRef}
       className={cn(
-        "pointer-events-none absolute inset-x-0 bottom-0 z-40 flex flex-col gap-[var(--mobile-tab-row-gap)] px-3 pt-3",
+        "pointer-events-none absolute inset-x-0 bottom-0 z-shell flex flex-col gap-[var(--mobile-tab-row-gap)] px-3 pt-3",
         searchOpen ? "pb-2" : MOBILE_SAFE_BOTTOM,
         "motion-safe:transition-[transform,opacity] motion-safe:duration-200",
         isActionsSheetOpen ? "translate-y-full opacity-0" : "translate-y-0 opacity-100"

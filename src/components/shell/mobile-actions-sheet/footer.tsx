@@ -11,7 +11,7 @@ export function MobileActionsSheetFooter() {
   if (!showSwitcher && !ActiveFooter) return null;
 
   return (
-    <div className="flex shrink-0 items-center gap-2 border-t border-border/30 px-3 pb-2 pt-2">
+    <div className="flex shrink-0 items-center gap-2 border-t border-hairline px-3 pb-2 pt-2">
       {showSwitcher ? (
         <div role="tablist" aria-label="Panels" className="flex min-w-0 flex-1 items-stretch gap-1">
           {sidebarSlots.map((slot) => {
@@ -28,13 +28,13 @@ export function MobileActionsSheetFooter() {
                 aria-selected={isActive}
                 aria-label={label}
                 onClick={() => selectSlot(slot.id)}
-                className={cn(switcherItemClassName, isActive && "bg-primary/15 text-primary")}
+                className={cn(switcherItemClassName, isActive && "bg-primary-selected text-primary")}
               >
                 <span
                   className={cn(
                     "flex size-6 shrink-0 items-center justify-center",
                     isMedia && "overflow-hidden rounded-full",
-                    isMedia && isActive && "ring-2 ring-primary/60",
+                    isMedia && isActive && "ring-2 ring-primary-strong",
                     "motion-safe:transition-transform motion-safe:duration-150 motion-safe:group-active:scale-90"
                   )}
                 >

@@ -45,7 +45,7 @@ export function MobileNavBackButton({ href, onClick, label, className }: MobileN
       <ChevronLeft className="size-6 -ml-1" strokeWidth={2.25} />
     </>
   );
-  const classes = cn(MOBILE_NAV_ICON_BUTTON, "text-primary hover:bg-primary/10", className);
+  const classes = cn(MOBILE_NAV_ICON_BUTTON, "text-primary hover:bg-primary-wash", className);
 
   if (href) {
     return (

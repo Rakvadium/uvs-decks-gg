@@ -24,11 +24,12 @@ export function useDeckCreateDialogModel() {
       setActiveDeck(newDeckId);
       setNewDeckName("");
       actions.closeCreateDialog();
-      router.push(`/decks/${newDeckId}`);
+      // Import lands on the new deck with Import/Export open (see DECK_OPEN_PANEL_PARAM).
+      router.push(state.createIntent === "import" ? `/decks/${newDeckId}?open=import-export` : `/decks/${newDeckId}`);
     } finally {
       setIsCreating(false);
     }
-  }, [actions, createDeck, game, newDeckName, router, setActiveDeck]);
+  }, [actions, createDeck, game, newDeckName, router, setActiveDeck, state.createIntent]);
 
   const handleOpenChange = useCallback(
     (open: boolean) => {
@@ -53,6 +54,7 @@ export function useDeckCreateDialogModel() {
 
   return {
     isOpen: state.isCreateDialogOpen,
+    isImport: state.createIntent === "import",
     newDeckName,
     isCreating,
     canCreate: Boolean(newDeckName.trim()) && !isCreating,

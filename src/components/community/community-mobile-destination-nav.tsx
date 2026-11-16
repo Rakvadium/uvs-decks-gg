@@ -3,6 +3,7 @@
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { SegmentedControl } from "@/components/ui/segmented-control";
 import { cn } from "@/lib/utils";
+import { useMobileLayoutModeOptional } from "@/components/shell/mobile-layout/mode";
 import { useGameFeatures } from "@/games/game-context";
 import {
   communityDestinationFromLocation,
@@ -21,14 +22,16 @@ export function CommunityMobileDestinationNav({
   const router = useRouter();
   const value = communityDestinationFromLocation(pathname, searchParams);
   const destinations = communityDestinationsFor(useGameFeatures());
-  if (destinations.length === 0) return null;
+  const mode = useMobileLayoutModeOptional();
+  // Pannu's action bar holds the Community sections instead.
+  if (destinations.length === 0 || mode === "pannu") return null;
 
   return (
     <nav className={cn("min-w-0 md:hidden", className)} aria-label="Community destinations">
       <SegmentedControl
         size="sm"
         stretch
-        className="w-full bg-muted/30"
+        className="w-full bg-muted-tint"
         itemClassName="h-10"
         value={value === "hub" ? undefined : value}
         onValueChange={(next) => {

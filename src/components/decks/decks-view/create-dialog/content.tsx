@@ -50,9 +50,11 @@ export function DeckCreateDialog() {
                   <Layers className="h-5 w-5 text-primary" />
                 </div>
                 <div>
-                  <DialogTitle className="text-xl">Create New Deck</DialogTitle>
+                  <DialogTitle className="text-xl">{model.isImport ? "Import Deck" : "Create New Deck"}</DialogTitle>
                   <DialogDescription className="text-sm">
-                    Give it a name now; you can always refine it later.
+                    {model.isImport
+                      ? "Name the deck, then paste or upload your list on the next screen."
+                      : "Give it a name now; you can always refine it later."}
                   </DialogDescription>
                 </div>
               </div>

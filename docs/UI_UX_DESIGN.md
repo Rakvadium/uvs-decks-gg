@@ -85,10 +85,13 @@ Do not use `hsl(var(--border)…)` — theme borders are oklch via `var(--border
 | Controls / inputs | `rounded-md` |
 | Cards / panels | `rounded-lg` |
 | Large feature surfaces | `rounded-xl` |
-| Hero / marketing shells | `rounded-3xl` |
-| Pills / avatars | `rounded-full` |
+| Hero / marketing shells, floating shell panels | `rounded-3xl` |
+| Chrome pills (mobile capsules, tab items, round shell buttons, chips) | `rounded-pill` |
+| Avatars, status dots, true circles | `rounded-full` |
 
 Avoid one-off `rounded-[Npx]` except micro geometry (e.g. tooltip arrows). Dialogs use this same ladder — panel `rounded-lg`, fields and footer buttons `rounded-md` — not a one-off dialog radius.
+
+Every step from `rounded-md` to `rounded-3xl` derives from the chrome `--radius` (`base.css` `@theme`), so a chrome that tightens its radius tightens all of them. `rounded-pill` reads `--chrome-pill-radius`: a full pill in soft chromes, the chrome's `rounded-xl` step in tight ones (Bubble Gum, Holoterminal). Use `rounded-full` only for shapes that must stay circular in every chrome. JS that clips to a shape (the mobile morph surfaces) reads the rendered radius with `cornerRadius()` instead of hard-coding pixels.
 
 Bare `rounded` and `rounded-sm` are off-ladder: `rounded` is a static 4px that ignores the chrome `--radius`, so it drifts from every other control. Buttons (all sizes), badges, tooltips, and segmented controls are `rounded-md`.
 

@@ -94,10 +94,10 @@ export function FilterChip({
       aria-pressed={selected}
       onClick={onClick}
       className={cn(
-        "inline-flex h-9 items-center gap-1.5 rounded-full border px-3.5 text-[13px] font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring motion-safe:active:scale-95 motion-safe:transition-[color,background-color,border-color,transform]",
+        "inline-flex h-9 items-center gap-1.5 rounded-pill border px-3.5 text-sm font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring motion-safe:active:scale-95 motion-safe:transition-[color,background-color,border-color,transform]",
         selected
-          ? "border-primary/50 bg-primary/20 text-primary shadow-[var(--chrome-filter-tile-shadow-selected)]"
-          : "border-border/50 bg-background/60 text-foreground hover:border-primary/30 hover:bg-muted/60",
+          ? "border-primary-strong bg-primary-selected text-primary shadow-[var(--chrome-filter-tile-shadow-selected)]"
+          : "border-surface bg-background-soft text-foreground hover:border-primary-soft hover:bg-muted-elevated",
         className
       )}
     >
@@ -123,7 +123,7 @@ export function ActiveFilterChip({ label, onRemove }: { label: string; onRemove:
       type="button"
       onClick={onRemove}
       aria-label={`Remove ${label}`}
-      className="inline-flex h-8 shrink-0 items-center gap-1 rounded-full border border-primary/40 bg-primary/15 pl-3 pr-2 text-xs font-medium text-primary transition-colors duration-150 hover:bg-primary/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      className="inline-flex h-8 shrink-0 items-center gap-1 rounded-pill border border-primary-soft bg-primary-selected pl-3 pr-2 text-xs font-medium text-primary transition-colors duration-150 hover:border-primary-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
     >
       <span className="max-w-[10rem] truncate">{label}</span>
       <X className="size-3.5" strokeWidth={2.5} aria-hidden />
@@ -161,7 +161,7 @@ export function FilterOptionRow({
       </span>
       <span className="flex min-w-0 flex-1 flex-col items-start leading-tight">
         <span className="w-full truncate font-medium">{label}</span>
-        {meta ? <span className="w-full truncate text-[11px] text-muted-foreground">{meta}</span> : null}
+        {meta ? <span className="w-full truncate text-xs text-muted-foreground">{meta}</span> : null}
       </span>
     </button>
   );
