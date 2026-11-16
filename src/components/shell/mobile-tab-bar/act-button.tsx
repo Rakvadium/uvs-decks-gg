@@ -14,7 +14,7 @@ interface MobileActButtonProps extends Omit<ComponentPropsWithoutRef<"button">, 
 }
 
 export const MOBILE_ACT_BUTTON_CLASS =
-  "relative flex shrink-0 items-center justify-center rounded-full text-foreground transition-colors duration-150 hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring motion-safe:active:scale-95 motion-safe:transition-[color,background-color,transform] disabled:pointer-events-none disabled:opacity-40";
+  "relative flex shrink-0 items-center justify-center rounded-island text-foreground transition-colors duration-150 hover:bg-muted-elevated focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring motion-safe:active:scale-95 motion-safe:transition-[color,background-color,transform] disabled:pointer-events-none disabled:opacity-40";
 
 export function MobileActButton({
   label,
@@ -35,8 +35,8 @@ export function MobileActButton({
       className={cn(
         MOBILE_ACT_BUTTON_CLASS,
         MOBILE_TAB_ACT_SIZE_CLASS,
-        tone === "primary" && "text-primary hover:bg-primary/10",
-        active && "bg-primary/20 text-primary",
+        tone === "primary" && "text-primary hover:bg-primary-wash",
+        active && "bg-primary-selected text-primary",
         className
       )}
       {...props}

@@ -3,6 +3,7 @@
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { SegmentedControl } from "@/components/ui/segmented-control";
 import { cn } from "@/lib/utils";
+import { useMobileLayoutModeOptional } from "@/components/shell/mobile-layout/mode";
 import { useGameFeatures } from "@/games/game-context";
 import {
   communityDestinationFromLocation,
@@ -21,7 +22,9 @@ export function CommunityMobileDestinationNav({
   const router = useRouter();
   const value = communityDestinationFromLocation(pathname, searchParams);
   const destinations = communityDestinationsFor(useGameFeatures());
-  if (destinations.length === 0) return null;
+  const mode = useMobileLayoutModeOptional();
+  // Pannu's action bar holds the Community sections instead.
+  if (destinations.length === 0 || mode === "pannu") return null;
 
   return (
     <nav className={cn("min-w-0 md:hidden", className)} aria-label="Community destinations">

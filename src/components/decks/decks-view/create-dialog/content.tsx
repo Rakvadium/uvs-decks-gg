@@ -10,8 +10,12 @@ export function DeckCreateDialog() {
       open={model.isOpen}
       onOpenChange={model.handleOpenChange}
       icon={Layers}
-      title="Create New Deck"
-      description="Give it a name now; you can always refine it later."
+      title={model.isImport ? "Import Deck" : "Create New Deck"}
+      description={
+        model.isImport
+          ? "Name the deck, then paste or upload your list on the next screen."
+          : "Give it a name now; you can always refine it later."
+      }
       name={{
         id: "create-deck-name",
         label: "Deck name",

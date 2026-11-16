@@ -154,6 +154,34 @@ Nested sheet → dialog needs `suppressSubsequentPointerEvents`.
 6. Pad scroll with `--mobile-nav-h` / `--mobile-tab-h` (or reuse `FloatingPageLayout`’s mobile padding).
 7. Update the inventory table in this file in the same change.
 
+## Pannu (the mobile layout)
+
+**Pannu** is the only mobile layout offered. It builds on the **Menu** layout, and the Classic layout this doc describes above is kept in code as a fallback. Neither Menu nor Classic appears anywhere in the UI: reach them with `?mobile-layout=menu` or `?mobile-layout=classic` (and `?mobile-layout=pannu` to come back). The choice is stored in `localStorage` (`tcgdecks:mobile-layout-v2`). To revert to Classic for everyone, set `DEFAULT_MODE` in `mobile-layout/mode.tsx`. `usesMenuChrome()` is true for both Menu and Pannu. Code: `src/components/shell/mobile-layout/`.
+
+Shared by Menu and Pannu:
+
+- **Header:** the profile avatar sits after the media toggle.
+- **Top-right pill** (`MobileToolsPill`): searches, filters and sorts what's on screen. Gallery: Search, Filters. Decks: Search, then Show (Mine/Public/Tourney), Sort, Format. Tier lists: Search. Deck details: View & Sort, rendered by the page through `MobileChromePortal target="header-tools"`. Tapping it grows the pill down and left into a large panel.
+- **Action button** (grid-with-plus icon): opens a labeled menu with three kinds of entry. Panels come from `right-sidebar` slots, filtered per route in `routes.ts`: context from another view (Active Deck, Decks, the deck's card Gallery) and extra data (Stats, Simulator, Import/Export). Direct entries come from `menu-actions.tsx`, grouped: Decks has Show (My/Public/Tournament Decks) and Create (New Deck, Import Deck); Deck details has Duplicate and Edit; Gallery has Open Deck Details. Picking a panel morphs the menu into a panel with equal top and bottom margins, whose bottom row switches panels (`ActionSurface`).
+- **Import Deck:** creates the deck, then opens it at `?open=import-export`, which shows the Import/Export panel.
+- **Motion:** surfaces are laid out full size and revealed with an animated `clip-path` (`morph.ts`), measured from the real trigger, so nothing scales. Keep `filter` off their ancestors.
+- **iOS:** triggers and closed surfaces need `touch-action: manipulation`, `user-select: none` and `-webkit-touch-callout: none` (`TAP_TARGET`). Without them, iOS reads taps as long presses and never fires `click`.
+
+**Menu** (`MobileMenuDock`): labeled tabs (Gallery, Decks, Community) with the round action button beside them. The Decks scope switch is not in the page; the large title names the current list.
+
+**Pannu** (`MobilePannuDock`): one dock with the action button as the last navigation item ("Actions") and a per-page action bar above the tabs (`PannuActionBar`):
+
+| Page | Action bar |
+| --- | --- |
+| Gallery | Active Deck row (opens its panel) |
+| Decks | Mine / Public / Tourney |
+| Deck details | Gallery / Stats / Hand Sim (open those panels) |
+| Community | Content / Rankings |
+| Teams landing | My Teams / Team Decks |
+| Inside a team | News / Chat / Calendar / Decks / Members |
+
+The action menu keeps every entry even when the bar repeats one. Bars with more than three items stack labels under icons.
+
 ## Anti-patterns
 
 - Persistent full-width search field above the tab bar

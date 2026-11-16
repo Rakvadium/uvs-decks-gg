@@ -186,7 +186,7 @@ export function MobileActionsBottomSheet() {
 
   return (
     <div
-      className="pointer-events-none absolute inset-x-0 bottom-0 z-50 flex flex-col justify-end"
+      className="pointer-events-none absolute inset-x-0 bottom-0 z-modal flex flex-col justify-end"
       role="dialog"
       aria-modal="false"
       aria-label={activeSlot?.label ?? "Page details"}

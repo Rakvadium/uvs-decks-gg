@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { LoadingState } from "@/components/ui/loading-state";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useConvexAuth, useQuery } from "convex/react";
 import { BarChart3, Download, Grid2x2Plus, Shuffle } from "lucide-react";
 
@@ -14,7 +15,8 @@ import { DeckDetailsPrivateLinkPanel } from "@/components/deck-details/deck-deta
 import { DeckDetailsReadOnlyBanner } from "@/components/deck-details/deck-details-read-only-banner";
 import { useDeckDetails } from "@/providers/DeckDetailsProvider";
 import { useGameFeatures } from "@/games/game-context";
-import { useRegisterSlot } from "@/components/shell/shell-slot-provider";
+import { useRegisterSlot, useShellSlotActions } from "@/components/shell/shell-slot-provider";
+import { useMobileShellOptional } from "@/components/shell/mobile-shell-context";
 import { FloatingPageLayout } from "@/components/shell/floating-page-bar";
 import { useIsBelowLg } from "@/hooks/useIsMobile";
 import { DeckDetailsFloatingTopBar } from "./deck-details-floating-top-bar";
@@ -64,7 +66,24 @@ function DeckDetailsSimulatorSlotRegistration() {
 function DeckDetailsImportExportSlotRegistration() {
   const options = useMemo(() => ({ label: "Import/Export", icon: Download, priority: 1 }), []);
   useRegisterSlot("right-sidebar", "deck-import-export", ImportExportSidebar, options);
+  useOpenPanelFromQuery("import-export", "deck-import-export");
   return null;
+}
+
+/** `?open=<value>` opens a panel once (e.g. Import Deck from the Decks page), then drops the param. */
+function useOpenPanelFromQuery(value: string, slotId: string) {
+  const { setActiveSidebarAction } = useShellSlotActions();
+  const mobileShell = useMobileShellOptional();
+  const router = useRouter();
+
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (url.searchParams.get("open") !== value) return;
+    setActiveSidebarAction(slotId);
+    mobileShell?.setActionsSheetOpen(true);
+    url.searchParams.delete("open");
+    router.replace(`${url.pathname}${url.search}`, { scroll: false });
+  }, [mobileShell, router, setActiveSidebarAction, slotId, value]);
 }
 
 export function DeckDetailsView() {

@@ -1,3 +1,3 @@
 "use client";
 
-export { GalleryMobileFilterSheet } from "./mobile-filter-sheet/view";
+export { GalleryMobileFilterPanel, GalleryMobileFilterSheet } from "./mobile-filter-sheet/view";

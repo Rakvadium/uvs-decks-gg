@@ -284,8 +284,8 @@ function SymbolTile({
         size === "sm" ? "size-8" : size === "md" ? "size-10" : "size-11",
         shape === "circle" ? "rounded-full" : "rounded-md",
         selected
-          ? "border-primary ring-2 ring-primary/60 ring-offset-background shadow-[var(--chrome-filter-tile-shadow-selected)]"
-          : "border-border/50 hover:border-primary/40",
+          ? "border-primary ring-2 ring-primary-strong ring-offset-background shadow-[var(--chrome-filter-tile-shadow-selected)]"
+          : "border-surface hover:border-primary-soft",
         selected && (size === "lg" ? "ring-offset-2" : "ring-offset-1")
       )}
     >

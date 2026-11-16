@@ -49,7 +49,7 @@ export function MobileSearchField({
         autoCapitalize="none"
         spellCheck={false}
         className={cn(
-          "h-11 w-full min-w-0 rounded-full border-0 bg-muted/60 pl-10 text-base text-foreground outline-none placeholder:text-muted-foreground",
+          "h-11 w-full min-w-0 rounded-island border-0 bg-muted-elevated pl-10 text-base text-foreground outline-none placeholder:text-muted-foreground",
           "focus-visible:ring-2 focus-visible:ring-ring",
           "[&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden",
           endPadding
