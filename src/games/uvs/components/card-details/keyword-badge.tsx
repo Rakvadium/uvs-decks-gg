@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { KEYWORD_ABILITY_MAP, TIMING_COLORS } from "./constants";
 
 const keywordChipClassName =
-  "chrome-label-case inline-flex items-center rounded-sm border px-2.5 py-1 text-xs font-bold";
+  "chrome-label-case inline-flex items-center rounded-md border px-2.5 py-1 text-xs font-bold";
 
 interface KeywordBadgeProps {
   keyword: string;
@@ -34,7 +34,7 @@ export function KeywordBadge({ keyword }: KeywordBadgeProps) {
           type="button"
           className={cn(
             keywordChipClassName,
-            "cursor-pointer motion-safe:transition-transform motion-safe:duration-150 motion-safe:hover:scale-105"
+            "cursor-pointer motion-safe:transition-transform motion-safe:duration-150 motion-safe:hover:scale-105 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           )}
           style={{
             backgroundColor: `${color}20`,

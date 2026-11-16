@@ -40,6 +40,10 @@ Presets include **Aurora**, **Sorbet**, and **Singularity** as the color layers 
 
 Structural and “feel” tokens live in `src/styles/base.css` (and related layers): radius scale, shadows, scrollbar chrome, badge/button/shell variables, FX gates, and so on. Chrome must not redefine core palette hues; expressive effects may reference **`var(--primary)`** so they track the active palette.
 
+### Role tokens
+
+Each chrome layer sets 12 role tokens: four radii (`--radius-control`, `--radius-surface`, `--radius-cta`, `--radius-island`), four control heights (`--control-h-xs` to `--control-h-lg`), and four selected and hover colours derived from `--accent`. Primitives read them, so a chrome changes every button, field, card and island at once. Calm, darkmatter and expressive make CTAs and islands pills. Bubblegum and holoterminal give them the chrome's own `--radius`. The per-chrome values are in [UI_UX_DESIGN.md § Role tokens](./UI_UX_DESIGN.md#role-tokens).
+
 ### Casing is chrome-owned
 
 Text transform and letter spacing are never hardcoded at a call site. Two utilities read the chrome tokens:
@@ -57,7 +61,7 @@ Calm-family chromes resolve both to `none` (label spacing `0.01em`); expressive-
 
 ### Floating chrome shadow
 
-`--chrome-floating-shadow` / `--chrome-floating-shadow-focus` back `FloatingIslandCapsule`, `FLOATING_ACTION_PILL_CLASS`, and the floating rail buttons. Calm-family chromes fork the value by `.dark`; expressive-family chromes tint it with `--primary`.
+`--chrome-floating-shadow` / `--chrome-floating-shadow-focus` back the floating island surface (`floatingIslandSurfaceClassName`, used by `FloatingIslandCapsule` and `FloatingActionPill`) and the floating rail buttons. Calm-family chromes fork the value by `.dark`; expressive-family chromes tint it with `--primary`.
 
 ## Control roles
 
@@ -66,17 +70,15 @@ Do not restyle `Button` at each call site. Pick a role primitive (these may wrap
 | Role | Primitive / treatment | When |
 | --- | --- | --- |
 | Header primary | Filled `FloatingActionPill` | Opens a flow (New Deck, Edit). |
-| Header secondary | Outline `FloatingActionPill` | Non-primary header action. |
+| Header secondary | `FloatingActionPill variant="floating"` | Non-primary header action, on the opaque island fill. |
 | Context toggle | Distinct **off** vs **on** | Changes global edit context. Off: Set Active. On: Active. Not a dialog opener. |
-| Dialog dismiss | Outline / ghost | Always **Close** (not Cancel). |
+| Dialog dismiss | `DialogCancel` (outline) | **Cancel** beside a commit button. **Close** in a view-only dialog. |
 | Dialog commit | Filled primary | Create / Save / etc. |
 | Dialog destroy | Destructive | Delete. |
 
 Dialog field labels use `chrome-label-case` (or `Kicker`) so casing follows the chrome. Do not hardcode `uppercase` on labels.
 
-Dialog panels, fields, and footer buttons use the same radius ladder as the rest of the app (`docs/UI_UX_DESIGN.md`): controls `rounded-md`, cards/panels `rounded-lg`. Do not invent a dialog-only radius.
-
-Implementation sweep: GitHub #170. Font leftovers: #169.
+Dialog panels, fields, and footer buttons use the same role radii as the rest of the app: the panel `rounded-surface`, fields and buttons `rounded-control`. Do not invent a dialog-only radius.
 
 ## Custom colors
 

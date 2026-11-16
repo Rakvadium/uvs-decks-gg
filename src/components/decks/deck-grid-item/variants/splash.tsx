@@ -40,7 +40,7 @@ export function DeckSplashItem() {
     >
       <article
         className={cn(
-          "relative aspect-[3/4] overflow-hidden rounded-2xl border border-white/10 bg-card shadow-[var(--chrome-elevation-low)]",
+          "relative aspect-[3/4] overflow-hidden rounded-surface border border-on-scrim/10 bg-card shadow-[var(--chrome-elevation-low)]",
           "transition-[transform,box-shadow,border-color] duration-300 ease-out",
           "group-hover:-translate-y-1 group-hover:border-[hsl(var(--accent-h)_var(--accent-s)_var(--accent-l)/0.6)] group-hover:shadow-[0_18px_40px_-18px_hsl(var(--accent-h)_var(--accent-s)_var(--accent-l)/0.55)]",
         )}
@@ -63,13 +63,13 @@ export function DeckSplashItem() {
                 "radial-gradient(120% 80% at 50% 0%, hsl(var(--accent-h) var(--accent-s) var(--accent-l) / 0.35), transparent 60%), hsl(var(--accent-h) 20% 10%)",
             }}
           >
-            <Hexagon className="h-16 w-16 text-white/10" />
-            <Layers className="absolute h-6 w-6 text-white/40" />
+            <Hexagon className="h-16 w-16 text-on-scrim/10" />
+            <Layers className="absolute h-6 w-6 text-on-scrim/40" />
           </div>
         )}
 
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/5" />
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[42%] bg-gradient-to-t from-black via-black/85 to-transparent" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-scrim via-scrim/40 to-scrim/5" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[42%] bg-gradient-to-t from-scrim via-scrim/85 to-transparent" />
         <div
           className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 opacity-70 mix-blend-screen motion-safe:transition-opacity motion-safe:duration-150 motion-safe:group-hover:opacity-100"
           style={{
@@ -80,10 +80,10 @@ export function DeckSplashItem() {
 
         <div className="absolute inset-x-0 top-0 flex items-start justify-between p-2.5">
           {accentSymbol ? (
-            <span className="inline-flex items-center gap-1 rounded-full border border-white/15 bg-black/45 p-1 pr-1.5 backdrop-blur-sm">
+            <span className="inline-flex items-center gap-1 rounded-full border border-on-scrim/15 bg-scrim/45 p-1 pr-1.5 backdrop-blur-sm">
               <SymbolIcon symbol={accentSymbol} size="sm" />
               {characterSymbols.length > 1 ? (
-                <span className="text-[10px] font-semibold tabular-nums text-white/70">
+                <span className="text-[10px] font-semibold tabular-nums text-on-scrim/70">
                   +{characterSymbols.length - 1}
                 </span>
               ) : null}
@@ -105,31 +105,31 @@ export function DeckSplashItem() {
             <span className="chrome-label-case text-[10px] font-semibold text-[hsl(var(--accent-h)_var(--accent-s)_72%)]">
               {deck.format}
               {deck.subFormat ? (
-                <span className="text-white/50"> / {deck.subFormat}</span>
+                <span className="text-on-scrim/50"> / {deck.subFormat}</span>
               ) : null}
             </span>
           ) : null}
 
           <div className="min-w-0">
-            <h3 className="line-clamp-2 text-[15px] font-bold leading-tight tracking-tight text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+            <h3 className="line-clamp-2 text-[15px] font-bold leading-tight tracking-tight text-on-scrim drop-shadow-[0_1px_2px_color-mix(in_oklab,var(--scrim)_80%,transparent)]">
               {displayName}
             </h3>
             {startingCharacterName ? (
-              <p className="mt-0.5 truncate text-[11px] text-white/65">
+              <p className="mt-0.5 truncate text-[11px] text-on-scrim/65">
                 {startingCharacterName}
               </p>
             ) : null}
           </div>
 
-          <div className="flex items-center justify-between gap-2 border-t border-white/10 pt-2">
+          <div className="flex items-center justify-between gap-2 border-t border-on-scrim/10 pt-2">
             <div className="flex items-center gap-2">
               <ProgressRing
                 progress={progress}
                 size={34}
                 stroke={3}
-                className="text-white"
+                className="text-on-scrim"
               >
-                <span className="text-[10px] font-bold tabular-nums text-white">
+                <span className="text-[10px] font-bold tabular-nums text-on-scrim">
                   {counts.main}
                 </span>
               </ProgressRing>
@@ -142,7 +142,7 @@ export function DeckSplashItem() {
                 >
                   {isReady ? "Ready" : "Building"}
                 </span>
-                <span className="mt-0.5 text-[10px] tabular-nums text-white/55">
+                <span className="mt-0.5 text-[10px] tabular-nums text-on-scrim/55">
                   {counts.main}/{mainTarget}
                   {counts.side > 0 ? (
                     <span className="ml-1.5 inline-flex items-center gap-0.5">
@@ -155,7 +155,7 @@ export function DeckSplashItem() {
             </div>
 
             {showAuthor ? (
-              <span className="inline-flex min-w-0 items-center gap-1 text-[10px] text-white/60">
+              <span className="inline-flex min-w-0 items-center gap-1 text-[10px] text-on-scrim/60">
                 <User className="h-3 w-3 shrink-0" />
                 <span className="truncate">{authorLabel}</span>
               </span>

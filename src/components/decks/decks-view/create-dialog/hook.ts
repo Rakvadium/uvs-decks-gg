@@ -1,4 +1,4 @@
-import { useCallback, useState, type KeyboardEvent } from "react";
+import { useCallback, useState } from "react";
 import { useMutation } from "convex/react";
 import { useRouter } from "next/navigation";
 import { api } from "../../../../../convex/_generated/api";
@@ -42,24 +42,12 @@ export function useDeckCreateDialogModel() {
     [actions]
   );
 
-  const handleNameKeyDown = useCallback(
-    (event: KeyboardEvent<HTMLInputElement>) => {
-      if (event.key === "Enter") {
-        void handleCreate();
-      }
-    },
-    [handleCreate]
-  );
-
   return {
     isOpen: state.isCreateDialogOpen,
     newDeckName,
     isCreating,
-    canCreate: Boolean(newDeckName.trim()) && !isCreating,
     setNewDeckName,
     handleCreate,
     handleOpenChange,
-    handleNameKeyDown,
-    closeDialog: actions.closeCreateDialog,
   };
 }

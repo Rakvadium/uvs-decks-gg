@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { OptionTile } from "@/components/ui/option-tile";
 import type { CachedCard } from "@/lib/universus/card-store";
 import { CharacterThumbnail } from "./character-thumbnail";
 import { useCharacterPickerContentContext } from "./context";
@@ -7,21 +7,19 @@ export function CharacterOption({ card }: { card: CachedCard }) {
   const { onSelectCharacter, selectedCharacterId, subtitleFor } = useCharacterPickerContentContext();
 
   return (
-    <button
-      type="button"
+    <OptionTile
+      variant="ghost"
+      selected={card._id === selectedCharacterId}
       onClick={() => {
         void onSelectCharacter(card);
       }}
-      className={cn(
-        "flex w-full items-center gap-2 rounded-md border border-transparent px-2 py-1.5 text-left hover:border-primary/40 hover:bg-primary/5",
-        card._id === selectedCharacterId && "border-primary/40 bg-primary/10"
-      )}
+      className="flex w-full items-center gap-2 px-2 py-1.5 text-left"
     >
       <CharacterThumbnail imageUrl={card.imageUrl} name={card.name} className="h-8 w-6" />
       <div className="min-w-0">
         <p className="truncate text-xs font-medium">{card.name}</p>
         <p className="chrome-label-case text-[10px] text-muted-foreground">{subtitleFor(card)}</p>
       </div>
-    </button>
+    </OptionTile>
   );
 }

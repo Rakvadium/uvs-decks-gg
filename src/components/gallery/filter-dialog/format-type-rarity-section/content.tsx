@@ -1,4 +1,5 @@
 import { FormatRow } from "./format-row";
+import { Panel } from "@/components/ui/panel";
 import { RarityRow } from "./rarity-row";
 import { TypeRow } from "./type-row";
 import {
@@ -23,7 +24,7 @@ function SearchModeRow() {
         value={state.searchMode}
         onValueChange={(value) => actions.setSearchMode(value as "name" | "text" | "all")}
       >
-        <SelectTrigger size="sm" className="h-8 w-full text-[10px]">
+        <SelectTrigger size="sm" className="w-full text-[10px]">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
@@ -42,24 +43,24 @@ export function FormatTypeRaritySection() {
   if (!isMobile) {
     return (
       <div className="space-y-3">
-        <div className="space-y-3 rounded-lg border border-border/50 bg-card/30 p-3 backdrop-blur-sm">
+        <Panel className="space-y-3 p-3">
           <FormatRow />
-        </div>
-        <div className="space-y-3 rounded-lg border border-border/50 bg-card/30 p-3 backdrop-blur-sm">
+        </Panel>
+        <Panel className="space-y-3 p-3">
           <TypeRow />
-        </div>
-        <div className="space-y-3 rounded-lg border border-border/50 bg-card/30 p-3 backdrop-blur-sm">
+        </Panel>
+        <Panel className="space-y-3 p-3">
           <RarityRow />
-        </div>
+        </Panel>
       </div>
     );
   }
 
   return (
-    <div className="space-y-2.5 rounded-lg border border-border/50 bg-card/30 p-2.5 backdrop-blur-sm">
+    <Panel className="space-y-2.5 p-2.5">
       <SearchModeRow />
       <FormatRow />
       <TypeRow />
-    </div>
+    </Panel>
   );
 }

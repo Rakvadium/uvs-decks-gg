@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogBody,
-  DialogClose,
+  DialogCancel,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -124,11 +124,7 @@ export function TeamLogoCropDialog({
           ) : null}
         </DialogBody>
         <DialogFooter>
-          <DialogClose asChild>
-            <Button type="button" variant="outline" disabled={busy}>
-              Cancel
-            </Button>
-          </DialogClose>
+          <DialogCancel disabled={busy} />
           <Button type="button" disabled={busy || !imageSrc} onClick={() => void handleApply()}>
             Save logo
           </Button>

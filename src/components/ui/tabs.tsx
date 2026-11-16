@@ -28,10 +28,8 @@ function TabsList({ className, orientation = "horizontal", ...props }: TabsListP
       data-slot="tabs-list"
       data-orientation={orientation}
       className={cn(
-        "group tab-container inline-flex h-11 w-fit items-stretch justify-center overflow-hidden rounded-md p-0",
-        "bg-muted-soft border border-surface",
-        "backdrop-blur-sm",
-        orientation === "vertical" && "tab-container-vertical h-auto w-full flex-col",
+        "group inline-flex h-(--control-h-md) w-fit items-stretch justify-center overflow-hidden rounded-control border border-surface bg-muted-soft p-0 backdrop-blur-sm",
+        orientation === "vertical" && "h-auto w-full flex-col",
         className
       )}
       {...props}
@@ -47,13 +45,13 @@ function TabsTrigger({
     <TabsPrimitive.Trigger
       data-slot="tabs-trigger"
       className={cn(
-        "inline-flex h-full flex-1 items-center justify-center gap-2 border-y border-transparent px-4 py-2 text-sm whitespace-nowrap transition-colors duration-150",
+        "inline-flex h-full flex-1 items-center justify-center gap-2 px-4 whitespace-nowrap transition-colors duration-150",
         "border-r border-surface last:border-r-0",
         "chrome-label-case text-muted-foreground text-xs",
-        "hover:bg-muted-overlay hover:text-foreground",
-        "focus-visible:z-10 focus-visible:ring-2 focus-visible:ring-primary-soft focus-visible:ring-offset-0 focus-visible:outline-none",
+        "hover:bg-(--hover-bg) hover:text-foreground",
+        "outline-none focus-visible:z-10 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring",
         "disabled:pointer-events-none disabled:opacity-50",
-        "data-[state=active]:bg-background data-[state=active]:text-primary",
+        "data-[state=active]:bg-(--selected-bg) data-[state=active]:text-(--selected-fg)",
         "group-data-[orientation=vertical]:border-r-0 group-data-[orientation=vertical]:border-b group-data-[orientation=vertical]:last:border-b-0",
         "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className

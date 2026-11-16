@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { Panel } from "@/components/ui/panel";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator"
@@ -29,7 +30,7 @@ function SymbolButton({
       title={symbol}
       className={cn(
         "relative h-8 w-8 overflow-hidden border border-border/50 bg-background p-0 transition-colors hover:bg-muted",
-        shape === "circle" ? "rounded-full" : "rounded-xs",
+        shape === "circle" ? "rounded-full" : "rounded-md",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
         selected && "ring-2 ring-primary ring-offset-1 ring-offset-background"
       )}
@@ -96,13 +97,9 @@ export function SymbolsPickerPanel({
   onSymbolMatchAllChange,
   plain = false,
 }: SymbolsPickerPanelProps) {
+  const Shell = plain ? "div" : Panel;
   return (
-    <div
-      className={cn(
-        "space-y-3",
-        !plain && "rounded-lg border p-3 border-border/50 bg-card/30 backdrop-blur-sm"
-      )}
-    >
+    <Shell className={cn("space-y-3", !plain && "p-3")}>
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-2">
           <Switch
@@ -151,6 +148,6 @@ export function SymbolsPickerPanel({
           />
         </div>
       </div>
-    </div>
+    </Shell>
   );
 }

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowUpRight, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Panel } from "@/components/ui/panel";
 import { COMMUNITY_LABS, COMMUNITY_RESOURCES } from "../community-content-data";
 import { CommunitySectionHeader } from "../shared/section-header";
 import { SectionHeading } from "@/components/ui/typography-headings";
@@ -15,7 +16,7 @@ export function CommunityLabsSection() {
           description="Join collaborative spaces for tier ranking, deckbuilding, polls, and playtests."
         />
 
-        <Card className="border-primary/20 bg-card/80">
+        <Card>
           <CardHeader className="space-y-2">
             <CardTitle className="text-lg">New: Tier List Lab</CardTitle>
             <CardDescription>
@@ -38,24 +39,24 @@ export function CommunityLabsSection() {
             const Icon = tool.icon;
 
             return (
-              <div key={tool.title} className="rounded-xl border border-border/50 bg-card/80 p-4">
+              <Panel key={tool.title} className="p-4">
                 <div className="flex items-center justify-between">
                   <span className="chrome-label-case text-[10px] text-muted-foreground">
                     {tool.kicker}
                   </span>
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-border/50 bg-background/80">
+                  <div className="flex size-8 items-center justify-center rounded-control border border-surface bg-background-elevated">
                     <Icon className="h-4 w-4 text-primary" />
                   </div>
                 </div>
                 <SectionHeading size="xs" className="mt-3">{tool.title}</SectionHeading>
                 <p className="mt-1 text-xs text-muted-foreground">{tool.description}</p>
-              </div>
+              </Panel>
             );
           })}
         </div>
       </div>
 
-      <Card className="border border-border/50">
+      <Card>
         <CardHeader className="space-y-2">
           <CardTitle className="text-lg">Community Resources</CardTitle>
           <CardDescription>High-signal places to catch up fast.</CardDescription>
@@ -66,10 +67,10 @@ export function CommunityLabsSection() {
             const Icon = resource.icon;
 
             return (
-              <div key={resource.label} className="rounded-lg border border-border/50 bg-background/50 px-3 py-3">
+              <Panel key={resource.label} className="px-3 py-3">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 flex items-start gap-2">
-                    <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-border/50 bg-card/80">
+                    <div className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-control border border-surface bg-background-elevated">
                       <Icon className="h-3.5 w-3.5 text-primary" />
                     </div>
                     <div className="min-w-0">
@@ -81,11 +82,11 @@ export function CommunityLabsSection() {
                     {resource.cta}
                   </Button>
                 </div>
-              </div>
+              </Panel>
             );
           })}
 
-          <div className="rounded-lg border border-dashed border-border/50 bg-card/50 px-3 py-3">
+          <Panel className="px-3 py-3">
             <div className="chrome-label-case flex items-center gap-2 text-xs text-muted-foreground">
               <Trophy className="h-4 w-4 text-secondary" />
               Creator note
@@ -100,7 +101,7 @@ export function CommunityLabsSection() {
               Learn about creator verification
               <ArrowUpRight className="h-3.5 w-3.5" />
             </Link>
-          </div>
+          </Panel>
         </CardContent>
       </Card>
     </section>

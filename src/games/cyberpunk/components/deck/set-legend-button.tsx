@@ -42,7 +42,7 @@ export function CyberpunkSetLegendButton({ card, compact, className }: GameCardS
     <Button
       type="button"
       variant={isLegend ? "default" : "outline"}
-      size={compact ? "sm" : "default"}
+      size={compact ? "sm" : "md"}
       onClick={toggle}
       disabled={Boolean(blockedReason)}
       aria-pressed={isLegend}

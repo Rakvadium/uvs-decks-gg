@@ -1,11 +1,12 @@
 "use client";
 
 import { useState, type ComponentProps } from "react";
-import { AlertTriangle, CheckCircle2, Info, MoreHorizontal, OctagonAlert, Sparkles, Terminal } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Eye, Info, Layers, MoreHorizontal, OctagonAlert, Sparkles, Terminal } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge, badgeVariants, type BadgeTone, type BadgeVariantLegacy } from "@/components/ui/badge";
+import { Badge, badgeVariants, type BadgeSize, type BadgeTone, type BadgeVariantLegacy } from "@/components/ui/badge";
+import { Banner } from "@/components/ui/banner";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -17,11 +18,16 @@ import {
   CardTitle,
   Surface,
   type CardProps,
-  type CardVariant,
 } from "@/components/ui/card";
+import { Chip } from "@/components/ui/chip";
+import { CountBadge, countBadgeVariants, type CountBadgeTone } from "@/components/ui/count-badge";
+import { EmptyState, emptyStateVariants, type EmptyStateVariant } from "@/components/ui/empty-state";
 import { Label } from "@/components/ui/label";
+import { LoadingState } from "@/components/ui/loading-state";
+import { Panel } from "@/components/ui/panel";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Spinner, type SpinnerSize } from "@/components/ui/spinner";
 import { StatBar, StatBarGroup } from "@/components/ui/stat-bar";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -54,6 +60,12 @@ const BADGE_TONES: Record<BadgeTone, string> = {
   signalViolet: "Expressive signal",
 };
 
+const BADGE_SIZES: Record<BadgeSize, string> = {
+  sm: "h-5 · 10px · dense tags",
+  md: "Default",
+  lg: "32px · header chips",
+};
+
 const LEGACY_VARIANTS: Record<BadgeVariantLegacy, string> = {
   default: "default",
   secondary: "secondary",
@@ -74,8 +86,9 @@ export function BadgeEntry() {
       description={
         <p>
           Prefer <Code>tone</Code>; the legacy <Code>variant</Code> prop maps onto a tone. Status uses{" "}
-          <Code>success</Code>/<Code>warning</Code>/<Code>info</Code>/<Code>destructive</Code>, never palette hues. Click a
-          badge to see its classes.
+          <Code>success</Code>/<Code>warning</Code>/<Code>info</Code>/<Code>destructive</Code>, never palette hues. A badge is
+          static. Hover chrome comes only with <Code>interactive</Code>, for a badge that is itself a trigger. Size it with{" "}
+          <Code>size</Code>, never <Code>h-*</Code> or <Code>text-[10px]</Code>. Click a badge to see its classes.
         </p>
       }
     >
@@ -104,9 +117,29 @@ export function BadgeEntry() {
           ))}
         </ul>
       </Preview>
+      <Preview label="size · interactive">
+        <div className="flex flex-wrap items-center gap-4">
+          {(Object.keys(BADGE_SIZES) as BadgeSize[]).map((size) => (
+            <div key={size} className="flex flex-col items-start gap-1.5">
+              <Badge tone={tone} size={size}>
+                {size}
+              </Badge>
+              <SpecimenLabel>{BADGE_SIZES[size]}</SpecimenLabel>
+            </div>
+          ))}
+          <div className="flex flex-col items-start gap-1.5">
+            <Badge tone={tone} size="lg" interactive asChild>
+              <button type="button" className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                interactive
+              </button>
+            </Badge>
+            <SpecimenLabel>Hover me</SpecimenLabel>
+          </div>
+        </div>
+      </Preview>
       <div className="grid gap-4 lg:grid-cols-2">
         <div className="min-w-0 space-y-3" aria-live="polite">
-          <CodeBlock code={`import { Badge } from "@/components/ui/badge"\n\n<Badge tone="${tone}">Label</Badge>`} />
+          <CodeBlock code={`import { Badge } from "@/components/ui/badge"\n\n<Badge tone="${tone}" size="sm">Label</Badge>`} />
           <CodeBlock wrap caption={`badgeVariants({ tone: "${tone}" })`} code={badgeVariants({ tone })} />
         </div>
         <Preview label="Legacy variant → tone">
@@ -127,14 +160,9 @@ export function BadgeEntry() {
   );
 }
 
-const CARD_VARIANTS: Record<CardVariant, string> = {
-  fx: "Default. Chrome card shadow + primary wash on hover.",
-  quiet: "Low elevation, no wash. Same as <Surface>.",
-};
-
-function SampleCard({ variant, ...props }: CardProps) {
+function SampleCard(props: CardProps) {
   return (
-    <Card variant={variant} {...props}>
+    <Card {...props}>
       <CardHeader>
         <CardTitle>Spellbook Control</CardTitle>
         <CardDescription>60 cards · updated 2 days ago</CardDescription>
@@ -165,34 +193,204 @@ export function CardEntry() {
       id="card"
       description={
         <p>
-          <Code>bg-card-elevated</Code>, <Code>border-surface</Code>, <Code>rounded-lg</Code>. Hover a card to see the
-          variant&apos;s hover chrome. <Code>CardAction</Code> pins top-right inside the header grid.
+          <Code>bg-card-elevated</Code>, <Code>border-surface</Code>, <Code>rounded-surface</Code>. A card is static. Pass{" "}
+          <Code>fx</Code> only when the whole card is a link or button. It adds the chrome hover shadow, border and primary
+          wash. <Code>CardAction</Code> pins top-right inside the header grid.
         </p>
       }
     >
       <div className="grid gap-4 lg:grid-cols-3">
-        {(Object.keys(CARD_VARIANTS) as CardVariant[]).map((variant) => (
-          <div key={variant} className="space-y-2">
-            <SampleCard variant={variant} />
-            <SpecimenLabel className="block">
-              <Code>variant=&quot;{variant}&quot;</Code> {CARD_VARIANTS[variant]}
-            </SpecimenLabel>
-          </div>
-        ))}
+        <div className="space-y-2">
+          <SampleCard />
+          <SpecimenLabel className="block">
+            <Code>&lt;Card&gt;</Code> Static. Hovering changes nothing.
+          </SpecimenLabel>
+        </div>
+        <div className="space-y-2">
+          <SampleCard fx />
+          <SpecimenLabel className="block">
+            <Code>&lt;Card fx&gt;</Code> Interactive. Hover for the chrome card shadow and wash.
+          </SpecimenLabel>
+        </div>
         <div className="space-y-2">
           <Surface className="gap-3 py-5">
             <CardContent className="space-y-1">
               <CardTitle>Surface</CardTitle>
-              <CardDescription>A quiet card for grouping, without the header grid.</CardDescription>
+              <CardDescription>A quiet static card for grouping, at low elevation.</CardDescription>
             </CardContent>
           </Surface>
           <SpecimenLabel className="block">
-            <Code>&lt;Surface&gt;</Code> = <Code>&lt;Card variant=&quot;quiet&quot;&gt;</Code>, with a ref.
+            <Code>&lt;Surface&gt;</Code> Low elevation, never hover chrome.
           </SpecimenLabel>
         </div>
       </div>
       <CodeBlock
-        code={`import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"\n\n<Card variant="quiet">\n  <CardHeader>\n    <CardTitle>Spellbook Control</CardTitle>\n    <CardDescription>60 cards</CardDescription>\n    <CardAction><Button variant="ghost" size="icon-sm" aria-label="Deck actions"><MoreHorizontal /></Button></CardAction>\n  </CardHeader>\n  <CardContent>…</CardContent>\n  <CardFooter className="justify-end gap-2">…</CardFooter>\n</Card>`}
+        code={`import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"\n\n<Link href={href}>\n  <Card fx>\n    <CardHeader>\n      <CardTitle>Spellbook Control</CardTitle>\n      <CardDescription>60 cards</CardDescription>\n    </CardHeader>\n    <CardContent>…</CardContent>\n  </Card>\n</Link>`}
+      />
+    </CatalogEntrySection>
+  );
+}
+
+const COUNT_TONES: Record<CountBadgeTone, string> = {
+  primary: "Unread, active filters",
+  soft: "Inside a selected tab",
+  muted: "Neutral totals",
+};
+
+export function CountBadgeEntry() {
+  return (
+    <CatalogEntrySection
+      id="count-badge"
+      description={<p>One count bubble for tabs, rails and filter buttons. Counts above <Code>max</Code> (default 99) read as 99+.</p>}
+    >
+      <Preview>
+        <div className="flex flex-wrap items-end gap-6">
+          {(Object.keys(COUNT_TONES) as CountBadgeTone[]).map((tone) => (
+            <div key={tone} className="flex flex-col items-start gap-1.5">
+              <div className="flex items-center gap-2 text-sm">
+                Filters <CountBadge tone={tone} count={3} /> <CountBadge tone={tone} count={250} />
+              </div>
+              <SpecimenLabel>
+                <Code>tone=&quot;{tone}&quot;</Code> {COUNT_TONES[tone]}
+              </SpecimenLabel>
+            </div>
+          ))}
+        </div>
+      </Preview>
+      <CodeBlock wrap caption={`countBadgeVariants({ tone: "primary" })`} code={countBadgeVariants({ tone: "primary" })} />
+    </CatalogEntrySection>
+  );
+}
+
+const CHIP_VALUES = ["Fire", "Water", "Order", "Chaos"];
+
+export function ChipEntry() {
+  const [selected, setSelected] = useState<string[]>(["Fire"]);
+  const toggle = (value: string) =>
+    setSelected((current) => (current.includes(value) ? current.filter((v) => v !== value) : [...current, value]));
+  return (
+    <CatalogEntrySection
+      id="chip"
+      description={
+        <p>
+          An interactive pill built on <Code>Button</Code> (<Code>outline</Code>, <Code>rounded-full</Code>). <Code>size</Code> is{" "}
+          <Code>sm</Code> (the default) or <Code>xs</Code> for dense filter grids, read from the control height tokens, so a call
+          site never sets <Code>h-*</Code>. Selected reads the <Code>--selected-*</Code> role tokens. For a read-only tag use{" "}
+          <Code>Badge</Code>. A row of chips that scrolls sideways uses <Code>scroll-row</Code>: no scrollbar, and padding below
+          and at the end equal to <Code>--chrome-shadow-reach</Code>, so bubblegum&apos;s offset shadow is not clipped. The reach
+          is 0 in every other chrome.
+        </p>
+      }
+      sourcePaths={["src/styles/base.css"]}
+    >
+      <Preview>
+        <div className="space-y-3">
+          {(["sm", "xs"] as const).map((size) => (
+            <div key={size} className="flex flex-wrap items-center gap-2">
+              {CHIP_VALUES.map((value) => (
+                <Chip key={value} size={size} selected={selected.includes(value)} onClick={() => toggle(value)}>
+                  {value}
+                </Chip>
+              ))}
+              <SpecimenLabel>size {size}</SpecimenLabel>
+            </div>
+          ))}
+        </div>
+      </Preview>
+      <Preview label="scroll-row">
+        <div className="flex max-w-xs gap-2 scroll-row">
+          {[...CHIP_VALUES, "Good", "Evil", "Air", "Earth"].map((value) => (
+            <Chip key={value} className="shrink-0" selected={selected.includes(value)} onClick={() => toggle(value)}>
+              {value}
+            </Chip>
+          ))}
+        </div>
+      </Preview>
+      <CodeBlock code={`import { Chip } from "@/components/ui/chip"\n\n<Chip selected={on} onClick={toggle}>Fire</Chip>\n<Chip size="xs" selected={on} onClick={toggle}>Fire</Chip>\n\n<div className="flex gap-2 scroll-row">{chips}</div>`} />
+    </CatalogEntrySection>
+  );
+}
+
+export function PanelEntry() {
+  return (
+    <CatalogEntrySection
+      id="panel"
+      description={
+        <p>
+          The inset panel inside a card, sidebar or dialog: <Code>rounded-surface border-surface bg-card-tint</Code>. Set
+          padding and layout with <Code>className</Code>, never its fill or radius. <Code>asChild</Code> puts the recipe on a link.
+        </p>
+      }
+    >
+      <Surface className="gap-3 p-4">
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Panel className="space-y-1 p-3">
+            <div className="text-sm font-medium">Card type ratios</div>
+            <div className="text-xs text-muted-foreground">18 characters · 27 attacks · 15 foundations</div>
+          </Panel>
+          <Panel className="space-y-1 p-3">
+            <div className="text-sm font-medium">Block zones</div>
+            <div className="text-xs text-muted-foreground">High 22 · Mid 20 · Low 18</div>
+          </Panel>
+        </div>
+      </Surface>
+      <CodeBlock code={`import { Panel } from "@/components/ui/panel"\n\n<Panel className="space-y-2 p-3">…</Panel>`} />
+    </CatalogEntrySection>
+  );
+}
+
+export function BannerEntry() {
+  return (
+    <CatalogEntrySection
+      id="banner"
+      description={<p>A one-line notice above content, such as read-only mode, guest browsing or a sign-in prompt. <Code>bg-muted-elevated</Code> on the surface border.</p>}
+    >
+      <Banner>
+        <Eye className="size-3.5 text-muted-foreground" aria-hidden />
+        You&apos;re viewing this deck in read-only mode.
+      </Banner>
+      <CodeBlock code={`import { Banner } from "@/components/ui/banner"\n\n<Banner>\n  <Eye className="size-3.5 text-muted-foreground" aria-hidden />\n  You're viewing this deck in read-only mode.\n</Banner>`} />
+    </CatalogEntrySection>
+  );
+}
+
+const EMPTY_VARIANTS: Record<EmptyStateVariant, string> = {
+  page: "A page or tab with nothing in it",
+  panel: "A section inside a page",
+  inline: "A sidebar or picker list",
+};
+
+export function EmptyStateEntry() {
+  return (
+    <CatalogEntrySection
+      id="empty-state"
+      description={
+        <p>
+          The team hub recipe for every empty state: <Code>border-dashed border-placeholder bg-muted-tint rounded-surface</Code>,
+          with fixed <Code>icon</Code>, <Code>title</Code>, <Code>description</Code> and <Code>action</Code> slots. The variant
+          sets padding and type size only.
+        </p>
+      }
+    >
+      <div className="grid gap-4 lg:grid-cols-3">
+        {(Object.keys(EMPTY_VARIANTS) as EmptyStateVariant[]).map((variant) => (
+          <div key={variant} className="space-y-2">
+            <EmptyState
+              variant={variant}
+              icon={Layers}
+              title="No decks yet"
+              description={variant === "inline" ? "Create a deck to see it here." : "Build your first deck to see it here."}
+              action={variant === "inline" ? null : <Button size="sm">Create deck</Button>}
+            />
+            <SpecimenLabel className="block">
+              <Code>variant=&quot;{variant}&quot;</Code> {EMPTY_VARIANTS[variant]}
+            </SpecimenLabel>
+          </div>
+        ))}
+      </div>
+      <CodeBlock wrap caption={`emptyStateVariants({ variant: "page" })`} code={emptyStateVariants({ variant: "page" })} />
+      <CodeBlock
+        code={`import { EmptyState } from "@/components/ui/empty-state"\n\n<EmptyState\n  variant="page"\n  icon={Layers}\n  title="No decks yet"\n  action={<Button onClick={create}>Create deck</Button>}\n/>`}
       />
     </CatalogEntrySection>
   );
@@ -342,7 +540,7 @@ export function SkeletonEntry() {
   return (
     <CatalogEntrySection
       id="skeleton"
-      description={<p><Code>bg-accent animate-pulse rounded-md</Code>; shape it with size classes. The pulse is paused here so the page stays still; it is static under reduced motion anyway.</p>}
+      description={<p><Code>bg-muted animate-pulse rounded-md</Code>, one neutral tone everywhere, Teams included. Shape it with size classes. The pulse is paused here so the page stays still; it is static under reduced motion anyway.</p>}
     >
       <Preview>
         <div className="flex items-center gap-4" aria-hidden>
@@ -361,6 +559,58 @@ export function SkeletonEntry() {
         </div>
       </Preview>
       <CodeBlock code={`import { Skeleton } from "@/components/ui/skeleton"\n\n<Skeleton className="h-4 w-3/5" />\n<Skeleton className="size-12 rounded-full" />`} />
+    </CatalogEntrySection>
+  );
+}
+
+const SPINNER_SIZES: Record<SpinnerSize, string> = {
+  sm: "In a button or row",
+  md: "In a panel",
+  lg: "A page",
+};
+
+export function SpinnerEntry() {
+  return (
+    <CatalogEntrySection
+      id="spinner"
+      description={<p>The one spinner. Never spin an icon yourself; render <Code>Spinner</Code>. It takes the text colour around it, so a button spinner matches the label.</p>}
+    >
+      <Preview>
+        <div className="flex flex-wrap items-end gap-6 text-muted-foreground">
+          {(Object.keys(SPINNER_SIZES) as SpinnerSize[]).map((size) => (
+            <div key={size} className="flex flex-col items-center gap-2">
+              <Spinner size={size} />
+              <SpecimenLabel>
+                {size} · {SPINNER_SIZES[size]}
+              </SpecimenLabel>
+            </div>
+          ))}
+          <Button size="sm" disabled>
+            <Spinner />
+            Saving
+          </Button>
+        </div>
+      </Preview>
+      <CodeBlock code={`import { Spinner } from "@/components/ui/spinner"\n\n<Button disabled={saving}>{saving ? <Spinner /> : <Save />}Save</Button>`} />
+    </CatalogEntrySection>
+  );
+}
+
+export function LoadingStateEntry() {
+  return (
+    <CatalogEntrySection
+      id="loading-state"
+      description={<p>A centred spinner with an optional label, in muted text, announced with <Code>role=&quot;status&quot;</Code>.</p>}
+    >
+      <div className="grid gap-4 md:grid-cols-2">
+        <Panel>
+          <LoadingState label="Loading decks" />
+        </Panel>
+        <Panel>
+          <LoadingState size="sm" className="py-6" />
+        </Panel>
+      </div>
+      <CodeBlock code={`import { LoadingState } from "@/components/ui/loading-state"\n\n<LoadingState label="Loading decks" />`} />
     </CatalogEntrySection>
   );
 }
@@ -421,12 +671,19 @@ export function DisplayChapter() {
   return (
     <>
       <BadgeEntry />
+      <CountBadgeEntry />
+      <ChipEntry />
       <CardEntry />
+      <PanelEntry />
+      <BannerEntry />
+      <EmptyStateEntry />
       <AlertEntry />
       <AvatarEntry />
       <TableEntry />
       <StatBarEntry />
       <SkeletonEntry />
+      <SpinnerEntry />
+      <LoadingStateEntry />
       <SeparatorEntry />
       <AspectRatioEntry />
     </>

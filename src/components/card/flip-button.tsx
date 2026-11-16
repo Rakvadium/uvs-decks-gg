@@ -34,8 +34,8 @@ export function CardFlipButton({
           onClick={onFlip}
           disabled={disabled}
           className={cn(
-            "absolute left-0 top-0 z-30 flex h-7 w-7 items-center justify-center",
-            "rounded-tl-lg rounded-br-lg rounded-tr-none rounded-bl-none",
+            "absolute left-0 top-0 z-30 flex h-7 w-7 items-center justify-center outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+            "rounded-tab-tl",
             "border-r border-b border-border/40",
             frosted
               ? "bg-background/80 backdrop-blur-sm transition-[opacity,color,background-color,border-color] duration-200"

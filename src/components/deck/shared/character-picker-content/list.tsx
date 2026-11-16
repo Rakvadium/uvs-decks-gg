@@ -1,4 +1,5 @@
 import { CharacterOption } from "./character-option";
+import { EmptyState } from "@/components/ui/empty-state";
 import { useCharacterPickerContentContext } from "./context";
 
 export function CharacterList() {
@@ -11,9 +12,7 @@ export function CharacterList() {
       ))}
 
       {filteredCharacters.length === 0 ? (
-        <div className="rounded-md border border-dashed border-border/50 p-3 text-xs text-muted-foreground">
-          No characters found.
-        </div>
+        <EmptyState variant="inline" title="No characters found." />
       ) : null}
     </div>
   );

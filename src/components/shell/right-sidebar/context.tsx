@@ -24,7 +24,6 @@ interface RightSidebarContextValue {
   activeActionId: string | null;
   activeSlot: SlotRegistration | undefined;
   ActiveComponent: SlotComponent | undefined;
-  ActiveHeader: SlotComponent | undefined;
   ActiveFooter: SlotComponent | undefined;
   isExpanded: boolean;
   isResizing: boolean;
@@ -45,7 +44,6 @@ export function RightSidebarProvider({ children }: { children: ReactNode }) {
 
   const activeSlot = sidebarSlots.find((slot) => slot.id === activeActionId);
   const ActiveComponent = activeSlot?.component;
-  const ActiveHeader = activeSlot?.header;
   const ActiveFooter = activeSlot?.footer;
   const isExpanded = Boolean(activeActionId && ActiveComponent);
 
@@ -60,7 +58,6 @@ export function RightSidebarProvider({ children }: { children: ReactNode }) {
       activeActionId,
       activeSlot,
       ActiveComponent,
-      ActiveHeader,
       ActiveFooter,
       isExpanded,
       isResizing,
@@ -73,7 +70,6 @@ export function RightSidebarProvider({ children }: { children: ReactNode }) {
       activeActionId,
       activeSlot,
       ActiveComponent,
-      ActiveHeader,
       ActiveFooter,
       isExpanded,
       isResizing,

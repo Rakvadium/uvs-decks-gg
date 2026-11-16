@@ -1,12 +1,14 @@
 "use client";
 
 import Link from "next/link";
+import { LoadingState } from "@/components/ui/loading-state";
 import { useConvexAuth, useQuery } from "convex/react";
-import { Loader2 } from "lucide-react";
+
 import { api } from "../../../../convex/_generated/api";
 import { useStartAuth } from "@/components/auth/use-start-auth";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -34,7 +36,7 @@ export function CommunityTierListsSidebarPanel() {
     <div className="flex h-full min-h-0 flex-col">
       <Tabs defaultValue="public" className="flex min-h-0 flex-1 flex-col gap-0">
         <div className="shrink-0 border-b border-border/30 px-3 pb-0 pt-2">
-          <TabsList className="h-10 w-full max-w-none">
+          <TabsList className="w-full max-w-none">
             <TabsTrigger value="public" className="flex-1">
               Public
             </TabsTrigger>
@@ -52,7 +54,7 @@ export function CommunityTierListsSidebarPanel() {
                 ))}
               </div>
             ) : publicFeed.length === 0 ? (
-              <p className="text-center text-xs text-muted-foreground">No public tier lists yet.</p>
+              <EmptyState variant="inline" title="No public tier lists yet." />
             ) : (
               <ul className="space-y-2">
                 {publicFeed.map(({ tierList, author, listModerationStatus }) => (
@@ -66,8 +68,8 @@ export function CommunityTierListsSidebarPanel() {
                         <span className="text-[10px] text-muted-foreground">
                           {author?.username ?? "Community"}
                         </span>
-                        <TierListModerationBadge status={listModerationStatus} className="h-5 px-1.5 text-[10px]" />
-                        <Badge variant="outline" className="h-5 px-1.5 text-[10px] font-normal">
+                        <TierListModerationBadge status={listModerationStatus} size="sm" />
+                        <Badge size="sm" variant="outline" className="font-normal">
                           {getTierListScopeLabel(tierList.rankingScope)}
                         </Badge>
                         <span className="chrome-label-case text-[10px] text-muted-foreground">
@@ -91,11 +93,9 @@ export function CommunityTierListsSidebarPanel() {
                 </Button>
               </div>
             ) : myLists === undefined ? (
-              <div className="flex justify-center py-10">
-                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-              </div>
+              <LoadingState className="py-10" />
             ) : myLists.length === 0 ? (
-              <p className="text-center text-xs text-muted-foreground">You have no tier lists yet.</p>
+              <EmptyState variant="inline" title="You have no tier lists yet." />
             ) : (
               <ul className="space-y-2">
                 {myLists.map((tierList) => (
@@ -107,16 +107,13 @@ export function CommunityTierListsSidebarPanel() {
                       <div className="line-clamp-2 text-sm font-medium leading-snug">{tierList.title}</div>
                       <div className="mt-1 flex flex-wrap items-center gap-1.5">
                         {tierList.isPublic && isHiddenByModeration(tierList.listModerationStatus) ? (
-                          <TierListModerationBadge
-                            status={tierList.listModerationStatus}
-                            className="h-5 px-1.5 text-[10px]"
-                          />
+                          <TierListModerationBadge status={tierList.listModerationStatus} size="sm" />
                         ) : (
-                          <Badge variant={tierList.isPublic ? "default" : "outline"} className="h-5 px-1.5 text-[10px]">
+                          <Badge size="sm" variant={tierList.isPublic ? "default" : "outline"}>
                             {tierList.isPublic ? "Public" : "Private"}
                           </Badge>
                         )}
-                        <Badge variant="outline" className="h-5 px-1.5 text-[10px] font-normal">
+                        <Badge size="sm" variant="outline" className="font-normal">
                           {getTierListScopeLabel(tierList.rankingScope)}
                         </Badge>
                         <span className="chrome-label-case text-[10px] text-muted-foreground">

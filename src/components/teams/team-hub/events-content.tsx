@@ -1,6 +1,7 @@
 "use client";
 
 import { PageHeading } from "@/components/ui/typography-headings";
+import { Panel } from "@/components/ui/panel";
 import { useMutation, useQuery } from "convex/react";
 import { Plus } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
@@ -11,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogBody,
-  DialogClose,
+  DialogCancel,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -23,6 +24,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useTeamHub } from "./hook";
 import { useRegisterTeamHubPrimaryAction } from "./primary-action-context";
+import { Skeleton } from "@/components/ui/skeleton";
+import { EmptyState } from "@/components/ui/empty-state";
 
 function formatRange(starts: number, ends: number | undefined) {
   const a = new Date(starts);
@@ -117,8 +120,8 @@ export function TeamHubEventsContent({ teamId }: TeamHubEventsContentProps) {
   if (caps === undefined || events === undefined) {
     return (
       <div className="space-y-3">
-        <div className="h-6 w-28 animate-pulse rounded-md bg-muted" />
-        <div className="h-40 w-full animate-pulse rounded-md bg-muted-overlay" />
+        <Skeleton className="h-6 w-28" />
+        <Skeleton className="h-40 w-full" />
       </div>
     );
   }
@@ -134,7 +137,7 @@ export function TeamHubEventsContent({ teamId }: TeamHubEventsContentProps) {
         {caps.canManageEvents ? (
           <Button
             type="button"
-            className="h-9 shrink-0 text-xs sm:mt-0.5"
+            className="shrink-0 text-xs sm:mt-0.5"
             onClick={openCreate}
           >
             Create Calendar Item
@@ -197,11 +200,7 @@ export function TeamHubEventsContent({ teamId }: TeamHubEventsContentProps) {
             </div>
           </DialogBody>
           <DialogFooter>
-            <DialogClose asChild>
-              <Button type="button" variant="outline" disabled={submitting}>
-                Cancel
-              </Button>
-            </DialogClose>
+            <DialogCancel disabled={submitting} />
             <Button type="button" disabled={submitting || !title.trim()} onClick={() => void onCreate()}>
               Add to calendar
             </Button>
@@ -212,45 +211,44 @@ export function TeamHubEventsContent({ teamId }: TeamHubEventsContentProps) {
       <div className="space-y-3">
         <h2 className="chrome-heading-case text-xs text-muted-foreground">Upcoming &amp; past</h2>
         {events.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No events scheduled.</p>
+          <EmptyState variant="inline" title="No events scheduled." />
         ) : (
           <ul className="space-y-3">
             {events.map((row) => {
               const e = row.event;
               return (
-                <li
-                  key={e._id}
-                  className="flex flex-col gap-1 rounded-lg border border-surface bg-background-soft px-4 py-3 sm:flex-row sm:items-start sm:justify-between"
-                >
-                  <div className="min-w-0">
-                    <p className="font-medium text-foreground">{e.title}</p>
-                    {e.description?.trim() ? (
-                      <p className="mt-1 text-sm text-muted-foreground whitespace-pre-wrap">{e.description}</p>
-                    ) : null}
-                    <p className="mt-1 text-xs text-primary">{formatRange(e.startsAt, e.endsAt)}</p>
-                    <p className="text-xs text-muted-foreground">
-                      Added by {row.creatorUsername?.trim() || e.createdByUserId.slice(-6)}
-                    </p>
-                  </div>
-                  {caps.canManageEvents && (
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="shrink-0 self-start text-destructive"
-                      onClick={async () => {
-                        try {
-                          await remove({ eventId: e._id });
-                          toast.success("Event removed");
-                        } catch (err) {
-                          toast.error(err instanceof Error ? err.message : "Could not remove");
-                        }
-                      }}
-                    >
-                      Remove
-                    </Button>
-                  )}
-                </li>
+                <Panel asChild key={e._id}>
+                  <li className="flex flex-col gap-1 px-4 py-3 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="min-w-0">
+                      <p className="font-medium text-foreground">{e.title}</p>
+                      {e.description?.trim() ? (
+                        <p className="mt-1 text-sm text-muted-foreground whitespace-pre-wrap">{e.description}</p>
+                      ) : null}
+                      <p className="mt-1 text-xs text-primary">{formatRange(e.startsAt, e.endsAt)}</p>
+                      <p className="text-xs text-muted-foreground">
+                        Added by {row.creatorUsername?.trim() || e.createdByUserId.slice(-6)}
+                      </p>
+                    </div>
+                    {caps.canManageEvents && (
+                      <Button
+                        type="button"
+                        variant="destructiveOutline"
+                        size="sm"
+                        className="shrink-0 self-start"
+                        onClick={async () => {
+                          try {
+                            await remove({ eventId: e._id });
+                            toast.success("Event removed");
+                          } catch (err) {
+                            toast.error(err instanceof Error ? err.message : "Could not remove");
+                          }
+                        }}
+                      >
+                        Remove
+                      </Button>
+                    )}
+                  </li>
+                </Panel>
               );
             })}
           </ul>

@@ -40,11 +40,11 @@ export function CyberpunkCardDeckBar({ card }: { card: CachedCard }) {
       <Button
         type="button"
         variant="ghost"
-        size="icon-sm"
+        size="icon-xs"
         onClick={() => removeCard(card._id, "main")}
         disabled={count === 0}
         aria-label={`Remove ${card.name} from deck`}
-        className="h-7 w-7 text-destructive hover:bg-destructive/10 hover:text-destructive"
+        className="text-destructive hover:bg-destructive/10 hover:text-destructive"
       >
         <Minus className="h-3.5 w-3.5" />
       </Button>
@@ -54,11 +54,11 @@ export function CyberpunkCardDeckBar({ card }: { card: CachedCard }) {
       <Button
         type="button"
         variant="ghost"
-        size="icon-sm"
+        size="icon-xs"
         onClick={() => addCard(card._id, "main")}
         disabled={!canAdd}
         aria-label={`Add ${card.name} to deck`}
-        className="h-7 w-7 text-primary hover:bg-primary/10 hover:text-primary"
+        className="text-primary hover:bg-primary/10 hover:text-primary"
       >
         <Plus className="h-3.5 w-3.5" />
       </Button>

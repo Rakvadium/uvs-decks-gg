@@ -91,16 +91,6 @@ export function CardGridItemImageStage({ FaceImage }: { FaceImage: ComponentType
         className="pointer-events-none absolute inset-0 rounded-xl bg-gradient-to-t from-background/80 via-transparent to-transparent transition-opacity duration-150"
         style={{ opacity: !isDragging && isHovered ? 0.25 : 0 }}
       />
-
-      <div
-        className="pointer-events-none absolute inset-0 rounded-xl bg-[linear-gradient(135deg,transparent_40%,var(--primary)/10_50%,transparent_60%)] transition-opacity duration-150"
-        style={{
-          backgroundSize: "200% 200%",
-          opacity: !isDragging && isHovered ? 1 : 0,
-          animation:
-            !isDragging && isHovered && !prefersReducedMotion ? "holo-shimmer 3s ease-in-out infinite" : "none",
-        }}
-      />
     </div>
   );
 }

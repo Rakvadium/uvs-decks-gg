@@ -71,7 +71,7 @@ export function FormatRow() {
           Format
         </span>
         <Select value={activeFormat} onValueChange={toggleFormat}>
-          <SelectTrigger size="sm" className="h-8 w-full text-[10px]">
+          <SelectTrigger size="sm" className="w-full text-[10px]">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>

@@ -1,9 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { EmptyState } from "@/components/ui/empty-state";
 import type { Id } from "../../../../convex/_generated/dataModel";
 import Image from "next/image";
-import { Loader2, Search, XIcon } from "lucide-react";
+import { XIcon } from "lucide-react";
 import { UNIVERSUS_FILTER_SYMBOLS, UNIVERSUS_SYMBOL_DISPLAY, formatUniversusCardType, type UniversusSymbol } from "@/games/uvs/config";
 import { useCardData } from "@/lib/universus/card-data-provider";
 import { filterCards } from "@/lib/universus/use-universus-cards";
@@ -14,9 +15,10 @@ import { CardGridItem } from "./card-grid-item/content";
 import { CardNavigationProvider } from "@/components/card/navigation-context";
 import { getSymbolPath } from "./symbol-icon/utils";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
+import { SearchField } from "@/components/ui/search-field";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { Spinner } from "@/components/ui/spinner";
 
 interface DeckCharacterPickerDialogProps {
   open: boolean;
@@ -135,7 +137,7 @@ export function DeckCharacterPickerDialog({
             </DialogTitle>
             <DialogClose
               type="button"
-              className="pointer-events-auto flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-transparent opacity-70 transition-colors hover:border-primary/30 hover:bg-primary/10 hover:text-primary hover:opacity-100 focus:outline-hidden focus:ring-2 focus:ring-primary/30 disabled:pointer-events-none"
+              className="pointer-events-auto flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-transparent opacity-70 transition-colors hover:border-primary/30 hover:bg-primary/10 hover:text-primary hover:opacity-100 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none"
             >
               <XIcon className="h-4 w-4" />
               <span className="sr-only">Close</span>
@@ -173,15 +175,13 @@ export function DeckCharacterPickerDialog({
                 );
               })}
             </div>
-            <div className="relative min-w-0 w-full shrink-0 lg:max-w-md xl:max-w-[25rem]">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-                placeholder="Search characters..."
-                className="min-w-0 pl-9"
-              />
-            </div>
+            <SearchField
+              value={search}
+              onValueChange={setSearch}
+              placeholder="Search characters..."
+              name="character-search"
+              className="w-full shrink-0 lg:max-w-md xl:max-w-[25rem]"
+            />
           </div>
         </DialogHeader>
 
@@ -189,9 +189,7 @@ export function DeckCharacterPickerDialog({
           {isLoading ? <CharacterPickerSkeleton /> : null}
 
           {!isLoading && visibleCharacters.length === 0 ? (
-            <div className="flex min-h-48 min-w-0 items-center justify-center rounded-xl border border-dashed border-border/50 bg-card/30 px-0 text-center text-sm text-muted-foreground sm:min-h-64">
-              No characters match the current search and symbol filters.
-            </div>
+            <EmptyState className="min-h-48 sm:min-h-64" title="No characters match the current search and symbol filters." />
           ) : null}
 
           {!isLoading && visibleCharacters.length > 0 ? (
@@ -214,7 +212,7 @@ export function DeckCharacterPickerDialog({
                       ) : null}
                       {isSelecting ? (
                         <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-background/50">
-                          <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                          <Spinner size="md" />
                         </div>
                       ) : null}
                     </div>

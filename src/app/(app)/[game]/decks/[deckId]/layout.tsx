@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { fetchQuery } from "convex/nextjs";
 import { api } from "../../../../../../convex/_generated/api";
-import type { Id } from "../../../../../../convex/_generated/dataModel";
 import { DEFAULT_GAME_ID, isGameId } from "@shared/games/types";
 
 type Props = {
@@ -22,7 +21,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const deck = await fetchQuery(api.decks.getById, {
       // `[game]/layout.tsx` already 404s unknown games.
       game: isGameId(game) ? game : DEFAULT_GAME_ID,
-      deckId: deckId as Id<"decks">,
+      deckId,
     });
     if (!deck) {
       return {

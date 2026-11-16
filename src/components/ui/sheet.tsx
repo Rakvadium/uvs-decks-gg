@@ -7,6 +7,7 @@ import { XIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { overlayScrimClassName } from "@/components/ui/dialog"
+import { IconToolbarButton } from "@/components/ui/icon-toolbar-button"
 
 function Sheet({
   ...props
@@ -92,12 +93,10 @@ function SheetContent({
       >
         {children}
         {showCloseButton && (
-          <DialogPrimitive.Close
-            data-slot="sheet-close"
-            className="ring-offset-background focus-visible:ring-ring absolute right-4 top-4 rounded-md opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary"
-          >
-            <XIcon className="h-4 w-4" />
-            <span className="sr-only">Close</span>
+          <DialogPrimitive.Close asChild>
+            <IconToolbarButton data-slot="sheet-close" label="Close" className="absolute right-4 top-4">
+              <XIcon />
+            </IconToolbarButton>
           </DialogPrimitive.Close>
         )}
       </DialogPrimitive.Content>

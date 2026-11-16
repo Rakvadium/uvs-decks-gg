@@ -31,7 +31,7 @@ export function SidebarGameSwitcher() {
         className={cn(
           SHELL_NAV_ITEM_BASE,
           SHELL_NAV_ITEM_IDLE,
-          collapsed ? SHELL_RAIL_ITEM_COLLAPSED_CLASS : "w-full py-2"
+          collapsed ? SHELL_RAIL_ITEM_COLLAPSED_CLASS : "w-full"
         )}
       >
         <GameBadge game={gameModule.id} className={collapsed ? "size-full" : undefined} />

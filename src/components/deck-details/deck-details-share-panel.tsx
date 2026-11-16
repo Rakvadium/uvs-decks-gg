@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Panel } from "@/components/ui/panel";
 import { useMutation, useQuery } from "convex/react";
 import { UserMinus } from "lucide-react";
 import { toast } from "sonner";
@@ -52,7 +53,7 @@ export function DeckDetailsSharePanel() {
   };
 
   return (
-    <div className="space-y-3 rounded-lg border border-border/50 bg-background/50 p-3">
+    <Panel className="space-y-3 p-3">
       <div className="space-y-1">
         <p className="chrome-label-case text-[10px] text-muted-foreground">Share with</p>
         <p className="text-xs text-muted-foreground">
@@ -69,13 +70,12 @@ export function DeckDetailsSharePanel() {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             placeholder="Username"
-            className="h-9"
             onKeyDown={(e) => {
               if (e.key === "Enter") void onInvite();
             }}
           />
         </div>
-        <Button type="button" size="sm" className="h-9 shrink-0" disabled={busy || !username.trim()} onClick={() => void onInvite()}>
+        <Button type="button" className="shrink-0" disabled={busy || !username.trim()} onClick={() => void onInvite()}>
           Invite
         </Button>
       </div>
@@ -92,8 +92,8 @@ export function DeckDetailsSharePanel() {
               <Button
                 type="button"
                 variant="ghost"
-                size="icon"
-                className="h-8 w-8 shrink-0 text-muted-foreground hover:text-destructive"
+                size="icon-sm"
+                className="shrink-0 text-muted-foreground hover:text-destructive"
                 aria-label="Remove access"
                 onClick={() => void onRevoke(row.userId)}
               >
@@ -103,6 +103,6 @@ export function DeckDetailsSharePanel() {
           ))}
         </ul>
       ) : null}
-    </div>
+    </Panel>
   );
 }

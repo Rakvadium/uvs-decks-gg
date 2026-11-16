@@ -78,6 +78,8 @@ const SURFACE_RE = new RegExp(`^bg-(${BASES.join("|")})/(.+)$`);
 const NAMED_SURFACE_RE = new RegExp(`^bg-(${BASES.join("|")})-(tint|soft|elevated|overlay)$`);
 
 const RADIUS_SIDES = "t|r|b|l|s|e|tl|tr|br|bl|ss|se|es|ee";
+const RADIUS_CORNER_RE = /^rounded-(?:tl|tr|br|bl|ss|se|es|ee)(?:-|$)/;
+const RADIUS_LARGE_RE = /^rounded(?:-[trblse])?-[2-9]xl$/;
 const RADIUS_OFF_RE = new RegExp(`^rounded(-(?:${RADIUS_SIDES}))?(-sm|-xs)?$`);
 const RADIUS_ARB_RE = new RegExp(`^rounded(-(?:${RADIUS_SIDES}))?-\\[(\\d*\\.?\\d+)(px|rem)\\]$`);
 /**
@@ -85,6 +87,10 @@ const RADIUS_ARB_RE = new RegExp(`^rounded(-(?:${RADIUS_SIDES}))?-\\[(\\d*\\.?\\
  * this many px are allowed.
  */
 export const MICRO_RADIUS_PX = 4;
+
+const LITERAL_COLOR_PREFIXES = ["text", "bg", "border(?:-[xytrblse])?", "ring", "ring-offset", "outline", "divide", "from", "via", "to", "fill", "stroke", "shadow", "decoration", "caret", "placeholder", "accent"];
+const LITERAL_COLOR_RE = new RegExp(`^(?:${LITERAL_COLOR_PREFIXES.join("|")})-(?:white|black)(?:/\\S+)?$`);
+const ARBITRARY_LITERAL_COLOR_RE = /\[[^\]]*(?:rgba?\(|#[0-9a-fA-F]{3,8}(?![0-9a-zA-Z]))/;
 
 const Z_RE = /^z-(?:(\d+)|\[(\d+)\])$/;
 const TINY_TEXT_RE = /^text-\[(\d*\.?\d+)(px|rem)\]$/;
@@ -98,6 +104,9 @@ export const RULES = {
   typography: "chrome-typography",
   zIndex: "named-z-index",
   hslBorder: "no-hsl-border",
+  literalColor: "no-literal-color",
+  primitiveGeometry: "primitive-geometry",
+  buttonFocus: "button-focus",
 };
 
 /**
@@ -159,6 +168,13 @@ export function classifyUtility(utility) {
     return {
       rule: RULES.palette,
       message: `Raw palette hue \`${utility}\`. Use ${hint} (UI_UX_DESIGN.md § Status colors); domain colors live in src/games/uvs/config.ts.`,
+    };
+  }
+
+  if (LITERAL_COLOR_RE.test(utility) || ARBITRARY_LITERAL_COLOR_RE.test(utility)) {
+    return {
+      rule: RULES.literalColor,
+      message: `Literal colour in \`${utility}\` ignores the chrome and palette. Use a theme token (foreground, background, card, primary-foreground) or a chrome variable.`,
     };
   }
 
@@ -249,6 +265,20 @@ export function classifyUtility(utility) {
     };
   }
 
+  if (RADIUS_CORNER_RE.test(utility)) {
+    return {
+      rule: RULES.radius,
+      message: `Corner-only radius \`${utility}\` hand-builds a notch shape. Round all corners from the ladder, or use a shared primitive for the notch.`,
+    };
+  }
+
+  if (RADIUS_LARGE_RE.test(utility)) {
+    return {
+      rule: RULES.radius,
+      message: `\`${utility}\` is off the radius ladder. Use rounded-surface (cards, panels, dialogs) or rounded-xl.`,
+    };
+  }
+
   m = utility.match(RADIUS_OFF_RE);
   if (m) {
     const side = m[1] ?? "";
@@ -266,7 +296,7 @@ export function classifyUtility(utility) {
     if (px <= MICRO_RADIUS_PX) return null;
     return {
       rule: RULES.radius,
-      message: `One-off radius \`${utility}\`. Use the ladder: rounded-md (controls), -lg (cards), -xl, -3xl, -full.`,
+      message: `One-off radius \`${utility}\`. Use the ladder: rounded-md (controls), -lg (cards), -xl, -full, or a role radius.`,
     };
   }
 
@@ -421,4 +451,84 @@ export function classifyGroup(tokens) {
       : undefined;
     return { token, finding, replacementToken };
   });
+}
+
+const CLASSNAME_FORWARDERS = {
+  AuthField: "Input",
+  CardFlipButton: "Button",
+  CopyButton: "Button",
+  CreateTeamButton: "Button",
+  CyberpunkSetLegendButton: "Button",
+  DeckFormatLegalityBadge: "Badge",
+  DeckFormatLegalityBadgeContent: "Badge",
+  DialogCancel: "Button",
+  FloatingActionPill: "Button",
+  FooterActionButton: "Button",
+  IconToolbarButton: "Button",
+  InlineScopeSelect: "SelectTrigger",
+  LeftSidebarUserMenuTrigger: "Button",
+  StartingCharacterButton: "Button",
+  TierListModerationBadge: "Badge",
+};
+
+/**
+ * Primitives that own their height and radius, and the wrappers that forward `className` to one:
+ * a call-site `className` must not set either.
+ */
+export const GEOMETRY_PRIMITIVES = {
+  Button: "Use `size` (xs, sm, md, lg, icon-*) and `shape` (control, cta, island) instead (UI_UX_DESIGN.md § Buttons).",
+  Badge: "Badge owns its height and radius; add a variant to the primitive instead.",
+  Input: "Input owns its height and radius; add a variant to the primitive instead.",
+  SelectTrigger: "SelectTrigger owns its height and radius; add a variant to the primitive instead.",
+  Chip: "Use `size` (xs, sm) instead; Chip is a rounded-full Button.",
+  FilterChip: "Use `size` (xs, sm) instead; FilterChip renders a Chip.",
+  SearchField: "Use `size` (xs, sm, md, lg) instead; SearchField renders an Input.",
+  ...Object.fromEntries(
+    Object.entries(CLASSNAME_FORWARDERS).map(([name, primitive]) => [
+      name,
+      `${name} forwards className to <${primitive}>, which owns its height and radius; give ${name} a prop instead.`,
+    ])
+  ),
+};
+
+/** Raw button elements, which must draw their own keyboard focus ring. */
+export const RAW_BUTTONS = new Set(["button", "motion.button"]);
+
+const GEOMETRY_RE = /^(?:rounded(?:-.+)?|h-.+|size-.+)$/;
+/** `[&_svg]:size-4`, `[&>span]:h-3`, `*:rounded-md` style the children, not the element. */
+const CHILD_VARIANT_RE = /\[&\s*[_>~+]|(?:^|:)\*{1,2}:/;
+const FOCUS_VISIBLE_RE = /(?:^|:)focus-visible:|\[&:focus-visible\]:/;
+
+/**
+ * Classifies the `className` tokens of one JSX element. `complete` is false when some of the
+ * class text could not be resolved (a prop, an import, an unknown call, a later spread), so a
+ * missing class cannot be proven. Returns `[{ token, finding }]`; `token` is null for a finding
+ * about the element as a whole.
+ */
+export function classifyElement(name, tokens, { complete }) {
+  const advice = GEOMETRY_PRIMITIVES[name];
+  if (advice) {
+    return tokens.flatMap((token) => {
+      const { variants, utility } = parseToken(token.text);
+      if (!GEOMETRY_RE.test(utility) || CHILD_VARIANT_RE.test(variants)) return [];
+      return [
+        {
+          token,
+          finding: { rule: RULES.primitiveGeometry, message: `\`${token.text}\` overrides <${name}> geometry. ${advice}` },
+        },
+      ];
+    });
+  }
+  if (RAW_BUTTONS.has(name) && complete && !tokens.some((token) => FOCUS_VISIBLE_RE.test(parseToken(token.text).variants))) {
+    return [
+      {
+        token: null,
+        finding: {
+          rule: RULES.buttonFocus,
+          message: `Raw <${name}> has no \`focus-visible:\` class, so keyboard users see no focus ring. Use <Button>, or add \`focus-visible:ring-2 focus-visible:ring-ring\`.`,
+        },
+      },
+    ];
+  }
+  return [];
 }

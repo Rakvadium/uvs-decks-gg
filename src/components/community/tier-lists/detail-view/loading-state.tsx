@@ -1,9 +1,5 @@
-import { Loader2 } from "lucide-react";
+import { LoadingState } from "@/components/ui/loading-state";
 
 export function CommunityTierListDetailLoadingState() {
-  return (
-    <div className="flex h-full items-center justify-center p-6">
-      <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-    </div>
-  );
+  return <LoadingState className="h-full p-6" />;
 }

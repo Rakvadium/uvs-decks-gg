@@ -23,8 +23,8 @@ export function CurrentCharacterRow() {
       {onViewDetails ? (
         <Button
           variant="ghost"
-          size="sm"
-          className="h-7 px-2 text-[10px]"
+          size="xs"
+          className="px-2 text-[10px]"
           onClick={onViewDetails}
         >
           View Details

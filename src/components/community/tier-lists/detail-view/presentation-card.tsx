@@ -12,7 +12,7 @@ export function CommunityTierListPresentationCard() {
   }
 
   return (
-    <div className="pointer-events-auto w-72 rounded-bl-none rounded-br-none rounded-tl-xl rounded-tr-none  border-b-0  p-3 pb-2  md:w-80">
+    <div className="pointer-events-auto w-72 p-3 pb-2 md:w-80">
       <CardGridItem
         card={presentationCard}
         backCard={getBackCard(presentationCard)}

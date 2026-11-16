@@ -41,7 +41,7 @@ export function DeckDetailsTopBarTitleSection({
           type="button"
           className={cn(
             "chrome-heading-case block w-full min-w-0 text-left text-sm font-bold",
-            "rounded-sm focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring",
+            "rounded-md focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring",
             titleExpanded ? "whitespace-normal break-words" : "truncate",
           )}
           title={deck.name}
@@ -64,7 +64,6 @@ export function DeckDetailsTopBarTitleSection({
           editTeamCollaboration={deckTeamSharingFromDeck(deck)}
           onSelect={noopVis}
           onSelectTeamSharing={noopTeam}
-          compact
           canSetTournamentVisibility={isAdmin}
           canSetTeamVisibility={canSetTeamVisibility}
         />

@@ -31,7 +31,7 @@ export function CommunityTierListsFloatingTopBar() {
     <FloatingPageBar
       left={
         <>
-          <FloatingBackPill href="/community" label="Community" iconOnly />
+          <FloatingBackPill href="/community" label="Community" />
           <FloatingTabsPill
             value={activeTab}
             onValueChange={(value) => setActiveTab(value as typeof activeTab)}

@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
+import { Panel } from "@/components/ui/panel";
 import { ActiveDeckSectionProvider, useActiveDeckSectionContext } from "./context";
 import { ActiveDeckSectionGroups } from "./group-list";
 import { ActiveDeckSectionHeader } from "./header";
@@ -10,17 +11,17 @@ function ActiveDeckSectionContent() {
   const { canDrop, droppableProps, isOver } = useActiveDeckSectionContext();
 
   return (
-    <div
+    <Panel
       className={cn(
-        "space-y-2 rounded-lg border border-border/50 bg-card/50 p-3 transition-colors",
-        canDrop && "border-primary/40 bg-primary/5",
-        isOver && "bg-primary/10"
+        "space-y-2 p-3 transition-colors",
+        canDrop && "border-(--selected-border) bg-(--hover-bg)",
+        isOver && "bg-(--selected-bg)"
       )}
       {...droppableProps}
     >
       <ActiveDeckSectionHeader />
       <ActiveDeckSectionGroups />
-    </div>
+    </Panel>
   );
 }
 

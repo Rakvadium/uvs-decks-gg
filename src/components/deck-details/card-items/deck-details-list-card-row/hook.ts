@@ -8,9 +8,9 @@ import { useEnabledDeckSections } from "@/lib/deck/use-deck-sections";
 import { useDeckDetailsOptional } from "@/providers/DeckDetailsProvider";
 import { useDeckCardsSectionContext } from "../../deck-details-cards-section-context";
 import { useCardDetailsDialogTrigger, useDeckSectionCounts } from "../hooks";
-import type { DeckDetailsListCardRowProps } from "./types";
+import type { DeckCardRowModel, DeckDetailsListCardRowProps } from "./types";
 
-export function useDeckDetailsListCardRowModel({ entry }: DeckDetailsListCardRowProps) {
+export function useDeckDetailsListCardRowModel({ entry }: DeckDetailsListCardRowProps): DeckCardRowModel {
   const isMobile = useIsMobile();
   const deckDetails = useDeckDetailsOptional();
   const isOwner = deckDetails?.isOwner ?? false;
@@ -122,5 +122,3 @@ export function useDeckDetailsListCardRowModel({ entry }: DeckDetailsListCardRow
     handleCardClick,
   };
 }
-
-export type DeckDetailsListCardRowModel = ReturnType<typeof useDeckDetailsListCardRowModel>;

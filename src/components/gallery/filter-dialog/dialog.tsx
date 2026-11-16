@@ -5,7 +5,7 @@ import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogClose,
+  DialogCancel,
   DialogContent,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -53,11 +53,7 @@ export function GalleryFilterDialog({
         showCloseButton={false}
         footer={
           <>
-            <DialogClose asChild>
-              <Button variant="outline">
-                <span className="chrome-label-case text-xs">Close</span>
-              </Button>
-            </DialogClose>
+            <DialogCancel>Close</DialogCancel>
             {filtersContext.meta.hasClearableFilters ? (
               <Button
                 type="button"

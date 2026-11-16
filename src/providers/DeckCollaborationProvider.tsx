@@ -66,11 +66,11 @@ function DeckCollaborationCursorsLayer() {
           }}
         >
           <div
-            className="flex items-center gap-1 rounded-md px-2 py-0.5 text-[10px] font-medium text-white shadow-md"
+            className="flex items-center gap-1 rounded-md px-2 py-0.5 text-[10px] font-medium text-on-scrim shadow-md"
             style={{ backgroundColor: o.color }}
           >
             <span
-              className="h-2 w-2 rounded-full bg-white/90 ring-2 ring-white"
+              className="h-2 w-2 rounded-full bg-on-scrim/90 ring-2 ring-on-scrim"
               style={{ boxShadow: `0 0 0 2px ${o.color}` }}
             />
             {o.label}

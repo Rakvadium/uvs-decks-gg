@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { Trophy } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
 import {
   Dialog,
   DialogBody,
@@ -12,15 +14,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { cn } from "@/lib/utils";
 import type { Id } from "../../../../convex/_generated/dataModel";
 import { useCommunityRankingsModel } from "./hook";
-import type { CommunityRankingsViewProps } from "./types";
 import { useGameModule } from "@/games/game-context";
 
 const TIER_PREVIEW_CARD_LIMIT = 10;
 
-export function CommunityRankingsView({ embedded = false }: CommunityRankingsViewProps) {
+export function CommunityRankingsView() {
   const { CardImageDisplay } = useGameModule().ui;
   const {
     scopeType,
@@ -36,18 +36,9 @@ export function CommunityRankingsView({ embedded = false }: CommunityRankingsVie
   } | null>(null);
 
   return (
-    <div className={cn("relative flex h-full flex-col overflow-y-auto", embedded && "overflow-visible")}>
-      {!embedded ? (
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.08),transparent_30%),radial-gradient(circle_at_80%_10%,rgba(20,184,166,0.10),transparent_26%)]" />
-      ) : null}
-
-      <div className={cn("relative z-10 flex min-h-full flex-col gap-4", embedded ? "py-2" : "p-4 md:p-6")}>
-        <Card
-          className={cn(
-            "bg-card/80",
-            leaderboard ? "border-border/50" : "border-dashed border-border/80",
-          )}
-        >
+    <div className="relative flex h-full flex-col">
+      <div className="relative z-10 flex min-h-full flex-col gap-4 py-2">
+        <Card>
           {leaderboard ? (
             <CardHeader className="space-y-1">
               <Badge variant="outline" className="w-fit shrink-0 text-xs font-normal">
@@ -57,11 +48,14 @@ export function CommunityRankingsView({ embedded = false }: CommunityRankingsVie
           ) : null}
           <CardContent>
             {!leaderboard ? (
-              <div className="flex min-h-48 items-center justify-center rounded-xl border border-dashed border-border/80 bg-background/30 px-4 py-8 text-center text-sm text-muted-foreground">
-                {scopeType === "set_scope"
-                  ? "No ranked set-scoped lists are available yet."
-                  : "No ranked global lists are available yet."}
-              </div>
+              <EmptyState
+                icon={Trophy}
+                title={
+                  scopeType === "set_scope"
+                    ? "No ranked set-scoped lists are available yet."
+                    : "No ranked global lists are available yet."
+                }
+              />
             ) : (
               <div className="space-y-4">
                 {leaderboard.tiers.map((tier) => {
@@ -71,7 +65,7 @@ export function CommunityRankingsView({ embedded = false }: CommunityRankingsVie
                   return (
                     <div
                       key={tier.id}
-                      className="rounded-2xl border px-4 py-3"
+                      className="rounded-surface border px-4 py-3"
                       style={{
                         borderColor: `${tier.color}55`,
                         backgroundColor: `${tier.color}10`,
@@ -79,7 +73,7 @@ export function CommunityRankingsView({ embedded = false }: CommunityRankingsVie
                     >
                       <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <div className="flex flex-wrap items-center gap-2">
-                          <Badge variant="outline" className="text-[10px]">
+                          <Badge size="sm" variant="outline">
                             {tier.label}
                           </Badge>
                           <span className="text-xs text-muted-foreground">
@@ -127,9 +121,7 @@ export function CommunityRankingsView({ embedded = false }: CommunityRankingsVie
                           })}
                         </div>
                       ) : (
-                        <div className="rounded-xl border border-dashed border-border/80 bg-background/30 px-4 py-5 text-sm text-muted-foreground">
-                          No cards have landed in this community tier yet.
-                        </div>
+                        <EmptyState variant="inline" title="No cards have landed in this community tier yet." />
                       )}
                     </div>
                   );
@@ -152,7 +144,7 @@ export function CommunityRankingsView({ embedded = false }: CommunityRankingsVie
               </DialogHeader>
               <DialogBody className="px-6 pb-6">
                 <div
-                  className="rounded-2xl border px-4 py-4"
+                  className="rounded-surface border px-4 py-4"
                   style={{
                     borderColor: `${dialogTier.color}55`,
                     backgroundColor: `${dialogTier.color}08`,

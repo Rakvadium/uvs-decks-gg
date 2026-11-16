@@ -1,7 +1,8 @@
+import type { ReactNode } from "react";
 import * as m from "framer-motion/m";
 import { AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { IconToolbarButton } from "@/components/ui/icon-toolbar-button";
 import { usePrefersReducedMotion } from "@/lib/reduced-motion";
 import { cn } from "@/lib/utils";
 import { SectionHeading } from "@/components/ui/typography-headings";
@@ -11,12 +12,38 @@ import {
 } from "../shell-chrome";
 import { useRightSidebarContext } from "./context";
 
+export function PanelHeader({ title, onClose }: { title: string; onClose: () => void }) {
+  return (
+    <div
+      data-slot="panel-header"
+      className="relative z-10 flex h-(--control-h-lg) shrink-0 items-center gap-2 border-b border-sidebar-border px-4"
+    >
+      <SectionHeading data-slot="panel-title" size="xs" className="min-w-0 flex-1 truncate text-sidebar-foreground">
+        {title}
+      </SectionHeading>
+      <IconToolbarButton label="Close panel" className="shrink-0" onClick={onClose}>
+        <X />
+      </IconToolbarButton>
+    </div>
+  );
+}
+
+export function PanelFooter({ children }: { children: ReactNode }) {
+  return (
+    <div
+      data-slot="panel-footer"
+      className="relative z-10 flex shrink-0 items-center justify-end gap-2 border-t border-sidebar-border bg-sidebar px-4 py-3"
+    >
+      {children}
+    </div>
+  );
+}
+
 export function RightSidebarExpandedPanel() {
   const {
     activeSlot,
     ActiveComponent,
     ActiveFooter,
-    ActiveHeader,
     isExpanded,
     isResizing,
     panelWidth,
@@ -48,34 +75,19 @@ export function RightSidebarExpandedPanel() {
             className="flex h-full min-h-0 w-full min-w-0 flex-col"
             style={{ width: panelWidth, minWidth: panelWidth }}
           >
-            <div className="relative z-10 flex shrink-0 items-center justify-between border-b border-sidebar-border px-4 py-3">
-              <div className="min-w-0 flex-1">
-                {ActiveHeader ? (
-                  <ActiveHeader />
-                ) : (
-                  <SectionHeading size="xs" className="text-sidebar-foreground">
-                    {activeSlot?.label}
-                  </SectionHeading>
-                )}
-              </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="ml-2 h-8 w-8 shrink-0 border border-transparent text-sidebar-foreground hover:border-accent/35 hover:bg-accent/10 hover:text-accent"
-                onClick={() => setActiveSidebarAction(null)}
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
+            <PanelHeader
+              title={activeSlot?.label ?? activeSlot?.id ?? ""}
+              onClose={() => setActiveSidebarAction(null)}
+            />
 
             <div className="relative z-10 min-h-0 flex-1 overflow-hidden bg-background/40">
               {ActiveComponent ? <ActiveComponent /> : null}
             </div>
 
             {ActiveFooter ? (
-              <div className="relative z-10 shrink-0 border-t border-sidebar-border bg-sidebar/90 px-4 py-3">
+              <PanelFooter>
                 <ActiveFooter />
-              </div>
+              </PanelFooter>
             ) : null}
           </div>
         </m.div>

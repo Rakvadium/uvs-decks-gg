@@ -64,16 +64,15 @@ export function KeywordsSection() {
         {selectedKeywords.length > 0 ? (
           <div className="flex flex-wrap gap-1">
             {selectedKeywords.slice(0, 6).map((keyword) => (
-              <Badge
+              <Badge size="sm"
                 key={`keyword-selected-${keyword}`}
                 variant="outline"
-                className="px-1.5 py-0.5 text-[10px]"
               >
                 {keyword}
               </Badge>
             ))}
             {selectedKeywords.length > 6 ? (
-              <Badge variant="outline" className="px-1.5 py-0.5 text-[10px]">
+              <Badge size="sm" variant="outline">
                 +{selectedKeywords.length - 6}
               </Badge>
             ) : null}

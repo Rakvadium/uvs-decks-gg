@@ -5,6 +5,8 @@ import * as DialogPrimitive from "@radix-ui/react-dialog"
 import { XIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
+import { Button, type ButtonProps } from "@/components/ui/button"
+import { IconToolbarButton } from "@/components/ui/icon-toolbar-button"
 import { suppressSubsequentPointerEvents } from "@/lib/suppress-subsequent-pointer"
 
 const DialogOnOpenChangeContext = React.createContext<
@@ -54,6 +56,20 @@ function DialogClose({
   return <DialogPrimitive.Close data-slot="dialog-close" {...props} />
 }
 
+function DialogCancel({
+  children = "Cancel",
+  type = "button",
+  ...props
+}: Omit<ButtonProps, "variant" | "size" | "asChild">) {
+  return (
+    <DialogPrimitive.Close asChild>
+      <Button data-slot="dialog-cancel" type={type} variant="outline" {...props}>
+        {children}
+      </Button>
+    </DialogPrimitive.Close>
+  )
+}
+
 function DialogOverlay({
   className,
   onPointerDown,
@@ -98,6 +114,11 @@ const dialogSizeStyles = {
 }
 
 export const overlayScrimClassName = "fixed inset-0 z-modal bg-background-soft backdrop-blur-[2px]"
+
+export const dialogSurfaceClassName =
+  "border-primary-soft bg-card-overlay shadow-lg backdrop-blur-lg after:pointer-events-none after:absolute after:inset-0 after:-z-10 after:rounded-[inherit] after:bg-gradient-to-br after:from-primary/10 after:via-transparent after:to-secondary/10 before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-primary/40 before:to-transparent"
+
+export const dialogTitleClassName = "chrome-heading-case text-lg leading-none font-semibold"
 
 type DialogSize = keyof typeof dialogSizeStyles
 
@@ -153,15 +174,14 @@ function DialogContent({
         data-slot="dialog-content"
         className={cn(
           "fixed z-modal duration-200 overflow-x-hidden flex flex-col",
-          !isPlain && "shadow-lg md:shadow-none",
-          !isPlain && "bg-card-overlay backdrop-blur-lg border-primary-soft",
+          !isPlain && dialogSurfaceClassName,
           isPlain &&
             "border-0 bg-transparent shadow-none backdrop-blur-none md:border-0 md:shadow-none",
           "data-[state=open]:animate-in data-[state=closed]:animate-out",
           "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
           "inset-0 h-[100dvh] w-full rounded-none border-0",
           !isPlain &&
-            "md:inset-auto md:top-[50%] md:left-[50%] md:h-auto md:max-h-[85vh] md:translate-x-[-50%] md:translate-y-[-50%] md:rounded-lg md:border md:overflow-y-auto",
+            "md:inset-auto md:top-[50%] md:left-[50%] md:h-auto md:max-h-[85vh] md:translate-x-[-50%] md:translate-y-[-50%] md:rounded-surface md:border md:overflow-y-auto",
           isPlain &&
             "max-md:!pointer-events-none max-md:!inset-x-4 max-md:!top-12 max-md:!bottom-6 max-md:!h-auto max-md:!w-auto md:pointer-events-auto md:inset-auto md:top-[50%] md:left-[50%] md:h-auto md:max-h-[85vh] md:translate-x-[-50%] md:translate-y-[-50%] md:overflow-hidden md:rounded-none md:border-0",
           "md:data-[state=closed]:zoom-out-95 md:data-[state=open]:zoom-in-95",
@@ -171,12 +191,6 @@ function DialogContent({
         )}
         {...props}
       >
-        {!isPlain ? (
-          <>
-            <div className="pointer-events-none absolute inset-0 rounded-lg bg-gradient-to-br from-primary/10 via-transparent to-secondary/10" />
-            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
-          </>
-        ) : null}
         <div
           className={cn(
             "relative z-10 flex min-h-0 flex-1 flex-col overflow-y-auto",
@@ -212,12 +226,14 @@ function DialogContent({
           )}
         </div>
         {showCloseButton && (
-          <DialogPrimitive.Close
-            data-slot="dialog-close"
-            className="pointer-events-auto flex absolute top-4 right-4 z-chrome h-8 w-8 rounded-md items-center justify-center opacity-70 transition-colors hover:opacity-100 hover:bg-primary-wash hover:text-primary focus:ring-2 focus:ring-primary-soft focus:outline-hidden disabled:pointer-events-none border border-transparent hover:border-primary-soft"
-          >
-            <XIcon className="h-4 w-4" />
-            <span className="sr-only">Close</span>
+          <DialogPrimitive.Close asChild>
+            <IconToolbarButton
+              data-slot="dialog-close"
+              label="Close"
+              className="pointer-events-auto absolute top-4 right-4 z-chrome"
+            >
+              <XIcon />
+            </IconToolbarButton>
           </DialogPrimitive.Close>
         )}
       </DialogPrimitive.Content>
@@ -273,10 +289,7 @@ function DialogTitle({
   return (
     <DialogPrimitive.Title
       data-slot="dialog-title"
-      className={cn(
-        "chrome-heading-case text-lg leading-none font-semibold",
-        className
-      )}
+      className={cn(dialogTitleClassName, className)}
       {...props}
     />
   )
@@ -298,6 +311,7 @@ function DialogDescription({
 export {
   Dialog,
   DialogBody,
+  DialogCancel,
   DialogClose,
   DialogContent,
   DialogDescription,

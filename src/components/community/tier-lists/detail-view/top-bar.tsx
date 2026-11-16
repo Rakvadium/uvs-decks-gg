@@ -23,10 +23,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { PageHeading } from "@/components/ui/typography-headings";
 import { COMMUNITY_TIER_RANKING, getRankingScopeLabel } from "../../../../../shared/app-config";
-import { ArrowLeft, ChevronDown, Edit3, Globe, Loader2, Lock, Save, Trash2, X } from "lucide-react";
+import { ArrowLeft, ChevronDown, Edit3, Globe, Lock, Save, Trash2, X } from "lucide-react";
 import { useProfanityDisplayText } from "@/lib/moderation/use-profanity-display-text";
 import { TierListModerationBadge } from "../moderation-badge";
 import { useOptionalCommunityTierListDetailContext } from "./context";
+import { Spinner } from "@/components/ui/spinner";
 
 export function CommunityTierListDetailTopBar() {
   const { display } = useProfanityDisplayText();
@@ -61,12 +62,12 @@ export function CommunityTierListDetailTopBar() {
     return (
       <div className="flex w-full min-w-0 items-center gap-2">
         <Link href="/community/tier-lists" aria-label="Tier lists">
-          <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" aria-label="Tier lists">
+          <Button variant="ghost" size="icon-sm" className="shrink-0" aria-label="Tier lists">
             <ArrowLeft className="h-4 w-4" />
           </Button>
         </Link>
         <div className="chrome-label-case flex items-center gap-2 text-sm text-muted-foreground">
-          <Loader2 className="h-4 w-4 animate-spin" />
+          <Spinner />
           <span>Loading Tier List</span>
         </div>
       </div>
@@ -77,7 +78,7 @@ export function CommunityTierListDetailTopBar() {
     return (
       <div className="flex w-full min-w-0 items-center gap-2">
         <Link href="/community/tier-lists" aria-label="Tier lists">
-          <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" aria-label="Tier lists">
+          <Button variant="ghost" size="icon-sm" className="shrink-0" aria-label="Tier lists">
             <ArrowLeft className="h-4 w-4" />
           </Button>
         </Link>
@@ -92,8 +93,8 @@ export function CommunityTierListDetailTopBar() {
 
   const saveMetaButton = (
     <Button
-      size="icon"
-      className="h-8 w-8 shrink-0"
+      size="icon-sm"
+      className="shrink-0"
       onClick={() =>
         void persistTierList({
           onSuccess: () => setIsEditingMeta(false),
@@ -103,7 +104,7 @@ export function CommunityTierListDetailTopBar() {
       disabled={isSaving}
       aria-label="Save tier list details"
     >
-      {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+      {isSaving ? <Spinner /> : <Save className="h-4 w-4" />}
     </Button>
   );
 
@@ -112,7 +113,7 @@ export function CommunityTierListDetailTopBar() {
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          className="chrome-label-case inline-flex h-8 shrink-0 items-center gap-1.5 rounded-md border border-border/50 px-2.5 text-[10px] text-foreground transition-colors hover:border-primary/40 hover:text-primary"
+          className="chrome-label-case inline-flex h-8 shrink-0 items-center gap-1.5 rounded-md border border-border/50 px-2.5 text-[10px] text-foreground outline-none transition-colors hover:border-primary/40 hover:text-primary focus-visible:ring-2 focus-visible:ring-ring"
         >
           {isPublic ? <Globe className="h-3 w-3" /> : <Lock className="h-3 w-3" />}
           {displayPublicity}
@@ -131,7 +132,7 @@ export function CommunityTierListDetailTopBar() {
       </DropdownMenuContent>
     </DropdownMenu>
   ) : (
-    <Badge variant={isPublic ? "default" : "outline"} className="hidden h-8 items-center gap-1.5 px-2.5 text-[10px] sm:inline-flex">
+    <Badge size="lg" variant={isPublic ? "default" : "outline"} className="hidden sm:inline-flex">
       {isPublic ? <Globe className="h-3 w-3" /> : <Lock className="h-3 w-3" />}
       {displayPublicity}
     </Badge>
@@ -142,7 +143,7 @@ export function CommunityTierListDetailTopBar() {
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          className="chrome-label-case inline-flex h-8 shrink-0 items-center gap-1.5 rounded-md border border-border/50 px-2.5 text-[10px] text-foreground transition-colors hover:border-primary/40 hover:text-primary"
+          className="chrome-label-case inline-flex h-8 shrink-0 items-center gap-1.5 rounded-md border border-border/50 px-2.5 text-[10px] text-foreground outline-none transition-colors hover:border-primary/40 hover:text-primary focus-visible:ring-2 focus-visible:ring-ring"
         >
           {rankingScopeLabel}
           <ChevronDown className="h-3 w-3 shrink-0 text-muted-foreground" />
@@ -157,7 +158,7 @@ export function CommunityTierListDetailTopBar() {
       </DropdownMenuContent>
     </DropdownMenu>
   ) : (
-    <Badge variant="outline" className="hidden h-8 items-center gap-1.5 px-2.5 text-[10px] sm:inline-flex">
+    <Badge size="lg" variant="outline" className="hidden sm:inline-flex">
       {rankingScopeLabel}
     </Badge>
   );
@@ -167,8 +168,8 @@ export function CommunityTierListDetailTopBar() {
       <AlertDialogTrigger asChild>
         <Button
           variant="destructiveOutline"
-          size="icon"
-          className="h-8 w-8 shrink-0"
+          size="icon-sm"
+          className="shrink-0"
         >
           <Trash2 className="h-4 w-4" />
         </Button>
@@ -186,7 +187,7 @@ export function CommunityTierListDetailTopBar() {
             variant="destructive"
             onClick={() => void handleDelete()}
           >
-            {isDeleting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+            {isDeleting ? <Spinner /> : null}
             Delete
           </AlertDialogAction>
         </AlertDialogFooter>
@@ -199,8 +200,8 @@ export function CommunityTierListDetailTopBar() {
   const cancelButton = isEditingMeta ? (
     <Button
       variant="ghost"
-      size="icon"
-      className="h-8 w-8 shrink-0"
+      size="icon-sm"
+      className="shrink-0"
       onClick={cancelMetaEditing}
       aria-label="Cancel tier list detail edits"
     >
@@ -212,7 +213,7 @@ export function CommunityTierListDetailTopBar() {
     <>
       <div className="flex w-full min-w-0 items-center gap-2">
         <Link href="/community/tier-lists" aria-label="Tier lists">
-          <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" aria-label="Tier lists">
+          <Button variant="ghost" size="icon-sm" className="shrink-0" aria-label="Tier lists">
             <ArrowLeft className="h-4 w-4" />
           </Button>
         </Link>
@@ -220,9 +221,10 @@ export function CommunityTierListDetailTopBar() {
         <div className="min-w-0 flex-1">
           {canEdit && isEditingMeta ? (
             <Input
+              size="sm"
               value={title}
               onChange={(event) => setTitle(event.target.value)}
-              className="chrome-label-case h-8 min-w-0 text-sm font-bold"
+              className="chrome-label-case min-w-0 text-sm font-bold"
               placeholder="Tier list name..."
             />
           ) : (
@@ -236,14 +238,14 @@ export function CommunityTierListDetailTopBar() {
         </div>
 
         <div className="ml-auto flex shrink-0 items-center gap-2">
-          <TierListModerationBadge status={detail.listModerationStatus} className="h-8 px-2.5 text-[10px]" />
+          <TierListModerationBadge status={detail.listModerationStatus} size="lg" />
           {!isEditingMeta ? publicityControl : null}
           {!isEditingMeta ? rankingScopeControl : null}
           {canEdit ? (isEditingMeta ? saveMetaButton : (
             <Button
               variant="outline"
               size="sm"
-              className="h-8 shrink-0"
+              className="shrink-0"
               onClick={() => setIsEditingMeta(true)}
               aria-label="Edit tier list details"
             >

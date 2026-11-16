@@ -35,7 +35,7 @@ export function SignInForm({
         required
         labelAction={
           <Button
-            className="h-auto p-0 text-xs"
+            className="text-xs"
             type="button"
             variant="link"
             onClick={() => setFlow("reset")}

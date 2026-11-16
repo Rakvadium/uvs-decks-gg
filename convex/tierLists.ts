@@ -383,13 +383,15 @@ export const getEditable = query({
 export const getDetail = query({
   args: {
     game: v.optional(gameIdValidator),
-    tierListId: v.id("tierLists"),
+    tierListId: v.string(),
   },
   returns: v.union(tierListDetailValidator, v.null()),
   handler: async (ctx, rawArgs) => {
     const args = withResolvedGame(rawArgs);
+    const tierListId = ctx.db.normalizeId("tierLists", args.tierListId);
+    if (tierListId === null) return null;
     const viewer = await getTierListViewer(ctx);
-    const tierList = await ctx.db.get(args.tierListId);
+    const tierList = await ctx.db.get(tierListId);
 
     // A tier list is only visible on its own game's host.
     if (!isDocInGame(tierList, args.game) || !canViewTierList(viewer, tierList)) {
@@ -402,16 +404,16 @@ export const getDetail = query({
       ctx.db.get(tierList.userId),
       ctx.db
         .query("tierListItems")
-        .withIndex("by_tierList", (q) => q.eq("tierListId", args.tierListId))
+        .withIndex("by_tierList", (q) => q.eq("tierListId", tierListId))
         .take(600),
       ctx.db
         .query("tierListComments")
         .withIndex("by_tierList_and_status_and_createdAt", (q) =>
-          q.eq("tierListId", args.tierListId).eq("status", "approved")
+          q.eq("tierListId", tierListId).eq("status", "approved")
         )
         .order("desc")
         .take(50),
-      getLikedState(ctx, viewer.userId, args.tierListId),
+      getLikedState(ctx, viewer.userId, tierListId),
     ]);
 
     const commentsWithAuthors: Array<{

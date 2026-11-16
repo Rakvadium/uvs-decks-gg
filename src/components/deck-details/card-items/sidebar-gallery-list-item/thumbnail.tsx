@@ -9,6 +9,7 @@ export function SidebarGalleryListItemThumbnail() {
   } = useSidebarGalleryListItemContext();
 
   return (
+    // eslint-disable-next-line design/radius-ladder -- printed card art: a 32px card thumbnail keeps the small card corner
     <div className="relative h-12 w-8 shrink-0 overflow-hidden rounded border border-border/40 bg-muted/20">
       {imageUrl ? (
         <Image

@@ -144,7 +144,7 @@ export function SizzleReelContent() {
 
           <div
             className={cn(
-              "relative min-h-[300px] overflow-hidden rounded-3xl border border-surface bg-card-tint shadow-[var(--chrome-elevation-mid)] backdrop-blur-sm md:min-h-[480px]",
+              "relative min-h-[300px] overflow-hidden rounded-xl border border-surface bg-card-tint shadow-[var(--chrome-elevation-mid)] backdrop-blur-sm md:min-h-[480px]",
               "before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:z-10 before:h-px before:bg-gradient-to-r before:from-transparent before:via-primary/40 before:to-transparent"
             )}
           >

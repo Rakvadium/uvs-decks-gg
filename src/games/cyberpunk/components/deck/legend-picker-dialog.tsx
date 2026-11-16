@@ -1,7 +1,8 @@
 "use client";
 
 import { useCallback, useDeferredValue, useMemo, useState } from "react";
-import { Check, Loader2, Search, XIcon } from "lucide-react";
+import { EmptyState } from "@/components/ui/empty-state";
+import { Check, XIcon } from "lucide-react";
 import { CYBERPUNK_COLORS } from "@shared/games/cyberpunk/card-types";
 import { CYBERPUNK_LEGEND_COUNT, normalizeCyberpunkSetup } from "@shared/games/cyberpunk/setup";
 import { Button } from "@/components/ui/button";
@@ -14,7 +15,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
+import { SearchField } from "@/components/ui/search-field";
+import { OptionTile } from "@/components/ui/option-tile";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { GameSetupCardPickerDialogProps } from "@/games/types";
 import { useCardIdMap } from "@/hooks/useCardIdMap";
@@ -25,6 +27,7 @@ import { cyberpunkCardTitle } from "../../config";
 import { SymbolBadge, SymbolIcon } from "../color-pip";
 import { LegendArt } from "./legend-art";
 import { applyLegendPick, buildLegendPickerOptions } from "./legend-model";
+import { Spinner } from "@/components/ui/spinner";
 
 /**
  * Legend picker: Legend cards only, name search, color filter. Without `slotIndex` it toggles
@@ -91,7 +94,7 @@ export function LegendPickerDialog({ open, onOpenChange, setup, onChange, slotIn
             </span>
             <DialogClose
               type="button"
-              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-transparent opacity-70 transition-colors hover:border-primary/40 hover:bg-primary/10 hover:text-primary hover:opacity-100 focus:outline-hidden focus:ring-2 focus:ring-primary/40"
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-transparent opacity-70 transition-colors hover:border-primary/40 hover:bg-primary/10 hover:text-primary hover:opacity-100 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
             >
               <XIcon className="h-4 w-4" />
               <span className="sr-only">Close</span>
@@ -113,16 +116,13 @@ export function LegendPickerDialog({ open, onOpenChange, setup, onChange, slotIn
                 />
               ))}
             </div>
-            <div className="relative min-w-0 w-full sm:max-w-xs">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-                placeholder="Search Legends..."
-                aria-label="Search Legends"
-                className="min-w-0 pl-9"
-              />
-            </div>
+            <SearchField
+              value={search}
+              onValueChange={setSearch}
+              placeholder="Search Legends..."
+              name="legend-search"
+              className="w-full sm:max-w-xs"
+            />
           </div>
         </DialogHeader>
 
@@ -134,11 +134,14 @@ export function LegendPickerDialog({ open, onOpenChange, setup, onChange, slotIn
               ))}
             </div>
           ) : options.length === 0 ? (
-            <div className="flex min-h-48 items-center justify-center rounded-lg border border-dashed border-border/80 bg-card/30 px-4 text-center text-sm text-muted-foreground">
-              {cards.some((card) => card.type?.toLowerCase() === "legend")
-                ? "No Legends match the current search and colors."
-                : "No Legend cards are available yet."}
-            </div>
+            <EmptyState
+              className="min-h-48"
+              title={
+                cards.some((card) => card.type?.toLowerCase() === "legend")
+                  ? "No Legends match the current search and colors."
+                  : "No Legend cards are available yet."
+              }
+            />
           ) : (
             <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
               {options.map(({ card, selected, disabledReason }) => {
@@ -146,23 +149,18 @@ export function LegendPickerDialog({ open, onOpenChange, setup, onChange, slotIn
                 const disabled = Boolean(disabledReason) || pendingId !== null;
                 return (
                   <li key={card._id}>
-                    <button
-                      type="button"
+                    <OptionTile
+                      variant="ghost"
+                      selected={selected}
                       disabled={disabled}
-                      aria-pressed={selected}
                       title={disabledReason ?? undefined}
                       onClick={() => void handlePick(card._id as Id<"cards">)}
-                      className={cn(
-                        "group relative block w-full rounded-lg p-1 text-left transition-colors",
-                        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
-                        selected ? "bg-primary/20" : "enabled:hover:bg-primary/10",
-                        disabledReason && "cursor-not-allowed opacity-50"
-                      )}
+                      className={cn("group relative block w-full p-1 text-left", !disabledReason && "disabled:opacity-100")}
                     >
                       <LegendArt
                         card={card}
                         sizes="(max-width: 640px) 45vw, 180px"
-                        className={cn("ring-1", selected ? "ring-2 ring-primary" : "ring-border/50")}
+                        className={cn("ring-1", selected ? "ring-2 ring-(--selected-border)" : "ring-border/50")}
                       />
                       {selected ? (
                         <span className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-[var(--chrome-elevation-low)]">
@@ -171,7 +169,7 @@ export function LegendPickerDialog({ open, onOpenChange, setup, onChange, slotIn
                       ) : null}
                       {pendingId === card._id ? (
                         <span className="absolute inset-1 flex items-center justify-center rounded-md bg-background/60">
-                          <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                          <Spinner size="md" />
                         </span>
                       ) : null}
                       <span className="mt-1.5 block truncate text-xs font-semibold">{cardTitle}</span>
@@ -185,7 +183,7 @@ export function LegendPickerDialog({ open, onOpenChange, setup, onChange, slotIn
                       {disabledReason ? (
                         <span className="mt-0.5 block text-[10px] leading-tight text-muted-foreground">{disabledReason}</span>
                       ) : null}
-                    </button>
+                    </OptionTile>
                   </li>
                 );
               })}
