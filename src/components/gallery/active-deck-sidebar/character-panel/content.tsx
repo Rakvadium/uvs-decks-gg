@@ -1,5 +1,6 @@
 "use client";
 
+import { ActiveDeckCount, ActiveDeckStatsSummary } from "@/components/shell/mobile-layout/active-deck-strip-stats";
 import { useGameModule } from "@/games/game-context";
 import { useActiveDeckCharacterPanelModel } from "./hook";
 
@@ -17,6 +18,8 @@ export function ActiveDeckCharacterPanel() {
       mainQuantities={activeDeck?.mainQuantities}
       deckName={activeDeck?.name}
       deckDescription={activeDeck?.description}
+      summary={<ActiveDeckStatsSummary />}
+      controlsEnd={<ActiveDeckCount />}
     />
   );
 }

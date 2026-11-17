@@ -3,18 +3,27 @@
 import { useState } from "react";
 import { Panel } from "@/components/ui/panel";
 import Image from "next/image";
-import { Hexagon, Layers } from "lucide-react";
+import { Hexagon, Layers, UserRoundPen } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import type { GameDeckSetupPanelProps } from "@/games/types";
 import { cn } from "@/lib/utils";
 import type { Id } from "../../../../../convex/_generated/dataModel";
 import { CardDetailsDialog } from "../card-details/dialog";
 import { DeckCharacterPickerDialog } from "../character-picker-dialog";
-import { UvsChangeCharacterButton } from "./change-character-button";
+import { SymbolIcon } from "../symbol-icon/symbol-icon";
 import { useUvsSetupModel } from "./model";
-import { UvsSetupSymbolSelector } from "./symbol-selector";
+import { formatSymbolName, UvsSetupSymbolSelector } from "./symbol-selector";
 
 /** Gallery active-deck panel: character art, change/identity controls, name and deck description. */
-export function UvsDeckSetupSidebar({ setup, getCard, onChange, readOnly, deckDescription }: GameDeckSetupPanelProps) {
+export function UvsDeckSetupSidebar({
+  setup,
+  getCard,
+  onChange,
+  readOnly,
+  deckDescription,
+  summary,
+  controlsEnd,
+}: GameDeckSetupPanelProps) {
   const { startingCharacterId, startingCharacter, startingCharacterBack, selectedSymbol, characterSymbols } =
     useUvsSetupModel({ setup, getCard });
   const [characterOpen, setCharacterOpen] = useState(false);
@@ -50,7 +59,7 @@ export function UvsDeckSetupSidebar({ setup, getCard, onChange, readOnly, deckDe
             <div className="relative">
               <div
                 className={cn(
-                  "relative h-full min-h-[108px] w-[86px] overflow-hidden rounded-none border-0 border-r border-border/40 bg-muted/50",
+                  "relative aspect-[2.5/3.5] w-[86px] overflow-hidden rounded-none border-0 border-r border-border/40 bg-muted/50",
                   "transition-colors hover:border-r-primary/40 hover:shadow-[0_0_14px_-8px_var(--primary)]",
                   !startingCharacter && "opacity-80"
                 )}
@@ -81,7 +90,6 @@ export function UvsDeckSetupSidebar({ setup, getCard, onChange, readOnly, deckDe
                   )}
                 </button>
 
-                {editable ? <UvsChangeCharacterButton onClick={() => setCharacterOpen(true)} /> : null}
               </div>
 
               {editable ? (
@@ -93,15 +101,6 @@ export function UvsDeckSetupSidebar({ setup, getCard, onChange, readOnly, deckDe
                 />
               ) : null}
 
-              {editable && startingCharacter ? (
-                <UvsSetupSymbolSelector
-                  characterSymbols={characterSymbols}
-                  selectedSymbol={selectedSymbol}
-                  open={symbolOpen}
-                  onOpenChange={setSymbolOpen}
-                  onSelectSymbol={handleSelectSymbol}
-                />
-              ) : null}
             </div>
 
             <div className="min-w-0 flex-1 p-3">
@@ -119,10 +118,44 @@ export function UvsDeckSetupSidebar({ setup, getCard, onChange, readOnly, deckDe
                 <p className="chrome-label-case line-clamp-2 text-[10px] text-muted-foreground">
                   {deckDescription?.trim() ? deckDescription : "No description yet."}
                 </p>
+                {editable || controlsEnd || (startingCharacter && characterSymbols.length > 0) ? (
+                  <div className="flex min-w-0 items-center gap-1 pt-1.5">
+                    {startingCharacter && characterSymbols.length > 0 ? (
+                      editable ? (
+                        <UvsSetupSymbolSelector
+                          layout="inline"
+                          characterSymbols={characterSymbols}
+                          selectedSymbol={selectedSymbol}
+                          open={symbolOpen}
+                          onOpenChange={setSymbolOpen}
+                          onSelectSymbol={handleSelectSymbol}
+                        />
+                      ) : (
+                        <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+                          <SymbolIcon symbol={selectedSymbol ?? characterSymbols[0]} size="sm" />
+                          {formatSymbolName(selectedSymbol ?? characterSymbols[0])}
+                        </span>
+                      )
+                    ) : null}
+                    {editable ? (
+                      <Button
+                        type="button"
+                        variant={startingCharacter ? "ghost" : "outline"}
+                        size="xs"
+                        onClick={() => setCharacterOpen(true)}
+                      >
+                        <UserRoundPen />
+                        {startingCharacter ? "Change" : "Choose character"}
+                      </Button>
+                    ) : null}
+                    {controlsEnd ? <span className="ml-auto shrink-0 pl-1">{controlsEnd}</span> : null}
+                  </div>
+                ) : null}
               </div>
             </div>
           </div>
         </div>
+        {summary ? <div className="border-t border-divider p-3 empty:hidden">{summary}</div> : null}
       </Panel>
 
       <CardDetailsDialog

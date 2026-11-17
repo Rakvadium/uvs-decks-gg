@@ -54,6 +54,7 @@ export const CYBERPUNK_CLIENT_UI = {
   // Deck stats
   deckStats: CYBERPUNK_DECK_STATS_PALETTE,
   deckStatsCharts: CYBERPUNK_DECK_STATS_CHARTS,
+  deckStripCurves: [{ chartId: "cost", label: "Cost" }],
 
   // Deck setup (deck-builder wave): 3 Legend slots, Legend picker, RAM budget, "Set As Legend"
   DeckSetupPanel: CyberpunkDeckSetupPanel,
