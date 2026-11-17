@@ -4,7 +4,9 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { BarChart3, Calendar, ChevronUp, Layers, Megaphone, MessageSquare, PlaySquare, Users } from "lucide-react";
 import { DECK_VISIBILITY_MOBILE_TAB_LABELS, TABS } from "@/components/decks/decks-view/constants";
+import { useActiveDeck } from "@/providers/ActiveDeckProvider";
 import { useDecksOptional } from "@/providers/DecksProvider";
+import { ActiveDeckStripStats } from "./active-deck-strip-stats";
 import { communityDestinationFromLocation } from "@/components/community/community-destinations";
 import { useLocationSearchParams } from "@/hooks/useLocationSearchParams";
 import { cn } from "@/lib/utils";
@@ -82,6 +84,9 @@ function PeekRow({ slot, onOpen }: { slot: SlotRegistration; onOpen: (element: H
   const Icon = slot.icon;
   const isMedia = slot.iconFit === "media";
   const subtitle = slot.tabLabel && slot.tabLabel !== slot.label ? slot.tabLabel : "Tap to open";
+  // The Active Deck row shows the deck's card count and curves instead of a subtitle.
+  const { activeDeck } = useActiveDeck();
+  const showDeckStats = slot.id === "active-deck" && Boolean(activeDeck);
 
   return (
     <button
@@ -103,7 +108,11 @@ function PeekRow({ slot, onOpen }: { slot: SlotRegistration; onOpen: (element: H
       </span>
       <span className="min-w-0 flex-1 leading-tight">
         <span className="block truncate text-sm font-semibold text-foreground">{slot.label ?? slot.id}</span>
-        <span className="block truncate text-xs text-muted-foreground">{subtitle}</span>
+        {showDeckStats ? (
+          <ActiveDeckStripStats />
+        ) : (
+          <span className="block truncate text-xs text-muted-foreground">{subtitle}</span>
+        )}
       </span>
       <span className="flex size-8 shrink-0 items-center justify-center rounded-island bg-muted-elevated text-foreground">
         <ChevronUp className="size-4" />

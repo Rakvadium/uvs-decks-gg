@@ -1,3 +1,5 @@
+import { ChevronDown } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { SymbolBadge } from "../symbol-icon/symbol-badge";
@@ -9,6 +11,13 @@ interface UvsSetupSymbolSelectorProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSelectSymbol: (symbol: string) => void;
+  /** `corner`: a tab on the card art (hero). `inline`: a labeled button in a control row (sidebar). */
+  layout?: "corner" | "inline";
+}
+
+/** "infinity" -> "Infinity" for the inline label. */
+export function formatSymbolName(symbol: string) {
+  return symbol.charAt(0).toUpperCase() + symbol.slice(1);
 }
 
 /** Identity symbol corner button + popover (hero and sidebar share the same markup). */
@@ -18,12 +27,21 @@ export function UvsSetupSymbolSelector({
   open,
   onOpenChange,
   onSelectSymbol,
+  layout = "corner",
 }: UvsSetupSymbolSelectorProps) {
   if (characterSymbols.length === 0) return null;
+  const current = selectedSymbol ?? characterSymbols[0];
 
   return (
     <Popover open={open} onOpenChange={onOpenChange}>
       <PopoverTrigger asChild>
+        {layout === "inline" ? (
+          <Button type="button" variant="outline" size="xs" aria-label={`Symbol: ${formatSymbolName(current)}. Change symbol`}>
+            <SymbolIcon symbol={current} size="sm" />
+            {formatSymbolName(current)}
+            <ChevronDown className="text-muted-foreground" />
+          </Button>
+        ) : (
         <button
           type="button"
           aria-label="Change symbol"
@@ -35,8 +53,9 @@ export function UvsSetupSymbolSelector({
             "transition-colors hover:bg-primary/10 hover:border-primary/40"
           )}
         >
-          <SymbolIcon symbol={selectedSymbol ?? characterSymbols[0]} size="lg" />
+          <SymbolIcon symbol={current} size="lg" />
         </button>
+        )}
       </PopoverTrigger>
       <PopoverContent className="w-auto p-2" align="start">
         <div className="flex items-center gap-2">

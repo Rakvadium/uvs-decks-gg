@@ -38,4 +38,9 @@ export const UVS_CLIENT_UI = {
   formatCardType: formatUniversusCardType,
   deckStats: UVS_DECK_STATS_PALETTE,
   deckStatsCharts: UVS_DECK_STATS_CHARTS,
+  deckStripCurves: [
+    // Difficulty 0 through 7+; check values start at 1 (no card has a 0 check).
+    { chartId: "difficulty", label: "Diff", min: 0, max: 7 },
+    { chartId: "check", label: "Chk", min: 1 },
+  ],
 } as const satisfies ClientGameUi;

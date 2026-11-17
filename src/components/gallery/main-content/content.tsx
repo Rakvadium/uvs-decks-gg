@@ -2,10 +2,9 @@
 
 import { useCallback, useState } from "react";
 import type { CachedCard } from "@/lib/universus/card-store";
-import { useIsMobile } from "@/hooks/useIsMobile";
 import { useGalleryFilters } from "@/providers/GalleryFiltersProvider";
 import { FloatingPageLayout } from "@/components/shell/floating-page-bar";
-import { FilterTokens, GalleryToolbarProvider, GalleryTopBarFilters } from "../gallery-top-bar-filters";
+import { GalleryToolbarProvider, GalleryTopBarFilters } from "../gallery-top-bar-filters";
 import { GalleryCardMapProvider, useGalleryCardMap } from "./card-map-context";
 import { GalleryDetailsView } from "./details-view";
 import { GalleryGridView } from "./grid-view";
@@ -22,7 +21,6 @@ function GalleryMainContentBody() {
   const [detailsCard, setDetailsCard] = useState<CachedCard | null>(null);
   const filterKey = meta.filteredListKey;
   const setScrollRef = useGalleryMainScrollSetRef();
-  const isMobile = useIsMobile();
 
   const openCardDetails = useCallback((card: CachedCard) => {
     setDetailsCard(card);
@@ -35,8 +33,12 @@ function GalleryMainContentBody() {
   const detailsOpen = detailsCard !== null;
 
   return (
-    <FloatingPageLayout bar={<GalleryTopBarFilters />} pageWash="glow" scrollRef={setScrollRef}>
-      {isMobile ? null : <FilterTokens centered className="mb-4" />}
+    <FloatingPageLayout
+      bar={<GalleryTopBarFilters />}
+      contentClassName="md:pt-[6.5rem]"
+      pageWash="glow"
+      scrollRef={setScrollRef}
+    >
       {state.viewMode === "card" ? (
         <GalleryGridView
           key={filterKey}

@@ -53,6 +53,8 @@ function CyberpunkDeckSetupEditor({
   readOnly,
   mainQuantities,
   deckDescription,
+  summary,
+  controlsEnd,
   overlay,
   className,
 }: GameDeckSetupPanelProps) {
@@ -87,6 +89,7 @@ function CyberpunkDeckSetupEditor({
                 {legendIds.length}/{CYBERPUNK_LEGEND_COUNT}
               </span>
             </Kicker>
+            {!isHero && controlsEnd ? controlsEnd : null}
           </div>
           {overlay}
 
@@ -115,6 +118,7 @@ function CyberpunkDeckSetupEditor({
             getCard={getCard}
             className="border-t border-border/40 pt-3"
           />
+          {!isHero && summary ? <div className="border-t border-divider pt-3 empty:hidden">{summary}</div> : null}
         </section>
       </Panel>
 
