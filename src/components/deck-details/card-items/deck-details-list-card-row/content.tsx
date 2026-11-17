@@ -68,7 +68,7 @@ function DeckCardRowContent() {
         <div
           className={cn(
             "min-w-0 flex flex-1 items-center px-2.5 py-1.5",
-            isOwner && "pr-24 max-md:pr-48"
+            isOwner && "pr-28 max-md:pr-36"
           )}
         >
           <p className="truncate text-xs font-medium leading-tight">{card.name}</p>

@@ -91,6 +91,10 @@ export interface GameDeckSetupPanelProps {
   coverCard?: CachedCard | null;
   deckName?: string;
   deckDescription?: string;
+  /** Sidebar: a full-width section under the setup (the Active Deck panel's curves and type counts). */
+  summary?: ReactNode;
+  /** Sidebar: shown at the end of the setup's control row (the Active Deck panel's card count). */
+  controlsEnd?: ReactNode;
   /** Hero: the deck has no cards (UVS collapses the empty frame on mobile). */
   deckEmpty?: boolean;
   /** Hero: extra overlay rendered inside the panel frame (e.g. the Ready badge). */
@@ -228,6 +232,12 @@ export interface ClientGameUi {
   deckStats: GameDeckStatsPalette;
   /** Charts in the deck stats sidebar, in order. */
   deckStatsCharts: readonly GameDeckStatsChart[];
+  /**
+   * Numeric `deckStatsCharts` (by id) drawn as small stacked curves on the mobile Active Deck strip
+   * and panel, with a short label each. `min` is the first column; `max` is an open-ended last
+   * column ("7+") the curve always reaches. Empty shows only the card count.
+   */
+  deckStripCurves: readonly { chartId: string; label: string; min?: number; max?: number }[];
 }
 
 /** Client-side game module: the shared module plus React components/hooks (`ui`). */

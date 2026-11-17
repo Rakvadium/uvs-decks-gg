@@ -26,7 +26,7 @@ export function DeckCardRowControls() {
 
   return (
     <div
-      className="pointer-events-none absolute right-2 top-1/2 flex -translate-y-1/2 items-center gap-1 opacity-0 transition-opacity duration-150 group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100 max-md:pointer-events-auto max-md:opacity-100 max-md:gap-2 max-md:[--control-h-xs:var(--control-h-md)]"
+      className="pointer-events-none absolute right-1 top-1/2 flex -translate-y-1/2 items-center opacity-0 transition-opacity duration-150 group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100 max-md:pointer-events-auto max-md:opacity-100 max-md:[--control-h-xs:var(--control-h-sm)]"
       onClick={(e) => e.stopPropagation()}
     >
       <Button
@@ -39,7 +39,7 @@ export function DeckCardRowControls() {
         <Minus className="h-3.5 w-3.5 max-md:h-4 max-md:w-4" />
       </Button>
 
-      <span className="chrome-label-case min-w-[26px] text-center text-[10px] text-muted-foreground max-md:min-w-10">
+      <span className="chrome-label-case min-w-5 text-center text-[10px] tabular-nums text-muted-foreground max-md:min-w-6 max-md:text-xs">
         x{count}
       </span>
 
@@ -58,7 +58,6 @@ export function DeckCardRowControls() {
           <Button
             variant="ghost"
             size="icon-xs"
-            className="max-md:ml-0.5"
             data-no-drag
             aria-label={`More actions for ${card.name}`}
           >
